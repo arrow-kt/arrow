@@ -13,26 +13,39 @@ inline val Target.targetNames inline get() = foci.map(Focus::className)
 
 private fun processElement(iso: AnnotatedElement, target: Target): String {
   val foci = target.foci
-  val hasTupleFocus = foci.size > 1
   val letters = ('a'..'v').toList()
 
+  fun Focus.format(): String =
+    "${iso.sourceName}.${paramName.plusIfNotBlank(prefix = "`", postfix = "`")}"
+
   fun tupleConstructor() =
-    foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = { "${iso.sourceName}.${it.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}" })
+    when (foci.size) {
+      1 -> "${iso.sourceName}.${foci.first().paramName}"
+      2 -> "$Pair(${foci[0].format()}, ${foci[1].format()})"
+      3 -> "$Triple(${foci[0].format()}, ${foci[1].format()}, ${foci[2].format()})"
+      else -> foci.joinToString(prefix = "$Tuple${foci.size}(", postfix = ")", transform = Focus::format)
+    }
 
   fun focusType() =
-    if (hasTupleFocus) target.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
-    else target.targetNames.first()
+    when (foci.size) {
+      1 -> target.targetNames.first()
+      2 -> target.targetNames.joinToString(prefix = "$Pair<", postfix = ">")
+      3 -> target.targetNames.joinToString(prefix = "$Triple<", postfix = ">")
+      else -> target.targetNames.joinToString(prefix = "$Tuple${foci.size}<", postfix = ">")
+    }
 
-  fun classConstructorFromTuple(sourceClassName: String, propertiesSize: Int) =
-    (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "tuple.${letters[it]}" })
-
-  val get = if (hasTupleFocus) tupleConstructor() else "${iso.sourceName}.${foci.first().paramName}"
-  val reverseGet = if (hasTupleFocus) "tuple: ${focusType()} -> ${classConstructorFromTuple(iso.sourceClassName, foci.size)}" else "${iso.sourceClassName}(it)"
+  fun classConstructorFromTuple() =
+    when (foci.size) {
+      1 -> "${iso.sourceClassName}(it)"
+      2 -> "pair: ${focusType()} -> ${iso.sourceClassName}(pair.first, pair.second)"
+      3 -> "triple: ${focusType()} -> ${iso.sourceClassName}(triple.first, triple.second, triple.third)"
+      else -> (foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })
+    }
 
   return """
         |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
-        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> $get },
-        |  reverseGet = { $reverseGet }
+        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${tupleConstructor()} },
+        |  reverseGet = { ${classConstructorFromTuple()} }
         |)
         |""".trimMargin()
 }
