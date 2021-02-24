@@ -8,7 +8,6 @@
     - FX           libraries when opening 'arrow-libs/fx'
     - OPTICS       libraries when opening 'arrow-libs/optics'
     - ANK          libraries when opening 'arrow-libs/ank'
-    - INTEGRATIONS libraries when opening 'arrow-libs/integrations'
 
   This distribution is also useful to publish the artifacts from GitHub tasks (the number of
   artifacts for publication into Bintray in a single task is limited).  
@@ -74,11 +73,6 @@ include 'arrow-ank-gradle'
 
 project(":arrow-ank").projectDir = file("ank/arrow-ank")
 project(":arrow-ank-gradle").projectDir = file("ank/arrow-ank-gradle")
-
-// Integrations
-include 'arrow-integrations-retrofit-adapter'
-
-project(":arrow-integrations-retrofit-adapter").projectDir = file("integrations/arrow-integrations-retrofit-adapter")
 
 // Examples
 include 'examples'
