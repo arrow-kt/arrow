@@ -55,10 +55,11 @@ ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
 }
 ```
 ```kotlin:ank
+import arrow.core.Either
 import arrow.core.extensions.option.applicative.*
 
 val liftedFO = ListK.head<Int>().liftF(Option.applicative()) { head ->
-    Option.just(head / 0)
+    Either.catch { head / 0 }.toOption()
 }
 liftedFO(listOf(1, 3, 6).k())
 ```
