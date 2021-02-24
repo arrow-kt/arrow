@@ -1,0 +1,118 @@
+// SIDEBAR menu
+// -----------------------------------------------
+// -----------------------------------------------
+.sidebar-menu {
+  .sidebar-menu-item {
+    &.active {
+      > a,
+      a.active {
+        color: $gray-primary;
+      }
+    }
+
+    &.open {
+
+      .sub-menu {
+        max-height: 1600px;
+      }
+
+      & > button {
+        .fa {
+             @include rotate(90deg);
+        }
+      }
+    }
+
+    button,
+    a {
+      display: flex;
+      padding: 12px 32px;
+      width: 100%;
+      font-size: 1.1rem;
+      font-family: $base-font-family;
+      color: $white;
+      transition: background $base-duration $base-timing;
+
+      .fa {
+            margin-left: ($base-point-grid * 2);
+            font-size: 18px;
+            transition: all .3s;
+            -moz-osx-font-smoothing: unset;
+            pointer-events: none;
+      }
+    }
+
+    a {
+      @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .sub-menu {
+      max-height: 0px;
+      overflow: hidden;
+      transition: max-height 0.8s ease-in-out;
+
+      .sidebar-menu-item {
+        &.active {
+          color: $gray-primary;
+        }
+      }
+
+      a {
+        font-size: 1rem;
+        padding: $base-point-grid ($base-point-grid * 2);
+        @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+
+        &:hover {
+          text-decoration: none;
+        }
+
+        &:before {
+            content: "•";
+            margin-right: ($base-point-grid * 2);
+        }
+      }
+    }
+  }
+}
+
+
+// Sidebar doc versions
+// -----------------------------------------------
+// -----------------------------------------------
+.doc-version-container {
+  margin-top: $base-point-grid * 7;
+    border-top: 1px solid rgba($white, 0.1);
+}
+
+.sidebar-doc-versions {
+      display: flex;
+      justify-content: center;
+
+      #doc-version-dropdown {
+           width: 100%;
+           &.active {
+               > a {
+                 border-color: transparent;
+               }
+               ul {
+                 display: block;
+               }
+             }
+           ul {
+               position: sticky;
+               li {
+                 a {
+                   font-size: 0.800rem;
+                 }
+               }
+
+               li:nth-child(4) {
+                 border-top: solid 1px rgba(255, 255, 255, 0.5);
+               }
+           }
+      }
+}
