@@ -1,7 +1,6 @@
 package arrow.typeclasses
 
-import arrow.fx.IO
-import arrow.fx.handleErrorWith
+import arrow.core.Either
 
 // This code is explained in "Simple dependency management in Kotlin"
 // Video: https://skillsmatter.com/skillscasts/12907-simple-dependency-management-in-kotlin
@@ -14,11 +13,10 @@ typealias Index = Int
 
 data class User(val id: Index)
 
-fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): IO<User> =
-    IO { dao.query("SELECT * FROM Users where id = $i").toUserFromDatabase() }
-        .handleErrorWith {
-            IO { network.fetch(i, mapOf()).toUserFromNetwork() }
-        }
+suspend fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): User =
+  Either.catch {
+    dao.query("SELECT * FROM Users where id = $i").toUserFromDatabase()
+  }.orNull() ?:  network.fetch(i, mapOf()).toUserFromNetwork()
 
 inline fun <A> realWorld(f: () -> A): A = Math.random().let {
     if (it > 0.0003) {

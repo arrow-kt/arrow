@@ -2,46 +2,70 @@
 
 package com.pacoworks.typeclasses.basics.solved
 
-import arrow.Kind
-import arrow.fx.IO
-import arrow.fx.ForIO
-import arrow.fx.extensions.io.async.async
-import arrow.fx.fix
-import arrow.fx.typeclasses.Async
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
 import arrow.typeclasses.NetworkModule
+import arrow.typeclasses.Query
 import arrow.typeclasses.User
-import arrow.typeclasses.solved.RequestOperationsAsync
+import arrow.typeclasses.UserDao
+import arrow.typeclasses.UserDto
+import com.pacoworks.typeclasses.basics.solved.advanced.RequestOperationsAsync
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
-fun <F> RequestOperationsAsync<F>.fetchUser(idx: Index): Kind<F, User> =
+suspend fun RequestOperationsAsync.fetchUser(idx: Index): User =
   idx.fetchUser()
 
-class MyViewModel<F>(dep: RequestOperationsAsync<F>) : RequestOperationsAsync<F> by dep {
+class MyViewModel(dep: RequestOperationsAsync) : RequestOperationsAsync by dep {
+  val scope = CoroutineScope(dep)
+
   fun onStart() {
-    1.fetchUser()
+    scope.launch { 1.fetchUser() }
+  }
+
+  fun onDestroy() {
+    scope.cancel()
   }
 }
 
 class MyActivity {
+  val scope = CoroutineScope(Dispatchers.Main)
+
   fun onStart() {
-    dependenciesAsValues.run { 1.fetchUser() }.fix().unsafeRunSync()
+    dependenciesAsValues.run {
+      scope.launch { 1.fetchUser() }
+    }
 
     runBlocking { dependenciesAsValues.fetchUser(1) }
 
     runBlocking { MyViewModel(dependenciesAsValues).fetchUser(1) }
   }
+
+  fun onDestroy() {
+    scope.cancel()
+  }
 }
 
-val dependenciesAsValues: RequestOperationsAsync<ForIO> =
-  object : RequestOperationsAsync<ForIO>,
-    Async<ForIO> by IO.async() {
-    override val network: NetworkModule = NetworkModule()
-    override val dao: DaoDatabase = DaoDatabase()
-    override val ctx: CoroutineContext = Dispatchers.Default
+val dependenciesAsValues: RequestOperationsAsync =
+  object : RequestOperationsAsync, CoroutineContext by Dispatchers.Default {
+
+    val network: NetworkModule = NetworkModule()
+    val dao: DaoDatabase = DaoDatabase()
+
+    override fun fetch(id: Int, headers: Map<String, String>): UserDto = network.fetch(id, headers)
+
+    override fun fetchAsync(id: Int, headers: Map<String, String>, fe: (Throwable) -> Unit, f: (UserDto) -> Unit) =
+      network.fetchAsync(id, headers, fe, f)
+
+    override fun query(s: Query): UserDao =
+      dao.query(s)
+
+    override fun queryAsync(s: Query, fe: (Throwable) -> Unit, f: (UserDao) -> Unit) =
+      dao.queryAsync(s, fe, f)
   }
 
 // Interlude: Retrofit, Dependency Injection and KEEP 87
