@@ -21,7 +21,6 @@ In this doc, we'll describe all the modules that form the core, alongside a list
 * [arrow-fx-coroutines]({{ '/quickstart/libraries/#arrow-fx-coroutines' | relative_url }})
 * [arrow-fx-stm]({{ '/quickstart/libraries/#arrow-fx-stm' | relative_url }})
 * [arrow-syntax]({{ '/quickstart/libraries/#arrow-syntax' | relative_url }})
-* [arrow-fx-rx2 & arrow-fx-reactor]({{ '/quickstart/libraries/#arrow-fx-rx2&arrow-fx-reactor' | relative_url }})
 * [arrow-mtl]({{ '/quickstart/libraries/#arrow-mtl' | relative_url }})
 * [arrow-mtl-data]({{ '/quickstart/libraries/#arrow-mtl-data' | relative_url }})
 * [arrow-recursion]({{ '/quickstart/libraries/#arrow-recursion' | relative_url }})
@@ -119,23 +118,6 @@ For collections, arrow-syntax provides `firstOption`, tail, basic list traversal
 
 Dependency: `arrow-core`
 
-### arrow-fx-rx2 & arrow-fx-reactor
-
-```groovy
-dependencies {
-    implementation "io.arrow-kt:arrow-fx-rx2:$arrow_version"
-    implementation "io.arrow-kt:arrow-fx-reactor:$arrow_version"
-}
-```
-
-Each of these modules provides wrappers over the datatypes in each of the libraries that implement all the typeclasses provided by arrow-fx
-
-[Rx]({{ 'integrations/rx2/' | relative_url }})
-
-[Reactor]({{ 'integrations/reactor/' | relative_url }})
-
-Dependency: `arrow-fx`
-
 ### arrow-mtl
 
 ```groovy
@@ -183,18 +165,6 @@ dependencies {
 This library includes the datatypes and typeclasses in Recursion schemes.
 
 Dependency: `arrow-core`
-
-### arrow-integrations-retrofit-adapter
-
-```groovy
-dependencies {
-    implementation "io.arrow-kt:arrow-integrations-retrofit-adapter:$arrow_version"
-}
-```
-
-The [adapter]({{ 'integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
-
-Dependency: `arrow-fx`
 
 ### arrow-free
 

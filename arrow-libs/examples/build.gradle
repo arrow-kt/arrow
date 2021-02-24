@@ -11,8 +11,6 @@ dependencies {
     testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testImplementation project(":arrow-annotations")
     testImplementation project(":arrow-core")
-    testImplementation project(":arrow-fx")
-    testImplementation project(":arrow-fx-rx2")
     testImplementation project(":arrow-optics")
     testImplementation project(":arrow-meta")
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow

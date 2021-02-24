@@ -22,7 +22,6 @@ Select applies an effectful computation wrapped in a `Kind<F, (A) -> B>` that wi
 ```kotlin:ank
 import arrow.core.*
 import arrow.core.extensions.*
-import arrow.fx.*
 
 Some<Either<Int, String>>(Left(1))
   .select(Some({ a: Int -> a.toString() }))
