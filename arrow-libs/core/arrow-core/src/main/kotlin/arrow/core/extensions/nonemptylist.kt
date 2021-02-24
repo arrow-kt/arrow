@@ -25,10 +25,12 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Order
@@ -38,15 +40,22 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.combineK as nelCombineK
 
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass."
+)
 interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
   override fun NonEmptyList<A>.combine(b: NonEmptyList<A>): NonEmptyList<A> = this + b
 }
 
+@Deprecated(
+  EqDeprecation
+)
 interface NonEmptyListEq<A> : Eq<NonEmptyList<A>> {
 
   fun EQ(): Eq<A>
@@ -57,16 +66,27 @@ interface NonEmptyListEq<A> : Eq<NonEmptyList<A>> {
     }
 }
 
+@Deprecated(
+  ShowDeprecation
+)
 interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
   fun SA(): Show<A>
   override fun NonEmptyList<A>.show(): String = show(SA())
 }
 
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
 
+@Deprecated(
+  message = "Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListApply : Apply<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
@@ -75,6 +95,10 @@ interface NonEmptyListApply : Apply<ForNonEmptyList> {
     fix().map(f)
 }
 
+@Deprecated(
+  message = "Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
@@ -86,6 +110,10 @@ interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
     NonEmptyList.just(a)
 }
 
+@Deprecated(
+  message = "Monad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListMonad : Monad<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
@@ -103,6 +131,10 @@ interface NonEmptyListMonad : Monad<ForNonEmptyList> {
     NonEmptyList.just(a)
 }
 
+@Deprecated(
+  message = "Comonad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> =
     fix().coflatMap(f)
@@ -114,6 +146,10 @@ interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
     fix().map(f)
 }
 
+@Deprecated(
+  message = "Bimonad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
@@ -137,6 +173,10 @@ interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
     fix().extract()
 }
 
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListFoldable : Foldable<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -148,6 +188,10 @@ interface NonEmptyListFoldable : Foldable<ForNonEmptyList> {
     fix().isEmpty()
 }
 
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
@@ -165,11 +209,19 @@ interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
     fix().isEmpty()
 }
 
+@Deprecated(
+  message = "SemigroupK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
   override fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
     fix().nelCombineK(y)
 }
 
+@Deprecated(
+  message = HashDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListHash<A> : Hash<NonEmptyList<A>> {
   fun HA(): Hash<A>
 
@@ -184,6 +236,10 @@ interface NonEmptyListOrder<A> : Order<NonEmptyList<A>> {
     ListK.order(OA()).run { all.k().compare(b.all.k()) }
 }
 
+@Deprecated(
+  message = "Reducible typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
   fa.reduceRightTo(
     { a -> NonEmptyList.of(a) },
@@ -192,9 +248,17 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
     }
   ).value()
 
+@Deprecated(
+  message = "fx bindings are no longer supported for NonEmptyList. Use mapN or flatMap instead.",
+  level = DeprecationLevel.WARNING
+)
 fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
   NonEmptyList.monad().fx.monad(c).fix()
 
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListEqK : EqK<ForNonEmptyList> {
   override fun <A> Kind<ForNonEmptyList, A>.eqK(other: Kind<ForNonEmptyList, A>, EQ: Eq<A>) =
     (this.fix() to other.fix()).let {
@@ -202,6 +266,10 @@ interface NonEmptyListEqK : EqK<ForNonEmptyList> {
     }
 }
 
+@Deprecated(
+  message = "Semialign typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFunctor {
   override fun <A, B> align(
     a: Kind<ForNonEmptyList, A>,
@@ -216,6 +284,10 @@ interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFuncto
   }
 }
 
+@Deprecated(
+  message = "Zip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListZip : Zip<ForNonEmptyList>, NonEmptyListSemialign {
   override fun <A, B> Kind<ForNonEmptyList, A>.zip(other: Kind<ForNonEmptyList, B>): Kind<ForNonEmptyList, Tuple2<A, B>> =
     (this.fix() to other.fix()).let { nel ->
@@ -223,6 +295,10 @@ interface NonEmptyListZip : Zip<ForNonEmptyList>, NonEmptyListSemialign {
     }
 }
 
+@Deprecated(
+  message = "Unzip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on NonEmptyList.",
+  level = DeprecationLevel.WARNING
+)
 interface NonEmptyListUnzip : Unzip<ForNonEmptyList>, NonEmptyListZip {
   override fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, B>> =
     this.fix().all.let { list ->
