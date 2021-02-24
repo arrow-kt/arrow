@@ -1,6 +1,11 @@
 name: "Build documentation"
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+    - 'arrow-libs/**'
+    - 'arrow-docs/**'
+    - 'arrow-site/**'
 
 jobs:
   build_doc:
