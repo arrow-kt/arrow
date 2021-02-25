@@ -9,7 +9,10 @@ import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.bifunctor.mapLeft
 import arrow.core.identity
 import arrow.core.invalidNel
+import arrow.core.nonEmptyList
+import arrow.core.sequenceValidated
 import arrow.core.validNel
+import arrow.typeclasses.Semigroup
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -63,9 +66,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
     "parTraverseValidated identity is identity" {
       checkAll(Arb.list(Arb.validatedNel(Arb.int(), Arb.int()))) { l ->
         val res = l.parTraverseValidated(NonEmptyList.semigroup(), ::identity)
-        res shouldBe l.sequence(Validated.applicative(NonEmptyList.semigroup()))
-          // TODO Fix with Arrow Core Iterable<A>.traverseValidated
-          .mapLeft { NonEmptyList.fromListUnsafe(it.reversed()) }
+        res shouldBe l.sequenceValidated(Semigroup.nonEmptyList())
       }
     }
 
