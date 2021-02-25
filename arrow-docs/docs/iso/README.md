@@ -108,7 +108,10 @@ When dealing with polymorphic equivalent structures, we can create polymorphic I
 Given our previous structures `Pair<A, B>` and a structure `Tuple2<A, B>`, we can create a polymorphic `PIso` that represents a `get: (Pair<A, B>) -> Tuple2<A, B>` and a `reverseGet: (Tuple2<C, D) -> Pair<C, D>`.
 
 ```kotlin:ank
-data class Tuple2<A, B>(val a: A, val b: B)
+data class Tuple2<A, B>(val a: A, val b: B) {
+  fun reversed(): Tuple2<B, A> =
+    Tuple2(b, a)
+}
 
 fun <A, B, C, D> pair(): PIso<Pair<A, B>, Pair<C, D>, Tuple2<A, B>, Tuple2<C, D>> = PIso(
   { (a, b) -> Tuple2(a, b) },
@@ -121,7 +124,7 @@ this allows us to use functions defined for `Tuple2` for a value of type `Pair`.
 
 ```kotlin:ank
 val reverseTupleAsPair: (Pair<Int, String>) -> Pair<String, Int> =
-  pair<Int, String, String, Int>().lift { tuple: Tuple2<Int, String> -> tuple.b toT tuple.a }
+  pair<Int, String, String, Int>().lift(Tuple2<Int, String>::reversed)
 
 val reverse: Pair<String, Int> = reverseTupleAsPair(5 to "five")
 reverse
