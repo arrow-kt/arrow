@@ -7,7 +7,6 @@ import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.eqK.eqK
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
-import arrow.core.extensions.setk.monoid.monoid
 import arrow.core.extensions.setk.monoidK.monoidK
 import arrow.core.extensions.setk.monoidal.monoidal
 import arrow.core.extensions.setk.semigroupK.semigroupK

@@ -16,7 +16,6 @@ import arrow.core.extensions.sequencek.hash.hash
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monadLogic.monadLogic
-import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
 import arrow.core.extensions.sequencek.order.order
