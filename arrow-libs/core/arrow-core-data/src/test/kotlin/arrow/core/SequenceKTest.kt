@@ -29,6 +29,7 @@ import arrow.core.extensions.sequencek.unzip.unzip
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
+import arrow.core.test.generators.sequence
 import arrow.core.test.generators.sequenceK
 import arrow.core.test.laws.AlignLaws
 import arrow.core.test.laws.CrosswalkLaws
@@ -45,6 +46,8 @@ import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
 import arrow.core.test.laws.UnalignLaws
 import arrow.core.test.laws.UnzipLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -69,7 +72,7 @@ class SequenceKTest : UnitSpec() {
       MonadCombineLaws.laws(SequenceK.monadCombine(), SequenceK.genK(), SequenceK.eqK()),
       ShowLaws.laws(SequenceK.show(Int.show()), EQ, Gen.sequenceK(Gen.int())),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), SequenceK.eqK()),
-      MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
+      MonoidLaws.laws(Monoid.sequence(), Gen.sequence(Gen.int()), Eq { a, b -> a.toList() == b.toList() }),
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
