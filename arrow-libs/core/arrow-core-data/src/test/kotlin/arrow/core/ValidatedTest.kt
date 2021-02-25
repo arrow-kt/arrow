@@ -246,31 +246,31 @@ class ValidatedTest : UnitSpec() {
       Validated.catchNel { loadFromNetwork() } shouldBe Invalid(NonEmptyList(exception))
     }
 
-    with(VAL_AP) {
+    "Cartesian builder should build products over homogeneous Validated" {
+      Validated.mapN(
+        Semigroup.string(),
+        Valid("11th"),
+        Valid("Doctor"),
+        Valid("Who")
+      ) { a, b, c -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
+    }
 
-      "Cartesian builder should build products over homogeneous Validated" {
-        mapN(
-          Valid("11th"),
-          Valid("Doctor"),
-          Valid("Who")
-        ) { (a, b, c) -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
-      }
+    "Cartesian builder should build products over heterogeneous Validated" {
+      Validated.mapN(
+        Semigroup.string(),
+        Valid(13),
+        Valid("Doctor"),
+        Valid(false)
+      ) { a, b, c -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
+    }
 
-      "Cartesian builder should build products over heterogeneous Validated" {
-        mapN(
-          Valid(13),
-          Valid("Doctor"),
-          Valid(false)
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
-      }
-
-      "Cartesian builder should build products over Invalid Validated" {
-        mapN(
-          Invalid("fail1"),
-          Invalid("fail2"),
-          Valid("Who")
-        ) { "success!" } shouldBe Invalid("fail1fail2")
-      }
+    "Cartesian builder should build products over Invalid Validated" {
+      Validated.mapN(
+        Semigroup.string(),
+        Invalid("fail1"),
+        Invalid("fail2"),
+        Valid("Who")
+      ) { _, _, _ -> "success!" } shouldBe Invalid("fail1fail2")
     }
 
     with(VAL_SGK) {
