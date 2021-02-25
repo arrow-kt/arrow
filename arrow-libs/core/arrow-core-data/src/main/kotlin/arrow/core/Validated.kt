@@ -1112,6 +1112,9 @@ inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) 
     }
   }
 
+fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
+  ff.map { this.ap(SE, it) }
+
 @Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
   ReplaceWith("handleErrorWith(f)")
