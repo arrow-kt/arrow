@@ -2,17 +2,13 @@ package arrow.optics.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.ListK
+import arrow.core.Nullable
 import arrow.core.k
-import arrow.core.fix
-import arrow.core.extensions.option.applicative.applicative
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.PPrism
@@ -59,6 +55,7 @@ interface ListKEach<A> : Each<ListK<A>, A> {
   override fun each(): Traversal<ListK<A>, A> =
     ListK.traversal()
 }
+
 /**
  * [FilterIndex] instance definition for [ListK].
  */
@@ -130,9 +127,7 @@ interface ListKCons<A> : Cons<ListK<A>, A> {
 interface ListKSnoc<A> : Snoc<ListK<A>, A> {
   override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
     override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =
-      Option.applicative().mapN(Option.just(s.dropLast(1).k()), s.lastOrNull().toOption(), ::identity)
-        .fix()
-        .toEither { s }
+      Nullable.mapN(s.dropLast(1), s.lastOrNull()) { a, b -> Tuple2(a.k(), b) }?.right() ?: s.left()
 
     override fun reverseGet(b: Tuple2<ListK<A>, A>): ListK<A> =
       ListK(b.a + b.b)

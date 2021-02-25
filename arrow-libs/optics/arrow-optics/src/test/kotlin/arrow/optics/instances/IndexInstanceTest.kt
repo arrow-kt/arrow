@@ -1,8 +1,6 @@
 package arrow.optics.instances
 
-import arrow.core.extensions.eq
 import arrow.core.SequenceK
-import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.index.index
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
@@ -22,7 +20,7 @@ class IndexInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQOptionB = Eq.any(),
-        EQA = SequenceK.eq(String.eq())
+        EQA = Eq.invoke { sequenceK, sequenceK2 -> sequenceK.toList() == sequenceK2.toList() }
       )
     )
   }

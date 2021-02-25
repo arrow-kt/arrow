@@ -1,7 +1,5 @@
 package arrow.optics.std
 
-import arrow.core.ListK
-import arrow.core.Option
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -11,9 +9,8 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.eq.eq
+import arrow.core.int
+import arrow.core.string
 import arrow.optics.first
 import arrow.optics.second
 import arrow.optics.third
@@ -32,6 +29,7 @@ import arrow.core.test.generators.tuple9
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class TupleTest : UnitSpec() {
@@ -46,7 +44,7 @@ class TupleTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = Int.monoid()
+        MB = Monoid.int()
       )
     )
 
@@ -58,7 +56,7 @@ class TupleTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       )
     )
 
@@ -70,7 +68,7 @@ class TupleTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = Int.monoid()
+        MB = Monoid.int()
       )
     )
 
@@ -82,7 +80,7 @@ class TupleTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       )
     )
 
@@ -94,7 +92,7 @@ class TupleTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       )
     )
 
@@ -105,8 +103,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -117,8 +114,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -129,8 +125,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -141,8 +136,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -153,8 +147,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -165,8 +158,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -177,8 +169,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -199,8 +190,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -222,8 +212,7 @@ class TupleTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
   }

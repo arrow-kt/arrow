@@ -673,5 +673,5 @@ fun <A> Monoid.Companion.sequence(): Monoid<Sequence<A>> =
 
 object SequenceMonoid : Monoid<Sequence<Any?>> {
   override fun empty(): Sequence<Any?> = emptySequence()
-  override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = this + b
+  override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = sequenceOf(this, b).flatten()
 }

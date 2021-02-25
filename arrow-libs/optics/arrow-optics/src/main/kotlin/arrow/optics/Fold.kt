@@ -4,14 +4,12 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Const
 import arrow.core.Either
-import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.AndMonoid
-import arrow.core.extensions.listk.monoid.monoid
-import arrow.core.extensions.monoid
 import arrow.core.identity
+import arrow.core.int
+import arrow.core.list
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
 
@@ -76,7 +74,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Calculate the number of targets
    */
-  fun size(s: S) = foldMap(Int.monoid(), s = s, f = { _ -> 1 })
+  fun size(s: S) = foldMap(Monoid.int(), s = s, f = { _ -> 1 })
 
   /**
    * Check if all targets satisfy the predicate
@@ -116,7 +114,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get all targets of the [Fold]
    */
-  fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s) { ListK.just(it) }
+  fun getAll(s: S): List<A> = foldMap(Monoid.list(), s) { listOf(it) }
 
   /**
    * Join two [Fold] with the same target

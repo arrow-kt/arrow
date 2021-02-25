@@ -5,8 +5,6 @@ import arrow.core.Either
 import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
-import arrow.core.extensions.either.traverse.traverse
-import arrow.core.fix
 import arrow.typeclasses.Applicative
 
 /**
@@ -31,7 +29,5 @@ fun <A, B> Either.Companion.toValidated(): Iso<Either<A, B>, Validated<A, B>> = 
 fun <L, R> PTraversal.Companion.either(): Traversal<Either<L, R>, R> =
   object : Traversal<Either<L, R>, R> {
     override fun <F> modifyF(FA: Applicative<F>, s: Either<L, R>, f: (R) -> Kind<F, R>): Kind<F, Either<L, R>> =
-      with(Either.traverse<L>()) {
-        FA.run { s.traverse(FA, f).map { it.fix() } }
-      }
+      TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
   }

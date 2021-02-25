@@ -6,16 +6,14 @@ import arrow.core.ListExtensions
 import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.None
+import arrow.core.Nullable
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.extensions.option.applicative.applicative
-import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toOption
 import arrow.core.toT
 import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.FilterIndex
@@ -206,9 +204,7 @@ fun <A> List<A>.uncons(): Option<Tuple2<A, List<A>>> =
 fun <A> listSnoc(): Snoc<List<A>, A> = Snoc {
   object : Prism<List<A>, Tuple2<List<A>, A>> {
     override fun getOrModify(s: List<A>): Either<List<A>, Tuple2<List<A>, A>> =
-      Option.applicative().mapN(Option.just(s.dropLast(1)), s.lastOrNull().toOption(), ::identity)
-        .fix()
-        .toEither { s }
+      Nullable.mapN(s.dropLast(1), s.lastOrNull(), ::Tuple2)?.right() ?: s.left()
 
     override fun reverseGet(b: Tuple2<List<A>, A>): List<A> =
       b.a + b.b

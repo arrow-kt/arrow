@@ -2,7 +2,6 @@ package arrow.optics.extensions
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.core.extensions.option.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.typeclasses.Applicative
@@ -22,9 +21,8 @@ import arrow.typeclasses.Applicative
   DeprecationLevel.WARNING
 )
 fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> = object : Traversal<Option<A>, A> {
-  override fun <F> modifyF(FA: Applicative<F>, s: Option<A>, f: (A) -> Kind<F, A>): Kind<F, Option<A>> = with(Option.traverse()) {
-    s.traverse(FA, f)
-  }
+  override fun <F> modifyF(FA: Applicative<F>, s: Option<A>, f: (A) -> Kind<F, A>): Kind<F, Option<A>> =
+    TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
 }
 
 /**

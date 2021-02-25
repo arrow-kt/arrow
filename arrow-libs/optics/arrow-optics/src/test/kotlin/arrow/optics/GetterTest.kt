@@ -4,10 +4,11 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.extensions.monoid
 import arrow.core.k
+import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.toT
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -47,13 +48,13 @@ class GetterTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(genToken) { token ->
-          combineAll(String.monoid(), token) == token.value
+          combineAll(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genToken) { token ->
-          fold(String.monoid(), token) == token.value
+          fold(Monoid.string(), token) == token.value
         }
       }
 

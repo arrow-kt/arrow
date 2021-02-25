@@ -2,8 +2,6 @@ package arrow.optics.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.fix
-import arrow.core.extensions.either.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.typeclasses.Applicative
@@ -20,9 +18,8 @@ import arrow.typeclasses.Applicative
   DeprecationLevel.WARNING
 )
 fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : Traversal<Either<L, R>, R> {
-  override fun <F> modifyF(FA: Applicative<F>, s: Either<L, R>, f: (R) -> Kind<F, R>): Kind<F, Either<L, R>> = with(Either.traverse<L>()) {
-    FA.run { s.traverse(FA, f).map { it.fix() } }
-  }
+  override fun <F> modifyF(FA: Applicative<F>, s: Either<L, R>, f: (R) -> Kind<F, R>): Kind<F, Either<L, R>> =
+    TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
 }
 
 /**

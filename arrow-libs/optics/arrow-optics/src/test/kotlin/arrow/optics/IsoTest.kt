@@ -1,15 +1,10 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.monoid
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.option.functor.functor
 import arrow.core.toT
-import arrow.core.ListK
 import arrow.core.k
+import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.IsoLaws
@@ -19,6 +14,7 @@ import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -39,7 +35,7 @@ class IsoTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       ),
 
       PrismLaws.laws(
@@ -57,8 +53,7 @@ class IsoTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -67,7 +62,7 @@ class IsoTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       SetterLaws.laws(
@@ -85,7 +80,7 @@ class IsoTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        bMonoid = String.monoid()
+        bMonoid = Monoid.string()
       )
     )
 
@@ -117,13 +112,13 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(genToken) { token ->
-          combineAll(String.monoid(), token) == token.value
+          combineAll(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genToken) { token ->
-          fold(String.monoid(), token) == token.value
+          fold(Monoid.string(), token) == token.value
         }
       }
 
@@ -164,14 +159,6 @@ class IsoTest : UnitSpec() {
     "Lifting a function should yield the same result as not yielding" {
       forAll(genToken, Gen.string()) { token, value ->
         tokenIso.modify(token) { value } == tokenIso.lift { value }(token)
-      }
-    }
-
-    "Lifting a function as a functor should yield the same result as not yielding" {
-      forAll(genToken, Gen.string()) { token, value ->
-        tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF(Option.functor()) { Some(value) }(
-          token
-        )
       }
     }
 

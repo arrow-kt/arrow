@@ -1,10 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.list.traverse.sequence
 import arrow.core.left
 import arrow.core.right
+import arrow.core.sequenceEither
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -61,7 +60,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val res = l.parTraverseEither { it }
 
         if (containsError) l.contains(res) shouldBe true
-        else res shouldBe l.sequence(Either.applicative())
+        else res shouldBe l.sequenceEither()
       }
     }
 

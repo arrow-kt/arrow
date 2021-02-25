@@ -1,27 +1,21 @@
 package arrow.optics
 
 import arrow.core.Left
-import arrow.core.ListK
 import arrow.core.None
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.extensions.list.foldable.nonEmpty
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.eq.eq
 import arrow.core.getOrElse
 import arrow.core.identity
+import arrow.core.int
 import arrow.core.k
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
 import arrow.core.test.generators.tuple2
 import arrow.core.toOption
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -36,7 +30,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -47,7 +41,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -58,7 +52,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.tuple2(Gen.int(), Gen.bool()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -69,7 +63,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.tuple2(Gen.int(), Gen.bool()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -80,7 +74,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.tuple2(Gen.bool(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.bool(), Gen.int())),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -91,8 +85,7 @@ class OptionalTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -141,15 +134,15 @@ class OptionalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll { ints: List<Int> ->
-          combineAll(Int.monoid(), ints) ==
-            ints.firstOrNull().toOption().fold({ Int.monoid().empty() }, ::identity)
+          combineAll(Monoid.int(), ints) ==
+            ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll { ints: List<Int> ->
-          fold(Int.monoid(), ints) ==
-            ints.firstOrNull().toOption().fold({ Int.monoid().empty() }, ::identity)
+          fold(Monoid.int(), ints) ==
+            ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
 
@@ -191,13 +184,6 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    "LiftF should be consistent with modifyF" {
-      forAll(Gen.list(Gen.int()), Gen.option(Gen.int())) { list, tryInt ->
-        val f = { _: Int -> tryInt }
-        Optional.listHead<Int>().liftF(Option.applicative(), f)(list) == Optional.listHead<Int>().modifyF(Option.applicative(), list, f)
-      }
-    }
-
     "Checking if a target exists" {
       forAll(Gen.list(Gen.int())) { list ->
         Optional.listHead<Int>().isEmpty(list) == list.isEmpty()
@@ -206,13 +192,13 @@ class OptionalTest : UnitSpec() {
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        Optional.listHead<Int>().find(list) { predicate }.fold({ false }, { true }) == (predicate && list.nonEmpty())
+        Optional.listHead<Int>().find(list) { predicate }.fold({ false }, { true }) == (predicate && list.isNotEmpty())
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        Optional.listHead<Int>().exists(list) { predicate } == (predicate && list.nonEmpty())
+        Optional.listHead<Int>().exists(list) { predicate } == (predicate && list.isNotEmpty())
       }
     }
 

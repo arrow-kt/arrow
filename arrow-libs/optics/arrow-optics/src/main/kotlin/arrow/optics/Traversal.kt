@@ -4,16 +4,12 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Const
 import arrow.core.Either
-import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.AndMonoid
-import arrow.core.extensions.const.applicative.applicative
-import arrow.core.extensions.listk.monoid.monoid
-import arrow.core.extensions.monoid
 import arrow.core.identity
-import arrow.core.value
+import arrow.core.int
+import arrow.core.list
 import arrow.optics.typeclasses.Id
 import arrow.optics.typeclasses.fix
 import arrow.optics.typeclasses.idApplicative
@@ -221,7 +217,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
-    modifyF(Const.applicative(M), s) { b -> Const<R, B>(f(b)) }.value()
+    TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
 
   /**
    * Fold using the given [Monoid] instance.
@@ -236,7 +232,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Get all foci of the [PTraversal]
    */
-  fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s) { ListK(listOf(it)) }
+  fun getAll(s: S): List<A> = foldMap(Monoid.list(), s) { listOf(it) }
 
   /**
    * Set polymorphically the target of a [PTraversal] with a value
@@ -246,7 +242,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Calculate the number of targets in the [PTraversal]
    */
-  fun size(s: S): Int = foldMap(Int.monoid(), s) { 1 }
+  fun size(s: S): Int = foldMap(Monoid.int(), s) { 1 }
 
   /**
    * Check if there is no target
@@ -351,7 +347,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(s: S, f: (A) -> R, M: Monoid<R>): R =
-    modifyF(Const.applicative(M), s) { b -> Const(f(b)) }.value()
+    TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
 
   /**
    * Modify polymorphically the target of a [PTraversal] with a function [f]

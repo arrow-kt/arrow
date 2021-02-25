@@ -1,13 +1,8 @@
 package arrow.optics.instances
 
-import arrow.core.ListK
 import arrow.core.MapK
-import arrow.core.Option
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.option.monoid.monoid
-import arrow.core.extensions.semigroup
+import arrow.core.int
+import arrow.core.option
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
@@ -27,6 +22,8 @@ import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 
 class MapInstanceTest : UnitSpec() {
@@ -40,8 +37,7 @@ class MapInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -52,8 +48,7 @@ class MapInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -64,8 +59,7 @@ class MapInstanceTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -76,8 +70,7 @@ class MapInstanceTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -111,7 +104,7 @@ class MapInstanceTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.option(Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = Option.monoid(Int.monoid())
+        MB = Monoid.option(Semigroup.int())
       )
     )
 
@@ -123,7 +116,7 @@ class MapInstanceTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.option(Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = Option.monoid(Int.semigroup())
+        MB = Monoid.option(Semigroup.int())
       )
     )
   }

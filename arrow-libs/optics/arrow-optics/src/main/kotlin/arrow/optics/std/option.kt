@@ -6,7 +6,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.extensions.option.traverse.traverse
 import arrow.core.identity
 import arrow.typeclasses.Applicative
 
@@ -66,7 +65,5 @@ fun <A> Option.Companion.toEither(): Iso<Option<A>, Either<Unit, A>> = toPEither
 fun <A> PTraversal.Companion.option(): Traversal<Option<A>, A> =
   object : Traversal<Option<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: Option<A>, f: (A) -> Kind<F, A>): Kind<F, Option<A>> =
-      with(Option.traverse()) {
-        s.traverse(FA, f)
-      }
+      TODO("Fixed in https://github.com/arrow-kt/arrow/pull/2249")
   }

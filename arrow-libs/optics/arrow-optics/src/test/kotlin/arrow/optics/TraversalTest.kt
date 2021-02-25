@@ -1,13 +1,7 @@
 package arrow.optics
 
-import arrow.Kind
-import arrow.core.ForListK
-import arrow.core.ListK
 import arrow.core.Option
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.listk.traverse.traverse
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.eq.eq
+import arrow.core.int
 import arrow.core.k
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
@@ -18,6 +12,7 @@ import arrow.core.toT
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -25,25 +20,24 @@ class TraversalTest : UnitSpec() {
 
   init {
 
-    val listKTraverse = Traversal.fromTraversable<ForListK, Int, Int>(ListK.traverse())
+    val listKTraverse = Traversal.list<Int>()
 
     testLaws(
       TraversalLaws.laws(
         traversal = listKTraverse,
-        aGen = Gen.listK(Gen.int()).map<Kind<ForListK, Int>> { it },
+        aGen = Gen.list(Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       SetterLaws.laws(
         setter = listKTraverse.asSetter(),
-        aGen = Gen.listK(Gen.int()).map<Kind<ForListK, Int>> { it },
+        aGen = Gen.list(Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = ListK.eq(Eq.any())
+        EQA = Eq.any()
       )
     )
 
@@ -54,8 +48,7 @@ class TraversalTest : UnitSpec() {
         bGen = Gen.float(),
         funcGen = Gen.functionAToB(Gen.float()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -87,13 +80,13 @@ class TraversalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(Gen.listK(Gen.int())) { ints ->
-          combineAll(Int.monoid(), ints) == ints.sum()
+          combineAll(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(Gen.listK(Gen.int())) { ints ->
-          fold(Int.monoid(), ints) == ints.sum()
+          fold(Monoid.int(), ints) == ints.sum()
         }
       }
 
@@ -120,13 +113,13 @@ class TraversalTest : UnitSpec() {
 
       "Folding all the values of a traversal" {
         forAll(Gen.list(Gen.int())) { ints ->
-          fold(Int.monoid(), ints.k()) == ints.sum()
+          fold(Monoid.int(), ints.k()) == ints.sum()
         }
       }
 
       "Combining all the values of a traversal" {
         forAll(Gen.list(Gen.int())) { ints ->
-          combineAll(Int.monoid(), ints.k()) == ints.sum()
+          combineAll(Monoid.int(), ints.k()) == ints.sum()
         }
       }
 

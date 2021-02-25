@@ -1,12 +1,6 @@
 package arrow.optics.instances
 
 import arrow.core.ListK
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.core.extensions.eq
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.listK
@@ -39,8 +33,7 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -51,8 +44,7 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -63,7 +55,6 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQListB = Eq.any(),
         EQOptionB = Eq.any()
       )
     )
@@ -75,7 +66,6 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQListB = Eq.any(),
         EQOptionB = Eq.any()
       )
     )
@@ -108,8 +98,8 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.listK(Gen.int()),
         bGen = Gen.tuple2(Gen.int(), Gen.listK(Gen.int())),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.listK(Gen.int()))),
-        EQA = ListK.eq(Int.eq()),
-        EQOptionB = Option.eq(Tuple2.eq(Int.eq(), ListK.eq(Int.eq())))
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
       )
     )
 
@@ -120,7 +110,7 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.tuple2(Gen.int(), Gen.list(Gen.int())),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.list(Gen.int()))),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Tuple2.eq(Int.eq(), Eq.any()))
+        EQOptionB = Eq.any()
       )
     )
 
@@ -130,8 +120,8 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.listK(Gen.int()),
         bGen = Gen.tuple2(Gen.listK(Gen.int()), Gen.int()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.listK(Gen.int()), Gen.int())),
-        EQA = ListK.eq(Int.eq()),
-        EQOptionB = Option.eq(Tuple2.eq(ListK.eq(Int.eq()), Int.eq()))
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
       )
     )
 
@@ -142,7 +132,7 @@ class ListInstanceTest : UnitSpec() {
         bGen = Gen.tuple2(Gen.list(Gen.int()), Gen.int()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.list(Gen.int()), Gen.int())),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Tuple2.eq(Eq.any(), Int.eq()))
+        EQOptionB = Eq.any()
       )
     )
   }

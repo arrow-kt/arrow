@@ -1,10 +1,10 @@
 package arrow.core
 
-import arrow.core.extensions.endo.monoid.monoid
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.endo
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class EndoTest : UnitSpec() {
@@ -14,7 +14,7 @@ class EndoTest : UnitSpec() {
 
   init {
     testLaws(
-      MonoidLaws.laws(Endo.monoid(), Gen.endo(Gen.int()), EQ)
+      MonoidLaws.laws(Monoid.endo(), Gen.endo(Gen.int()), EQ)
     )
   }
 }

@@ -1,18 +1,12 @@
 package arrow.optics.test.laws
 
-import arrow.core.Const
-import arrow.core.None
 import arrow.core.Option
-import arrow.core.Some
 import arrow.core.compose
-import arrow.core.extensions.const.applicative.applicative
 import arrow.core.identity
-import arrow.core.value
 import arrow.optics.Optional
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -31,14 +25,7 @@ object OptionalLaws {
     Law("Optional Law: set is idempotent") { setIdempotent(optionalGen, aGen, bGen, EQA) },
     Law("Optional Law: modify identity = identity") { modifyIdentity(optionalGen, aGen, EQA) },
     Law("Optional Law: compose modify") { composeModify(optionalGen, aGen, funcGen, EQA) },
-    Law("Optional Law: consistent set with modify") { consistentSetModify(optionalGen, aGen, bGen, EQA) },
-    Law("Optional Law: consistent getOption with modify identity") {
-      consistentGetOptionModifyId(
-        optionalGen,
-        aGen,
-        EQOptionB
-      )
-    }
+    Law("Optional Law: consistent set with modify") { consistentSetModify(optionalGen, aGen, bGen, EQA) }
   )
 
   /**
@@ -105,27 +92,4 @@ object OptionalLaws {
           .equalUnderTheLaw(modify(a) { b }, EQA)
       }
     }
-
-  fun <A, B> consistentGetOptionModifyId(
-    optionalGen: Gen<Optional<A, B>>,
-    aGen: Gen<A>,
-    EQOptionB: Eq<Option<B>>
-  ) {
-    val firstMonoid = object : Monoid<FirstOption<B>> {
-      override fun empty(): FirstOption<B> = FirstOption(None)
-      override fun FirstOption<B>.combine(b: FirstOption<B>): FirstOption<B> =
-        if (option.fold({ false }, { true })) this else b
-    }
-
-    forAll(optionalGen, aGen) { optional, a ->
-      optional.run {
-        modifyF(Const.applicative(firstMonoid), a) { b ->
-          Const(FirstOption(Some(b)))
-        }.value().option.equalUnderTheLaw(getOption(a), EQOptionB)
-      }
-    }
-  }
-
-  @PublishedApi
-  internal data class FirstOption<A>(val option: Option<A>)
 }

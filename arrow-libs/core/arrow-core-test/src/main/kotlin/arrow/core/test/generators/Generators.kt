@@ -26,9 +26,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.Validated
-import arrow.core.extensions.listk.semialign.semialign
-import arrow.core.extensions.sequencek.semialign.semialign
-import arrow.core.fix
+import arrow.core.align
 import arrow.core.k
 import arrow.core.left
 import arrow.core.right
@@ -163,6 +161,9 @@ fun <A> Gen.Companion.listK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map { 
 
 fun <A> Gen.Companion.sequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map { it.asSequence().k() }
 
+fun <A> Gen.Companion.sequence(genA: Gen<A>): Gen<Sequence<A>> =
+  Gen.list(genA).map { it.asSequence() }
+
 fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
 
 fun Gen.Companion.unit(): Gen<Unit> =
@@ -187,14 +188,12 @@ fun <A> Gen<A>.hashed(HA: Hash<A>): Gen<Hashed<A>> = map { v -> Hashed(HA.run { 
 private fun <A, B, R> Gen<A>.alignWith(genB: Gen<B>, transform: (Ior<A, B>) -> R): Gen<R> =
   object : Gen<R> {
     override fun constants(): Iterable<R> =
-      ListK.semialign().run {
-        alignWith(this@alignWith.constants().toList().k(), genB.constants().toList().k(), transform)
-      }.fix()
+      this@alignWith.constants()
+        .align(genB.constants(), transform)
 
     override fun random(): Sequence<R> =
-      SequenceK.semialign().run {
-        alignWith(this@alignWith.random().k(), genB.random().k(), transform)
-      }.fix()
+      this@alignWith.random()
+        .align(genB.random(), transform)
   }
 
 fun Gen.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Gen<suspend () -> Either<Any, Any>> =

@@ -1,16 +1,14 @@
 package arrow.ank
 
-import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.ValidatedNel
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.nonemptylist.semigroup.semigroup
-import arrow.core.extensions.validated.applicative.applicative
-import arrow.core.fix
 import arrow.core.invalidNel
+import arrow.core.nonEmptyList
+import arrow.core.sequenceValidated
 import arrow.core.toT
 import arrow.core.validNel
 import arrow.fx.coroutines.nonFatalOrThrow
+import arrow.typeclasses.Semigroup
 import java.nio.file.Path
 import kotlin.math.ln
 import kotlin.math.pow
@@ -57,7 +55,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
     }
 
     acc + res
-  }.sequence(ValidatedNel.applicative(NonEmptyList.semigroup<Throwable>())).fix()
+  }.sequenceValidated(Semigroup.nonEmptyList())
 
   validatedPaths.fold({ errors ->
     val separator = "\n----------------------------------------------------------------\n"
@@ -69,7 +67,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
         it.msg
       })
   }, { paths ->
-    val message = colored(ANSI_GREEN, "Ank Processed ${paths.fix().size} files")
+    val message = colored(ANSI_GREEN, "Ank Processed ${paths.size} files")
     printConsole(message)
   })
 }

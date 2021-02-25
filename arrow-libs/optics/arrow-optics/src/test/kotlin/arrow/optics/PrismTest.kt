@@ -1,14 +1,10 @@
 package arrow.optics
 
-import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.ListK
 import arrow.core.k
-import arrow.core.extensions.monoid
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
+import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
@@ -18,6 +14,7 @@ import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -48,8 +45,7 @@ class PrismTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -58,7 +54,7 @@ class PrismTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -145,15 +141,15 @@ class PrismTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(genSum) { sum: SumType ->
-          combineAll(String.monoid(), sum) ==
-            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+          combineAll(Monoid.string(), sum) ==
+            sumPrism.getOption(sum).fold({ Monoid.string().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genSum) { sum: SumType ->
-          fold(String.monoid(), sum) ==
-            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+          fold(Monoid.string(), sum) ==
+            sumPrism.getOption(sum).fold({ Monoid.string().empty() }, ::identity)
         }
       }
 

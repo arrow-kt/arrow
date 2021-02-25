@@ -3,12 +3,7 @@ package arrow.optics.instances
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.NonEmptyList
-import arrow.core.Option
 import arrow.core.SequenceK
-import arrow.core.extensions.eq
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
@@ -39,7 +34,6 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQListB = Eq.any(),
         EQOptionB = Eq.any()
       )
     )
@@ -51,7 +45,6 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQListB = Eq.any(),
         EQOptionB = Eq.any()
       )
     )
@@ -63,8 +56,7 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -74,9 +66,8 @@ class FilterIndexInstanceTest : UnitSpec() {
         aGen = Gen.sequenceK(Gen.char()),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = SequenceK.eq(Char.eq()),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.invoke { sequenceK, sequenceK2 -> sequenceK.toList() == sequenceK2.toList() },
+        EQOptionB = Eq.any()
       )
     )
 
@@ -87,8 +78,7 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -99,8 +89,7 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -111,8 +100,7 @@ class FilterIndexInstanceTest : UnitSpec() {
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
   }
