@@ -138,7 +138,7 @@ In the scope of `Index`, you don't need to specify the instance, so we can enabl
 
 ```kotlin:ank
 Index.list<Employee>().run {
-  Employees.employees[0].company.address.street.name.getOption(updatedJohn)
+  Employees.employees[0].company.address.street.name.getOrNull(updatedJohn)
 }
 ```
 

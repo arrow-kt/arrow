@@ -111,8 +111,8 @@ Given our previous structures `Pair<A, B>` and a structure `Tuple2<A, B>`, we ca
 data class Tuple2<A, B>(val a: A, val b: B)
 
 fun <A, B, C, D> pair(): PIso<Pair<A, B>, Pair<C, D>, Tuple2<A, B>, Tuple2<C, D>> = PIso(
-  { pair -> pair.first toT pair.second },
-  { tuple -> tuple.a to tuple.b }
+  { (a, b) -> Tuple2(a, b) },
+  { (a, b) -> a to b }
 )
 ```
 
