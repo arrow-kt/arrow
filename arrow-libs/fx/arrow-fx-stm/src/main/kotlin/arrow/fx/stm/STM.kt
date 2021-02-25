@@ -96,6 +96,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * import arrow.fx.stm.STM
  * import kotlinx.coroutines.runBlocking
  * import kotlinx.coroutines.async
+ * import kotlinx.coroutines.delay
  *
  * //sampleStart
  * fun STM.transfer(from: TVar<Int>, to: TVar<Int>, amount: Int): Unit {
@@ -124,7 +125,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *   println("Balance account 2: ${acc2.unsafeRead()}")
  *   async {
  *     println("Sending money - Searching")
- *     sleep(2.seconds)
+ *     delay(2000)
  *     println("Sending money - Found some")
  *     atomically { acc1.write(100_000_000) }
  *   }
