@@ -20,12 +20,12 @@ class PredefTest : ArrowFxSpec(
         val x = i.suspended()
           .startCoroutineUninterceptedOrReturn(
             Continuation(EmptyCoroutineContext) {
-              promise.complete(it.getOrThrow())
+              it.fold(promise::complete, promise::completeExceptionally)
             }
           )
 
         x shouldBe COROUTINE_SUSPENDED
-        promise.join() shouldBe i
+        promise.await() shouldBe i
       }
     }
 

@@ -8,8 +8,8 @@ import arrow.core.Tuple3
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
 import arrow.core.toT
-import arrow.fx.coroutines.IOPool
-import arrow.fx.coroutines.evalOn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentMap
 import javax.script.ScriptContext
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
+import kotlin.streams.asSequence
 
 val extensionMappings = mapOf(
   "java" to "java",
@@ -95,13 +96,13 @@ val interpreter: AnkOps = object : AnkOps {
     }
 
   override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
-    evalOn(IOPool) { Files.walk(this) }
+    withContext(Dispatchers.IO) { Files.walk(this@ankFiles) }
       .filter { Files.isDirectory(it).not() }
       .filter { path ->
         SupportedMarkdownExtensions.fold(false) { c, ext ->
           c || path.toString().endsWith(ext)
         } && path.containsAnkSnippets()
-      }.iterator().asSequence().mapIndexed { index, path ->
+      }.asSequence().mapIndexed { index, path ->
         AnkProcessingContext(index, path)
       }
 
