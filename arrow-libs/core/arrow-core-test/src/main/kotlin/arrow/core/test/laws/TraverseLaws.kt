@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Const
 import arrow.core.Eval
 import arrow.core.Tuple2
@@ -49,6 +50,7 @@ fun <F, G> ComposedApplicative(apF: Applicative<F>, apG: Applicative<G>): Applic
   override fun <A> just(a: A): Kind<Nested<F, G>, A> = apF.just(apG.just(a)).nest()
 }
 
+@Deprecated(KindDeprecation)
 object TraverseLaws {
   fun <F> laws(TF: Traverse<F>, GA: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val GEN = GENK.genK(Gen.intSmall())

@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.andThen
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK2
@@ -11,6 +12,7 @@ import arrow.typeclasses.Profunctor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object ProfunctorLaws {
 
   fun <F> laws(PF: Profunctor<F>, GENK: GenK2<F>, EQK: EqK2<F>): List<Law> {

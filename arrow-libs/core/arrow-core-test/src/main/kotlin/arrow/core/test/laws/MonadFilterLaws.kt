@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.functionAToB
@@ -13,6 +14,7 @@ import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object MonadFilterLaws {
 
   private fun <F> monadFilterLaws(

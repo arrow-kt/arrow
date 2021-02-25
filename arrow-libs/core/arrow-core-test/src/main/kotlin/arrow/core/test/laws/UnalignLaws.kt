@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Ior
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
@@ -16,6 +17,7 @@ import arrow.typeclasses.Unalign
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object UnalignLaws {
   fun <F> laws(
     UA: Unalign<F>,
