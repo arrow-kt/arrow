@@ -115,7 +115,7 @@ fun <E, A, B> Sequence<A>.flatTraverseEither(f: (A) -> Either<E, Sequence<B>>): 
 
 fun <E, A, B> Sequence<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Sequence<B>>): Validated<E, Sequence<B>> =
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: Sequence<B> -> b + bs }  } })
+    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: Sequence<B> -> b + bs } } })
   }.value()
 
 fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
@@ -466,7 +466,7 @@ fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
 fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(Eval.now(emptySequence<B>().right())) { a, acc ->
+  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, acc ->
     f(a).apEval(acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
   }.value()
 
