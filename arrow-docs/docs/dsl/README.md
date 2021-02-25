@@ -146,6 +146,6 @@ Since [Index]({{ '/optics/index' | relative_url }}) returns an [Optional]({{ '/o
 
 ```kotlin:ank
 Index.list<Employee>().run {
-  Employees.employees[2].company.address.street.name.getOption(employees)
+  Employees.employees[2].company.address.street.name.getOrNull(employees)
 }
 ```

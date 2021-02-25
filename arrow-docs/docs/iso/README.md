@@ -116,12 +116,14 @@ fun <A, B, C, D> pair(): PIso<Pair<A, B>, Pair<C, D>, Tuple2<A, B>, Tuple2<C, D>
 )
 ```
 
-`PIso` (defined above) can lift a `reverse` function of `(Pair<A, B>) -> Tuple2<B, A>` to a function `(Tuple2<A, B>) -> Pair<B, A>`.
+`PIso` (defined above) can lift a `reverse` function of `(Tuple2<A, B>) -> Tuple2<B, A>` to a function `(Pair<A, B>) -> Pair<B, A>`,
+this allows us to use functions defined for `Tuple2` for a value of type `Pair`.
 
 ```kotlin:ank
-val reverseTupleAsPair: (Tuple2<Int, String>) -> Pair<String, Int> =
-        pair<Int, String, String, Int>().lift { intStringPair -> intStringPair.second toT intStringPair.first }
-val reverse: Pair<String, Int> = reverseTupleAsPair(5 toT "five")
+val reverseTupleAsPair: (Pair<Int, String>) -> Pair<String, Int> =
+  pair<Int, String, String, Int>().lift { tuple: Tuple2<Int, String> -> tuple.b toT tuple.a }
+
+val reverse: Pair<String, Int> = reverseTupleAsPair(5 to "five")
 reverse
 //(five, 5)
 ```
