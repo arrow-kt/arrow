@@ -2,11 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.Validated
-import arrow.core.extensions.list.traverse.sequence
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
-import arrow.core.extensions.validated.applicative.applicative
-import arrow.core.extensions.validated.bifunctor.mapLeft
 import arrow.core.identity
 import arrow.core.invalidNel
 import arrow.core.nonEmptyList
