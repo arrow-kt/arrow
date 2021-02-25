@@ -163,6 +163,8 @@ fun <A> Gen.Companion.listK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map { 
 
 fun <A> Gen.Companion.sequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map { it.asSequence().k() }
 
+fun <A> Gen.Companion.sequence(genA: Gen<A>): Gen<Sequence<A>> = Gen.list(genA).map { it.asSequence() }
+
 fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
 
 fun Gen.Companion.unit(): Gen<Unit> =
