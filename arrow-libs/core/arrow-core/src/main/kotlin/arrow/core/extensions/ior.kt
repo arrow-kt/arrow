@@ -357,5 +357,14 @@ interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
     }
 }
 
+@Deprecated(
+  "component1 for Ior is deprecated. Use leftOrNull() instead",
+  ReplaceWith("leftOrNull()")
+)
 operator fun <L, R> Ior<L, R>.component1(): L? = leftOrNull()
+
+@Deprecated(
+  "component2 for Ior is deprecated. Use orNull() instead",
+  ReplaceWith("orNull()")
+)
 operator fun <L, R> Ior<L, R>.component2(): R? = orNull()
