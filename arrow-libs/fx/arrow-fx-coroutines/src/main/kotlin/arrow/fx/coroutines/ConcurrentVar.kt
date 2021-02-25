@@ -42,8 +42,7 @@ import kotlinx.atomicfu.atomic
  * > Note that this only works if all operations over the [ConcurrentVar] follow the pattern of first taking and then putting back both exactly once and in order.
  *  Or use the helpers to also be safe in case of exceptions and cancellation.
  */
-// TODO benchmark against Channel(1), if Channel(1) is faster deprecate ConcurrentVar.
-// Channel(1) uses locks.
+@Deprecated("ConcurrentVar is deprecated in favor of kotlinx.coroutines.channels.Channel(1).")
 interface ConcurrentVar<A> {
 
   /**
