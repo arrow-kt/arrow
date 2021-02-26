@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
@@ -19,6 +20,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.runBlocking
 
+@Deprecated(KindDeprecation)
 object ApplicativeErrorLaws {
 
   fun <F> laws(AE: ApplicativeError<F, Throwable>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

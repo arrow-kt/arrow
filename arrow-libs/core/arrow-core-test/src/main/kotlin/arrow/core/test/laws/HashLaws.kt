@@ -2,9 +2,11 @@ package arrow.core.test.laws
 
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(HashDeprecation)
 object HashLaws {
 
   fun <F> laws(HF: Hash<F>, G: Gen<F>, EQ: Eq<F>): List<Law> =

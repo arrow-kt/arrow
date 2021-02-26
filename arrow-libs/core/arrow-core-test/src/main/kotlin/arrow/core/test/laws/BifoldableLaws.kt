@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
@@ -12,6 +13,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object BifoldableLaws {
 
   fun <F> laws(BF: Bifoldable<F>, GENK: GenK2<F>): List<Law> {
