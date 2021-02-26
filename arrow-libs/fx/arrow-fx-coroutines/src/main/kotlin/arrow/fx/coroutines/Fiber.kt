@@ -66,7 +66,7 @@ internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fibe
  * Cancelling this [Fiber] **will not** cancel its parent.
  */
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  "Use async with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("async(ctx) { f() }", "kotlinx.coroutines.async")
 )
 suspend fun <A> ForkConnected(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> {
@@ -82,7 +82,7 @@ suspend fun <A> ForkConnected(ctx: CoroutineContext = Dispatchers.Default, f: su
 
 /** @see ForkConnected **/
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  "Use async with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("async(ctx) { invoke() }", "kotlinx.coroutines.async")
 )
 suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
@@ -140,7 +140,7 @@ suspend fun <A> ForkScoped(
 
 /** @see ForkScoped */
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  "Use async with KotlinX Coroutines Structured Concurrency",
   ReplaceWith(
     "val scope = CoroutineScope(ctx); scope.async(ctx) { f() }.also { scope.launch { interruptWhen(); it.cancelAndJoin() } }",
     "kotlinx.coroutines.async",
@@ -162,7 +162,7 @@ suspend fun <A> (suspend () -> A).forkScoped(
  * @see ForkConnected for a fork operation that wires cancellation to its parent in a safe way.
  */
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  "Use async with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("GlobalScope.async(ctx) { f() }", "kotlinx.coroutines.async", "kotlinx.coroutines.GlobalScope")
 )
 suspend fun <A> ForkAndForget(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> =
@@ -170,7 +170,7 @@ suspend fun <A> ForkAndForget(ctx: CoroutineContext = Dispatchers.Default, f: su
 
 /** @see ForkAndForget */
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  "Use async with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("GlobalScope.async(ctx) { this() }", "kotlinx.coroutines.async", "kotlinx.coroutines.GlobalScope")
 )
 suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
