@@ -47,13 +47,13 @@ jobs:
       working-directory: arrow-libs
       run: ./gradlew dokka
     - name: "Validate documentation"
-      working-directory: arrow-docs
+      working-directory: arrow-site
       run: ./gradlew runAnk
     - name: "Latest release: build (landing page + docs/)"
       if: steps.versions.outputs.new-release-version-exists == '1'
       working-directory: arrow-site
       run: |
-        bundle exec jekyll build -b docs -s docs
+        bundle exec jekyll build -b docs -s build/site
         tree _site > $BASEDIR/logs/content_docs.log
     - name: "Latest release: publish (landing page + docs/)"
       if: steps.versions.outputs.new-release-version-exists == '1'
@@ -69,7 +69,7 @@ jobs:
       working-directory: arrow-site
       run: |
         SHORT_VERSION=$(echo ${{ steps.versions.outputs.release-version }} | cut -d. -f1-2)
-        bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
+        bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
         tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
     - name: "Latest release: publish release directory (docs/<major.minor>)"
       if: steps.versions.outputs.new-release-version-exists == '1'
@@ -85,7 +85,7 @@ jobs:
     - name: "Next version: build (/docs/next)"
       working-directory: arrow-site
       run: |
-        bundle exec jekyll build -b docs/next -s docs
+        bundle exec jekyll build -b docs/next -s build/site
         tree _site > $BASEDIR/logs/content_docs-next.log
     - name: "Next version: publish (/docs/next)"
       working-directory: arrow-site
