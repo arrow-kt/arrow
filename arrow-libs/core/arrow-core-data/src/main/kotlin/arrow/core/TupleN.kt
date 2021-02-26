@@ -1108,14 +1108,12 @@ internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Sequence<Tuple2<K, V>>
 operator fun <K, V> Map<out K, V>.plus(tuple: Tuple2<K, V>): Map<K, V> =
   if (this.isEmpty()) mapOf(tuple) else LinkedHashMap(this).apply { put(tuple.a, tuple.b) }
 
-
 @Deprecated(
   "Tuple2 is deprecated in favor of Kotlin's Pair",
   ReplaceWith("this.plus(tuples.map { (a, b) -> Pair(a, b) })")
 )
 operator fun <K, V> Map<out K, V>.plus(tuples: Iterable<Tuple2<K, V>>): Map<K, V> =
   if (this.isEmpty()) tuples.toMap() else LinkedHashMap(this).apply { putAll(tuples) }
-
 
 @Deprecated(
   "Tuple2 is deprecated in favor of Kotlin's Pair",
