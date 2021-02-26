@@ -109,14 +109,14 @@ fun <E, A> Sequence<Validated<E, Sequence<A>>>.flatSequenceValidated(semigroup: 
   flatTraverseValidated(semigroup, ::identity)
 
 fun <E, A, B> Sequence<A>.flatTraverseEither(f: (A) -> Either<E, Sequence<B>>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(emptySequence<B>().right()) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: Sequence<B> -> b + bs } })
-  }
+  foldRight<A, Either<E, Sequence<B>>>(Eval.now(emptySequence<B>().right())) { a, acc ->
+    f(a).apEval(acc.map { it.map { bs -> { b: Sequence<B> -> b + bs } } })
+  }.value()
 
 fun <E, A, B> Sequence<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Sequence<B>>): Validated<E, Sequence<B>> =
-  foldRight<A, Validated<E, Sequence<B>>>(emptySequence<B>().valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: Sequence<B> -> b + bs } })
-  }
+  foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
+    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: Sequence<B> -> b + bs } } })
+  }.value()
 
 fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
   flatMap(::identity)
@@ -132,9 +132,6 @@ fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     acc.combine(f(a))
   }
 }
-
-inline fun <A, B> Sequence<A>.foldRight(initial: B, operation: (A, B) -> B): B =
-  toList().foldRight(initial, operation)
 
 fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun Iterator<A>.loop(): Eval<B> =
@@ -469,26 +466,26 @@ fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
 fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(emptySequence<B>().right()) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: B -> sequenceOf(b) + bs } })
-  }
+  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, acc ->
+    f(a).apEval(acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+  }.value()
 
 fun <E, A> Sequence<A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight<A, Either<E, Unit>>(Unit.right()) { a, acc ->
-    f(a).ap(acc.map(void))
-  }
+  val void: (Either<E, Unit>) -> Either<E, (Any?) -> Unit> = { it.map { { Unit } } }
+  return foldRight<A, Either<E, Unit>>(Eval.now(Unit.right())) { a, acc ->
+    f(a).apEval(acc.map(void))
+  }.value()
 }
 
 fun <E, A, B> Sequence<A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, Sequence<B>> =
-  foldRight<A, Validated<E, Sequence<B>>>(emptySequence<B>().valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> sequenceOf(b) + bs } })
-  }
+  foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
+    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+  }.value()
 
 fun <E, A> Sequence<A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> =
-  foldRight<A, Validated<E, Unit>>(Unit.valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { { Unit } })
-  }
+  foldRight<A, Validated<E, Unit>>(Eval.now(Unit.valid())) { a, acc ->
+    f(a).apEval(semigroup, acc.map { it.map { { Unit } } })
+  }.value()
 
 /**
  *  Pairs [B] with [A] returning a Sequence<Pair<B, A>>
@@ -596,7 +593,7 @@ fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   } ?: emptySequence()
 
 /**
- * unzips the structure holding the resulting elements in an `Tuple2`
+ * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin:ank:playground
  * import arrow.core.unzip
