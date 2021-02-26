@@ -5,27 +5,29 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 
 class GuaranteeCaseTest : ArrowFxSpec(
   spec = {
 
     "release for success was invoked" {
       checkAll(Arb.int()) { i ->
-        val p = Promise<ExitCase>()
+        val p = CompletableDeferred<ExitCase>()
 
         val res = guaranteeCase(
           fa = { i },
           finalizer = { ex -> p.complete(ex) }
         )
 
-        p.get() shouldBe ExitCase.Completed
+        p.await() shouldBe ExitCase.Completed
         res shouldBe i
       }
     }
 
     "release for error was invoked" {
       checkAll(Arb.throwable()) { e ->
-        val p = Promise<ExitCase>()
+        val p = CompletableDeferred<ExitCase>()
         val attempted = Either.catch {
           guaranteeCase<Int>(
             fa = { throw e },
@@ -33,16 +35,16 @@ class GuaranteeCaseTest : ArrowFxSpec(
           )
         }
 
-        p.get() shouldBe ExitCase.Failure(e)
+        p.await() shouldBe ExitCase.Failure(e)
         attempted shouldBe Either.Left(e)
       }
     }
 
     "release for never was invoked" {
-      val p = Promise<ExitCase>()
-      val start = Promise<Unit>()
+      val p = CompletableDeferred<ExitCase>()
+      val start = CompletableDeferred<Unit>()
 
-      val fiber = ForkAndForget {
+      val fiber = async {
         guaranteeCase(
           fa = {
             start.complete(Unit)
@@ -52,9 +54,9 @@ class GuaranteeCaseTest : ArrowFxSpec(
         )
       }
 
-      start.get()
+      start.await()
       fiber.cancel()
-      p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
+      p.await().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 )

@@ -94,10 +94,9 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
- * import arrow.fx.coroutines.Environment
- * import arrow.fx.coroutines.ForkConnected
- * import arrow.fx.coroutines.seconds
- * import arrow.fx.coroutines.sleep
+ * import kotlinx.coroutines.runBlocking
+ * import kotlinx.coroutines.async
+ * import kotlinx.coroutines.delay
  *
  * //sampleStart
  * fun STM.transfer(from: TVar<Int>, to: TVar<Int>, amount: Int): Unit {
@@ -119,26 +118,24 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * }
  * //sampleEnd
  *
- * fun main() {
- *   Environment().unsafeRunSync {
- *     val acc1 = TVar.new(0)
- *     val acc2 = TVar.new(300)
- *     println("Balance account 1: ${acc1.unsafeRead()}")
- *     println("Balance account 2: ${acc2.unsafeRead()}")
- *     ForkConnected {
- *       println("Sending money - Searching")
- *       sleep(2.seconds)
- *       println("Sending money - Found some")
- *       atomically { acc1.write(100_000_000) }
- *     }
- *     println("Performing transaction")
- *     atomically {
- *       println("Trying to transfer")
- *       transfer(acc1, acc2, 50)
- *     }
- *     println("Balance account 1: ${acc1.unsafeRead()}")
- *     println("Balance account 2: ${acc2.unsafeRead()}")
+ * fun main(): Unit = runBlocking {
+ *   val acc1 = TVar.new(0)
+ *   val acc2 = TVar.new(300)
+ *   println("Balance account 1: ${acc1.unsafeRead()}")
+ *   println("Balance account 2: ${acc2.unsafeRead()}")
+ *   async {
+ *     println("Sending money - Searching")
+ *     delay(2000)
+ *     println("Sending money - Found some")
+ *     atomically { acc1.write(100_000_000) }
  *   }
+ *   println("Performing transaction")
+ *   atomically {
+ *     println("Trying to transfer")
+ *     transfer(acc1, acc2, 50)
+ *   }
+ *   println("Balance account 1: ${acc1.unsafeRead()}")
+ *   println("Balance account 2: ${acc2.unsafeRead()}")
  * }
  * ```
  *
@@ -153,7 +150,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *  If the fallback retries as well the whole transaction retries.
  *
  * ```kotlin:ank:playground
- * import arrow.fx.coroutines.Environment
+ * import kotlinx.coroutines.runBlocking
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
@@ -168,18 +165,16 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *   } orElse { null }
  * //sampleEnd
  *
- * fun main() {
- *   Environment().unsafeRunSync {
- *     val v = TVar.new(100)
- *     println("Value is ${v.unsafeRead()}")
- *     atomically { transaction(v) }
- *       .also { println("Transaction returned $it") }
- *     println("Set value to 5")
- *     println("Value is ${v.unsafeRead()}")
- *     atomically { v.write(5) }
- *     atomically { transaction(v) }
- *       .also { println("Transaction returned $it") }
- *   }
+ * fun main(): Unit = runBlocking {
+ *   val v = TVar.new(100)
+ *   println("Value is ${v.unsafeRead()}")
+ *   atomically { transaction(v) }
+ *     .also { println("Transaction returned $it") }
+ *   println("Set value to 5")
+ *   println("Value is ${v.unsafeRead()}")
+ *   atomically { v.write(5) }
+ *   atomically { transaction(v) }
+ *     .also { println("Transaction returned $it") }
  * }
  * ```
  *

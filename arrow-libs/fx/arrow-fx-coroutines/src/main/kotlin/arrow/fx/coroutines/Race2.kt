@@ -22,12 +22,13 @@ import kotlin.coroutines.EmptyCoroutineContext
  * ```kotlin:ank:playground
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.suspendCancellableCoroutine
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     cancellable { callback ->
+ *     suspendCancellableCoroutine { cont ->
  *        // Wait forever and never complete callback
- *        CancelToken { println("Never got cancelled for losing.") }
+ *        cont.invokeOnCancellation { println("Never got cancelled for losing.") }
  *     }
  *
  *   val winner = raceN({ loser() }, { 5 })
@@ -63,12 +64,13 @@ suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb:
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
+ * import kotlinx.coroutines.suspendCancellableCoroutine
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     cancellable { callback ->
+ *     suspendCancellableCoroutine { cont ->
  *        // Wait forever and never complete callback
- *        CancelToken { println("Never got cancelled for losing.") }
+ *        cont.invokeOnCancellation { println("Never got cancelled for losing.") }
  *     }
  *
  *   val winner = raceN(Dispatchers.IO, { loser() }, { 5 })
