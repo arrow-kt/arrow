@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -18,6 +19,7 @@ import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object ApplicativeLaws {
 
   fun <F> laws(A: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> = laws(A, A, GENK, EQK)

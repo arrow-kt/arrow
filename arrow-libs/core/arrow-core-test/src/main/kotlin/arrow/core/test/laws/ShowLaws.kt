@@ -2,9 +2,11 @@ package arrow.core.test.laws
 
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(ShowDeprecation)
 object ShowLaws {
 
   fun <F> laws(S: Show<F>, EQ: Eq<F>, GEN: Gen<F>): List<Law> =

@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.extensions.eq
@@ -17,6 +18,7 @@ import arrow.typeclasses.Reducible
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object ReducibleLaws {
 
   fun <F> laws(RF: Reducible<F>, GA: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

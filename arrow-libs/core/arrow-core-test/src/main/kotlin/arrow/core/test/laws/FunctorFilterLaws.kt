@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -17,6 +18,7 @@ import arrow.typeclasses.FunctorFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object FunctorFilterLaws {
 
   fun <F> laws(FFF: FunctorFilter<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

@@ -7,7 +7,6 @@ import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.eqK.eqK
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
-import arrow.core.extensions.setk.monoid.monoid
 import arrow.core.extensions.setk.monoidK.monoidK
 import arrow.core.extensions.setk.monoidal.monoidal
 import arrow.core.extensions.setk.semigroupK.semigroupK
@@ -26,6 +25,7 @@ import arrow.core.test.laws.MonoidalLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class SetKTest : UnitSpec() {
@@ -44,7 +44,7 @@ class SetKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(SetK.show(Int.show()), EQ, Gen.genSetK(Gen.int())),
-      MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
+      MonoidLaws.laws(Monoid.set(), Gen.set(Gen.int()), Eq.any()),
       SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
       MonoidalLaws.laws(
         SetK.monoidal(),

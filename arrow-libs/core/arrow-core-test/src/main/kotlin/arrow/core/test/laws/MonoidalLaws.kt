@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.tuple2.eq.eq
@@ -11,6 +12,7 @@ import arrow.typeclasses.Monoidal
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object MonoidalLaws {
 
   fun <F> laws(
