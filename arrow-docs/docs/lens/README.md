@@ -132,7 +132,7 @@ val balanceLens: Lens<Account, Int> = Account.balance
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
-When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `pFirstTuple2<A, B, R>()` in the `arrow.optics` package.
+When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `PLens.pPairFirst<A, B, R>()` in the `arrow.optics` package.
 
 ```kotlin:ank
 fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
@@ -140,7 +140,7 @@ fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
         { ab, r -> r to ab.second }
 )
 
-Lens.pPairFirst<Int, String, String>().set(5 to "World", "Hello, ")
+PLens.pPairFirst<Int, String, String>().set(5 to "World", "Hello, ")
 ```
 
 ### Laws

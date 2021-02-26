@@ -97,7 +97,7 @@ val optionalAddress: Optional<Person, Address> = Person.address
 
 A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }}) and [PPrism]({{'/optics/prism#PPrism' | relative_url }}). So let's see if we can combine both examples shown in their documentation.
 
-Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Tuple2` within.
+Given a `PPrism` with a focus into `Some` of `Option<Pair<Int, String>>` that can polymorphically change its content to `Pair<String, String>` and a `PLens` with a focus into the `Pair<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Pair` within.
 
 ```kotlin:ank
 val pprism = PPrism.pOption<Pair<Int, String>, Pair<String, String>>()

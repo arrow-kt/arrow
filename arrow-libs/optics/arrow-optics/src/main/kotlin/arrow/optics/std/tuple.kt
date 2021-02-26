@@ -121,10 +121,10 @@ fun <A> PTraversal.Companion.triple(): Traversal<Triple<A, A, A>, A> =
  */
 fun <A, B> PTraversal.Companion.pTuple4(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
     set = { a, b, c, d, _ -> Tuple4(a, b, c, d) }
   )
 
@@ -139,11 +139,11 @@ fun <A> PTraversal.Companion.tuple4(): Traversal<Tuple4<A, A, A, A>, A> =
  */
 fun <A, B> PTraversal.Companion.pTuple5(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
     set = { a, b, c, d, e, _ -> Tuple5(a, b, c, d, e) }
   )
 
@@ -158,12 +158,12 @@ fun <A> PTraversal.Companion.tuple5(): Traversal<Tuple5<A, A, A, A, A>, A> =
  */
 fun <A, B> PTraversal.Companion.pTuple6(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
-    get6 = { it.f },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
+    get6 = { it.sixth },
     set = { a, b, c, d, e, f, _ -> Tuple6(a, b, c, d, e, f) }
   )
 
@@ -178,13 +178,13 @@ fun <A> PTraversal.Companion.tuple6(): Traversal<Tuple6<A, A, A, A, A, A>, A> =
  */
 fun <A, B> PTraversal.Companion.pTuple7(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
-    get6 = { it.f },
-    get7 = { it.g },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
+    get6 = { it.sixth },
+    get7 = { it.seventh },
     set = { a, b, c, d, e, f, g, _ -> Tuple7(a, b, c, d, e, f, g) }
   )
 
@@ -199,14 +199,14 @@ fun <A> PTraversal.Companion.tuple7(): Traversal<Tuple7<A, A, A, A, A, A, A>, A>
  */
 fun <A, B> PTraversal.Companion.pTuple8(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
-    get6 = { it.f },
-    get7 = { it.g },
-    get8 = { it.h },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
+    get6 = { it.sixth },
+    get7 = { it.seventh },
+    get8 = { it.eighth },
     set = { a, b, c, d, e, f, g, h, _ -> Tuple8(a, b, c, d, e, f, g, h) }
   )
 
@@ -221,15 +221,15 @@ fun <A> PTraversal.Companion.tuple8(): Traversal<Tuple8<A, A, A, A, A, A, A, A>,
  */
 fun <A, B> PTraversal.Companion.pTuple9(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
-    get6 = { it.f },
-    get7 = { it.g },
-    get8 = { it.h },
-    get9 = { it.i },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
+    get6 = { it.sixth },
+    get7 = { it.seventh },
+    get8 = { it.eighth },
+    get9 = { it.ninth },
     set = { a, b, c, d, e, f, g, h, i, _ -> Tuple9(a, b, c, d, e, f, g, h, i) }
   )
 
@@ -244,16 +244,16 @@ fun <A> PTraversal.Companion.tuple9(): Traversal<Tuple9<A, A, A, A, A, A, A, A, 
  */
 fun <A, B> PTraversal.Companion.pTuple10(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
   PTraversal(
-    get1 = { it.a },
-    get2 = { it.b },
-    get3 = { it.c },
-    get4 = { it.d },
-    get5 = { it.e },
-    get6 = { it.f },
-    get7 = { it.g },
-    get8 = { it.h },
-    get9 = { it.i },
-    get10 = { it.j },
+    get1 = { it.first },
+    get2 = { it.second },
+    get3 = { it.third },
+    get4 = { it.fourth },
+    get5 = { it.fifth },
+    get6 = { it.sixth },
+    get7 = { it.seventh },
+    get8 = { it.eighth },
+    get9 = { it.ninth },
+    get10 = { it.tenth },
     set = { a, b, c, d, e, f, g, h, i, j, _ -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
   )
 

@@ -35,9 +35,6 @@ interface Fold<S, A> {
   fun all(source: S, predicate: (focus: A) -> Boolean): Boolean =
     foldMap(Monoid.boolean(), source, predicate)
 
-  fun forall(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    all(source, predicate)
-
   /**
    * Returns `true` if at least one focus matches the given [predicate].
    */

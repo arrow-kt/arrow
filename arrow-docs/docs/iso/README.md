@@ -30,7 +30,7 @@ point
 ```
 ```kotlin:ank
 val pair = pointIsoPair.get(point)
-tuple
+pair
 ```
 ```kotlin:ank
 pointIsoPair.reverseGet(pair)
