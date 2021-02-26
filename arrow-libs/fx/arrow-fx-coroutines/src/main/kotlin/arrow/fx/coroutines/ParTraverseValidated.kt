@@ -99,6 +99,7 @@ suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEither(sem
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
+ * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -147,6 +148,7 @@ suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
+ * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *

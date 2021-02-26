@@ -39,7 +39,7 @@ Semigroup.int().run { 1.combine(2) }
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.core.extensions.*
+import arrow.typeclasses.*
 
 Semigroup.list<Int>().run {
   listOf(1, 2, 3).combine(listOf(4, 5, 6))
