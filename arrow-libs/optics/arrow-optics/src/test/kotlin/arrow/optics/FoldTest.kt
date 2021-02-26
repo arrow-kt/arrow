@@ -67,7 +67,7 @@ class FoldTest : UnitSpec() {
 
       "Check if all targets match the predicate" {
         forAll(Gen.list(Gen.int())) { ints ->
-          forall(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
+          all(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
         }
       }
 
