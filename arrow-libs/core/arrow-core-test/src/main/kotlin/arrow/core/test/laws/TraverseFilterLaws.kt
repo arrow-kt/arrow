@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.extensions.eq
@@ -13,6 +14,7 @@ import arrow.typeclasses.TraverseFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object TraverseFilterLaws {
 
   fun <F> laws(

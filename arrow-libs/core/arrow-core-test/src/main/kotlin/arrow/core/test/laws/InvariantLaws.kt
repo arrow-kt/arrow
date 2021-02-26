@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.compose
 import arrow.core.extensions.eq
 import arrow.core.identity
@@ -12,6 +13,7 @@ import arrow.typeclasses.Invariant
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object InvariantLaws {
 
   fun <F> laws(IF: Invariant<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

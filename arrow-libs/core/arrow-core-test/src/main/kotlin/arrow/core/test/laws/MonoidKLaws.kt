@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.extensions.eq
 import arrow.core.extensions.list.foldable.fold
 import arrow.core.test.generators.GenK
@@ -10,6 +11,7 @@ import arrow.typeclasses.MonoidK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object MonoidKLaws {
 
   fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

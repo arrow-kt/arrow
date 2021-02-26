@@ -15,25 +15,29 @@ typealias Invalid<E> = Validated.Invalid<E>
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) class ForValidated private constructor() {
+)
+class ForValidated private constructor() {
   companion object
 }
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
+)
+typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
+)
+typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline
+)
+inline
 fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
   this as Validated<E, A>
 
@@ -678,15 +682,15 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       } else SE.run {
         var accumulatedError: E? = null
         accumulatedError = if (a is Invalid) a.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (b is Invalid) b.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (c is Invalid) c.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (d is Invalid) d.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (e is Invalid) e.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (ff is Invalid) ff.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (g is Invalid) g.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (h is Invalid) h.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (i is Invalid) i.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (j is Invalid) j.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (b is Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
+        accumulatedError = if (c is Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
+        accumulatedError = if (d is Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
+        accumulatedError = if (e is Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
+        accumulatedError = if (ff is Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
+        accumulatedError = if (g is Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
+        accumulatedError = if (h is Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
+        accumulatedError = if (i is Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
+        accumulatedError = if (j is Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
         Invalid(accumulatedError!!)
       }
   }

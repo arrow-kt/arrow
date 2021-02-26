@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.compose
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK
@@ -11,6 +12,7 @@ import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object ContravariantLaws {
 
   fun <F> laws(CF: Contravariant<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {

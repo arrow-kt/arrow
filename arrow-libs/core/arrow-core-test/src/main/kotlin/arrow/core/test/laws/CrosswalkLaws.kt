@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.extensions.eq
@@ -16,6 +17,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.abs
 
+@Deprecated(KindDeprecation)
 object CrosswalkLaws {
 
   fun <T> laws(

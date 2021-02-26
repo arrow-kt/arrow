@@ -1,9 +1,11 @@
 package arrow.core.test.laws
 
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(EqDeprecation)
 object EqLaws {
 
   fun <F> laws(
