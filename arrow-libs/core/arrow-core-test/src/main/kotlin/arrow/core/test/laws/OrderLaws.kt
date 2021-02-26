@@ -5,9 +5,11 @@ import arrow.core.GT
 import arrow.core.LT
 import arrow.core.Ordering
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(OrderDeprecation)
 object OrderLaws {
   fun <A> laws(OA: Order<A>, gen: Gen<A>): List<Law> =
     EqLaws.laws(OA, gen) + listOf(

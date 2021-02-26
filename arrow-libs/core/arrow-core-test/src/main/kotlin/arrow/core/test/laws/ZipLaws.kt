@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Ior
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
@@ -17,6 +18,7 @@ import arrow.typeclasses.Zip
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object ZipLaws {
 
   private val intTupleEq = Tuple2.eq(Int.eq(), Int.eq())

@@ -4,9 +4,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Validated
-import arrow.core.ap
-import arrow.core.identity
-import arrow.core.valid
+import arrow.core.sequenceValidated
 import arrow.typeclasses.Semigroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,15 +179,5 @@ suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
 ): Validated<E, List<B>> =
   coroutineScope {
     map { async(ctx) { f.invoke(it) } }.awaitAll()
-      .sequence(semigroup)
+      .sequenceValidated(semigroup)
   }
-
-@PublishedApi // TODO should be in Arrow Core
-internal inline fun <E, A, B> Iterable<A>.traverse(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, List<B>> =
-  fold(emptyList<B>().valid() as Validated<E, List<B>>) { acc, a ->
-    f(a).ap(semigroup, acc.map { bs: List<B> -> { b: B -> bs + b } })
-  }
-
-@PublishedApi // TODO should be in Arrow Core
-internal fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)

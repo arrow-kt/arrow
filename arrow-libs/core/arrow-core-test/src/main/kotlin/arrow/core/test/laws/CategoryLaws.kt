@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK2
 import arrow.typeclasses.Category
@@ -9,6 +10,7 @@ import arrow.typeclasses.EqK2
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object CategoryLaws {
 
   fun <F> laws(C: Category<F>, GENK: GenK2<F>, EQK: EqK2<F>): List<Law> {

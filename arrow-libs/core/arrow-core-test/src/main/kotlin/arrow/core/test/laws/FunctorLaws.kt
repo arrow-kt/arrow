@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
@@ -17,6 +18,7 @@ import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object FunctorLaws {
 
   private val fproductIdentityTupleEq = Tuple2.eq(Int.eq(), String.eq())
