@@ -108,16 +108,6 @@ val interpreter: AnkOps = object : AnkOps {
     return target
   }
 
-  override suspend fun Path.process(): Sequence<String> =
-    toFile().useLines { ls ->
-      val (_, lines) =
-        ls
-          .fold(emptyList<String>() toT emptySequence<String>()) { (classes, lines), line ->
-            classes toT lines + line
-          }
-      lines
-    }
-
   val fenceRegexStart = "```(.*):ank.*".toRegex()
   val fenceRegexEnd = "```.*".toRegex()
 

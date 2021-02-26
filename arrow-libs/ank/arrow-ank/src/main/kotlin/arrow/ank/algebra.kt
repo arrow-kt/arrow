@@ -14,8 +14,6 @@ interface AnkOps {
 
   suspend fun Path.ankFiles(): Sequence<AnkProcessingContext>
 
-  suspend fun Path.process(): Sequence<String>
-
   fun extractCode(content: Sequence<String>): Tuple2<Sequence<String>, Sequence<Snippet>>
 
   suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet>
