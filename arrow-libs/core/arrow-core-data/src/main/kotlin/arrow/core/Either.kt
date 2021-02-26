@@ -1588,7 +1588,7 @@ fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   flatMap { a -> ff.fix().map { f -> f(a) } }
 
 fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
-  ff.map { this.ap(it) }
+  fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })
 
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
