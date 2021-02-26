@@ -29,11 +29,11 @@ val point = Point2D(6, 10)
 point
 ```
 ```kotlin:ank
-val tuple = pointIsoPair.get(point)
+val pair = pointIsoPair.get(point)
 tuple
 ```
 ```kotlin:ank
-pointIsoPair.reverseGet(tuple)
+pointIsoPair.reverseGet(pair)
 ```
 
 Given an `Iso<Point2D, Pair<Int, Int>>`, we also have an `Iso<Pair<Int, Int>, Point2D>`. Since it represents an isomorphism between equivalent structures, we can reverse it.

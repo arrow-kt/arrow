@@ -18,13 +18,13 @@ fun <A, B, R> PLens.Companion.pPairFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> 
   )
 
 /**
- * [Lens] to focus into the first value of a [arrow.core.Tuple2]
+ * [Lens] to focus into the first value of a [kotlin.Pair]
  */
 fun <A, B> PLens.Companion.pairFirst(): Lens<Pair<A, B>, A> =
   pPairFirst()
 
 /**
- * [PLens] to focus into the second value of a [arrow.core.Tuple2]
+ * [PLens] to focus into the second value of a [kotlin.Pair]
  */
 fun <A, B, R> PLens.Companion.pPairSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
   PLens(
@@ -33,13 +33,13 @@ fun <A, B, R> PLens.Companion.pPairSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R>
   )
 
 /**
- * [Lens] to focus into the second value of a [arrow.core.Tuple2]
+ * [Lens] to focus into the second value of a [kotlin.Pair]
  */
 fun <A, B> PLens.Companion.pairSecond(): Lens<Pair<A, B>, B> =
   pPairSecond()
 
 /**
- * [PTraversal] to focus into the first and second value of a [arrow.core.Tuple2]
+ * [PTraversal] to focus into the first and second value of a [kotlin.Pair]
  */
 fun <A, B> PTraversal.Companion.pPair(): PTraversal<Pair<A, A>, Pair<B, B>, A, B> =
   PTraversal(
@@ -49,7 +49,7 @@ fun <A, B> PTraversal.Companion.pPair(): PTraversal<Pair<A, A>, Pair<B, B>, A, B
   )
 
 /**
- * [Traversal] to focus into the first and second value of a [arrow.core.Tuple2]
+ * [Traversal] to focus into the first and second value of a [kotlin.Pair]
  */
 fun <A> PTraversal.Companion.pair(): Traversal<Pair<A, A>, A> =
   pPair()

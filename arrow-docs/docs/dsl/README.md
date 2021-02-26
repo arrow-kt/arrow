@@ -66,7 +66,7 @@ The DSL also has special support for [Each]({{ '/optics/each' | relative_url }})
 
 ### Each
 
-`Each` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
+`Every` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
 
 ```kotlin
 @optics data class Employees(val employees: List<Employee>)
