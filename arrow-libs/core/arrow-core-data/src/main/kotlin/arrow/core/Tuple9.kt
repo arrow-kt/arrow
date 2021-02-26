@@ -63,7 +63,7 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
 
   @Deprecated(ShowDeprecation)

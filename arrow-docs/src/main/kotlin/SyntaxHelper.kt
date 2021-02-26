@@ -25,12 +25,12 @@ data class Employee(val name: String, val company: Company?) {
 }
 
 @optics
-data class Employees(val employees: ListK<Employee>) {
+data class Employees(val employees: List<Employee>) {
   companion object
 }
 
 @optics
-data class Db(val content: MapK<Int, String>) {
+data class Db(val content: Map<Int, String>) {
   companion object
 }
 

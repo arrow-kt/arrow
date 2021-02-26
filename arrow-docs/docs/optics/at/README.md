@@ -6,9 +6,6 @@ permalink: /optics/at/
 
 ## At
 
-
-
-
 `At` provides a [Lens]({{ '/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
 
 ### Example
@@ -20,16 +17,16 @@ A `MapK<Int, String>` can be indexed by its keys `Int`, but not for every index 
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.optics.typeclasses.*
-import arrow.optics.extensions.mapk.at.*
+import arrow.optics.map
+import arrow.optics.typeclasses.At
 
-val mapAt = MapK.at<Int, String>().at(2)
+val mapAt = At.map<Int, String>().at(2)
 
 val map = mapOf(
             1 to "one",
             2 to "two",
             3 to "three"
-    ).k()
+    )
 
 mapAt.set(map, "new value".some())
 ```

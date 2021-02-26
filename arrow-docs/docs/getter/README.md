@@ -36,10 +36,10 @@ Or, from any of the optics defined in `arrow-optics` that allow getting its focu
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.optics.extensions.*
+import arrow.optics.*
 
-val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
-val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
+val headGetter: Getter<NonEmptyList<String>, String> = Lens.nonEmptyListHead<String>()
+val tupleGetter: Getter<Pair<String, Int>, String> = PLens.pairFirst<String, Int>()
 ```
 
 ## Composition
@@ -47,7 +47,7 @@ val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>
 Unlike a regular `get` function, a `Getter` composes. Similar to a `Lens`, we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
-val firstBar: Getter<NonEmptyList<Player>, Int> = NonEmptyList.head<Player>() compose healthGetter
+val firstBar: Getter<NonEmptyList<Player>, Int> = Lens.nonEmptyListHead<Player>() compose healthGetter
 firstBar.get(Player(5).nel())
 ```
 

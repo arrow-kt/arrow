@@ -57,7 +57,6 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQOptionB = Option.eq(String.eq()),
         EQA = sequenceEq(String.eq())
       )
     )
