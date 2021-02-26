@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.collections.plus as _plus
 
 object SetExtensions
 
@@ -9,7 +10,7 @@ object SortedSetInstances
 
 fun <A> Semigroup.Companion.set(): Semigroup<Set<A>> = object : Semigroup<Set<A>> {
   override fun Set<A>.combine(b: Set<A>): Set<A> =
-    this + b
+    this._plus(b)
 }
 
 fun <A> Monoid.Companion.set(): Monoid<Set<A>> = object : Monoid<Set<A>> {
@@ -17,5 +18,5 @@ fun <A> Monoid.Companion.set(): Monoid<Set<A>> = object : Monoid<Set<A>> {
     emptySet<A>()
 
   override fun Set<A>.combine(b: Set<A>): Set<A> =
-    this + b
+    this._plus(b)
 }

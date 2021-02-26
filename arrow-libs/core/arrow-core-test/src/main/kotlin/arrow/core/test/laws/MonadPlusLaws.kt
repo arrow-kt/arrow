@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK
 import arrow.typeclasses.Eq
@@ -9,6 +10,7 @@ import arrow.typeclasses.MonadPlus
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object MonadPlusLaws {
 
   fun <F> laws(MP: MonadPlus<F>, GK: GenK<F>, EQK: EqK<F>): List<Law> {

@@ -1,5 +1,6 @@
 package arrow.core.test.laws
 
+import arrow.KindDeprecation
 import arrow.core.test.generators.GenK
 import arrow.typeclasses.Apply
 import arrow.typeclasses.EqK
@@ -7,6 +8,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.Selective
 
+@Deprecated(KindDeprecation)
 object MonadCombineLaws {
 
   fun <F> laws(
