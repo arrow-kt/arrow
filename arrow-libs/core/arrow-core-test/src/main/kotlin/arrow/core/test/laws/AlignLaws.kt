@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Ior
 import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
@@ -12,6 +13,7 @@ import arrow.typeclasses.Foldable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
+@Deprecated(KindDeprecation)
 object AlignLaws {
 
   val iorEq = Ior.eq(Int.eq(), Int.eq())

@@ -652,7 +652,7 @@ sealed class Option<out A> : OptionOf<A> {
     ff.fix().flatMap { this.fix().map(it) }
 
   fun <B> apEval(ff: Eval<Option<(A) -> B>>): Eval<Option<B>> =
-    ff.map { ap(it) }
+    fold({ Eval.now(none()) }, { r -> ff.map { it.map { f -> f(r) } } })
 
   inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {

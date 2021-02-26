@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Eval.Companion.always
@@ -46,6 +47,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
+@Deprecated(KindDeprecation)
 object FoldableLaws {
 
   fun <F> laws(FF: Foldable<F>, GENK: GenK<F>): List<Law> {

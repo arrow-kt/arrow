@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
@@ -16,6 +17,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
+@Deprecated(KindDeprecation)
 object MonadLogicLaws {
 
   fun <F> laws(

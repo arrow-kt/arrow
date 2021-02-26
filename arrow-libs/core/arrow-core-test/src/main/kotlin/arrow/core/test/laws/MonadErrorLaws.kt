@@ -1,6 +1,7 @@
 package arrow.core.test.laws
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.extensions.eq
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicative
@@ -19,6 +20,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldThrowAny
 
+@Deprecated(KindDeprecation)
 object MonadErrorLaws {
 
   private fun <F> monadErrorLaws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> {
