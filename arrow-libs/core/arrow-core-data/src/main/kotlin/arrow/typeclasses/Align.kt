@@ -8,20 +8,5 @@ import arrow.KindDeprecation
  */
 @Deprecated(KindDeprecation)
 interface Align<F> : Semialign<F> {
-  /**
-   * An empty structure.
-   *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.core.extensions.*
-   * import arrow.core.extensions.listk.align.align
-   * import arrow.core.*
-   *
-   * ListK.align().run {
-   *   align(listOf("A", "B").k(), empty<String>())
-   * }
-   * ```
-   */
   fun <A> empty(): Kind<F, A>
 }

@@ -31,51 +31,10 @@ interface Bifunctor<F> {
    */
   fun <A, B, C, D> Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 
-  /**
-   * Lifts two functions to the Bifunctor type.
-   *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   * import arrow.core.extensions.tuple2.bifunctor.lift
-   *
-   * val sumFive : (Int) -> Int = { it + 5 }
-   * val sumTwo : (Int) -> Int = { it + 2 }
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val tuple : Tuple2<Int, Int> = lift(sumFive, sumTwo)(Tuple2(2, 2)).fix()
-   *   //sampleEnd
-   *   println("First value: ${tuple.a}")
-   *   println("Second value: ${tuple.b}")
-   * }
-   *
-   * ```
-   */
   fun <A, B, C, D> lift(fl: (A) -> C, fr: (B) -> D): (Kind2<F, A, B>) -> Kind2<F, C, D> = { kind2 ->
     kind2.bimap(fl, fr)
   }
 
-  /**
-   * Map the left side type of Kind2
-   *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.core.Tuple2
-   * import arrow.core.extensions.tuple2.bifunctor.mapLeft
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val tuple = Tuple2(2, 2).mapLeft { num -> num * 2 }
-   *   //sampleEnd
-   *   println("First value: ${tuple.a}")
-   *   println("Second value: ${tuple.b}")
-   * }
-   * ```
-   *
-   */
   fun <A, B, C> Kind2<F, A, B>.mapLeft(f: (A) -> C): Kind2<F, C, B> =
     bimap(f, ::identity)
 

@@ -77,36 +77,6 @@ nelOne.flatMap { one ->
 }
 ```
 
-## Monad binding
-
-Λrrow allows imperative style comprehensions to make computing over `NonEmptyList` values easy.
-
-```kotlin:ank
-import arrow.typeclasses.*
-import arrow.core.extensions.*
-
-val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
-val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
-val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
-
-NonEmptyList.fx {
-  val (one) = nelOne
-  val (two) = nelTwo
-  val (three) = nelThree
-  one + two + three
-}
-```
-
-Monad binding in `NonEmptyList` and other collection related data type can be used as generators
-
-```kotlin:ank
-NonEmptyList.fx {
-  val (x) = NonEmptyList.of(1, 2, 3)
-  val (y) = NonEmptyList.of(1, 2, 3)
-  x + y
-}
-```
-
 ## Applicative Builder
 
 Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
@@ -132,5 +102,4 @@ NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
 - We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
 - `foldLeft`, `map`, `flatMap`, and others are used to compute over the internal contents of a `NonEmptyList` value.
-- `fx { ... } comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
-- `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
+- `NonEmptyList.mapN(..) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`

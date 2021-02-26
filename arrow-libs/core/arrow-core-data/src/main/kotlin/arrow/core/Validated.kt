@@ -240,11 +240,12 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * ```kotlin:ank:silent
  * import arrow.core.Validated
  * import arrow.core.validNel
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.core.nonEmptyList
+ * import arrow.typeclasses.Semigroup
  *
  * //sampleStart
  * val parallelValidate = Validated
- *   .mapN(NonEmptyList.semigroup<ConfigError>(), 1.validNel(), 2.validNel())
+ *   .mapN(Semigroup.nonEmptyList<ConfigError>(), 1.validNel(), 2.validNel())
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
@@ -262,7 +263,8 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.core.nonEmptyList
+ * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -307,7 +309,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
  *  val valid = Validated.mapN(
- *    NonEmptyList.semigroup<ConfigError>(),
+ *    Semigroup.nonEmptyList<ConfigError>(),
  *    config.parse(Read.stringRead, "url"),
  *    config.parse(Read.intRead, "port")
  *  ) { url, port -> ConnectionParams(url, port) }
@@ -325,7 +327,8 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.core.nonEmptyList
+ * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -369,7 +372,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
  *
  * val valid = Validated.mapN(
- *  NonEmptyList.semigroup<ConfigError>(),
+ *  Semigroup.nonEmptyList<ConfigError>(),
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
  *  ) { url, port -> ConnectionParams(url, port) }

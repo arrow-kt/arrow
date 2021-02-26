@@ -22,65 +22,6 @@ import arrow.documented
  *
  * Currently, [Semiring] instances are defined for all available number types.
  *
- * ### Examples
- *
- * Here a some examples:
- *
- * ```kotlin:ank:playground
- * import arrow.core.extensions.*
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Int.semiring().run { 1.combine(2) }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.extensions.*
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Int.semiring().run { 2.combineMultiplicate(3) }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * The type class `Semiring` also has support for the `+` `*` syntax:
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.*
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Int.semiring().run {
- *      1 + 2
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.*
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Int.semiring().run {
- *      2 * 3
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
  */
 @documented
 interface Semiring<A> {

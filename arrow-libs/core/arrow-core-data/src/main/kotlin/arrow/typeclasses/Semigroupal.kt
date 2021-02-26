@@ -2,7 +2,6 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.documented
 
@@ -24,72 +23,6 @@ import arrow.documented
  * f(a.product(b.product(c))) == (a.product(b)).product(c)
  * ```
  *
- * Currently, [Semigroupal] instances are defined for [Option], [ListK], [SequenceK] and [SetK].
- *
- * ```kotlin:ank:playground:extension
- * _imports_
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   _extensionFactory_
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * ### Examples
- *
- * Here a some examples:
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.option.semigroupal.semigroupal
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Option.semigroupal().run {
- *       Option.just(1).product(Option.just(1))
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * [Semigroupal] also has support of the `*` syntax:
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.option.semigroupal.semigroupal
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Option.semigroupal().run {
- *       Option.just(1) * Option.just(2)
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- * The same applies to [ListK], [SequenceK] and [SetK] instances:
- *
- * ```kotlin:ank:playground
- * import arrow.core.ListK
- * import arrow.core.extensions.listk.semigroupal.semigroupal
- * import arrow.core.k
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   ListK.semigroupal().run {
- *       listOf(1,2,3).k() * listOf('a','b','c').k()
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
  */
 @documented
 @Deprecated(KindDeprecation)

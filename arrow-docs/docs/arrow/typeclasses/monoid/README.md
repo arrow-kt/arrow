@@ -6,9 +6,6 @@ permalink: /arrow/typeclasses/monoid/
 
 ## Monoid
 
-
-
-
 `Monoid` extends the `Semigroup` type class, adding an `empty` method to semigroup's `combine`. The empty method must return a value that, when combined with any other instance of that type, returns the other instance, i.e.,
 
 ```kotlin
@@ -22,11 +19,10 @@ Having an empty defined allows us to combine all the elements of some potentiall
 And let's see the instance of Monoid<String> in action.
 
 ```kotlin:ank
-import arrow.*
-import arrow.core.extensions.*
+import arrow.core.*
 import arrow.typeclasses.*
 
-String.monoid().run { empty() }
+Monoid.string().run { empty() }
 ```
 
 ```kotlin:ank
@@ -37,9 +33,8 @@ String.monoid().run {
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.core.extensions.option.monoid.*
 
-Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
+Monoid.option(Monoid.int()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```
 
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, for example.
@@ -48,13 +43,12 @@ This is also true if we define our own instances. As an example, let's use `Fold
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.core.extensions.list.foldable.foldMap
 
-listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
+listOf(1, 2, 3, 4, 5).foldMap(Monoid.int(), ::identity)
 ```
 
 ```kotlin:ank
-listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() })
+listOf(1, 2, 3, 4, 5).foldMap(Monoid.string(), { it.toString() })
 ```
 
 To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
@@ -76,7 +70,7 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way, we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-val M = monoidTuple(Int.monoid(), String.monoid())
+val M = monoidTuple(Monoid.int(), Monoid.string())
 val list = listOf(1, 1).k()
 
 list.foldMap(M) { n: Int ->

@@ -769,11 +769,10 @@ fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
- * import arrow.core.extensions.either.apply.tupled
  *
  * val value =
  * //sampleStart
- *  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+ *  Either.mapN(Either.Right(1), Either.Right("a"), Either.Right(2.0), ::Triple)
  * //sampleEnd
  * fun main() {
  *  println(value)

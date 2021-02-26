@@ -43,58 +43,6 @@ import arrow.typeclasses.internal.idApplicative
  *
  * Note the return type `List<Either<NotFound, Profile>>`. This makes sense given the type signatures, but seems unwieldy. We now have a list of result values, and to work with those values we must then use the combinators on `Either` for every single one. It would be nicer instead if we could get the aggregate result in a single `Either`, say a `Either<NotFound, List<Profile>>`.
  *
- * ### Sequencing
- *
- * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<Either<NotFound, Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `Either<NotFound, List<Profile>>`. Given `Option` and `Either` have access to [traverse] and [sequence] we can reverse the types.
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.list.traverse.sequence
- * import arrow.core.extensions.option.applicative.applicative
- * import arrow.core.none
- * import arrow.core.some
- *
- * fun main() {
- *   //sampleStart
- *   val optionList =
- *     listOf(1.some(), 2.some(), 3.some())
- *       .sequence(Option.applicative())
- *
- *   val emptyList =
- *     listOf(1.some(), none(), 3.some())
- *       .sequence(Option.applicative())
- *   //sampleEnd
- *   println("optionList = $optionList")
- *   println("emptyList = $emptyList")
- * }
- * ```
- *
- * [Traverse] provides [sequence] as a convenience method for `traverse(::identity)`.
- *
- * ```kotlin:ank:playground
- * import arrow.core.extensions.option.applicative.applicative
- * import arrow.core.extensions.option.applicative.map
- * import arrow.core.fix
- * import arrow.core.identity
- * import arrow.core.none
- * import arrow.core.some
- * import arrow.core.Option
- * import arrow.core.extensions.list.traverse.traverse
- *
- * fun main() {
- *   //sampleStart
- *   val optionList: Option<List<Int>> =
- *     listOf(1.some(), 2.some(), 3.some())
- *       .traverse(Option.applicative(), ::identity).fix().map { it.fix() }
- *
- *   val emptyList: Option<List<Int>> =
- *     listOf(1.some(), none(), 3.some())
- *       .traverse(Option.applicative(), ::identity).map { it.fix() }
- *   //sampleEnd
- *   println("optionList = $optionList")
- *   println("emptyList = $emptyList")
- * }
- * ```
  *
  * Interestingly enough, [traverse] is a much more generalized and powerful form of [sequence] that would allow us to parse a `List<String>` or validate credentials for a `List<User>`.
  *
@@ -133,88 +81,16 @@ import arrow.typeclasses.internal.idApplicative
  *
  * Sometimes our effectful functions return a [Unit] value in cases where there is no interesting value to return (e.g. writing to some sort of store).
  *
- * ```kotlin:ank
- *
- * interface Data
- *
- * fun writeToStore(data: Data): Either<NotFound, Unit> =
- *   Right(Unit)
- * ```
- *
- * If we traverse using this, we end up with a funny type.
- *
- * ```kotlin:ank
- * import arrow.core.ListK
- * import arrow.core.extensions.either.applicative.applicative
- * import arrow.core.fix
- *
- * interface Data
- *
- * fun writeToStore(data: Data): Either<NotFound, Unit> = TODO("")
- *
- * fun writeManyToStore(data: ListK<Data>): Either<NotFound, ListK<Unit>> =
- *   data.traverse(Either.applicative()) { writeToStore(it) }.fix()
- * ```
  *
  * We end up with a `Either<NotFound, List<Unit>>`! A `List<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
  *
  * Traversing solely for the sake of the effects (ignoring any values that may be produced, [Unit] or otherwise) is common, so [Foldable] (superclass of [Traverse]) provides [traverse_] and [sequence_] methods that do the same thing as [traverse] and [sequence] but ignore any value produced along the way, returning [Unit] at the end.
- *
- * ```kotlin:ank
- * import arrow.core.extensions.list.foldable.traverse_
- *
- * fun writeToStore(data: Data): Either<NotFound, Unit> = TODO("")
- *
- * fun writeManyToStore(data: List<Data>): Either<NotFound, Unit> =
- *   data.traverse_(Either.applicative()) { writeToStore(it) }.fix()
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.extensions.either.applicative.applicative
- * import arrow.core.extensions.list.foldable.sequence_
- * import arrow.core.left
- * import arrow.core.right
- *
- * fun main() {
- *   //sampleStart
- *   val rightUnit = listOf(1.right(), 2.right(), 3.right())
- *     .sequence_(Either.applicative())
- *   val leftString = listOf(1.right(), "String".left(), 3.right())
- *     .sequence_(Either.applicative())
- *   //sampleEnd
- *   println("someUnit= $rightUnit")
- *   println("noneUnit= $leftString")
- * }
- * ```
  *
  * ### When to use Traverse over Foldable
  *
  * Even though, [Foldable] and [Traverse] are related, because both 'reduce their values to something', it is not obvious why to consider [Traverse] over [Foldable].
  *
  * Here is one example:
- *
- * ```kotlin:ank:playground
- * import arrow.core.MapK
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.extensions.option.applicative.applicative
- * import arrow.core.fix
- * import arrow.core.k
- *
- * fun main(){
- *   //sampleStart
- *   val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
- *
- *   val optionMapK: Option<MapK<String, String>> = map.traverse(Option.applicative()) { Some("$it") }.fix()
- *
- *   // val optionMapKBoilered = map.foldLeft(Some(emptyMap())) { acc: Option<MapK<String, String>>, i: Int ->
- *   //   acc.fold({ emptyMap() }, { /*Some logic to retrieve the key of a value, transform it and add it to the accumulated Map*/ })
- *   // }
- *   //sampleEnd
- *   println(optionMapK)
- * }
- * ```
  *
  * Both methodologies try to attain the same thing, but what [Foldable] lacks is that it solely drills down to its `A` here `Int` and does not preserve it's shape `F` - `MapK`. Resulting in a tiresome implementation, where we need to come up with an algorithm to resolve a key of a given value in the `Map` - let alone that this algorithm is not universal over any given `Map`.
  *
@@ -249,95 +125,9 @@ import arrow.typeclasses.internal.idApplicative
  *
  * We can now [traverse] structures that contain strings and parse them into integers with either with a `fail-fast` strategy using [Either] or accumulating failures with [ValidatedNel].
  *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.extensions.either.applicative.applicative
- * import arrow.core.k
- * import arrow.core.ValidatedNel
- * import arrow.core.extensions.either.foldable.isEmpty
- * import arrow.core.invalidNel
- * import arrow.core.validNel
- *
- * fun parseIntEither(s: String): Either<NumberFormatException, Int> =
- *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
- *   else Either.Left(NumberFormatException("$s is not a valid integer."))
- *
- * fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
- *   if (s.matches(Regex("-?[0-9]+"))) s.toInt().validNel()
- *   else NumberFormatException("$s is not a valid integer.").invalidNel()
- *
- * fun main() {
- *   //sampleStart
- *   val list = listOf("1", "2", "3").k().traverse(Either.applicative(), ::parseIntEither)
- *   val failFastList = listOf("1", "abc", "3", "4s").k().traverse(Either.applicative(), ::parseIntEither)
- *   //sampleEnd
- *   println("list= $list")
- *   println("failFastList= $failFastList")
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.Nel
- * import arrow.core.ValidatedNel
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
- * import arrow.core.extensions.validated.applicative.applicative
- * import arrow.core.fix
- * import arrow.core.invalidNel
- * import arrow.core.k
- * import arrow.core.validNel
- *
- * fun parseIntEither(s: String): Either<NumberFormatException, Int> =
- *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
- *   else Either.Left(NumberFormatException("$s is not a valid integer."))
- *
- * fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
- *   if (s.matches(Regex("-?[0-9]+"))) s.toInt().validNel()
- *   else NumberFormatException("$s is not a valid integer.").invalidNel()
- *
- * fun main() {
- *   //sampleStart
- *   val validatedList = listOf("1", "22w", "3", "33s").k()
- *     .traverse(ValidatedNel.applicative(Nel.semigroup<NumberFormatException>()), ::parseIntValidated)
- *   //sampleEnd
- *   println(validatedList)
- * }
- * ```
- *
  * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are run in isolation.
  *
  * Continuing with the example, we traverse a `List<A>` with its [traverse] and a function `(A) -> Either<NotFound, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the suspended `Either` operations completes they will be gathered back into a `List`.
- *
- * ```kotlin:ank:playground
- * import arrow.core.computations.either
- * import arrow.fx.coroutines.parTraverse
- * import arrow.core.Right
- *
- * interface Profile
- * interface User
- * //sampleStart
- * data class DummyUser(val name: String) : User
- * data class DummyProfile(val u: User) : Profile
- *
- * suspend fun userInfo(u: User): Either<NotFound, Profile> =
- *   Right(DummyProfile(u)) // this can be a call to the DB
- *
- * suspend fun List<User>.processLogin(): Either<NotFound, List<Profile>> =
- *   either {
- *     parTraverse { userInfo(it).bind() }
- *   }
- *
- * suspend fun program(): Unit {
- *   val list = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa"))
- *     .processLogin()
- *   println(list)
- * }
- *
- * //sampleEnd
- * suspend fun main() {
- *   program()
- * }
- * ```
  *
  * [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
  *

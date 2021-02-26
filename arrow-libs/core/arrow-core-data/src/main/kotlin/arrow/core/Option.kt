@@ -291,11 +291,10 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  *
  * ```kotlin:ank:playground
  * import arrow.core.Some
- * import arrow.core.extensions.option.apply.tupled
  *
  *  val value =
  * //sampleStart
- *  tupled(Some(1), Some("Hello"), Some(20.0))
+ *  Option.mapN(Some(1), Some("Hello"), Some(20.0), ::Triple)
  * //sampleEnd
  * fun main() {
  *  println(value)
