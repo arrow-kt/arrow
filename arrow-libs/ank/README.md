@@ -182,12 +182,13 @@ Example:
 
 ````
 ```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
+fun hello(name: String) = "Hello $name!"
 
-DataType(Option::class).tcMarkdownList()
+hello("Arrow")
 ```
 ````
+
+That snippet will be replaced by "Hello Arrow!" after running `runAnk`.
 
 Output:
 

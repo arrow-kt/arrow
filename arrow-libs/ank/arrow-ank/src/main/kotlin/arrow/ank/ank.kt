@@ -48,7 +48,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
       val p = file.path
       val message = "Ank Compile: [${file.index}] ${path.relativize(p)} | Used Heap: ${usedHeap.humanBytes()}"
       printConsole(colored(ANSI_GREEN, message))
-      val preProcessed = p.processMacros()
+      val preProcessed = p.process()
       val (processed, snippets) = extractCode(preProcessed)
       val compiledResult = compileCode(p toT snippets, compilerArgs)
       val result = replaceAnkToLang(processed, compiledResult)

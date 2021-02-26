@@ -76,8 +76,6 @@ const val AnkPlayground = ":ank:playground"
 const val AnkFailBlock = ":ank:fail"
 const val AnkPlaygroundExtension = ":ank:playground:extension"
 
-val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
-
 sealed class SnippetParserState {
   data class CollectingCode(val snippet: Snippet) : SnippetParserState()
   object Searching : SnippetParserState()
@@ -91,7 +89,7 @@ val interpreter: AnkOps = object : AnkOps {
 
   private fun Path.containsAnkSnippets(): Boolean =
     toFile().bufferedReader().use {
-      it.lines().anyMatch { s -> s.contains(AnkBlock) || s.contains("ank_macro") }
+      it.lines().anyMatch { s -> s.contains(AnkBlock) }
     }
 
   override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
@@ -110,20 +108,14 @@ val interpreter: AnkOps = object : AnkOps {
     return target
   }
 
-  override suspend fun Path.processMacros(): Sequence<String> =
+  override suspend fun Path.process(): Sequence<String> =
     toFile().useLines { ls ->
-      val (classes, lines) =
+      val (_, lines) =
         ls
           .fold(emptyList<String>() toT emptySequence<String>()) { (classes, lines), line ->
-            val cs = ankMacroRegex.findAll(line).map { it.groupValues[1] }
-            (classes + cs) toT lines + line
+            classes toT lines + line
           }
-      val cleanedSource = lines.map { ankMacroRegex.replace(it) { "" } }
-      if (classes.isNotEmpty()) {
-        cleanedSource +
-          sequenceOf("\n", "\n", "\n", "## Type Class Hierarchy", "\n", "\n") +
-          generateMixedHierarchyDiagramCode(classes.toList())
-      } else cleanedSource
+      lines
     }
 
   val fenceRegexStart = "```(.*):ank.*".toRegex()
@@ -264,26 +256,5 @@ val interpreter: AnkOps = object : AnkOps {
       }
       cache
     }
-  }
-
-  // TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
-  private fun generateMixedHierarchyDiagramCode(classes: List<String>): Sequence<String> {
-    // careful meta-meta-programming ahead
-    val hierarchyGraphsJoined =
-      "listOf(" + classes
-        .map { "TypeClass($it::class)" }
-        .joinToString(", ") + ").mixedHierarchyGraph()"
-
-    return sequenceOf(
-      """<canvas id="hierarchy-diagram"></canvas>""",
-      """<script>""",
-      """  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')""",
-      """</script>""",
-      "",
-      """```kotlin:ank:outFile(diagram.nomnol)""",
-      """import arrow.reflect.*""",
-      hierarchyGraphsJoined,
-      """```""""
-    )
   }
 }
