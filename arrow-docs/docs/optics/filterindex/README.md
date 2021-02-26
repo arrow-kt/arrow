@@ -11,7 +11,7 @@ permalink: /optics/filterindex/
 
 If the foci `A` for a structure `S` can be indexed by `I`, then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
 
-`FilterIndex` can easily be created, given a `Every` instance that filers a certain index.
+`FilterIndex` can easily be created, given an `Every` instance that filters a certain index.
 
 ```kotlin:ank
 import arrow.core.*
@@ -34,7 +34,7 @@ val filterIndexStringByIndex : FilterIndex<List<String>, Int, String> = FilterIn
 Given a `FilterIndex` instance, we can create a `Traversal` that filters out the foci that do not match the predicate.
 
 ```kotlin:ank
-val filter: Every<List<String>, String> = filterIndexStringByIndex.filter { length -> length > 3 }
+val filter: Every<List<String>, String> = filterIndexStringByIndex.filter { index -> index > 3 }
 
 filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello"))
 ```

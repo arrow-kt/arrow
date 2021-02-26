@@ -103,10 +103,10 @@ Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that 
 val pprism = PPrism.pOption<Pair<Int, String>, Pair<String, String>>()
 val plens = PLens.pPairFirst<Int, String, String>()
 
-val someTuple2: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>, Int, String> =
+val somePair: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>, Int, String> =
     pprism compose plens
 
-val lifted: (Option<Pair<Int, String>>) -> Option<Pair<String, String>> = someTuple2.lift { _ -> "Hello, " }
+val lifted: (Option<Pair<Int, String>>) -> Option<Pair<String, String>> = somePair.lift { _ -> "Hello, " }
 ```
 ```kotlin:ank
 lifted(None)
