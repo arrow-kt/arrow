@@ -66,7 +66,7 @@ data class Tuple11<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -135,7 +135,7 @@ data class Tuple12<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -207,7 +207,7 @@ data class Tuple13<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -282,7 +282,7 @@ data class Tuple14<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -360,7 +360,7 @@ data class Tuple15<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -441,7 +441,7 @@ data class Tuple16<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -525,7 +525,7 @@ data class Tuple17<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -612,7 +612,7 @@ data class Tuple18<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -702,7 +702,7 @@ data class Tuple19<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -795,7 +795,7 @@ data class Tuple20<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -891,7 +891,7 @@ data class Tuple21<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
@@ -989,7 +989,7 @@ data class Tuple22<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val fifth: E = e
   val sixth: F = f
   val seventh: G = g
-  val eight: H = h
+  val eighth: H = h
   val ninth: I = i
   val tenth: J = j
   val eleventh: K = k
