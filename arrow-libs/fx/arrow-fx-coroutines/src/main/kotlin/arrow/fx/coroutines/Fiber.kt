@@ -66,8 +66,8 @@ internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fibe
  * Cancelling this [Fiber] **will not** cancel its parent.
  */
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
-  ReplaceWith("async(ctx) { f() }", "kotlinx.coroutines.Deferred")
+  "Use async with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("async(ctx) { f() }", "kotlinx.coroutines.async")
 )
 suspend fun <A> ForkConnected(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> {
   val def = CoroutineScope(coroutineContext[Job] ?: Job()).async(ctx) {
@@ -82,8 +82,8 @@ suspend fun <A> ForkConnected(ctx: CoroutineContext = Dispatchers.Default, f: su
 
 /** @see ForkConnected **/
 @Deprecated(
-  "Use Deferred with KotlinX Coroutines Structured Concurrency",
-  ReplaceWith("async(ctx) { invoke() }", "kotlinx.coroutines.Deferred")
+  "Use async with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("async(ctx) { invoke() }", "kotlinx.coroutines.async")
 )
 suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
   ForkConnected(ctx, this)
@@ -119,7 +119,14 @@ suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Dispatch
  * }
  * ```
  */
-// TODO provide proper deprecation annotation
+@Deprecated(
+  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith(
+    "val scope = CoroutineScope(ctx); scope.async(ctx) { f() }.also { scope.launch { interruptWhen(); it.cancelAndJoin() } }",
+    "kotlinx.coroutines.async",
+    "kotlinx.coroutines.CoroutineScope"
+  )
+)
 suspend fun <A> ForkScoped(
   ctx: CoroutineContext = Dispatchers.Default,
   interruptWhen: suspend () -> Unit,
@@ -132,7 +139,14 @@ suspend fun <A> ForkScoped(
 }
 
 /** @see ForkScoped */
-// TODO provide proper deprecation annotation
+@Deprecated(
+  "Use async with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith(
+    "val scope = CoroutineScope(ctx); scope.async(ctx) { f() }.also { scope.launch { interruptWhen(); it.cancelAndJoin() } }",
+    "kotlinx.coroutines.async",
+    "kotlinx.coroutines.CoroutineScope"
+  )
+)
 suspend fun <A> (suspend () -> A).forkScoped(
   ctx: CoroutineContext = Dispatchers.Default,
   interruptWhen: suspend () -> Unit
@@ -147,12 +161,18 @@ suspend fun <A> (suspend () -> A).forkScoped(
  *
  * @see ForkConnected for a fork operation that wires cancellation to its parent in a safe way.
  */
-// TODO provide proper deprecation annotation
+@Deprecated(
+  "Use async with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("GlobalScope.async(ctx) { f() }", "kotlinx.coroutines.async", "kotlinx.coroutines.GlobalScope")
+)
 suspend fun <A> ForkAndForget(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> =
   f.forkAndForget(ctx)
 
 /** @see ForkAndForget */
-// TODO provide proper deprecation annotation
+@Deprecated(
+  "Use async with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("GlobalScope.async(ctx) { this() }", "kotlinx.coroutines.async", "kotlinx.coroutines.GlobalScope")
+)
 suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
   CoroutineScope(ctx).async {
     invoke()
