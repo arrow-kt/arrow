@@ -12,11 +12,14 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 typealias RacePair<A, B> = Either<Pair<A, Fiber<B>>, Pair<Fiber<A>, B>>
 
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 fun <A, B, C> Either<Pair<A, Fiber<B>>, Pair<Fiber<A>, B>>.fold(ifLeft: (A, Fiber<B>) -> C, ifRight: (Fiber<A>, B) -> C): C =
   fold({ (a, b) -> ifLeft(a, b) }, { (a, b) -> ifRight(a, b) })
 
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 suspend fun <A, B> racePair(fa: suspend () -> A, fb: suspend () -> B): RacePair<A, B> =
   racePair(Dispatchers.Default, fa, fb)
 
@@ -63,7 +66,7 @@ suspend fun <A, B> racePair(
     }
   }
 
-suspend fun <A, B> oldRacePair(
+private suspend fun <A, B> oldRacePair(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B

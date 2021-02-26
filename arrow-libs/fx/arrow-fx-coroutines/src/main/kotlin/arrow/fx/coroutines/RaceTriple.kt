@@ -11,6 +11,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 sealed class RaceTriple<A, B, C> {
   data class First<A, B, C>(val winner: A, val fiberB: Fiber<B>, val fiberC: Fiber<C>) : RaceTriple<A, B, C>()
   data class Second<A, B, C>(val fiberA: Fiber<A>, val winner: B, val fiberC: Fiber<C>) : RaceTriple<A, B, C>()
@@ -27,6 +28,7 @@ sealed class RaceTriple<A, B, C> {
   }
 }
 
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 suspend fun <A, B, C> raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: suspend () -> C): RaceTriple<A, B, C> =
   raceTriple(Dispatchers.Default, fa, fb, fc)
 
@@ -76,7 +78,7 @@ suspend fun <A, B, C> raceTriple(
     }
   }
 
-suspend fun <A, B, C> oldRaceTriple(
+private suspend fun <A, B, C> oldRaceTriple(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B,
