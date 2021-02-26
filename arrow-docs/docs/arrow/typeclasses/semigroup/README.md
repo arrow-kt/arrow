@@ -32,7 +32,7 @@ Now that you've learned about the Semigroup instance for Int, try to guess how i
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.typiclasses.*
+import arrow.typeclasses.*
 
 Semigroup.int().run { 1.combine(2) }
 ```

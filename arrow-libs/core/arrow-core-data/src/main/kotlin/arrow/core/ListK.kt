@@ -81,6 +81,7 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * ```kotlin:ank:playground
  * import arrow.core.Right
  * import arrow.core.Left
+ * import arrow.core.traverseEither
  *
  * //sampleStart
  * val numbers = listOf(Math.random(), Math.random(), Math.random())
@@ -95,6 +96,7 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  *
  * ```kotlin:ank:playground
  * import arrow.core.Right
+ * import arrow.core.sequenceEither
  *
  * //sampleStart
  * val requests = listOf(Right(Math.random()), Right(Math.random()), Right(Math.random()))

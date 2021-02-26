@@ -26,7 +26,7 @@ Monoid.string().run { empty() }
 ```
 
 ```kotlin:ank
-String.monoid().run {
+Monoid.string().run {
   listOf<String>("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
