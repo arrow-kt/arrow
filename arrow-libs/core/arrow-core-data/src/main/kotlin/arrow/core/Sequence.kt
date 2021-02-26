@@ -596,7 +596,7 @@ fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   } ?: emptySequence()
 
 /**
- * unzips the structure holding the resulting elements in an `Tuple2`
+ * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin:ank:playground
  * import arrow.core.unzip
