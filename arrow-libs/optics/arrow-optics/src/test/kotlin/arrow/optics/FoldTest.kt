@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.core.Option
 import arrow.core.int
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
@@ -11,9 +10,6 @@ class FoldTest : UnitSpec() {
 
   init {
 
-    val intFold = Traversal.list<Int>().asFold()
-    val stringFold = Traversal.list<String>().asFold()
-
     "Fold select a list that contains one" {
       val select = Fold.select<List<Int>> { it.contains(1) }
 
@@ -23,7 +19,7 @@ class FoldTest : UnitSpec() {
       }
     }
 
-    with(intFold) {
+    with(Fold.list<Int>()) {
 
       "Folding a list of ints" {
         forAll(Gen.list(Gen.int())) { ints ->
@@ -39,7 +35,8 @@ class FoldTest : UnitSpec() {
 
       "Folding and mapping a list of strings" {
         forAll(Gen.list(Gen.int())) { ints ->
-          stringFold.run { foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) } == ints.sum()
+          Fold.list<String>()
+            .foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) == ints.sum()
         }
       }
 
@@ -57,7 +54,7 @@ class FoldTest : UnitSpec() {
 
       "Find the first element matching the predicate" {
         forAll(Gen.list(Gen.choose(-100, 100))) { ints ->
-          find(ints) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
+          findOrNull(ints) { it > 10 } == ints.firstOrNull { it > 10 }
         }
       }
 
@@ -69,7 +66,7 @@ class FoldTest : UnitSpec() {
 
       "Check if all targets match the predicate" {
         forAll(Gen.list(Gen.int())) { ints ->
-          forall(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
+          all(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
         }
       }
 
@@ -81,7 +78,7 @@ class FoldTest : UnitSpec() {
 
       "Check if there is a target" {
         forAll(Gen.list(Gen.int())) { ints ->
-          nonEmpty(ints) == ints.isNotEmpty()
+          isNotEmpty(ints) == ints.isNotEmpty()
         }
       }
     }

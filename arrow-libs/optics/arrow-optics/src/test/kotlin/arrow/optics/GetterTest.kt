@@ -2,12 +2,9 @@ package arrow.optics
 
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.k
 import arrow.core.string
 import arrow.core.test.UnitSpec
-import arrow.core.toT
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -16,11 +13,11 @@ class GetterTest : UnitSpec() {
 
   init {
 
-    val userGetter = userIso.asGetter()
+    val userGetter = userIso
     val length = Getter<String, Int> { it.length }
     val upper = Getter<String, String> { it.toUpperCase() }
 
-    with(tokenGetter.asFold()) {
+    with(tokenGetter) {
 
       "asFold should behave as valid Fold: size" {
         forAll(genToken) { token ->
@@ -30,7 +27,7 @@ class GetterTest : UnitSpec() {
 
       "asFold should behave as valid Fold: nonEmpty" {
         forAll(genToken) { token ->
-          nonEmpty(token)
+          isNotEmpty(token)
         }
       }
 
@@ -60,13 +57,13 @@ class GetterTest : UnitSpec() {
 
       "asFold should behave as valid Fold: headOption" {
         forAll(genToken) { token ->
-          headOption(token) == Some(token.value)
+          firstOrNull(token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
         forAll(genToken) { token ->
-          lastOption(token) == Some(token.value)
+          lastOrNull(token) == token.value
         }
       }
     }
@@ -81,20 +78,20 @@ class GetterTest : UnitSpec() {
 
       "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
         forAll { value: String, predicate: Boolean ->
-          find(Token(value)) { predicate }.fold({ false }, { true }) == predicate
+          findOrNull(Token(value)) { predicate }?.let { true } ?: false == predicate
         }
       }
 
       "Checking existence of a target should always result in the same result as predicate" {
         forAll { value: String, predicate: Boolean ->
-          exist(Token(value)) { predicate } == predicate
+          any(Token(value)) { predicate } == predicate
         }
       }
     }
 
     "Zipping two lenses should yield a tuple of the targets" {
       forAll { value: String ->
-        length.zip(upper).get(value) == value.length toT value.toUpperCase()
+        length.zip(upper).get(value) == value.length to value.toUpperCase()
       }
     }
 
@@ -110,23 +107,23 @@ class GetterTest : UnitSpec() {
     }
 
     "Pairing two disjoint getters should yield a pair of their results" {
-      val splitGetter: Getter<Tuple2<Token, User>, Tuple2<String, Token>> = tokenGetter.split(userGetter)
+      val splitGetter: Getter<Pair<Token, User>, Pair<String, Token>> = tokenGetter.split(userGetter)
       forAll(genToken, genUser) { token: Token, user: User ->
-        splitGetter.get(token toT user) == token.value toT user.token
+        splitGetter.get(token to user) == token.value to user.token
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenGetter.first<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
-        first.get(token toT int) == token.value toT int
+        first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val first = tokenGetter.second<Int>()
       forAll(Gen.int(), genToken) { int: Int, token: Token ->
-        first.get(int toT token) == int toT token.value
+        first.get(int to token) == int to token.value
       }
     }
   }

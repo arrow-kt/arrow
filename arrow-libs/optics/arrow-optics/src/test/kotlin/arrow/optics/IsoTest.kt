@@ -1,9 +1,6 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.Some
-import arrow.core.toT
-import arrow.core.k
 import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
@@ -29,7 +26,7 @@ class IsoTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lens = tokenIso.asLens(),
+        lens = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -39,25 +36,23 @@ class IsoTest : UnitSpec() {
       ),
 
       PrismLaws.laws(
-        prism = aIso.asPrism(),
+        prism = aIso,
         aGen = genSumTypeA,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       ),
 
       TraversalLaws.laws(
-        traversal = tokenIso.asTraversal(),
+        traversal = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
-        optional = tokenIso.asOptional(),
+        optional = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -66,7 +61,7 @@ class IsoTest : UnitSpec() {
       ),
 
       SetterLaws.laws(
-        setter = tokenIso.asSetter(),
+        setter = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -84,7 +79,7 @@ class IsoTest : UnitSpec() {
       )
     )
 
-    with(tokenIso.asFold()) {
+    with(tokenIso) {
 
       "asFold should behave as valid Fold: size" {
         forAll(genToken) { token ->
@@ -94,7 +89,7 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: nonEmpty" {
         forAll(genToken) { token ->
-          nonEmpty(token)
+          isNotEmpty(token)
         }
       }
 
@@ -106,7 +101,7 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll(genToken) { token ->
-          getAll(token) == listOf(token.value).k()
+          getAll(token) == listOf(token.value)
         }
       }
 
@@ -124,18 +119,18 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: headOption" {
         forAll(genToken) { token ->
-          headOption(token) == Some(token.value)
+          firstOrNull(token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
         forAll(genToken) { token ->
-          lastOption(token) == Some(token.value)
+          lastOrNull(token) == token.value
         }
       }
     }
 
-    with(tokenIso.asGetter()) {
+    with(tokenIso) {
 
       "asGetter should behave as valid Getter: get" {
         forAll(genToken) { token ->
@@ -145,13 +140,13 @@ class IsoTest : UnitSpec() {
 
       "asGetter should behave as valid Getter: find" {
         forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
-          find(token, p) == tokenGetter.find(token, p)
+          findOrNull(token, p) == tokenGetter.findOrNull(token, p)
         }
       }
 
       "asGetter should behave as valid Getter: exist" {
         forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
-          exist(token, p) == tokenGetter.exist(token, p)
+          any(token, p) == tokenGetter.any(token, p)
         }
       }
     }
@@ -165,14 +160,14 @@ class IsoTest : UnitSpec() {
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenIso.first<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
-        first.get(token toT int) == token.value toT int
+        first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value to target" {
       val second = tokenIso.second<Int>()
       forAll(Gen.int(), genToken) { int: Int, token: Token ->
-        second.get(int toT token) == int toT token.value
+        second.get(int to token) == int to token.value
       }
     }
 
@@ -194,13 +189,13 @@ class IsoTest : UnitSpec() {
 
     "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
       forAll { predicate: Boolean ->
-        tokenIso.find(Token("any value")) { predicate }.fold({ false }, { true }) == predicate
+        tokenIso.findOrNull(Token("any value")) { predicate }?.let { true } ?: false == predicate
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
       forAll { predicate: Boolean ->
-        tokenIso.exist(Token("any value")) { predicate } == predicate
+        tokenIso.any(Token("any value")) { predicate } == predicate
       }
     }
 
@@ -210,7 +205,7 @@ class IsoTest : UnitSpec() {
       forAll { tokenValue: String ->
         val token = Token(tokenValue)
         val user = User(token)
-        joinedIso.get(token toT user) == tokenValue toT token
+        joinedIso.get(token to user) == tokenValue to token
       }
     }
 

@@ -65,7 +65,7 @@ class ScheduleTest : ArrowFxSpec(
 
     "Schedule.once() repeats 1 additional time" {
       var count = 0
-      repeat(Schedule.once()) {
+      Schedule.once<Int>().repeat {
         count++
       }
       count shouldBe 2
@@ -104,8 +104,8 @@ class ScheduleTest : ArrowFxSpec(
     "Repeat a scheduled repeat repeats the whole number" {
       val n = 42
       var count = 0
-      repeat(Schedule.recurs(1)) {
-        repeat(Schedule.recurs(n)) {
+      Schedule.recurs<Int>(1).repeat {
+        Schedule.recurs<Int>(n).repeat {
           count++
         }
       }
@@ -115,7 +115,7 @@ class ScheduleTest : ArrowFxSpec(
 
     "Schedule.never() times out" {
       withTimeoutOrNull(10.milliseconds) {
-        val a: Nothing = repeat(Schedule.never()) {
+        val a: Nothing = Schedule.never<Int>().repeat {
           1
         }
       } shouldBe null
@@ -180,7 +180,7 @@ class ScheduleTest : ArrowFxSpec(
       val eff = SideEffect()
 
       val l = Either.catch {
-        repeat(schedule) {
+        schedule.repeat {
           if (eff.counter >= n) throw stop
           else eff.increment()
         }
@@ -192,19 +192,19 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeat fails fast on errors" {
       val ex = Throwable("Hello")
-      repeatOrElseEither(Schedule.recurs(0), { throw ex }) { exc, _ -> exc }
+      Schedule.recurs<Int>(0).repeatOrElseEither({ throw ex }) { exc, _ -> exc }
         .fold({ it shouldBe ex }, { fail("The impossible happened") })
     }
 
     "repeat should run the schedule with the correct input" {
       var i = 0
-      repeat(Schedule.recurs<Int>(10).zipRight(Schedule.collect())) { i++ } shouldBe (0..10).toList()
+      (Schedule.recurs<Int>(10).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..10).toList()
     }
 
     "retry is stack-safe" {
       val count = Atomic(0)
       val l = Either.catch {
-        retry(Schedule.recurs(20_000)) {
+        Schedule.recurs<Throwable>(20_000).retry {
           count.updateAndGet { it + 1 }
           throw exception
         }
@@ -215,17 +215,14 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "retry succeeds if no exception is thrown" {
-      retry(Schedule.recurs(0)) { 1 } shouldBe 1
+      Schedule.recurs<Throwable>(0).retry { 1 } shouldBe 1
     }
 
     "retryOrElseEither runs the schedule with the correct input and runs the orElse handler if it does not retry" {
       val ex = Throwable("Hello")
-      val res = retryOrElseEither<Int, Int, Throwable>(
-        Schedule.recurs(0),
-        {
-          throw ex
-        }
-      ) { e, _ -> e }
+      val res = Schedule.recurs<Throwable>(0)
+        .retryOrElseEither({ throw ex }) { e, _ -> e }
+
       res.fold({ it shouldBe ex }, { fail("The impossible happened") })
     }
   }
@@ -287,7 +284,7 @@ private tailrec suspend fun <I, A> go(
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Unit {
   val count = Atomic(0)
-  repeat(schedule) {
+  schedule.repeat {
     count.updateAndGet { it + 1 }
   } shouldBe expected
 }
@@ -302,6 +299,3 @@ private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<An
     require(lh == rh) { "Decision#cont: $lh shouldBe $rh" }
   }
 }
-
-private val Duration.inSeconds: Long
-  get() = timeUnit.toSeconds(amount)

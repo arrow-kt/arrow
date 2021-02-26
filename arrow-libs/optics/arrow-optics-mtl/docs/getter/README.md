@@ -12,7 +12,7 @@ permalink: /optics/getter/
 import arrow.optics.mtl.*
 import arrow.mtl.*
 
-val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
+val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().ask()
 
 reader
   .map(String::toUpperCase)
@@ -20,7 +20,7 @@ reader
 ```
 
 ```kotlin:ank
-NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
+NonEmptyList.head<String>().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 

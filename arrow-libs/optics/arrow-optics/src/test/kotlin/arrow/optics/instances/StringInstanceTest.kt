@@ -2,7 +2,6 @@ package arrow.optics.instances
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.tuple2
 import arrow.optics.Traversal
 import arrow.optics.string
 import arrow.optics.test.generators.char
@@ -26,8 +25,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       )
     )
 
@@ -37,8 +35,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       )
     )
 
@@ -48,7 +45,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQOptionB = Eq.any(),
         EQA = Eq.any()
       )
     )
@@ -57,10 +53,9 @@ class StringInstanceTest : UnitSpec() {
       PrismLaws.laws(
         prism = Cons.string().cons(),
         aGen = Gen.string(),
-        bGen = Gen.tuple2(Gen.char(), Gen.string()),
-        funcGen = Gen.functionAToB(Gen.tuple2(Gen.char(), Gen.string())),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        bGen = Gen.pair(Gen.char(), Gen.string()),
+        funcGen = Gen.functionAToB(Gen.pair(Gen.char(), Gen.string())),
+        EQA = Eq.any()
       )
     )
 
@@ -68,10 +63,9 @@ class StringInstanceTest : UnitSpec() {
       PrismLaws.laws(
         prism = Snoc.string().snoc(),
         aGen = Gen.string(),
-        bGen = Gen.tuple2(Gen.string(), Gen.char()),
-        funcGen = Gen.functionAToB(Gen.tuple2(Gen.string(), Gen.char())),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        bGen = Gen.pair(Gen.string(), Gen.char()),
+        funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.char())),
+        EQA = Eq.any()
       )
     )
   }

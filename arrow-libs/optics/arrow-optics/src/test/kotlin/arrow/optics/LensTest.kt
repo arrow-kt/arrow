@@ -2,14 +2,10 @@ package arrow.optics
 
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.int
-import arrow.core.k
 import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
-import arrow.core.toT
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
@@ -34,16 +30,15 @@ class LensTest : UnitSpec() {
       ),
 
       TraversalLaws.laws(
-        traversal = tokenLens.asTraversal(),
+        traversal = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
-        optional = tokenLens.asOptional(),
+        optional = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -52,7 +47,7 @@ class LensTest : UnitSpec() {
       ),
 
       SetterLaws.laws(
-        setter = tokenLens.asSetter(),
+        setter = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -74,67 +69,67 @@ class LensTest : UnitSpec() {
 
     "asFold should behave as valid Fold: size" {
       forAll(genToken) { token ->
-        tokenLens.asFold().size(token) == 1
+        tokenLens.size(token) == 1
       }
     }
 
     "asFold should behave as valid Fold: nonEmpty" {
       forAll(genToken) { token ->
-        tokenLens.asFold().nonEmpty(token)
+        tokenLens.isNotEmpty(token)
       }
     }
 
     "asFold should behave as valid Fold: isEmpty" {
       forAll(genToken) { token ->
-        !tokenLens.asFold().isEmpty(token)
+        !tokenLens.isEmpty(token)
       }
     }
 
     "asFold should behave as valid Fold: getAll" {
       forAll(genToken) { token ->
-        tokenLens.asFold().getAll(token) == listOf(token.value).k()
+        tokenLens.getAll(token) == listOf(token.value)
       }
     }
 
     "asFold should behave as valid Fold: combineAll" {
       forAll(genToken) { token ->
-        tokenLens.asFold().combineAll(Monoid.string(), token) == token.value
+        tokenLens.combineAll(Monoid.string(), token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: fold" {
       forAll(genToken) { token ->
-        tokenLens.asFold().fold(Monoid.string(), token) == token.value
+        tokenLens.fold(Monoid.string(), token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: headOption" {
       forAll(genToken) { token ->
-        tokenLens.asFold().headOption(token) == Some(token.value)
+        tokenLens.firstOrNull(token) == token.value
       }
     }
 
     "asFold should behave as valid Fold: lastOption" {
       forAll(genToken) { token ->
-        tokenLens.asFold().lastOption(token) == Some(token.value)
+        tokenLens.lastOrNull(token) == token.value
       }
     }
 
     "asGetter should behave as valid Getter: get" {
       forAll(genToken) { token ->
-        tokenLens.asGetter().get(token) == tokenGetter.get(token)
+        tokenLens.get(token) == tokenGetter.get(token)
       }
     }
 
     "asGetter should behave as valid Getter: find" {
       forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
-        tokenLens.asGetter().find(token, p) == tokenGetter.find(token, p)
+        tokenLens.findOrNull(token, p) == tokenGetter.findOrNull(token, p)
       }
     }
 
     "asGetter should behave as valid Getter: exist" {
       forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
-        tokenLens.asGetter().exist(token, p) == tokenGetter.exist(token, p)
+        tokenLens.any(token, p) == tokenGetter.any(token, p)
       }
     }
 
@@ -146,13 +141,13 @@ class LensTest : UnitSpec() {
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       forAll { predicate: Boolean ->
-        tokenLens.find(Token("any value")) { predicate }.fold({ false }, { true }) == predicate
+        tokenLens.findOrNull(Token("any value")) { predicate }?.let { true } ?: false == predicate
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
       forAll { predicate: Boolean ->
-        tokenLens.exist(Token("any value")) { predicate } == predicate
+        tokenLens.any(Token("any value")) { predicate } == predicate
       }
     }
 
@@ -168,23 +163,23 @@ class LensTest : UnitSpec() {
     }
 
     "Pairing two disjoint lenses should yield a pair of their results" {
-      val spiltLens: Lens<Tuple2<Token, User>, Tuple2<String, Token>> = tokenLens split userLens
+      val spiltLens: Lens<Pair<Token, User>, Pair<String, Token>> = tokenLens split userLens
       forAll(genToken, genUser) { token: Token, user: User ->
-        spiltLens.get(token toT user) == token.value toT user.token
+        spiltLens.get(token to user) == token.value to user.token
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenLens.first<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
-        first.get(token toT int) == token.value toT int
+        first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val second = tokenLens.second<Int>()
       forAll(Gen.int(), genToken) { int: Int, token: Token ->
-        second.get(int toT token) == int toT token.value
+        second.get(int to token) == int to token.value
       }
     }
   }

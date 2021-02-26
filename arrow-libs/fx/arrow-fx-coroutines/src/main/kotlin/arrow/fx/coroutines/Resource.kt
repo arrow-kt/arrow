@@ -272,12 +272,13 @@ sealed class Resource<out A> {
      *
      * ```kotlin:ank:playground
      * import arrow.fx.coroutines.*
+     * import kotlinx.coroutines.withContext
      *
      * val singleCtx = Resource.singleThreadContext("single")
      *
      * suspend fun main(): Unit =
      *   singleCtx.use { ctx ->
-     *     evalOn(ctx) {
+     *     withContext(ctx) {
      *       println("I am running on ${Thread.currentThread().name}")
      *     }
      *   }

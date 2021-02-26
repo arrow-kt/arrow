@@ -19,8 +19,7 @@ class EitherInstanceTest : UnitSpec() {
         aGen = Gen.either(Gen.string(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        EQA = Eq.any()
       )
     )
   }

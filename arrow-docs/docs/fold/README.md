@@ -26,27 +26,19 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 }
 ```
 
-Or you can get a `Fold` from any existing `Foldable`.
-
-```kotlin:ank:silent
-import arrow.core.extensions.nonemptylist.foldable.*
-
-val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
-```
-
 `Fold` has an API similar to `Foldable`, but because it's defined in terms of `foldMap`, there are no associative fold functions available.
 
 ```kotlin:ank
 nullableFold<Int>().isEmpty(null)
 ```
 ```kotlin:ank
-nonEmptyIntFold.combineAll(Int.monoid(), NonEmptyList.of(1, 2, 3))
+Fold.nonEmptyList<Int>().combineAll(Int.monoid(), NonEmptyList.of(1, 2, 3))
 ```
 ```kotlin:ank
-nullableFold<Int>().headOption(null)
+nullableFold<Int>().firstOrNull(null)
 ```
 ```kotlin:ank
-nonEmptyIntFold.headOption(NonEmptyList.of(1, 2, 3, 4))
+Fold.nonEmptyList<Int>().firstOrNull(NonEmptyList.of(1, 2, 3, 4))
 ```
 
 ## Composition
@@ -54,13 +46,13 @@ nonEmptyIntFold.headOption(NonEmptyList.of(1, 2, 3, 4))
 Composing `Fold` can be used for accessing foci in nested structures.
 
 ```kotlin:ank
-val nestedNelFold: Fold<NonEmptyListOf<NonEmptyListOf<Int>>, NonEmptyListOf<Int>> = Fold.fromFoldable(NonEmptyList.foldable())
+val nestedNelFold: Fold<NonEmptyList<NonEmptyList<Int>>, NonEmptyList<Int>> = Fold.nonEmptyList()
 
 val nestedNel = NonEmptyList.of(1, 2, 3, 4).map {
     NonEmptyList.of(it, it)
 }
 
-(nestedNelFold compose nonEmptyIntFold).getAll(nestedNel)
+(nestedNelFold compose Fold.nonEmptyList()).getAll(nestedNel)
 ```
 
 `Fold` can be composed with all optics except `Setter`, and results in the following optics.

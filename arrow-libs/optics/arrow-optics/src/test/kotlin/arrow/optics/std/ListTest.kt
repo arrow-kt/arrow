@@ -44,16 +44,14 @@ class ListTest : UnitSpec() {
       )
     )
 
-    testLaws(
-      IsoLaws.laws(
-        iso = Iso.listToOptionNel(),
-        aGen = Gen.list(Gen.int()),
-        bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
-        funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        bMonoid = Monoid.option(Semigroup.nonEmptyList())
-      )
-    )
+    testLaws(IsoLaws.laws(
+      iso = Iso.listToOptionNel(),
+      aGen = Gen.list(Gen.int()),
+      bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
+      funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
+      EQA = Eq.any(),
+      EQB = Eq.any(),
+      bMonoid = Monoid.option(Semigroup.nonEmptyList())
+    ))
   }
 }

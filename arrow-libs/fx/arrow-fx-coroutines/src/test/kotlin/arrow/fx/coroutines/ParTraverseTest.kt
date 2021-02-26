@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.Dispatchers
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -26,22 +27,22 @@ class ParTraverseTest : ArrowFxSpec(
     }
 
     "parTraverse runs in parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit)
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit)
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get()
+          promiseC.await()
         }
       ).parSequence()
     }
@@ -110,44 +111,44 @@ class ParTraverseTest : ArrowFxSpec(
     }
 
     "parTraverseN(3) runs in (3) parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit)
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit)
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get()
+          promiseC.await()
         }
       ).parSequenceN(3)
     }
 
     "parTraverseN(1) times out running 3 tasks" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       withTimeoutOrNull(10.milliseconds) {
         listOf(
           suspend {
-            promiseA.get()
+            promiseA.await()
             promiseC.complete(Unit)
           },
           suspend {
-            promiseB.get()
+            promiseB.await()
             promiseA.complete(Unit)
           },
           suspend {
             promiseB.complete(Unit)
-            promiseC.get()
+            promiseC.await()
           }
         ).parSequenceN(1)
       } shouldBe null

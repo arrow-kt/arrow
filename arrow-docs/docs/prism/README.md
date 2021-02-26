@@ -59,20 +59,6 @@ val lifted: (NetworkResult) -> NetworkResult = networkSuccessPrism.lift { succes
 lifted(NetworkResult.Failure)
 ```
 
-We can also modify or lift functions using `Functors`.
-
-```kotlin:ank
-import arrow.core.extensions.option.applicative.*
-
-networkSuccessPrism.modifyF(Option.applicative(), networkResult) { success ->
-    success.some()
-}
-```
-```kotlin:ank
-val liftF = networkSuccessPrism.liftF(Option.applicative()) { None }
-liftF(networkResult)
-```
-
 `Prisms` can easily be created by using any of the already mentioned constructors, although, for a `sealed class`, a `Prism` could easily be [generated](#generated-prisms). But we can also use a `PartialFunction` to create a `Prism`.
 
 ```kotlin:ank
@@ -102,13 +88,13 @@ val successToInt: Prism<NetworkResult.Success, Int> = Prism(
 val networkInt: Prism<NetworkResult, Int> = networkSuccessPrism compose successToInt
 ```
 ```kotlin:ank
-networkInt.getOption(NetworkResult.Success("invalid int"))
+networkInt.getOrNull(NetworkResult.Success("invalid int"))
 ```
 ```kotlin:ank
-networkInt.getOption(NetworkResult.Failure)
+networkInt.getOrNull(NetworkResult.Failure)
 ```
 ```kotlin:ank
-networkInt.getOption(NetworkResult.Success("5"))
+networkInt.getOrNull(NetworkResult.Success("5"))
 ```
 `Prism` can be composed with all optics but `Getter`, and result in the following optics:
 

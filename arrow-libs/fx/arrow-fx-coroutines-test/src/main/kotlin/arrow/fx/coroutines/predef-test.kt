@@ -14,7 +14,6 @@ import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.equalityMatcher
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.char
@@ -33,7 +32,6 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.ThreadFactory
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -57,34 +55,6 @@ class NamedThreadFactory(private val mkName: (Int) -> String) : ThreadFactory {
   override fun newThread(r: Runnable): Thread =
     Thread(r, mkName(count.value))
       .apply { isDaemon = true }
-}
-
-fun unsafeEquals(other: CancelToken): Matcher<CancelToken> = object : Matcher<CancelToken> {
-  val env = Environment(EmptyCoroutineContext)
-  override fun test(value: CancelToken): MatcherResult {
-    val r1 = env.unsafeRunSync { value.cancel.invoke() }
-    val r2 = env.unsafeRunSync { other.cancel.invoke() }
-    return MatcherResult(r1 == r2, "Expected: $r2 but found: $r1", "$r2 and $r1 should be equal")
-  }
-}
-
-suspend fun assertCancellable(f: suspend () -> Unit): Unit {
-  val p = Promise<ExitCase>()
-  val start = Promise<Unit>()
-
-  val fiber = ForkAndForget {
-    guaranteeCase(
-      fa = {
-        start.complete(Unit)
-        f()
-      },
-      finalizer = { ex -> p.complete(ex) }
-    )
-  }
-
-  start.get()
-  fiber.cancel()
-  p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
 }
 
 /**

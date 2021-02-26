@@ -17,11 +17,10 @@ object OptionalLaws {
     aGen: Gen<A>,
     bGen: Gen<B>,
     funcGen: Gen<(B) -> B>,
-    EQA: Eq<A>,
-    EQOptionB: Eq<Option<B>>
+    EQA: Eq<A>
   ): List<Law> = listOf(
     Law("Optional Law: set what you get") { getOptionSet(optionalGen, aGen, EQA) },
-    Law("Optional Law: set what you get") { setGetOption(optionalGen, aGen, bGen, EQOptionB) },
+    Law("Optional Law: set what you get") { setGetOption(optionalGen, aGen, bGen) },
     Law("Optional Law: set is idempotent") { setIdempotent(optionalGen, aGen, bGen, EQA) },
     Law("Optional Law: modify identity = identity") { modifyIdentity(optionalGen, aGen, EQA) },
     Law("Optional Law: compose modify") { composeModify(optionalGen, aGen, funcGen, EQA) },
@@ -38,7 +37,7 @@ object OptionalLaws {
     funcGen: Gen<(B) -> B>,
     EQA: Eq<A>,
     EQOptionB: Eq<Option<B>>
-  ): List<Law> = laws(Gen.constant(optional), aGen, bGen, funcGen, EQA, EQOptionB)
+  ): List<Law> = laws(Gen.constant(optional), aGen, bGen, funcGen, EQA)
 
   fun <A, B> getOptionSet(optionalGen: Gen<Optional<A, B>>, aGen: Gen<A>, EQA: Eq<A>): Unit =
     forAll(optionalGen, aGen) { optional, a ->
@@ -51,13 +50,12 @@ object OptionalLaws {
   fun <A, B> setGetOption(
     optionalGen: Gen<Optional<A, B>>,
     aGen: Gen<A>,
-    bGen: Gen<B>,
-    EQOptionB: Eq<Option<B>>
+    bGen: Gen<B>
   ): Unit =
     forAll(optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
-        getOption(set(a, b))
-          .equalUnderTheLaw(getOption(a).map { b }, EQOptionB)
+        getOrNull(set(a, b))
+          .equalUnderTheLaw(getOrNull(a)?.let { b }, Eq.any())
       }
     }
 
