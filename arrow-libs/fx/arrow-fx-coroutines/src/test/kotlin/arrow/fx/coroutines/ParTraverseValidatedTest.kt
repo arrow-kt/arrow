@@ -15,6 +15,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseValidatedTest : ArrowFxSpec(
   spec = {
@@ -27,22 +28,22 @@ class ParTraverseValidatedTest : ArrowFxSpec(
     }
 
     "parTraverseValidated runs in parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit).validNel()
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit).validNel()
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get().validNel()
+          promiseC.await().validNel()
         }
       ).parTraverseValidated(NonEmptyList.semigroup()) { it() }
     }
