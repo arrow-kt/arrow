@@ -58,7 +58,7 @@ In order to generate the documentation and validate it:
 cd arrow-libs
 ./gradlew dokka
 
-cd ../arrow-docs
+cd ../arrow-site
 ./gradlew runAnk
 ```
 

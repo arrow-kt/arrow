@@ -1,3 +1,6 @@
+---
+library: core
+---
 {: data-executable="true"}
 ```kotlin:ank
 import arrow.core.Either

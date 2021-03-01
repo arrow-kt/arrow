@@ -24,10 +24,10 @@ jobs:
       working-directory: arrow-libs
       run: ./gradlew dokka
     - name: Validate documentation
-      working-directory: arrow-docs
+      working-directory: arrow-site
       run: ./gradlew runAnk
     - name: Build site
       working-directory: arrow-site
       run: |
          bundle install --gemfile Gemfile --path vendor/bundle
-         bundle exec jekyll build -s docs
+         bundle exec jekyll build -s build/site
