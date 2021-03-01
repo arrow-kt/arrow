@@ -6,7 +6,6 @@ on:
     - master
     paths:
     - 'arrow-libs/**'
-    - 'arrow-docs/**'
     - 'arrow-site/**'
 
 jobs:
