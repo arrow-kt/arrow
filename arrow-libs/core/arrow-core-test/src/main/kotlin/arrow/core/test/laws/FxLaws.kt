@@ -2,7 +2,6 @@ package arrow.core.test.laws
 
 import arrow.continuations.Effect
 import arrow.core.test.generators.throwable
-import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -23,12 +22,12 @@ object FxLaws {
   fun <Eff : Effect<*>, F, A> suspended(
     pureGen: Gen<F>,
     G: Gen<F>,
-    EQ: Eq<F>,
+    f: (F, F) -> Boolean,
     fxSuspend: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
-    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, EQ, fxSuspend, invoke) },
-    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, EQ, fxSuspend, invoke) },
+    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, f, fxSuspend, invoke) },
+    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, f, fxSuspend, invoke) },
     Law("suspended fx can bind immediate exceptions") { suspendedCanBindImmediateExceptions(pureGen, fxSuspend, invoke) },
     Law("suspended fx can bind suspended exceptions") { suspendedCanBindSuspendedExceptions(pureGen, fxSuspend, invoke) }
   )
@@ -36,17 +35,17 @@ object FxLaws {
   fun <Eff : Effect<*>, F, A> eager(
     pureGen: Gen<F>,
     G: Gen<F>,
-    EQ: Eq<F>,
+    f: (F, F) -> Boolean,
     fxEager: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
-    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, EQ, fxEager, invoke) },
+    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, f, fxEager, invoke) },
     Law("non-suspended fx can bind immediate exceptions") { nonSuspendedCanBindImmediateException(pureGen, fxEager, invoke) }
   )
 
   private suspend fun <Eff : Effect<*>, F, A> nonSuspendedCanBindImmediateValues(
     G: Gen<F>,
-    EQ: Eq<F>,
+    eq: (F, F) -> Boolean,
     fxBlock: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
@@ -54,7 +53,7 @@ object FxLaws {
       fxBlock {
         val res = invoke(f)
         res
-      }.equalUnderTheLaw(f, EQ)
+      }.equalUnderTheLaw(f, eq)
     }
   }
 
@@ -78,7 +77,7 @@ object FxLaws {
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindImmediateValues(
     G: Gen<F>,
-    EQ: Eq<F>,
+    eq: (F, F) -> Boolean,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
@@ -88,13 +87,13 @@ object FxLaws {
         fxBlock {
           val res = invoke(f)
           res
-        }.equalUnderTheLaw(f, EQ)
+        }.equalUnderTheLaw(f, eq)
       }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindSuspendedValues(
     G: Gen<F>,
-    EQ: Eq<F>,
+    eq: (F, F) -> Boolean,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
@@ -104,7 +103,7 @@ object FxLaws {
         fxBlock {
           val res = invoke(f.suspend())
           res
-        }.equalUnderTheLaw(f, EQ)
+        }.equalUnderTheLaw(f, eq)
       }
   }
 

@@ -2,9 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 const val ListKDeprecation =
   "ListK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.List instead." +
@@ -163,11 +160,6 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     }
 
   fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
-
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
-    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { f(a).apEval(eval.map { it.map { xs -> { a: B -> (listOf(a) + xs).k() } } }) }
-    }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     flatMap { a ->
@@ -436,11 +428,6 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     other: ListK<B>
   ): ListK<Tuple2<A, B?>> =
     this.rightPadZip(other) { a, b -> a toT b }
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>): String = SA.run {
-    joinToString(prefix = "[", separator = ", ", postfix = "]") { it.show() }
-  }
 
   override fun toString(): String =
     list.toString()

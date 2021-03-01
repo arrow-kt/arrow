@@ -2,11 +2,8 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -43,16 +40,6 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   @Suppress("UNCHECKED_CAST")
   fun <U> retag(): Const<A, U> =
     this as Const<A, U>
-
-  @Suppress("UNUSED_PARAMETER")
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-  fun <G, U> traverse(GA: Applicative<G>, f: (T) -> Kind<G, U>): Kind<G, Const<A, U>> =
-    GA.just(retag())
-
-  @Suppress("UNUSED_PARAMETER")
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-  fun <G, U> traverseFilter(GA: Applicative<G>, f: (T) -> Kind<G, Option<U>>): Kind<G, Const<A, U>> =
-    GA.just(retag())
 
   companion object {
     fun <A, T> just(a: A): Const<A, T> =
@@ -218,10 +205,6 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   fun <U> map(f: (T) -> U): Const<A, U> =
     retag()
 
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>): String =
-    "$Const(${SA.run { value.show() }})"
-
   override fun toString(): String =
     "$Const($value)"
 }
@@ -246,10 +229,6 @@ fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T>
 )
 fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> =
   fix().retag<U>().combine(SG, ff.fix().retag())
-
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-fun <T, A, G> ConstOf<A, Kind<G, T>>.sequence(GA: Applicative<G>): Kind<G, Const<A, T>> =
-  fix().traverse(GA, ::identity)
 
 inline fun <A> A.const(): Const<A, Nothing> =
   Const(this)

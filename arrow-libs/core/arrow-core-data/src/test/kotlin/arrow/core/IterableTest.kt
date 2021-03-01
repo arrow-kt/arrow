@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.equalUnderTheLaw
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.max
@@ -62,7 +61,7 @@ class IterableTest : UnitSpec() {
         val result = a.rightPadZip(b)
 
         result == left.zip(right) { l, r -> l to r }.filter { it.first != null } &&
-          result.map { it.first }.equalUnderTheLaw(a, Eq.any())
+          result.map { it.first }.equalUnderTheLaw(a)
       }
     }
 
@@ -74,7 +73,7 @@ class IterableTest : UnitSpec() {
         val result = a.rightPadZip(b) { a, b -> a to b }
 
         result == left.zip(right) { l, r -> l to r }.filter { it.first != null } &&
-          result.map { it.first }.equalUnderTheLaw(a, Eq.any())
+          result.map { it.first }.equalUnderTheLaw(a)
       }
     }
 

@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -37,9 +35,6 @@ inline fun <A, B, C> Tuple3Of<A, B, C>.fix(): Tuple3<A, B, C> =
 
 @Deprecated("Deprecated in favor of Kotlin's Triple", ReplaceWith("Triple(a, b, c)"))
 data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C) : Tuple3Of<A, B, C> {
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }).joinToString(", ") + ")"
 
   override fun toString(): String =
     "($a, $b, $c)"

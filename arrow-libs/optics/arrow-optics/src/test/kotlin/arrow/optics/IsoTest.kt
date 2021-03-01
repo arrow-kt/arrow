@@ -10,7 +10,6 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -29,53 +28,42 @@ class IsoTest : UnitSpec() {
         lens = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Token.eq(),
-        EQB = Eq.any(),
-        MB = Monoid.string()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       PrismLaws.laws(
         prism = aIso,
         aGen = genSumTypeA,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       TraversalLaws.laws(
         traversal = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       OptionalLaws.laws(
         optional = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       SetterLaws.laws(
         setter = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Token.eq()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       IsoLaws.laws(
         iso = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Token.eq(),
-        EQB = Eq.any(),
-        bMonoid = Monoid.string()
+        funcGen = Gen.functionAToB(Gen.string())
       )
     )
 

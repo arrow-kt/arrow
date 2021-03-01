@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -50,10 +48,6 @@ data class Tuple4<out A, out B, out C, out D>(
   val second: B = b
   val third: C = c
   val fourth: D = d
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }).joinToString(", ") + ")"
 
   override fun toString(): String =
     "($a, $b, $c, $d)"

@@ -10,7 +10,6 @@ import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -23,10 +22,7 @@ class LensTest : UnitSpec() {
         lens = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.string()
+        funcGen = Gen.functionAToB(Gen.string())
       ),
 
       TraversalLaws.laws(
@@ -34,7 +30,6 @@ class LensTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -42,8 +37,6 @@ class LensTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
       ),
 
       SetterLaws.laws(
@@ -51,7 +44,6 @@ class LensTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Token.eq()
       )
     )
 
@@ -61,9 +53,6 @@ class LensTest : UnitSpec() {
         aGen = Gen.int(),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.int()
       )
     )
 

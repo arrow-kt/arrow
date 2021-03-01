@@ -2,10 +2,7 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -224,9 +221,6 @@ class NonEmptyList<out A>(
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
 
-  fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
-    AG.run { all.k().traverse(AG, f).map { Nel.fromListUnsafe(it) } }
-
   @JvmName("coflatMapKind")
   @Deprecated(
     "Kind is deprecated, and will be removed in 0.13.0. Please the coflatMap method defined for NonEmptyList instead",
@@ -274,10 +268,6 @@ class NonEmptyList<out A>(
 
   override fun hashCode(): Int =
     all.hashCode()
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>): String =
-    "NonEmptyList(${all.k().show(SA)})"
 
   override fun toString(): String =
     "NonEmptyList(${all.joinToString()})"
@@ -485,9 +475,6 @@ fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
 
 inline fun <A> A.nel(): NonEmptyList<A> =
   nonEmptyListOf(this)
-
-fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
-  fix().traverse(GA, ::identity)
 
 @Deprecated(
   "Kind is deprecated, and will be removed in 0.13.0. Please the plus method defined for NonEmptyList instead",

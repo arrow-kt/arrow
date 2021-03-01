@@ -1,8 +1,6 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
-import arrow.typeclasses.HashDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -35,9 +33,4 @@ inline fun <A> HashedOf<A>.fix(): Hashed<A> =
  *
  * Provides a fast inequality check with its [Eq] instance and its [Hash] instance will use the cached hash.
  */
-@Deprecated(HashDeprecation)
-data class Hashed<A>(val hash: Int, val value: A) : HashedOf<A> {
-  companion object {
-    fun <A> A.fromHash(HA: Hash<A>): Hashed<A> = Hashed(HA.run { this@fromHash.hash() }, this)
-  }
-}
+data class Hashed<A>(val hash: Int, val value: A) : HashedOf<A>

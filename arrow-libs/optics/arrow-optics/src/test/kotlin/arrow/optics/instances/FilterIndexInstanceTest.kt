@@ -11,7 +11,6 @@ import arrow.optics.string
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class FilterIndexInstanceTest : UnitSpec() {
@@ -22,7 +21,6 @@ class FilterIndexInstanceTest : UnitSpec() {
       aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -32,7 +30,6 @@ class FilterIndexInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -41,7 +38,6 @@ class FilterIndexInstanceTest : UnitSpec() {
       aGen = Gen.nonEmptyList(Gen.string()),
       bGen = Gen.string(),
       funcGen = Gen.functionAToB(Gen.string()),
-      EQA = Eq.any()
     ))
 
     testLaws(
@@ -50,7 +46,6 @@ class FilterIndexInstanceTest : UnitSpec() {
         aGen = Gen.map(Gen.char(), Gen.intSmall()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -59,7 +54,6 @@ class FilterIndexInstanceTest : UnitSpec() {
       aGen = Gen.string(),
       bGen = Gen.char(),
       funcGen = Gen.functionAToB(Gen.char()),
-      EQA = Eq.any()
     ))
   }
 }

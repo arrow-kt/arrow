@@ -9,7 +9,6 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class SequenceInstanceTest : UnitSpec() {
@@ -22,7 +21,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq { a, b -> a.toList() == b.toList() }
+        EQA = { a, b -> a.toList() == b.toList() }
       )
     )
 
@@ -32,7 +31,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq { a, b -> a.toList() == b.toList() }
+        EQA = { a, b -> a.toList() == b.toList() }
       )
     )
 
@@ -42,7 +41,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq { a, b -> a.toList() == b.toList() }
+        EQA = { a, b -> a.toList() == b.toList() }
       )
     )
   }

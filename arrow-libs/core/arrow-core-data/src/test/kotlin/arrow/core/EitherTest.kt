@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.computations.EitherEffect
 import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
@@ -15,7 +14,6 @@ import arrow.core.test.generators.suspendFunThatThrows
 import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -25,16 +23,15 @@ import kotlinx.coroutines.runBlocking
 
 class EitherTest : UnitSpec() {
 
-  val EQ: Eq<Kind<EitherPartialOf<ForOption>, Int>> = Eq.any()
   val GEN = Gen.either(Gen.string(), Gen.int())
 
   init {
     testLaws(
-      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN, Eq.any()),
-      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::invoke) {
+      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN),
+      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::invoke) {
         it.bind()
       },
-      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::eager) {
+      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::eager) {
         it.bind()
       }
     )

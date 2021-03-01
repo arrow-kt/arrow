@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.ior
 import arrow.core.test.laws.SemigroupLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.forAll
 import io.kotlintest.properties.Gen
@@ -17,7 +16,7 @@ class IorTest : UnitSpec() {
     val GEN = Gen.ior(Gen.string(), Gen.int())
 
     testLaws(
-      SemigroupLaws.laws(Semigroup.ior(Semigroup.string(), Semigroup.int()), GEN, Eq.any())
+      SemigroupLaws.laws(Semigroup.ior(Semigroup.string(), Semigroup.int()), GEN)
     )
 
     "bimap() should allow modify both value" {

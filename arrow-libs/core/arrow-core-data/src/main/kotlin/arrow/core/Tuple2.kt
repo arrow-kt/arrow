@@ -6,8 +6,6 @@ package arrow.core
 import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -73,10 +71,6 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
     f(b, lb)
 
   fun reverse(): Tuple2<B, A> = Tuple2(b, a)
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>, SB: Show<B>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }).joinToString(", ") + ")"
 
   override fun toString(): String =
     "($a, $b)"

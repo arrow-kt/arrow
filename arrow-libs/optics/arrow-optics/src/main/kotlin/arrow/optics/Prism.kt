@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 
 /**
@@ -128,8 +127,8 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
     /**
      * A [PPrism] that checks for equality with a given value [a]
      */
-    fun <A> only(a: A, EQA: Eq<A>): Prism<A, Unit> = Prism(
-      getOrModify = { a2 -> (if (EQA.run { a.eqv(a2) }) Either.Left(a) else Either.Right(Unit)) },
+    fun <A> only(a: A, equals: (A, A) -> Boolean): Prism<A, Unit> = Prism(
+      getOrModify = { a2 -> (if (equals(a, a2)) Either.Left(a) else Either.Right(Unit)) },
       reverseGet = { a }
     )
   }

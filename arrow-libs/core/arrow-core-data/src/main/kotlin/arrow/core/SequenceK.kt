@@ -2,9 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 const val SequenceKDeprecation =
   "SequenceK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.sequences.Sequence instead." +
@@ -49,11 +46,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { this.iterator().loop() }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
-    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { f(a).apEval(eval.map { it.map { xs -> { b: B -> (listOf(b) + xs).k() } } }) }
-    }.value().let { GA.run { it.map { it.asSequence().k() } } }
-
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->
       fb.fix().map { b ->
@@ -96,10 +88,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     }
 
   fun toList(): List<A> = this.fix().sequence.toList()
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>): String =
-    "Sequence(${toList().k().show(SA)})"
 
   override fun toString(): String =
     sequence.toString()
@@ -265,10 +253,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
 @Deprecated(SequenceKDeprecation, ReplaceWith("this + y"))
 fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
-
-@Deprecated("Applicative is deprecated use sequenceEither or sequenceValidated on Sequence instead.")
-fun <A, G> SequenceKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, SequenceK<A>> =
-  fix().traverse(GA, ::identity)
 
 @Deprecated(SequenceKDeprecation, ReplaceWith("this"))
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)

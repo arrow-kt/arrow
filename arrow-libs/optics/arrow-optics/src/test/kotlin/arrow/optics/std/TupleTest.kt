@@ -1,7 +1,5 @@
 package arrow.optics.std
 
-import arrow.core.int
-import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.tuple10
@@ -29,8 +27,6 @@ import arrow.optics.tuple6
 import arrow.optics.tuple7
 import arrow.optics.tuple8
 import arrow.optics.tuple9
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class TupleTest : UnitSpec() {
@@ -43,9 +39,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.pair(Gen.int(), Gen.string()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.int()
       )
     )
 
@@ -55,9 +48,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.pair(Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.string()
       )
     )
 
@@ -67,9 +57,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.triple(Gen.int(), Gen.string(), Gen.string()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.int()
       )
     )
 
@@ -79,9 +66,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.triple(Gen.int(), Gen.string(), Gen.int()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.string()
       )
     )
 
@@ -91,9 +75,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.triple(Gen.int(), Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.string()
       )
     )
 
@@ -103,7 +84,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.pair(Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -113,7 +93,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.triple(Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -123,7 +102,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.tuple4(Gen.int(), Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -133,7 +111,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.tuple5(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -143,7 +120,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.tuple6(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -153,7 +129,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.tuple7(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -163,7 +138,6 @@ class TupleTest : UnitSpec() {
         aGen = Gen.tuple8(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -183,7 +157,6 @@ class TupleTest : UnitSpec() {
         ),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -204,7 +177,6 @@ class TupleTest : UnitSpec() {
         ),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
   }

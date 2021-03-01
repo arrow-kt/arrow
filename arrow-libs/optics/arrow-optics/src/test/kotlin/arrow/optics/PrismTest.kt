@@ -8,7 +8,6 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -22,7 +21,6 @@ class PrismTest : UnitSpec() {
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       ),
 
       SetterLaws.laws(
@@ -30,7 +28,6 @@ class PrismTest : UnitSpec() {
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       ),
 
       TraversalLaws.laws(
@@ -38,7 +35,6 @@ class PrismTest : UnitSpec() {
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -46,8 +42,6 @@ class PrismTest : UnitSpec() {
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Eq.any()
       )
     )
 
@@ -57,7 +51,6 @@ class PrismTest : UnitSpec() {
         aGen = Gen.pair(genSum, Gen.int()),
         bGen = Gen.pair(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.int())),
-        EQA = Eq.any()
       )
     )
 
@@ -67,7 +60,6 @@ class PrismTest : UnitSpec() {
         aGen = Gen.pair(Gen.int(), genSum),
         bGen = Gen.pair(Gen.int(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.string())),
-        EQA = Eq.any()
       )
     )
 
@@ -77,7 +69,6 @@ class PrismTest : UnitSpec() {
         aGen = Gen.either(Gen.int(), genSum),
         bGen = Gen.either(Gen.int(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.string())),
-        EQA = Eq.any()
       )
     )
 
@@ -87,7 +78,6 @@ class PrismTest : UnitSpec() {
         aGen = Gen.either(genSum, Gen.int()),
         bGen = Gen.either(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),
-        EQA = Eq.any()
       )
     )
 
@@ -97,7 +87,6 @@ class PrismTest : UnitSpec() {
         aGen = Gen.either(Gen.int(), Gen.int()),
         bGen = Gen.either(Gen.int(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.int())),
-        EQA = Eq.any()
       )
     )
 
@@ -163,12 +152,7 @@ class PrismTest : UnitSpec() {
 
     "Checking if a prism exists with a target" {
       forAll(genSum, genSum, Gen.bool()) { a, other, bool ->
-        Prism.only(
-          a,
-          object : Eq<SumType> {
-            override fun SumType.eqv(b: SumType): Boolean = bool
-          }
-        ).isEmpty(other) == bool
+        Prism.only(a) { _, _ -> bool }.isEmpty(other) == bool
       }
     }
 

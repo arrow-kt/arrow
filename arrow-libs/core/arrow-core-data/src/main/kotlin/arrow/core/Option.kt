@@ -5,7 +5,6 @@ import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
 
 @Deprecated(
   message = KindDeprecation,
@@ -937,18 +936,6 @@ sealed class Option<out A> : OptionOf<A> {
   } else {
     value
   }
-
-  @Deprecated(
-    "Show typeclass is deprecated, and will be removed in 0.13.0. Please use the toString method instead.",
-    ReplaceWith(
-      "toString()"
-    ),
-    DeprecationLevel.WARNING
-  )
-  fun show(SA: Show<A>): String = fold(
-    { "None" },
-    { "Some(${SA.run { it.show() }})" }
-  )
 
   override fun toString(): String = fold(
     { "Option.None" },

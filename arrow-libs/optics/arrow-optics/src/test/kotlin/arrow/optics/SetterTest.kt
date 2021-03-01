@@ -6,7 +6,6 @@ import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.SetterLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -20,7 +19,6 @@ class SetterTest : UnitSpec() {
         aGen = Gen.int(),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -30,7 +28,6 @@ class SetterTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 

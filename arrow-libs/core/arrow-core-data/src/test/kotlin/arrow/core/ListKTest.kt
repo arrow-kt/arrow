@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.listK
 import arrow.core.test.laws.MonoidLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -12,9 +11,7 @@ class ListKTest : UnitSpec() {
 
   init {
 
-    testLaws(
-      MonoidLaws.laws(Monoid.list(), Gen.list(Gen.int()), Eq.any()),
-    )
+    testLaws(MonoidLaws.laws(Monoid.list(), Gen.list(Gen.int())))
 
     "filterMap() should map list and filter out None values" {
       forAll(Gen.listK(Gen.int())) { listk ->

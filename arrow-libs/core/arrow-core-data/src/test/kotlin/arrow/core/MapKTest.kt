@@ -5,7 +5,6 @@ import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.longSmall
 import arrow.core.test.generators.mapK
 import arrow.core.test.laws.MonoidLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
@@ -14,9 +13,7 @@ import io.kotlintest.properties.forAll
 class MapKTest : UnitSpec() {
 
   init {
-    testLaws(
-      MonoidLaws.laws(Monoid.map(Semigroup.int()), Gen.map(Gen.longSmall(), Gen.intSmall()), Eq.any()),
-    )
+    testLaws(MonoidLaws.laws(Monoid.map(Semigroup.int()), Gen.map(Gen.longSmall(), Gen.intSmall())))
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
