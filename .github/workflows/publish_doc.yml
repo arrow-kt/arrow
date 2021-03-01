@@ -63,7 +63,7 @@ jobs:
         ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
     - name: "Remove index for versions"
       working-directory: arrow-site
-      run: rm -f docs/index.md
+      run: rm -f build/site/index.md
     - name: "Latest release: build release directory (docs/<major.minor>)"
       if: steps.versions.outputs.new-release-version-exists == '1'
       working-directory: arrow-site
