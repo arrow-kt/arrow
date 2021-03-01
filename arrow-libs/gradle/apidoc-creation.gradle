@@ -19,7 +19,7 @@ apply plugin: "org.jetbrains.dokka"
 //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
 dokka {
     outputFormat = 'jekyll'
-    outputDirectory = "${rootDir}/../arrow-docs/docs/apidocs"
+    outputDirectory = "${rootDir}/../arrow-site/docs/apidocs"
     configuration {
         includes = ['README.md']
         reportUndocumented = false

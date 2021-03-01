@@ -37,7 +37,7 @@ dependencies {
 apply plugin: 'ank-gradle-plugin'
 
 ank {
-    source = file("${projectDir}/docs")
-    target = file("${rootDir}/../arrow-site/docs")
+    source = file("${rootDir}/docs")
+    target = file("${rootDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
 }

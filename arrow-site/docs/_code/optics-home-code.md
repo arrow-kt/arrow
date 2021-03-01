@@ -1,3 +1,6 @@
+---
+library: optics
+---
 {: data-executable="true"}
 ```kotlin:ank
 package example
