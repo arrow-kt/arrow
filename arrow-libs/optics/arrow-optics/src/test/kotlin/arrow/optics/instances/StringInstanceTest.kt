@@ -1,10 +1,5 @@
 package arrow.optics.instances
 
-import arrow.core.ListK
-import arrow.core.Option
-import arrow.core.extensions.eq
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
@@ -30,9 +25,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.any()
       )
     )
 
@@ -42,9 +35,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.any()
       )
     )
 
@@ -64,7 +55,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.pair(Gen.char(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.char(), Gen.string())),
-        EQA = String.eq()
+        EQA = Eq.any()
       )
     )
 
@@ -74,7 +65,7 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.pair(Gen.string(), Gen.char()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.char())),
-        EQA = String.eq()
+        EQA = Eq.any()
       )
     )
   }

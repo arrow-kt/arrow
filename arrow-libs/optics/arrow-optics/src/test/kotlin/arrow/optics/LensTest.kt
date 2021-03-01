@@ -1,11 +1,7 @@
 package arrow.optics
 
 import arrow.core.Left
-import arrow.core.ListK
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
 import arrow.core.int
 import arrow.core.string
 import arrow.core.test.UnitSpec
@@ -38,9 +34,7 @@ class LensTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -49,7 +43,7 @@ class LensTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       SetterLaws.laws(

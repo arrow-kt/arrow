@@ -11,7 +11,9 @@ import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class SetInstanceTest : UnitSpec() {
+
   init {
+
     testLaws(
       LensLaws.laws(
         lensGen = Gen.string().map { At.set<String>().at(it) },

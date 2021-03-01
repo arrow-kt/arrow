@@ -28,56 +28,11 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * errors in the context of a binding, short-circuiting the complete computation and returning the error raised to the
  * same computational context (through [raiseError]).
  *
- * ```kotlin:ank:playground:extension
- * _imports_
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   _extensionFactory_
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
  * ### Example
  *
  * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
  * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
  *
- * ```kotlin:ank:playground:extension
- * _imports_
- * import arrow.Kind
- * import arrow.typeclasses.MonadThrow
- *
- * typealias Impacted = Boolean
- *
- * object Lettuce
- * object Knife
- * object Salad
- * class InsufficientAmount(val quantityInGrams : Int) : Throwable("You need $quantityInGrams more grams of ingredient")
- *
- * fun <F> MonadThrow<F>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
- * fun <F> MonadThrow<F>.getKnife(): Kind<F, Knife> = just(Knife)
- * fun <F> MonadThrow<F>.launchImpure(tool: Knife, ingredient: Lettuce): Salad {
- *   throw InsufficientAmount(5)
- * }
- *
- * fun main(args: Array<String>) {
- *    //sampleStart
- *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, Salad> =
- *      fx.monadThrow {
- *        val lettuce = takeFoodFromRefrigerator().bind()
- *        val knife = getKnife().bind()
- *        val salad = launchImpure(knife, lettuce) // this throws!
- *        salad
- *      }
- *
- *    val result = _extensionFactory_.prepareLunch()
- *    //sampleEnd
- *    println(result)
- * }
- * ```
  */
 @documented
 interface MonadThrow<F> : MonadError<F, Throwable> {
@@ -94,40 +49,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ### Example
    *
    * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
-   * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * import arrow.Kind
-   * import arrow.typeclasses.MonadThrow
-   *
-   * typealias SaladPrepared = Boolean
-   *
-   * object Lettuce
-   * object Knife
-   * class InsufficientAmount(val quantityInGrams : Int) : Throwable("You need $quantityInGrams more grams of ingredient")
-   *
-   * fun <F> MonadThrow<F>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
-   * fun <F> MonadThrow<F>.getKnife(): Kind<F, Knife> = just(Knife)
-   * fun <F> MonadThrow<F>.launchImpure(tool: Knife, ingredient: Lettuce): Salad {
-   *   throw InsufficientAmount(5)
-   * }
-   *
-   * fun main(args: Array<String>) {
-   *    //sampleStart
-   *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, SaladPrepared> =
-   *      fx.monadThrow {
-   *        val lettuce = takeFoodFromRefrigerator().bind()
-   *        val knife = getKnife().bind()
-   *        val salad = launchImpure(knife, lettuce) // this throws!
-   *        salad
-   *      }
-   *
-   *    val result = _extensionFactory_.prepareLunch()
-   *    //sampleEnd
-   *    println(result)
-   * }
-   * ```
+   * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process
    *
    */
   override val fx: MonadThrowFx<F>

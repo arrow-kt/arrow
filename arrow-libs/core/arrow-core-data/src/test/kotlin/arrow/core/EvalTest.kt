@@ -1,21 +1,12 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.computations.EvalEffect
 import arrow.core.computations.RestrictedEvalEffect
 import arrow.core.computations.eval
-import arrow.core.extensions.eval.applicative.applicative
-import arrow.core.extensions.eval.bimonad.bimonad
-import arrow.core.extensions.eval.comonad.comonad
-import arrow.core.extensions.eval.functor.functor
-import arrow.core.extensions.eval.monad.monad
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
-import arrow.core.test.generators.GenK
-import arrow.core.test.laws.BimonadLaws
 import arrow.core.test.laws.FxLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -23,26 +14,9 @@ import io.kotlintest.shouldBe
 
 class EvalTest : UnitSpec() {
 
-  val GENK = object : GenK<ForEval> {
-    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForEval, A>> {
-      return gen.map { Eval.now(it) }
-    }
-  }
-
-  val EQK = object : EqK<ForEval> {
-    override fun <A> Kind<ForEval, A>.eqK(other: Kind<ForEval, A>, EQ: Eq<A>): Boolean =
-      EQ.run { this@eqK.fix().value().eqv(other.fix().value()) }
-  }
-
-  private val nowGen = Gen.int().map { Eval.now(it) }
-  private val laterGen = Gen.int().map { Eval.later { it } }
-  private val alwaysGen = Gen.int().map { Eval.always { it } }
-  private val evalGen = Gen.oneOf(nowGen, laterGen, alwaysGen)
-
   init {
 
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), GENK, EQK),
       FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eq.any(), eval::invoke) {
         it.bind()
       },

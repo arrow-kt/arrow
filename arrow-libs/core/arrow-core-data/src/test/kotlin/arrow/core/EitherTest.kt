@@ -4,54 +4,19 @@ import arrow.Kind
 import arrow.core.computations.EitherEffect
 import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
-import arrow.core.extensions.combine
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.bicrosswalk.bicrosswalk
-import arrow.core.extensions.either.bifunctor.bifunctor
-import arrow.core.extensions.either.bitraverse.bitraverse
-import arrow.core.extensions.either.eq.eq
-import arrow.core.extensions.either.eqK.eqK
-import arrow.core.extensions.either.eqK2.eqK2
-import arrow.core.extensions.either.functor.functor
-import arrow.core.extensions.either.hash.hash
-import arrow.core.extensions.either.monad.monad
-import arrow.core.extensions.either.monadError.monadError
-import arrow.core.extensions.either.monoid.monoid
-import arrow.core.extensions.either.order.order
-import arrow.core.extensions.either.semigroupK.semigroupK
-import arrow.core.extensions.either.show.show
-import arrow.core.extensions.either.traverse.traverse
-import arrow.core.extensions.eq
-import arrow.core.extensions.hash
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.order
-import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.any
 import arrow.core.test.generators.either
-import arrow.core.test.generators.genK
-import arrow.core.test.generators.genK2
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
 import arrow.core.test.generators.suspendFunThatReturnsAnyRight
 import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
 import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
-import arrow.core.test.generators.throwable
-import arrow.core.test.laws.BicrosswalkLaws
-import arrow.core.test.laws.BifunctorLaws
-import arrow.core.test.laws.BitraverseLaws
-import arrow.core.test.laws.EqK2Laws
 import arrow.core.test.laws.FxLaws
-import arrow.core.test.laws.HashLaws
-import arrow.core.test.laws.MonadErrorLaws
 import arrow.core.test.laws.MonoidLaws
-import arrow.core.test.laws.OrderLaws
-import arrow.core.test.laws.SemigroupKLaws
-import arrow.core.test.laws.ShowLaws
-import arrow.core.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -61,29 +26,11 @@ import kotlinx.coroutines.runBlocking
 class EitherTest : UnitSpec() {
 
   val EQ: Eq<Kind<EitherPartialOf<ForOption>, Int>> = Eq.any()
-  val throwableEQ: Eq<Throwable> = Eq.any()
   val GEN = Gen.either(Gen.string(), Gen.int())
 
   init {
     testLaws(
-      EqK2Laws.laws(Either.eqK2(), Either.genK2()),
-      BifunctorLaws.laws(Either.bifunctor(), Either.genK2(), Either.eqK2()),
-      MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), GEN, Either.eq(String.eq(), Int.eq())),
-      ShowLaws.laws(Either.show(String.show(), Int.show()), Either.eq(String.eq(), Int.eq()), GEN),
-      MonadErrorLaws.laws(
-        Either.monadError(),
-        Either.functor(),
-        Either.applicative(),
-        Either.monad(),
-        Either.genK(Gen.throwable()),
-        Either.eqK(throwableEQ)
-      ),
-      TraverseLaws.laws(Either.traverse(), Either.applicative(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
-      BitraverseLaws.laws(Either.bitraverse(), Either.genK2(), Either.eqK2()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.int().map(::Some)), Either.eqK(Option.eq(Int.eq()))),
-      HashLaws.laws(Either.hash(String.hash(), Int.hash()), GEN, Either.eq(String.eq(), Int.eq())),
-      OrderLaws.laws(Either.order(String.order(), Int.order()), GEN),
-      BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
+      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN, Eq.any()),
       FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::invoke) {
         it.bind()
       },
@@ -104,26 +51,26 @@ class EitherTest : UnitSpec() {
 
     "empty should return a Right of the empty of the inner type" {
       forAll { _: String ->
-        Right(String.monoid().run { empty() }) == Either.monoid(String.monoid(), String.monoid()).run { empty() }
+        Right(Monoid.string().empty()) == Monoid.either(Monoid.string(), Monoid.string()).empty()
       }
     }
 
     "combine two rights should return a right of the combine of the inners" {
       forAll { a: String, b: String ->
-        String.monoid().run { Either.right(a.combine(b)) } == Either.right(a).combine(String.monoid(), String.monoid(), Either.right(b))
+        Monoid.string().run { Right(a.combine(b)) } == Right(a).combine(Monoid.string(), Monoid.string(), Right(b))
       }
     }
 
     "combine two lefts should return a left of the combine of the inners" {
       forAll { a: String, b: String ->
-        String.monoid().run { Either.left(a.combine(b)) } == Either.left(a).combine(String.monoid(), String.monoid(), Either.left(b))
+        Monoid.string().run { Left(a.combine(b)) } == Left(a).combine(Monoid.string(), Monoid.string(), Left(b))
       }
     }
 
     "combine a right and a left should return left" {
       forAll { a: String, b: String ->
-        Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b)) &&
-          Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
+        Left(a) == Left(a).combine(Monoid.string(), Monoid.string(), Right(b)) &&
+          Left(a) == Right(b).combine(Monoid.string(), Monoid.string(), Left(a))
       }
     }
 

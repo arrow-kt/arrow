@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
 import arrow.core.toT
 import kotlinx.coroutines.Dispatchers
@@ -221,7 +220,7 @@ val interpreter: AnkOps = object : AnkOps {
     }
 
   override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
-    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { snippetContent, snippet ->
+    sequenceOf(compiledSnippets.fold(content.joinToString("\n")) { snippetContent, snippet ->
       snippet.result.fold(
         {
           if (snippet.isPlayground)

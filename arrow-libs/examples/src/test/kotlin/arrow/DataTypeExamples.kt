@@ -9,14 +9,9 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Tuple3
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.applicativeError.handleError
-import arrow.core.extensions.either.functor.functor
-import arrow.core.extensions.fx
-import arrow.core.extensions.option.applicative.applicative
 import arrow.core.flatMap
 import arrow.core.getOrElse
+import arrow.core.handleError
 import arrow.core.handleErrorWith
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -63,31 +58,6 @@ class DataTypeExamples : FreeSpec() {
                 // Fold will extract the value from the option, or provide a default if the value is None
                 someValue.fold({ 1 }, { it * 3 }) shouldBe 126
                 noneValue.fold({ 1 }, { it * 3 }) shouldBe 1
-            }
-
-            "Applicative" {
-                // Computing over independent values
-                val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
-                tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
-            }
-
-            "Monad" {
-                // Computing over dependent values ignoring absence
-                val six = Option.fx {
-                    val a = !Option(1)
-                    val b = !Option(1 + a)
-                    val c = !Option(1 + b)
-                    a + b + c
-                }
-                six shouldBe Some(6)
-
-                val none = Option.fx {
-                    val a = !Option(1)
-                    val b = !noneValue
-                    val c = !Option(1 + b)
-                    a + b + c
-                }
-                none shouldBe None
             }
         }
 
@@ -148,25 +118,6 @@ class DataTypeExamples : FreeSpec() {
 
                 val jackPot = Either.catch { playLottery(42) }
                 jackPot.fold({ error("not expected") }, { it * 100 }) shouldBe 100_000
-            }
-
-            "Functor" {
-                // Transforming the value, if the computation is a success:
-                val actual = Either.functor<Int>().run {
-                    (try {
-                        Either.right("3".toInt())
-                    } catch (e: Throwable) {
-                        Either.left(e)
-                    }).map { it + 1 }
-                }
-                actual shouldBe Either.Right(4)
-            }
-
-            "Applicative" {
-                // Computing over independent values:
-                val exception = IllegalArgumentException("")
-                val tryHarder = Either.applicative<Throwable>().tupledN(Either.Right(5), Either.Right(3), Either.Left(exception))
-                tryHarder shouldBe Left(exception)
             }
         }
 

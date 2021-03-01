@@ -1,6 +1,6 @@
 package arrow.optics.std
 
-import arrow.core.extensions.monoid
+import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
@@ -24,7 +24,7 @@ class NonEmptyListTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       )
     )
 

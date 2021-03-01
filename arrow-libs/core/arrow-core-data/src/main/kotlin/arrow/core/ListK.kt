@@ -61,14 +61,13 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * It can be used to cheaply combine two lists:
  *
  * ```kotlin:ank:playground
- * import arrow.core.extensions.list.semigroupK.combineK
  *
  * //sampleStart
  * val hello = listOf('h', 'e', 'l', 'l', 'o')
  * val commaSpace = listOf(',', ' ')
  * val world = listOf('w', 'o', 'r', 'l', 'd')
  *
- * val combinedList = hello.combineK(commaSpace).combineK(world)
+ * val combinedList = hello + commaSpace + world
  * //sampleEnd
  * fun main() {
  *  println("combinedList = $combinedList")
@@ -80,15 +79,13 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * Traversing a list creates a new container [Kind<F, A>]({{'/patterns/glossary/#type-constructors' | relative_url }}) by combining the result of a function applied to each element:
  *
  * ```kotlin:ank:playground
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.extensions.list.traverse.traverse
- * import arrow.core.extensions.option.applicative.applicative
+ * import arrow.core.Right
+ * import arrow.core.Left
+ * import arrow.core.traverseEither
  *
  * //sampleStart
  * val numbers = listOf(Math.random(), Math.random(), Math.random())
- * val traversedList = numbers.traverse(Option.applicative(), { if (it > 0.5) Some(it) else None })
+ * val traversedList = numbers.traverseEither { if (it > 0.5) Right(it) else Left(Unit) }
  * //sampleEnd
  * fun main() {
  *   println("traversedList $traversedList")
@@ -98,14 +95,12 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * and complements the convenient function `sequence()` that converts a list of `ListK<Kind<F, A>>` into a `Kind<F, ListK<A>>`:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.extensions.list.traverse.sequence
- * import arrow.core.extensions.option.applicative.applicative
+ * import arrow.core.Right
+ * import arrow.core.sequenceEither
  *
  * //sampleStart
- * val requests = listOf(Some(Math.random()), Some(Math.random()), Some(Math.random()))
- * val sequenceList = requests.sequence(Option.applicative())
+ * val requests = listOf(Right(Math.random()), Right(Math.random()), Right(Math.random()))
+ * val sequenceList = requests.sequenceEither()
  * //sampleEnd
  * fun main() {
  *   println("sequenceList = $sequenceList")
@@ -118,10 +113,10 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  *
  * ```kotlin:ank:playground
  * import arrow.core.k
- * import arrow.core.extensions.list.foldable.foldLeft
+ *
  * val value =
  * //sampleStart
- *  listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
+ *  listOf('a', 'b', 'c', 'd', 'e').k().fold("-> ") { x, y -> x + y }
  * //sampleEnd
  * fun main() {
  *  println(value)
@@ -131,7 +126,7 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * Or you can apply a list of transformations using `ap` from [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }}).
  *
  * ```kotlin:ank:playground
- * import arrow.core.extensions.list.apply.ap
+ * import arrow.core.*
  *
  * val value =
  * //sampleStart

@@ -1,8 +1,8 @@
 package arrow.optics
 
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import arrow.core.getOrElse
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.SetterLaws

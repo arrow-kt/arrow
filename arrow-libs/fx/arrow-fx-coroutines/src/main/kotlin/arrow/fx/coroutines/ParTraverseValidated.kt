@@ -99,8 +99,8 @@ suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEither(sem
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
+ * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  * import kotlinx.coroutines.Dispatchers
  *
  * typealias Task = suspend () -> ValidatedNel<Throwable, Unit>
@@ -112,7 +112,7 @@ suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEither(sem
  *
  *   val res = listOf(1, 2, 3)
  *     .map(::getTask)
- *     .parSequenceValidated(Dispatchers.IO, NonEmptyList.semigroup())
+ *     .parSequenceValidated(Dispatchers.IO, Semigroup.nonEmptyList())
  *   //sampleEnd
  *   println(res)
  * }
@@ -148,7 +148,7 @@ suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -162,10 +162,10 @@ suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *     else User(id, Thread.currentThread().name).validNel()
  *
  *   val res = listOf(1, 3, 5)
- *     .parTraverseValidated(Dispatchers.IO, NonEmptyList.semigroup(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
  *
  *   val res2 = listOf(1, 2, 3, 4, 5)
- *     .parTraverseValidated(Dispatchers.IO, NonEmptyList.semigroup(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
  *  //sampleEnd
  *  println(res)
  *  println(res2)

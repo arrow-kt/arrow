@@ -3,41 +3,10 @@ package arrow.core
 import arrow.core.computations.RestrictedValidatedEffect
 import arrow.core.computations.ValidatedEffect
 import arrow.core.computations.validated
-import arrow.core.extensions.eq
-import arrow.core.extensions.hash
-import arrow.core.extensions.monoid
-import arrow.core.extensions.order
-import arrow.core.extensions.semigroup
-import arrow.core.extensions.show
-import arrow.core.extensions.validated.applicative.applicative
-import arrow.core.extensions.validated.bifunctor.bifunctor
-import arrow.core.extensions.validated.bitraverse.bitraverse
-import arrow.core.extensions.validated.eq.eq
-import arrow.core.extensions.validated.eqK.eqK
-import arrow.core.extensions.validated.eqK2.eqK2
-import arrow.core.extensions.validated.functor.functor
-import arrow.core.extensions.validated.hash.hash
-import arrow.core.extensions.validated.order.order
-import arrow.core.extensions.validated.selective.selective
-import arrow.core.extensions.validated.semigroupK.semigroupK
-import arrow.core.extensions.validated.show.show
-import arrow.core.extensions.validated.traverse.traverse
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.genK
-import arrow.core.test.generators.genK2
-import arrow.core.test.generators.validated
-import arrow.core.test.laws.BifunctorLaws
-import arrow.core.test.laws.BitraverseLaws
-import arrow.core.test.laws.EqK2Laws
-import arrow.core.test.laws.EqLaws
 import arrow.core.test.laws.FxLaws
-import arrow.core.test.laws.HashLaws
-import arrow.core.test.laws.OrderLaws
-import arrow.core.test.laws.SelectiveLaws
-import arrow.core.test.laws.SemigroupKLaws
-import arrow.core.test.laws.ShowLaws
-import arrow.core.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -47,34 +16,7 @@ import io.kotlintest.shouldBe
 class ValidatedTest : UnitSpec() {
 
   init {
-
-    val EQ = Validated.eq(String.eq(), Int.eq())
-
-    val VAL_AP = Validated.applicative(String.monoid())
-
-    val VAL_SGK = Validated.semigroupK(String.semigroup())
-
-    val validatedGen = Gen.validated(Gen.string(), Gen.int())
-
     testLaws(
-      EqK2Laws.laws(Validated.eqK2(), Validated.genK2()),
-      BifunctorLaws.laws(Validated.bifunctor(), Validated.genK2(), Validated.eqK2()),
-      EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
-      ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
-      HashLaws.laws(Validated.hash(String.hash(), Int.hash()), Gen.validated(Gen.string(), Gen.int()), EQ),
-      OrderLaws.laws(Validated.order(String.order(), Int.order()), Gen.validated(Gen.string(), Gen.int())),
-      SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
-      TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.semigroup()), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
-      SemigroupKLaws.laws(
-        Validated.semigroupK(String.semigroup()),
-        Validated.genK(Gen.string()),
-        Validated.eqK(String.eq())
-      ),
-      BitraverseLaws.laws(
-        Validated.bitraverse(),
-        Validated.genK2(),
-        Validated.eqK2()
-      ),
       FxLaws.suspended<ValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Eq.any(), validated::invoke) {
         it.bind()
       },
@@ -175,7 +117,7 @@ class ValidatedTest : UnitSpec() {
       Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
     }
 
-    val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
+    val plusIntSemigroup: Semigroup<Int> = Semigroup.int()
 
     "findValid should return the first Valid value or combine or Invalid values otherwise" {
       Valid(10).findValid(plusIntSemigroup) { fail("None should not be called") } shouldBe Valid(10)
@@ -273,44 +215,42 @@ class ValidatedTest : UnitSpec() {
       ) { _, _, _ -> "success!" } shouldBe Invalid("fail1fail2")
     }
 
-    with(VAL_SGK) {
-      "CombineK should combine Valid Validated" {
-        val valid = Valid("Who")
+    "CombineK should combine Valid Validated" {
+      val valid = Valid("Who")
 
-        valid.combineK(valid) shouldBe (Valid("Who"))
-      }
+      valid.combineK(Semigroup.string(), valid) shouldBe (Valid("Who"))
+    }
 
-      "CombineK should combine Valid and Invalid Validated" {
-        val valid = Valid("Who")
-        val invalid = Invalid("Nope")
+    "CombineK should combine Valid and Invalid Validated" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
 
-        valid.combineK(invalid) shouldBe (Valid("Who"))
-      }
+      valid.combineK(Semigroup.string(), invalid) shouldBe (Valid("Who"))
+    }
 
-      "CombineK should combine Invalid Validated" {
-        val invalid = Invalid("Nope")
+    "CombineK should combine Invalid Validated" {
+      val invalid = Invalid("Nope")
 
-        invalid.combineK(invalid) shouldBe (Invalid("NopeNope"))
-      }
+      invalid.combineK(Semigroup.string(), invalid) shouldBe (Invalid("NopeNope"))
     }
 
     "Combine should combine Valid Validated" {
       val valid: Validated<String, String> = Valid("Who")
 
-      valid.combine(String.monoid(), String.monoid(), valid) shouldBe (Valid("WhoWho"))
+      valid.combine(Monoid.string(), Monoid.string(), valid) shouldBe (Valid("WhoWho"))
     }
 
     "Combine should combine Valid and Invalid Validated" {
       val valid = Valid("Who")
       val invalid = Invalid("Nope")
 
-      valid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("Nope"))
+      valid.combine(Monoid.string(), Monoid.string(), invalid) shouldBe (Invalid("Nope"))
     }
 
     "Combine should combine Invalid Validated" {
       val invalid: Validated<String, String> = Invalid("Nope")
 
-      invalid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("NopeNope"))
+      invalid.combine(Monoid.string(), Monoid.string(), invalid) shouldBe (Invalid("NopeNope"))
     }
   }
 }

@@ -19,44 +19,8 @@ const val HashDeprecation = "Hash is deprecated in favor of hashCode(), since Ko
 @Deprecated(HashDeprecation)
 interface Hash<in F> {
 
-  /**
-   * Produces a hash for an object of type [F].
-   *
-   * @receiver The object to hash
-   * @returns an int representing the object hash
-   *
-   * ```kotlin:ank:playground
-   * import arrow.core.extensions.*
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = String.hash().run { "MyString".hash() }
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
   fun F.hash(): Int = hashWithSalt(defaultSalt)
 
-  /**
-   * Produces a hash for an object of type [F] with a given salt.
-   *
-   * @receiver The object to hash
-   * @param salt The salt to apply
-   * @returns an int representing the objects hash
-   *
-   * ```kotlin:ank:playground
-   * import arrow.core.extensions.*
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = String.hash().run { "MyString".hashWithSalt(10) }
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   *
-   */
   fun F.hashWithSalt(salt: Int): Int = salt.combineHashes(hash())
 
   companion object {

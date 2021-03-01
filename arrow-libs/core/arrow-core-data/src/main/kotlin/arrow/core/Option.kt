@@ -291,11 +291,10 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  *
  * ```kotlin:ank:playground
  * import arrow.core.Some
- * import arrow.core.extensions.option.apply.tupled
  *
  *  val value =
  * //sampleStart
- *  tupled(Some(1), Some("Hello"), Some(20.0))
+ *  Option.mapN(Some(1), Some("Hello"), Some(20.0), ::Triple)
  * //sampleEnd
  * fun main() {
  *  println(value)
@@ -1241,14 +1240,14 @@ fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
     None -> b
   }
 
-fun <A> Monoid.Companion.option(MA: Monoid<A>): Monoid<Option<A>> =
+fun <A> Monoid.Companion.option(MA: Semigroup<A>): Monoid<Option<A>> =
   OptionMonoid(MA)
 
 fun <A> Semigroup.Companion.option(SGA: Semigroup<A>): Semigroup<Option<A>> =
   OptionSemigroup(SGA)
 
 private class OptionMonoid<A>(
-  private val MA: Monoid<A>
+  private val MA: Semigroup<A>
 ) : Monoid<Option<A>> {
 
   override fun Option<A>.combine(b: Option<A>): Option<A> =

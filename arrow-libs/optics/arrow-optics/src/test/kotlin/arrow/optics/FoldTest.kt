@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.core.extensions.list.foldable.nonEmpty
 import arrow.core.int
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
@@ -61,7 +60,7 @@ class FoldTest : UnitSpec() {
 
       "Checking existence of a target" {
         forAll(Gen.list(Gen.int()), Gen.bool()) { ints, predicate ->
-          exists(ints) { predicate } == (predicate && ints.nonEmpty())
+          exists(ints) { predicate } == (predicate && ints.isNotEmpty())
         }
       }
 

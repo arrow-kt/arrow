@@ -18,7 +18,6 @@ Creating a `Fold` can be done by manually defining `foldMap`.
 import arrow.core.*
 import arrow.optics.*
 import arrow.typeclasses.*
-import arrow.core.extensions.*
 
 fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
     override fun <R> foldMap(M: Monoid<R>, s: T?, f: (T) -> R): R =
@@ -32,7 +31,7 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 nullableFold<Int>().isEmpty(null)
 ```
 ```kotlin:ank
-Fold.nonEmptyList<Int>().combineAll(Int.monoid(), NonEmptyList.of(1, 2, 3))
+Fold.nonEmptyList<Int>().combineAll(Monoid.int(), NonEmptyList.of(1, 2, 3))
 ```
 ```kotlin:ank
 nullableFold<Int>().firstOrNull(null)

@@ -1,10 +1,6 @@
 package arrow.optics
 
-import arrow.core.Option
-import arrow.core.ListK
-import arrow.core.extensions.monoid
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
+import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
@@ -13,6 +9,7 @@ import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -41,9 +38,7 @@ class PrismTest : UnitSpec() {
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -52,7 +47,7 @@ class PrismTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       )
     )
 
@@ -134,15 +129,15 @@ class PrismTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         forAll(genSum) { sum: SumType ->
-          combineAll(String.monoid(), sum) ==
-              sumPrism.getOrNull(sum) ?: String.monoid().empty()
+          combineAll(Monoid.string(), sum) ==
+              sumPrism.getOrNull(sum) ?: Monoid.string().empty()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genSum) { sum: SumType ->
-          fold(String.monoid(), sum) ==
-              sumPrism.getOrNull(sum) ?: String.monoid().empty()
+          fold(Monoid.string(), sum) ==
+              sumPrism.getOrNull(sum) ?: Monoid.string().empty()
         }
       }
 

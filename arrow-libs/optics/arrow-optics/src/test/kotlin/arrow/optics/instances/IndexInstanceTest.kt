@@ -21,7 +21,7 @@ class IndexInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
+        EQA = Eq.invoke { sequenceK, sequenceK2 -> sequenceK.toList() == sequenceK2.toList() }
       )
     )
   }

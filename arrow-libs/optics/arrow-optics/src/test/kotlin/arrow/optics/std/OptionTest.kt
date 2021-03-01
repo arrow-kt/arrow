@@ -1,10 +1,10 @@
 package arrow.optics.std
 
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.extensions.monoid
-import arrow.core.extensions.option.monoid.monoid
+import arrow.core.int
+import arrow.core.option
+import arrow.optics.none
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
@@ -12,7 +12,6 @@ import arrow.core.test.generators.option
 import arrow.core.zip
 import arrow.optics.Iso
 import arrow.optics.Prism
-import arrow.optics.none
 import arrow.optics.option
 import arrow.optics.optionToEither
 import arrow.optics.optionToNullable
@@ -20,6 +19,7 @@ import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 
 class OptionTest : UnitSpec() {
@@ -49,7 +49,7 @@ class OptionTest : UnitSpec() {
       EQA = Eq.any(),
       EQB = Eq.any(),
       funcGen = Gen.functionAToB(Gen.option(Gen.int())),
-      bMonoid = Option.monoid(Int.monoid())
+      bMonoid = Monoid.option(Semigroup.int())
     ))
 
     testLaws(IsoLaws.laws(

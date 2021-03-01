@@ -52,7 +52,6 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```kotlin:ank:playground
  * import arrow.core.andThen
  * import arrow.core.AndThen
- * import arrow.core.extensions.list.foldable.foldLeft
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -62,7 +61,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  *     }
  *
  *   val f2 = (0..10000).toList()
- *     .foldLeft(AndThen { x: Int -> x + 1 }) { acc, _ ->
+ *     .fold(AndThen { x: Int -> x + 1 }) { acc, _ ->
  *       acc.andThen { it + 1 }
  *     }
  *   //sampleEnd
@@ -92,11 +91,10 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    *
    * ```kotlin:ank:playground
    * import arrow.core.AndThen
-   * import arrow.core.extensions.list.foldable.foldLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val f = (0..10000).toList().foldLeft(AndThen { i: Int -> i + 1 }) { acc, _ ->
+   *   val f = (0..10000).toList().fold(AndThen { i: Int -> i + 1 }) { acc, _ ->
    *     acc.andThen { it + 1 }
    *   }
    *

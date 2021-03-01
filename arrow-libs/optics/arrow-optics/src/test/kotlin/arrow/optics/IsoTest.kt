@@ -1,11 +1,6 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.Option
-import arrow.core.extensions.monoid
-import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.option.eq.eq
-import arrow.core.ListK
 import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
@@ -37,7 +32,7 @@ class IsoTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        MB = String.monoid()
+        MB = Monoid.string()
       ),
 
       PrismLaws.laws(
@@ -53,9 +48,7 @@ class IsoTest : UnitSpec() {
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any()),
-        EQListB = ListK.eq(Eq.any())
+        EQA = Eq.any()
       ),
 
       OptionalLaws.laws(
@@ -64,7 +57,7 @@ class IsoTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Option.eq(Eq.any())
+        EQOptionB = Eq.any()
       ),
 
       SetterLaws.laws(
@@ -82,7 +75,7 @@ class IsoTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        bMonoid = String.monoid()
+        bMonoid = Monoid.string()
       )
     )
 

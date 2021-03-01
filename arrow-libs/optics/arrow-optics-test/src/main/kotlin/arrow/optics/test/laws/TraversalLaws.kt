@@ -1,9 +1,7 @@
 package arrow.optics.test.laws
 
-import arrow.core.Option
 import arrow.core.compose
 import arrow.core.identity
-import arrow.core.ListK
 import arrow.optics.Traversal
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
@@ -13,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object TraversalLaws {
 
-  fun <A, B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>, EQListB: Eq<ListK<B>>) = listOf(
+  fun <A, B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) = listOf(
     Law("Traversal law: set is idempotent") { traversal.setIdempotent(aGen, bGen, EQA) },
     Law("Traversal law: modify identity") { traversal.modifyIdentity(aGen, EQA) },
     Law("Traversal law: compose modify") { traversal.composeModify(aGen, funcGen, EQA) }
