@@ -1,5 +1,9 @@
+---
+library: meta
+---
 ```kotlin
 //sampleStart
+
 val Meta.helloWorld: CliPlugin get() =
   "Hello World" {
     meta(

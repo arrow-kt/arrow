@@ -1,3 +1,6 @@
+---
+library: fx
+---
 ```kotlin:ank:playground
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parMapN
@@ -23,6 +26,8 @@ fun employee(name: String, company: Company): Employee =
 
 suspend fun main() {
     //sampleStart
+
+
     //maps each function to `::employee` in parallel
     val audrey = parMapN({ "Audrey" }, { company("Arrow") }, ::employee) 
     val pepe   = parMapN({  "Pepe"  }, { company("Arrow") }, ::employee)

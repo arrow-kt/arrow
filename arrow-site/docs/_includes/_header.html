@@ -3,15 +3,15 @@
     <div class="header-flex">
       <div class="header-text">
         <h1 id="header-text">{{site.data.commons.description}}</h1>
-        {% for library in site.data.code.libraries %}
-        <div id="{{ library }}-code-block" class="browser-content">
+        {% assign codeCol = site.code %}
+        {% for code in codeCol %}
+        <div id="{{code.library}}-code-block" class="browser-content">
           <ul class="browser-header">
             <li></li>
             <li></li>
             <li></li>
           </ul>
-          {% capture library_snippet %}{% include_relative landingpage/{{ library }}-home-code.md  %}{% endcapture %}
-          <div class="browser-code">{{ library_snippet | markdownify }}</div>
+          <div class="browser-code">{{ code }}</div>
         </div>
         {% endfor %}
       </div>
