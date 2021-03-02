@@ -1,10 +1,6 @@
 name: "Build libraries"
 
-on:
-  pull_request:
-    paths:
-    - 'arrow-libs/**'
-    - '.github/**'
+on: pull_request
 
 jobs:
   build:
