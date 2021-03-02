@@ -1,41 +1,9 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForConst private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias ConstPartialOf<A> = arrow.Kind<ForConst, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)inline
-fun <A, T> ConstOf<A, T>.fix(): Const<A, T> =
-  this as Const<A, T>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
-
-data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
+data class Const<A, out T>(private val value: A) {
 
   @Suppress("UNCHECKED_CAST")
   fun <U> retag(): Const<A, U> =
@@ -209,26 +177,8 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
     "$Const($value)"
 }
 
-@Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use the combine method defined for Const instead",
-  level = DeprecationLevel.WARNING
-)
-fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> =
-  Const(SG.run { value().combine(that.value()) })
-
 fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> =
-  Const(SG.run { value().combine(that.value()) })
-
-@Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
-  ReplaceWith(
-    "Const.mapN(MA, this, arg1)",
-    "arrow.core.Const"
-  ),
-  DeprecationLevel.WARNING
-)
-fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> =
-  fix().retag<U>().combine(SG, ff.fix().retag())
+  Const(SG.run { this@combine.value().combine(that.value()) })
 
 inline fun <A> A.const(): Const<A, Nothing> =
   Const(this)

@@ -1,29 +1,8 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForOption private constructor() { companion object }
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias OptionOf<A> = arrow.Kind<ForOption, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
 
 /**
  *
@@ -352,7 +331,7 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
     "as described here https://github.com/arrow-kt/arrow-core/issues/114#issuecomment-641211639",
   ReplaceWith("A?")
 )
-sealed class Option<out A> : OptionOf<A> {
+sealed class Option<out A> {
 
   companion object {
 
@@ -382,8 +361,8 @@ sealed class Option<out A> : OptionOf<A> {
     )
     fun <A> just(a: A): Option<A> = Some(a)
 
-    tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
-      when (val option = f(a).fix()) {
+    tailrec fun <A, B> tailRecM(a: A, f: (A) -> Option<Either<A, B>>): Option<B> =
+      when (val option = f(a)) {
         is Some -> {
           when (option.t) {
             is Either.Left -> tailRecM(option.t.a, f)
@@ -584,8 +563,8 @@ sealed class Option<out A> : OptionOf<A> {
       "arrow.core.zip"
     )
   )
-  fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
-    flatMap { a: A -> fb.fix().map { b -> f(a toT b) } }
+  fun <B, R> map2(fb: Option<B>, f: (Tuple2<A, B>) -> R): Option<R> =
+    flatMap { a: A -> fb.map { b -> f(a toT b) } }
 
   @Deprecated(
     "filterMap will be renamed to mapNotNull to be consistent with Kotlin Std's naming, please use mapNotNull instead of filterMap",
@@ -625,10 +604,10 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+  inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
     when (this) {
       is None -> this
-      is Some -> f(t).fix()
+      is Some -> f(t)
     }
 
   fun <B> align(b: Option<B>): Option<Ior<A, B>> =
@@ -646,8 +625,8 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
-  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
-    ff.fix().flatMap { this.fix().map(it) }
+  fun <B> ap(ff: Option<(A) -> B>): Option<B> =
+    ff.flatMap { this.map(it) }
 
   fun <B> apEval(ff: Eval<Option<(A) -> B>>): Eval<Option<B>> =
     fold({ Eval.now(none()) }, { r -> ff.map { it.map { f -> f(r) } } })
@@ -973,12 +952,12 @@ inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> = if (isEmpty()) alternative() else this
 
-infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
+infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
   value
 } else {
-  fix()
+  this
 }
 
 fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
@@ -1013,8 +992,8 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
-fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  branch(f.fix(), Some(::identity))
+fun <A, B> Option<Either<A, B>>.select(f: Option<(A) -> B>): Option<B> =
+  branch(f, Some(::identity))
 
 fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
   flatMap {

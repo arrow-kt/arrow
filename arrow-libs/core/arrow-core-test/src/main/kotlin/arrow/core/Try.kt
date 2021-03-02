@@ -1,14 +1,11 @@
 package arrow.core
 
-import arrow.higherkind
-
 typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 
 /**
  * TODO Used only for tests runtime until Kotlintest is upgraded to Kotest
  */
-@higherkind
 sealed class Try<out A> : TryOf<A> {
 
   companion object {

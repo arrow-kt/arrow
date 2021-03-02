@@ -3,40 +3,11 @@
 
 package arrow.core
 
-import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForTuple2 private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple2Of<A, B> = arrow.Kind2<ForTuple2, A, B>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple2PartialOf<A> = arrow.Kind<ForTuple2, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B> Tuple2Of<A, B>.fix(): Tuple2<A, B> =
-  this as Tuple2<A, B>
-
 @Deprecated("Deprecated in favor of Kotlin's Pair", ReplaceWith("Pair(a, b)"))
-data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
+data class Tuple2<out A, out B>(val a: A, val b: B) {
 
   @Deprecated("Functor hierarchy for Tuple2 is deprecated", ReplaceWith("Tuple2(this.a, f(this.b))", "arrow.core.Tuple2"))
   fun <C> map(f: (B) -> C) =
@@ -45,18 +16,6 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
   @Deprecated("BiFunctor hierarchy for Tuple2 is deprecated", ReplaceWith("Tuple2(fl(this.a), fr(this.b))", "arrow.core.Tuple2"))
   fun <C, D> bimap(fl: (A) -> C, fr: (B) -> D) =
     fl(a) toT fr(b)
-
-  @Deprecated("Apply hierarchy for Tuple2 is deprecated", ReplaceWith("Tuple2(this.a, f.b(this.b))", "arrow.core.Tuple2"))
-  fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
-    map(f.fix().b)
-
-  @Deprecated("Monad hierarchy for Tuple2 is deprecated", ReplaceWith("f(this.b)"))
-  fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
-    f(b).fix()
-
-  @Deprecated("Comonad hierarchy for Tuple2 is deprecated", ReplaceWith("a toT f(this)", "arrow.core.toT"))
-  fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
-    a toT f(this)
 
   @Deprecated("Comonad hierarchy for Tuple2 is deprecated", ReplaceWith("this.b"))
   fun extract() =

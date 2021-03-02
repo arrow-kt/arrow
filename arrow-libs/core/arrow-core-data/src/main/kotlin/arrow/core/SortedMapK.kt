@@ -1,47 +1,13 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import kotlin.collections.flatMap
 
 const val SortedMapKDeprecation =
   "SortedMapK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use java.util.SortedMap instead." +
     "Arrow provides extension functions on java.util.SortedMap and kotlin.collections.Map to cover all the behavior defined for SortedMapK"
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForSortedMapK private constructor() { companion object }
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias SortedMapKOf<A, B> = arrow.Kind2<ForSortedMapK, A, B>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias SortedMapKPartialOf<A> = arrow.Kind<ForSortedMapK, A>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias SortedMapKKindedJ<A, B> = arrow.HkJ2<ForSortedMapK, A, B>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B> SortedMapKOf<A, B>.fix(): SortedMapK<A, B> where A : kotlin.Comparable<A> =
-  this as SortedMapK<A, B>
-
 @Deprecated(SortedMapKDeprecation)
-data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
+data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMap<A, B> by map {
 
   fun <C> map(f: (B) -> C): SortedMapK<A, C> =
     this.map.map { it.key to f(it.value) }.toMap().toSortedMap().k()

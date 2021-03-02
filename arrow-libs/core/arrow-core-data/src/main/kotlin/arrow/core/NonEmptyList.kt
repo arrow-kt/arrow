@@ -1,29 +1,6 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.typeclasses.Semigroup
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForNonEmptyList private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias NonEmptyListOf<A> = arrow.Kind<ForNonEmptyList, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A> NonEmptyListOf<A>.fix(): NonEmptyList<A> =
-  this as NonEmptyList<A>
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -162,7 +139,7 @@ typealias Nel<A> = NonEmptyList<A>
 class NonEmptyList<out A>(
   val head: A,
   val tail: List<A>
-) : NonEmptyListOf<A>, AbstractList<A>() {
+) : AbstractList<A>() {
 
   private constructor(list: List<A>) : this(list[0], list.drop(1))
 
@@ -184,24 +161,8 @@ class NonEmptyList<out A>(
   inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
     NonEmptyList(f(head), tail.map(f))
 
-  @JvmName("flatMapKind")
-  @Deprecated(
-    "Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for NonEmptyList instead",
-    level = DeprecationLevel.WARNING
-  )
-  inline fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
-    f(head).fix() + tail.flatMap { f(it).fix().all }
-
   inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
     f(head) + tail.flatMap { f(it).all }
-
-  @JvmName("apKind")
-  @Deprecated(
-    "Kind is deprecated, and will be removed in 0.13.0. Please the ap method defined for NonEmptyList instead",
-    level = DeprecationLevel.WARNING
-  )
-  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
   fun <B> ap(ff: NonEmptyList<(A) -> B>): NonEmptyList<B> =
     flatMap { a -> ff.map { f -> f(a) } }
@@ -220,24 +181,6 @@ class NonEmptyList<out A>(
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
-
-  @JvmName("coflatMapKind")
-  @Deprecated(
-    "Kind is deprecated, and will be removed in 0.13.0. Please the coflatMap method defined for NonEmptyList instead",
-    level = DeprecationLevel.WARNING
-  )
-  fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
-    val buf = mutableListOf<B>()
-    tailrec fun consume(list: List<A>): List<B> =
-      if (list.isEmpty()) {
-        buf
-      } else {
-        val tail = list.subList(1, list.size)
-        buf += f(NonEmptyList(list[0], tail))
-        consume(tail)
-      }
-    return NonEmptyList(f(this), consume(this.fix().tail))
-  }
 
   fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()
@@ -445,7 +388,7 @@ class NonEmptyList<out A>(
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
-      f: (A) -> Kind<ForNonEmptyList, Either<A, B>>,
+      f: (A) -> NonEmptyList<Either<A, B>>,
       v: NonEmptyList<Either<A, B>>
     ) {
       val head: Either<A, B> = v.head
@@ -458,13 +401,13 @@ class NonEmptyList<out A>(
             is None -> Unit
           }
         }
-        is Either.Left -> go(buf, f, f(head.a).fix() + v.tail)
+        is Either.Left -> go(buf, f, f(head.a) + v.tail)
       }
     }
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyList<Either<A, B>>): NonEmptyList<B> {
       val buf = ArrayList<B>()
-      go(buf, f, f(a).fix())
+      go(buf, f, f(a))
       return fromListUnsafe(buf)
     }
   }
@@ -485,8 +428,8 @@ inline fun <A> A.nel(): NonEmptyList<A> =
   ),
   DeprecationLevel.WARNING
 )
-fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
-  fix().plus(y.fix())
+fun <A> NonEmptyList<A>.combineK(y: NonEmptyList<A>): NonEmptyList<A> =
+  this.plus(y)
 
 operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A>): Int =
   all.compareTo(other.all)

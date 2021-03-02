@@ -3,36 +3,6 @@
 
 package arrow.core
 
-import arrow.KindDeprecation
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForTuple10 private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple10Of<A, B, C, D, E, F, G, H, I, J> = arrow.Kind10<ForTuple10, A, B, C, D, E, F, G, H, I, J>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple10PartialOf<A, B, C, D, E, F, G, H, I> = arrow.Kind9<ForTuple10, A, B, C, D, E, F, G, H, I>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B, C, D, E, F, G, H, I, J> Tuple10Of<A, B, C, D, E, F, G, H, I, J>.fix(): Tuple10<A, B, C, D, E, F, G, H, I, J> =
-  this as Tuple10<A, B, C, D, E, F, G, H, I, J>
-
 data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
   @Deprecated("Use first instead", ReplaceWith("first"))
   val a: A,
@@ -54,7 +24,7 @@ data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val i: I,
   @Deprecated("Use tenth instead", ReplaceWith("tenth"))
   val j: J
-) : Tuple10Of<A, B, C, D, E, F, G, H, I, J> {
+) {
 
   val first: A = a
   val second: B = b

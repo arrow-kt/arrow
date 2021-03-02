@@ -1,42 +1,11 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
 typealias Invalid<E> = Validated.Invalid<E>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForValidated private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline
-fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
-  this as Validated<E, A>
 
 /**
  *
@@ -446,7 +415,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  *
  * ```
  */
-sealed class Validated<out E, out A> : ValidatedOf<E, A> {
+sealed class Validated<out E, out A> {
 
   companion object {
 
@@ -1053,27 +1022,27 @@ fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boole
 /**
  * Return the Valid value, or the default if Invalid
  */
-inline fun <E, A> ValidatedOf<E, A>.getOrElse(default: () -> A): A =
-  fix().fold({ default() }, ::identity)
+inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
+  fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid
  */
-fun <E, A> ValidatedOf<E, A>.orNull(): A? =
+fun <E, A> Validated<E, A>.orNull(): A? =
   getOrElse { null }
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-inline fun <E, A> ValidatedOf<E, A>.valueOr(f: (E) -> A): A =
-  fix().fold({ f(it) }, ::identity)
+inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
+  fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
  * This is similar to [orElse] except that here failures are accumulated.
  */
-inline fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
-  fix().fold(
+inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
+  fold(
     { e ->
       that().fold(
         { ee -> Invalid(SE.run { e.combine(ee) }) },
@@ -1088,8 +1057,8 @@ inline fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Vali
  * The functionality is similar to that of [findValid] except for failure accumulation,
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
-inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
-  fix().fold(
+inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
+  fold(
     { default() },
     { Valid(it) }
   )
@@ -1098,15 +1067,15 @@ inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Vali
  * From Apply:
  * if both the function and this value are Valid, apply the function
  */
-inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  when (val value = fix()) {
+inline fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
+  when (this) {
     is Validated.Valid -> when (f) {
-      is Validated.Valid -> Valid(f.a(value.a))
+      is Validated.Valid -> Valid(f.a(this.a))
       is Validated.Invalid -> f
     }
     is Validated.Invalid -> when (f) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> Invalid(SE.run { value.e.combine(f.e) })
+      is Validated.Valid -> this
+      is Validated.Invalid -> Invalid(SE.run { this@ap.e.combine(f.e) })
     }
   }
 
@@ -1117,19 +1086,19 @@ fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A)
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
   ReplaceWith("handleErrorWith(f)")
 )
-inline fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
+inline fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> Validated<E, A>): Validated<E, A> =
   handleErrorWith(f)
 
-inline fun <E, A> ValidatedOf<E, A>.handleErrorWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
-  when (val value = fix()) {
-    is Validated.Valid -> value
-    is Validated.Invalid -> f(value.e).fix()
+inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
+  when (this) {
+    is Validated.Valid -> this
+    is Validated.Invalid -> f(this.e)
   }
 
-inline fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
-  when (val value = fix()) {
-    is Validated.Valid -> value
-    is Validated.Invalid -> Valid(f(value.e))
+inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
+  when (this) {
+    is Validated.Valid -> this
+    is Validated.Invalid -> Valid(f(this.e))
   }
 
 inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
@@ -1141,28 +1110,24 @@ inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validat
 fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
-fun <E, A> ValidatedOf<E, A>.combine(
+fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,
   SA: Semigroup<A>,
-  y: ValidatedOf<E, A>
+  y: Validated<E, A>
 ): Validated<E, A> =
-  y.fix().let { that ->
-    when {
-      this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })
-      this is Invalid && that is Invalid -> Invalid(SE.run { e.combine(that.e) })
-      this is Invalid -> this
-      else -> that
-    }
+  when {
+    this is Valid && y is Valid -> Valid(SA.run { a.combine(y.a) })
+    this is Invalid && y is Invalid -> Invalid(SE.run { e.combine(y.e) })
+    this is Invalid -> this
+    else -> y
   }
 
-fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Validated<E, A> {
-  val xev = fix()
-  val yev = y.fix()
-  return when (xev) {
-    is Valid -> xev
-    is Invalid -> when (yev) {
-      is Invalid -> Invalid(SE.run { xev.e.combine(yev.e) })
-      is Valid -> yev
+fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Validated<E, A> {
+  return when (this) {
+    is Valid -> this
+    is Invalid -> when (y) {
+      is Invalid -> Invalid(SE.run { this@combineK.e.combine(y.e) })
+      is Valid -> y
     }
   }
 }
@@ -1170,8 +1135,8 @@ fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): V
 /**
  * Converts the value to an Ior<E, A>
  */
-fun <E, A> ValidatedOf<E, A>.toIor(): Ior<E, A> =
-  fix().fold({ Ior.Left(it) }, { Ior.Right(it) })
+fun <E, A> Validated<E, A>.toIor(): Ior<E, A> =
+  fold({ Ior.Left(it) }, { Ior.Right(it) })
 
 inline fun <A> A.valid(): Validated<Nothing, A> =
   Valid(this)
