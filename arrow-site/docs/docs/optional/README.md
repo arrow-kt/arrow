@@ -42,7 +42,7 @@ We can also lift such functions.
 
 ```kotlin:ank
 val lifted = POptional.listHead<Int>().lift { head -> head * 5 }
-lifted(emptyList<Int>().k())
+lifted(emptyList<Int>())
 ```
 
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens`, or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.

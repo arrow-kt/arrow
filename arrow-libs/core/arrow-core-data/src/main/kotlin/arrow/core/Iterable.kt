@@ -380,7 +380,7 @@ fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *    listOf("A:1", "B:2", "C:3").k().unzip { e ->
+ *    listOf("A:1", "B:2", "C:3").unzip { e ->
  *      e.split(":").let {
  *        it.first() to it.last()
  *      }
