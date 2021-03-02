@@ -15,16 +15,16 @@ object LensLaws {
     aGen: Gen<A>,
     bGen: Gen<B>,
     funcGen: Gen<(B) -> B>,
-    EQA: (A, A) -> Boolean = { a, b -> a?.equals(b) == true },
-    EQB: (B, B) -> Boolean = { a, b -> a?.equals(b) == true }
+    eqa: (A, A) -> Boolean = { a, b -> a == b },
+    eqb: (B, B) -> Boolean = { a, b -> a == b }
   ): List<Law> =
     listOf(
-      Law("Lens law: get set") { lensGetSet(lensGen, aGen, EQA) },
-      Law("Lens law: set get") { lensSetGet(lensGen, aGen, bGen, EQB) },
-      Law("Lens law: is set idempotent") { lensSetIdempotent(lensGen, aGen, bGen, EQA) },
-      Law("Lens law: modify identity") { lensModifyIdentity(lensGen, aGen, EQA) },
-      Law("Lens law: compose modify") { lensComposeModify(lensGen, aGen, funcGen, EQA) },
-      Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, EQA) }
+      Law("Lens law: get set") { lensGetSet(lensGen, aGen, eqa) },
+      Law("Lens law: set get") { lensSetGet(lensGen, aGen, bGen, eqb) },
+      Law("Lens law: is set idempotent") { lensSetIdempotent(lensGen, aGen, bGen, eqa) },
+      Law("Lens law: modify identity") { lensModifyIdentity(lensGen, aGen, eqa) },
+      Law("Lens law: compose modify") { lensComposeModify(lensGen, aGen, funcGen, eqa) },
+      Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, eqa) }
     )
 
   /**
@@ -35,49 +35,49 @@ object LensLaws {
     aGen: Gen<A>,
     bGen: Gen<B>,
     funcGen: Gen<(B) -> B>,
-    EQA: (A, A) -> Boolean = { a, b -> a?.equals(b) == true },
-    EQB: (B, B) -> Boolean = { a, b -> a?.equals(b) == true }
-  ): List<Law> = laws(Gen.constant(lens), aGen, bGen, funcGen, EQA, EQB)
+    eqa: (A, A) -> Boolean = { a, b -> a == b },
+    eqb: (B, B) -> Boolean = { a, b -> a == b }
+  ): List<Law> = laws(Gen.constant(lens), aGen, bGen, funcGen, eqa, eqb)
 
-  fun <A, B> lensGetSet(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, EQA: (A, A) -> Boolean) =
+  fun <A, B> lensGetSet(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, eq: (A, A) -> Boolean) =
     forAll(lensGen, aGen) { lens, a ->
       lens.run {
-        set(a, get(a)).equalUnderTheLaw(a, EQA)
+        set(a, get(a)).equalUnderTheLaw(a, eq)
       }
     }
 
-  fun <A, B> lensSetGet(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, EQB: (B, B) -> Boolean) =
+  fun <A, B> lensSetGet(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, eq: (B, B) -> Boolean) =
     forAll(lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
-        get(set(a, b)).equalUnderTheLaw(b, EQB)
+        get(set(a, b)).equalUnderTheLaw(b, eq)
       }
     }
 
-  fun <A, B> lensSetIdempotent(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, EQA: (A, A) -> Boolean) =
+  fun <A, B> lensSetIdempotent(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, eq: (A, A) -> Boolean) =
     forAll(lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
-        set(set(a, b), b).equalUnderTheLaw(set(a, b), EQA)
+        set(set(a, b), b).equalUnderTheLaw(set(a, b), eq)
       }
     }
 
-  fun <A, B> lensModifyIdentity(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, EQA: (A, A) -> Boolean) =
+  fun <A, B> lensModifyIdentity(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, eq: (A, A) -> Boolean) =
     forAll(lensGen, aGen) { lens, a ->
       lens.run {
-        modify(a, ::identity).equalUnderTheLaw(a, EQA)
+        modify(a, ::identity).equalUnderTheLaw(a, eq)
       }
     }
 
-  fun <A, B> lensComposeModify(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: (A, A) -> Boolean) =
+  fun <A, B> lensComposeModify(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, funcGen: Gen<(B) -> B>, eq: (A, A) -> Boolean) =
     forAll(lensGen, aGen, funcGen, funcGen) { lens, a, f, g ->
       lens.run {
-        modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), EQA)
+        modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
       }
     }
 
-  fun <A, B> lensConsistentSetModify(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, EQA: (A, A) -> Boolean) =
+  fun <A, B> lensConsistentSetModify(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, bGen: Gen<B>, eq: (A, A) -> Boolean) =
     forAll(lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
-        set(a, b).equalUnderTheLaw(modify(a) { b }, EQA)
+        set(a, b).equalUnderTheLaw(modify(a) { b }, eq)
       }
     }
 }

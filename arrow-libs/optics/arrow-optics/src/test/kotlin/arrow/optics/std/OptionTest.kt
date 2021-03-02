@@ -36,9 +36,7 @@ class OptionTest : UnitSpec() {
       iso = Iso.optionToNullable<Int>().reverse(),
       aGen = Gen.int().orNull(),
       bGen = Gen.option(Gen.int()),
-      funcGen = Gen.functionAToB(Gen.option(Gen.int())),
-      EQA = { a, b -> a == b },
-      EQB = { a, b -> a == b }
+      funcGen = Gen.functionAToB(Gen.option(Gen.int()))
     ))
 
     testLaws(IsoLaws.laws(

@@ -22,12 +22,12 @@ object FxLaws {
   fun <Eff : Effect<*>, F, A> suspended(
     pureGen: Gen<F>,
     G: Gen<F>,
-    f: (F, F) -> Boolean,
+    eq: (F, F) -> Boolean,
     fxSuspend: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
-    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, f, fxSuspend, invoke) },
-    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, f, fxSuspend, invoke) },
+    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, eq, fxSuspend, invoke) },
+    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, eq, fxSuspend, invoke) },
     Law("suspended fx can bind immediate exceptions") { suspendedCanBindImmediateExceptions(pureGen, fxSuspend, invoke) },
     Law("suspended fx can bind suspended exceptions") { suspendedCanBindSuspendedExceptions(pureGen, fxSuspend, invoke) }
   )
@@ -35,11 +35,11 @@ object FxLaws {
   fun <Eff : Effect<*>, F, A> eager(
     pureGen: Gen<F>,
     G: Gen<F>,
-    f: (F, F) -> Boolean,
+    eq: (F, F) -> Boolean,
     fxEager: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
-    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, f, fxEager, invoke) },
+    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, eq, fxEager, invoke) },
     Law("non-suspended fx can bind immediate exceptions") { nonSuspendedCanBindImmediateException(pureGen, fxEager, invoke) }
   )
 
