@@ -28,6 +28,7 @@ In your project's root `build.gradle`, append these repositories to your list:
 allprojects {
     repositories {
         mavenCentral()
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" } // for SNAPSHOT builds
     }
 }
 ```
