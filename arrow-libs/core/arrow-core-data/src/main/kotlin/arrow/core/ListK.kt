@@ -52,7 +52,7 @@ const val ListKDeprecation =
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either.Left
- * import arrow.core.Either.Left
+ * import arrow.core.Either.Right
  * import arrow.core.traverseEither
  *
  * //sampleStart

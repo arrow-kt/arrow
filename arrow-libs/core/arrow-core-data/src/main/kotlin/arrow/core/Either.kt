@@ -617,7 +617,7 @@ import arrow.typeclasses.Semigroup
  * See the examples below:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Either.Left
+ * import arrow.core.Either.Right
  * import arrow.core.leftIfNull
  *
  * val value =
@@ -630,7 +630,7 @@ import arrow.typeclasses.Semigroup
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.Either.Left
+ * import arrow.core.Either.Right
  * import arrow.core.leftIfNull
  *
  * val value =
@@ -917,7 +917,7 @@ sealed class Either<out A, out B> {
    * Example:
    * ```kotlin:ank:playground
    * import arrow.core.Either.Left
-   * import arrow.core.Either.Left
+   * import arrow.core.Either.Right
    *
    * //sampleStart
    * val right = Right(12).orNull() // Result: 12
@@ -1442,6 +1442,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: 
  * {: data-executable='true'}
  * ```kotlin:ank
  * import arrow.core.*
+ * import arrow.core.Either.Right
  *
  * Right(12).filterOrOther({ it > 10 }, { -1 })
  * ```

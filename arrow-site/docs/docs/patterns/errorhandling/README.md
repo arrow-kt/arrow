@@ -202,6 +202,9 @@ In Kotlin, it is encoded using sealed hierarchies. We can think of sealed hierar
 Once we have an ADT defined to model our known errors, we can redefine our functions.
 
 ```kotlin:ank
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+
 fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
 fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
 fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))

@@ -192,7 +192,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
- *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
+ *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.value, listOf(v2.value)))
  *   else -> throw IllegalStateException("Not possible value")
  *  }
  * //sampleEnd
