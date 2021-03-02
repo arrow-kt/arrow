@@ -1,33 +1,8 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
-
 const val ListKDeprecation =
   "ListK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.List instead." +
     "Arrow provides extension functions on Iterable to cover all the behavior defined for ListK as extension functions"
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForListK private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias ListKOf<A> = arrow.Kind<ForListK, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A> ListKOf<A>.fix(): ListK<A> =
-  this as ListK<A>
 
 /**
  *
@@ -136,9 +111,9 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  *
  */
 @Deprecated(ListKDeprecation)
-data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list {
+data class ListK<out A>(private val list: List<A>) : List<A> by list {
 
-  fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
+  fun <B> flatMap(f: (A) -> ListK<B>): ListK<B> = list.flatMap { f(it).list }.k()
 
   fun <B> map(f: (A) -> B): ListK<B> = list.map(f).k()
 
@@ -147,7 +122,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: ListK<A>): Eval<B> = when {
       fa_p.list.isEmpty() -> lb
-      else -> f(fa_p.fix().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
+      else -> f(fa_p.list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
     }
     return Eval.defer { loop(this) }
   }
@@ -159,11 +134,11 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       else -> false
     }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
+  fun <B> ap(ff: ListK<(A) -> B>): ListK<B> = flatMap { a -> ff.map { f -> f(a) } }
 
-  fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  fun <B, Z> map2(fb: ListK<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     flatMap { a ->
-      fb.fix().map { b ->
+      fb.map { b ->
         f(Tuple2(a, b))
       }
     }
@@ -443,7 +418,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
-      f: (A) -> Kind<ForListK, Either<A, B>>,
+      f: (A) -> ListK<Either<A, B>>,
       v: ListK<Either<A, B>>
     ) {
       if (!v.isEmpty()) {
@@ -453,15 +428,15 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
             buf += head.b
             go(buf, f, v.drop(1).k())
           }
-          is Either.Left -> go(buf, f, (f(head.a).fix() + v.drop(1)).k())
+          is Either.Left -> go(buf, f, (f(head.a) + v.drop(1)).k())
         }
       }
     }
 
     @Deprecated(ListKDeprecation, ReplaceWith("tailRecMIterable(a, f)"))
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListK, Either<A, B>>): ListK<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> ListK<Either<A, B>>): ListK<B> {
       val buf = ArrayList<B>()
-      go(buf, f, f(a).fix())
+      go(buf, f, f(a))
       return ListK(buf)
     }
 
@@ -599,8 +574,8 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
 }
 
 @Deprecated(ListKDeprecation, ReplaceWith("this + y"))
-fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
-  (fix() + y.fix()).k()
+fun <A> ListK<A>.combineK(y: ListK<A>): ListK<A> =
+  (this + y).k()
 
 @Deprecated(ListKDeprecation, ReplaceWith("this"))
 fun <A> List<A>.k(): ListK<A> = ListK(this)

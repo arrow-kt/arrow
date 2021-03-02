@@ -1,34 +1,7 @@
 package arrow.core
 
-import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForEval private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias EvalOf<A> = arrow.Kind<ForEval, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)inline
-fun <A> EvalOf<A>.fix(): Eval<A> =
-  this as Eval<A>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-fun <A> EvalOf<A>.value(): A = this.fix().value()
 
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
@@ -82,23 +55,9 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  * ```
  *
  */
-sealed class Eval<out A> : EvalOf<A> {
+sealed class Eval<out A> {
 
   companion object {
-
-    @JvmName("tailRecMKind")
-    @Deprecated(
-      "Kind is deprecated, and will be removed in 0.13.0. Please use the tailRecM method defined for Eval instead",
-      ReplaceWith("tailRecM(f)"),
-      DeprecationLevel.WARNING
-    )
-    fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
-      f(a).fix().flatMap { eval: Either<A, B> ->
-        when (eval) {
-          is Either.Left -> tailRecM(eval.a, f)
-          is Either.Right -> just(eval.b)
-        }
-      }
 
     fun <A, B> tailRecM(a: A, f: (A) -> Eval<Either<A, B>>): Eval<B> =
       f(a).flatMap { eval: Either<A, B> ->
@@ -428,37 +387,8 @@ sealed class Eval<out A> : EvalOf<A> {
   inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
 
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Eval instead")
-  fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    ff.fix().flatMap { f -> map(f) }.fix()
-
   fun <B> ap(ff: Eval<(A) -> B>): Eval<B> =
     ff.flatMap { f -> map(f) }
-
-  @JvmName("flatMapKind")
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for Eval instead")
-  @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
-  inline fun <B> flatMap(crossinline f: (A) -> EvalOf<B>): Eval<B> =
-    when (this) {
-      is FlatMap<A> -> object : FlatMap<B>() {
-        override fun <S> start(): Eval<S> = (this@Eval).start()
-
-        @IgnoreJRERequirement
-        override fun <S> run(s: S): Eval<B> =
-          object : FlatMap<B>() {
-            override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
-            override fun <S1> run(s1: S1): Eval<B> = f(s1 as A).fix()
-          }
-      }
-      is Defer<A> -> object : FlatMap<B>() {
-        override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
-        override fun <S> run(s: S): Eval<B> = f(s as A).fix()
-      }
-      else -> object : FlatMap<B>() {
-        override fun <S> start(): Eval<S> = this@Eval as Eval<S>
-        override fun <S> run(s: S): Eval<B> = f(s as A).fix()
-      }
-    }
 
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
   fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
@@ -482,11 +412,6 @@ sealed class Eval<out A> : EvalOf<A> {
         override fun <S> run(s: S): Eval<B> = f(s as A)
       }
     }
-
-  @JvmName("coflatMapKind")
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the coflatMap method defined for Eval instead")
-  inline fun <B> coflatMap(crossinline f: (EvalOf<A>) -> B): Eval<B> =
-    Later { f(this) }
 
   inline fun <B> coflatMap(crossinline f: (Eval<A>) -> B): Eval<B> =
     Later { f(this) }

@@ -1,40 +1,15 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
-
 const val SequenceKDeprecation =
   "SequenceK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.sequences.Sequence instead." +
     "Arrow provides extension functions on kotlin.sequences.Sequence to cover all the behavior defined for SequenceK"
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForSequenceK private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias SequenceKOf<A> = arrow.Kind<ForSequenceK, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A> SequenceKOf<A>.fix(): SequenceK<A> =
-  this as SequenceK<A>
-
 @Deprecated(SequenceKDeprecation)
-data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
+data class SequenceK<out A>(val sequence: Sequence<A>) : Sequence<A> by sequence {
 
-  fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()
+  fun <B> flatMap(f: (A) -> SequenceK<B>): SequenceK<B> = sequence.flatMap { f(it).sequence }.k()
 
-  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
+  fun <B> ap(ff: SequenceK<(A) -> B>): SequenceK<B> = flatMap { a -> ff.map { f -> f(a) } }
 
   fun <B> map(f: (A) -> B): SequenceK<B> = sequence.map(f).k()
 
@@ -46,9 +21,9 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { this.iterator().loop() }
   }
 
-  fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+  fun <B, Z> map2(fb: SequenceK<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->
-      fb.fix().map { b ->
+      fb.map { b ->
         f(Tuple2(a, b))
       }
     }
@@ -87,7 +62,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
     }
 
-  fun toList(): List<A> = this.fix().sequence.toList()
+  fun toList(): List<A> = this.sequence.toList()
 
   override fun toString(): String =
     sequence.toString()
@@ -220,10 +195,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
 
     @Deprecated("tailRecM for Sequence is a terminal operator that breaks the Sequence semantics and will be no longer be supported")
-    fun <A, B> tailRecM(a: A, f: (A) -> SequenceKOf<Either<A, B>>): SequenceK<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> SequenceK<Either<A, B>>): SequenceK<B> {
       tailrec fun <A, B> go(
         buf: MutableList<B>,
-        f: (A) -> SequenceKOf<Either<A, B>>,
+        f: (A) -> SequenceK<Either<A, B>>,
         v: SequenceK<Either<A, B>>
       ) {
         if (v.toList().isNotEmpty()) {
@@ -235,9 +210,9 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
             }
             is Either.Left -> {
               if (v.count() == 1) {
-                go(buf, f, (f(head.a).fix()).k())
+                go(buf, f, (f(head.a)).k())
               } else {
-                go(buf, f, (f(head.a).fix() + v.drop(1)).k())
+                go(buf, f, (f(head.a) + v.drop(1)).k())
               }
             }
           }
@@ -245,14 +220,14 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
 
       val buf = mutableListOf<B>()
-      go(buf, f, f(a).fix())
+      go(buf, f, f(a))
       return SequenceK(buf.asSequence())
     }
   }
 }
 
 @Deprecated(SequenceKDeprecation, ReplaceWith("this + y"))
-fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
+fun <A> SequenceK<A>.combineK(y: SequenceK<A>): SequenceK<A> = (sequence + y.sequence).k()
 
 @Deprecated(SequenceKDeprecation, ReplaceWith("this"))
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)

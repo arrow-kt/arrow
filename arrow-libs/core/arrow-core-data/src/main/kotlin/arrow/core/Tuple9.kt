@@ -3,36 +3,6 @@
 
 package arrow.core
 
-import arrow.KindDeprecation
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForTuple9 private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple9Of<A, B, C, D, E, F, G, H, I> = arrow.Kind9<ForTuple9, A, B, C, D, E, F, G, H, I>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple9PartialOf<A, B, C, D, E, F, G, H> = arrow.Kind8<ForTuple9, A, B, C, D, E, F, G, H>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B, C, D, E, F, G, H, I> Tuple9Of<A, B, C, D, E, F, G, H, I>.fix(): Tuple9<A, B, C, D, E, F, G, H, I> =
-  this as Tuple9<A, B, C, D, E, F, G, H, I>
-
 data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(
   @Deprecated("Use first instead", ReplaceWith("first"))
   val a: A,
@@ -52,7 +22,7 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
   val h: H,
   @Deprecated("Use ninth instead", ReplaceWith("ninth"))
   val i: I
-) : Tuple9Of<A, B, C, D, E, F, G, H, I> {
+) {
 
   val first: A = a
   val second: B = b

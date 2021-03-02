@@ -3,36 +3,6 @@
 
 package arrow.core
 
-import arrow.KindDeprecation
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForTuple8 private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple8Of<A, B, C, D, E, F, G, H> = arrow.Kind8<ForTuple8, A, B, C, D, E, F, G, H>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple8PartialOf<A, B, C, D, E, F, G> = arrow.Kind7<ForTuple8, A, B, C, D, E, F, G>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B, C, D, E, F, G, H> Tuple8Of<A, B, C, D, E, F, G, H>.fix(): Tuple8<A, B, C, D, E, F, G, H> =
-  this as Tuple8<A, B, C, D, E, F, G, H>
-
 data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(
   @Deprecated("Use first instead", ReplaceWith("first"))
   val a: A,
@@ -50,7 +20,7 @@ data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(
   val g: G,
   @Deprecated("Use eighth instead", ReplaceWith("eighth"))
   val h: H
-) : Tuple8Of<A, B, C, D, E, F, G, H> {
+) {
 
   val first: A = a
   val second: B = b

@@ -1,31 +1,11 @@
 package arrow.core
 
-import arrow.KindDeprecation
-
 const val SetKDeprecation =
   "SetK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.Set instead." +
     "Arrow provides extension functions on Iterable and kotlin.collections.Set to cover all the behavior defined for SetK"
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForSetK private constructor() { companion object }
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias SetKOf<A> = arrow.Kind<ForSetK, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A> SetKOf<A>.fix(): SetK<A> =
-  this as SetK<A>
-
 @Deprecated(SetKDeprecation)
-data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
+data class SetK<out A>(private val set: Set<A>) : Set<A> by set {
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
@@ -60,7 +40,7 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
 }
 
 @Deprecated(SetKDeprecation, ReplaceWith("this + y"))
-fun <A> SetKOf<A>.combineK(y: SetKOf<A>): SetK<A> = (fix() + y.fix()).k()
+fun <A> SetK<A>.combineK(y: SetK<A>): SetK<A> = (this + y).k()
 
 @Deprecated(SetKDeprecation, ReplaceWith("this"))
 fun <A> Set<A>.k(): SetK<A> = SetK(this)

@@ -1,34 +1,7 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForIor private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias IorOf<A, B> = arrow.Kind2<ForIor, A, B>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias IorPartialOf<A> = arrow.Kind<ForIor, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)inline
-fun <A, B> IorOf<A, B>.fix(): Ior<A, B> =
-  this as Ior<A, B>
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 
@@ -51,7 +24,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
-sealed class Ior<out A, out B> : IorOf<A, B> {
+sealed class Ior<out A, out B> {
 
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
@@ -132,17 +105,16 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
         }
       }
 
-    private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> = when (v) {
+    private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> Ior<L, Either<A, B>>): Ior<L, B> = when (v) {
       is Left -> Left(v.value)
       is Right -> when (v.value) {
         is Either.Right -> Right(v.value.b)
-        is Either.Left -> loop(f(v.value.a).fix(), f)
+        is Either.Left -> loop(f(v.value.a), f)
       }
       is Both -> when (v.rightValue) {
         is Either.Right -> Both(v.leftValue, v.rightValue.b)
         is Either.Left -> {
-          val fnb = f(v.rightValue.a).fix()
-          when (fnb) {
+          when (val fnb = f(v.rightValue.a)) {
             is Left -> Left(v.leftValue.combine(fnb.value))
             is Right -> loop(Both(v.leftValue, fnb.value), f)
             is Both -> loop(Both(v.leftValue.combine(fnb.leftValue), fnb.rightValue), f)
@@ -151,8 +123,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       }
     }
 
-    fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
-      SL.run { loop(f(a).fix(), f) }
+    fun <L, A, B> tailRecM(a: A, f: (A) -> Ior<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
+      SL.run { loop(f(a), f) }
 
     fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
@@ -878,8 +850,8 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
   }
 )
 
-fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
-  flatMap(SG) { a -> ff.fix().map { f -> f(a) } }
+fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: Ior<A, (B) -> D>): Ior<A, D> =
+  flatMap(SG) { a -> ff.map { f -> f(a) } }
 
 fun <A, B, D> Ior<A, B>.apEval(SG: Semigroup<A>, ff: Eval<Ior<A, (B) -> D>>): Eval<Ior<A, D>> =
   ff.map { ap(SG, it) }

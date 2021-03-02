@@ -1,36 +1,11 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.KindDeprecation
-
 const val MapKDeprecation =
   "MapK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.Map instead." +
     "Arrow provides extension functions on kotlin.collections.Map to cover all the behavior defined for MapK"
 
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) class ForMapK private constructor() { companion object }
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-) typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
-
 @Deprecated(MapKDeprecation)
-data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
+data class MapK<K, out A>(private val map: Map<K, A>) : Map<K, A> by map {
 
   fun <B> map(f: (A) -> B): MapK<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
 

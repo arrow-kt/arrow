@@ -3,36 +3,6 @@
 
 package arrow.core
 
-import arrow.KindDeprecation
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForTuple7 private constructor() {
-  companion object
-}
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple7Of<A, B, C, D, E, F, G> = arrow.Kind7<ForTuple7, A, B, C, D, E, F, G>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias Tuple7PartialOf<A, B, C, D, E, F> = arrow.Kind6<ForTuple7, A, B, C, D, E, F>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B, C, D, E, F, G> Tuple7Of<A, B, C, D, E, F, G>.fix(): Tuple7<A, B, C, D, E, F, G> =
-  this as Tuple7<A, B, C, D, E, F, G>
-
 data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(
   @Deprecated("Use first instead", ReplaceWith("first"))
   val a: A,
@@ -48,7 +18,7 @@ data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(
   val f: F,
   @Deprecated("Use seventh instead", ReplaceWith("seventh"))
   val g: G
-) : Tuple7Of<A, B, C, D, E, F, G> {
+) {
 
   val first: A = a
   val second: B = b

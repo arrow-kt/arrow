@@ -1,45 +1,5 @@
 package arrow.core
 
-import arrow.KindDeprecation
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-class ForAndThen private constructor() { companion object }
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias AndThenOf<A, B> = arrow.Kind2<ForAndThen, A, B>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias AndThenPartialOf<A> = arrow.Kind<ForAndThen, A>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-typealias AndThenKindedJ<A, B> = arrow.HkJ2<ForAndThen, A, B>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-inline fun <A, B> AndThenOf<A, B>.fix(): AndThen<A, B> =
-  this as AndThen<A, B>
-
-@Deprecated(
-  message = KindDeprecation,
-  level = DeprecationLevel.WARNING
-)
-operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
-
 /**
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.
  * It's similar to [arrow.core.andThen] and [arrow.core.compose] and can be used to build stack safe
@@ -74,7 +34,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
   "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
   level = DeprecationLevel.WARNING
 )
-sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
+sealed class AndThen<A, B> : (A) -> B {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
 
@@ -164,10 +124,10 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   fun <C> contramap(f: (C) -> A): AndThen<C, B> =
     this compose f
 
-  fun <C> flatMap(f: (B) -> AndThenOf<A, C>): AndThen<A, C> = Join(this.map(AndThen(f).andThen { it.fix() }))
+  fun <C> flatMap(f: (B) -> AndThen<A, C>): AndThen<A, C> = Join(this.map(AndThen(f)))
 
-  fun <C> ap(ff: AndThenOf<A, (B) -> C>): AndThen<A, C> =
-    ff.fix().flatMap { f ->
+  fun <C> ap(ff: AndThen<A, (B) -> C>): AndThen<A, C> =
+    ff.flatMap { f ->
       map(f)
     }
 
@@ -227,10 +187,10 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       else -> Single(f, 0)
     }
 
-    fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
+    fun <I, A, B> tailRecM(a: A, f: (A) -> AndThen<I, Either<A, B>>): AndThen<I, B> =
       AndThen { t: I -> step(a, t, f) }
 
-    private tailrec fun <I, A, B> step(a: A, t: I, fn: (A) -> AndThenOf<I, Either<A, B>>): B {
+    private tailrec fun <I, A, B> step(a: A, t: I, fn: (A) -> AndThen<I, Either<A, B>>): B {
       val af = fn(a)(t)
       return when (af) {
         is Either.Right -> af.b
