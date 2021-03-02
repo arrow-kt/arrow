@@ -23,7 +23,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Both for all entries existing in a and b
-      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).all {
           aligned[it]?.isBoth ?: false
@@ -31,7 +31,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Left for all entries existing only in a
-      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         (a.keys - b.keys).all { key ->
           aligned[key]?.let { it.isLeft } ?: false
@@ -56,22 +56,6 @@ class MapKTest : UnitSpec() {
         val expected: Map<Int, Int> = a.filter { (k, v) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, v + b[k]!!) }
           .toMap()
-        result == expected
-      }
-    }
-
-    "ap2" {
-      forAll(
-        Gen.mapK(Gen.intSmall(), Gen.intSmall()),
-        Gen.mapK(Gen.intSmall(), Gen.intSmall())
-      ) { a, b ->
-        val result = a.ap2(
-          a.map { {x: Int, y: Int -> x + y } },
-          b
-        )
-        val expected: MapK<Int, Int> = a.filter { (k, v) -> b.containsKey(k) }
-          .map { (k, v) -> Tuple2(k, v + b[k]!!) }
-          .let { mapOf(*it.toTypedArray()) }
         result == expected
       }
     }

@@ -180,7 +180,7 @@ class NonEmptyList<out A>(
     this.tail.fold(f(b, this.head), f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    all.k().foldRight(lb, f)
+    all.foldRight(lb, f)
 
   fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()

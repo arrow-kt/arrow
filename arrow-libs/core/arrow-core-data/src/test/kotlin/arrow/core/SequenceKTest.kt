@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.sequence
-import arrow.core.test.generators.sequenceK
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotlintest.matchers.sequences.shouldBeEmpty
@@ -58,33 +57,8 @@ class SequenceKTest : UnitSpec() {
       }
     }
 
-    "filterMap" {
-      forAll(Gen.sequenceK(Gen.int())) { a ->
-        val result =
-          a.filterMap {
-            when (it % 2 == 0) {
-              true -> Some(it.toString())
-              else -> None
-            }
-          }
-
-        val expected =
-          a.toList()
-            .mapNotNull {
-              when (it % 2 == 0) {
-                true -> it.toString()
-                else -> null
-              }
-            }
-            .asSequence()
-            .k()
-
-        result.toList() == expected.toList()
-      }
-    }
-
     "mapNotNull" {
-      forAll(Gen.sequenceK(Gen.int())) { a ->
+      forAll(Gen.sequence(Gen.int())) { a ->
         val result = a.mapNotNull {
           when (it % 2 == 0) {
             true -> it.toString()
@@ -100,7 +74,6 @@ class SequenceKTest : UnitSpec() {
               }
             }
             .asSequence()
-            .k()
 
         result.toList() == expected.toList()
       }

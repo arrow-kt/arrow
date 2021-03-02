@@ -6,13 +6,9 @@ import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.Left
-import arrow.core.ListK
-import arrow.core.MapK
 import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Right
-import arrow.core.SequenceK
-import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.Tuple10
 import arrow.core.Tuple2
@@ -138,17 +134,8 @@ fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
 fun <K : Comparable<K>, V> Gen.Companion.sortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
   Gen.bind(genK, genV) { k: K, v: V -> sortedMapOf(k to v) }.map { it.k() }
 
-fun <K, V> Gen.Companion.mapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
-  Gen.map(genK, genV).map { it.k() }
-
-fun <A> Gen.Companion.listK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map { it.k() }
-
-fun <A> Gen.Companion.sequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map { it.asSequence().k() }
-
 fun <A> Gen.Companion.sequence(genA: Gen<A>): Gen<Sequence<A>> =
   Gen.list(genA).map { it.asSequence() }
-
-fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
 
 fun Gen.Companion.unit(): Gen<Unit> =
   create { Unit }
