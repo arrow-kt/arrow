@@ -23,14 +23,14 @@ class EitherTest : UnitSpec() {
         when (this) {
           is Invalid -> {
             when (b) {
-              is Invalid -> Invalid((e + b.e))
+              is Invalid -> Invalid((value + b.value))
               is Valid -> b
             }
           }
           is Valid -> {
             when (b) {
               is Invalid -> b
-              is Valid -> arrow.core.Valid((a + b.a))
+              is Valid -> arrow.core.Valid((value + b.value))
             }
           }
         }

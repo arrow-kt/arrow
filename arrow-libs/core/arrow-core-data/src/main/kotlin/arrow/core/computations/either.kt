@@ -17,8 +17,8 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 
   suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
-      is Validated.Valid -> a
-      is Validated.Invalid -> control().shift(Left(e))
+      is Validated.Valid -> value
+      is Validated.Invalid -> control().shift(Left(value))
     }
 
   @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))
