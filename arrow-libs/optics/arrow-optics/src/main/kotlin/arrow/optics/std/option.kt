@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Right
+import arrow.core.Either.Right
 import arrow.core.Some
 import arrow.core.identity
 import arrow.typeclasses.Monoid

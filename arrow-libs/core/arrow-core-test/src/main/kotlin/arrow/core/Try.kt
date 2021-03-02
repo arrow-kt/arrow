@@ -90,7 +90,7 @@ sealed class Try<out A> : TryOf<A> {
 
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
-  fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
+  fun toEither(): Either<Throwable, A> = fold({ Either.Left(it) }, { Either.Right(it) })
 
   fun <B> toEither(onLeft: (Throwable) -> B): Either<B, A> = this.toEither().fold({ onLeft(it).left() }, { it.right() })
 

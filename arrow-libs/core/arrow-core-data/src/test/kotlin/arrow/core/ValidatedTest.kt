@@ -3,6 +3,8 @@ package arrow.core
 import arrow.core.computations.RestrictedValidatedEffect
 import arrow.core.computations.ValidatedEffect
 import arrow.core.computations.validated
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.FxLaws
 import arrow.typeclasses.Monoid

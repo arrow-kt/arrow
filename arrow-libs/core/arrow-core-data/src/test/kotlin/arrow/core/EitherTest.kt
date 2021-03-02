@@ -3,6 +3,8 @@ package arrow.core
 import arrow.core.computations.EitherEffect
 import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
+import arrow.core.Either.Right
+import arrow.core.Either.Left
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.any
 import arrow.core.test.generators.either

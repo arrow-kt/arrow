@@ -1,7 +1,7 @@
 package arrow.optics
 
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.int
