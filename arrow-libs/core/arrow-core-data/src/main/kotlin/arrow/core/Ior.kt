@@ -527,43 +527,7 @@ sealed class Ior<out A, out B> {
    */
   @Deprecated("Deprecated, use `leftOrNull` instead", ReplaceWith("leftOrNull()"))
   fun toLeftOption(): Option<A> =
-    fold({
-      /**
-       * Lifts a pure [A] value to [Option]
-       *
-       * {: data-executable='true'}
-       *
-       * ```kotlin:ank
-       * import arrow.core.Option
-       * fun main(args: Array<String>) {
-       * //sampleStart
-       * val result: Option<Int> = Option.just(1)
-       * //sampleEnd
-       * println(result)
-       * }
-       * ```
-       *
-       */
-      Some(it)
-    }, { None }, { a, _ ->
-      /**
-       * Lifts a pure [A] value to [Option]
-       *
-       * {: data-executable='true'}
-       *
-       * ```kotlin:ank
-       * import arrow.core.Option
-       * fun main(args: Array<String>) {
-       * //sampleStart
-       * val result: Option<Int> = Option.just(1)
-       * //sampleEnd
-       * println(result)
-       * }
-       * ```
-       *
-       */
-      Some(a)
-    })
+    fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]
