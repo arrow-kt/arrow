@@ -6,6 +6,7 @@ on:
     - master
     paths:
     - 'arrow-libs/**'
+    - '.github/**'
 
 jobs:
   publish:

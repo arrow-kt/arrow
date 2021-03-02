@@ -5,7 +5,9 @@ on:
     branches:
     - master
     paths:
+    - 'arrow-libs/**'
     - 'arrow-stack/**'
+    - '.github/**'
 
 jobs:
   publish-arrow-stack:
