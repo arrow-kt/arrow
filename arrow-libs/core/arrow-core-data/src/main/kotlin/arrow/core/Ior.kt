@@ -126,9 +126,9 @@ sealed class Ior<out A, out B> {
     fun <L, A, B> tailRecM(a: A, f: (A) -> Ior<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
       SL.run { loop(f(a), f) }
 
-    fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
+    fun <A, B> leftNel(a: A): IorNel<A, B> = Left(nonEmptyListOf(a))
 
-    fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(NonEmptyList.of(a), b)
+    fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(nonEmptyListOf(a), b)
 
     /**
      *  Lifts a function `(B) -> C` to the [Ior] structure returning a polymorphic function

@@ -186,7 +186,7 @@ class ValidatedTest : UnitSpec() {
     "catchNel should return Invalid(Nel(result)) when f throws" {
       val exception = MyException("Boom!")
       suspend fun loadFromNetwork(): Int = throw exception
-      Validated.catchNel { loadFromNetwork() } shouldBe Invalid(NonEmptyList(exception))
+      Validated.catchNel { loadFromNetwork() } shouldBe Invalid(nonEmptyListOf(exception))
     }
 
     "Cartesian builder should build products over homogeneous Validated" {
