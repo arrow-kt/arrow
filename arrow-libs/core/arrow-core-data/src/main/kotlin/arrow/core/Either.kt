@@ -990,7 +990,7 @@ sealed class Either<out A, out B> {
     if (n <= 0) emptyList<B>().right()
     else when (this) {
       is Left -> this
-      is Right -> List(n) { this.b }.right()
+      is Right -> List(n) { this.value }.right()
     }
 
   inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
@@ -1001,7 +1001,7 @@ sealed class Either<out A, out B> {
 
   inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
-      is Right -> fa(this.b).map { Right(it) }
+      is Right -> fa(this.value).map { Right(it) }
       is Left -> this.valid()
     }
 
@@ -1019,7 +1019,7 @@ sealed class Either<out A, out B> {
 
   inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
-      is Right -> if (predicate(this.b)) this.b else null
+      is Right -> if (predicate(this.value)) this.value else null
       is Left -> null
     }
 
@@ -1033,39 +1033,25 @@ sealed class Either<out A, out B> {
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
-  data class Left<out A> constructor(
-    @Deprecated("Use value instead", ReplaceWith("value"))
-    val a: A
-  ) : Either<A, Nothing>() {
-    val value: A = a
+  data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
     override val isLeft = true
     override val isRight = false
 
-    override fun toString(): String = "Either.Left($a)"
+    override fun toString(): String = "Either.Left($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Left(a)", "arrow.core.Either"))
-      operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
-    }
+    companion object
   }
 
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
-  data class Right<out B> constructor(
-    @Deprecated("Use value instead", ReplaceWith("value"))
-    val b: B
-  ) : Either<Nothing, B>() {
-    val value: B = b
+  data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
     override val isLeft = false
     override val isRight = true
 
-    override fun toString(): String = "Either.Right($b)"
+    override fun toString(): String = "Either.Right($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Right(b)", "arrow.core.Either"))
-      operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
-    }
+    companion object
   }
 
   override fun toString(): String = fold(
@@ -1081,34 +1067,22 @@ sealed class Either<out A, out B> {
 
   companion object {
 
-    @Deprecated(
-      "This constructor is duplicated with Either.Left. Use Either.Left instead.",
-      ReplaceWith("Either.Left(left)", "arrow.core.Either")
-    )
-    fun <L> left(left: L): Either<L, Nothing> = Left(left)
-
-    @Deprecated(
-      "This constructor is duplicated with Either.Right. Use Either.Right instead.",
-      ReplaceWith("Either.Right(right)", "arrow.core.Either")
-    )
-    fun <R> right(right: R): Either<Nothing, R> = Right(right)
-
     @PublishedApi
     internal val leftUnit: Either<Unit, Nothing> =
-      left(Unit)
+      Left(Unit)
 
     @PublishedApi
-    internal val unit: Either<Nothing, Unit> = right(Unit)
+    internal val unit: Either<Nothing, Unit> = Right(Unit)
 
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Either<L, Either<A, B>>): Either<L, B> {
       return when (val ev = f(a)) {
-        is Left -> Left(ev.a)
+        is Left -> Left(ev.value)
         is Right -> {
-          when (val b = ev.b) {
-            is Left -> tailRecM(b.a, f)
-            is Right -> Right(b.b)
+          when (val b = ev.value) {
+            is Left -> tailRecM(b.value, f)
+            is Right -> Right(b.value)
           }
         }
       }
@@ -1137,7 +1111,7 @@ sealed class Either<out A, out B> {
      * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
      */
     inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
-      if (test) right(ifTrue()) else left(ifFalse())
+      if (test) Right(ifTrue()) else Left(ifFalse())
 
     @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
     suspend inline fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
@@ -1375,10 +1349,6 @@ sealed class Either<out A, out B> {
     mapConst(Unit)
 }
 
-fun <L> Left(left: L): Either<L, Nothing> = Left(left)
-
-fun <R> Right(right: R): Either<Nothing, R> = Right(right)
-
 fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
   EitherSemigroup(SA, SB)
 
@@ -1587,19 +1557,19 @@ inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (t
  */
 inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
   when (this) {
-    is Left -> f(this.a)
+    is Left -> f(this.value)
     is Right -> this
   }
 
 inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
   when (this) {
-    is Left -> f(a).right()
+    is Left -> f(value).right()
     is Right -> this
   }
 
 inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
   when (this) {
-    is Left -> fe(a).right()
+    is Left -> fe(value).right()
     is Right -> map(fa)
   }
 
@@ -1612,12 +1582,12 @@ operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other
 fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
   when (this) {
     is Left -> when (b) {
-      is Left -> Left(SGA.run { a.combine(b.a) })
+      is Left -> Left(SGA.run { value.combine(b.value) })
       is Right -> this
     }
     is Right -> when (b) {
       is Left -> b
-      is Right -> Either.right(SGB.run { this@combine.b.combine(b.b) })
+      is Right -> Either.Right(SGB.run { this@combine.value.combine(b.value) })
     }
   }
 
@@ -1666,7 +1636,7 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   else MB.run {
     when (this@replicate) {
       is Left -> this@replicate
-      is Right -> List(n) { this@replicate.b }.combineAll().right()
+      is Right -> List(n) { this@replicate.value }.combineAll().right()
     }
   }
 
@@ -1683,14 +1653,14 @@ fun <A, B, C> Either<A, Either<B, C>>.selectM(f: Either<A, (B) -> C>): Either<A,
 
 inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   when (this) {
-    is Right -> if (predicate(this.b)) this else error().left()
+    is Right -> if (predicate(this.value)) this else error().left()
     is Left -> this
   }
 
 inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
   when (this) {
-    is Left -> fa(this.a)
-    is Right -> fb(this.b)
+    is Left -> fa(this.value)
+    is Right -> fb(this.value)
   }
 
 fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =

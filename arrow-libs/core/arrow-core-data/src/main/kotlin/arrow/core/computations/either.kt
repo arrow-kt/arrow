@@ -11,7 +11,7 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 
   suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
-      is Either.Right -> b
+      is Either.Right -> value
       is Either.Left -> control().shift(this@bind)
     }
 

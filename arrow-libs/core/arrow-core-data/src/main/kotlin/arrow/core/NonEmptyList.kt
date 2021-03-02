@@ -394,14 +394,14 @@ class NonEmptyList<out A>(
       val head: Either<A, B> = v.head
       when (head) {
         is Either.Right -> {
-          buf += head.b
+          buf += head.value
           val x = fromList(v.tail)
           when (x) {
             is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.t)
             is None -> Unit
           }
         }
-        is Either.Left -> go(buf, f, f(head.a) + v.tail)
+        is Either.Left -> go(buf, f, f(head.value) + v.tail)
       }
     }
 

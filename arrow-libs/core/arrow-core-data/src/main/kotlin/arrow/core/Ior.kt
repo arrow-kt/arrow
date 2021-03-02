@@ -108,13 +108,13 @@ sealed class Ior<out A, out B> {
     private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> Ior<L, Either<A, B>>): Ior<L, B> = when (v) {
       is Left -> Left(v.value)
       is Right -> when (v.value) {
-        is Either.Right -> Right(v.value.b)
-        is Either.Left -> loop(f(v.value.a), f)
+        is Either.Right -> Right(v.value.value)
+        is Either.Left -> loop(f(v.value.value), f)
       }
       is Both -> when (v.rightValue) {
-        is Either.Right -> Both(v.leftValue, v.rightValue.b)
+        is Either.Right -> Both(v.leftValue, v.rightValue.value)
         is Either.Left -> {
-          when (val fnb = f(v.rightValue.a)) {
+          when (val fnb = f(v.rightValue.value)) {
             is Left -> Left(v.leftValue.combine(fnb.value))
             is Right -> loop(Both(v.leftValue, fnb.value), f)
             is Both -> loop(Both(v.leftValue.combine(fnb.leftValue), fnb.rightValue), f)

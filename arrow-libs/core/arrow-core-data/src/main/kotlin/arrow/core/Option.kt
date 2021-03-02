@@ -365,8 +365,8 @@ sealed class Option<out A> {
       when (val option = f(a)) {
         is Some -> {
           when (option.t) {
-            is Either.Left -> tailRecM(option.t.a, f)
-            is Either.Right -> Some(option.t.b)
+            is Either.Left -> tailRecM(option.t.value, f)
+            is Either.Right -> Some(option.t.value)
           }
         }
         is None -> None

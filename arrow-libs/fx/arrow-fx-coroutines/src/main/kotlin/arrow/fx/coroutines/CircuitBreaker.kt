@@ -105,11 +105,11 @@ private constructor(
       is Closed -> {
         when (result) {
           is Either.Right -> {
-            if (curr.failures == 0) result.b
+            if (curr.failures == 0) result.value
             else { // In case of success, must reset the failures counter!
               val update = Closed(0)
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
-              else result.b
+              else result.value
             }
           }
           is Either.Left -> {
@@ -119,7 +119,7 @@ private constructor(
               // It's fine, just increment the failures count
               val update = Closed(curr.failures + 1)
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
-              else throw result.a
+              else throw result.value
             } else {
               // N.B. this could be canceled, however we don't care
               val now = System.currentTimeMillis()
@@ -129,7 +129,7 @@ private constructor(
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry
               else {
                 onOpen.invoke()
-                throw result.a
+                throw result.value
               }
             }
           }

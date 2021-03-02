@@ -998,8 +998,8 @@ fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Vali
 fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
   when (this) {
     is Validated.Valid -> when (val either = this.a) {
-      is Either.Left -> fl.map { f -> f(either.a) }
-      is Either.Right -> fr.map { f -> f(either.b) }
+      is Either.Left -> fl.map { f -> f(either.value) }
+      is Either.Right -> fr.map { f -> f(either.value) }
     }
     is Validated.Invalid -> this
   }
