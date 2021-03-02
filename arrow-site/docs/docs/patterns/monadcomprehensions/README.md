@@ -51,7 +51,7 @@ Let's see one example of the block `either` that uses [`Effect`]({{ '/arrow/cont
 import arrow.core.computations.either
 import arrow.core.Either
 import arrow.core.Either.Left
-import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */
@@ -193,7 +193,7 @@ With this new style, we can rewrite our original example of database fetching as
 import arrow.core.computations.either
 import arrow.core.Either
 import arrow.core.Either.Left
-import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */

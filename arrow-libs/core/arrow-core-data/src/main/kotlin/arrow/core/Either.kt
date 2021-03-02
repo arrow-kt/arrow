@@ -235,7 +235,7 @@ import arrow.typeclasses.Semigroup
  *     is IllegalArgumentException -> "Can't take reciprocal of 0!"
  *     else -> "Unknown error"
  *   }
- *   is Either.Right -> "Got reciprocal: ${x.b}"
+ *   is Either.Right -> "Got reciprocal: ${x.value}"
  * }
  * //sampleEnd
  * fun main() {
@@ -306,7 +306,7 @@ import arrow.typeclasses.Semigroup
  *     is Error.NotANumber -> "Not a number!"
  *     is Error.NoZeroReciprocal -> "Can't take reciprocal of 0!"
  *   }
- *   is Either.Right -> "Got reciprocal: ${x.b}"
+ *   is Either.Right -> "Got reciprocal: ${x.value}"
  * }
  * //sampleEnd
  * fun main() {

@@ -161,7 +161,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleStart
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
  *  return when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+ *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
  *   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
@@ -189,7 +189,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * fun <E, A, B, C> parallelValidate
  *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
  *  when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+ *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
