@@ -10,17 +10,12 @@ import io.kotlintest.properties.Gen
 class IndexInstanceTest : UnitSpec() {
 
   init {
-
-    listOf(1, 2, 3)
-      .map { it + 1 }
-
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.int().map { Index.list<String>().index(it) },
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
-        EQA = { sequenceK, sequenceK2 -> sequenceK.toList() == sequenceK2.toList() }
+        funcGen = Gen.functionAToB(Gen.string())
       )
     )
   }

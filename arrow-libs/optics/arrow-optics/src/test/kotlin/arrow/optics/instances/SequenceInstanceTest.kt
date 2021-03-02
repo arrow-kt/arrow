@@ -21,7 +21,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = { a, b -> a.toList() == b.toList() }
+        eq = { a, b -> a.toList() == b.toList() }
       )
     )
 
@@ -31,7 +31,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = { a, b -> a.toList() == b.toList() }
+        eq = { a, b -> a.toList() == b.toList() }
       )
     )
 
@@ -41,7 +41,7 @@ class SequenceInstanceTest : UnitSpec() {
         aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = { a, b -> a.toList() == b.toList() }
+        eqa = { a, b -> a.toList() == b.toList() }
       )
     )
   }
