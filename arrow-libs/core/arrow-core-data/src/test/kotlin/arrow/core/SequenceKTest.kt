@@ -4,7 +4,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.sequence
 import arrow.core.test.generators.sequenceK
 import arrow.core.test.laws.MonoidLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
@@ -16,9 +15,7 @@ class SequenceKTest : UnitSpec() {
 
   init {
 
-    testLaws(
-      MonoidLaws.laws(Monoid.sequence(), Gen.sequence(Gen.int()), Eq.invoke { s1, s2 -> s1.toList() == s2.toList() }),
-    )
+    testLaws(MonoidLaws.laws(Monoid.sequence(), Gen.sequence(Gen.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "can align sequences" {
       forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->

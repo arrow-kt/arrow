@@ -6,7 +6,6 @@ import arrow.core.computations.eval
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.FxLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -17,10 +16,10 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eq.any(), eval::invoke) {
+      FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
         it.bind()
       },
-      FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eq.any(), eval::eager) {
+      FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eval<Int>::equals, eval::eager) {
         it.bind()
       }
     )

@@ -2,9 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 import kotlin.collections.flatMap
 
 const val SortedMapKDeprecation =
@@ -81,12 +78,6 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
   fun <C> foldLeft(c: SortedMapK<A, C>, f: (SortedMapK<A, C>, Tuple2<A, B>) -> SortedMapK<A, C>): SortedMapK<A, C> =
     this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
-  fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
-    map.iterator().iterateRight(Eval.always { just(sortedMapOf<A, C>().k()) }) { kv, lbuf ->
-      f(kv.value).apEval(lbuf.map { it.map { xs -> { b: C -> (mapOf(kv.key to b).k() + xs).toSortedMap().k() } } })
-    }.value()
-  }
-
   override fun equals(other: Any?): Boolean =
     when (other) {
       is SortedMapK<*, *> -> this.map == other.map
@@ -95,10 +86,6 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     }
 
   override fun hashCode(): Int = map.hashCode()
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>, SB: Show<B>): String =
-    "SortedMap(${toList().k().map { it.toTuple2() }.show(Show { show(SA, SB) })})"
 
   override fun toString(): String =
     map.toString()
@@ -114,10 +101,6 @@ fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fol
   { sortedMapOf<A, B>().k() },
   { mapEntry -> sortedMapOf(mapEntry.a to mapEntry.b).k() }
 )
-
-@Deprecated(SortedMapKDeprecation)
-fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
-  fix().traverse(GA, ::identity)
 
 @Deprecated(SortedMapKDeprecation, ReplaceWith("this.map { (k, v) -> Pair(k, v) }.toMap().toSortedMap()"))
 fun <A : Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapK<A, B> =

@@ -11,7 +11,6 @@ import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class ListInstanceTest : UnitSpec() {
@@ -24,7 +23,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -34,7 +32,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -44,7 +41,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -54,7 +50,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -64,7 +59,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.int()),
         bGen = Gen.pair(Gen.int(), Gen.list(Gen.int())),
         funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.list(Gen.int()))),
-        EQA = Eq.any()
       )
     )
 
@@ -74,7 +68,6 @@ class ListInstanceTest : UnitSpec() {
         aGen = Gen.list(Gen.int()),
         bGen = Gen.pair(Gen.list(Gen.int()), Gen.int()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.list(Gen.int()), Gen.int())),
-        EQA = Eq.any()
       )
     )
   }

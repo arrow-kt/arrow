@@ -7,7 +7,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -22,11 +21,11 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonoidLaws.laws(Monoid.option(Monoid.int()), Gen.option(Gen.int()), Eq.any()),
-      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Eq.any(), option::invoke) {
+      MonoidLaws.laws(Monoid.option(Monoid.int()), Gen.option(Gen.int())),
+      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Option<String>::equals, option::invoke) {
         it.bind()
       },
-      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Eq.any(), option::eager) {
+      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Option<String>::equals, option::eager) {
         it.bind()
       }
     )

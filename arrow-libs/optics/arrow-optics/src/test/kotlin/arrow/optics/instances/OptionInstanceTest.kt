@@ -6,7 +6,6 @@ import arrow.core.test.generators.option
 import arrow.optics.Traversal
 import arrow.optics.option
 import arrow.optics.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class OptionInstanceTest : UnitSpec() {
@@ -19,7 +18,6 @@ class OptionInstanceTest : UnitSpec() {
         aGen = Gen.option(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
   }

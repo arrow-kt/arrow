@@ -2,10 +2,8 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
 
 @Deprecated(
   message = KindDeprecation,
@@ -364,14 +362,6 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
-  @Deprecated(
-    "Applicative typleclass is deprecated. Use traverse, traverseEither or traverseValidated instead",
-    level = DeprecationLevel.WARNING
-  )
-  fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<A, C>> = GA.run {
-    fold({ just(Left(it)) }, { b -> f(b).map { Right(it) } }, { _, b -> f(b).map { Right(it) } })
-  }
-
   inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
 
@@ -639,23 +629,6 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override fun toString(): String = "Ior.Both($leftValue, $rightValue)"
   }
 
-  @Deprecated(
-    "Show typeclass is deprecated, and will be removed in 0.13.0. Please use the toString method instead.",
-    ReplaceWith(
-      "toString()"
-    ),
-    DeprecationLevel.WARNING
-  )
-  fun show(SL: Show<A>, SR: Show<B>): String = fold(
-    {
-      "Left(${SL.run { it.show() }})"
-    },
-    {
-      "Right(${SR.run { it.show() }})"
-    },
-    { a, b -> "Both(${SL.run { a.show() }}, ${SR.run { b.show() }})" }
-  )
-
   override fun toString(): String = fold(
     { "Ior.Left($it" },
     { "Ior.Right($it)" },
@@ -913,13 +886,6 @@ fun <A, B, D> Ior<A, B>.apEval(SG: Semigroup<A>, ff: Eval<Ior<A, (B) -> D>>): Ev
 
 inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity, { _, b -> b })
-
-@Deprecated(
-  "Applicative typleclass is deprecated. Use sequence, sequenceEither or sequenceValidated instead",
-  level = DeprecationLevel.WARNING
-)
-fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
-  fix().traverse(GA, ::identity)
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 

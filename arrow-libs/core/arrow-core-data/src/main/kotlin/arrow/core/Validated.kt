@@ -2,11 +2,8 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -836,12 +833,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
 
-  @Deprecated(ShowDeprecation)
-  fun show(SE: Show<E>, SA: Show<A>): String = fold(
-    { "Invalid(${SE.run { it.show() }})" },
-    { "Valid(${SA.run { it.show() }})" }
-  )
-
   override fun toString(): String = fold(
     { "Validated.Invalid($it)" },
     { "Validated.Valid($it)" }
@@ -1149,15 +1140,6 @@ inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validat
 
 fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
-
-@Deprecated("@extension kinded projected functions are deprecated. Replace with traverse or traverseEither from arrow.core.*")
-fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
-  fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
-}
-
-@Deprecated("@extension kinded projected functions are deprecated. Replace with sequence or sequenceEither from arrow.core.*")
-fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
-  fix().traverse(GA, ::identity)
 
 fun <E, A> ValidatedOf<E, A>.combine(
   SE: Semigroup<E>,

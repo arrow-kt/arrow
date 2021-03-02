@@ -12,7 +12,6 @@ import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class StringInstanceTest : UnitSpec() {
@@ -25,7 +24,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any()
       )
     )
 
@@ -35,7 +33,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any()
       )
     )
 
@@ -45,7 +42,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
-        EQA = Eq.any()
       )
     )
 
@@ -55,7 +51,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.pair(Gen.char(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.char(), Gen.string())),
-        EQA = Eq.any()
       )
     )
 
@@ -65,7 +60,6 @@ class StringInstanceTest : UnitSpec() {
         aGen = Gen.string(),
         bGen = Gen.pair(Gen.string(), Gen.char()),
         funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.char())),
-        EQA = Eq.any()
       )
     )
   }

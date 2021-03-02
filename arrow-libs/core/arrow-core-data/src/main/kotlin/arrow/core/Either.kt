@@ -7,8 +7,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -1100,12 +1098,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
     }
   }
-
-  @Deprecated(ShowDeprecation)
-  fun show(SL: Show<A>, SR: Show<B>): String = fold(
-    { "Left(${SL.run { it.show() }})" },
-    { "Right(${SR.run { it.show() }})" }
-  )
 
   override fun toString(): String = fold(
     { "Either.Left($it)" },

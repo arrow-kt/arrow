@@ -17,7 +17,6 @@ import arrow.core.test.generators.short
 import arrow.core.test.generators.shortSmall
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.SemiringLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semiring
 import io.kotlintest.properties.Gen
@@ -25,18 +24,18 @@ import io.kotlintest.properties.forAll
 
 class NumberInstancesTest : UnitSpec() {
 
-  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, GEN: Gen<F>, EQ: Eq<F>) {
-    testLaws(SemiringLaws.laws(SG, GEN, EQ))
-    testLaws(MonoidLaws.laws(M, GEN, EQ))
+  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, GEN: Gen<F>) {
+    testLaws(SemiringLaws.laws(SG, GEN))
+    testLaws(MonoidLaws.laws(M, GEN))
   }
 
   init {
-    testAllLaws(Semiring.byte(), Monoid.byte(), Gen.byteSmall(), Eq.any())
-    testAllLaws(Semiring.double(), Monoid.double(), Gen.doubleSmall(), Eq.any())
-    testAllLaws(Semiring.int(), Monoid.int(), Gen.intSmall(), Eq.any())
-    testAllLaws(Semiring.short(), Monoid.short(), Gen.shortSmall(), Eq.any())
-    testAllLaws(Semiring.float(), Monoid.float(), Gen.floatSmall(), Eq.any())
-    testAllLaws(Semiring.long(), Monoid.long(), Gen.longSmall(), Eq.any())
+    testAllLaws(Semiring.byte(), Monoid.byte(), Gen.byteSmall())
+    testAllLaws(Semiring.double(), Monoid.double(), Gen.doubleSmall())
+    testAllLaws(Semiring.int(), Monoid.int(), Gen.intSmall())
+    testAllLaws(Semiring.short(), Monoid.short(), Gen.shortSmall())
+    testAllLaws(Semiring.float(), Monoid.float(), Gen.floatSmall())
+    testAllLaws(Semiring.long(), Monoid.long(), Gen.longSmall())
 
     /** Semigroup specific instance check */
 

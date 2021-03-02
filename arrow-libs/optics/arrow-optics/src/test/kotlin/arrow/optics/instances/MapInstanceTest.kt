@@ -15,9 +15,6 @@ import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 
 class MapInstanceTest : UnitSpec() {
@@ -30,7 +27,6 @@ class MapInstanceTest : UnitSpec() {
         aGen = Gen.map(Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQA = Eq.any()
       )
     )
 
@@ -40,7 +36,6 @@ class MapInstanceTest : UnitSpec() {
         aGen = Gen.map(Gen.char(), Gen.intSmall()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -50,7 +45,6 @@ class MapInstanceTest : UnitSpec() {
         aGen = Gen.map(Gen.string(), Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
-        EQA = Eq.any()
       )
     )
 
@@ -60,9 +54,6 @@ class MapInstanceTest : UnitSpec() {
         aGen = Gen.map(Gen.string(), Gen.int()),
         bGen = Gen.option(Gen.int()),
         funcGen = Gen.functionAToB(Gen.option(Gen.int())),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        MB = Monoid.option(Semigroup.int())
       )
     )
   }

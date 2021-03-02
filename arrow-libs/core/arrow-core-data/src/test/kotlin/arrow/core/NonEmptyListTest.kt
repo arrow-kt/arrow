@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.SemigroupLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -13,9 +12,7 @@ import kotlin.math.min
 class NonEmptyListTest : UnitSpec() {
   init {
 
-    testLaws(
-      SemigroupLaws.laws(Semigroup.nonEmptyList(), Gen.nonEmptyList(Gen.int()), Eq.any()),
-    )
+    testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Gen.nonEmptyList(Gen.int())))
 
     "can align lists with different lengths" {
       forAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->

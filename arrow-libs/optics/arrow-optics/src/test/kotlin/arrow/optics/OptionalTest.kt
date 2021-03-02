@@ -12,7 +12,6 @@ import arrow.core.toOption
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -26,8 +25,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
     ))
 
     testLaws(OptionalLaws.laws(
@@ -35,8 +32,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.int(),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
     ))
 
     testLaws(OptionalLaws.laws(
@@ -44,8 +39,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.pair(Gen.list(Gen.int()), Gen.bool()),
       bGen = Gen.pair(Gen.int(), Gen.bool()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
     ))
 
     testLaws(OptionalLaws.laws(
@@ -53,8 +46,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.pair(Gen.list(Gen.int()), Gen.bool()),
       bGen = Gen.pair(Gen.int(), Gen.bool()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
     ))
 
     testLaws(OptionalLaws.laws(
@@ -62,8 +53,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.pair(Gen.bool(), Gen.list(Gen.int())),
       bGen = Gen.pair(Gen.bool(), Gen.int()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.bool(), Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
     ))
 
     testLaws(TraversalLaws.laws(
@@ -71,7 +60,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any()
     ))
 
     testLaws(SetterLaws.laws(
@@ -79,7 +67,6 @@ class OptionalTest : UnitSpec() {
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any()
     ))
 
     "asSetter should set absent optional" {

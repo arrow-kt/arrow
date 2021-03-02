@@ -5,7 +5,6 @@ import arrow.core.computations.ValidatedEffect
 import arrow.core.computations.validated
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.FxLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
@@ -17,10 +16,10 @@ class ValidatedTest : UnitSpec() {
 
   init {
     testLaws(
-      FxLaws.suspended<ValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Eq.any(), validated::invoke) {
+      FxLaws.suspended<ValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Validated<String, Int>::equals, validated::invoke) {
         it.bind()
       },
-      FxLaws.eager<RestrictedValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Eq.any(), validated::eager) {
+      FxLaws.eager<RestrictedValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Validated<String, Int>::equals, validated::eager) {
         it.bind()
       }
     )

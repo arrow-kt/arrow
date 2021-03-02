@@ -1,8 +1,6 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Show
-import arrow.typeclasses.ShowDeprecation
 
 const val SetKDeprecation =
   "SetK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.Set instead." +
@@ -45,9 +43,6 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
       is Set<*> -> this.set == other
       else -> false
     }
-
-  @Deprecated(ShowDeprecation)
-  fun show(SA: Show<A>): String = "Set(${toList().k().show(SA)})"
 
   override fun toString(): String =
     set.toString()

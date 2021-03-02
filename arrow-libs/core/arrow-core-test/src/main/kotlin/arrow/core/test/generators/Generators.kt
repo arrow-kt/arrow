@@ -1,11 +1,9 @@
 package arrow.core.test.generators
 
-import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
-import arrow.core.Hashed
 import arrow.core.Ior
 import arrow.core.Left
 import arrow.core.ListK
@@ -31,9 +29,6 @@ import arrow.core.k
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toOption
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.shrinking.DoubleShrinker
 import io.kotlintest.properties.shrinking.FloatShrinker
@@ -44,17 +39,6 @@ fun Gen.Companion.short(): Gen<Short> =
 
 fun Gen.Companion.byte(): Gen<Byte> =
   Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
-
-fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
-  map { AP.just(it) }
-
-fun <F, A, E> Gen.Companion.applicativeError(genA: Gen<A>, errorGen: Gen<E>, AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
-  Gen.oneOf<Either<E, A>>(genA.map(::Right), errorGen.map(::Left)).map {
-    it.fold(AP::raiseError, AP::just)
-  }
-
-fun <F, A> Gen<A>.applicativeError(AP: ApplicativeError<F, Throwable>): Gen<Kind<F, A>> =
-  Gen.applicativeError(this, Gen.throwable(), AP)
 
 fun <A, B> Gen.Companion.functionAToB(gen: Gen<B>): Gen<(A) -> B> = gen.map { b: B -> { _: A -> b } }
 
@@ -182,8 +166,6 @@ fun <A> Gen<A>.eval(): Gen<Eval<A>> =
 
 fun Gen.Companion.char(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
-
-fun <A> Gen<A>.hashed(HA: Hash<A>): Gen<Hashed<A>> = map { v -> Hashed(HA.run { v.hash() }, v) }
 
 private fun <A, B, R> Gen<A>.alignWith(genB: Gen<B>, transform: (Ior<A, B>) -> R): Gen<R> =
   object : Gen<R> {
