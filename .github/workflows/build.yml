@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
     - 'arrow-libs/**'
+    - '.github/**'
 
 jobs:
   build:

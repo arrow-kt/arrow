@@ -5,6 +5,7 @@ on:
     paths:
     - 'arrow-libs/**'
     - 'arrow-site/**'
+    - '.github/**'
 
 jobs:
   build_doc:
