@@ -1454,6 +1454,8 @@ inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: 
  *
  * {: data-executable='true'}
  * ```kotlin:ank
+ * import arrow.core.Either.Left
+ *
  * val left: Either<Int, Int> = Left(12)
  * left.filterOrOther({ it > 10 }, { -1 })
  * ```
