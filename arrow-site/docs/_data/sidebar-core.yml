@@ -1,13 +1,6 @@
 options:
   - title: Quick Start
-
-    nested_options:
-
-      - title: Setup
-        url: /quickstart/setup/
-
-      - title: Projects & Examples
-        url: /quickstart/projects/
+    url: /quickstart/setup/
 
   - title: Tutorials
 

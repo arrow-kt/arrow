@@ -88,7 +88,7 @@ After generating and validating the documentation (previous step):
 ```sh
 cd arrow-site
 bundle install --gemfile Gemfile --path vendor/bundle
-bundle exec jekyll serve -s docs
+bundle exec jekyll serve -s build/site
 ```
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
