@@ -325,12 +325,6 @@ import arrow.typeclasses.Semigroup
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
  * Originally based on the Scala Koans.
  */
-@Deprecated(
-  "Option will be deleted soon as it promotes the wrong message of using a slower and memory unfriendly " +
-    "abstraction when the lang provides a better one. Alternatively, if you can't support nulls, consider aliasing Either<Unit, A> " +
-    "as described here https://github.com/arrow-kt/arrow-core/issues/114#issuecomment-641211639",
-  ReplaceWith("A?")
-)
 sealed class Option<out A> {
 
   companion object {
