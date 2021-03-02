@@ -397,7 +397,7 @@ class NonEmptyList<out A>(
           buf += head.value
           val x = fromList(v.tail)
           when (x) {
-            is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.t)
+            is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
             is None -> Unit
           }
         }

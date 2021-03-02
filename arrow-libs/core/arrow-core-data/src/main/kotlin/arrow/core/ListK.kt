@@ -183,8 +183,8 @@ data class ListK<out A>(private val list: List<A>) : List<A> by list {
   ): ListK<Tuple2<Option<A>, Option<B>>> =
     alignWith(this, other) { ior ->
       ior.fold(
-        { it.some() toT Option.empty<B>() },
-        { Option.empty<A>() toT it.some() },
+        { it.some() toT None },
+        { None toT it.some() },
         { a, b -> a.some() toT b.some() }
       )
     }

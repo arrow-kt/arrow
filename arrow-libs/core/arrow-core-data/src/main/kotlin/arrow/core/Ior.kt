@@ -75,11 +75,11 @@ sealed class Ior<out A, out B> {
     @Deprecated("Deprecated, use `fromNullables` instead", ReplaceWith("fromNullables(a, b)"))
     fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
       is Some -> when (ob) {
-        is Some -> Some(Both(oa.t, ob.t))
-        is None -> Some<Ior<A, B>>(Left(oa.t))
+        is Some -> Some(Both(oa.value, ob.value))
+        is None -> Some<Ior<A, B>>(Left(oa.value))
       }
       is None -> when (ob) {
-        is Some -> Some(Right(ob.t))
+        is Some -> Some(Right(ob.value))
         is None -> None
       }
     }
@@ -527,7 +527,43 @@ sealed class Ior<out A, out B> {
    */
   @Deprecated("Deprecated, use `leftOrNull` instead", ReplaceWith("leftOrNull()"))
   fun toLeftOption(): Option<A> =
-    fold({ Option.just(it) }, { Option.empty() }, { a, _ -> Option.just(a) })
+    fold({
+      /**
+       * Lifts a pure [A] value to [Option]
+       *
+       * {: data-executable='true'}
+       *
+       * ```kotlin:ank
+       * import arrow.core.Option
+       * fun main(args: Array<String>) {
+       * //sampleStart
+       * val result: Option<Int> = Option.just(1)
+       * //sampleEnd
+       * println(result)
+       * }
+       * ```
+       *
+       */
+      Some(it)
+    }, { None }, { a, _ ->
+      /**
+       * Lifts a pure [A] value to [Option]
+       *
+       * {: data-executable='true'}
+       *
+       * ```kotlin:ank
+       * import arrow.core.Option
+       * fun main(args: Array<String>) {
+       * //sampleStart
+       * val result: Option<Int> = Option.just(1)
+       * //sampleEnd
+       * println(result)
+       * }
+       * ```
+       *
+       */
+      Some(a)
+    })
 
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]

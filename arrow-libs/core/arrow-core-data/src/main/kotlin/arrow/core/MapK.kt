@@ -182,7 +182,7 @@ fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
 @Deprecated("Deprecated, use nullable instead", ReplaceWith("Tuple2<K, A>>?.let { ... }"))
 fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
   when (this) {
-    is Some -> mapOf(this.t).k()
+    is Some -> mapOf(this.value).k()
     is None -> emptyMap<K, A>().k()
   }
 

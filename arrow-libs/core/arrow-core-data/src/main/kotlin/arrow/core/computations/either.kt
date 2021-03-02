@@ -2,7 +2,7 @@ package arrow.core.computations
 
 import arrow.continuations.Effect
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
 import arrow.core.Validated
 import arrow.core.right
 import kotlin.coroutines.RestrictsSuspension
@@ -12,7 +12,7 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
   suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
-      is Either.Left -> control().shift(this@bind)
+      is Left -> control().shift(this@bind)
     }
 
   suspend fun <B> Validated<E, B>.bind(): B =
