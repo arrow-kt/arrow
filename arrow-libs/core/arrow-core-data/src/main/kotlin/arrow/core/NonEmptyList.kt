@@ -228,40 +228,15 @@ class NonEmptyList<out A>(
 
   companion object {
 
-    @Deprecated(
-      "Renamed to nonEmptyListOf to align with Kotlin Std standards",
-      ReplaceWith("nonEmptyListOf(head, t)", "arrow.core.nonEmptyListOf")
-    )
-    operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> =
-      NonEmptyList(head, t.asList())
-
-    @Deprecated(
-      "Renamed to nonEmptyListOf to align with Kotlin Std standards",
-      ReplaceWith("nonEmptyListOf(head, t)", "arrow.core.nonEmptyListOf")
-    )
-    fun <A> of(head: A, vararg t: A): NonEmptyList<A> =
-      NonEmptyList(head, t.asList())
-
     fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
       if (l.isEmpty()) None else Some(NonEmptyList(l))
 
     fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
       NonEmptyList(l)
 
-    @Deprecated(
-      "just is deprecated, and will be removed in 0.13.0. Please use nonEmptyListOf instead.",
-      ReplaceWith(
-        "nonEmptyListOf(a)",
-        "arrow.core.NonEmptyList"
-      ),
-      DeprecationLevel.WARNING
-    )
-    fun <A> just(a: A): NonEmptyList<A> =
-      of(a)
-
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
-      of(Unit)
+      nonEmptyListOf(Unit)
 
     inline fun <B, C, D> mapN(
       b: NonEmptyList<B>,
@@ -419,15 +394,6 @@ fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
 inline fun <A> A.nel(): NonEmptyList<A> =
   nonEmptyListOf(this)
 
-@Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please the plus method defined for NonEmptyList instead",
-  ReplaceWith(
-    "fix().plus(y.fix())",
-    "arrow.core.fix",
-    "arrow.core.plus"
-  ),
-  DeprecationLevel.WARNING
-)
 fun <A> NonEmptyList<A>.combineK(y: NonEmptyList<A>): NonEmptyList<A> =
   this.plus(y)
 
@@ -438,7 +404,7 @@ fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
   this.flatMap(::identity)
 
 fun <A, B> NonEmptyList<Either<A, B>>.selectM(f: NonEmptyList<(A) -> B>): NonEmptyList<B> =
-  this.flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }
+  this.flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> nonEmptyListOf(b) }) }
 
 fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
@@ -452,8 +418,8 @@ fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>,
   }
 
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  foldRight(f(head).map { NonEmptyList.just(it) }) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: B -> NonEmptyList(b) + bs } })
+  foldRight(f(head).map { nonEmptyListOf(it) }) { a, acc ->
+    f(a).ap(acc.map { bs -> { b: B -> nonEmptyListOf(b) + bs } })
   }
 
 inline fun <E, A, B> NonEmptyList<A>.flatTraverseEither(f: (A) -> Either<E, NonEmptyList<B>>): Either<E, NonEmptyList<B>> =
@@ -478,8 +444,8 @@ fun <E> NonEmptyList<Either<E, *>>.sequenceEither_(): Either<E, Unit> =
   traverseEither_(::identity)
 
 inline fun <E, A, B> NonEmptyList<A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, NonEmptyList<B>> =
-  foldRight(f(head).map { NonEmptyList(it) }) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> NonEmptyList(b) + bs } })
+  foldRight(f(head).map { nonEmptyListOf(it) }) { a, acc ->
+    f(a).ap(semigroup, acc.map { bs -> { b: B -> nonEmptyListOf(b) + bs } })
   }
 
 inline fun <E, A, B> NonEmptyList<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, NonEmptyList<B>>): Validated<E, NonEmptyList<B>> =
