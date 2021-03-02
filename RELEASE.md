@@ -2,6 +2,7 @@
 
 Prepare a pull request for `arrow` repository with these changes:
 
+0. Update `arrow-stack/build.gradle` when required
 1. Update versions in `arrow-libs/gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
 ```
 VERSION_NAME=0.11.0-SNAPSHOT
