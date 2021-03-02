@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.k
 import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
@@ -39,7 +38,7 @@ class GetterTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll(genToken) { token ->
-          getAll(token) == listOf(token.value).k()
+          getAll(token) == listOf(token.value)
         }
       }
 

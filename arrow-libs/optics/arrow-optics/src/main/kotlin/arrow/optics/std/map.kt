@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.core.getOption
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.typeclasses.At
@@ -46,7 +45,7 @@ fun <K, V> PTraversal.Companion.map(): Traversal<Map<K, V>, V> =
 fun <K, V> At.Companion.map(): At<Map<K, V>, K, Option<V>> =
   At { i ->
     PLens(
-      get = { it.getOption(i) },
+      get = { Option.fromNullable(it[i]) },
       set = { map, optV ->
         optV.fold({
           (map - i)

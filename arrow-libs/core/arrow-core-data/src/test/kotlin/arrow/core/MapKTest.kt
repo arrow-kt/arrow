@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.longSmall
-import arrow.core.test.generators.mapK
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -39,10 +38,10 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Right for all entries existing only in b
-      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         (b.keys - a.keys).all { key ->
-          aligned[key]?.let { it.isRight } ?: false
+          aligned[key]?.isRight ?: false
         }
       }
     }
