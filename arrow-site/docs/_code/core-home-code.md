@@ -4,8 +4,8 @@ library: core
 {: data-executable="true"}
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.computations.either
 
 object Lettuce

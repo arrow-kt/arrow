@@ -213,8 +213,8 @@ All values on the left side assume to be `Right` biased and, whenever a `Left` v
 
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Left
 import arrow.core.computations.either
 
 object Lettuce

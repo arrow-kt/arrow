@@ -125,7 +125,7 @@ import arrow.typeclasses.Semigroup
  * //sampleStart
  * val someValue: Option<Double> = Some(20.0)
  * val value = when(someValue) {
- *  is Some -> someValue.t
+ *  is Some -> someValue.value
  *  is None -> 0.0
  * }
  * //sampleEnd
@@ -142,7 +142,7 @@ import arrow.typeclasses.Semigroup
  * //sampleStart
  * val noValue: Option<Double> = None
  * val value = when(noValue) {
- *  is Some -> noValue.t
+ *  is Some -> noValue.value
  *  is None -> 0.0
  * }
  * //sampleEnd

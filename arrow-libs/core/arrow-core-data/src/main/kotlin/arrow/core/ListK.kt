@@ -51,8 +51,8 @@ const val ListKDeprecation =
  * Traversing a list creates a new container [Kind<F, A>]({{'/patterns/glossary/#type-constructors' | relative_url }}) by combining the result of a function applied to each element:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
- * import arrow.core.Left
+ * import arrow.core.Either.Left
+ * import arrow.core.Either.Left
  * import arrow.core.traverseEither
  *
  * //sampleStart
@@ -67,7 +67,7 @@ const val ListKDeprecation =
  * and complements the convenient function `sequence()` that converts a list of `ListK<Kind<F, A>>` into a `Kind<F, ListK<A>>`:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  * import arrow.core.sequenceEither
  *
  * //sampleStart

@@ -22,7 +22,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```kotlin:ank
  * import arrow.core.Either
- * import arrow.core.Left
+ * import arrow.core.Either.Left
  * import arrow.core.flatMap
  *
  * //sampleStart

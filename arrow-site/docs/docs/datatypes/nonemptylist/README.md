@@ -28,9 +28,9 @@ import arrow.core.*
 A `NonEmptyList` guarantees the list always has at least 1 element.
 
 ```kotlin:ank:silent
-NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
-NonEmptyList.of(1, 2) // NonEmptyList<Int>
-//NonEmptyList.of() // does not compile
+nonEmptyListOf(1, 2, 3, 4, 5) // NonEmptyList<Int>
+nonEmptyListOf(1, 2) // NonEmptyList<Int>
+//nonEmptyListOf() // does not compile
 ```
 
 ## head
@@ -38,7 +38,7 @@ NonEmptyList.of(1, 2) // NonEmptyList<Int>
 Unlike `List#[0]`, `NonEmptyList#head` is a safe operation that guarantees no exception throwing.
 
 ```kotlin
-NonEmptyList.of(1, 2, 3, 4, 5).head
+nonEmptyListOf(1, 2, 3, 4, 5).head
 ```
 
 ## foldLeft
@@ -51,7 +51,7 @@ The second argument is a function that takes the current state and element in th
 fun sumNel(nel: NonEmptyList<Int>): Int =
   nel.foldLeft(0) { acc, n -> acc + n }
 
-sumNel(NonEmptyList.of(1, 1, 1, 1))
+sumNel(nonEmptyListOf(1, 1, 1, 1))
 ```
 
 ## map
@@ -59,7 +59,7 @@ sumNel(NonEmptyList.of(1, 1, 1, 1))
 `map` allows us to transform `A` into `B` in `NonEmptyList< A >`
 
 ```kotlin:ank
-NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
+nonEmptyListOf(1, 1, 1, 1).map { it + 1 }
 ```
 
 ## flatMap
@@ -67,8 +67,8 @@ NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
 `flatMap` allows us to compute over the contents of multiple `NonEmptyList< * >` values
 
 ```kotlin:ank
-val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
-val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
+val nelOne: NonEmptyList<Int> = nonEmptyListOf(1)
+val nelTwo: NonEmptyList<Int> = nonEmptyListOf(2)
 
 nelOne.flatMap { one ->
   nelTwo.map { two ->
@@ -88,9 +88,9 @@ import java.util.*
 data class Person(val id: UUID, val name: String, val year: Int)
 
 // Note each NonEmptyList is of a different type
-val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUUID())
-val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
-val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
+val nelId: NonEmptyList<UUID> = nonEmptyListOf(UUID.randomUUID(), UUID.randomUUID())
+val nelName: NonEmptyList<String> = nonEmptyListOf("William Alvin Howard", "Haskell Curry")
+val nelYear: NonEmptyList<Int> = nonEmptyListOf(1926, 1900)
 
 NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
   Person(id, name, year)
@@ -100,6 +100,6 @@ NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
 ### Summary
 
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
-- We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
+- We can easily construct values of `NonEmptyList` with `nonEmptyListOf`
 - `foldLeft`, `map`, `flatMap`, and others are used to compute over the internal contents of a `NonEmptyList` value.
 - `NonEmptyList.mapN(..) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`

@@ -33,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  *   val res = when(winner) {
  *     is Either.Left -> "Never always loses race"
- *     is Either.Right -> "Race was won with ${winner.b}"
+ *     is Either.Right -> "Race was won with ${winner.value}"
  *   }
  *   //sampleEnd
  *   println(res)
@@ -75,7 +75,7 @@ suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb:
  *
  *   val res = when(winner) {
  *     is Either.Left -> "Never always loses race"
- *     is Either.Right -> "Race was won with ${winner.b}"
+ *     is Either.Right -> "Race was won with ${winner.value}"
  *   }
  *   //sampleEnd
  *   println(res)

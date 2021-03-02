@@ -31,13 +31,13 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 nullableFold<Int>().isEmpty(null)
 ```
 ```kotlin:ank
-Fold.nonEmptyList<Int>().combineAll(Monoid.int(), NonEmptyList.of(1, 2, 3))
+Fold.nonEmptyList<Int>().combineAll(Monoid.int(), nonEmptyListOf(1, 2, 3))
 ```
 ```kotlin:ank
 nullableFold<Int>().firstOrNull(null)
 ```
 ```kotlin:ank
-Fold.nonEmptyList<Int>().firstOrNull(NonEmptyList.of(1, 2, 3, 4))
+Fold.nonEmptyList<Int>().firstOrNull(nonEmptyListOf(1, 2, 3, 4))
 ```
 
 ## Composition
@@ -47,8 +47,8 @@ Composing `Fold` can be used for accessing foci in nested structures.
 ```kotlin:ank
 val nestedNelFold: Fold<NonEmptyList<NonEmptyList<Int>>, NonEmptyList<Int>> = Fold.nonEmptyList()
 
-val nestedNel = NonEmptyList.of(1, 2, 3, 4).map {
-    NonEmptyList.of(it, it)
+val nestedNel = nonEmptyListOf(1, 2, 3, 4).map {
+    nonEmptyListOf(it, it)
 }
 
 (nestedNelFold compose Fold.nonEmptyList()).getAll(nestedNel)

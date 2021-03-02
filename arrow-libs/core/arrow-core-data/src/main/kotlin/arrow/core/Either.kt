@@ -230,7 +230,7 @@ import arrow.typeclasses.Semigroup
  * //sampleStart
  * val x = magic("2")
  * val value = when(x) {
- *   is Either.Left -> when (x.a){
+ *   is Either.Left -> when (x.value) {
  *     is NumberFormatException -> "Not a number!"
  *     is IllegalArgumentException -> "Can't take reciprocal of 0!"
  *     else -> "Unknown error"
@@ -302,7 +302,7 @@ import arrow.typeclasses.Semigroup
  * //sampleStart
  * val x = magic("2")
  * val value = when(x) {
- *   is Either.Left -> when (x.a){
+ *   is Either.Left -> when (x.value) {
  *     is Error.NotANumber -> "Not a number!"
  *     is Error.NoZeroReciprocal -> "Can't take reciprocal of 0!"
  *   }
@@ -451,7 +451,7 @@ import arrow.typeclasses.Semigroup
  * `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  * import arrow.core.Either
  *
  * //sampleStart
@@ -617,7 +617,7 @@ import arrow.typeclasses.Semigroup
  * See the examples below:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  * import arrow.core.leftIfNull
  *
  * val value =
@@ -630,7 +630,7 @@ import arrow.typeclasses.Semigroup
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  * import arrow.core.leftIfNull
  *
  * val value =
@@ -643,7 +643,7 @@ import arrow.typeclasses.Semigroup
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.Left
+ * import arrow.core.Either.Left
  * import arrow.core.leftIfNull
  *
  * val value =
@@ -723,7 +723,7 @@ import arrow.typeclasses.Semigroup
  * Transforming the inner contents
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  *
  * val value =
  * //sampleStart
@@ -916,8 +916,8 @@ sealed class Either<out A, out B> {
    *
    * Example:
    * ```kotlin:ank:playground
-   * import arrow.core.Right
-   * import arrow.core.Left
+   * import arrow.core.Either.Left
+   * import arrow.core.Either.Left
    *
    * //sampleStart
    * val right = Right(12).orNull() // Result: 12
