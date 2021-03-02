@@ -117,7 +117,7 @@ Arrow and the Kotlin standard library provides proper datatypes and abstractions
 
 ### Nullable types
 
-We use [`Nullable Types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) to model the potential absence of a value.
+We use [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) to model the potential absence of a value.
 
 When using `Nullable types`, our previous example may look like:
 
@@ -127,8 +127,8 @@ fun getKnife(): Knife? = null
 fun prepare(tool: Knife, ingredient: Lettuce): Salad? = Salad
 ```
 
-It's easy to work with [`Nullable Types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) if your lang supports special syntax like `?` as Kotlin does. 
-Nullable types are faster than boxed types like `Option`. Nonetheless `Option` is also supported by Arrow to interop with Java based libraries that use `null` as signal or interruption value like [ReactiveX RxJava](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls).
+It's easy to work with [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) if your lang supports special syntax like `?` as Kotlin does. 
+Nullable types are faster than boxed types like `Option`. Nonetheless `Option` is also supported by Arrow to interop with Java based libraries that use `null` as signal or interruption value like [ReactiveX RxJava](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls). Additionally `Option` is useful in generic code when not constraining with generic bounds of `A : Any` and using null as a nested signal to produce values of `Option<Option<A>>` since A? can't have double nesting.
 
 ```kotlin:ank
 import arrow.core.computations.nullable
@@ -274,6 +274,7 @@ object Rules {
       maxLength(250)
     ) { _, _ -> Email(value) }.handleErrorWith { ValidationError.NotAnEmail(it).invalidNel() }
 
+  /** either blocks support binding over Validated values with no additional cost or need to convert first to Either **/
   private fun FormField.validateFailFast(): Either<Nel<ValidationError>, Email> =
     either.eager {
       contains("@").bind() // fails fast on first error found
