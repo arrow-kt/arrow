@@ -574,10 +574,7 @@ sealed class Ior<out A, out B> {
 
     override fun toString(): String = "Ior.Left($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Left(a)", "arrow.core.Ior"))
-      operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
-    }
+    companion object
   }
 
   data class Right<out B>(val value: B) : Ior<Nothing, B>() {
@@ -587,10 +584,7 @@ sealed class Ior<out A, out B> {
 
     override fun toString(): String = "Ior.Right($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Right(a)", "arrow.core.Right"))
-      operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
-    }
+    companion object
   }
 
   data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
@@ -764,7 +758,7 @@ sealed class Ior<out A, out B> {
 
   inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
     fold(
-      { a -> Either.right(Left(a)) },
+      { a -> Either.Right(Left(a)) },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
@@ -780,7 +774,7 @@ sealed class Ior<out A, out B> {
     fold({ emptyList() }, { fa(it).void() }, { _, b -> fa(b).void() })
 
   inline fun <AA, C> traverseEither_(fa: (B) -> Either<AA, C>): Either<AA, Unit> =
-    fold({ Either.right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
+    fold({ Either.Right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
 
   inline fun <AA, C> traverseValidated_(fa: (B) -> Validated<AA, C>): Validated<AA, Unit> =
     fold({ Valid(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
