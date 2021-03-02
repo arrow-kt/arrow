@@ -21,9 +21,9 @@ For a structure `List<Int>`, we can create an `Optional` to focus an optional he
 import arrow.core.*
 import arrow.optics.*
 
-val optionalHead: Optional<ListK<Int>, Int> = Optional(
+val optionalHead: Optional<List<Int>, Int> = Optional(
     getOption = { list -> list.firstOrNull().toOption() },
-    set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() }
+    set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value } }
 )
 ```
 
@@ -35,7 +35,7 @@ import arrow.optics.*
 POptional.listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
 ```kotlin:ank
-POptional.listHead<Int>().modify(listOf(1, 3, 6).k()) { head -> head * 5 }
+POptional.listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
 ```
 
 We can also lift such functions.

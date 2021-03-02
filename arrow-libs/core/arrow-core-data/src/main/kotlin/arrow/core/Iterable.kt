@@ -360,7 +360,7 @@ fun <A> Iterable<A>.salign(
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *      listOf("A" to 1, "B" to 2).k().unzip()
+ *      listOf("A" to 1, "B" to 2).unzip()
  *   //sampleEnd
  *   println(result)
  * }
