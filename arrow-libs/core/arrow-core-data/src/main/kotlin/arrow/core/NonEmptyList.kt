@@ -394,9 +394,6 @@ fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
 inline fun <A> A.nel(): NonEmptyList<A> =
   nonEmptyListOf(this)
 
-fun <A> NonEmptyList<A>.combineK(y: NonEmptyList<A>): NonEmptyList<A> =
-  this.plus(y)
-
 operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A>): Int =
   all.compareTo(other.all)
 
