@@ -4,7 +4,7 @@ import arrow.continuations.Reset
 import arrow.continuations.generic.MultiShotDelimContScope
 import arrow.continuations.generic.RestrictedScope
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.test.UnitSpec

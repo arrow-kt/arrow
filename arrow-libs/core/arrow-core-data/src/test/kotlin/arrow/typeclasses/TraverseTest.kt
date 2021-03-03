@@ -1,7 +1,7 @@
 package arrow.typeclasses
 
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Right
+import arrow.core.Either.Left
 import arrow.core.sequenceEither
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec

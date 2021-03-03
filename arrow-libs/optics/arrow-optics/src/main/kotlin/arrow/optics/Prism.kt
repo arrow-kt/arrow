@@ -82,8 +82,8 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
       { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
       {
         when (it) {
-          is Either.Left -> Either.Left(reverseGet(it.a))
-          is Either.Right -> Either.Right(it.b)
+          is Either.Left -> Either.Left(reverseGet(it.value))
+          is Either.Right -> Either.Right(it.value)
         }
       }
     )

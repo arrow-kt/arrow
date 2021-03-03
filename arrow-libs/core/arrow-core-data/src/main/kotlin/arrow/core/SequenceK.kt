@@ -205,14 +205,14 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : Sequence<A> by sequence
           val head: Either<A, B> = v.first()
           when (head) {
             is Either.Right -> {
-              buf += head.b
+              buf += head.value
               go(buf, f, v.drop(1).k())
             }
             is Either.Left -> {
               if (v.count() == 1) {
-                go(buf, f, (f(head.a)).k())
+                go(buf, f, (f(head.value)).k())
               } else {
-                go(buf, f, (f(head.a) + v.drop(1)).k())
+                go(buf, f, (f(head.value) + v.drop(1)).k())
               }
             }
           }

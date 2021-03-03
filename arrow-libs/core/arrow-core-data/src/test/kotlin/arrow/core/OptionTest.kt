@@ -16,7 +16,7 @@ import io.kotlintest.shouldNotBe
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
-  val none: Option<String> = Option.empty()
+  val none: Option<String> = None
 
   init {
 
