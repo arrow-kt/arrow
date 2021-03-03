@@ -443,7 +443,7 @@ fun interface OptionEffect<A> : Effect<Option<A>> {
 }
 
 object option {
-  suspend operator fun <A> invoke(func: suspend OptionEffect<*>.() -> A?): Option<A> =
+  operator fun <A> invoke(func: suspend OptionEffect<*>.() -> A?): Option<A> =
     Effect.restricted(eff = { OptionEffect { it } }, f = func, just = { Option.fromNullable(it) })
 }
 
