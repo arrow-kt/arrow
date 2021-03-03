@@ -1416,8 +1416,10 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     mapConst(Unit)
 }
 
+@Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Left(left)", "arrow.core.Either"))
 fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 
+@Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Right(right)", "arrow.core.Either"))
 fun <R> Right(right: R): Either<Nothing, R> = Right(right)
 
 fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
