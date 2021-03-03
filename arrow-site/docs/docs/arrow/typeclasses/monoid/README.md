@@ -70,8 +70,10 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way, we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
+import arrow.core.foldMap
+
 val M = monoidTuple(Monoid.int(), Monoid.string())
-val list = listOf(1, 1).k()
+val list = listOf(1, 2, 3, 4)
 
 list.foldMap(M) { n: Int ->
   Tuple2(n, n.toString())

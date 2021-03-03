@@ -5,7 +5,6 @@ import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.int
-import arrow.core.k
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.toOption
@@ -98,7 +97,7 @@ class OptionalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: getAll" {
         forAll { ints: List<Int> ->
-          getAll(ints) == ints.firstOrNull().toOption().toList().k()
+          getAll(ints) == ints.firstOrNull().toOption().toList()
         }
       }
 
