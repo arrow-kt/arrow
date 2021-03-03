@@ -5,7 +5,6 @@ import arrow.core.ValidatedNel
 import arrow.core.invalidNel
 import arrow.core.nonEmptyList
 import arrow.core.sequenceValidated
-import arrow.core.toT
 import arrow.core.validNel
 import arrow.fx.coroutines.nonFatalOrThrow
 import arrow.typeclasses.Semigroup
@@ -48,7 +47,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
       printConsole(colored(ANSI_GREEN, message))
       val lines = p.toFile().readLines().asSequence()
       val (processed, snippets) = extractCode(lines)
-      val compiledResult = compileCode(p toT snippets, compilerArgs)
+      val compiledResult = compileCode(p to snippets, compilerArgs)
       val result = replaceAnkToLang(processed, compiledResult)
       val generatedPath = generateFile(p, result)
       generatedPath

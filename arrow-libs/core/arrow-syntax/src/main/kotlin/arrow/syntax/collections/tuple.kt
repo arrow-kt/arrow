@@ -6,8 +6,6 @@
 
 package arrow.syntax.collections
 
-import arrow.core.Tuple2
-import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -28,8 +26,6 @@ import arrow.core.Tuple20
 import arrow.core.Tuple21
 import arrow.core.Tuple22
 
-operator fun <A, B, C> Tuple2<A, B>.plus(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
-operator fun <A, B, C, D> Tuple3<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
 operator fun <A, B, C, D, E> Tuple4<A, B, C, D>.plus(e: E): Tuple5<A, B, C, D, E> = Tuple5(this.a, this.b, this.c, this.d, e)
 operator fun <A, B, C, D, E, F> Tuple5<A, B, C, D, E>.plus(f: F): Tuple6<A, B, C, D, E, F> = Tuple6(this.a, this.b, this.c, this.d, this.e, f)
 operator fun <A, B, C, D, E, F, G> Tuple6<A, B, C, D, E, F>.plus(g: G): Tuple7<A, B, C, D, E, F, G> = Tuple7(this.a, this.b, this.c, this.d, this.e, this.f, g)

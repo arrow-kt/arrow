@@ -54,16 +54,16 @@ listOf(1, 2, 3, 4, 5).foldMap(Monoid.string(), { it.toString() })
 To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
 
 ```kotlin:ank:silent
-fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
-  object: Monoid<Tuple2<A, B>> {
+fun <A, B> monoidPair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
+  object: Monoid<Pair<A, B>> {
 
-    override fun Tuple2<A, B>.combine(y: Tuple2<A, B>): Tuple2<A, B> {
+    override fun Pair<A, B>.combine(y: Pair<A, B>): Pair<A, B> {
       val (xa, xb) = this
       val (ya, yb) = y
-      return Tuple2(MA.run { xa.combine(ya) }, MB.run { xb.combine(yb) })
+      return Pair(MA.run { xa.combine(ya) }, MB.run { xb.combine(yb) })
     }
 
-    override fun empty(): Tuple2<A, B> = Tuple2(MA.empty(), MB.empty())
+    override fun empty(): Pair<A, B> = Pair(MA.empty(), MB.empty())
   }
 ```
 
@@ -72,10 +72,10 @@ This way, we are able to combine both values in one pass, hurrah!
 ```kotlin:ank
 import arrow.core.foldMap
 
-val M = monoidTuple(Monoid.int(), Monoid.string())
+val M = monoidPair(Monoid.int(), Monoid.string())
 val list = listOf(1, 2, 3, 4)
 
 list.foldMap(M) { n: Int ->
-  Tuple2(n, n.toString())
+  Pair(n, n.toString())
 }
 ```

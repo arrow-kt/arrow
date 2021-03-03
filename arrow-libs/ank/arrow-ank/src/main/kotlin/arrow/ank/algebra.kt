@@ -1,6 +1,5 @@
 package arrow.ank
 
-import arrow.core.Tuple2
 import java.nio.file.Path
 
 data class AnkProcessingContext(
@@ -14,9 +13,9 @@ interface AnkOps {
 
   suspend fun Path.ankFiles(): Sequence<AnkProcessingContext>
 
-  fun extractCode(content: Sequence<String>): Tuple2<Sequence<String>, Sequence<Snippet>>
+  fun extractCode(content: Sequence<String>): Pair<Sequence<String>, Sequence<Snippet>>
 
-  suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet>
+  suspend fun compileCode(snippets: Pair<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet>
 
   fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String>
 

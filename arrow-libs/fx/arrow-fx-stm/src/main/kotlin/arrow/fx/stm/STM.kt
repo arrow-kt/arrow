@@ -1,6 +1,5 @@
 package arrow.fx.stm
 
-import arrow.core.Tuple2
 import arrow.fx.stm.internal.STMTransaction
 import arrow.fx.stm.internal.alterHamtWithHash
 import arrow.fx.stm.internal.lookupHamtWithHash
@@ -1309,26 +1308,6 @@ interface STM {
    * ```
    */
   operator fun <K, V> TMap<K, V>.set(k: K, v: V): Unit = insert(k, v)
-
-  /**
-   * Add a key value pair to the map
-   *
-   * ```kotlin:ank:playground
-   * import arrow.core.toT
-   * import arrow.fx.stm.TMap
-   * import arrow.fx.stm.atomically
-   *
-   * suspend fun main() {
-   *   //sampleStart
-   *   val tmap = TMap.new<Int, String>()
-   *   atomically {
-   *     tmap += (1 toT "Hello")
-   *   }
-   *   //sampleEnd
-   * }
-   * ```
-   */
-  operator fun <K, V> TMap<K, V>.plusAssign(kv: Tuple2<K, V>): Unit = insert(kv.a, kv.b)
 
   /**
    * Add a key value pair to the map

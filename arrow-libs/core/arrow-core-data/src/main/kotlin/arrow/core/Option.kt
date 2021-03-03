@@ -514,17 +514,6 @@ sealed class Option<out A> {
     map { b }
 
   @Deprecated(
-    "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
-    ReplaceWith(
-      "zip(fb) { b, c -> f(Tuple2(b, c)) }",
-      "arrow.core.Tuple2",
-      "arrow.core.zip"
-    )
-  )
-  fun <B, R> map2(fb: Option<B>, f: (Tuple2<A, B>) -> R): Option<R> =
-    flatMap { a: A -> fb.map { b -> f(a toT b) } }
-
-  @Deprecated(
     "filterMap will be renamed to mapNotNull to be consistent with Kotlin Std's naming, please use mapNotNull instead of filterMap",
     ReplaceWith(
       "this.mapNotNull(f.andThen { it.orNull() })",

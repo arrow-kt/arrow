@@ -323,7 +323,7 @@ inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  */
 fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
   (keys + b.keys).mapNotNull { key ->
-    Ior.fromNullables(this[key], b[key])?.let { key toT it }
+    Ior.fromNullables(this[key], b[key])?.let { key to it }
   }.toMap()
 
 /**

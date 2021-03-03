@@ -72,11 +72,12 @@ class OptionTest : UnitSpec() {
       none.map(String::toUpperCase) shouldBe None
     }
 
-    "map2" {
+    "zip" {
       forAll { a: Int ->
         val op: Option<Int> = a.some()
-        some.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == Some("kotlin$a")
-        none.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == None
+        some.zip(op) { a, b -> a + b } == Some("kotlin$a") &&
+        none.zip(op) { a, b -> a + b } == None &&
+          some.zip(op) == Some(Pair("kotlin", a))
       }
     }
 
@@ -156,7 +157,7 @@ class OptionTest : UnitSpec() {
     "toLeftOption" {
       1.leftIor().toLeftOption() shouldBe Some(1)
       2.rightIor().toLeftOption() shouldBe None
-      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
+      (1 to 2).bothIor().toLeftOption() shouldBe Some(1)
     }
   }
 }
