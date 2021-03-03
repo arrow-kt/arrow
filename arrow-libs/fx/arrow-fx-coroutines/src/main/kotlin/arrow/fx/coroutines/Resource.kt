@@ -152,7 +152,7 @@ sealed class Resource<out A> {
     Bind(this, f)
 
   fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
-   gradle flatMap { r ->
+   flatMap { r ->
       other.map { r2 -> combine(r, r2) }
     }
 
