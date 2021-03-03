@@ -3,6 +3,8 @@ package arrow.core
 import arrow.core.computations.RestrictedValidatedEffect
 import arrow.core.computations.ValidatedEffect
 import arrow.core.computations.validated
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.FxLaws
 import arrow.typeclasses.Monoid
@@ -184,7 +186,7 @@ class ValidatedTest : UnitSpec() {
     "catchNel should return Invalid(Nel(result)) when f throws" {
       val exception = MyException("Boom!")
       suspend fun loadFromNetwork(): Int = throw exception
-      Validated.catchNel { loadFromNetwork() } shouldBe Invalid(NonEmptyList(exception))
+      Validated.catchNel { loadFromNetwork() } shouldBe Invalid(nonEmptyListOf(exception))
     }
 
     "Cartesian builder should build products over homogeneous Validated" {

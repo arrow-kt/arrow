@@ -50,8 +50,8 @@ Let's see one example of the block `either` that uses [`Effect`]({{ '/arrow/cont
 ```kotlin:ank:playground
 import arrow.core.computations.either
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */
@@ -155,7 +155,7 @@ This will blow up the stack and won't be obvious to users that our method can fa
 
 ```kotlin:ank:playground
 import arrow.core.computations.either
-import arrow.core.Right
+import arrow.core.Either.Left
 
 suspend fun test(): Either<String, Int> =
  either {
@@ -174,7 +174,7 @@ The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank:playground
 import arrow.core.flatMap
-import arrow.core.Right
+import arrow.core.Either.Left
 
 //sampleStart
 val x: Either<String, Int> = Right(1)
@@ -192,8 +192,8 @@ With this new style, we can rewrite our original example of database fetching as
 ```kotlin:ank:playground
 import arrow.core.computations.either
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */

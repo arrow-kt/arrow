@@ -51,8 +51,8 @@ const val ListKDeprecation =
  * Traversing a list creates a new container [Kind<F, A>]({{'/patterns/glossary/#type-constructors' | relative_url }}) by combining the result of a function applied to each element:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
- * import arrow.core.Left
+ * import arrow.core.Either.Left
+ * import arrow.core.Either.Right
  * import arrow.core.traverseEither
  *
  * //sampleStart
@@ -67,7 +67,7 @@ const val ListKDeprecation =
  * and complements the convenient function `sequence()` that converts a list of `ListK<Kind<F, A>>` into a `Kind<F, ListK<A>>`:
  *
  * ```kotlin:ank:playground
- * import arrow.core.Right
+ * import arrow.core.Either.Left
  * import arrow.core.sequenceEither
  *
  * //sampleStart
@@ -183,8 +183,8 @@ data class ListK<out A>(private val list: List<A>) : List<A> by list {
   ): ListK<Tuple2<Option<A>, Option<B>>> =
     alignWith(this, other) { ior ->
       ior.fold(
-        { it.some() toT Option.empty<B>() },
-        { Option.empty<A>() toT it.some() },
+        { it.some() toT None },
+        { None toT it.some() },
         { a, b -> a.some() toT b.some() }
       )
     }
@@ -425,10 +425,10 @@ data class ListK<out A>(private val list: List<A>) : List<A> by list {
         val head: Either<A, B> = v.first()
         when (head) {
           is Either.Right -> {
-            buf += head.b
+            buf += head.value
             go(buf, f, v.drop(1).k())
           }
-          is Either.Left -> go(buf, f, (f(head.a) + v.drop(1)).k())
+          is Either.Left -> go(buf, f, (f(head.value) + v.drop(1)).k())
         }
       }
     }

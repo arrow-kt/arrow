@@ -29,7 +29,7 @@ fun <T> nonEmptyListHead() = Getter<NonEmptyList<T>, T> {
     it.head
 }
 
-nonEmptyListHead<Int>().get(NonEmptyList.of(1, 2, 3, 4))
+nonEmptyListHead<Int>().get(nonEmptyListOf(1, 2, 3, 4))
 ```
 
 Or, from any of the optics defined in `arrow-optics` that allow getting its focus safely.

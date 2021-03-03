@@ -82,8 +82,8 @@ Let's assume following domain, and compare two snippets one using `IO<Either<E, 
 
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 
 /* inline */ class Id(val id: Long)
 object PersistenceError

@@ -2,6 +2,8 @@ package arrow.core
 
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -20,7 +22,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```kotlin:ank
  * import arrow.core.Either
- * import arrow.core.Left
+ * import arrow.core.Either.Left
  * import arrow.core.flatMap
  *
  * //sampleStart
@@ -159,7 +161,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleStart
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
  *  return when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+ *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
  *   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
@@ -187,10 +189,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  * fun <E, A, B, C> parallelValidate
  *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
  *  when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+ *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
- *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
+ *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.value, listOf(v2.value)))
  *   else -> throw IllegalStateException("Not possible value")
  *  }
  * //sampleEnd
@@ -647,19 +649,19 @@ sealed class Validated<out E, out A> {
       f: (A, B, C, D, EE, F, G, H, I, J) -> Z
     ): Validated<E, Z> =
       if (a is Valid && b is Valid && c is Valid && d is Valid && e is Valid && ff is Valid && g is Valid && h is Valid && i is Valid && j is Valid) {
-        Valid(f(a.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
+        Valid(f(a.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
       } else SE.run {
         var accumulatedError: E? = null
-        accumulatedError = if (a is Invalid) a.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (b is Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
-        accumulatedError = if (c is Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
-        accumulatedError = if (d is Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
-        accumulatedError = if (e is Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
-        accumulatedError = if (ff is Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
-        accumulatedError = if (g is Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
-        accumulatedError = if (h is Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
-        accumulatedError = if (i is Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
-        accumulatedError = if (j is Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
+        accumulatedError = if (a is Invalid) a.value.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (b is Invalid) accumulatedError?.let { it.combine(b.value) } ?: b.value else accumulatedError
+        accumulatedError = if (c is Invalid) accumulatedError?.let { it.combine(c.value) } ?: c.value else accumulatedError
+        accumulatedError = if (d is Invalid) accumulatedError?.let { it.combine(d.value) } ?: d.value else accumulatedError
+        accumulatedError = if (e is Invalid) accumulatedError?.let { it.combine(e.value) } ?: e.value else accumulatedError
+        accumulatedError = if (ff is Invalid) accumulatedError?.let { it.combine(ff.value) } ?: ff.value else accumulatedError
+        accumulatedError = if (g is Invalid) accumulatedError?.let { it.combine(g.value) } ?: g.value else accumulatedError
+        accumulatedError = if (h is Invalid) accumulatedError?.let { it.combine(h.value) } ?: h.value else accumulatedError
+        accumulatedError = if (i is Invalid) accumulatedError?.let { it.combine(i.value) } ?: i.value else accumulatedError
+        accumulatedError = if (j is Invalid) accumulatedError?.let { it.combine(j.value) } ?: j.value else accumulatedError
         Invalid(accumulatedError!!)
       }
   }
@@ -765,12 +767,12 @@ sealed class Validated<out E, out A> {
 
   inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     when (this) {
-      is Valid -> fa(this.a).map { Valid(it) }
+      is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> this.right()
     }
 
   inline fun <EE, B> traverseEither_(fa: (A) -> Either<EE, B>): Either<EE, Unit> =
-    fold({ Either.right(Unit) }, { fa(it).void() })
+    fold({ Either.unit }, { fa(it).void() })
 
   inline fun <B> bifoldLeft(
     c: B,
@@ -807,26 +809,18 @@ sealed class Validated<out E, out A> {
     { "Validated.Valid($it)" }
   )
 
-  data class Valid<out A>(
-    @Deprecated("Use value instead", ReplaceWith("value"))
-    val a: A
-  ) : Validated<Nothing, A>() {
-    val value: A = a
-    override fun toString(): String = "Validated.Valid($a)"
+  data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
+    override fun toString(): String = "Validated.Valid($value)"
   }
 
-  data class Invalid<out E>(
-    @Deprecated("Use value instead", ReplaceWith("value"))
-    val e: E
-  ) : Validated<E, Nothing>() {
-    val value: E = e
-    override fun toString(): String = "Validated.Invalid($e)"
+  data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
+    override fun toString(): String = "Validated.Invalid($value)"
   }
 
   inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
-      is Valid -> fa(a)
-      is Invalid -> (fe(e))
+      is Valid -> fa(value)
+      is Invalid -> (fe(value))
     }
 
   val isValid =
@@ -842,7 +836,7 @@ sealed class Validated<out E, out A> {
 
   inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
-      is Valid -> if (predicate(this.a)) this.a else null
+      is Valid -> if (predicate(this.value)) this.value else null
       is Invalid -> null
     }
 
@@ -917,7 +911,7 @@ sealed class Validated<out E, out A> {
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     when (this) {
-      is Valid -> Eval.defer { f(this.a, lb) }
+      is Valid -> Eval.defer { f(this.value, lb) }
       is Invalid -> lb
     }
 
@@ -997,9 +991,9 @@ fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Vali
 
 fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
   when (this) {
-    is Validated.Valid -> when (val either = this.a) {
-      is Either.Left -> fl.map { f -> f(either.a) }
-      is Either.Right -> fr.map { f -> f(either.b) }
+    is Validated.Valid -> when (val either = this.value) {
+      is Either.Left -> fl.map { f -> f(either.value) }
+      is Either.Right -> fr.map { f -> f(either.value) }
     }
     is Validated.Invalid -> this
   }
@@ -1070,12 +1064,12 @@ inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Valida
 inline fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   when (this) {
     is Validated.Valid -> when (f) {
-      is Validated.Valid -> Valid(f.a(this.a))
+      is Validated.Valid -> Valid(f.value(this.value))
       is Validated.Invalid -> f
     }
     is Validated.Invalid -> when (f) {
       is Validated.Valid -> this
-      is Validated.Invalid -> Invalid(SE.run { this@ap.e.combine(f.e) })
+      is Validated.Invalid -> Invalid(SE.run { this@ap.value.combine(f.value) })
     }
   }
 
@@ -1092,19 +1086,19 @@ inline fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> Validated<E, A>): Val
 inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
   when (this) {
     is Validated.Valid -> this
-    is Validated.Invalid -> f(this.e)
+    is Validated.Invalid -> f(this.value)
   }
 
 inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
   when (this) {
     is Validated.Valid -> this
-    is Validated.Invalid -> Valid(f(this.e))
+    is Validated.Invalid -> Valid(f(this.value))
   }
 
 inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
   when (this) {
     is Validated.Valid -> map(fa)
-    is Validated.Invalid -> Valid(fe(this.e))
+    is Validated.Invalid -> Valid(fe(this.value))
   }
 
 fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
@@ -1116,8 +1110,8 @@ fun <E, A> Validated<E, A>.combine(
   y: Validated<E, A>
 ): Validated<E, A> =
   when {
-    this is Valid && y is Valid -> Valid(SA.run { a.combine(y.a) })
-    this is Invalid && y is Invalid -> Invalid(SE.run { e.combine(y.e) })
+    this is Valid && y is Valid -> Valid(SA.run { value.combine(y.value) })
+    this is Invalid && y is Invalid -> Invalid(SE.run { value.combine(y.value) })
     this is Invalid -> this
     else -> y
   }
@@ -1126,7 +1120,7 @@ fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Valid
   return when (this) {
     is Valid -> this
     is Invalid -> when (y) {
-      is Invalid -> Invalid(SE.run { this@combineK.e.combine(y.e) })
+      is Invalid -> Invalid(SE.run { this@combineK.value.combine(y.value) })
       is Valid -> y
     }
   }

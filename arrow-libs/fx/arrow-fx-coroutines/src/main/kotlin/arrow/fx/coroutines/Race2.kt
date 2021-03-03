@@ -1,8 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
@@ -35,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  *   val res = when(winner) {
  *     is Either.Left -> "Never always loses race"
- *     is Either.Right -> "Race was won with ${winner.b}"
+ *     is Either.Right -> "Race was won with ${winner.value}"
  *   }
  *   //sampleEnd
  *   println(res)
@@ -77,7 +75,7 @@ suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb:
  *
  *   val res = when(winner) {
  *     is Either.Left -> "Never always loses race"
- *     is Either.Right -> "Race was won with ${winner.b}"
+ *     is Either.Right -> "Race was won with ${winner.value}"
  *   }
  *   //sampleEnd
  *   println(res)
@@ -98,8 +96,8 @@ suspend inline fun <A, B> raceN(
     val a = async(ctx) { fa() }
     val b = async(ctx) { fb() }
     select<Either<A, B>> {
-      a.onAwait.invoke { Left(it) }
-      b.onAwait.invoke { Right(it) }
+      a.onAwait.invoke { Either.Left(it) }
+      b.onAwait.invoke { Either.Right(it) }
     }.also {
       when (it) {
         is Either.Left -> b.cancelAndJoin()

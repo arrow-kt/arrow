@@ -13,7 +13,7 @@ fun interface ValidatedEffect<E, A> : Effect<Validated<E, A>> {
 
   suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
-      is Validated.Valid -> a
+      is Validated.Valid -> value
       is Validated.Invalid -> control().shift(this@bind)
     }
 
