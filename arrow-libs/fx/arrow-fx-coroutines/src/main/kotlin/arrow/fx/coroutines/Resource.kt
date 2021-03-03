@@ -153,7 +153,7 @@ sealed class Resource<out A> {
 
   @Deprecated(
     "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
-    ReplaceWith("zip(other, combine)", )
+    ReplaceWith("zip(other, combine)")
   )
   fun <B, C> map2(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
     flatMap { r ->
