@@ -302,7 +302,7 @@ suspend fun nextTalkCity(speaker: Speaker): City {
 
 In the first 2 cases, there was a complication that prevented us from sequencing method calls fluently.
 In the last case with `suspend` functions we have the maximum expression and simplification where we observe there is no need to call `flatMap` or create any callbacks. 
-Kotlin `suspend` is a form of the Continuation monad from which other monads can be generalized and composed thanks to it's async and concurrent capable nature.
+Kotlin `suspend` is a form of the Continuation monad from which other monads can be generalized and composed thanks to its async and concurrent capable nature.
 Using `suspend` callback and completion features Arrow is able to bring direct syntax to all these monadic data-types.
 
 Let's try to generalize this approach from the very beginning. 
@@ -348,8 +348,9 @@ Subsequently, `addStep` is called two times to transfer to `Conference` and then
 
 The name of this pattern is **Monad**.
 
-In Arrow terms, a `Monad` can be formalized by the powers provided in an impl of the `Effect<F>` interface.
-The `Effect` interface defines the ability to have a delimited scope in which a continuation can be used to complete the context or yield a value.
+In Arrow terms, a Monad can be implemented by means of the Effect interface.
+
+The `Effect` interface defines the ability to have a scope in which a coroutine can be used to complete the context or yield a value.
 
 ```kotlin
 fun interface Effect<F> {
@@ -369,6 +370,9 @@ fun interface NullableEffect<A> : Effect<A?> {
 ```
 
 Monad `bind` is then implemented by shifting out of the context with `null` if the value being bound happens to be null or yielding the value by returning it if not null.
+
+`control().shift(value)` can be seen as a functional throw. Once we pass a value the context of our Effect will exit with `value`.
+
 With `control().shift` based on the `Effect` interface we can implement monad bind short-circuiting and other patterns supported by the Continuation monad for arbitrary data types.
 
 ```kotlin:ank
@@ -379,6 +383,12 @@ object nullable {
 ```
 
 The argument `just` in `Effect` is used to put the result of the computation expression in the Effect we are modeling, in this case nullability and absence typed as `A?`.
+
+In the example above we saw that in order to form a Monad we need a `just` constructor used in the effect block and an implementation for `suspend bind` declared in a subtype of the `Effect` interface.
+
+The Effect interface provides a `restricted` scope for pure computations that do not require suspension and a `suspended` block for those that do require suspension.
+
+Finally we can use our new `nullable` effect block, and its `bind` function to compute over the happy path of nullable typed values.
 
 ```kotlin:ank
 suspend fun nextTalkCity(maybeSpeaker: Speaker?): City? =
@@ -447,7 +457,7 @@ suspend fun OptionRepository.shipperOfLastOrderOnCurrentAddress(customerId: Int)
   }
 ```
 
-We observe here how in the same way we implemented and used monad comprehensions for nullable types, we now implement the same Monad pattern, this time over Option. Fortunately Arrow already provides all these effect builders for all the data types that support monadic behavior.
+We observe here how in the same way we implemented and used monad comprehensions for nullable types, we now implement the same Monad pattern, this time over `Option`. Fortunately Arrow already provides all these effect builders for all the data types that support monadic behavior.
 
 ### Abstraction for all Monads
 
@@ -459,16 +469,16 @@ As you have seen, neither A? nor Option implement Monad directly. Their actual `
 
 This is intentional, as you can potentially have several Monad implementations for a single type or even mix non-monadic effects inside `Effect` interfaces in order to provide more expressive DSLs. This is notorious in the actual Arrow implementations where effects such as `Either` can perform different forms of monad bind over multiple types like `Either` and `Validated` using the same idioms.
 
-Arrow specifies that Monad must be implemented by a separate object or class in terms of the `Effect` interface, referred to as the "instance of Monad for type F" or "computation expression for F". By implementing this interface using coroutines and continuations, Arrow provides a specialization that enables readable direct async/await direct style code for any data type that provides an effect block with `bind` capabilities.
+Arrow specifies that Monad capabilities must be implemented by a separate object or class in terms of the `Effect` interface, referred to as the "instance of Monad for type F" or "computation expression for F".
 
 More info on binding and effects is available at [Computation Expressions and Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
 ### Monad Laws
 
+A typical monad tutorial will place a lot of emphasis on the laws, but we find them less important to explain to folks learning about Monads for usage purposes. Nonetheless, here they are for the sake of completeness or for those cases where you wish to implement your own monad or Effect instances.
+
 There are a couple laws that the `just` constructor and `bind` need to adhere to consider the Effect a Monad with a stable implementation.
 These laws are encoded in Arrow as tests and are already applied on all `Effect` instances in the library.
-
-A typical monad tutorial will place a lot of emphasis on the laws, but we find them less important to explain to folks learning about Monads for usage purposes. Nonetheless, here they are for the sake of completeness or for those cases where you wish to implement your own monad or Effect instances.
 
 Let us re-write the laws in effect-notation. `effect` here represents `either`, `option` or any effect implementing `suspend bind` and a constructor here represented as `just`.
 
