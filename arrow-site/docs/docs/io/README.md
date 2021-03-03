@@ -165,13 +165,13 @@ class DataModule(
 ```
 
 We can also define top-level functions based on constraints on the receiver.
-Here we define `getProcessUsers` which can only be called where `R` is both `Repo` and `Persistence`.
+Here we define `getProcessedUsers` which can only be called where `R` is both `Repo` and `Persistence`.
 
 ```kotlin:ank
 /**
  * Generic top-level function based on syntax enabled by [Persistence] & [Repo] constraint
  */
-suspend fun <R> R.getProcessUsers(): Either<PersistenceError, List<ProcessedUser>>
+suspend fun <R> R.getProcessedUsers(): Either<PersistenceError, List<ProcessedUser>>
         where R : Repo,
               R : Persistence = fetchUsers().process()
 ```
