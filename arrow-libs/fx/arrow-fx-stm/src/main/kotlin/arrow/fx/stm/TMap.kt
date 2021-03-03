@@ -68,7 +68,6 @@ fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * ```kotlin:ank:playground
  * import arrow.fx.stm.TMap
- * import arrow.core.toT
  * import arrow.fx.stm.atomically
  *
  * suspend fun main() {
@@ -76,7 +75,7 @@ fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   val tmap = TMap.new<Int, String>()
  *   atomically {
  *     tmap += (1 to "Hello")
- *     tmap += (2 toT "World")
+ *     tmap += (2 to "World")
  *   }
  *   //sampleEnd
  * }
