@@ -2,7 +2,7 @@ package arrow.core.computations
 
 import arrow.continuations.Effect
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
 import arrow.core.Validated
 import arrow.core.right
 import kotlin.coroutines.RestrictsSuspension
@@ -11,14 +11,14 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 
   suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
-      is Either.Right -> b
+      is Either.Right -> value
       is Either.Left -> control().shift(this@bind)
     }
 
   suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
-      is Validated.Valid -> a
-      is Validated.Invalid -> control().shift(Left(e))
+      is Validated.Valid -> value
+      is Validated.Invalid -> control().shift(Left(value))
     }
 
   @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))

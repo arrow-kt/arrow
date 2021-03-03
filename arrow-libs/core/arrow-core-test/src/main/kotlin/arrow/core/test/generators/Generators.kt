@@ -5,10 +5,8 @@ import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
-import arrow.core.Left
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Right
 import arrow.core.SortedMapK
 import arrow.core.Tuple10
 import arrow.core.Tuple2
@@ -118,8 +116,8 @@ fun <B> Gen.Companion.option(gen: Gen<B>): Gen<Option<B>> =
   gen.orNull().map { it.toOption() }
 
 fun <E, A> Gen.Companion.either(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> {
-  val genLeft = genE.map<Either<E, A>> { Left(it) }
-  val genRight = genA.map<Either<E, A>> { Right(it) }
+  val genLeft = genE.map<Either<E, A>> { Either.Left(it) }
+  val genRight = genA.map<Either<E, A>> { Either.Right(it) }
   return Gen.oneOf(genLeft, genRight)
 }
 

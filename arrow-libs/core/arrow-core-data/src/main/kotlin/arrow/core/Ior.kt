@@ -75,11 +75,11 @@ sealed class Ior<out A, out B> {
     @Deprecated("Deprecated, use `fromNullables` instead", ReplaceWith("fromNullables(a, b)"))
     fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
       is Some -> when (ob) {
-        is Some -> Some(Both(oa.t, ob.t))
-        is None -> Some<Ior<A, B>>(Left(oa.t))
+        is Some -> Some(Both(oa.value, ob.value))
+        is None -> Some<Ior<A, B>>(Left(oa.value))
       }
       is None -> when (ob) {
-        is Some -> Some(Right(ob.t))
+        is Some -> Some(Right(ob.value))
         is None -> None
       }
     }
@@ -108,13 +108,13 @@ sealed class Ior<out A, out B> {
     private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> Ior<L, Either<A, B>>): Ior<L, B> = when (v) {
       is Left -> Left(v.value)
       is Right -> when (v.value) {
-        is Either.Right -> Right(v.value.b)
-        is Either.Left -> loop(f(v.value.a), f)
+        is Either.Right -> Right(v.value.value)
+        is Either.Left -> loop(f(v.value.value), f)
       }
       is Both -> when (v.rightValue) {
-        is Either.Right -> Both(v.leftValue, v.rightValue.b)
+        is Either.Right -> Both(v.leftValue, v.rightValue.value)
         is Either.Left -> {
-          when (val fnb = f(v.rightValue.a)) {
+          when (val fnb = f(v.rightValue.value)) {
             is Left -> Left(v.leftValue.combine(fnb.value))
             is Right -> loop(Both(v.leftValue, fnb.value), f)
             is Both -> loop(Both(v.leftValue.combine(fnb.leftValue), fnb.rightValue), f)
@@ -126,9 +126,9 @@ sealed class Ior<out A, out B> {
     fun <L, A, B> tailRecM(a: A, f: (A) -> Ior<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
       SL.run { loop(f(a), f) }
 
-    fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
+    fun <A, B> leftNel(a: A): IorNel<A, B> = Left(nonEmptyListOf(a))
 
-    fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(NonEmptyList.of(a), b)
+    fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(nonEmptyListOf(a), b)
 
     /**
      *  Lifts a function `(B) -> C` to the [Ior] structure returning a polymorphic function
@@ -527,7 +527,7 @@ sealed class Ior<out A, out B> {
    */
   @Deprecated("Deprecated, use `leftOrNull` instead", ReplaceWith("leftOrNull()"))
   fun toLeftOption(): Option<A> =
-    fold({ Option.just(it) }, { Option.empty() }, { a, _ -> Option.just(a) })
+    fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]
@@ -574,10 +574,7 @@ sealed class Ior<out A, out B> {
 
     override fun toString(): String = "Ior.Left($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Left(a)", "arrow.core.Ior"))
-      operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
-    }
+    companion object
   }
 
   data class Right<out B>(val value: B) : Ior<Nothing, B>() {
@@ -587,10 +584,7 @@ sealed class Ior<out A, out B> {
 
     override fun toString(): String = "Ior.Right($value)"
 
-    companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Right(a)", "arrow.core.Right"))
-      operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
-    }
+    companion object
   }
 
   data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
@@ -764,7 +758,7 @@ sealed class Ior<out A, out B> {
 
   inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
     fold(
-      { a -> Either.right(Left(a)) },
+      { a -> Either.Right(Left(a)) },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
@@ -780,7 +774,7 @@ sealed class Ior<out A, out B> {
     fold({ emptyList() }, { fa(it).void() }, { _, b -> fa(b).void() })
 
   inline fun <AA, C> traverseEither_(fa: (B) -> Either<AA, C>): Either<AA, Unit> =
-    fold({ Either.right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
+    fold({ Either.Right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
 
   inline fun <AA, C> traverseValidated_(fa: (B) -> Validated<AA, C>): Validated<AA, Unit> =
     fold({ Valid(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })

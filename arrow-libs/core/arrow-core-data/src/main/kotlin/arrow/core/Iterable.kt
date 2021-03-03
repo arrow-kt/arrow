@@ -274,10 +274,10 @@ private tailrec fun <A, B> go(
   if (v.isNotEmpty()) {
     when (val head: Either<A, B> = v.first()) {
       is Either.Right -> {
-        buf += head.b
+        buf += head.value
         go(buf, f, v.drop(1))
       }
-      is Either.Left -> go(buf, f, (f(head.a) + v.drop(1)))
+      is Either.Left -> go(buf, f, (f(head.value) + v.drop(1)))
     }
   }
 }

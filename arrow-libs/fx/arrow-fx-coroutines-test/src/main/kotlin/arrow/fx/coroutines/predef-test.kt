@@ -198,25 +198,25 @@ fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
     override fun test(value: Either<Throwable, *>): MatcherResult =
       when (value) {
         is Either.Left -> when {
-          value.a::class != e::class -> MatcherResult(
+          value.value::class != e::class -> MatcherResult(
             false,
-            "Expected exception of type ${e::class} but found ${value.a::class}",
+            "Expected exception of type ${e::class} but found ${value.value::class}",
             "Should not be exception of type ${e::class}"
           )
-          value.a.message != e.message -> MatcherResult(
+          value.value.message != e.message -> MatcherResult(
             false,
-            "Expected exception with message ${e.message} but found ${value.a.message}",
+            "Expected exception with message ${e.message} but found ${value.value.message}",
             "Should not be exception with message ${e.message}"
           )
           else -> MatcherResult(
             true,
-            "Expected exception of type ${e::class} and found ${value.a::class}",
-            "Expected exception of type ${e::class} and found ${value.a::class}"
+            "Expected exception of type ${e::class} and found ${value.value::class}",
+            "Expected exception of type ${e::class} and found ${value.value::class}"
           )
         }
         is Either.Right -> MatcherResult(
           false,
-          "Expected Either.Left with exception of type ${e::class} and found Right with ${value.b}",
+          "Expected Either.Left with exception of type ${e::class} and found Right with ${value.value}",
           "Should not be Either.Left with exception"
         )
       }
@@ -227,20 +227,20 @@ fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
     override fun test(value: Either<Throwable, A>): MatcherResult =
       when (value) {
         is Either.Left -> when {
-          value.a::class != (e.swap().orNull() ?: Int)::class -> MatcherResult(
+          value.value::class != (e.swap().orNull() ?: Int)::class -> MatcherResult(
             false,
             "Expected $e but found $value",
             "Should not be $e"
           )
-          value.a.message != (e.swap().orNull()?.message ?: -1) -> MatcherResult(
+          value.value.message != (e.swap().orNull()?.message ?: -1) -> MatcherResult(
             false,
             "Expected $e but found $value",
             "Should not be $e"
           )
           else -> MatcherResult(
             true,
-            "Expected exception of type ${e::class} and found ${value.a::class}",
-            "Expected exception of type ${e::class} and found ${value.a::class}"
+            "Expected exception of type ${e::class} and found ${value.value::class}",
+            "Expected exception of type ${e::class} and found ${value.value::class}"
           )
         }
         is Either.Right -> equalityMatcher(e).test(value)

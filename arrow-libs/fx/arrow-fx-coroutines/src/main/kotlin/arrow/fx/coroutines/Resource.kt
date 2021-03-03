@@ -305,9 +305,9 @@ sealed class Resource<out A> {
           when (res) {
             is Either.Left -> {
               r.release(res, ExitCase.Completed)
-              tailRecM(res.a, f)
+              tailRecM(res.value, f)
             }
-            is Either.Right -> Allocate({ res.b }, { _, ec -> r.release(res, ec) })
+            is Either.Right -> Allocate({ res.value }, { _, ec -> r.release(res, ec) })
           }
         }
         is Defer -> Defer { loop(r.resource.invoke()) }

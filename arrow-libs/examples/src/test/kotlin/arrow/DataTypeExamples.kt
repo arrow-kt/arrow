@@ -5,7 +5,8 @@ import arrow.Problem.noReciprocal
 import arrow.Problem.somethingExploded
 import arrow.Problem.somethingWentWRong
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -64,14 +65,14 @@ class DataTypeExamples : FreeSpec() {
         // Either http://arrow.io/docs/apidocs/arrow-core-data/arrow.core/-either/
         "Either left or right" - {
             fun parse(s: String): ProblemOrInt = try {
-                Either.right(s.toInt())
+                Right(s.toInt())
             } catch (e: Throwable) {
-                Either.left(invalidInt)
+                Left(invalidInt)
             }
 
             fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
                 0 -> Left(noReciprocal)
-                else -> Either.Right(1.0 / i)
+                else -> Right(1.0 / i)
             }
 
             fun magic(s: String): Either<Problem, String> =
@@ -80,11 +81,11 @@ class DataTypeExamples : FreeSpec() {
             var either: ProblemOrInt
 
             "Right" {
-                either = Either.right(5)
-                either shouldBe Either.Right(5)
+                either = Right(5)
+                either shouldBe Right(5)
                 either.getOrElse { 0 } shouldBe 5
-                either.map { it + 1 } shouldBe Either.right(6)
-                either.flatMap { Either.right(6) } shouldBe Either.right(6)
+                either.map { it + 1 } shouldBe Right(6)
+                either.flatMap { Right(6) } shouldBe Right(6)
                 either.flatMap { Left(somethingWentWRong) } shouldBe Left(somethingWentWRong)
             }
 
@@ -99,13 +100,13 @@ class DataTypeExamples : FreeSpec() {
 
             "Either rather than exception" {
                 parse("Not an number") shouldBe Left(invalidInt)
-                parse("2") shouldBe Either.right(2)
+                parse("2") shouldBe Right(2)
             }
 
             "Combinators" {
                 magic("0") shouldBe Left(noReciprocal)
                 magic("Not a number") shouldBe Left(invalidInt)
-                magic("1") shouldBe Either.right("1.0")
+                magic("1") shouldBe Right("1.0")
             }
 
             "Fold" {
@@ -142,14 +143,14 @@ class DataTypeExamples : FreeSpec() {
 
             "Recover" {
                 val gain = Either.catch { playLottery(99) }
-                gain.handleError { 0 } shouldBe Either.Right(0)
+                gain.handleError { 0 } shouldBe Right(0)
                 gain.handleErrorWith {
                     try {
-                        Either.Right(playLottery(42))
+                        Right(playLottery(42))
                     } catch (e: Throwable) {
                         Either.Left(e)
                     }
-                } shouldBe Either.Right(1000)
+                } shouldBe Right(1000)
             }
         }
     }
