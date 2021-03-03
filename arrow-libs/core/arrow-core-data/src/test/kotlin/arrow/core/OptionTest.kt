@@ -77,7 +77,7 @@ class OptionTest : UnitSpec() {
         val op: Option<Int> = a.some()
         some.zip(op) { a, b -> a + b } == Some("kotlin$a") &&
         none.zip(op) { a, b -> a + b } == None &&
-          some.zip(op) == Some(Pair("kotling", a))
+          some.zip(op) == Some(Pair("kotlin", a))
       }
     }
 
