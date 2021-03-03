@@ -28,8 +28,22 @@ import arrow.core.Tuple20
 import arrow.core.Tuple21
 import arrow.core.Tuple22
 
+@Deprecated(
+  "Tuple2 is deprecated in favor of Kotlin's Pair",
+  ReplaceWith("Tuple3(this.a, this.b, c)", "arrow.core.Tuple3")
+)
 operator fun <A, B, C> Tuple2<A, B>.plus(c: C): Tuple3<A, B, C> = Tuple3(this.a, this.b, c)
+
+operator fun <A, B, C> Pair<A, B>.plus(c: C): Triple<A, B, C> = Triple(this.first, this.second, c)
+
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple",
+  ReplaceWith("Tuple4(this.a, this.b, this.c, d)", "arrow.core.Tuple4")
+)
 operator fun <A, B, C, D> Tuple3<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
+
+operator fun <A, B, C, D> Triple<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.first, this.second, this.third, d)
+
 operator fun <A, B, C, D, E> Tuple4<A, B, C, D>.plus(e: E): Tuple5<A, B, C, D, E> = Tuple5(this.a, this.b, this.c, this.d, e)
 operator fun <A, B, C, D, E, F> Tuple5<A, B, C, D, E>.plus(f: F): Tuple6<A, B, C, D, E, F> = Tuple6(this.a, this.b, this.c, this.d, this.e, f)
 operator fun <A, B, C, D, E, F, G> Tuple6<A, B, C, D, E, F>.plus(g: G): Tuple7<A, B, C, D, E, F, G> = Tuple7(this.a, this.b, this.c, this.d, this.e, this.f, g)
