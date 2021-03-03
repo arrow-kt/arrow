@@ -377,7 +377,7 @@ With `control().shift` based on the `Effect` interface we can implement monad bi
 
 ```kotlin:ank
 object nullable {
-  suspend operator fun <A> invoke(func: suspend NullableEffect<*>.() -> A?): A? =
+  operator fun <A> invoke(func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.restricted(eff = { NullableEffect { it } }, f = func, just = { it })
 }
 ```
