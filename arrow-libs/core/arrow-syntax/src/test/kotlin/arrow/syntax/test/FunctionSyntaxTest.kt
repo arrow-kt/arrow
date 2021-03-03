@@ -16,12 +16,9 @@ import arrow.syntax.function.partially4
 import arrow.syntax.function.partially5
 import arrow.syntax.function.reverse
 import arrow.syntax.function.tripled
-import arrow.syntax.function.tupled
 import arrow.syntax.function.uncurried
 import arrow.syntax.function.unpaired
 import arrow.syntax.function.untripled
-import arrow.syntax.function.untupled
-import arrow.core.Tuple2
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 import java.util.Random
@@ -123,13 +120,13 @@ class FunctionSyntaxTest : UnitSpec() {
 
     "testTupling" {
       val sum2ints = { x: Int, y: Int -> x + y }
-      val tupled = sum2ints.tupled()
-      tupled(Tuple2(2, 4)) shouldBe 6
+      val tupled = sum2ints.paired()
+      tupled(Pair(2, 4)) shouldBe 6
     }
 
     "testUntupling" {
-      val sum2ints = { t: Tuple2<Int, Int> -> t.a + t.b }
-      val untupled = sum2ints.untupled()
+      val sum2ints = { t: Pair<Int, Int> -> t.first + t.second }
+      val untupled = sum2ints.unpaired()
       untupled(2, 4) shouldBe 6
     }
 

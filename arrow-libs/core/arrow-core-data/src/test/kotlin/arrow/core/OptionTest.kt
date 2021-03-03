@@ -157,7 +157,7 @@ class OptionTest : UnitSpec() {
     "toLeftOption" {
       1.leftIor().toLeftOption() shouldBe Some(1)
       2.rightIor().toLeftOption() shouldBe None
-      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
+      (1 to 2).bothIor().toLeftOption() shouldBe Some(1)
     }
   }
 }

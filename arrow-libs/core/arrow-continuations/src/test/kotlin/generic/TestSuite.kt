@@ -5,10 +5,7 @@ import arrow.continuations.generic.MultiShotDelimContScope
 import arrow.continuations.generic.RestrictedScope
 import arrow.core.Either
 import arrow.core.Either.Left
-import arrow.core.Tuple2
-import arrow.core.Tuple3
 import arrow.core.test.UnitSpec
-import arrow.core.toT
 import io.kotlintest.shouldBe
 
 abstract class ContTestSuite : UnitSpec() {
@@ -34,33 +31,33 @@ abstract class ContTestSuite : UnitSpec() {
     // some examples from http://homes.sice.indiana.edu/ccshan/recur/recur.pdf
     if (capabilities().contains(ScopeCapabilities.MultiShot)) {
       "multshot nondet" {
-        runScope<List<Tuple2<Int, Int>>> {
+        runScope<List<Pair<Int, Int>>> {
           val i: Int = shift { k -> k(10) + k(20) }
           val j: Int = shift { k -> k(15) + k(25) }
-          listOf(i toT j)
-        } shouldBe listOf(10 toT 15, 10 toT 25, 20 toT 15, 20 toT 25)
+          listOf(i to j)
+        } shouldBe listOf(10 to 15, 10 to 25, 20 to 15, 20 to 25)
       }
       "multishot more than twice" {
-        runScope<List<Tuple3<Int, Int, Int>>> {
+        runScope<List<Triple<Int, Int, Int>>> {
           val i: Int = shift { k -> k(10) + k(20) }
           val j: Int = shift { k -> k(15) + k(25) }
           val k: Int = shift { k -> k(17) + k(27) }
-          listOf(Tuple3(i, j, k))
-        } shouldBe listOf(10, 20).flatMap { i -> listOf(15, 25).flatMap { j -> listOf(17, 27).map { k -> Tuple3(i, j, k) } } }
+          listOf(Triple(i, j, k))
+        } shouldBe listOf(10, 20).flatMap { i -> listOf(15, 25).flatMap { j -> listOf(17, 27).map { k -> Triple(i, j, k) } } }
       }
       "multishot more than twice and with more multishot invocations" {
-        runScope<List<Tuple3<Int, Int, Int>>> {
+        runScope<List<Triple<Int, Int, Int>>> {
           val i: Int = shift { k -> k(10) + k(20) + k(30) + k(40) + k(50) }
           val j: Int = shift { k -> k(15) + k(25) + k(35) + k(45) + k(55) }
           val k: Int = shift { k -> k(17) + k(27) + k(37) + k(47) + k(57) }
-          listOf(Tuple3(i, j, k))
+          listOf(Triple(i, j, k))
         } shouldBe
           listOf(10, 20, 30, 40, 50)
             .flatMap { i ->
               listOf(15, 25, 35, 45, 55)
                 .flatMap { j ->
                   listOf(17, 27, 37, 47, 57)
-                    .map { k -> Tuple3(i, j, k) }
+                    .map { k -> Triple(i, j, k) }
                 }
             }
       }

@@ -1,7 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.core.Tuple2
-import arrow.core.Tuple3
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
@@ -130,7 +128,7 @@ abstract class ArrowFxSpec(
       genC,
       genD,
       genE,
-      Arb.bind(genF, genG, ::Tuple2)
+      Arb.bind(genF, genG, ::Pair)
     ) { a, b, c, d, e, (f, g) ->
       property(a, b, c, d, e, f, g)
     }
@@ -153,7 +151,7 @@ abstract class ArrowFxSpec(
       genC,
       genD,
       genE,
-      Arb.bind(genF, genG, genH, ::Tuple3)
+      Arb.bind(genF, genG, genH, ::Triple)
     ) { a, b, c, d, e, (f, g, h) ->
       property(a, b, c, d, e, f, g, h)
     }

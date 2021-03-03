@@ -9,8 +9,6 @@ import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.SortedMapK
 import arrow.core.Tuple10
-import arrow.core.Tuple2
-import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -68,11 +66,6 @@ fun Gen.Companion.byteSmall(): Gen<Byte> = Gen.oneOf(Gen.choose(Byte.MIN_VALUE /
 fun Gen.Companion.shortSmall(): Gen<Short> = Gen.oneOf(Gen.choose(Short.MIN_VALUE / 1000, -1), Gen.choose(0, Short.MAX_VALUE / 1000)).map { it.toShort() }
 
 fun Gen.Companion.longSmall(): Gen<Long> = Gen.oneOf(Gen.choose(Long.MIN_VALUE / 100000L, -1L), Gen.choose(0L, Long.MAX_VALUE / 100000L))
-
-fun <A, B> Gen.Companion.tuple2(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> = Gen.bind(genA, genB) { a: A, b: B -> Tuple2(a, b) }
-
-fun <A, B, C> Gen.Companion.tuple3(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>): Gen<Tuple3<A, B, C>> =
-  Gen.bind(genA, genB, genC) { a: A, b: B, c: C -> Tuple3(a, b, c) }
 
 fun <A, B, C, D> Gen.Companion.tuple4(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>): Gen<Tuple4<A, B, C, D>> =
   Gen.bind(genA, genB, genC, genD) { a: A, b: B, c: C, d: D -> Tuple4(a, b, c, d) }

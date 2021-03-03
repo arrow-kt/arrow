@@ -3,9 +3,6 @@
 
 package arrow.core
 
-import java.util.Collections
-import kotlin.collections.LinkedHashMap
-
 data class Tuple11<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K>(
   @Deprecated("Use first instead", ReplaceWith("first"))
   val a: A,
@@ -672,149 +669,9 @@ data class Tuple22<out A, out B, out C, out D, out E, out F, out G, out H, out I
 
 private const val INT_MAX_POWER_OF_TWO: Int = Int.MAX_VALUE / 2 + 1
 
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("Pair(this, b)")
-)
-infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("Pair(this.a, this.b)")
-)
-fun <A, B> Tuple2<A, B>.toPair(): Pair<A, B> = Pair(this.a, this.b)
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Please use Pair values instead.",
-  level = DeprecationLevel.WARNING
-)
-fun <A, B> Pair<A, B>.toTuple2(): Tuple2<A, B> = Tuple2(this.first, this.second)
-
-fun <A, B, C> Tuple3<A, B, C>.toTriple(): Triple<A, B, C> = Triple(this.a, this.b, this.c)
-
-@Deprecated(
-  "Tuple3 is deprecated in favor of Kotlin's Triple. Please use Triple values instead.",
-  level = DeprecationLevel.WARNING
-)
-fun <A, B, C> Triple<A, B, C>.toTuple3(): Tuple3<A, B, C> = Tuple3(this.first, this.second, this.third)
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.map { (a, b) -> Pair(a, b) }.toMap()")
-)
-fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {
-  if (this is Collection) {
-    return when (size) {
-      0 -> emptyMap()
-      1 -> mapOf(if (this is List) this[0] else iterator().next())
-      else -> toMap(LinkedHashMap(mapCapacity(size)))
-    }
-  }
-  return toMap(LinkedHashMap()).optimizeReadOnlyMap()
-}
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.map { (a, b) -> Pair(a, b) }.toMap()")
-)
-fun <K, V> Array<out Tuple2<K, V>>.toMap(): Map<K, V> = when (size) {
-  0 -> emptyMap()
-  1 -> mapOf(this[0])
-  else -> toMap(LinkedHashMap(mapCapacity(size)))
-}
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.map { (a, b) -> Pair(a, b) }.toMap()")
-)
-fun <K, V> Sequence<Tuple2<K, V>>.toMap(): Map<K, V> =
-  toMap(LinkedHashMap()).optimizeReadOnlyMap()
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("mapOf(pair.a to pair.b)")
-)
-fun <K, V> mapOf(pair: Tuple2<K, V>): Map<K, V> =
-  Collections.singletonMap(pair.a, pair.b)
-
-internal fun <K, V, M : MutableMap<in K, in V>> Iterable<Tuple2<K, V>>.toMap(destination: M): M =
-  destination.apply { putAll(this@toMap) }
-
-internal fun <K, V, M : MutableMap<in K, in V>> Array<out Tuple2<K, V>>.toMap(destination: M): M =
-  destination.apply { putAll(this@toMap) }
-
-internal fun <K, V, M : MutableMap<in K, in V>> Sequence<Tuple2<K, V>>.toMap(destination: M): M =
-  destination.apply { putAll(this@toMap) }
-
-internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Iterable<Tuple2<K, V>>) {
-  for ((key, value) in tuples) {
-    put(key, value)
-  }
-}
-
-internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Array<out Tuple2<K, V>>) {
-  for ((key, value) in tuples) {
-    put(key, value)
-  }
-}
-
-internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Sequence<Tuple2<K, V>>) {
-  for ((key, value) in tuples) {
-    put(key, value)
-  }
-}
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.plus(Pair(tuple.a, tuple.b)")
-)
-operator fun <K, V> Map<out K, V>.plus(tuple: Tuple2<K, V>): Map<K, V> =
-  if (this.isEmpty()) mapOf(tuple) else LinkedHashMap(this).apply { put(tuple.a, tuple.b) }
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.plus(tuples.map { (a, b) -> Pair(a, b) })")
-)
-operator fun <K, V> Map<out K, V>.plus(tuples: Iterable<Tuple2<K, V>>): Map<K, V> =
-  if (this.isEmpty()) tuples.toMap() else LinkedHashMap(this).apply { putAll(tuples) }
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.plus(tuples.map { (a, b) -> Pair(a, b) })")
-)
-operator fun <K, V> Map<out K, V>.plus(tuples: Array<out Tuple2<K, V>>): Map<K, V> =
-  if (this.isEmpty()) tuples.toMap() else LinkedHashMap(this).apply { putAll(tuples) }
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("this.plus(tuples.map { (a, b) -> Pair(a, b) })")
-)
-operator fun <K, V> Map<out K, V>.plus(tuples: Sequence<Tuple2<K, V>>): Map<K, V> =
-  LinkedHashMap(this).apply { putAll(tuples) }.optimizeReadOnlyMap()
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair",
-  ReplaceWith("Pair(this.key, this.value)")
-)
-fun <K, V> Map.Entry<K, V>.toTuple2(): Tuple2<K, V> = Tuple2(key, value)
-
 internal fun mapCapacity(expectedSize: Int): Int =
   when {
     expectedSize < 3 -> expectedSize + 1
     expectedSize < INT_MAX_POWER_OF_TWO -> expectedSize + expectedSize / 3
     else -> Int.MAX_VALUE
-  }
-
-// do not expose for now @PublishedApi
-internal fun <K, V> Map<K, V>.optimizeReadOnlyMap() =
-  when (size) {
-    0 -> emptyMap()
-    1 -> this.toSingletonMap()
-    else -> this
-  }
-
-// creates a singleton copy of map
-internal fun <K, V> Map<out K, V>.toSingletonMap(): Map<K, V> =
-  with(entries.iterator().next()) {
-    Collections.singletonMap(key, value)
   }

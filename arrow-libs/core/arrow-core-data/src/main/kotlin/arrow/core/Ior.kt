@@ -855,12 +855,6 @@ inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Please use the bothIor method defined for Pair instead.",
-  level = DeprecationLevel.WARNING
-)
-fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
-
 fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
