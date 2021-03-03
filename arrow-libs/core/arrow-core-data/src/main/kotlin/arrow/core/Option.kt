@@ -591,7 +591,7 @@ sealed class Option<out A> {
 
   inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
-      is None -> None.map { None }
+      is None -> this
       is Some -> f(value).map { Some(it) }
     }
 

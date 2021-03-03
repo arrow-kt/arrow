@@ -67,7 +67,7 @@ class DataTypeExamples : FreeSpec() {
             fun parse(s: String): ProblemOrInt = try {
                 Right(s.toInt())
             } catch (e: Throwable) {
-                Either.Left(invalidInt)
+                Left(invalidInt)
             }
 
             fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
