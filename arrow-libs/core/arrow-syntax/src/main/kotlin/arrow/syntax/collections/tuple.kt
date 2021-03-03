@@ -38,7 +38,7 @@ operator fun <A, B, C> Pair<A, B>.plus(c: C): Triple<A, B, C> = Triple(this.firs
 
 @Deprecated(
   "Tuple3 is deprecated in favor of Kotlin's Triple",
-  ReplaceWith("Tuple4(this.a, this.b, c)", "arrow.core.Tuple4")
+  ReplaceWith("Tuple4(this.a, this.b, this.c, d)", "arrow.core.Tuple4")
 )
 operator fun <A, B, C, D> Tuple3<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.a, this.b, this.c, d)
 
