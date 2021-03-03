@@ -1,7 +1,12 @@
 package arrow.core
 
+@Deprecated("MapK object is deprecated, and will be removed in 1.0.0")
 object MapK {
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -22,6 +27,10 @@ object MapK {
       map(key, bb, cc)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -43,6 +52,10 @@ object MapK {
       map(key, bb, cc, dd)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -65,6 +78,10 @@ object MapK {
       map(key, bb, cc, dd, ee)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -88,6 +105,10 @@ object MapK {
       map(key, bb, cc, dd, ee, ff)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G, H> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -112,6 +133,10 @@ object MapK {
       map(key, bb, cc, dd, ee, ff, gg)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G, H, I> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -137,6 +162,10 @@ object MapK {
       map(key, bb, cc, dd, ee, ff, gg, hh)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G, H, I, J> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -163,6 +192,10 @@ object MapK {
       map(key, bb, cc, dd, ee, ff, gg, hh, ii)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, j, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G, H, I, J, K> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -179,6 +212,10 @@ object MapK {
       map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj)
     }
 
+  @Deprecated(
+    "mapN for Map has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, j, k, map)", "arrow.core.mapN")
+  )
   inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> mapN(
     b: Map<Key, B>,
     c: Map<Key, C>,
@@ -211,9 +248,3 @@ object MapK {
     return destination
   }
 }
-
-internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
-  when (this) {
-    null -> emptyList()
-    else -> listOf(this)
-  }
