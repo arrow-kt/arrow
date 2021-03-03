@@ -151,13 +151,15 @@ sealed class Resource<out A> {
   fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
     Bind(this, f)
 
-  fun <B, C> map2(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
-    flatMap { r ->
+  fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
+   flatMap { r ->
       other.map { r2 -> combine(r, r2) }
     }
 
   fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
-    map2(other, ::Pair)
+    flatMap { r ->
+      other.map { r2 -> Pair(r, r2) }
+    }
 
   class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
 
