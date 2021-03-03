@@ -6,9 +6,6 @@ permalink: /patterns/error_handling/
 
 ## Functional Error Handling
 
-
-
-
 When dealing with errors in a purely functional way, we try as much as we can to avoid exceptions.
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
 
@@ -73,7 +70,9 @@ They often lead to incorrect and dangerous code because `Throwable` is an open h
 ```kotlin
 try {
   doExceptionalStuff() //throws IllegalArgumentException
-} catch (e: Throwable) { //too broad matches:
+} catch (e: Throwable) { 
+    // too broad, `Throwable` matches a set of fatal exceptions and errors a 
+   // a user may be unable to recover from:
     /*
     VirtualMachineError
     OutOfMemoryError
@@ -104,70 +103,62 @@ Constructing an exception may be as costly as your current Thread stack size, an
 More info on the cost of instantiating Throwables, and throwing exceptions in general, can be found in the links below.
 
 > [The Hidden Performance costs of instantiating Throwables](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)
-> * New: Creating a new Throwable each time
-> * Lazy: Reusing a created Throwable in the method invocation.
-> * Static: Reusing a static Throwable with an empty stacktrace.
 
 Exceptions may be considered generally a poor choice in Functional Programming when:
 
 - Modeling absence
 - Modeling known business cases that result in alternate paths
-- Used in async boundaries over unprincipled APIs (callbacks)
-- In general, when people have no access to your source code
+- Used in async boundaries over APIs based callbacks that lack some form of structured concurrency.
+- In general, when people have no access to your source code.
 
 ### How do we model exceptional cases then?
 
-Arrow provides proper datatypes and typeclasses to represent exceptional cases.
+Arrow and the Kotlin standard library provides proper datatypes and abstractions to represent exceptional cases.
 
-### Option
+### Nullable types
 
-We use [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to model the potential absence of a value.
+We use [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) to model the potential absence of a value.
 
-When using `Option`, our previous example may look like:
+When using `Nullable types`, our previous example may look like:
 
 ```kotlin:ank
-import arrow.*
-import arrow.core.*
-
-fun takeFoodFromRefrigerator(): Option<Lettuce> = None
-fun getKnife(): Option<Knife> = None
-fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
+fun takeFoodFromRefrigerator(): Lettuce? = null
+fun getKnife(): Knife? = null
+fun prepare(tool: Knife, ingredient: Lettuce): Salad? = Salad
 ```
 
-It's easy to work with [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) if your lang supports [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
-Arrow provides [monadic comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`]({{'/arrow/typeclasses/monad' | relative_url }}) instance exists built atop coroutines.
+It's easy to work with [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) if your lang supports special syntax like `?` as Kotlin does. 
+Nullable types are faster than boxed types like `Option`. Nonetheless `Option` is also supported by Arrow to interop with Java based libraries that use `null` as signal or interruption value like [ReactiveX RxJava](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls). Additionally `Option` is useful in generic code when not constraining with generic bounds of `A : Any` and using null as a nested signal to produce values of `Option<Option<A>>` since A? can't have double nesting.
 
 ```kotlin:ank
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.computations.option
+import arrow.core.computations.nullable
 
-object Lettuce
-object Knife
-object Salad
+fun prepareLunch(): Salad? {
+  val lettuce = takeFoodFromRefrigerator()
+  val knife = getKnife()
+  val salad = knife?.let { k -> lettuce?.let { l -> prepare(k, l) } }
+  return salad
+}
+```
 
-fun takeFoodFromRefrigerator(): Option<Lettuce> = None
-fun getKnife(): Option<Knife> = None
-fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
+In addition to `let` provided by the standard library Arrow provides `nullable` which allows the use of [Computation Expressions]({{ '/patterns/monad_comprehensions' | relative_url }}).
 
-//sampleStart
-fun prepareLunchOption(): Option<Salad> =
-  option.eager {
+
+```kotlin:ank
+import arrow.core.computations.nullable
+
+suspend fun prepareLunch(): Salad? =
+  nullable {
     val lettuce = takeFoodFromRefrigerator().bind()
     val knife = getKnife().bind()
     val salad = prepare(knife, lettuce).bind()
     salad
   }
-//sampleEnd
-
-prepareLunchOption()
-//None
 ```
 
-While we could model this problem using `Option`, and forgetting about exceptions, we are still unable to determine the reasons why `takeFoodFromRefrigerator()` and `getKnife()` returned empty values in the form of `None`.
-For this reason, using `Option` is only a good idea when we know that values may be absent, but we don't really care about the reason why.
-Additionally, `Option` is unable to capture exceptions. So, if an exception was thrown internally, it would still bubble up and result in a runtime exception.
+While we could model this problem using `Nullable Types`, and forgetting about exceptions, we are still unable to determine the reasons why `takeFoodFromRefrigerator()` and `getKnife()` returned empty values in the form of `null`.
+For this reason, using `Nullable Types` is only a good idea when we know that values may be absent, but we don't really care about the reason why.
+Additionally, `Nullable Types` are unable to capture exceptions. If an exception was thrown internally, it would still bubble up and result in a runtime exception.
 
 In the next example, we are going to use `Either` to deal with potentially thrown exceptions that are outside the control of the caller.
 
@@ -186,22 +177,22 @@ We can now assign proper types and values to the exceptional cases.
 
 ```kotlin:ank
 sealed class CookingException {
-    object LettuceIsRotten: CookingException()
-    object KnifeNeedsSharpening: CookingException()
-    data class InsufficientAmount(val quantityInGrams : Int): CookingException()
+  object NastyLettuce: CookingException()
+  object KnifeIsDull: CookingException()
+  data class InsufficientAmountOfLettuce(val quantityInGrams : Int): CookingException()
 }
-
-typealias NastyLettuce = CookingException.LettuceIsRotten
-typealias KnifeIsDull = CookingException.KnifeNeedsSharpening
-typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
+typealias NastyLettuce = CookingException.NastyLettuce
+typealias KnifeIsDull = CookingException.KnifeIsDull
+typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmountOfLettuce
 ```
 
 This type of definition is commonly known as an Algebraic Data Type or Sum Type in most FP capable languages.
-In Kotlin, it is encoded using sealed hierarchies. We can think of sealed hierarchies as a declaration of a type and all its  possible states.
+In Kotlin, it is encoded using sealed hierarchies. We can think of sealed hierarchies as a declaration of a type and all its possible construction states.
 
 Once we have an ADT defined to model our known errors, we can redefine our functions.
 
 ```kotlin:ank
+import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 
@@ -210,7 +201,7 @@ fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
 fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
 ```
 
-Arrow also provides a `Monad` instance for `Either` in the same way it did for `Option`.
+Arrow also provides an `Effect` instance for `Either` in the same way it did for `Nullable types`.
 Except for the types signatures, our program remains unchanged when we compute over `Either`.
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
@@ -220,25 +211,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.computations.either
 
-object Lettuce
-object Knife
-object Salad
-
-typealias NastyLettuce = CookingException.LettuceIsRotten
-typealias KnifeIsDull = CookingException.KnifeNeedsSharpening
-typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
-
-sealed class CookingException {
-  object LettuceIsRotten: CookingException()
-  object KnifeNeedsSharpening: CookingException()
-  data class InsufficientAmount(val quantityInGrams : Int): CookingException()
-}
-
-fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
-fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
-fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
-
-//sampleStart
 suspend fun prepareEither(): Either<CookingException, Salad> =
   either {
     val lettuce = takeFoodFromRefrigerator().bind()
@@ -246,19 +218,107 @@ suspend fun prepareEither(): Either<CookingException, Salad> =
     val salad = lunch(knife, lettuce).bind()
     salad
   }
-//sampleEnd
+```
 
-suspend fun main() {
-  prepareEither()
+### Alternative validation strategies : Failing fast vs accumulating errors
+
+In this different validation example, we demonstrate how we can use `Validated` to perform validation with error accumulation or short-circuit strategies.
+
+```kotlin:ank
+import arrow.core.Nel
+import arrow.core.ValidatedNel
+import arrow.core.computations.either
+import arrow.core.handleErrorWith
+import arrow.core.invalidNel
+import arrow.core.nonEmptyList
+import arrow.core.traverseEither
+import arrow.core.traverseValidated
+import arrow.core.validNel
+import arrow.typeclasses.Semigroup
+```
+
+*Model*
+
+```kotlin:ank
+sealed class ValidationError(val msg: String) {
+  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
 }
-//Left(InsufficientAmountOfLettuce(5))
+
+data class FormField(val label: String, val value: String)
+data class Email(val value: String)
+```
+
+*Strategies*
+
+```kotlin:ank
+/** strategies **/
+sealed class Strategy {
+  object FailFast : Strategy()
+  object ErrorAccumulation : Strategy()
+}
+
+/** Abstracts away invoke strategy **/
+object Rules {
+
+  private fun FormField.contains(needle: String): ValidatedNel<ValidationError, FormField> =
+    if (value.contains(needle, false)) validNel()
+    else ValidationError.DoesNotContain(needle).invalidNel()
+
+  private fun FormField.maxLength(maxLength: Int): ValidatedNel<ValidationError, FormField> =
+    if (value.length <= maxLength) validNel()
+    else ValidationError.MaxLength(maxLength).invalidNel()
+
+  private fun FormField.validateErrorAccumulate(): ValidatedNel<ValidationError, Email> =
+    ValidatedNel.mapN(
+      Semigroup.nonEmptyList(), // accumulates errors in a non empty list
+      contains("@"),
+      maxLength(250)
+    ) { _, _ -> Email(value) }.handleErrorWith { ValidationError.NotAnEmail(it).invalidNel() }
+
+  /** either blocks support binding over Validated values with no additional cost or need to convert first to Either **/
+  private fun FormField.validateFailFast(): Either<Nel<ValidationError>, Email> =
+    either.eager {
+      contains("@").bind() // fails fast on first error found
+      maxLength(250).bind()
+      Email(value)
+    }
+
+  operator fun invoke(strategy: Strategy, fields: List<FormField>): Either<Nel<ValidationError>, List<Email>> =
+    when (strategy) {
+      Strategy.FailFast ->
+        fields.traverseEither { it.validateFailFast() }
+      Strategy.ErrorAccumulation ->
+        fields.traverseValidated(Semigroup.nonEmptyList()) {
+          it.validateErrorAccumulate()
+        }.toEither()
+    }
+}
+```
+
+*Program*
+
+```kotlin:ank
+val fields = listOf(
+    FormField("Invalid Email Domain Label", "nowhere.com"),
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails 
+    FormField("Valid Email Label", "getlost@nowhere.com")
+)
+```
+
+*Fail Fast*
+
+```kotlin:ank
+Rules(Strategy.FailFast, fields)
+```
+
+*Error Accumulation*
+
+```kotlin:ank
+Rules(Strategy.ErrorAccumulation, fields)
 ```
 
 ### Credits
 
 Tutorial adapted from the 47 Degrees blog [`Functional Error Handling`](https://www.47deg.com/presentations/2017/02/18/Functional-error-handling/)
-
-Deck:
-
-- https://speakerdeck.com/raulraja/functional-error-handling
-- https://github.com/47deg/functional-error-handling
