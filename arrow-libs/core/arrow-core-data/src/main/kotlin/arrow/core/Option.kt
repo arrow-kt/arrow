@@ -512,7 +512,7 @@ sealed class Option<out A> {
    */
   fun <B> mapConst(b: B): Option<B> =
     map { b }
-  
+
   @Deprecated(
     "filterMap will be renamed to mapNotNull to be consistent with Kotlin Std's naming, please use mapNotNull instead of filterMap",
     ReplaceWith(
