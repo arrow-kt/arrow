@@ -216,7 +216,7 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 @Deprecated(MapKDeprecation, ReplaceWith("this"))
 fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
 
-@Deprecated("Deprecated, use nullable instead", ReplaceWith("Tuple2<K, A>>?.let { ... }"))
+@Deprecated("Deprecated, use nullable instead", ReplaceWith("fold({ emptyMap<K, A>() }, { (a, b) -> mapOf(a to b) })"))
 fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
   when (this) {
     is Some -> mapOf(this.t).k()
@@ -230,7 +230,7 @@ fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K
 @Deprecated(MapKDeprecation, ReplaceWith("this.map { it.key to it.value }.toMap()"))
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()
 
-@Deprecated("Deprecated, use nullable instead", ReplaceWith("map[k]?.let { ... }"))
+@Deprecated("Deprecated, use nullable instead", ReplaceWith("Option.fromNullable(this[k])", "arrow.core.Option"))
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
 @Deprecated(MapKDeprecation, ReplaceWith("this + Pair(k, value)"))
