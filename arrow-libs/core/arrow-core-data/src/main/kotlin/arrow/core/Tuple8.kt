@@ -4,55 +4,38 @@
 package arrow.core
 
 data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(
-  @Deprecated("Use first instead", ReplaceWith("first"))
-  val a: A,
-  @Deprecated("Use second instead", ReplaceWith("second"))
-  val b: B,
-  @Deprecated("Use third instead", ReplaceWith("third"))
-  val c: C,
-  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
-  val d: D,
-  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
-  val e: E,
-  @Deprecated("Use sixth instead", ReplaceWith("sixth"))
-  val f: F,
-  @Deprecated("Use seventh instead", ReplaceWith("seventh"))
-  val g: G,
-  @Deprecated("Use eighth instead", ReplaceWith("eighth"))
-  val h: H
+  val first: A,
+  val second: B,
+  val third: C,
+  val fourth: D,
+  val fifth: E,
+  val sixth: F,
+  val seventh: G,
+  val eighth: H
 ) {
 
-  val first: A = a
-  val second: B = b
-  val third: C = c
-  val fourth: D = d
-  val fifth: E = e
-  val sixth: F = f
-  val seventh: G = g
-  val eighth: H = h
-
   override fun toString(): String =
-    "($a, $b, $c, $d, $e, $f, $g, $h)"
+    "($first, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth)"
 
   companion object
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>>
 Tuple8<A, B, C, D, E, F, G, H>.compareTo(other: Tuple8<A, B, C, D, E, F, G, H>): Int {
-  val first = a.compareTo(other.a)
+  val first = first.compareTo(other.first)
   return if (first == 0) {
-    val second = b.compareTo(other.b)
+    val second = second.compareTo(other.second)
     if (second == 0) {
-      val third = c.compareTo(other.c)
+      val third = third.compareTo(other.third)
       if (third == 0) {
-        val fourth = d.compareTo(other.d)
+        val fourth = fourth.compareTo(other.fourth)
         if (fourth == 0) {
-          val fifth = e.compareTo(other.e)
+          val fifth = fifth.compareTo(other.fifth)
           if (fifth == 0) {
-            val sixth = f.compareTo(other.f)
+            val sixth = sixth.compareTo(other.sixth)
             if (sixth == 0) {
-              val seventh = g.compareTo(other.g)
-              if (seventh == 0) h.compareTo(other.h)
+              val seventh = seventh.compareTo(other.seventh)
+              if (seventh == 0) eighth.compareTo(other.eighth)
               else seventh
             } else sixth
           } else fifth

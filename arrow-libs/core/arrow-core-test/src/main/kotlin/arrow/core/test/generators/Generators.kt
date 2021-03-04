@@ -78,13 +78,13 @@ fun <A, B, C, D, E, F, G> Gen.Companion.tuple7(genA: Gen<A>, genB: Gen<B>, genC:
   Gen.bind(genA, genB, genC, genD, genE, genF, genG) { a: A, b: B, c: C, d: D, e: E, f: F, g: G -> Tuple7(a, b, c, d, e, f, g) }
 
 fun <A, B, C, D, E, F, G, H> Gen.Companion.tuple8(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>): Gen<Tuple8<A, B, C, D, E, F, G, H>> =
-  Gen.bind(Gen.tuple7(genA, genB, genC, genD, genE, genF, genG), genH) { tuple: Tuple7<A, B, C, D, E, F, G>, h: H -> Tuple8(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, h) }
+  Gen.bind(Gen.tuple7(genA, genB, genC, genD, genE, genF, genG), genH) { tuple: Tuple7<A, B, C, D, E, F, G>, h: H -> Tuple8(tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth, tuple.sixth, tuple.seventh, h) }
 
 fun <A, B, C, D, E, F, G, H, I> Gen.Companion.tuple9(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>): Gen<Tuple9<A, B, C, D, E, F, G, H, I>> =
-  Gen.bind(Gen.tuple8(genA, genB, genC, genD, genE, genF, genG, genH), genI) { tuple: Tuple8<A, B, C, D, E, F, G, H>, i: I -> Tuple9(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, i) }
+  Gen.bind(Gen.tuple8(genA, genB, genC, genD, genE, genF, genG, genH), genI) { tuple: Tuple8<A, B, C, D, E, F, G, H>, i: I -> Tuple9(tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth, tuple.sixth, tuple.seventh, tuple.eighth, i) }
 
 fun <A, B, C, D, E, F, G, H, I, J> Gen.Companion.tuple10(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>, genJ: Gen<J>): Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-  Gen.bind(Gen.tuple9(genA, genB, genC, genD, genE, genF, genG, genH, genI), genJ) { tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j: J -> Tuple10(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, tuple.i, j) }
+  Gen.bind(Gen.tuple9(genA, genB, genC, genD, genE, genF, genG, genH, genI), genJ) { tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j: J -> Tuple10(tuple.first, tuple.second, tuple.third, tuple.fourth, tuple.fifth, tuple.sixth, tuple.seventh, tuple.eighth, tuple.ninth, j) }
 
 fun Gen.Companion.nonZeroInt(): Gen<Int> = Gen.int().filter { it != 0 }
 
