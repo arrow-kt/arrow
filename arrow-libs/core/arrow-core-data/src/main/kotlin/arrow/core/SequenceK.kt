@@ -3,6 +3,10 @@ package arrow.core
 @Deprecated("SequenceK object is deprecated, and will be removed in 1.0.0")
 object SequenceK {
 
+  @PublishedApi
+  internal val unit: Sequence<Unit> =
+    sequenceOf(Unit)
+
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
     ReplaceWith("mapN(b, c, map)", "arrow.core.mapN")
@@ -15,15 +19,8 @@ object SequenceK {
     mapN(
       b,
       c,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+      unit, unit, unit, unit, unit, unit, unit, unit)
+     { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -39,14 +36,8 @@ object SequenceK {
       b,
       c,
       d,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+      unit, unit, unit, unit, unit, unit, unit)
+     { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -64,13 +55,8 @@ object SequenceK {
       c,
       d,
       e,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+      unit, unit, unit, unit, unit, unit)
+     { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -90,12 +76,8 @@ object SequenceK {
       d,
       e,
       f,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+      unit, unit, unit, unit, unit)
+     { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -117,11 +99,8 @@ object SequenceK {
       e,
       f,
       g,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+      unit, unit, unit, unit)
+     { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -145,10 +124,8 @@ object SequenceK {
       f,
       g,
       h,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+      unit, unit, unit)
+     { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
@@ -165,7 +142,7 @@ object SequenceK {
     i: Sequence<I>,
     map: (B, C, D, E, F, G, H, I) -> J
   ): Sequence<J> =
-    mapN(b, c, d, e, f, g, h, i, sequenceOf(Unit), sequenceOf(Unit)) { b, c, d, e, f, g, h, i, _, _ ->
+    mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ ->
       map(
         b,
         c,
@@ -194,7 +171,7 @@ object SequenceK {
     j: Sequence<J>,
     map: (B, C, D, E, F, G, H, I, J) -> K
   ): Sequence<K> =
-    mapN(b, c, d, e, f, g, h, i, j, sequenceOf(Unit)) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+    mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
   @Deprecated(
     "mapN for Sequence has become a top-level function.",
