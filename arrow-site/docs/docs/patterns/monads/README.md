@@ -179,7 +179,7 @@ Our sample API could look like this:
 
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
 
 object NotFound
 
