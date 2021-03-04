@@ -157,9 +157,7 @@ sealed class Resource<out A> {
     }
 
   fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
-    flatMap { r ->
-      other.map { r2 -> Pair(r, r2) }
-    }
+    zip(other, ::Pair)
 
   class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
 
