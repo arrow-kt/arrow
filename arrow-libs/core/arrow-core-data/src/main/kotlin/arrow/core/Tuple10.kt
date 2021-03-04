@@ -4,65 +4,44 @@
 package arrow.core
 
 data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
-  @Deprecated("Use first instead", ReplaceWith("first"))
-  val a: A,
-  @Deprecated("Use second instead", ReplaceWith("second"))
-  val b: B,
-  @Deprecated("Use third instead", ReplaceWith("third"))
-  val c: C,
-  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
-  val d: D,
-  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
-  val e: E,
-  @Deprecated("Use sixth instead", ReplaceWith("sixth"))
-  val f: F,
-  @Deprecated("Use seventh instead", ReplaceWith("seventh"))
-  val g: G,
-  @Deprecated("Use eighth instead", ReplaceWith("eighth"))
-  val h: H,
-  @Deprecated("Use ninth instead", ReplaceWith("ninth"))
-  val i: I,
-  @Deprecated("Use tenth instead", ReplaceWith("tenth"))
-  val j: J
+  val first: A,
+  val second: B,
+  val third: C,
+  val fourth: D,
+  val fifth: E,
+  val sixth: F,
+  val seventh: G,
+  val eighth: H,
+  val ninth: I,
+  val tenth: J
 ) {
 
-  val first: A = a
-  val second: B = b
-  val third: C = c
-  val fourth: D = d
-  val fifth: E = e
-  val sixth: F = f
-  val seventh: G = g
-  val eighth: H = h
-  val ninth: I = i
-  val tenth: J = j
-
   override fun toString(): String =
-    "($a, $b, $c, $d, $e, $f, $g, $h, $i, $j)"
+    "($first, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth, $ninth, $tenth)"
 
   companion object
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>, J : Comparable<J>>
 Tuple10<A, B, C, D, E, F, G, H, I, J>.compareTo(other: Tuple10<A, B, C, D, E, F, G, H, I, J>): Int {
-  val first = a.compareTo(other.a)
+  val first = first.compareTo(other.first)
   return if (first == 0) {
-    val second = b.compareTo(other.b)
+    val second = second.compareTo(other.second)
     if (second == 0) {
-      val third = c.compareTo(other.c)
+      val third = third.compareTo(other.third)
       if (third == 0) {
-        val fourth = d.compareTo(other.d)
+        val fourth = fourth.compareTo(other.fourth)
         if (fourth == 0) {
-          val fifth = e.compareTo(other.e)
+          val fifth = fifth.compareTo(other.fifth)
           if (fifth == 0) {
-            val sixth = f.compareTo(other.f)
+            val sixth = sixth.compareTo(other.sixth)
             if (sixth == 0) {
-              val seventh = g.compareTo(other.g)
+              val seventh = seventh.compareTo(other.seventh)
               if (seventh == 0) {
-                val eighth = h.compareTo(other.h)
+                val eighth = eighth.compareTo(other.eighth)
                 if (eighth == 0) {
-                  val ninth = i.compareTo(other.i)
-                  if (ninth == 0) j.compareTo(other.j)
+                  val ninth = ninth.compareTo(other.ninth)
+                  if (ninth == 0) tenth.compareTo(other.tenth)
                   else ninth
                 } else eighth
               } else seventh
