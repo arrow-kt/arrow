@@ -1333,6 +1333,10 @@ interface STM {
    * }
    * ```
    */
+  @Deprecated(
+    "Deprecated in favor of Kotlin's Pair",
+    ReplaceWith("this.plusAssign(Pair(kv.a, kv.b))")
+  )
   operator fun <K, V> TMap<K, V>.plusAssign(kv: Tuple2<K, V>): Unit = insert(kv.a, kv.b)
 
   /**
