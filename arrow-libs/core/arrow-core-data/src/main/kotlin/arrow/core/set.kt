@@ -4,10 +4,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.plus as _plus
 
-object SetExtensions
-
-object SortedSetInstances
-
 fun <A> Semigroup.Companion.set(): Semigroup<Set<A>> = object : Semigroup<Set<A>> {
   override fun Set<A>.combine(b: Set<A>): Set<A> =
     this._plus(b)

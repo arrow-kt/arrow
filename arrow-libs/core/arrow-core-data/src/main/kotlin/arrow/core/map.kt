@@ -4,10 +4,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
 
-object MapInstances
-
-object SortedMapInstances
-
 fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   _flatMap { entry ->
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
