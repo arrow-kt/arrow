@@ -1,6 +1,10 @@
 package arrow.core
 
 object SequenceK {
+  @PublishedApi
+    internal val unit: Sequence<Unit> =
+      sequenceOf(Unit)
+
   fun <B, C, D> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -9,15 +13,8 @@ object SequenceK {
     mapN(
       b,
       c,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+      unit, unit, unit, unit, unit, unit, unit, unit)
+     { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
   fun <B, C, D, E> mapN(
     b: Sequence<B>,
@@ -29,14 +26,8 @@ object SequenceK {
       b,
       c,
       d,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+      unit, unit, unit, unit, unit, unit, unit)
+     { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
   fun <B, C, D, E, F> mapN(
     b: Sequence<B>,
@@ -50,13 +41,8 @@ object SequenceK {
       c,
       d,
       e,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+      unit, unit, unit, unit, unit, unit)
+     { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
   fun <B, C, D, E, F, G> mapN(
     b: Sequence<B>,
@@ -72,12 +58,8 @@ object SequenceK {
       d,
       e,
       f,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+      unit, unit, unit, unit, unit)
+     { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
   fun <B, C, D, E, F, G, H> mapN(
     b: Sequence<B>,
@@ -95,11 +77,8 @@ object SequenceK {
       e,
       f,
       g,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+      unit, unit, unit, unit)
+     { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
 
   fun <B, C, D, E, F, G, H, I> mapN(
     b: Sequence<B>,
@@ -119,10 +98,8 @@ object SequenceK {
       f,
       g,
       h,
-      sequenceOf(Unit),
-      sequenceOf(Unit),
-      sequenceOf(Unit)
-    ) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+      unit, unit, unit)
+     { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
 
   fun <B, C, D, E, F, G, H, I, J> mapN(
     b: Sequence<B>,
@@ -135,7 +112,7 @@ object SequenceK {
     i: Sequence<I>,
     map: (B, C, D, E, F, G, H, I) -> J
   ): Sequence<J> =
-    mapN(b, c, d, e, f, g, h, i, sequenceOf(Unit), sequenceOf(Unit)) { b, c, d, e, f, g, h, i, _, _ ->
+    mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ ->
       map(
         b,
         c,
@@ -160,7 +137,7 @@ object SequenceK {
     j: Sequence<J>,
     map: (B, C, D, E, F, G, H, I, J) -> K
   ): Sequence<K> =
-    mapN(b, c, d, e, f, g, h, i, j, sequenceOf(Unit)) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+    mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
   fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
     b: Sequence<B>,
