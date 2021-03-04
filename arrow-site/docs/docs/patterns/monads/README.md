@@ -4,16 +4,9 @@ title: The Monad Tutorial
 permalink: /patterns/monads/
 ---
 
-## Monads explained in Kotlin (again)
-
-
-
-
 ### Credits
 
 This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples showing how they relate to standard library constructs.
-
-If you're just interested in the API, head down to the [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) typeclass page.
 
 ### Intro
 
@@ -59,18 +52,20 @@ I'm probably doomed to fail too, at least for some readers.
 
 The base element of each functional program is Function. In typed languages, each function is just a mapping between the type of its input parameter and output parameter. Such type can be annotated as `func: TypeA -> TypeB`.
 
-Kotlin is an object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to function `func` above. I can use a top level "static" method:
+Kotlin is a hybrid functional / object-oriented language, so we use top level functions or methods to declare functions. There are two ways to define a method comparable to function `func` above. I can use a top level "static" function:
 
-```kotlin
-fun func(a: ClassA): ClassB { ... }
+```kotlin:ank
+class ClassA
+class ClassB
+fun func(a: ClassA): ClassB = TODO()
 ```
 
 ... or an instance method:
 
-```kotlin
+```kotlin:ank
 class ClassA {
     // Instance method
-    fun func(): ClassB { ... }
+    fun func(): ClassB = TODO()
 }
 ```
 
@@ -80,25 +75,25 @@ How do we compose more complex workflows, programs, and applications out of such
 
 My sample code is going to be about conferences and speakers. The method implementations aren't really important. Just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
 
-```kotlin
+```kotlin:ank
 class Speaker {
-    fun nextTalk(): Talk { ... }
+    fun nextTalk(): Talk = TODO()
 }
 
 class Talk {
-    fun getConference(): Conference { ... }
+    fun getConference(): Conference = TODO()
 }
 
 class Conference {
-    fun getCity(): City { ... }
+    fun getCity(): City = TODO()
 }
 
-class City { ... }
+class City 
 ```
 
 These methods are currently very easy to compose into a workflow:
 
-```kotlin
+```kotlin:ank
 fun nextTalkCity(speaker: Speaker): City {
     val talk = speaker.nextTalk()
     val conf = talk.getConference()
@@ -109,7 +104,7 @@ fun nextTalkCity(speaker: Speaker): City {
 
 Because the return type of the previous step always matches the input type of the next step, we can write it even shorter:
 
-```kotlin
+```kotlin:ank
 fun nextTalkCity(speaker: Speaker): City =
   speaker
     .nextTalk()
@@ -117,35 +112,35 @@ fun nextTalkCity(speaker: Speaker): City =
     .getCity()
 ```
 
-This code looks quite readable. It's concise and it flows from top to bottom, from left to right, similar to how we are used to reading any text. There isn't much noise either.
+This code looks quite readable. It's concise, and it flows from top to bottom, from left to right, similar to how we are used to reading any text. There isn't much noise either.
 
 That's not what real codebases look like though, because there are multiple complications along the happy composition path. Let's look at some of them.
 
-### NULLs
+### Nullability
 
-Any class instance in Kotlin can be null. In the example above, I might get runtime errors if one of the methods ever returns null back.
+When interacting with Java or other languages whose function may return null with any type hints any value returned can be null. 
+
+In the example above, I might get runtime errors if one of the methods ever returns null back.
 
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
-```kotlin
+```kotlin:ank
 class Speaker {
-    fun nextTalk(): Talk? { ... }
+    fun nextTalk(): Talk? = null
 }
 
 class Talk {
-    fun getConference(): Conference? { ... }
+    fun getConference(): Conference? = null
 }
 
 class Conference {
-    fun getCity(): City? { ... }
+    fun getCity(): City? = null
 }
-
-class City { ... }
 ```
 
 Now, when composing our workflow, we need to take care of null results:
 
-```kotlin
+```kotlin:ank
 fun nextTalkCity(speaker: Speaker?): City? {
     if (speaker == null) return null
 
@@ -164,81 +159,68 @@ It's still the same method, but it has more noise now. Even though I used short-
 
 To fight that problem, smart language designers came up with the [Safe Call Operator](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls):
 
-```kotlin
-fun nextTalkCity(speaker: Speaker?): City? {
-    return
-        speaker
-        ?.nextTalk()
-        ?.getConference()
-        ?.getCity()
-}
+```kotlin:ank
+fun nextTalkCity(speaker: Speaker?): City? =
+  speaker
+    ?.nextTalk()
+    ?.getConference()
+    ?.getCity()
 ```
 
 Now we are almost back to our original workflow code: It's clean and concise, but we still have 3 extra `?` symbols hanging around.
 
 Let's take another leap.
 
-### Collections
+### Errors
 
-Quite often, a function returns a collection of items, not just a single item. To some extent, that's a generalization of `null` case: With `T?`, we might get 0 or 1 results back, while, with a collection, we can get 0 to any n results.
+Quite often, a function returns a `success` or an `error`, not just a `null` value as we did before. To some extent, that's a generalization of `null` case: With `T?`, we might get 0 or 1 results back, while, with something like `Either` or an similar type, we can get failure or success results.
 
 Our sample API could look like this:
 
-```kotlin
+```kotlin:ank
+import arrow.core.Either
+import arrow.core.Either.Left
+
+object NotFound
+
 class Speaker {
-    fun getTalks(): List<Talk> { ... }
+    fun getTalk(): Either<NotFound, Talk> = 
+      Left(NotFound)
 }
 
 class Talk {
-    fun getConferences(): List<Conference> { ... }
+    fun getConference(): Either<NotFound, Conference> = 
+      Left(NotFound)
 }
 
 class Conference {
-    fun getCities(): List<City> { ... }
+    fun getCity(): Either<NotFound, City> =
+      Left(NotFound)
 }
 ```
-
-I used `List<T>`, but it could be any class or even a `Sequence<T>`.
 
 How would we combine the methods into one workflow? The traditional version would look like this:
 
-```kotlin
-fun allCitiesToVisit(speaker: Speaker): List<City> {
-    val result = mutableListOf<City>()
+```kotlin:ank
+import arrow.core.flatMap
 
-    for (talk in speaker.getTalks())
-        for (conf in talk.getConferences())
-            for (city in conf.getCities())
-                result.add(city)
-
-    return result
-}
+fun cityToVisit(speaker: Speaker): Either<NotFound, City> =
+  speaker
+    .getTalk()
+    .flatMap { talk -> talk.getConference() }
+    .flatMap { conf -> conf.getCity() }
 ```
 
-It still reads ok-ish. But the combination of nested loops and mutation with some conditionals sprinkled on them can get unreadable pretty fast. The exact workflow might be lost in the mechanics.
-
-As an alternative, the Kotlin language designers included extension methods. We can write code like this:
-
-```kotlin
-fun allCitiesToVisit(speaker: Speaker): List<City> {
-    return
-        speaker
-        .getTalks()
-        .flatMap { talk -> talk.getConferences() }
-        .flatMap { conf -> conf.getCities() }
-}
-```
+It still reads ok-ish. But the combination of flatMaps can get unreadable pretty fast, specially in a more complex model with further nesting. The exact workflow might be lost in the mechanics.
 
 Let me do one additional trick and format the same code in an unusual way:
 
-```kotlin
-fun allCitiesToVisit(Speaker speaker): List<City> {
-    return
-        speaker
-        .getTalks()           .flatMap { x -> x
-        .getConferences()    }.flatMap { x -> x
-        .getCities()         }
-}
+```kotlin:ank
+fun cityToVisit(speaker: Speaker): Either<NotFound, City> =
+  speaker
+   .getTalk()           .flatMap { x -> x
+   .getConference()    }.flatMap { x -> x
+   .getCity()         }
 ```
 
 Now you can see the original code on the left, combined with just a bit of technical repetitive clutter on the right. Hold on, I'll show you where I'm going.
@@ -248,52 +230,49 @@ Let's discuss another possible complication.
 ### Asynchronous Calls
 
 What if our methods need to access some remote database or service to produce the results? This should be shown in type signature,
-and we can imagine a library providing a `Task<T>` type for that:
+and we can imagine a library providing a `Task<T>`, `IO<A>`, `Mono<A>` type for that.
+Luckily in Kotlin we have `suspend` functions which fix the problem of nesting and callbacks all around.
+Kotlin suspension is an ideal place to use monads because it allows imperative and direct syntax over monadic data types without the burden of flatMap chains.
 
-```kotlin
+```kotlin:ank
 class Speaker {
-    fun nextTalk(): Task<Talk> { ... }
+    suspend fun nextTalk(): Talk = TODO()
 }
 
 class Talk {
-    fun getConference(): Task<Conference> { ... }
+    suspend fun getConference(): Conference = TODO()
 }
 
 class Conference {
-    fun getCity(): Task<City> { ... }
+    suspend fun getCity(): City = TODO()
 }
 ```
 
-This change breaks our nice workflow composition again.
+This change fixes our nice workflow composition again.
 
-```kotlin
-fun nextTalkCity(speaker: Speaker): Task<City> {
-    return
-        speaker.nextTalk().execute()
-        .then { talk -> talk.getConference() }.execute()
-        .then { conf -> conf.getCity() }.execute()
+```kotlin:ank
+suspend fun nextTalkCity(speaker: Speaker): City {
+  val talk = speaker.nextTalk()
+  val conf = talk.getConference()
+  val city = conf.getCity()
+  return city
 }
 ```
 
-It's hard to read, but let me apply my formatting trick again:
+or simply
 
-```kotlin
-fun nextTalkCity(speaker: Speaker): Task<City> {
-    return
-        speaker
-        .nextTalk()         .execute().then { x -> x
-        .getConference()   }.execute().then { x -> x
-        .getCity()         }
-}
+```kotlin:ank
+suspend fun nextTalkCity(speaker: Speaker): City =
+  speaker.nextTalk().getConference().getCity()
 ```
 
-You can see that, once again, it's our nice, readable workflow on the left, plus some mechanical repeatable junction code on the right.
+You can see that, once again, it's our nice, readable workflow.
 
 ### Pattern
 
 Can you see a pattern yet?
 
-I'll repeat the `T?`, `List<T>`, `Task<T>`-based workflows again:
+I'll repeat the `T?`, `Either<NotFound, T>`, `suspend () -> T`-based workflows again:
 
 ```kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
@@ -304,7 +283,7 @@ fun nextTalkCity(speaker: Speaker?): City? {
         .getCity()
 }
 
-fun allCitiesToVisit(speaker: Speaker): List<City> {
+fun allCitiesToVisit(speaker: Speaker): Either<NotFound, City> {
     return
         speaker
         .getTalks()            .flatMap { x -> x
@@ -312,18 +291,22 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
         .getCities()          }
 }
 
-fun nextTalkCity(speaker: Speaker): Task<City> {
+suspend fun nextTalkCity(speaker: Speaker): City {
     return
         speaker
-        .nextTalk()            .execute().then { x -> x
-        .getConference()      }.execute().then { x -> x
-        .getCity()            }
+        .nextTalk()           
+        .getConference()     
+        .getCity()            
 }
 ```
 
-In all 3 cases, there was a complication that prevented us from sequencing method calls fluently. In all 3 cases, we found the gluing code to get back to fluent composition.
+In the first 2 cases, there was a complication that prevented us from sequencing method calls fluently.
+In the last case with `suspend` functions we have the maximum expression and simplification where we observe there is no need to call `flatMap` or create any callbacks. 
+Kotlin `suspend` is a form of the Continuation monad from which other monads can be generalized and composed thanks to its async and concurrent capable nature.
+Using `suspend` callback and completion features Arrow is able to bring direct syntax to all these monadic data-types.
 
-Let's try to generalize this approach. Given some generic container type `WorkflowThatReturns<T>`, we have a method to combine an instance of such a workflow with a function that accepts the result of that workflow and returns another workflow back:
+Let's try to generalize this approach from the very beginning. 
+Given some generic container type `WorkflowThatReturns<T>`, we have a method to combine an instance of such a workflow with a function that accepts the result of that workflow and returns another workflow back:
 
 ```kotlin
 class WorkflowThatReturns<T> {
@@ -341,7 +324,7 @@ We call `addStep` with a function, which maps `T` to `U` sitting inside yet anot
 
 We get an instance of `U`, but inside two containers.
 
-Two containers are automatically unwrapped into a single container to get back to the original shape.
+Two nested containers are automatically flattened into a single container to get back to the original shape.
 
 Now we are ready to add another step!
 
@@ -365,318 +348,249 @@ Subsequently, `addStep` is called two times to transfer to `Conference` and then
 
 The name of this pattern is **Monad**.
 
-In Arrow terms, a Monad is an interface with two operations: A constructor `just`, and `flatMap`.
+In Arrow terms, a Monad can be implemented by means of the Effect interface.
+
+The `Effect` interface defines the ability to have a scope in which a coroutine can be used to complete the context or yield a value.
 
 ```kotlin
-interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
-    fun <A> just (instance: A): Kind<F, A> // this comes from [Applicative] interface
-
-    fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>) : Kind<F, B>
+fun interface Effect<F> {
+  fun control(): DelimitedScope<F>
 }
 ```
 
-See that, instead of `WorkflowThatReturns<A>`, our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/patterns/glossary/#type-constructors' | relative_url }}).
+We can then define specific effects for our data types that implement Monad bind.
 
-The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
+```kotlin:ank
+import arrow.continuations.Effect
 
-We can think of `flatMap` as a combination of `map` and `flatten`, as defined by the following signature:
-
-```kotlin
-fun <F, A, B> Kind<F, A>.map(f: (A) ->  B): Kind<F, B> // Inherited from Functor
-
-fun <F, A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A>
-
-container
-  .map { x -> just(x + 1) } // Kind<F, Kind<F, Int>>
-  .flatten() // Kind<F, Int>
+fun interface NullableEffect<A> : Effect<A?> {
+  suspend fun <B> B?.bind(): B =
+    this ?: control().shift(null)
+}
 ```
 
-Even though I spent quite some time with examples, I expect you to be slightly confused at this point. That's ok.
+Monad `bind` is then implemented by shifting out of the context with `null` if the value being bound happens to be null or yielding the value by returning it if not null.
 
-Keep going and let's have a look at several sample implementations of Monad pattern.
+`control().shift(value)` can be seen as a functional throw. Once we pass a value the context of our Effect will exit with `value`.
+
+With `control().shift` based on the `Effect` interface we can implement monad bind short-circuiting and other patterns supported by the Continuation monad for arbitrary data types.
+
+```kotlin:ank
+object nullable {
+  operator fun <A> invoke(func: suspend NullableEffect<*>.() -> A?): A? =
+    Effect.restricted(eff = { NullableEffect { it } }, f = func, just = { it })
+}
+```
+
+The argument `just` in `Effect` is used to put the result of the computation expression in the Effect we are modeling, in this case nullability and absence typed as `A?`.
+
+In the example above we saw that in order to form a Monad we need a `just` constructor used in the effect block and an implementation for `suspend bind` declared in a subtype of the `Effect` interface.
+
+The Effect interface provides a `restricted` scope for pure computations that do not require suspension and a `suspended` block for those that do require suspension.
+
+Finally we can use our new `nullable` effect block, and its `bind` function to compute over the happy path of nullable typed values.
+
+```kotlin:ank
+suspend fun nextTalkCity(maybeSpeaker: Speaker?): City? =
+  nullable {
+    val speaker = maybeSpeaker.bind()
+    val talk = speaker.nextTalk().bind()
+    val conf = talk.getConference().bind()
+    val city = conf.getCity().bind()
+    city
+  }
+```
+
+Even though I spent quite some time with examples, we expect you to be slightly confused at this point. That's ok.
+
+Keep going and let's have a look at several sample implementations of the Monad pattern.
 
 ### Option
 
 My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it might have a value, but might not).
 
-Option is another approach to dealing with "no value" value, an alternative to the concept of null. You can read more about [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implements it.
+While nullable types are faster, Option is still required in some cases for interoperability with Java and polymorphism where you may want to represent nesting with `Option<Option<A>>`. Having said that we still recommend you use nullable types over Option where possible as the Kotlin language provides direct support for them in the type system.
+
+Option is yet another approach to dealing with absence of a value, an alternative to the concept of `null`. You can read more about [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implements it.
 
 When null is not allowed, any API contract gets more explicit: Either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.
 
 Given an imaginary repository contract (which does something with customers and orders):
 
-```kotlin
-interface OptionAwareRepository {
-    fun getCustomer(id: Int): Option<Customer>
+```kotlin:ank
+import arrow.core.Option
+import arrow.core.None
 
-    fun getAddress(id: Int): Option<Address>
+data class Customer(val addressId: Int)
+data class Address(val id: Int, val lastOrder: Option<Order> = None)
+data class Order(val id: Int, val shipper: Shipper = Shipper)
+object Shipper
 
-    fun getOrder(id: Int): Option<Order>
+interface OptionRepository {
+  fun getCustomer(id: Int): Option<Customer> = None
+  fun getAddress(id: Int): Option<Address> = None
+  fun getOrder(id: Int): Option<Order> = None
 }
 ```
 
-The client can be written with `flatMap` method composition, without branching, in fluent style:
+The monad `bind` behavior can be written without `flatMap` in a direct style:
 
-```kotlin
-fun shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
-    repo.getCustomer(customerId)
-        .flatMap { c -> c.address }
-        .flatMap { a -> repo.getAddress(a.id) }
-        .flatMap { a -> a.lastOrder }
-        .flatMap { lo -> repo.getOrder(lo.id) }
-        .flatMap { o -> o.shipper }
-```
-
-### Sequence can implement Monad
-
-Sequence is an interface for enumerable containers.
-
-You might have used `Sequence<T>` before, but what you probably didn't know is that it's a container type that fills the requirements of a Monad: Sequences can be constructed, and they can be flatMapped.
-
-Here's the signature of `flatMap`, as defined in the [Kotlin standard library](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/flat-map.html):
-
-```kotlin
-fun <T, R> Sequence<T>.flatMap(
-    transform: (T) -> Sequence<R>
-): Sequence<R>
-```
-
-And here is an example of composition:
-
-```kotlin
-val shippers: Sequence<Shipper> =
-    customers
-        .flatMap { c -> c.addresses }
-        .flatMap { a -> a.orders }
-        .flatMap { o -> o.shippers }
-```
-
-The query has no idea about how the collections are stored (encapsulated in containers). We use functions of type `A -> Sequence<B>` to produce new sequences using the `flatMap` operation.
-
-### Deferred (Future)
-
-In the Kotlin coroutines library, `Deferred<T>` type is used to denote asynchronous computation, which will eventually return an instance of `T`.
-The other names for similar concepts in other languages are Promise and Future.
-
-While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
-
-```kotlin
-class Future<T>(
-    val instance: Deferred<T>
-): Kind<ForFuture, A> {
-    constructor(instance: T) {
-        this.instance = async(LAZY) { instance }
-    }
-
-    constructor(instance: Deferred<T>) {
-        this.instance = instance
-    }
-
-    fun <U> flatMap(func: (T) -> Future<U>): Future<U> =
-        Future(async(LAZY) {
-            val t = instance.await()
-            func(t).await()
-        })
-
-    fun runSync(action: (Try<T>) -> Unit) =
-        runBlocking { action(Try { instance.await() }) }
+```kotlin:ank
+fun interface OptionEffect<A> : Effect<Option<A>> {
+  suspend fun <B> Option<B>.bind(): B =
+    fold({ control().shift(None) }, { it })
 }
+
+object option {
+  operator fun <A> invoke(func: suspend OptionEffect<*>.() -> A?): Option<A> =
+    Effect.restricted(eff = { OptionEffect { it } }, f = func, just = { Option.fromNullable(it) })
+}
+
+suspend fun OptionRepository.shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
+  option {
+    val customer = getCustomer(customerId).bind() 
+    val address = getAddress(customer.addressId).bind()
+    val lastOrder = address.lastOrder.bind()
+    val order = getOrder(lastOrder.id).bind()
+    order.shipper
+  }
 ```
 
-Effectively, it's just a wrapper around the Deferred, which doesn't add too much value, but it's a useful illustration because now we can do:
-
-```kotlin
-repository
-    .loadSpeaker()
-    .flatMap { speaker -> speaker.nextTalk()
-        .flatMap { talk -> talk.getConference() }
-        .flatMap { conference -> conference.getCity().map { it to speaker } }
-    }
-    .runSync { (city, speaker) -> city.fold(
-        { Logger.logError(it); reservations.cancel() },
-        { reservations.bookFlight(speaker, city) })
-    }
-```
-
-We are back to the familiar structure. Time for some more complications.
+We observe here how in the same way we implemented and used monad comprehensions for nullable types, we now implement the same Monad pattern, this time over `Option`. Fortunately Arrow already provides all these effect builders for all the data types that support monadic behavior.
 
 ### Abstraction for all Monads
 
 We're going to dispel one common misconception.
 Sometimes the word Monad is used to refer to types like Option, Future, Either, and so on, and that's not correct.
-Those are called datatypes or just types. Let's see the difference!
+Those are called data-types or just types. Let's see the difference!
 
-As you have seen, neither Future nor Option implement Monad directly.
-This is intentional, as you can potentially have several Monad implementations for a single type.
-For example, RxJava's Observable can be chained using `flatMap`, `switchMap`, and `concatMap`, and using each is still a Monad.
+As you have seen, neither A? nor Option implement Monad directly. Their actual `bind` and `just` capabilities are described by implementing the `Effect` interface.
 
-Instead, Arrow specifies that Monad must be implemented by a separate object or class, referred to as the "instance of Monad for type F".
+This is intentional, as you can potentially have several Monad implementations for a single type or even mix non-monadic effects inside `Effect` interfaces in order to provide more expressive DSLs. This is notorious in the actual Arrow implementations where effects such as `Either` can perform different forms of monad bind over multiple types like `Either` and `Validated` using the same idioms.
 
-```kotlin
-object FutureMonad: Monad<ForFuture> {
-    override fun <A> just (instance: A): Future<A> =
-        Future(a)
+Arrow specifies that Monad capabilities must be implemented by a separate object or class in terms of the `Effect` interface, referred to as the "instance of Monad for type F" or "computation expression for F".
 
-    override fun <A, B> Kind<ForFuture, A>.flatMap(f: (A) ->  Kind<ForFuture, B>): Future<B> =
-        flatMap(f) // as per precedence rules the class method is called
-}
-
-object OptionMonad: Monad<ForOption> {
-    override fun <A> just (instance: A): Option<A> =
-        Some(a)
-
-    // OptionOf<T> is an alias for Kind<ForOption, T>
-    override fun <A, B> OptionOf<A>.flatMap(f: (A) ->  OptionOf<B>): Option<B> =
-        flatMap(f)
-}
-
-object ObservableSwitchMonad: Monad<ForObservable> {
-    override fun <A> just (instance: A): Observable<A> =
-        Observable.just(a)
-
-    // ObservableOf<T> is an alias for Kind<ForObservable, T>
-    override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
-        switchMap(f)
-}
-
-object ObservableConcatMonad: Monad<ForObservable> {
-    override fun <A> just (instance: A): Observable<A> =
-        Observable.just(a)
-
-    // ObservableOf<T> is an alias for Kind<ForObservable, T>
-    override fun <A, B> ObservableOf<A>.flatMap(f: (A) ->  ObservableOf<B>): Observable<B> =
-        concatMap(f)
-}
-```
-
-What are the benefits of separating the instances from the direct implementation, causing a duplication in methods and an extra layer of indirection?
-
-The main use case is allowing you to write code that is generic for any object that can provide a Monad instance object.
-
-```kotlin
-fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Shipper> =
-    repo.getCustomer(customerId)
-        .flatMap { c -> c.address }
-        .flatMap { a -> repo.getAddress(a.id) }
-        .flatMap { a -> a.lastOrder }
-        .flatMap { lo -> repo.getOrder(lo.id) }
-        .flatMap { o -> o.shipper }
-```
-In this case, like with any other interface, Monad defines the API and behavior, but not the implementation details.
-This pattern is specially useful for libraries that must remain agnostic to implementations, and gives them a *lingua franca* when building on top of each other.
-
-Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions that can be reused by other codebases.
-
-You can read more about generalizing code in the [glossary]({{ '/patterns/glossary' | relative_url }}) and [typeclasses intro]({{ '/typeclasses/intro' | relative_url }}).
-
-### Non-Sequential Workflows
-
-Up until now, all the composed workflows had very linear, sequential structure: The output of a previous step was always the input for the next step.
-That piece of data could be discarded after the first use because it was never needed for later steps:
-
-![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//linear-workflow.png)
-
-Quite often though, this might not be the case. A workflow step might need data from two or more previous steps combined.
-
-In the example above, `bookFlight` method might actually needs both `Speaker` and `City` objects:
-
-![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//non-linear-workflow.png)
-
-In this case, we would have to use a lambda to save the speaker variable until we get a talk too:
-
-```kotlin
-repository
-    .loadSpeaker()
-    .runSync { speaker ->
-        speaker
-            .nextTalk()
-            .flatMap { talk -> talk.getConference() }
-            .flatMap { conference -> conference.getCity() }
-            .runSync { city -> city.fold(
-                { Logger.logError(it); reservations.cancel() },
-                { reservations.bookFlight(speaker, city) })
-            }
-        )
-    }
-```
-
-Obviously, this gets ugly very fast.
-
-To solve this structural problem, the Kotlin language introduced coroutines—the design that was inspired by other languages such as C# and JavaScript.
-
-If we move back to using Deferred instead of our custom Future, we are able to write:
-
-```kotlin
-val speaker = repository.loadSpeaker().await()
-val talk = speaker.nextTalk().await()
-val conference = talk.getConference().await()
-val city = conference.getCity().await()
-reservations.bookFlight(speaker, city).await()
-```
-
-Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
-
-By using coroutines, Arrow provides a specialization that enables readable async/await style code for any Monad.
-This specialization can be accessed using the function `binding` on any Monad, and the method `bind`. Internally, `Monad#flatMap` is used for chaining.
-
-```kotlin
-fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
-    M.fx.monad {
-        val (speaker) = repository.loadSpeaker()
-        val (talk) = speaker.nextTalk()
-        val (conference) = talk.getConference()
-        val (city) = conference.getCity()
-        reservations.bookFlight(speaker, city)()
-    }
-
-bookSpeakersFlights(ObservableSwitchMonad).fix() // Observable<Reservation>
-
-bookSpeakersFlights(OptionMonad).fix() // Option<Reservation>
-
-bookSpeakersFlights(ListMonad).fix() // List<Reservation>
-```
-
-These are called [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
+More info on binding and effects is available at [Computation Expressions and Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
 ### Monad Laws
 
-There are a couple laws that `just` constructor and `flatMap` need to adhere to, so that they produce a Monad with a stable implementation.
-These laws are encoded in Arrow as tests you can find in the `arrow-core-test` module, and are already tested for all instances in the library.
+A typical monad tutorial will place a lot of emphasis on the laws, but we find them less important to explain to folks learning about Monads for usage purposes. Nonetheless, here they are for the sake of completeness or for those cases where you wish to implement your own monad or Effect instances.
 
-A typical monad tutorial will place a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
+There are a couple laws that the `just` constructor and `bind` need to adhere to consider the Effect a Monad with a stable implementation.
+These laws are encoded in Arrow as tests and are already applied on all `Effect` instances in the library.
 
-`Left Identity law` says that Monad constructor is a neutral operation: You can safely run it before `flatMap`, and it won't change the result of the function call:
+Let us re-write the laws in effect-notation. `effect` here represents `either`, `option` or any effect implementing `suspend bind` and a constructor here represented as `just`.
 
+`Left Identity law` says that Monad constructor is a neutral operation: You can safely run it before `bind`, and it won't change the result of the function call:
+
+To demonstrate the laws we will use this version of the Identity monad and we will name it `Just`.
+Unlike `Option`, `Either` and other types here `Just` has no effect and simply models access to the identity of a value of type `A`
+
+```kotlin:ank
+data class Just<out A>(val value: A)
+
+fun interface JustEffect<A> : Effect<Just<A>> {
+  suspend fun <B> Just<B>.bind(): B = value
+}
+
+object effect {
+  operator fun <A> invoke(func: suspend JustEffect<*>.() -> A): Just<A> =
+    Effect.restricted(eff = { JustEffect { it } }, f = func, just = { Just(it) })
+}
 ```
-// Given
-val value: A
-val f: (A) -> Kind<F, B>
 
-// Then (== means both parts are equivalent)
-just(value).flatMap(f) == f(value)
+Left identity:
+
+Let's define `x` && `f` as
+
+```kotlin:ank
+fun f(x: Int): Just<Int> = Just(x)
+val x = 1
 ```
 
-`Right Identity law` says that, given a monadic value, wrapping its contained data into another monad of same type and then `flatMap` it doesn't change the original value:
+then
 
+```kotlin:ank
+effect { 
+  val x2 = Just(x).bind()
+  f(x2).bind()
+}
 ```
-// Given
-val monadicValue: Kind<F, A>
 
-// Then (== means both parts are equivalent)
-monadicValue.flatMap { x -> just(x) } == monadicValue
+is the same as 
+
+```kotlin:ank
+effect { 
+ f(x).bind() 
+}
 ```
 
-`Associativity law` means that the order in which `flatMap` operations are composed does not matter:
+`Right Identity law` says that, given a monadic value, wrapping its contained data into another monad of same type and then `bind` it doesn't change the original value:
 
+Right identity:	
+
+Given `m` defined as
+
+```kotlin:ank
+val m = Just(0)
 ```
-// Given
-val m: Kind<F, T>
-val f: (T) -> Kind<F, U>
-val g: (U) -> Kind<F, V>
 
-// Then (== means both parts are equivalent)
-m.flatMap(f).flatMap(g) == m.flatMap { a -> f(a).flatMap(g) }
+then
+
+```kotlin:ank
+effect { 
+  val x = m.bind()
+  Just(x).bind()
+}
+```
+
+is the same as
+
+```kotlin:ank
+effect { m.bind() }
+```
+
+`Associativity law` means that the order in which `bind` operations are composed does not matter.
+
+Associativity:
+
+Given `m`, `f` and `g` are defined as
+
+```kotlin:ank
+val m = Just(0)
+fun f(x: Int): Just<Int> = Just(x)
+fun g(x: Int): Just<Int> = Just(x + 1)
+```
+
+All the 3 example below are the same
+
+```kotlin:ank
+effect { 
+  val y = effect { 
+    val x = m.bind()
+    f(x).bind()
+  }.bind()
+  g(y).bind()
+}
+```
+
+```kotlin:ank
+effect { 
+  val x = m.bind()
+  effect { 
+    val y = f(x).bind()
+    g(y).bind()
+  }.bind()
+}
+```
+
+```kotlin:ank
+effect { 
+  val x = m.bind()
+  val y = f(x).bind()
+  g(y).bind()
+}
 ```
 
 The laws may look complicated, but, in fact, they are very natural expectations that any developer has when working with monads, so don't spend too much mental effort on memorizing them.
@@ -685,5 +599,4 @@ The laws may look complicated, but, in fact, they are very natural expectations 
 
 Don't be afraid of the "M-word" just because you are a Kotlin programmer.
 
-Kotlin does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world.
-Having said that, it's also true that Kotlin is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.
+Kotlin has a notion of monads as predefined language construct through its suspension system and this gives us tremendous power to write monadic applications in direct style using suspend functions and continuations with Kotlin and Arrow.
