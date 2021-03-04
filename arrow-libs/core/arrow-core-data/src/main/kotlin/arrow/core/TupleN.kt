@@ -1027,6 +1027,10 @@ fun <A, B> Tuple2<A, B>.toPair(): Pair<A, B> = Pair(this.a, this.b)
 )
 fun <A, B> Pair<A, B>.toTuple2(): Tuple2<A, B> = Tuple2(this.first, this.second)
 
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Please use Triple values instead.",
+  level = DeprecationLevel.WARNING
+)
 fun <A, B, C> Tuple3<A, B, C>.toTriple(): Triple<A, B, C> = Triple(this.a, this.b, this.c)
 
 @Deprecated(
