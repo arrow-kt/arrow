@@ -28,14 +28,17 @@ options:
       - title: Iterable
         url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-iterable/
 
-      - title: NonEmptyList
-        url: /arrow/core/nonemptylist/
+      - title: Option
+        url: /apidocs/arrow-core-data/arrow.core/-option/
 
       - title: List
         url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-list/
 
+      - title: NonEmptyList
+        url: /arrow/core/nonemptylist/
+
       - title: Sequence
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-sequence/
+        url: /apidocs/arrow-core-data/arrow.core/kotlin.sequences.-sequence/
 
       - title: Set
         url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-set/
@@ -52,20 +55,11 @@ options:
       - title: Semigroup
         url: /arrow/typeclasses/semigroup/
 
-      - title: Semigroupal
-        url: /apidocs/arrow-core-data/arrow.typeclasses/-semigroupal/
-
-      - title: Monoidal
-        url: /apidocs/arrow-core-data/arrow.typeclasses/-monoidal/
-
       - title: Monoid
         url: /arrow/typeclasses/monoid/
 
       - title: Semiring
         url: /apidocs/arrow-core-data/arrow.typeclasses/-semiring/
-
-      - title: Option
-        url: /apidocs/arrow-core-data/arrow.core/-option/
 
   - title: Media
     url: https://media.arrow-kt.io/tags/core/
