@@ -100,18 +100,19 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
   j: Iterable<J>,
   k: Iterable<K>,
   map: (B, C, D, E, F, G, H, I, J, K) -> L
-): List<L> =
-  b.flatMap { bb ->
-    c.flatMap { cc ->
-      d.flatMap { dd ->
-        e.flatMap { ee ->
-          f.flatMap { ff ->
-            g.flatMap { gg ->
-              h.flatMap { hh ->
-                i.flatMap { ii ->
-                  j.flatMap { jj ->
-                    k.map { kk ->
-                      map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+): List<L> {
+  val buffer = ArrayList<L>()
+  for (bb in b) {
+    for (cc in c) {
+      for (dd in d) {
+        for (ee in e) {
+          for (ff in f) {
+            for (gg in g) {
+              for (hh in h) {
+                for (ii in i) {
+                  for (jj in j) {
+                    for (kk in k) {
+                      buffer.add(map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk))
                     }
                   }
                 }
@@ -122,6 +123,8 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
       }
     }
   }
+  return buffer
+}
 
 fun <A> Semigroup.Companion.list(): Semigroup<List<A>> =
   Monoid.list()
