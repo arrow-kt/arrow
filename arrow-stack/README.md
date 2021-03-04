@@ -14,7 +14,6 @@ dependencies {
     implementation "io.arrow-kt:arrow-core"
     implementation "io.arrow-kt:arrow-fx"
     implementation "io.arrow-kt:arrow-mtl"
-    implementation "io.arrow-kt:arrow-syntax"
     ...
 }
 ```
