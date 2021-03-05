@@ -7,7 +7,6 @@ import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.SortedMapK
 import arrow.core.Tuple10
 import arrow.core.Tuple4
 import arrow.core.Tuple5
@@ -17,7 +16,6 @@ import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.Validated
 import arrow.core.align
-import arrow.core.k
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toOption
@@ -121,9 +119,6 @@ fun <E, A> Gen.Companion.validated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E,
 
 fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
   gen.flatMap { head -> Gen.list(gen).map { NonEmptyList(head, it) } }
-
-fun <K : Comparable<K>, V> Gen.Companion.sortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
-  Gen.bind(genK, genV) { k: K, v: V -> sortedMapOf(k to v) }.map { it.k() }
 
 fun <A> Gen.Companion.sequence(genA: Gen<A>): Gen<Sequence<A>> =
   Gen.list(genA).map { it.asSequence() }
