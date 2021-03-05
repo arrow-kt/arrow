@@ -1,10 +1,16 @@
 package arrow.core
 
+@Deprecated("SequenceK object is deprecated, and will be removed in 1.0.0")
 object SequenceK {
-  @PublishedApi
-    internal val unit: Sequence<Unit> =
-      sequenceOf(Unit)
 
+  @PublishedApi
+  internal val unit: Sequence<Unit> =
+    sequenceOf(Unit)
+
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, map)", "arrow.core.mapN")
+  )
   fun <B, C, D> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -16,6 +22,10 @@ object SequenceK {
       unit, unit, unit, unit, unit, unit, unit, unit)
      { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -29,6 +39,10 @@ object SequenceK {
       unit, unit, unit, unit, unit, unit, unit)
      { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -44,6 +58,10 @@ object SequenceK {
       unit, unit, unit, unit, unit, unit)
      { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -61,6 +79,10 @@ object SequenceK {
       unit, unit, unit, unit, unit)
      { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G, H> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -80,6 +102,10 @@ object SequenceK {
       unit, unit, unit, unit)
      { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G, H, I> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -101,6 +127,10 @@ object SequenceK {
       unit, unit, unit)
      { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G, H, I, J> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -125,6 +155,10 @@ object SequenceK {
       )
     }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, j, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G, H, I, J, K> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
@@ -139,6 +173,10 @@ object SequenceK {
   ): Sequence<K> =
     mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
+  @Deprecated(
+    "mapN for Sequence has become a top-level function.",
+    ReplaceWith("mapN(b, c, d, e, f, g, h, i, j, k, map)", "arrow.core.mapN")
+  )
   fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
     b: Sequence<B>,
     c: Sequence<C>,
