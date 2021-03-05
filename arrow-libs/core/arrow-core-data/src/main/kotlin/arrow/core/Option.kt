@@ -411,6 +411,9 @@ sealed class Option<out A> : OptionOf<A> {
     )
     fun <A> empty(): Option<A> = None
 
+    fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
+      { it.map(f) }
+
     @PublishedApi
     internal val unit: Option<Unit> = Some(Unit)
 
