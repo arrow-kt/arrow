@@ -696,7 +696,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold(
       { a -> fa(a).map { Left(it) } },
       { b -> fb(b).map { Right(it) } },
-      { a, b -> ListK.mapN(fa(a), fb(b)) { aa, c -> Both(aa, c) } }
+      { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
     )
 
   inline fun <AA, C, D> bitraverseEither(
