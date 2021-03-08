@@ -63,17 +63,9 @@ sealed class Eval<out A> {
       f(a).flatMap { eval: Either<A, B> ->
         when (eval) {
           is Either.Left -> tailRecM(eval.value, f)
-          is Either.Right -> just(eval.value)
+          is Either.Right -> now(eval.value)
         }
       }
-
-    @Deprecated(
-      "just is deprecated in favor of now",
-      ReplaceWith("now(a)"),
-      DeprecationLevel.WARNING
-    )
-    fun <A> just(a: A): Eval<A> =
-      now(a)
 
     /**
      * Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
@@ -389,13 +381,6 @@ sealed class Eval<out A> {
   inline fun <B> coflatMap(crossinline f: (Eval<A>) -> B): Eval<B> =
     Later { f(this) }
 
-  @Deprecated(
-    "extract is deprecated in favor of value",
-    ReplaceWith("value()"),
-    DeprecationLevel.WARNING
-  )
-  fun extract(): A = value()
-
   /**
    * Construct an eager Eval<A> instance. In some sense it is equivalent to using a val.
    *
@@ -518,11 +503,11 @@ fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> 
   fb.map { zip(it, f) }
 
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
-  if (n <= 0) Eval.just(emptyList())
+  if (n <= 0) Eval.now(emptyList())
   else Eval.mapN(this, replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
 
 fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
-  if (n <= 0) Eval.just(MA.empty())
+  if (n <= 0) Eval.now(MA.empty())
   else Eval.mapN(this@replicate, replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }
 
