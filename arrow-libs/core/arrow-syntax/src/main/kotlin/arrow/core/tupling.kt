@@ -1,39 +1,5 @@
 package arrow.core
 
-import arrow.core.Tuple10
-import arrow.core.Tuple11
-import arrow.core.Tuple12
-import arrow.core.Tuple13
-import arrow.core.Tuple14
-import arrow.core.Tuple15
-import arrow.core.Tuple16
-import arrow.core.Tuple17
-import arrow.core.Tuple18
-import arrow.core.Tuple19
-import arrow.core.Tuple2
-import arrow.core.Tuple20
-import arrow.core.Tuple21
-import arrow.core.Tuple22
-import arrow.core.Tuple3
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
-
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use paired() when using Pair.",
-  ReplaceWith("{ (t1, t2) -> this(t1, t2) }")
-)
-fun <T1, T2, R> ((T1, T2) -> R).tupled(): (Tuple2<T1, T2>) -> R = { (t1, t2) -> this(t1, t2) }
-
-@Deprecated(
-  "Tuple3 is deprecated in favor of Kotlin's Triple. Use tripled() when using Triple.",
-  ReplaceWith("{ (t1, t2, t3) -> this(t1, t2, t3) }")
-)
-fun <T1, T2, T3, R> ((T1, T2, T3) -> R).tupled(): (Tuple3<T1, T2, T3>) -> R = { (t1, t2, t3) -> this(t1, t2, t3) }
-
 fun <T1, T2, T3, T4, R> ((T1, T2, T3, T4) -> R).tupled(): (Tuple4<T1, T2, T3, T4>) -> R = { (t1, t2, t3, t4) -> this(t1, t2, t3, t4) }
 
 fun <T1, T2, T3, T4, T5, R> ((T1, T2, T3, T4, T5) -> R).tupled(): (Tuple5<T1, T2, T3, T4, T5>) -> R = { (t1, t2, t3, t4, t5) -> this(t1, t2, t3, t4, t5) }
@@ -71,18 +37,6 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17,
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, R> ((T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) -> R).tupled(): (Tuple21<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>) -> R = { (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21) -> this(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21) }
 
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, R> ((T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) -> R).tupled(): (Tuple22<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>) -> R = { (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22) -> this(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22) }
-
-@Deprecated(
-  "Tuple3 is deprecated in favor of Kotlin's Pair. Use unpaired() when using Pair.",
-  ReplaceWith("{ t1, t2 -> this(Tuple2(t1, t2)) }")
-)
-fun <T1, T2, R> ((Tuple2<T1, T2>) -> R).untupled(): (T1, T2) -> R = { t1, t2 -> this(Tuple2(t1, t2)) }
-
-@Deprecated(
-  "Tuple3 is deprecated in favor of Kotlin's Triple. Use untripled() when using Triple.",
-  ReplaceWith("{ t1, t2, t3 -> this(Tuple3(t1, t2, t3)) }")
-)
-fun <T1, T2, T3, R> ((Tuple3<T1, T2, T3>) -> R).untupled(): (T1, T2, T3) -> R = { t1, t2, t3 -> this(Tuple3(t1, t2, t3)) }
 
 fun <T1, T2, T3, T4, R> ((Tuple4<T1, T2, T3, T4>) -> R).untupled(): (T1, T2, T3, T4) -> R = { t1, t2, t3, t4 -> this(Tuple4(t1, t2, t3, t4)) }
 
