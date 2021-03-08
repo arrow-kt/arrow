@@ -127,8 +127,8 @@ import arrow.core.computations.either
 
 suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
   either {
-    val user = !fetchUser()
-    val processed = !user.process()
+    val user = fetchUser().bind()
+    val processed = user.process().bind()
     processed
   }
 ```
