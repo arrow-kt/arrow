@@ -19,25 +19,25 @@ Arrow is composed of 4 main modular libraries.
 
 ## [Core]({{ '/' | relative_url }})
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core-data/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core-data/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
-Core also includes the base continuation effects system which includes patterns to remove callbacks and enable controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax include [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
+Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
 
 ## [Fx]({{ '/fx/' | relative_url }})
 Arrow Fx is a full-featured, high-performance, asynchronous framework that brings functional operators to Kotlin's `suspend` functions.
 By leveraging the power of KotlinX Coroutines and the compiler support for CPS transformations, Arrow Fx results in optimal async programs with increased throughput and decreased allocations.
 
 ## [Optics]({{ '/optics/' | relative_url }})
-Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing and transforming deeply nested immutable data structures.
-Optics offers additionally all the base types such as [Lens]({{ '/optics/lens/' | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}) and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
+Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
+Optics also offers all the base types such as [Lens]({{ '/optics/lens/' | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
 
 ## [Meta]({{ '/meta/' | relative_url }})
 Arrow Meta is a general purpose library for meta-programming in Kotlin to build compiler plugins.
-Some type system features proposed by Arrow such as union types, product types, proof derivation and others are built with Arrow Meta and serve as exploration of what could be incorporated in the Kotlin compiler.
+Some type system features proposed by Arrow such as union types, product types, proof derivation, and others are built with Arrow Meta and serve as examples of what could be incorporated in the Kotlin compiler.
 
 ## Setup
 
 ### Next development version
 
-If you want to try the last features, replace `0.13.0` by `1.0.0-SNAPSHOT` in the following guideline.
+If you want to try the latest features, replace `0.13.0` with `1.0.0-SNAPSHOT` in the following guideline.
 
 ### JDK
 
