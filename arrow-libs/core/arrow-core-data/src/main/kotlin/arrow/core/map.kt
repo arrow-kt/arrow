@@ -10,6 +10,153 @@ object MapInstances
 @Deprecated("Receiver SortedMapInstances object is deprecated, prefer to turn SortedMap functions into top-level functions")
 object SortedMapInstances
 
+/**
+ * Combines to structures by taking the intersection of their shapes
+ * and using `Pair` to hold the elements.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result =
+ *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3"))
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ */
+fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
+  zip(other) { _, a, b -> Pair(a, b) }
+
+/**
+ * Combines to structures by taking the intersection of their shapes
+ * and combining the elements with the given function.
+ *
+ * ```kotlin:ank
+ * import arrow.core.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result =
+ *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
+ *      key, a, b -> "$key -> $a # $b"
+ *    }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ */
+inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
+  zip(other, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, _, _, _, _, _, _, _, _ ->
+    map(key, bb, cc)
+  }
+
+inline fun <Key, B, C, D, E> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  map: (Key, B, C, D) -> E
+): Map<Key, E> =
+  zip(c, d, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, _, _, _, _, _, _, _ ->
+    map(key, bb, cc, dd)
+  }
+
+inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  map: (Key, B, C, D, E) -> F
+): Map<Key, F> =
+  zip(c, d, e, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, _, _, _, _, _, _ ->
+    map(key, bb, cc, dd, ee)
+  }
+
+inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  map: (Key, B, C, D, E, F) -> G
+): Map<Key, G> =
+  zip(c, d, e, f, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, _, _, _, _, _ ->
+    map(key, bb, cc, dd, ee, ff)
+  }
+
+inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  map: (Key, B, C, D, E, F, G) -> H
+): Map<Key, H> =
+  zip(c, d, e, f, g, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, _, _, _, _ ->
+    map(key, bb, cc, dd, ee, ff, gg)
+  }
+
+inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  map: (Key, B, C, D, E, F, G, H) -> I
+): Map<Key, I> =
+  zip(c, d, e, f, g, h, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, _, _, _ ->
+    map(key, bb, cc, dd, ee, ff, gg, hh)
+  }
+
+inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  map: (Key, B, C, D, E, F, G, H, I) -> J
+): Map<Key, J> =
+  zip(c, d, e, f, g, h, i, emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, _, _ ->
+    map(key, bb, cc, dd, ee, ff, gg, hh, ii)
+  }
+
+inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  j: Map<Key, J>,
+  map: (Key, B, C, D, E, F, G, H, I, J) -> K
+): Map<Key, K> =
+  zip(c, d, e, f, g, h, i, j, emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, jj, _ ->
+    map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+  }
+
+inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  j: Map<Key, J>,
+  k: Map<Key, K>,
+  map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
+): Map<Key, L> {
+  val destination = LinkedHashMap<Key, L>(size)
+  for ((key, bb) in this) {
+    Nullable.mapN(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+      map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+    }?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
 fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   _flatMap { entry ->
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
@@ -259,50 +406,6 @@ fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  */
 fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
-
-/**
- * Combines to structures by taking the intersection of their shapes
- * and using `Pair` to hold the elements.
- *
- * ```kotlin:ank:playground
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3"))
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- */
-fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
-  keys.intersect(other.keys).mapNotNull { key ->
-    Nullable.mapN(this[key], other[key]) { a, b -> key to (a to b) }
-  }.toMap()
-
-/**
- * Combines to structures by taking the intersection of their shapes
- * and combining the elements with the given function.
- *
- * ```kotlin:ank
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
- *      key, a, b -> "$key -> $a # $b"
- *    }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- */
-fun <K, A, B, C> Map<K, A>.zip(other: Map<K, B>, f: (K, A, B) -> C): Map<K, C> =
-  keys.intersect(other.keys).mapNotNull { key ->
-    Nullable.mapN(this[key], other[key]) { a, b -> key to f(key, a, b) }
-  }.toMap()
 
 fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
   if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
