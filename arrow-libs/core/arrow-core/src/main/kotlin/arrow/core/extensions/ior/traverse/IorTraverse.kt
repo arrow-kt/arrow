@@ -7,6 +7,7 @@ import arrow.core.Ior.Companion
 import arrow.core.extensions.IorTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 
 /**
  * cached extension
@@ -80,10 +81,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(arg1: Function1<A, B>): Ior<L, B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated. Replace with flatTraverse, flatTraverseEither or flatTraverseValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.flatTraverse(
   arg1: Monad<Kind<ForIor, L>>,
   arg2: Applicative<G>,

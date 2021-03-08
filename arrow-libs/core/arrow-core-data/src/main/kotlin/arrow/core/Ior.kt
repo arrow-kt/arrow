@@ -6,6 +6,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.TraverseDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -831,12 +832,15 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
+  @Deprecated(TraverseDeprecation)
   inline fun <C> traverse_(fa: (B) -> Iterable<C>): List<Unit> =
     fold({ emptyList() }, { fa(it).void() }, { _, b -> fa(b).void() })
 
+  @Deprecated(TraverseDeprecation)
   inline fun <AA, C> traverseEither_(fa: (B) -> Either<AA, C>): Either<AA, Unit> =
     fold({ Either.right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
 
+  @Deprecated(TraverseDeprecation)
   inline fun <AA, C> traverseValidated_(fa: (B) -> Validated<AA, C>): Validated<AA, Unit> =
     fold({ Valid(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
 
@@ -933,12 +937,15 @@ fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
+@Deprecated(TraverseDeprecation)
 fun <A, B> Ior<A, Iterable<B>>.sequence_(): List<Unit> =
   traverse_(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither_(): Either<B, Unit> =
   traverseEither_(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated_(): Validated<B, Unit> =
   traverseValidated_(::identity)
 
@@ -978,12 +985,15 @@ fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B
 inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
+@Deprecated(TraverseDeprecation)
 inline fun <A, B, C> Ior<A, B>.flatTraverse(SA: Semigroup<A>, f: (B) -> Iterable<Ior<A, C>>): List<Ior<A, C>> =
-  traverse(f).map { it.flatten(SA) }
+  traverse(f).map { it.flatMap(SA, ::identity) }
 
+@Deprecated(TraverseDeprecation)
 inline fun <A, B, C, E> Ior<A, B>.flatTraverseEither(SA: Semigroup<A>, f: (B) -> Either<E, Ior<A, C>>): Either<E, Ior<A, C>> =
   traverseEither(f).map { it.flatten(SA) }
 
+@Deprecated(TraverseDeprecation)
 inline fun <A, B, C, E> Ior<A, B>.flatTraverseValidated(SA: Semigroup<A>, f: (B) -> Validated<E, Ior<A, C>>): Validated<E, Ior<A, C>> =
   traverseValidated(f).map { it.flatten(SA) }
 

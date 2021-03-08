@@ -7,6 +7,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
+import arrow.typeclasses.TraverseDeprecation
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -791,6 +792,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
+  @Deprecated(TraverseDeprecation)
   inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
     fold({ emptyList() }, { fa(it).void() })
 
@@ -800,6 +802,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       is Invalid -> this.right()
     }
 
+  @Deprecated(TraverseDeprecation)
   inline fun <EE, B> traverseEither_(fa: (A) -> Either<EE, B>): Either<EE, Unit> =
     fold({ Either.right(Unit) }, { fa(it).void() })
 
@@ -1014,12 +1017,14 @@ fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
 fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <E, A> Validated<E, Iterable<A>>.sequence_(): List<Unit> =
   traverse_(::identity)
 
 fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <E, A, B> Validated<A, Either<E, B>>.traverseEither_(): Either<E, Unit> =
   traverseEither_(::identity)
 

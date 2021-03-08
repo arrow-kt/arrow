@@ -10,6 +10,7 @@ import arrow.core.extensions.ConstFoldable
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Deprecated
@@ -229,7 +230,7 @@ fun <A> orEmpty(arg0: Applicative<Kind<ForConst, A>>, arg1: Monoid<A>): Const<A,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+@Deprecated(TraverseDeprecation)
 fun <A, G, B> Kind<Kind<ForConst, A>, A>.traverse_(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, B>>
@@ -244,7 +245,7 @@ fun <A, G, B> Kind<Kind<ForConst, A>, A>.traverse_(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+@Deprecated(TraverseDeprecation)
 fun <A, G> Kind<Kind<ForConst, A>, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
   arrow.core.Const.foldable<A>().run {
     this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>

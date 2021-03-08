@@ -6,6 +6,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
+import arrow.typeclasses.TraverseDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -526,11 +527,13 @@ inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Eit
     f(a).ap(acc.map { bs -> { b: B -> NonEmptyList(b) + bs } })
   }
 
+@Deprecated(TraverseDeprecation)
 inline fun <E, A, B> NonEmptyList<A>.flatTraverseEither(f: (A) -> Either<E, NonEmptyList<B>>): Either<E, NonEmptyList<B>> =
   foldRight(f(head)) { a, acc ->
     f(a).ap(acc.map { bs -> { b: NonEmptyList<B> -> b + bs } })
   }
 
+@Deprecated(TraverseDeprecation)
 inline fun <E, A> NonEmptyList<A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
   val void = { _: Unit -> { _: Any? -> Unit } }
   return foldRight<A, Either<E, Unit>>(Unit.right()) { a, acc ->
@@ -544,6 +547,7 @@ fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A
 fun <E, A> NonEmptyList<Either<E, NonEmptyList<A>>>.flatSequenceEither(): Either<E, NonEmptyList<A>> =
   flatTraverseEither(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <E> NonEmptyList<Either<E, *>>.sequenceEither_(): Either<E, Unit> =
   traverseEither_(::identity)
 
@@ -552,11 +556,13 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(semigroup: Semigroup<E>, 
     f(a).ap(semigroup, acc.map { bs -> { b: B -> NonEmptyList(b) + bs } })
   }
 
+@Deprecated(TraverseDeprecation)
 inline fun <E, A, B> NonEmptyList<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, NonEmptyList<B>>): Validated<E, NonEmptyList<B>> =
   foldRight(f(head)) { a, acc ->
     f(a).ap(semigroup, acc.map { bs -> { b: NonEmptyList<B> -> b + bs } })
   }
 
+@Deprecated(TraverseDeprecation)
 inline fun <E, A> NonEmptyList<A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> =
   foldRight<A, Validated<E, Unit>>(Unit.valid()) { a, acc ->
     f(a).ap(semigroup, acc.map { { Unit } })
@@ -568,6 +574,7 @@ fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<
 fun <E, A> NonEmptyList<Validated<E, NonEmptyList<A>>>.flatSequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   flatTraverseValidated(semigroup, ::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <E> NonEmptyList<Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
   traverseValidated_(semigroup, ::identity)
 

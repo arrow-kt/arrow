@@ -5,6 +5,7 @@ import arrow.core.ForListK
 import arrow.core.extensions.ListKTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Function1
 import kotlin.PublishedApi
 import kotlin.Suppress
@@ -59,7 +60,7 @@ fun <A, B> List<A>.map(arg1: Function1<A, B>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> List<A>.flatTraverse(
   arg1: Monad<ForListK>,
   arg2: Applicative<G>,

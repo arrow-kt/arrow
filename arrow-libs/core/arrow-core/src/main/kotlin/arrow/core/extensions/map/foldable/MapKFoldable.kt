@@ -15,6 +15,7 @@ import arrow.core.foldRight as _foldRight
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.TraverseDeprecation
 import java.lang.IllegalStateException
 import kotlin.Any
 import kotlin.Boolean
@@ -216,7 +217,7 @@ fun <K, A> orEmpty(arg0: Applicative<Kind<ForMapK, K>>, arg1: Monoid<A>): Map<K,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with traverseValidated_ or traverseEither_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <K, G, A, B> Map<K, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
   Unit> = arrow.core.extensions.map.foldable.Map.foldable<K>().run {
   arrow.core.MapK(this@traverse_).traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
@@ -229,7 +230,7 @@ fun <K, G, A, B> Map<K, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Ki
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceValidated_ or sequenceEither_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <K, G, A> Map<K, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
   arrow.core.extensions.map.foldable.Map.foldable<K>().run {
     arrow.core.MapK(this@sequence_).sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>

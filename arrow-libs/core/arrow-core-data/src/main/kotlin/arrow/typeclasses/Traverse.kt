@@ -2,17 +2,20 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.core.identity
-import arrow.core.Option
-import arrow.core.Either
-import arrow.core.Validated
 import arrow.core.Const
+import arrow.core.Either
 import arrow.core.Nel
+import arrow.core.Option
 import arrow.core.SequenceK
+import arrow.core.Validated
 import arrow.core.ValidatedNel
+import arrow.core.identity
 import arrow.typeclasses.internal.Id
 import arrow.typeclasses.internal.fix
 import arrow.typeclasses.internal.idApplicative
+
+const val TraverseDeprecation =
+  "@extension kinded projected functions are deprecated. Replace with traverse, traverseEither or traverseValidated from arrow.core.*"
 
 @Deprecated(KindDeprecation)
 /**
@@ -383,6 +386,11 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     traverse(idApplicative) { Id(f(it)) }.fix().value
 
-  fun <G, A, B> Kind<F, A>.flatTraverse(MF: Monad<F>, AG: Applicative<G>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
+  @Deprecated(TraverseDeprecation)
+  fun <G, A, B> Kind<F, A>.flatTraverse(
+    MF: Monad<F>,
+    AG: Applicative<G>,
+    f: (A) -> Kind<G, Kind<F, B>>
+  ): Kind<G, Kind<F, B>> =
     AG.run { traverse(this, f).map { MF.run { it.flatten() } } }
 }

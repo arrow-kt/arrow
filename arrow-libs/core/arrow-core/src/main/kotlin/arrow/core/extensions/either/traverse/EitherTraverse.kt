@@ -8,6 +8,7 @@ import arrow.core.extensions.EitherTraverse
 import arrow.core.fix
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Function1
 import kotlin.PublishedApi
@@ -68,7 +69,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.map(arg1: Function1<A, B>): Either<L, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. This signature is not valid for Validated.")
+@Deprecated(TraverseDeprecation)
 fun <L, G, A, B> Kind<Kind<ForEither, L>, A>.flatTraverse(
   arg1: Monad<Kind<ForEither, L>>,
   arg2: Applicative<G>,

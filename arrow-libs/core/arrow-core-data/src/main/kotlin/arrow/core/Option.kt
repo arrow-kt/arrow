@@ -6,6 +6,7 @@ import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.TraverseDeprecation
 
 @Deprecated(
   message = KindDeprecation,
@@ -749,18 +750,21 @@ sealed class Option<out A> : OptionOf<A> {
       is None -> null
     }
 
+  @Deprecated(TraverseDeprecation)
   inline fun <B> flatTraverse(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
     fold(
       { emptyList() },
       { f(it).toList() }
     )
 
+  @Deprecated(TraverseDeprecation)
   inline fun <E, B> flatTraverseEither(f: (A) -> Either<E, Option<B>>): Either<E, Option<B>> =
     fold(
       { Right(empty()) },
       { f(it) }
     )
 
+  @Deprecated(TraverseDeprecation)
   inline fun <E, B> flatTraverseValidated(f: (A) -> Validated<E, Option<B>>): Validated<E, Option<B>> =
     fold(
       { Valid(empty()) },
@@ -843,6 +847,7 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
     fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
 
+  @Deprecated(TraverseDeprecation)
   inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
     fold({ emptyList() }, { fa(it).void() })
 
@@ -852,6 +857,7 @@ sealed class Option<out A> : OptionOf<A> {
       is None -> Right(this)
     }
 
+  @Deprecated(TraverseDeprecation)
   inline fun <AA, B> traverseEither_(fa: (A) -> Either<AA, B>): Either<AA, Unit> =
     fold({ Right(Unit) }, { fa(it).void() })
 
@@ -861,6 +867,7 @@ sealed class Option<out A> : OptionOf<A> {
       is None -> Valid(this)
     }
 
+  @Deprecated(TraverseDeprecation)
   inline fun <AA, B> traverseValidated_(fa: (A) -> Validated<AA, B>): Validated<AA, Unit> =
     fold({ Valid(Unit) }, { fa(it).void() })
 
@@ -1155,18 +1162,21 @@ fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B
 fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
   traverse(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <A> Option<Iterable<A>>.sequence_(): List<Unit> =
   traverse_(::identity)
 
 fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   traverseEither(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <A, B> Option<Either<A, B>>.sequenceEither_(): Either<A, Unit> =
   traverseEither_(::identity)
 
 fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
   traverseValidated(::identity)
 
+@Deprecated(TraverseDeprecation)
 fun <A, B> Option<Validated<A, B>>.sequenceValidated_(): Validated<A, Unit> =
   traverseValidated_(::identity)
 
