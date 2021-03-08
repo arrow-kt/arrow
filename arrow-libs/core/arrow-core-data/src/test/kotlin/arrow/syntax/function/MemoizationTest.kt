@@ -1,5 +1,6 @@
 package arrow.syntax.function
 
+import arrow.core.memoize
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec

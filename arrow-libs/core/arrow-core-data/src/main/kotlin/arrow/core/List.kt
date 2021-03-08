@@ -1,3 +1,5 @@
+@file:JvmMultifileClass
+
 package arrow.core
 
 import arrow.typeclasses.Monoid
@@ -125,6 +127,15 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
   }
   return buffer
 }
+
+/**
+ * Returns a list containing all elements except the first element
+ */
+fun <T> List<T>.tail(): List<T> = this.drop(1)
+
+infix fun <T> T.prependTo(list: List<T>): List<T> = listOf(this)._plus(list)
+
+fun <T> List<Option<T>>.flatten(): List<T> = flatMap { it.fold(::emptyList, ::listOf) }
 
 fun <A> Semigroup.Companion.list(): Semigroup<List<A>> =
   Monoid.list()
