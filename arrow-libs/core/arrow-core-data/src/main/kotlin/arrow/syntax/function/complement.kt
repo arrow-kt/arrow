@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 fun (() -> Boolean).complement(): () -> Boolean = { !this() }
 

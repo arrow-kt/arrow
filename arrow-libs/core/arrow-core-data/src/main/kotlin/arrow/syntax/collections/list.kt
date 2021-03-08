@@ -1,6 +1,4 @@
-package arrow.syntax.collections
-
-import arrow.core.Option
+package arrow.core
 
 /**
  * Returns a list containing all elements except the first element

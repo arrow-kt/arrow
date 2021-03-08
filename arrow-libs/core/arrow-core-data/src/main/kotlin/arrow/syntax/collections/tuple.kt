@@ -1,24 +1,4 @@
-package arrow.syntax.collections
-
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
-import arrow.core.Tuple10
-import arrow.core.Tuple11
-import arrow.core.Tuple12
-import arrow.core.Tuple13
-import arrow.core.Tuple14
-import arrow.core.Tuple15
-import arrow.core.Tuple16
-import arrow.core.Tuple17
-import arrow.core.Tuple18
-import arrow.core.Tuple19
-import arrow.core.Tuple20
-import arrow.core.Tuple21
-import arrow.core.Tuple22
+package arrow.core
 
 operator fun <A, B, C> Pair<A, B>.plus(c: C): Triple<A, B, C> = Triple(this.first, this.second, c)
 operator fun <A, B, C, D> Triple<A, B, C>.plus(d: D): Tuple4<A, B, C, D> = Tuple4(this.first, this.second, this.third, d)

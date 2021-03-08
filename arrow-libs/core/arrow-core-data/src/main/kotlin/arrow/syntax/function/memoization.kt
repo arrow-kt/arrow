@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.loop

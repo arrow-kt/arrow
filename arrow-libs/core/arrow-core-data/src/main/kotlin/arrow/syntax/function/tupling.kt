@@ -1,24 +1,4 @@
-package arrow.syntax.function
-
-import arrow.core.Tuple10
-import arrow.core.Tuple11
-import arrow.core.Tuple12
-import arrow.core.Tuple13
-import arrow.core.Tuple14
-import arrow.core.Tuple15
-import arrow.core.Tuple16
-import arrow.core.Tuple17
-import arrow.core.Tuple18
-import arrow.core.Tuple19
-import arrow.core.Tuple20
-import arrow.core.Tuple21
-import arrow.core.Tuple22
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
+package arrow.core
 
 fun <T1, T2, T3, T4, R> ((T1, T2, T3, T4) -> R).tupled(): (Tuple4<T1, T2, T3, T4>) -> R = { (t1, t2, t3, t4) -> this(t1, t2, t3, t4) }
 

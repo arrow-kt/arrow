@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 infix fun <P1, R> P1.pipeLazy(t: (P1) -> R): () -> R = { t(this) }
 

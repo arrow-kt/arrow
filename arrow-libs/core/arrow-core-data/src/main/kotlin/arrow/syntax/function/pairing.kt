@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 fun <P1, P2, R> ((P1, P2) -> R).paired(): (Pair<P1, P2>) -> R = { pair: Pair<P1, P2> ->
   this(pair.component1(), pair.component2())

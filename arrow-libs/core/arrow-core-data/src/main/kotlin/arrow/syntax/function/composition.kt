@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 infix fun <P1, P2, IP, R> ((P1, P2) -> IP).andThen(f: (IP) -> R): (P1, P2) -> R =
   AndThen2(this).andThen(f)

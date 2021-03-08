@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 /**
  * Establishes the maximum stack depth when fusing `andThen` or `compose` calls.

@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 fun <P1, P2, R> ((P1, P2) -> R).reverse(): (P2, P1) -> R = { p2: P2, p1: P1 -> this(p1, p2) }
 
