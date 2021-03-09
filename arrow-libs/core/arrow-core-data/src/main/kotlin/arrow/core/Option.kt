@@ -12,7 +12,9 @@ import arrow.typeclasses.TraverseDeprecation
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
-class ForOption private constructor() { companion object }
+class ForOption private constructor() {
+  companion object
+}
 
 @Deprecated(
   message = KindDeprecation,
@@ -679,15 +681,6 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun filter(predicate: (A) -> Boolean): Option<A> =
     flatMap { a -> if (predicate(a)) Some(a) else None }
 
-  inline fun <AA> filterEither(predicate: (A) -> Either<AA, Boolean>): Either<AA, Option<A>> =
-    traverseFilterEither { a -> predicate(a).map { if (it) Some(a) else None } }
-
-  inline fun filterIterable(predicate: (A) -> Iterable<Boolean>): Iterable<Option<A>> =
-    traverseFilter { a -> predicate(a).map { if (it) Some(a) else None } }
-
-  inline fun <AA> filterValidated(predicate: (A) -> Validated<AA, Boolean>): Validated<AA, Option<A>> =
-    traverseFilterValidated { a -> predicate(a).map { if (it) Some(a) else None } }
-
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
    * this $option's value returns false. Otherwise, return $none.
@@ -871,15 +864,6 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun <AA, B> traverseValidated_(fa: (A) -> Validated<AA, B>): Validated<AA, Unit> =
     fold({ Valid(Unit) }, { fa(it).void() })
 
-  inline fun <B> traverseFilter(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
-    this.fold({ emptyList() }, { f(it).toList() })
-
-  inline fun <AA, B> traverseFilterEither(f: (A) -> Either<AA, Option<B>>): Either<AA, Option<B>> =
-    this.fold({ Right(empty()) }, f)
-
-  inline fun <AA, B> traverseFilterValidated(f: (A) -> Validated<AA, Option<B>>): Validated<AA, Option<B>> =
-    this.fold({ Valid(empty()) }, f)
-
   inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
@@ -929,13 +913,13 @@ sealed class Option<out A> : OptionOf<A> {
     mapConst(Unit)
 
   fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
-    mapN(this, other) { a, b -> a to b}
+    mapN(this, other) { a, b -> a to b }
 
   inline fun <B, C> zip(other: Option<B>, f: (A, B) -> C): Option<C> =
-    zip(other).map { a -> f(a.first, a.second)}
+    zip(other).map { a -> f(a.first, a.second) }
 
   inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
-    other.map {zip(it).map { a -> f(a.first, a.second) }}
+    other.map { zip(it).map { a -> f(a.first, a.second) } }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -991,7 +975,8 @@ inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -1085,15 +1070,6 @@ inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
 
 inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
   if (isEmpty()) f(Unit) else this
-
-inline fun <reified B> Option<*>.traverseFilterIsInstance(): List<Option<B>> =
-  filterIterable { a -> listOf(a is B) }.map { it.map { a -> a as B } }
-
-inline fun <E, reified B> Option<*>.traverseFilterIsInstanceEither(): Either<E, Option<B>> =
-  filterEither { a -> Right(a is B) }.map { it.map { a -> a as B } }
-
-inline fun <E, reified B> Option<*>.traverseFilterIsInstanceValidated(): Validated<E, Option<B>> =
-  filterValidated { a -> Valid(a is B) }.map { it.map { a -> a as B } }
 
 fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
@@ -1214,7 +1190,7 @@ fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
 inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
   fold(
     { Option.empty<A>() to Option.empty() },
-    { f(it).let { pair -> Some(pair.first) to Some(pair.second) }}
+    { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
   )
 
 /**
