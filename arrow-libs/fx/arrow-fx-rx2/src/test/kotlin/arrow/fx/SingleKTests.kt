@@ -2,28 +2,26 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.left
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.throwable
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
-import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.extensions.singlek.applicative.applicative
-import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.extensions.singlek.async.async
 import arrow.fx.rx2.extensions.singlek.functor.functor
 import arrow.fx.rx2.extensions.singlek.monad.flatMap
-import arrow.fx.rx2.extensions.singlek.monad.monad
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.ExitCase
-import arrow.core.test.generators.GenK
-import arrow.core.test.generators.throwable
+import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.test.laws.ConcurrentLaws
 import arrow.fx.test.laws.forFew
+import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -45,7 +43,6 @@ class SingleKTests : RxJavaSpec() {
         SingleK.timer(),
         SingleK.functor(),
         SingleK.applicative(),
-        SingleK.monad(),
         SingleK.genK(),
         SingleK.eqK(),
         testStackSafety = false

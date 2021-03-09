@@ -22,7 +22,6 @@ import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.order.order
 import arrow.core.extensions.option.repeat.repeat
-import arrow.core.extensions.option.selective.selective
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
@@ -75,7 +74,6 @@ class OptionTest : UnitSpec() {
         Option.monadCombine(),
         Option.functor(),
         Option.applicative(),
-        Option.selective(),
         Option.genK(),
         Option.eqK()
       ),

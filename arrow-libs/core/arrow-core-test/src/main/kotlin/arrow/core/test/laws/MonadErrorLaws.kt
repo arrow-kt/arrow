@@ -14,7 +14,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.Selective
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -45,11 +44,10 @@ object MonadErrorLaws {
     M: MonadError<F, Throwable>,
     FF: Functor<F>,
     AP: Apply<F>,
-    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, SL, GENK, EQK) +
+    MonadLaws.laws(M, FF, AP, GENK, EQK) +
       ApplicativeErrorLaws.laws(M, GENK, EQK) +
       monadErrorLaws(M, EQK)
 

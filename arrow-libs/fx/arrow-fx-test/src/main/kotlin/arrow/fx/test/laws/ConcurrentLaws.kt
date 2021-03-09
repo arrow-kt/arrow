@@ -9,7 +9,6 @@ import arrow.core.Tuple6
 import arrow.core.extensions.eq
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.core.extensions.tuple6.eq.eq
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.test.generators.GenK
@@ -31,7 +30,6 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -143,14 +141,13 @@ object ConcurrentLaws {
     T: Timer<F>,
     FF: Functor<F>,
     AP: Apply<F>,
-    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true,
     iterations: Int = 5_000
   ): List<Law> =
-    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
+    AsyncLaws.laws(CF, FF, AP, GENK, EQK, testStackSafety, iterations) +
       TimerLaws.laws(CF, T, EQK) +
       concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
 

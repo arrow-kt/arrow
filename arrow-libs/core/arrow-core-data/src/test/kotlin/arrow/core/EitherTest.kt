@@ -14,7 +14,6 @@ import arrow.core.extensions.either.eqK.eqK
 import arrow.core.extensions.either.eqK2.eqK2
 import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.hash.hash
-import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.either.monoid.monoid
 import arrow.core.extensions.either.order.order
@@ -74,7 +73,6 @@ class EitherTest : UnitSpec() {
         Either.monadError(),
         Either.functor(),
         Either.applicative(),
-        Either.monad(),
         Either.genK(Gen.throwable()),
         Either.eqK(throwableEQ)
       ),

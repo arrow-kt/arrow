@@ -16,7 +16,6 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -73,14 +72,13 @@ object MonadDeferLaws {
     SC: MonadDefer<F>,
     FF: Functor<F>,
     AP: Apply<F>,
-    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
     iterations: Int = 5_000
   ): List<Law> =
-    BracketLaws.laws(SC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
-      MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
+    BracketLaws.laws(SC, FF, AP, GENK, EQK, testStackSafety, iterations) +
+      MonadThrowLaws.laws(SC, SC, SC, GENK, EQK) +
       monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {

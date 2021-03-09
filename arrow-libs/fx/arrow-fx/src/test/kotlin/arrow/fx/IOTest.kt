@@ -21,7 +21,6 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
-import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.io.semigroupK.semigroupK
 import arrow.fx.extensions.timer
 import arrow.fx.extensions.toIO
@@ -57,7 +56,7 @@ class IOTest : ArrowFxSpec() {
   init {
     testLaws(
       SemigroupKLaws.laws(IO.semigroupK(), IO.genK(), IO.eqK()),
-      ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK())
+      ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.genK(), IO.eqK())
     )
 
     "should defer evaluation until run" {

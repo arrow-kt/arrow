@@ -7,20 +7,19 @@ import arrow.core.test.generators.throwable
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
-import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.reactor.extensions.fluxk.applicative.applicative
 import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.functor.functor
 import arrow.fx.reactor.extensions.fluxk.monad.flatMap
-import arrow.fx.reactor.extensions.fluxk.monad.monad
 import arrow.fx.reactor.extensions.fluxk.timer.timer
 import arrow.fx.reactor.extensions.fx
 import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
 import arrow.fx.reactor.value
-import arrow.fx.typeclasses.ExitCase
+import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.test.laws.AsyncLaws
 import arrow.fx.test.laws.TimerLaws
+import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.matchers.startWith
@@ -47,7 +46,6 @@ class FluxKTest : UnitSpec() {
         FluxK.async(),
         FluxK.functor(),
         FluxK.applicative(),
-        FluxK.monad(),
         FluxK.genk(),
         FluxK.eqK(),
         testStackSafety = false

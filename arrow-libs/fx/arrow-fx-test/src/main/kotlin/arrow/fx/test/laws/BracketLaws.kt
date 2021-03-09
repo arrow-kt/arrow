@@ -2,21 +2,20 @@ package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.fx.internal.AtomicIntW
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicativeError
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.throwable
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.MonadErrorLaws
+import arrow.fx.internal.AtomicIntW
+import arrow.fx.test.generators.raiseError
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
-import arrow.fx.test.generators.raiseError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -69,13 +68,12 @@ object BracketLaws {
     BF: Bracket<F, Throwable>,
     FF: Functor<F>,
     AP: Apply<F>,
-    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-    MonadErrorLaws.laws(BF, FF, AP, SL, GENK, EQK) +
+    MonadErrorLaws.laws(BF, FF, AP, GENK, EQK) +
       bracketLaws(BF, EQK, testStackSafety, iterations)
 
   fun <F> Bracket<F, Throwable>.bracketCaseWithJustUnitEqvMap(EQ: Eq<Kind<F, Int>>): Unit =

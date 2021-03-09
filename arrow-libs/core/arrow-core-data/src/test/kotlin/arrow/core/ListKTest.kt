@@ -11,7 +11,6 @@ import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
-import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monadLogic.monadLogic
 import arrow.core.extensions.listk.monoid.monoid
@@ -24,7 +23,6 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.order
-import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
@@ -62,7 +60,6 @@ class ListKTest : UnitSpec() {
         ListK.monadCombine(),
         ListK.functor(),
         ListK.applicative(),
-        ListK.monad(),
         ListK.genK(),
         ListK.eqK()
       ),

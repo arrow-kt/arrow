@@ -2,6 +2,8 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.left
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.throwable
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
@@ -11,17 +13,14 @@ import arrow.fx.rx2.extensions.maybek.applicative.applicative
 import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.extensions.maybek.functor.functor
 import arrow.fx.rx2.extensions.maybek.monad.flatMap
-import arrow.fx.rx2.extensions.maybek.monad.monad
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.ExitCase
-import arrow.core.test.generators.GenK
-import arrow.core.test.generators.throwable
 import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.test.laws.ConcurrentLaws
+import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -42,7 +41,6 @@ class MaybeKTests : RxJavaSpec() {
         MaybeK.timer(),
         MaybeK.functor(),
         MaybeK.applicative(),
-        MaybeK.monad(),
         MaybeK.genk(),
         MaybeK.eqK(),
         testStackSafety = false

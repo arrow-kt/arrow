@@ -10,7 +10,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadFilter
-import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -48,11 +47,10 @@ object MonadFilterLaws {
     MF: MonadFilter<F>,
     FF: Functor<F>,
     AP: Apply<F>,
-    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, SL, GENK, EQK) +
+    MonadLaws.laws(MF, FF, AP, GENK, EQK) +
       FunctorFilterLaws.laws(MF, GENK, EQK) +
       monadFilterLaws(MF, GENK, EQK)
 

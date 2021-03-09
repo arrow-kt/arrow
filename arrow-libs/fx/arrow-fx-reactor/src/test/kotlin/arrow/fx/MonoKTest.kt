@@ -2,6 +2,8 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.left
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.GenK
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
@@ -10,18 +12,15 @@ import arrow.fx.reactor.extensions.monok.applicative.applicative
 import arrow.fx.reactor.extensions.monok.async.async
 import arrow.fx.reactor.extensions.monok.functor.functor
 import arrow.fx.reactor.extensions.monok.monad.flatMap
-import arrow.fx.reactor.extensions.monok.monad.monad
 import arrow.fx.reactor.extensions.monok.timer.timer
 import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
 import arrow.fx.reactor.unsafeRunSync
 import arrow.fx.reactor.value
 import arrow.fx.test.eq.unsafeRunEq
-import arrow.fx.typeclasses.ExitCase
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.GenK
 import arrow.fx.test.laws.AsyncLaws
 import arrow.fx.test.laws.TimerLaws
+import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.matchers.startWith
@@ -62,7 +61,7 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-      AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.monad(), MonoK.genK(), EQK(), testStackSafety = false),
+      AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.genK(), EQK(), testStackSafety = false),
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQK())
     )
 
