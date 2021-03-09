@@ -7,7 +7,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import com.sun.tools.corba.se.idl.constExpr.Not
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -554,7 +553,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     internal val unit: Validated<Nothing, Unit> =
       Validated.Valid(Unit)
   }
-  
+
   /**
    * Discards the [A] value inside [Validated] signaling this container may be pointing to a noop
    * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
@@ -960,7 +959,6 @@ inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
   f: (A, B) -> Z
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, f)
-
 
 inline fun <E, A, B, C, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
