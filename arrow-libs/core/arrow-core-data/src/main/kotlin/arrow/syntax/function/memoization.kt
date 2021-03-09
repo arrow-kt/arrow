@@ -7,8 +7,12 @@ import kotlinx.atomicfu.loop
  * Memoizes the given **pure** function so that invocations with the same arguments will only execute the function once.
  *
  * ```kotlin:ank:playground
- * import arrow.syntax.function.memoize
- * fun someWorkIntensiveFunction(someParam: Int): String = "$someParam"
+ * import arrow.core.memoize
+ *
+ * fun someWorkIntensiveFunction(someParam: Int): String {
+ *   println("Doing intensive work!")
+ *   return "$someParam"
+ * }
  *
  * fun main() {
  *   //sampleStart
