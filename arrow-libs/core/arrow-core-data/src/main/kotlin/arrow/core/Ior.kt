@@ -987,7 +987,7 @@ inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
 
 @Deprecated(TraverseDeprecation)
 inline fun <A, B, C> Ior<A, B>.flatTraverse(SA: Semigroup<A>, f: (B) -> Iterable<Ior<A, C>>): List<Ior<A, C>> =
-  traverse(f).map { it.flatMap(SA, ::identity) }
+  traverse(f).map { it.flatten(SA) }
 
 @Deprecated(TraverseDeprecation)
 inline fun <A, B, C, E> Ior<A, B>.flatTraverseEither(SA: Semigroup<A>, f: (B) -> Either<E, Ior<A, C>>): Either<E, Ior<A, C>> =
