@@ -9,37 +9,39 @@ permalink: /arrow/typeclasses/monoid/
 
 
 
-`Monoid` extends the `Semigroup` type class, adding an `empty` method to semigroup's `combine`. The empty method must return a value that, when combined with any other instance of that type, returns the other instance, i.e.,
+`Monoid` extends the `Semigroup` type class, adding an `empty` function to semigroup's `combine`. The empty method must return a value that, when combined with any other instance of that type, returns the other instance, i.e.,
 
 ```kotlin
-(combine(x, empty) == combine(empty, x) == x)
+(a.combine(empty()) == empty().combine(a) == a)
 ```
 
-For example, if we have a `Monoid<String>` with `combine` defined as string concatenation, then `empty = ""`.
+For example, if we have a `Monoid<String>` with `combine` defined as string concatenation, then `empty() = ""`.
 
 Having an empty defined allows us to combine all the elements of some potentially empty collection of `T` for which a `Monoid<T>` is defined and return a `T`, rather than an `Option<T>` as we have a sensible default to fall back to.
 
-And let's see the instance of Monoid<String> in action.
+Let's see the instance of Monoid<String> in action:
 
 ```kotlin:ank
-import arrow.*
-import arrow.core.extensions.*
-import arrow.typeclasses.*
+import arrow.core.string
+import arrow.typeclasses.Monoid
 
-String.monoid().run { empty() }
+Monoid.string().run { empty() }
 ```
 
 ```kotlin:ank
-String.monoid().run {
-  listOf<String>("Λ", "R", "R", "O", "W").combineAll()
+Monoid.string().run {
+    listOf("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.option.monoid.*
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.int
+import arrow.core.option
+import arrow.typeclasses.Monoid
 
-Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
+Monoid.option(Monoid.int()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```
 
 The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, for example.
@@ -47,39 +49,52 @@ The advantage of using these type class provided methods, rather than the specif
 This is also true if we define our own instances. As an example, let's use `Foldable`'s `foldMap`, which maps over values accumulating the results, using the available `Monoid` for the type mapped onto.
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.list.foldable.foldMap
+import arrow.core.foldMap
+import arrow.core.identity
+import arrow.core.int
+import arrow.typeclasses.Monoid
 
-listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
+listOf(1, 2, 3, 4, 5).foldMap(Monoid.int(), ::identity)
 ```
 
 ```kotlin:ank
-listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() })
+import arrow.core.foldMap
+import arrow.core.string
+import arrow.typeclasses.Monoid
+
+listOf(1, 2, 3, 4, 5).foldMap(Monoid.string()) { it.toString() }
 ```
 
-To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
+To use this with a function that produces a pair, we can define a Monoid for a pair that will be valid for any pair where the types it contains also have a Monoid available.
 
 ```kotlin:ank:silent
-fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
-  object: Monoid<Tuple2<A, B>> {
+import arrow.typeclasses.Monoid
 
-    override fun Tuple2<A, B>.combine(y: Tuple2<A, B>): Tuple2<A, B> {
-      val (xa, xb) = this
-      val (ya, yb) = y
-      return Tuple2(MA.run { xa.combine(ya) }, MB.run { xb.combine(yb) })
+fun <A, B> monoidPair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
+    object : Monoid<Pair<A, B>> {
+    
+        override fun Pair<A, B>.combine(other: Pair<A, B>): Pair<A, B> {
+            val (thisA, thisB) = this
+            val (otherA, otherB) = other
+            return Pair(MA.run { thisA.combine(otherA) }, MB.run { thisB.combine(otherB) })
+        }
+        
+        override fun empty(): Pair<A, B> = Pair(MA.empty(), MB.empty())
     }
-
-    override fun empty(): Tuple2<A, B> = Tuple2(MA.empty(), MB.empty())
-  }
 ```
 
 This way, we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-val M = monoidTuple(Int.monoid(), String.monoid())
-val list = listOf(1, 1).k()
+import arrow.core.foldMap
+import arrow.core.int
+import arrow.core.string
+import arrow.typeclasses.Monoid
+
+val M = monoidPair(Monoid.int(), Monoid.string())
+val list = listOf(1, 1)
 
 list.foldMap(M) { n: Int ->
-  Tuple2(n, n.toString())
+    Pair(n, n.toString())
 }
 ```
