@@ -183,148 +183,6 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
       { it.bimap(fa, fb) }
 
-    inline fun <A, B, C, D> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      map: (B, C) -> D
-    ): Ior<A, D> =
-      mapN(SA, b, c, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-
-    inline fun <A, B, C, D, E> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      map: (B, C, D) -> E
-    ): Ior<A, E> =
-      mapN(SA, b, c, d, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-    inline fun <A, B, C, D, E, F> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      map: (B, C, D, E) -> F
-    ): Ior<A, F> =
-      mapN(SA, b, c, d, e, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
-
-    inline fun <A, B, C, D, E, F, G> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      map: (B, C, D, E, F) -> G
-    ): Ior<A, G> =
-      mapN(SA, b, c, d, e, f, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
-
-    inline fun <A, B, C, D, E, F, G, H> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      g: Ior<A, G>,
-      map: (B, C, D, E, F, G) -> H
-    ): Ior<A, H> =
-      mapN(SA, b, c, d, e, f, g, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
-
-    inline fun <A, B, C, D, E, F, G, H, I> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      g: Ior<A, G>,
-      h: Ior<A, H>,
-      map: (B, C, D, E, F, G, H) -> I
-    ): Ior<A, I> =
-      mapN(SA, b, c, d, e, f, g, h, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      g: Ior<A, G>,
-      h: Ior<A, H>,
-      i: Ior<A, I>,
-      map: (B, C, D, E, F, G, H, I) -> J
-    ): Ior<A, J> =
-      mapN(SA, b, c, d, e, f, g, h, i, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      g: Ior<A, G>,
-      h: Ior<A, H>,
-      i: Ior<A, I>,
-      j: Ior<A, J>,
-      map: (B, C, D, E, F, G, H, I, J) -> K
-    ): Ior<A, K> =
-      mapN(SA, b, c, d, e, f, g, h, i, j, Ior.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J, K, L> mapN(
-      SA: Semigroup<A>,
-      b: Ior<A, B>,
-      c: Ior<A, C>,
-      d: Ior<A, D>,
-      e: Ior<A, E>,
-      f: Ior<A, F>,
-      g: Ior<A, G>,
-      h: Ior<A, H>,
-      i: Ior<A, I>,
-      j: Ior<A, J>,
-      k: Ior<A, K>,
-      map: (B, C, D, E, F, G, H, I, J, K) -> L
-    ): Ior<A, L> =
-      if (b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right && k is Right) {
-        Right(map(b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value, k.value))
-      } else if (b is Both && c is Both && d is Both && e is Both && f is Both && g is Both && h is Both && i is Both && j is Both && k is Both) {
-        SA.run {
-          Both(
-            b.leftValue.combine(c.leftValue).combine(d.leftValue).combine(e.leftValue).combine(f.leftValue)
-              .combine(g.leftValue).combine(h.leftValue).combine(i.leftValue).combine(j.leftValue).combine(k.leftValue),
-            map(
-              b.rightValue,
-              c.rightValue,
-              d.rightValue,
-              e.rightValue,
-              f.rightValue,
-              g.rightValue,
-              h.rightValue,
-              i.rightValue,
-              j.rightValue,
-              k.rightValue
-            )
-          )
-        }
-      } else SA.run {
-        var accumulatedLeft: A? = null
-        accumulatedLeft = if (b is Left) b.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (c is Left) c.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (d is Left) d.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (e is Left) e.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (f is Left) f.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (g is Left) g.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (h is Left) h.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (i is Left) i.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (j is Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        accumulatedLeft = if (j is Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
-        Left(accumulatedLeft!!)
-      }
-
     val unit: Ior<Nothing, Unit> = Right(Unit)
 
     fun <L> unit(): Ior<L, Unit> = unit
@@ -1056,11 +914,141 @@ fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
 fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
 
-inline fun <A, B, C, Z> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>, crossinline f: (B, C) -> Z): Ior<A, Z> =
-  ap(SA, fb.map { c: C -> { b: B -> f(b, c) } })
-
 fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
   zip(SA, fb, ::Pair)
+
+inline fun <A, B, C, D> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  map: (B, C) -> D
+): Ior<A, D> =
+  zip(SA, c, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+
+inline fun <A, B, C, D, E> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  map: (B, C, D) -> E
+): Ior<A, E> =
+  zip(SA, c, d, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  map: (B, C, D, E) -> F
+): Ior<A, F> =
+  zip(SA, c, d, e, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  map: (B, C, D, E, F) -> G
+): Ior<A, G> =
+  zip(SA, c, d, e, f, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  map: (B, C, D, E, F, G) -> H
+): Ior<A, H> =
+  zip(SA, c, d, e, f, g, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  map: (B, C, D, E, F, G, H) -> I
+): Ior<A, I> =
+  zip(SA, c, d, e, f, g, h, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  map: (B, C, D, E, F, G, H, I) -> J
+): Ior<A, J> =
+  zip(SA, c, d, e, f, g, h, i, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  j: Ior<A, J>,
+  map: (B, C, D, E, F, G, H, I, J) -> K
+): Ior<A, K> =
+  zip(SA, c, d, e, f, g, h, i, j, Ior.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  j: Ior<A, J>,
+  k: Ior<A, K>,
+  map: (B, C, D, E, F, G, H, I, J, K) -> L
+): Ior<A, L> =
+  if (this is Ior.Right && c is Ior.Right && d is Ior.Right && e is Ior.Right && f is Ior.Right && g is Ior.Right && h is Ior.Right && i is Ior.Right && j is Ior.Right && k is Ior.Right) {
+    Ior.Right(map(value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value, k.value))
+  } else if (this is Ior.Both && c is Ior.Both && d is Ior.Both && e is Ior.Both && f is Ior.Both && g is Ior.Both && h is Ior.Both && i is Ior.Both && j is Ior.Both && k is Ior.Both) {
+    SA.run {
+      Ior.Both(
+        leftValue.combine(c.leftValue).combine(d.leftValue).combine(e.leftValue).combine(f.leftValue)
+          .combine(g.leftValue).combine(h.leftValue).combine(i.leftValue).combine(j.leftValue).combine(k.leftValue),
+        map(
+          rightValue,
+          c.rightValue,
+          d.rightValue,
+          e.rightValue,
+          f.rightValue,
+          g.rightValue,
+          h.rightValue,
+          i.rightValue,
+          j.rightValue,
+          k.rightValue
+        )
+      )
+    }
+  } else SA.run {
+    var accumulatedLeft: A? = null
+    accumulatedLeft = if (this@zip is Ior.Left) value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (c is Ior.Left) c.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (d is Ior.Left) d.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (e is Ior.Left) e.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (f is Ior.Left) f.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (g is Ior.Left) g.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (h is Ior.Left) h.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (i is Ior.Left) i.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (j is Ior.Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    accumulatedLeft = if (j is Ior.Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    Ior.Left(accumulatedLeft!!)
+  }
 
 fun <A, B, C, Z> Ior<A, B>.zipEval(SA: Semigroup<A>, other: Eval<Ior<A, C>>, f: (B, C) -> Z): Eval<Ior<A, Z>> =
   other.map { zip(SA, it).map { a -> f(a.first, a.second) } }
