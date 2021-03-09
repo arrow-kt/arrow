@@ -58,6 +58,12 @@ Semigroup.option(Semigroup.int()).run {
 ```
 
 ```kotlin:ank
+import arrow.core.Option
+import arrow.core.None
+import arrow.core.int
+import arrow.core.option
+import arrow.typeclasses.Semigroup
+
 Semigroup.option(Semigroup.int()).run {
     Option(1).combine(None)
 }
