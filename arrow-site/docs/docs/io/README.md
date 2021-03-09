@@ -151,7 +151,7 @@ interface Persistence {
     suspend fun User.process(): Either<PersistenceError, ProcessedUser>
 
     suspend fun List<User>.process(): Either<PersistenceError, List<ProcessedUser>> =
-        either { map { !it.process() } }
+        either { map { it.process().bind() } }
 }
 ```
 
