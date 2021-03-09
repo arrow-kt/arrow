@@ -229,7 +229,7 @@ fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T>
 @Deprecated(
   "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
   ReplaceWith(
-    "Const.mapN(MA, this, arg1)",
+    "this.zip(MA, arg1)",
     "arrow.core.Const"
   ),
   DeprecationLevel.WARNING
