@@ -17,7 +17,7 @@ permalink: /arrow/typeclasses/monoid/
 
 For example, if we have a `Monoid<String>` with `combine` defined as string concatenation, then `empty() = ""`.
 
-Having an empty defined allows us to combine all the elements of some potentially empty collection of `T` for which a `Monoid<T>` is defined and return a `T`, rather than an `Option<T>` as we have a sensible default to fall back to.
+Having `empty` defined allows us to combine all the elements of some potentially empty collection of `T` for which a `Monoid<T>` is defined and return a `T`, rather than an `Option<T>` as we have a sensible default to fall back to.
 
 Let's see the instance of Monoid<String> in action:
 
