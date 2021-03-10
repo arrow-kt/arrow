@@ -454,26 +454,10 @@ sealed class Validated<out E, out A> {
         e.nonFatalOrThrow().invalid()
       }
 
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend fun <A> catch(f: suspend () -> A): Validated<Throwable, A> =
-      try {
-        f().valid()
-      } catch (e: Throwable) {
-        e.nonFatalOrThrow().invalid()
-      }
-
     inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
       catch(f).mapLeft(recover)
 
     inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
-      try {
-        f().validNel()
-      } catch (e: Throwable) {
-        e.nonFatalOrThrow().invalidNel()
-      }
-
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend fun <A> catchNel(f: suspend () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
       } catch (e: Throwable) {
@@ -891,10 +875,6 @@ sealed class Validated<out E, out A> {
   inline fun <B> map(f: (A) -> B): Validated<E, B> =
     bimap(::identity, f)
 
-  @Deprecated("Use mapLeft for consistency", ReplaceWith("mapLeft(f)"))
-  inline fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> =
-    mapLeft(f)
-
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
    * Or, if the original valid was Valid, return it.
@@ -1075,13 +1055,6 @@ inline fun <E, A, B> Validated<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) ->
 
 fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
   ff.map { this.ap(SE, it) }
-
-@Deprecated(
-  "To keep API consistent with Either and Option please use `handleErrorWith` instead",
-  ReplaceWith("handleErrorWith(f)")
-)
-inline fun <E, A> Validated<E, A>.handleLeftWith(f: (E) -> Validated<E, A>): Validated<E, A> =
-  handleErrorWith(f)
 
 inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
   when (this) {

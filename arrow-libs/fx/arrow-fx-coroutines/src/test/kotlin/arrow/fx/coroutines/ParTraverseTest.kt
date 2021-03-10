@@ -1,14 +1,12 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.Dispatchers
-import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
@@ -78,17 +76,6 @@ class ParTraverseTest : ArrowFxSpec(
         single.use { ctx ->
           (0 until i).parTraverse(ctx) { Thread.currentThread().name }
         } shouldBe (0 until i).map { "single" }
-      }
-    }
-
-    "parTraverseN throws validation error as semaphore limit is greater than Int max value" {
-      val ref = Atomic(0)
-      shouldThrowExactly<ArithmeticException> {
-        (0 until 100).parTraverseN(Long.MAX_VALUE) {
-          ref.update { it + 1 }
-        }
-
-        ref.get() shouldBe 100
       }
     }
 
@@ -178,17 +165,6 @@ class ParTraverseTest : ArrowFxSpec(
       val count = 20_000
       val l = (0 until count).parTraverseN(20) { it }
       l shouldBe (0 until count).toList()
-    }
-
-    "parSequenceN throws validation error as semaphore limit is greater than Int max value" {
-      val ref = Atomic(0)
-      shouldThrowExactly<ArithmeticException> {
-        (0 until 100)
-          .map { suspend { ref.update { it + 1 } } }
-          .parSequenceN(Long.MAX_VALUE)
-
-        ref.get() shouldBe 100
-      }
     }
 
     "parSequenceN can traverse effect full computations" {

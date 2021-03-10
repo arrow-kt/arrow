@@ -144,13 +144,6 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "toOption should convert" {
-      forAll { a: Int ->
-        Right(a).toOption() == Some(a) &&
-          Left(a).toOption() == None
-      }
-    }
-
     "orNull should convert" {
       forAll { a: Int ->
         Right(a).orNull() == a &&
@@ -160,9 +153,12 @@ class EitherTest : UnitSpec() {
 
     "contains should check value" {
       forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
-        Right(a).contains(a) &&
-          !Right(a).contains(b) &&
-          !Left(a).contains(a)
+        val rightContains = Right(a).contains(a)
+        // We need to check that a != b or this test will result in a false negative
+        val rightDoesntContains = if (a != b) !Right(a).contains(b) else true
+        val leftNeverContains = !Left(a).contains(a)
+
+        rightContains && rightDoesntContains && leftNeverContains
       }
     }
 
