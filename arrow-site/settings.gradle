@@ -20,7 +20,6 @@ includeBuild('../arrow-libs/') {
         substitute module('io.arrow-kt:arrow-ank-gradle') with project(':arrow-ank-gradle')
         substitute module('io.arrow-kt:arrow-ank') with project(':arrow-ank')
         substitute module('io.arrow-kt:arrow-core-data') with project(':arrow-core-data')
-        substitute module('io.arrow-kt:arrow-syntax') with project(':arrow-syntax')
         substitute module('io.arrow-kt:arrow-meta') with project(':arrow-meta')
         substitute module('io.arrow-kt:arrow-fx-stm') with project(':arrow-fx-stm')
         substitute module('io.arrow-kt:arrow-fx-coroutines') with project(':arrow-fx-coroutines')

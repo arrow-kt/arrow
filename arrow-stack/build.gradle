@@ -26,7 +26,6 @@ dependencies {
         api "io.arrow-kt:arrow-meta:$VERSION_NAME"
         api "io.arrow-kt:arrow-optics:$VERSION_NAME"
         api "io.arrow-kt:arrow-optics-test:$VERSION_NAME"
-        api "io.arrow-kt:arrow-syntax:$VERSION_NAME"
     }
 }
 

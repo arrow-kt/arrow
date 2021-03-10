@@ -20,7 +20,6 @@ In this doc, we'll describe all the modules that form the core, alongside a list
 * [arrow-optics]({{ '/quickstart/libraries/#arrow-optics' | relative_url }})
 * [arrow-fx-coroutines]({{ '/quickstart/libraries/#arrow-fx-coroutines' | relative_url }})
 * [arrow-fx-stm]({{ '/quickstart/libraries/#arrow-fx-stm' | relative_url }})
-* [arrow-syntax]({{ '/quickstart/libraries/#arrow-syntax' | relative_url }})
 * [arrow-mtl]({{ '/quickstart/libraries/#arrow-mtl' | relative_url }})
 * [arrow-mtl-data]({{ '/quickstart/libraries/#arrow-mtl-data' | relative_url }})
 * [arrow-recursion]({{ '/quickstart/libraries/#arrow-recursion' | relative_url }})
@@ -101,22 +100,6 @@ Dependency: `arrow-fx-coroutines`
 ## Extension libraries
 
 These libraries are hosted inside the Arrow repository building on the core, to provide higher level constructs to deal with concepts rather than code abstraction.
-
-### arrow-syntax
-
-```groovy
-dependencies {
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
-}
-```
-
-Multiple extensions functions to work better with function objects and collections.
-
-For function objects, the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
-
-For collections, arrow-syntax provides `firstOption`, tail, basic list traversal, and tuple addition.
-
-Dependency: `arrow-core`
 
 ### arrow-mtl
 

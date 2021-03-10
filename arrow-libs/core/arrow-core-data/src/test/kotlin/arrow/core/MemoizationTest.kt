@@ -1,4 +1,4 @@
-package arrow.syntax.function
+package arrow.core
 
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

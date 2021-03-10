@@ -1,27 +1,7 @@
-package arrow.syntax.test
+package arrow.core
 
-import arrow.syntax.function.andThen
-import arrow.syntax.function.bind
-import arrow.syntax.function.complement
-import arrow.syntax.function.compose
-import arrow.syntax.function.curried
-import arrow.syntax.function.forwardCompose
-import arrow.syntax.function.invoke
-import arrow.syntax.function.memoize
-import arrow.syntax.function.paired
-import arrow.syntax.function.partially1
-import arrow.syntax.function.partially2
-import arrow.syntax.function.partially3
-import arrow.syntax.function.partially4
-import arrow.syntax.function.partially5
-import arrow.syntax.function.reverse
-import arrow.syntax.function.tripled
-import arrow.syntax.function.uncurried
-import arrow.syntax.function.unpaired
-import arrow.syntax.function.untripled
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
-import java.util.Random
 
 class FunctionSyntaxTest : UnitSpec() {
 
@@ -52,13 +32,6 @@ class FunctionSyntaxTest : UnitSpec() {
       (ninja + potato) shouldBe (get andThen map)()
     }
 
-    "it should compose function correctly (forwardCompose)" {
-      val randomDigit = Random().nextInt()
-      val get = { randomDigit }
-      val pow = { i: Int -> i * i }
-      randomDigit * randomDigit shouldBe (get forwardCompose pow)()
-    }
-
     "testAndThen" {
       val add5andMultiplyBy2 = add5 andThen multiplyBy2
       add5andMultiplyBy2(2) shouldBe 14
@@ -66,16 +39,6 @@ class FunctionSyntaxTest : UnitSpec() {
 
     "testAndThen2" {
       val sumAndMultiplyBy2 = sum andThen multiplyBy2
-      sumAndMultiplyBy2(5, 2) shouldBe 14
-    }
-
-    "testForwardCompose" {
-      val add5andMultiplyBy2 = add5 forwardCompose multiplyBy2
-      add5andMultiplyBy2(2) shouldBe 14
-    }
-
-    "testForwardCompose2" {
-      val sumAndMultiplyBy2 = sum forwardCompose multiplyBy2
       sumAndMultiplyBy2(5, 2) shouldBe 14
     }
 
@@ -179,7 +142,7 @@ class FunctionSyntaxTest : UnitSpec() {
     }
 
     "testReverse" {
-      val j: (String, List<String>) -> List<String> = f(p2 = 1)
+      val j: (String, List<String>) -> List<String> = f.partially2(1)
       j("x", listOf("a", "b", "c")) shouldBe j.reverse()(listOf("a", "b", "c"), "x")
     }
 
@@ -198,12 +161,12 @@ class FunctionSyntaxTest : UnitSpec() {
 
     "partials" {
       val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
-      val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints(p5 = 10)
-      val sum3intsTo15: (Int, Int, Int) -> Int = sum4intsTo10(p4 = 5)
-      val sum2intsTo17: (Int, Int) -> Int = sum3intsTo15(p3 = 2)
+      val sum4intsTo10: (Int, Int, Int, Int) -> Int = sum5ints.partially5(10)
+      val sum3intsTo15: (Int, Int, Int) -> Int = sum4intsTo10.partially4(5)
+      val sum2intsTo17: (Int, Int) -> Int = sum3intsTo15.partially3(2)
       sum2intsTo17(1, 2) shouldBe 20
       val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
-      val helloX: (String) -> String = prefixAndPostfix(p1 = "Hello, ")(p2 = "!")
+      val helloX: (String) -> String = prefixAndPostfix.partially1("Hello, ").partially2("!")
       helloX("Arrow") shouldBe "Hello, Arrow!"
     }
 
@@ -213,7 +176,7 @@ class FunctionSyntaxTest : UnitSpec() {
         i += a
       }
 
-      val binded = ::inc.bind(5)
+      val binded = ::inc.partially1(5)
       i shouldBe 0
       binded()
       i shouldBe 5

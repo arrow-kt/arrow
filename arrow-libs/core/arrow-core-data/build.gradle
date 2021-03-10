@@ -13,7 +13,6 @@ apply from: "$ANIMALSNIFFER"
 dependencies {
     api project(":arrow-annotations")
     api project(":arrow-continuations")
-    testCompileOnly project(":arrow-syntax")
     testCompileOnly project(":arrow-core")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testImplementation project(":arrow-core-test")

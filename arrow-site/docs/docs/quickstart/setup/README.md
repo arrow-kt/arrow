@@ -76,7 +76,6 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
     implementation "io.arrow-kt:arrow-core"
     implementation "io.arrow-kt:arrow-fx"
-    implementation "io.arrow-kt:arrow-syntax"
     ...
 ```
 

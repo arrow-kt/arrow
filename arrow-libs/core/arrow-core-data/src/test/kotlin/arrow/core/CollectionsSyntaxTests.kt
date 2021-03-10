@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package arrow.syntax.test
+package arrow.core
 
-import arrow.syntax.collections.destructured
-import arrow.syntax.collections.prependTo
-import arrow.syntax.collections.tail
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 
@@ -35,7 +32,7 @@ class CollectionsSyntaxTests : UnitSpec() {
     }
 
     "destructured" {
-      val (head, tail) = listOf(1, 2, 3).destructured()
+      val (head, tail) = listOf(1, 2, 3).let { it.first() to it.tail() }
       head shouldBe 1
       tail shouldBe listOf(2, 3)
     }

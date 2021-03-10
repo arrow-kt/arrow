@@ -1,5 +1,9 @@
 package arrow.core
 
+fun <P1, P2, R> ((P1, P2) -> R).paired(): (Pair<P1, P2>) -> R = { pair: Pair<P1, P2> -> this(pair.component1(), pair.component2()) }
+
+fun <P1, P2, P3, R> ((P1, P2, P3) -> R).tripled(): (Triple<P1, P2, P3>) -> R = { triple: Triple<P1, P2, P3> -> this(triple.component1(), triple.component2(), triple.component3()) }
+
 fun <T1, T2, T3, T4, R> ((T1, T2, T3, T4) -> R).tupled(): (Tuple4<T1, T2, T3, T4>) -> R = { (t1, t2, t3, t4) -> this(t1, t2, t3, t4) }
 
 fun <T1, T2, T3, T4, T5, R> ((T1, T2, T3, T4, T5) -> R).tupled(): (Tuple5<T1, T2, T3, T4, T5>) -> R = { (t1, t2, t3, t4, t5) -> this(t1, t2, t3, t4, t5) }
@@ -37,6 +41,10 @@ fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17,
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, R> ((T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) -> R).tupled(): (Tuple21<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>) -> R = { (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21) -> this(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21) }
 
 fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, R> ((T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) -> R).tupled(): (Tuple22<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>) -> R = { (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22) -> this(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22) }
+
+fun <P1, P2, R> ((Pair<P1, P2>) -> R).unpaired(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1 to p2) }
+
+fun <P1, P2, P3, R> ((Triple<P1, P2, P3>) -> R).untripled(): (P1, P2, P3) -> R = { p1: P1, p2: P2, p3: P3 -> this(Triple(p1, p2, p3)) }
 
 fun <T1, T2, T3, T4, R> ((Tuple4<T1, T2, T3, T4>) -> R).untupled(): (T1, T2, T3, T4) -> R = { t1, t2, t3, t4 -> this(Tuple4(t1, t2, t3, t4)) }
 
