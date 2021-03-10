@@ -6,7 +6,6 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
-import arrow.typeclasses.TraverseDeprecation
 
 @Deprecated(
   message = KindDeprecation,
