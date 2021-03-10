@@ -20,12 +20,10 @@ import arrow.core.test.laws.EqKLaws
 import arrow.core.test.laws.FoldableLaws
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.MonoidKLaws
-import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.MonoidalLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
 class SetKTest : UnitSpec() {
@@ -44,7 +42,6 @@ class SetKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(SetK.show(Int.show()), EQ, Gen.genSetK(Gen.int())),
-      MonoidLaws.laws(Monoid.set(), Gen.set(Gen.int()), Eq.any()),
       SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
       MonoidalLaws.laws(
         SetK.monoidal(),
