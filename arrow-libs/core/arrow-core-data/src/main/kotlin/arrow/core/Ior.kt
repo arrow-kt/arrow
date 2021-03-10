@@ -64,27 +64,6 @@ sealed class Ior<out A, out B> {
 
   companion object {
     /**
-     * Create an [Ior] from two Options if at least one of them is defined.
-     *
-     * @param oa an element (optional) for the left side of the [Ior]
-     * @param ob an element (optional) for the right side of the [Ior]
-     *
-     * @return [None] if both [oa] and [ob] are [None]. Otherwise [Some] wrapping
-     * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
-     */
-    @Deprecated("Deprecated, use `fromNullables` instead", ReplaceWith("fromNullables(a, b)"))
-    fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
-      is Some -> when (ob) {
-        is Some -> Some(Both(oa.value, ob.value))
-        is None -> Some<Ior<A, B>>(Left(oa.value))
-      }
-      is None -> when (ob) {
-        is Some -> Some(Right(ob.value))
-        is None -> None
-      }
-    }
-
-    /**
      * Create an [Ior] from two nullables if at least one of them is defined.
      *
      * @param a an element (nullable) for the left side of the [Ior]
@@ -420,23 +399,6 @@ sealed class Ior<out A, out B> {
   )
 
   /**
-   * Return this [Ior] as [Pair] of [Option]
-   *
-   * Example:
-   * ```
-   * Ior.Right(12).pad()          // Result: Pair(None, Some(12))
-   * Ior.Left(12).pad()           // Result: Pair(Some(12), None)
-   * Ior.Both("power", 12).pad()  // Result: Pair(Some("power"), Some(12))
-   * ```
-   */
-  @Deprecated("Deprecated, use `padNull` instead", ReplaceWith("padNull()"))
-  fun pad(): Pair<Option<A>, Option<B>> = fold(
-    { Pair(Some(it), None) },
-    { Pair(None, Some(it)) },
-    { a, b -> Pair(Some(a), Some(b)) }
-  )
-
-  /**
    * Return this [Ior] as [Pair] of nullables]
    *
    * Example:
@@ -477,21 +439,6 @@ sealed class Ior<out A, out B> {
     fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
 
   /**
-   * Returns a [Some] containing the [Right] value or `B` if this is [Right] or [Both]
-   * and [None] if this is a [Left].
-   *
-   * Example:
-   * ```
-   * Right(12).toOption() // Result: Some(12)
-   * Left(12).toOption()  // Result: None
-   * Both(12, "power").toOption()  // Result: Some("power")
-   * ```
-   */
-  @Deprecated("Deprecated, use `orNull` instead", ReplaceWith("orNull()"))
-  fun toOption(): Option<B> =
-    fold({ None }, { Some(it) }, { _, b -> Some(b) })
-
-  /**
    * Returns the [Right] value or `B` if this is [Right] or [Both]
    * and [null] if this is a [Left].
    *
@@ -513,21 +460,6 @@ sealed class Ior<out A, out B> {
    */
   fun orNull(): B? =
     fold({ null }, { it }, { _, b -> b })
-
-  /**
-   * Returns a [Some] containing the [Left] value or `A` if this is [Left] or [Both]
-   * and [None] if this is a [Right].
-   *
-   * Example:
-   * ```
-   * Right(12).toLeftOption() // Result: None
-   * Left(12).toLeftOption()  // Result: Some(12)
-   * Both(12, "power").toLeftOption()  // Result: Some(12)
-   * ```
-   */
-  @Deprecated("Deprecated, use `leftOrNull` instead", ReplaceWith("leftOrNull()"))
-  fun toLeftOption(): Option<A> =
-    fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]

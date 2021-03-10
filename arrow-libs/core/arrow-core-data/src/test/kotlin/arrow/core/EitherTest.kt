@@ -144,13 +144,6 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "toOption should convert" {
-      forAll { a: Int ->
-        Right(a).toOption() == Some(a) &&
-          Left(a).toOption() == None
-      }
-    }
-
     "orNull should convert" {
       forAll { a: Int ->
         Right(a).orNull() == a &&

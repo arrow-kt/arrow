@@ -114,10 +114,10 @@ class OptionTest : UnitSpec() {
       none.exists { it.startsWith('k') } shouldBe false
     }
 
-    "forall" {
-      some.forall { it.startsWith('k') } shouldBe true
-      some.forall { it.startsWith('j') } shouldBe false
-      none.forall { it.startsWith('k') } shouldBe true
+    "all" {
+      some.all { it.startsWith('k') } shouldBe true
+      some.all { it.startsWith('j') } shouldBe false
+      none.all { it.startsWith('k') } shouldBe true
     }
 
     "orElse" {
@@ -155,9 +155,9 @@ class OptionTest : UnitSpec() {
     }
 
     "toLeftOption" {
-      1.leftIor().toLeftOption() shouldBe Some(1)
-      2.rightIor().toLeftOption() shouldBe None
-      (1 to 2).bothIor().toLeftOption() shouldBe Some(1)
+      1.leftIor().leftOrNull() shouldBe 1
+      2.rightIor().leftOrNull() shouldBe null
+      (1 to 2).bothIor().leftOrNull() shouldBe 1
     }
   }
 }

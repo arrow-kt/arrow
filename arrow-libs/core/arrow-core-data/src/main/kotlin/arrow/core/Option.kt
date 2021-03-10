@@ -513,17 +513,6 @@ sealed class Option<out A> {
   fun <B> mapConst(b: B): Option<B> =
     map { b }
 
-  @Deprecated(
-    "filterMap will be renamed to mapNotNull to be consistent with Kotlin Std's naming, please use mapNotNull instead of filterMap",
-    ReplaceWith(
-      "this.mapNotNull(f.andThen { it.orNull() })",
-      "arrow.core.andThen"
-    ),
-    level = DeprecationLevel.WARNING
-  )
-  fun <B> filterMap(f: (A) -> Option<B>): Option<B> =
-    flatMap(f)
-
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
     is Some<A> -> ifSome(value)
@@ -558,10 +547,10 @@ sealed class Option<out A> {
     }
 
   fun <B> align(b: Option<B>): Option<Ior<A, B>> =
-    Ior.fromOptions(this, b)
+    Ior.fromNullables(this.orNull(), b.orNull()).toOption()
 
   inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
-    Ior.fromOptions(this, b).map(f)
+    Ior.fromNullables(this.orNull(), b.orNull())?.let(f).toOption()
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -640,21 +629,6 @@ sealed class Option<out A> {
    * @param predicate the predicate to test
    */
   inline fun exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
-
-  /**
-   * Returns true if this option is empty '''or''' the predicate
-   * $p returns true when applied to this $option's value.
-   *
-   * @param p the predicate to test
-   */
-  @Deprecated(
-    "forall will be renamed to all to be consistent with Kotlin Std's naming, please use all instead of forall",
-    ReplaceWith(
-      "this.all(p)"
-    ),
-    DeprecationLevel.WARNING
-  )
-  inline fun forall(p: (A) -> Boolean): Boolean = fold({ true }, p)
 
   /**
    * Returns the $option's value if this option is nonempty '''and''' the predicate

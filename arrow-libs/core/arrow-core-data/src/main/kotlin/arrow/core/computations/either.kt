@@ -20,14 +20,6 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
       is Validated.Valid -> value
       is Validated.Invalid -> control().shift(Left(value))
     }
-
-  @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))
-  suspend operator fun <B> Either<E, B>.not(): B =
-    bind()
-
-  @Deprecated("This operator can have problems when you do not capture the value, please use bind() instead", ReplaceWith("bind()"))
-  suspend operator fun <B> Either<E, B>.component1(): B =
-    bind()
 }
 
 @RestrictsSuspension
