@@ -150,7 +150,7 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
 ): Map<Key, L> {
   val destination = LinkedHashMap<Key, L>(size)
   for ((key, bb) in this) {
-    Nullable.mapN(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
       map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
     }?.let { l -> destination.put(key, l) }
   }
