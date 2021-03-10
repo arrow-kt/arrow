@@ -52,13 +52,8 @@ fun <A> SetK<A>.maybeCombine(arg1: SetK<A>): SetK<A> = arrow.core.SetK.semigroup
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Semigroup.set<A>()",
-    "arrow.core.set",
-    "arrow.typeclasses.Semigroup"
-  ),
-  DeprecationLevel.WARNING
+  "Semigroup is no longer support for Set. Use Set#plus from Kotlin Std instead.",
+  level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.semigroup(): SetKSemigroup<A> = semigroup_singleton as
   arrow.core.extensions.SetKSemigroup<A>

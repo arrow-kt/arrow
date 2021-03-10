@@ -21,8 +21,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
+    "flatMap { a -> arg1.map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

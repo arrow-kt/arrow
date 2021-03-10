@@ -25,13 +25,8 @@ internal val monoid_singleton: SetKMonoid<Any?> = object : SetKMonoid<Any?> {}
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "combineAll(Monoid.set<A>())",
-    "arrow.core.combineAll",
-    "arrow.typeclasses.Monoid",
-    "arrow.core.set"
-  ),
+  "Monoid is no longer support for Set. Use Set#plus and emptySet from Kotlin Std instead.",
+  ReplaceWith("fold(emptySet()) { acc, a -> acc + a }"),
   DeprecationLevel.WARNING
 )
 fun <A> Collection<SetK<A>>.combineAll(): SetK<A> = arrow.core.SetK.monoid<A>().run {
@@ -46,13 +41,8 @@ fun <A> Collection<SetK<A>>.combineAll(): SetK<A> = arrow.core.SetK.monoid<A>().
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.combineAll(Monoid.set<A>())",
-    "arrow.core.combineAll",
-    "arrow.typeclasses.Monoid",
-    "arrow.core.set"
-  ),
+  "Monoid is no longer support for Set. Use Set#plus and emptySet from Kotlin Std instead.",
+  ReplaceWith("arg0.fold(emptySet()) { acc, a -> acc + a }"),
   DeprecationLevel.WARNING
 )
 fun <A> combineAll(arg0: List<SetK<A>>): SetK<A> = arrow.core.SetK
@@ -64,13 +54,8 @@ fun <A> combineAll(arg0: List<SetK<A>>): SetK<A> = arrow.core.SetK
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Monoid.set<A>()",
-    "arrow.core.set",
-    "arrow.typeclasses.Monoid"
-  ),
-  DeprecationLevel.WARNING
+  "Monoid is no longer support for Set. Use Set#plus and emptySet from Kotlin Std instead.",
+  level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.monoid(): SetKMonoid<A> = monoid_singleton as
   arrow.core.extensions.SetKMonoid<A>
