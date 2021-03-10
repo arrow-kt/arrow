@@ -246,7 +246,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  *
  * //sampleStart
  * val parallelValidate =
- *    1.validNel().zip(NonEmptyList.semigroup<ConfigError>(), 2.validNel())
+ *    1.validNel().zip(Semigroup.nonEmptyList<ConfigError>(), 2.validNel())
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
