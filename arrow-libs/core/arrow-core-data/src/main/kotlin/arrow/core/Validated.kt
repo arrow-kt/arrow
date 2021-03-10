@@ -233,24 +233,40 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * ### Improving the validation
  *
  * Kotlin says that our match is not exhaustive and we have to add `else`. To solve this, we would need to nest our when,
- * but that would complicate the code. To achieve this, Arrow provides [mapN] & [tupledN].
+ * but that would complicate the code. To achieve this, Arrow provides [zip].
  * This function combines [Validated]s by accumulating errors in a tuple, which we can then map.
  * The above function can be rewritten as follows:
  *
  * ```kotlin:ank:silent
  * import arrow.core.Validated
  * import arrow.core.validNel
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.core.zip
+ * import arrow.typeclasses.Semigroup
+ * import arrow.core.nonEmptyList
  *
  * //sampleStart
- * val parallelValidate = Validated
- *   .mapN(NonEmptyList.semigroup<ConfigError>(), 1.validNel(), 2.validNel())
+ * val parallelValidate =
+ *    1.validNel().zip(NonEmptyList.semigroup<ConfigError>(), 2.validNel())
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
  *
- * Note that there are multiple `tupledN` functions with more arities, so we could easily add more parameters without worrying about
+ * Note that there are multiple `zip` functions with more arities, so we could easily add more parameters without worrying about
  * the function blowing up in complexity.
+ *
+ * When working with `NonEmptyList` in the `Invalid` side, there is no need to supply `Semigroup` as shown in the example above.
+ *
+ * ```kotlin:ank:silent
+ * import arrow.core.Validated
+ * import arrow.core.validNel
+ * import arrow.core.zip
+ *
+ * //sampleStart
+ * val parallelValidate =
+ *   1.validNel().zip(2.validNel())
+ *     { a, b -> /* combine the result */ }
+ * //sampleEnd
+ * ```
  *
  * ---
  *
