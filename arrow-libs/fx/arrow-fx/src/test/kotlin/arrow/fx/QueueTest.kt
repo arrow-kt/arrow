@@ -469,25 +469,6 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
         }
       }
 
-      // To test outstanding offers, we need to `offer` more elements to the queue than we have capacity
-      "$label - peekAll reads all values, including outstanding offers" {
-        forAll(
-          50,
-          Gen.nonEmptyList(Gen.int()).filter { it.size in 51..100 },
-          Gen.choose(1, 50)
-        ) { l, capacity ->
-          IO.fx {
-            val q = queue(capacity).bind()
-            l.parTraverse(NonEmptyList.traverse(), q::offer).fork().bind()
-            IO.sleep(50.milliseconds).bind() // Give take callbacks a chance to register
-
-            val res = q.peekAll().map(Iterable<Int>::toSet).bind()
-            val after = q.peekAll().map(Iterable<Int>::toSet).bind()
-            Tuple2(res, after)
-          }.equalUnderTheLaw(IO.just(Tuple2(l.toList().toSet(), l.toList().toSet())))
-        }
-      }
-
       // Offer only gets scheduled for Bounded Queues, others apply strategy.
       "$label - offer is cancelable" {
         forAll(Gen.int()) {
