@@ -168,6 +168,124 @@ sealed class Resource<out A> {
   fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     zip(other, ::Pair)
 
+  inline fun <B, C, D> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    crossinline map: (A, B, C) -> D
+  ): Resource<D> =
+    zip(b, c, unit, unit, unit, unit, unit, unit, unit) { a, b, c, _, _, _, _, _, _, _ ->
+      map(a, b, c)
+    }
+
+  inline fun <B, C, D, E> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    crossinline map: (A, B, C, D) -> E
+  ): Resource<E> =
+    zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
+      map(a, b, c, d)
+    }
+
+  inline fun <B, C, D, E, F, G> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    crossinline map: (A, B, C, D, E) -> G
+  ): Resource<G> =
+    zip(b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
+      map(a, b, c, d, e)
+    }
+
+  inline fun <B, C, D, E, F, G, H> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    crossinline map: (A, B, C, D, E, F) -> G
+  ): Resource<G> =
+    zip(b, c, d, e, f, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ ->
+      map(b, c, d, e, f, g)
+    }
+
+  inline fun <B, C, D, E, F, G, H> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    crossinline map: (A, B, C, D, E, F, G) -> H
+  ): Resource<H> =
+    zip(b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ ->
+      map(a, b, c, d, e, f, g)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    crossinline map: (A, B, C, D, E, F, G, H) -> I
+  ): Resource<I> =
+    zip(b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ ->
+      map(a, b, c, d, e, f, g, h)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I, J> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    i: Resource<I>,
+    crossinline map: (A, B, C, D, E, F, G, H, I) -> J
+  ): Resource<J> =
+    zip(b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ ->
+      map(a, b, c, d, e, f, g, h, i)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I, J, K> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    i: Resource<I>,
+    j: Resource<J>,
+    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K
+  ): Resource<K> =
+    flatMap { aa ->
+      b.flatMap { bb ->
+        c.flatMap { cc ->
+          d.flatMap { dd ->
+            e.flatMap { ee ->
+              f.flatMap { ff ->
+                g.flatMap { gg ->
+                  h.flatMap { hh ->
+                    i.flatMap { ii ->
+                      j.map { jj ->
+                        map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
   class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
 
   class Allocate<A>(
@@ -323,141 +441,6 @@ sealed class Resource<out A> {
 
       return loop(f(a))
     }
-
-    inline fun <B, C, D> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      crossinline map: (B, C) -> D
-    ): Resource<D> =
-      mapN(b, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ ->
-        map(b, c)
-      }
-
-    inline fun <B, C, D, E> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      crossinline map: (B, C, D) -> E
-    ): Resource<E> =
-      mapN(b, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ ->
-        map(b, c, d)
-      }
-
-    inline fun <B, C, D, E, F> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      crossinline map: (B, C, D, E) -> F
-    ): Resource<F> =
-      mapN(b, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ ->
-        map(b, c, d, e)
-      }
-
-    inline fun <B, C, D, E, F, G> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      crossinline map: (B, C, D, E, F) -> G
-    ): Resource<G> =
-      mapN(b, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ ->
-        map(b, c, d, e, f)
-      }
-
-    inline fun <B, C, D, E, F, G, H> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      crossinline map: (B, C, D, E, F, G) -> H
-    ): Resource<H> =
-      mapN(b, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ ->
-        map(b, c, d, e, f, g)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      crossinline map: (B, C, D, E, F, G, H) -> I
-    ): Resource<I> =
-      mapN(b, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ ->
-        map(b, c, d, e, f, g, h)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      crossinline map: (B, C, D, E, F, G, H, I) -> J
-    ): Resource<J> =
-      mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ ->
-        map(b, c, d, e, f, g, h, i)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      j: Resource<J>,
-      crossinline map: (B, C, D, E, F, G, H, I, J) -> K
-    ): Resource<K> =
-      mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ ->
-        map(b, c, d, e, f, g, h, i, j)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      j: Resource<J>,
-      k: Resource<K>,
-      crossinline map: (B, C, D, E, F, G, H, I, J, K) -> L
-    ): Resource<L> =
-      b.flatMap { bb ->
-        c.flatMap { cc ->
-          d.flatMap { dd ->
-            e.flatMap { ee ->
-              f.flatMap { ff ->
-                g.flatMap { gg ->
-                  h.flatMap { hh ->
-                    i.flatMap { ii ->
-                      j.flatMap { jj ->
-                        k.map { kk ->
-                          map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
   }
 
   private suspend fun continueLoop(

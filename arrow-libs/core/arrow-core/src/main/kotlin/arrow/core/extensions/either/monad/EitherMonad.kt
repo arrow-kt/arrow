@@ -14,6 +14,7 @@ import arrow.core.ForEither
 import arrow.core.Tuple2
 import arrow.core.extensions.EitherMonad
 import arrow.core.fix
+import arrow.core.zip
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Function0
@@ -104,9 +105,9 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedBy(arg1: Kind<Kind<ForEither, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(this, fb) { left, _ -> left }", "arrow.core.mapN"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.mapN"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.apTap(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
-  Either.mapN(fix(), arg1.fix()) { left, _ -> left }
+  fix().zip(arg1.fix()) { left, _ -> left }
 
 @JvmName("followedByEval")
 @Suppress(

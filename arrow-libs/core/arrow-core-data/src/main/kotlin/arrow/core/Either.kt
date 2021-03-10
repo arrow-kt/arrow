@@ -1271,125 +1271,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
-
-    inline fun <A, B, C, D> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      map: (B, C) -> D
-    ): Either<A, D> =
-      mapN(b, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-
-    inline fun <A, B, C, D, E> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      map: (B, C, D) -> E
-    ): Either<A, E> =
-      mapN(b, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-    inline fun <A, B, C, D, E, F> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      map: (B, C, D, E) -> F
-    ): Either<A, F> =
-      mapN(b, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
-
-    inline fun <A, B, C, D, E, F, G> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      map: (B, C, D, E, F) -> G
-    ): Either<A, G> =
-      mapN(b, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
-
-    inline fun <A, B, C, D, E, F, G, H> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      g: Either<A, G>,
-      map: (B, C, D, E, F, G) -> H
-    ): Either<A, H> =
-      mapN(b, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
-
-    inline fun <A, B, C, D, E, F, G, H, I> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      g: Either<A, G>,
-      h: Either<A, H>,
-      map: (B, C, D, E, F, G, H) -> I
-    ): Either<A, I> =
-      mapN(b, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      g: Either<A, G>,
-      h: Either<A, H>,
-      i: Either<A, I>,
-      map: (B, C, D, E, F, G, H, I) -> J
-    ): Either<A, J> =
-      mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      g: Either<A, G>,
-      h: Either<A, H>,
-      i: Either<A, I>,
-      j: Either<A, J>,
-      map: (B, C, D, E, F, G, H, I, J) -> K
-    ): Either<A, K> =
-      mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J, K, L> mapN(
-      b: Either<A, B>,
-      c: Either<A, C>,
-      d: Either<A, D>,
-      e: Either<A, E>,
-      f: Either<A, F>,
-      g: Either<A, G>,
-      h: Either<A, H>,
-      i: Either<A, I>,
-      j: Either<A, J>,
-      k: Either<A, K>,
-      map: (B, C, D, E, F, G, H, I, J, K) -> L
-    ): Either<A, L> =
-      b.flatMap { bb ->
-        c.flatMap { cc ->
-          d.flatMap { dd ->
-            e.flatMap { ee ->
-              f.flatMap { ff ->
-                g.flatMap { gg ->
-                  h.flatMap { hh ->
-                    i.flatMap { ii ->
-                      j.flatMap { jj ->
-                        k.map { kk ->
-                          map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
   }
 
   /**
@@ -1701,6 +1582,110 @@ fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D
 fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
   flatMap { a ->
     fb.map { b -> Pair(a, b) }
+  }
+
+inline fun <A, B, C, D, E> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  map: (B, C, D) -> E
+): Either<A, E> =
+  zip(c, d, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+inline fun <A, B, C, D, E, F> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  map: (B, C, D, E) -> F
+): Either<A, F> =
+  zip(c, d, e, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  map: (B, C, D, E, F) -> G
+): Either<A, G> =
+  zip(c, d, e, f, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  g: Either<A, G>,
+  map: (B, C, D, E, F, G) -> H
+): Either<A, H> =
+  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  g: Either<A, G>,
+  h: Either<A, H>,
+  map: (B, C, D, E, F, G, H) -> I
+): Either<A, I> =
+  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  g: Either<A, G>,
+  h: Either<A, H>,
+  i: Either<A, I>,
+  map: (B, C, D, E, F, G, H, I) -> J
+): Either<A, J> =
+  zip(c, d, e, f, g, h, i, Either.unit, Either.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  g: Either<A, G>,
+  h: Either<A, H>,
+  i: Either<A, I>,
+  j: Either<A, J>,
+  map: (B, C, D, E, F, G, H, I, J) -> K
+): Either<A, K> =
+  zip(c, d, e, f, g, h, i, j, Either.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
+  c: Either<A, C>,
+  d: Either<A, D>,
+  e: Either<A, E>,
+  f: Either<A, F>,
+  g: Either<A, G>,
+  h: Either<A, H>,
+  i: Either<A, I>,
+  j: Either<A, J>,
+  k: Either<A, K>,
+  map: (B, C, D, E, F, G, H, I, J, K) -> L
+): Either<A, L> =
+  flatMap { bb ->
+    c.flatMap { cc ->
+      d.flatMap { dd ->
+        e.flatMap { ee ->
+          f.flatMap { ff ->
+            g.flatMap { gg ->
+              h.flatMap { hh ->
+                i.flatMap { ii ->
+                  j.flatMap { jj ->
+                    k.map { kk ->
+                      map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
 fun <A, B, C, Z> Either<A, B>.zipEval(fb: Eval<Either<A, C>>, f: (B, C) -> Z): Eval<Either<A, Z>> =

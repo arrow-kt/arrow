@@ -232,6 +232,7 @@ import arrow.core.traverseEither
 import arrow.core.traverseValidated
 import arrow.core.validNel
 import arrow.typeclasses.Semigroup
+import arrow.core.zip
 ```
 
 *Model*
@@ -268,9 +269,8 @@ object Rules {
     else ValidationError.MaxLength(maxLength).invalidNel()
 
   private fun FormField.validateErrorAccumulate(): ValidatedNel<ValidationError, Email> =
-    ValidatedNel.mapN(
-      Semigroup.nonEmptyList(), // accumulates errors in a non empty list
-      contains("@"),
+  contains("@").zip(
+      Semigroup.nonEmptyList(), // accumulates errors in a non empty list, can be omited for NonEmptyList
       maxLength(250)
     ) { _, _ -> Email(value) }.handleErrorWith { ValidationError.NotAnEmail(it).invalidNel() }
 
