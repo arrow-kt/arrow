@@ -13,6 +13,7 @@ import arrow.core.ifS
 import arrow.core.andS
 import arrow.core.orS
 import arrow.core.whenS
+import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 import kotlin.Boolean
 import kotlin.Function0
@@ -42,7 +43,7 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, Either<A, B>>.select(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("branch(arg1, arg2)", "arrow.core.branch"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A, B, C> Kind<Kind<ForValidated, E>, Either<A, B>>.branch(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Function1<A, C>>,
@@ -57,7 +58,7 @@ fun <E, A, B, C> Kind<Kind<ForValidated, E>, Either<A, B>>.branch(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("whenS(arg1)", "arrow.core.whenS"))
+@Deprecated(SelectiveDeprecation)
 fun <E> Kind<Kind<ForValidated, E>, Boolean>.whenS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Function0<Unit>>
@@ -71,7 +72,7 @@ fun <E> Kind<Kind<ForValidated, E>, Boolean>.whenS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ifS(arg1, arg2)", "arrow.core.ifS"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.ifS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, A>,
@@ -86,7 +87,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.ifS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("orS(arg1)", "arrow.core.ifS"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.orS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Boolean>
@@ -100,6 +101,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.orS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.andS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated,

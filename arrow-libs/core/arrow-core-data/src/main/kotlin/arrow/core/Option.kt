@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
@@ -11,7 +12,9 @@ import arrow.typeclasses.Show
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
-class ForOption private constructor() { companion object }
+class ForOption private constructor() {
+  companion object
+}
 
 @Deprecated(
   message = KindDeprecation,
@@ -922,13 +925,13 @@ sealed class Option<out A> : OptionOf<A> {
     mapConst(Unit)
 
   fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
-    mapN(this, other) { a, b -> a to b}
+    mapN(this, other) { a, b -> a to b }
 
   inline fun <B, C> zip(other: Option<B>, f: (A, B) -> C): Option<C> =
-    zip(other).map { a -> f(a.first, a.second)}
+    zip(other).map { a -> f(a.first, a.second) }
 
   inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
-    other.map {zip(it).map { a -> f(a.first, a.second) }}
+    other.map { zip(it).map { a -> f(a.first, a.second) } }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -984,7 +987,8 @@ inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -1024,9 +1028,11 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
+@Deprecated(SelectiveDeprecation)
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
   branch(f.fix(), Some(::identity))
 
+@Deprecated(SelectiveDeprecation)
 fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
   flatMap {
     it.fold(
@@ -1034,21 +1040,6 @@ fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -
       { b -> Some(b).ap(fb) }
     )
   }
-
-private fun Option<Boolean>.selector(): Option<Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.right(Unit) else Either.left(Unit) }
-
-fun <A> Option<Boolean>.whenS(x: Option<() -> Unit>): Option<Unit> =
-  selector().select(x.map { f -> { _: Unit -> f() } })
-
-fun <A> Option<Boolean>.ifS(fl: Option<A>, fr: Option<A>): Option<A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun Option<Boolean>.orS(f: Option<Boolean>): Option<Boolean> =
-  ifS(Some(true), f)
-
-fun Option<Boolean>.andS(f: Option<Boolean>): Option<Boolean> =
-  ifS(f, Some(false))
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
@@ -1204,7 +1195,7 @@ fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
 inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
   fold(
     { Option.empty<A>() to Option.empty() },
-    { f(it).let { pair -> Some(pair.first) to Some(pair.second) }}
+    { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
   )
 
 /**
