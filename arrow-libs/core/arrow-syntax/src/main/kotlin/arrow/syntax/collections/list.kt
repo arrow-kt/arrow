@@ -1,14 +1,37 @@
 package arrow.syntax.collections
 
 import arrow.core.Option
+import arrow.core.tail as _tail
+import arrow.core.flatten as _flatten
+import arrow.core.prependTo as _prependTo
 
 /**
  * Returns a list containing all elements except the first element
  */
-fun <T> List<T>.tail(): List<T> = this.drop(1)
+@Deprecated(
+  "arrow.syntax.collections package is deprecated. Use arrow.core package instead.",
+  ReplaceWith("tail()", "arrow.core.tail")
+)
+fun <T> List<T>.tail(): List<T> =
+  _tail()
 
-infix fun <T> T.prependTo(list: List<T>): List<T> = listOf(this) + list
+@Deprecated(
+  "arrow.syntax.collections package is deprecated. Use arrow.core package instead.",
+  ReplaceWith("prependTo(list)", "arrow.core.prependTo")
+)
+infix fun <T> T.prependTo(list: List<T>): List<T> =
+  _prependTo(list)
 
-fun <T> List<T>.destructured(): Pair<T, List<T>> = first() to tail()
+@Deprecated(
+  "Unsafe operation use first and tail directly",
+  ReplaceWith("Pair(this.first(), this.tail())", "arrow.core.tail")
+)
+fun <T> List<T>.destructured(): Pair<T, List<T>> =
+  Pair(this.first(), this._tail())
 
-fun <T> List<Option<T>>.flatten(): List<T> = flatMap { it.fold(::emptyList, ::listOf) }
+@Deprecated(
+  "arrow.syntax.collections package is deprecated. Use arrow.core package instead.",
+  ReplaceWith("flatten()", "arrow.core.flatten")
+)
+fun <T> List<Option<T>>.flatten(): List<T> =
+  _flatten()
