@@ -4,7 +4,6 @@ package arrow.core
 
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.TraverseDeprecation
 import kotlin.collections.foldRight as _foldRight
 
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
@@ -21,47 +20,19 @@ inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<
     f(a).ap(acc.map { bs -> { b: B -> listOf(b) + bs } })
   }
 
-@Deprecated(TraverseDeprecation)
-inline fun <E, A> Iterable<A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight<A, Either<E, Unit>>(Unit.right()) { a, acc ->
-    f(a).ap(acc.map(void))
-  }
-}
-
 fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
-@Deprecated(TraverseDeprecation)
-fun <E> Iterable<Either<E, *>>.sequenceEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
-
-inline fun <E, A, B> Iterable<A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, List<B>> =
+inline fun <E, A, B> Iterable<A>.traverseValidated(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> =
   foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
     f(a).ap(semigroup, acc.map { bs -> { b: B -> listOf(b) + bs } })
   }
 
-@Deprecated(TraverseDeprecation)
-inline fun <E, A, B> Iterable<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Iterable<B>>): Validated<E, List<B>> =
-  foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: Iterable<B> -> b + bs } })
-  }
-
-@Deprecated(TraverseDeprecation)
-inline fun <E, A> Iterable<A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> =
-  foldRight<A, Validated<E, Unit>>(Unit.valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { { Unit } })
-  }
-
 fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(semigroup, ::identity)
-
-fun <E, A> Iterable<Validated<E, Iterable<A>>>.flatSequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  flatTraverseValidated(semigroup, ::identity)
-
-@Deprecated(TraverseDeprecation)
-fun <E> Iterable<Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
-  traverseValidated_(semigroup, ::identity)
 
 fun <A, B> Iterable<A>.mapConst(b: B): List<B> =
   map { b }
