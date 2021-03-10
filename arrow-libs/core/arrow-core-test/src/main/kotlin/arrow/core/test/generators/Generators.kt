@@ -135,7 +135,7 @@ fun <A, B> Gen.Companion.genConst(gen: Gen<A>): Gen<Const<A, B>> =
   }
 
 fun <A> Gen<A>.eval(): Gen<Eval<A>> =
-  map { Eval.just(it) }
+  map { Eval.now(it) }
 
 fun Gen.Companion.char(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())

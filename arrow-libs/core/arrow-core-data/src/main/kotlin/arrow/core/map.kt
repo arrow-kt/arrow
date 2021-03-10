@@ -4,12 +4,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
 
-@Deprecated("Receiver MapInstances object is deprecated, prefer to turn Map functions into top-level functions")
-object MapInstances
-
-@Deprecated("Receiver SortedMapInstances object is deprecated, prefer to turn SortedMap functions into top-level functions")
-object SortedMapInstances
-
 inline fun <Key, B, C, D> mapN(
   b: Map<Key, B>,
   c: Map<Key, C>,

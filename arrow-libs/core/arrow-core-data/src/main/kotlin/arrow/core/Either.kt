@@ -898,20 +898,6 @@ sealed class Either<out A, out B> {
     fold({ false }, predicate)
 
   /**
-   * Returns a [Some] containing the [Right] value
-   * if it exists or a [None] if this is a [Left].
-   *
-   * Example:
-   * ```
-   * Right(12).toOption() // Result: Some(12)
-   * Left(12).toOption()  // Result: None
-   * ```
-   */
-  @Deprecated("Deprecated, use `orNull` instead", ReplaceWith("orNull()"))
-  fun toOption(): Option<B> =
-    fold({ None }, { Some(it) })
-
-  /**
    * Returns the right value if it exists, otherwise null
    *
    * Example:
@@ -1088,16 +1074,6 @@ sealed class Either<out A, out B> {
       }
     }
 
-    @Deprecated(
-      message = "Use conditionally since the parameter order is consistent with Either class",
-      replaceWith = ReplaceWith(
-        "Either.conditionally(test, ifFalse, ifTrue)",
-        "arrow.core.Either.conditionally"
-      )
-    )
-    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> =
-      conditionally(test, ifFalse, ifTrue)
-
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
      * provided on second and third parameters. Second parameter represents function for creating
@@ -1113,10 +1089,6 @@ sealed class Either<out A, out B> {
     inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) Right(ifTrue()) else Left(ifFalse())
 
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend inline fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
-      catch { f() }
-
     inline fun <R> catch(f: () -> R): Either<Throwable, R> =
       try {
         f().right()
@@ -1124,20 +1096,8 @@ sealed class Either<out A, out B> {
         t.nonFatalOrThrow().left()
       }
 
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend inline fun <R> catchAndFlatten(f: suspend () -> Either<Throwable, R>): Either<Throwable, R> =
-      catchAndFlatten { f() }
-
     inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
       catch(f).fold({ it.left() }, { it })
-
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend fun <L, R> catch(fe: (Throwable) -> L, f: suspend () -> R): Either<L, R> =
-      try {
-        f().right()
-      } catch (t: Throwable) {
-        fe(t.nonFatalOrThrow()).left()
-      }
 
     inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
       try {
@@ -1145,19 +1105,6 @@ sealed class Either<out A, out B> {
       } catch (t: Throwable) {
         fe(t.nonFatalOrThrow()).left()
       }
-
-    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
-    suspend inline fun <E, A, B> resolve(
-      f: suspend () -> Either<E, A>,
-      success: suspend (a: A) -> Either<Throwable, B>,
-      error: suspend (e: E) -> Either<Throwable, B>,
-      throwable: suspend (throwable: Throwable) -> Either<Throwable, B>,
-      unrecoverableState: suspend (throwable: Throwable) -> Either<Throwable, Unit>
-    ): B =
-      catch { f() }
-        .fold({ t: Throwable -> throwable(t) }, { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
-        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
-        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
 
     /**
      * The resolve function can resolve any suspended function that yields an Either into one type of value.

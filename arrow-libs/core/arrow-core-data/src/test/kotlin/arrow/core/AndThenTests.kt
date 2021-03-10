@@ -1,8 +1,6 @@
-package arrow.syntax.test
+package arrow.core
 
 import arrow.core.test.generators.functionAToB
-import arrow.core.andThen
-import arrow.core.compose
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

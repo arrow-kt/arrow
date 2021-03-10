@@ -56,14 +56,6 @@ class IorTest : UnitSpec() {
       }
     }
 
-    "pad() should return the correct Pair of Options" {
-      forAll { a: Int, b: String ->
-        Ior.Left(a).pad() == Pair(Some(a), None) &&
-          Ior.Right(b).pad() == Pair(None, Some(b)) &&
-          Ior.Both(a, b).pad() == Pair(Some(a), Some(b))
-      }
-    }
-
     "padNull() should return the correct Pair of nullables" {
       forAll { a: Int, b: String ->
         Ior.Left(a).padNull() == Pair(a, null) &&
@@ -77,14 +69,6 @@ class IorTest : UnitSpec() {
         Ior.Left(a).toEither() == Either.Left(a) &&
           Ior.Right(b).toEither() == Either.Right(b) &&
           Ior.Both(a, b).toEither() == Either.Right(b)
-      }
-    }
-
-    "toOption() should convert values into a valid Option" {
-      forAll { a: Int, b: String ->
-        Ior.Left(a).toOption() == None &&
-          Ior.Right(b).toOption() == Some(b) &&
-          Ior.Both(a, b).toOption() == Some(b)
       }
     }
 
@@ -109,15 +93,6 @@ class IorTest : UnitSpec() {
         Ior.Left(a).toValidated() == Invalid(a) &&
           Ior.Right(b).toValidated() == Valid(b) &&
           Ior.Both(a, b).toValidated() == Valid(b)
-      }
-    }
-
-    "fromOptions() should build a correct Option<Ior>" {
-      forAll { a: Int, b: String ->
-        Ior.fromOptions(Some(a), None) == Some(Ior.Left(a)) &&
-          Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
-          Ior.fromOptions(None, Some(b)) == Some(Ior.Right(b)) &&
-          Ior.fromOptions(None, None) == None
       }
     }
 

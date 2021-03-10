@@ -1,25 +1,7 @@
-package arrow.syntax.test
+package arrow.core
 
-import arrow.core.andThen
-import arrow.core.complement
-import arrow.core.compose
-import arrow.core.curried
-import arrow.core.forwardCompose
-import arrow.core.memoize
-import arrow.core.paired
-import arrow.core.partially1
-import arrow.core.partially2
-import arrow.core.partially3
-import arrow.core.partially4
-import arrow.core.partially5
-import arrow.core.reverse
-import arrow.core.tripled
-import arrow.core.uncurried
-import arrow.core.unpaired
-import arrow.core.untripled
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
-import java.util.Random
 
 class FunctionSyntaxTest : UnitSpec() {
 
@@ -50,13 +32,6 @@ class FunctionSyntaxTest : UnitSpec() {
       (ninja + potato) shouldBe (get andThen map)()
     }
 
-    "it should compose function correctly (forwardCompose)" {
-      val randomDigit = Random().nextInt()
-      val get = { randomDigit }
-      val pow = { i: Int -> i * i }
-      randomDigit * randomDigit shouldBe (get forwardCompose pow)()
-    }
-
     "testAndThen" {
       val add5andMultiplyBy2 = add5 andThen multiplyBy2
       add5andMultiplyBy2(2) shouldBe 14
@@ -64,16 +39,6 @@ class FunctionSyntaxTest : UnitSpec() {
 
     "testAndThen2" {
       val sumAndMultiplyBy2 = sum andThen multiplyBy2
-      sumAndMultiplyBy2(5, 2) shouldBe 14
-    }
-
-    "testForwardCompose" {
-      val add5andMultiplyBy2 = add5 forwardCompose multiplyBy2
-      add5andMultiplyBy2(2) shouldBe 14
-    }
-
-    "testForwardCompose2" {
-      val sumAndMultiplyBy2 = sum forwardCompose multiplyBy2
       sumAndMultiplyBy2(5, 2) shouldBe 14
     }
 

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package arrow.syntax.test
+package arrow.core
 
-import arrow.core.prependTo
-import arrow.core.tail
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 

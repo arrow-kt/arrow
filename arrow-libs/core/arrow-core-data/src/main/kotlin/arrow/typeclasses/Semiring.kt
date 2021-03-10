@@ -1,7 +1,5 @@
 package arrow.typeclasses
 
-import arrow.documented
-
 /**
  * The [Semiring] type class for a given type `A` combines both a commutative additive [Monoid] and a multiplicative [Monoid].
  *  It requires the multiplicative [Monoid] to distribute over the additive one. The operations of the multiplicative [Monoid] have been renamed to
@@ -23,7 +21,6 @@ import arrow.documented
  * Currently, [Semiring] instances are defined for all available number types.
  *
  */
-@documented
 interface Semiring<A> {
 
   /**

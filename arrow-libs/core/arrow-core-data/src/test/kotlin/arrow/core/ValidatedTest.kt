@@ -1,30 +1,17 @@
 package arrow.core
 
-import arrow.core.computations.RestrictedValidatedEffect
-import arrow.core.computations.ValidatedEffect
-import arrow.core.computations.validated
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
-import arrow.core.test.laws.FxLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
-import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
 
   init {
-    testLaws(
-      FxLaws.suspended<ValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Validated<String, Int>::equals, validated::invoke) {
-        it.bind()
-      },
-      FxLaws.eager<RestrictedValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Validated<String, Int>::equals, validated::eager) {
-        it.bind()
-      }
-    )
 
     "fold should call function on Invalid" {
       val exception = Exception("My Exception")
