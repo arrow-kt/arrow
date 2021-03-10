@@ -232,6 +232,7 @@ import arrow.core.traverseEither
 import arrow.core.traverseValidated
 import arrow.core.validNel
 import arrow.typeclasses.Semigroup
+import arrrow.core.zip
 ```
 
 *Model*
