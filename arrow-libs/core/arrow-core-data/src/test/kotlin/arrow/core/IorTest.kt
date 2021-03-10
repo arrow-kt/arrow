@@ -65,6 +65,7 @@ class IorTest : UnitSpec() {
         Ior.monad(Int.semigroup()),
         Ior.functor(),
         Ior.applicative(Int.semigroup()),
+        Ior.monad(Int.semigroup()),
         Ior.genK(Gen.int()),
         Ior.eqK(Int.eq())
       ),

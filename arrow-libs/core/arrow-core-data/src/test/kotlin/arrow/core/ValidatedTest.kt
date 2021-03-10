@@ -15,8 +15,10 @@ import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.extensions.validated.eqK.eqK
 import arrow.core.extensions.validated.eqK2.eqK2
+import arrow.core.extensions.validated.functor.functor
 import arrow.core.extensions.validated.hash.hash
 import arrow.core.extensions.validated.order.order
+import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
@@ -31,6 +33,7 @@ import arrow.core.test.laws.EqLaws
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.OrderLaws
+import arrow.core.test.laws.SelectiveLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
@@ -60,6 +63,7 @@ class ValidatedTest : UnitSpec() {
       ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
       HashLaws.laws(Validated.hash(String.hash(), Int.hash()), Gen.validated(Gen.string(), Gen.int()), EQ),
       OrderLaws.laws(Validated.order(String.order(), Int.order()), Gen.validated(Gen.string(), Gen.int())),
+      SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.semigroup()), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),

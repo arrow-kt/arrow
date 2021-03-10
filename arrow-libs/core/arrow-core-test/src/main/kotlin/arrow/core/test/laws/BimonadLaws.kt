@@ -11,6 +11,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -51,10 +52,11 @@ object BimonadLaws {
     CM: Comonad<F>,
     FF: Functor<F>,
     AP: Apply<F>,
+    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, GENK, EQK) +
+    MonadLaws.laws(M, FF, AP, SL, GENK, EQK) +
       ComonadLaws.laws(CM, GENK, EQK) +
       bimonadLaws(BF, EQK)
 

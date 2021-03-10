@@ -42,7 +42,7 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), GENK, EQK),
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), GENK, EQK),
       FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eq.any(), eval::invoke) {
         it.bind()
       },

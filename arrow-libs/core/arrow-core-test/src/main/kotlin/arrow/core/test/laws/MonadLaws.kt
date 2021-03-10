@@ -11,6 +11,7 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.identity
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicative
+import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.functionToA
 import arrow.typeclasses.Apply
@@ -18,6 +19,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -41,6 +43,7 @@ object MonadLaws {
     M: Monad<F>,
     FF: Functor<F>,
     AP: Apply<F>,
+    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> {
@@ -53,6 +56,7 @@ object MonadLaws {
       Law("Monad Laws: monad ap should be consistent with applicative ap") { M.derivedApConsistent(GENK, AP, EQ) },
       Law("Monad Laws: monad apTap should be consistent with applicative apTap") { M.derivedApTapConsistent(GENK, AP, EQ) },
       Law("Monad Laws: monad followedBy should be consistent with applicative followedBy") { M.derivedFollowedByConsistent(GENK, AP, EQ) },
+      Law("Monad Laws: monad selective should be consistent with selective selective") { M.derivedSelectiveConsistent(GENK, SL, EQ) },
       Law("Monad Laws: monad flatten should be consistent") { M.derivedFlattenConsistent(GENK, EQ) },
       Law("Monad Laws: monad followedByEval should be consistent") { M.derivedFollowedByEvalConsistent(GENK, EQ) },
       Law("Monad Laws: monad productL should be consistent") { M.derivedProductLConsistent(GENK, EQ) },
@@ -86,6 +90,11 @@ object MonadLaws {
         val c = just(b + 1).bind()
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
+    }
+
+  private fun <F> Monad<F>.derivedSelectiveConsistent(GK: GenK<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(GK.genK(Gen.either(Gen.int(), Gen.int())), GK.genK(Gen.functionAToB<Int, Int>(Gen.int()))) { x, f ->
+      SL.run { x.select(f) }.equalUnderTheLaw(x.select(f), EQ)
     }
 
   private fun <F> Monad<F>.derivedMapConsistent(G: Gen<Kind<F, Int>>, FF: Functor<F>, EQ: Eq<Kind<F, Int>>): Unit =

@@ -14,6 +14,7 @@ import arrow.fx.extensions.resource.applicative.applicative
 import arrow.fx.extensions.resource.functor.functor
 import arrow.fx.extensions.resource.monad.monad
 import arrow.fx.extensions.resource.monoid.monoid
+import arrow.fx.extensions.resource.selective.selective
 import arrow.fx.test.laws.forFew
 import arrow.fx.typeclasses.seconds
 import arrow.typeclasses.Eq
@@ -30,6 +31,7 @@ class ResourceTest : ArrowFxSpec() {
         Resource.monad(IO.bracket()),
         Resource.functor(IO.bracket()),
         Resource.applicative(IO.bracket()),
+        Resource.selective(IO.bracket()),
         Resource.genK(),
         Resource.eqK()
       ),

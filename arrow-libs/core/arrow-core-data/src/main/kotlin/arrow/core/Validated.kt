@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.core.Validated.Companion.mapN
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -547,10 +546,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * }
      * ```
      */
-    inline fun <A, B, C, D> lift(
-      crossinline fl: (A) -> C,
-      crossinline fr: (B) -> D
-    ): (Validated<A, B>) -> Validated<C, D> =
+    inline fun <A, B, C, D> lift(crossinline fl: (A) -> C, crossinline fr: (B) -> D): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
 
     val s = 1.inc()
@@ -1033,6 +1029,33 @@ operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(ot
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
   )
 
+fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Validated<E, B> =
+  fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> r.valid() }) })
+
+fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
+  when (this) {
+    is Validated.Valid -> when (val either = this.a) {
+      is Either.Left -> fl.map { f -> f(either.a) }
+      is Either.Right -> fr.map { f -> f(either.b) }
+    }
+    is Validated.Invalid -> this
+  }
+
+private fun <E> Validated<E, Boolean>.selector(): Validated<E, Either<Unit, Unit>> =
+  map { bool -> if (bool) Either.leftUnit else Either.unit }
+
+fun <E> Validated<E, Boolean>.whenS(x: Validated<E, () -> Unit>): Validated<E, Unit> =
+  selector().select(x.map { f -> { f() } })
+
+fun <E, A> Validated<E, Boolean>.ifS(fl: Validated<E, A>, fr: Validated<E, A>): Validated<E, A> =
+  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
+
+fun <E> Validated<E, Boolean>.orS(f: Validated<E, Boolean>): Validated<E, Boolean> =
+  ifS(Valid(true), f)
+
+fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boolean> =
+  ifS(f, Valid(false))
+
 /**
  * Return the Valid value, or the default if Invalid
  */
@@ -1125,10 +1148,9 @@ fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverse or traverseEither from arrow.core.*")
-fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
-  GA.run {
-    fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
-  }
+fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
+  fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
+}
 
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequence or sequenceEither from arrow.core.*")
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =

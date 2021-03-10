@@ -13,6 +13,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Selective
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -38,10 +39,11 @@ object MonadThrowLaws {
     M: MonadThrow<F>,
     FF: Functor<F>,
     AP: Apply<F>,
+    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadErrorLaws.laws(M, FF, AP, GENK, EQK) +
+    MonadErrorLaws.laws(M, FF, AP, SL, GENK, EQK) +
       monadThrowLaws(M, EQK)
 
   fun <F> MonadThrow<F>.monadRaiseNonFatalRaiseError(EQ: Eq<Kind<F, Int>>): Unit =

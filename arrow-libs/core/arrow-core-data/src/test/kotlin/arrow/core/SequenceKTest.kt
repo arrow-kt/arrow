@@ -13,6 +13,7 @@ import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functor.functor
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
+import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monadLogic.monadLogic
 import arrow.core.extensions.sequencek.monoidK.monoidK
@@ -62,6 +63,7 @@ class SequenceKTest : UnitSpec() {
         SequenceK.monadCombine(),
         SequenceK.functor(),
         SequenceK.applicative(),
+        SequenceK.monad(),
         SequenceK.genK(),
         SequenceK.eqK()
       ),

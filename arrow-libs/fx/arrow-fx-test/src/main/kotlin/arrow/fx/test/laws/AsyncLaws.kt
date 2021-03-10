@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.eq
+import arrow.fx.internal.AtomicBooleanW
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicativeError
 import arrow.core.test.generators.either
@@ -14,13 +15,13 @@ import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.throwable
 import arrow.core.test.laws.Law
 import arrow.fx.Promise
-import arrow.fx.internal.AtomicBooleanW
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -69,12 +70,13 @@ object AsyncLaws {
     AC: Async<F>,
     FF: Functor<F>,
     AP: Apply<F>,
+    SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
     iterations: Int = 5_000
   ): List<Law> =
-    MonadDeferLaws.laws(AC, FF, AP, GENK, EQK, testStackSafety, iterations) +
+    MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
       asyncLaws(AC, GENK, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
