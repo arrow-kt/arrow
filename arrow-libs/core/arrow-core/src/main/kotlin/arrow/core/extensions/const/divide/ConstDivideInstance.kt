@@ -26,8 +26,7 @@ import arrow.typeclasses.Monoid
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1) { a, b -> arg2(Tuple2(a,b)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1) { a, b -> arg2(Tuple2(a,b)) }",
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -51,8 +50,7 @@ fun <O, A, B, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }",
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -77,8 +75,7 @@ fun <O, A, B, C, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }",
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -104,8 +101,7 @@ fun <O, A, B, C, D, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }",
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -132,8 +128,7 @@ fun <O, A, B, C, D, E, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }",
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -161,8 +156,7 @@ fun <O, A, B, C, D, E, FF, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }",
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -192,8 +186,7 @@ fun <O, A, B, C, D, E, FF, G, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }",
-    "arrow.core.Const",
+    "arg0.zip(MO,arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }",
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -224,9 +217,8 @@ fun <O, A, B, C, D, E, FF, G, H, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)\n" +
+    "arg0.zip(MO,arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)\n" +
       "{ a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i)) }",
-    "arrow.core.Const",
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -258,9 +250,8 @@ fun <O, A, B, C, D, E, FF, G, H, I, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)\n" +
+    "arg0.zip(MO,arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)\n" +
       "{ a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j)) }",
-    "arrow.core.Const",
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
@@ -293,8 +284,7 @@ fun <O, A, B, C, D, E, FF, G, H, I, J, Z> divide(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.Const",
+    "this.zip(MO, arg1) { a, b -> Tuple2(a, b) }",
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -314,8 +304,7 @@ fun <O, A, B> Kind<Kind<ForConst, O>, A>.product(MO: Monoid<O>, arg1: Kind<Kind<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1).map { ab, c -> Tuple3(ab.a, ab.b, c) }",
-    "arrow.core.Const",
+    "this.zip(MO, arg1).map { ab, c -> Tuple3(ab.a, ab.b, c) }",
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -338,8 +327,7 @@ fun <O, A, B, C> Kind<Kind<ForConst, O>, Tuple2<A, B>>.product(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1).map { abc, d -> Tuple4(abc.a, abc.b, abc.c, d) }",
-    "arrow.core.Const",
+    "this.zip(MO, arg1).map { abc, d -> Tuple4(abc.a, abc.b, abc.c, d) }",
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -362,8 +350,7 @@ fun <O, A, B, C, D> Kind<Kind<ForConst, O>, Tuple3<A, B, C>>.product(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1).map { abcd, e -> Tuple5(abcd.a, abcd.b, abcd.c, abcd.d, e) }",
-    "arrow.core.Const",
+    "this.zip(MO, arg1).map { abcd, e -> Tuple5(abcd.a, abcd.b, abcd.c, abcd.d, e) }",
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -386,8 +373,7 @@ fun <O, A, B, C, D, E> Kind<Kind<ForConst, O>, Tuple4<A, B, C, D>>.product(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1).map { abcde, f -> Tuple6(abcde.a, abcde.b, abcde.c, abcde.d, abcde.e, f) }",
-    "arrow.core.Const",
+    "this.zip(MO, arg1).map { abcde, f -> Tuple6(abcde.a, abcde.b, abcde.c, abcde.d, abcde.e, f) }",
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -411,9 +397,8 @@ fun <O, A, B, C, D, E, FF> Kind<Kind<ForConst, O>, Tuple5<A, B, C, D, E>>.produc
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1)\n" +
+    "this.zip(MO, arg1)\n" +
       ".map { abcdef, g -> Tuple7(abcdef.a, abcdef.b, abcdef.c, abcdef.d, abcdef.e, abcdef.f, g) }",
-    "arrow.core.Const",
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -435,9 +420,8 @@ fun <O, A, B, C, D, E, FF, G> Kind<Kind<ForConst, O>, Tuple6<A, B, C, D, E,
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1)\n" +
+    "this.zip(MO, arg1)\n" +
       ".map { abcdefg, h -> Tuple8(abcdefg.a, abcdefg.b, abcdefg.c, abcdefg.d, abcdefg.e, abcdefg.f, abcdefg.g, h) }",
-    "arrow.core.Const",
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -459,9 +443,8 @@ fun <O, A, B, C, D, E, FF, G, H> Kind<Kind<ForConst, O>, Tuple7<A, B, C, D, E, F
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1)\n" +
+    "this.zip(MO, arg1)\n" +
       ".map { abcdefgh, i -> Tuple9(abcdefgh.a, abcdefgh.b, abcdefgh.c, abcdefgh.d, abcdefgh.e, abcdefgh.f, abcdefgh.g, abcdefgh.h, i) }",
-    "arrow.core.Const",
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -483,9 +466,8 @@ fun <O, A, B, C, D, E, FF, G, H, I> Kind<Kind<ForConst, O>, Tuple8<A, B, C, D, E
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Const.mapN(MO, this, arg1)\n" +
+    "this.zip(MO, arg1)\n" +
       ".map { abcdefghi, j -> Tuple10(abcdefghi.a, abcdefghi.b, abcdefghi.c, abcdefghi.d, abcdefghi.e, abcdefghi.f, abcdefghi.g, abcdefghi.h, abcdefghi.i, j) }",
-    "arrow.core.Const",
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING

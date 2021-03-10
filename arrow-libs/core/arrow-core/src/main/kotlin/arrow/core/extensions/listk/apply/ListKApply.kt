@@ -75,7 +75,7 @@ fun <A, B, Z> Kind<ForListK, A>.map2Eval(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.ListK", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2"))
 fun <A, B, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -91,7 +91,7 @@ fun <A, B, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.ListK", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2"))
 fun <A, B, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -107,7 +107,7 @@ fun <A, B, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.ListK", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <A, B, C, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -124,7 +124,7 @@ fun <A, B, C, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.ListK", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <A, B, C, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -141,7 +141,7 @@ fun <A, B, C, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.ListK", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <A, B, C, D, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -159,7 +159,7 @@ fun <A, B, C, D, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.ListK", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.ListK", "arrow.core.Tuple4"))
 fun <A, B, C, D, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -177,7 +177,7 @@ fun <A, B, C, D, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.ListK", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <A, B, C, D, E, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -196,7 +196,7 @@ fun <A, B, C, D, E, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.ListK", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <A, B, C, D, E, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -215,7 +215,7 @@ fun <A, B, C, D, E, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.ListK", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <A, B, C, D, E, FF, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -235,7 +235,7 @@ fun <A, B, C, D, E, FF, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.ListK", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <A, B, C, D, E, FF, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -255,7 +255,7 @@ fun <A, B, C, D, E, FF, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.ListK", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <A, B, C, D, E, FF, G, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -277,7 +277,7 @@ fun <A, B, C, D, E, FF, G, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.ListK", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <A, B, C, D, E, FF, G, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -299,7 +299,7 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -322,7 +322,7 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -345,7 +345,7 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H, I, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -369,7 +369,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -393,7 +393,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.ListK", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -418,7 +418,7 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.ListK", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -583,7 +583,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> Kind<ForListK, Tuple9<A, B, C, D, E, FF, G, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1) { a, b -> Tuple2(a, b) }", "arrow.core.ListK", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> Tuple2(a, b) }", "arrow.core.Tuple2"))
 fun <A, B> tupled(arg0: Kind<ForListK, A>, arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
   arrow.core.ListK
     .apply()
@@ -596,7 +596,7 @@ fun <A, B> tupled(arg0: Kind<ForListK, A>, arg1: Kind<ForListK, B>): ListK<Tuple
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1) { a, b -> Tuple2(a, b) }", "arrow.core.ListK", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> Tuple2(a, b) }", "arrow.core.Tuple2"))
 fun <A, B> tupledN(arg0: Kind<ForListK, A>, arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
   arrow.core.ListK
     .apply()
@@ -609,7 +609,7 @@ fun <A, B> tupledN(arg0: Kind<ForListK, A>, arg1: Kind<ForListK, B>): ListK<Tupl
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.ListK", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <A, B, C> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -625,7 +625,7 @@ fun <A, B, C> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.ListK", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <A, B, C> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -641,7 +641,7 @@ fun <A, B, C> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.ListK", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <A, B, C, D> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -658,7 +658,7 @@ fun <A, B, C, D> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.ListK", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <A, B, C, D> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -675,7 +675,7 @@ fun <A, B, C, D> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.ListK", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <A, B, C, D, E> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -694,7 +694,7 @@ fun <A, B, C, D, E> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.ListK", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <A, B, C, D, E> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -713,7 +713,7 @@ fun <A, B, C, D, E> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.ListK", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <A, B, C, D, E, FF> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -733,7 +733,7 @@ fun <A, B, C, D, E, FF> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.ListK", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <A, B, C, D, E, FF> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -753,7 +753,7 @@ fun <A, B, C, D, E, FF> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.ListK", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <A, B, C, D, E, FF, G> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -774,7 +774,7 @@ fun <A, B, C, D, E, FF, G> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.ListK", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <A, B, C, D, E, FF, G> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -795,7 +795,7 @@ fun <A, B, C, D, E, FF, G> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -817,7 +817,7 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.ListK", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <A, B, C, D, E, FF, G, H> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -839,7 +839,7 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.ListK", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <A, B, C, D, E, FF, G, H, I> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -862,7 +862,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.ListK", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <A, B, C, D, E, FF, G, H, I> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -885,7 +885,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.ListK", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -910,7 +910,7 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.ListK", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg0: Kind<ForListK, A>,
   arg1: Kind<ForListK, B>,
@@ -948,7 +948,7 @@ fun <A, B> Kind<ForListK, A>.followedBy(arg1: Kind<ForListK, B>): ListK<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ListK.mapN(this, arg1) { left, _ -> left }", "arrow.core.mapN"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(arg1) { left, _ -> left }", "arrow.core.zip"))
 fun <A, B> Kind<ForListK, A>.apTap(arg1: Kind<ForListK, B>): ListK<A> =
   arrow.core.ListK.apply().run {
     this@apTap.apTap<A, B>(arg1) as arrow.core.ListK<A>
