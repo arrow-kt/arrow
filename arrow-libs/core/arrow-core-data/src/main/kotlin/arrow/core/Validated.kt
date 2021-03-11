@@ -1127,33 +1127,6 @@ operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(ot
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
   )
 
-fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Validated<E, B> =
-  fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> r.valid() }) })
-
-fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
-  when (this) {
-    is Validated.Valid -> when (val either = this.a) {
-      is Either.Left -> fl.map { f -> f(either.a) }
-      is Either.Right -> fr.map { f -> f(either.b) }
-    }
-    is Validated.Invalid -> this
-  }
-
-private fun <E> Validated<E, Boolean>.selector(): Validated<E, Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.leftUnit else Either.unit }
-
-fun <E> Validated<E, Boolean>.whenS(x: Validated<E, () -> Unit>): Validated<E, Unit> =
-  selector().select(x.map { f -> { f() } })
-
-fun <E, A> Validated<E, Boolean>.ifS(fl: Validated<E, A>, fr: Validated<E, A>): Validated<E, A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun <E> Validated<E, Boolean>.orS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(Valid(true), f)
-
-fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(f, Valid(false))
-
 /**
  * Return the Valid value, or the default if Invalid
  */

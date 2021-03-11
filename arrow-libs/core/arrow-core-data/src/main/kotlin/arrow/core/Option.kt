@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
@@ -974,7 +975,8 @@ inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -1014,31 +1016,14 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
+@Deprecated(SelectiveDeprecation)
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  branch(f.fix(), Some(::identity))
-
-fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
   flatMap {
     it.fold(
-      { a -> Some(a).ap(fa) },
-      { b -> Some(b).ap(fb) }
+      { a -> Some(a).ap(f.fix()) },
+      { b -> Some(b).ap(Some(::identity)) }
     )
   }
-
-private fun Option<Boolean>.selector(): Option<Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.right(Unit) else Either.left(Unit) }
-
-fun <A> Option<Boolean>.whenS(x: Option<() -> Unit>): Option<Unit> =
-  selector().select(x.map { f -> { _: Unit -> f() } })
-
-fun <A> Option<Boolean>.ifS(fl: Option<A>, fr: Option<A>): Option<A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun Option<Boolean>.orS(f: Option<Boolean>): Option<Boolean> =
-  ifS(Some(true), f)
-
-fun Option<Boolean>.andS(f: Option<Boolean>): Option<Boolean> =
-  ifS(f, Some(false))
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }

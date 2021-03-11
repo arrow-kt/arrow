@@ -6,6 +6,7 @@ import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionSelective
+import arrow.typeclasses.SelectiveDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Function0
@@ -49,14 +50,7 @@ fun <A, B> Kind<ForOption, Either<A, B>>.select(arg1: Kind<ForOption, Function1<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "branch(arg1, arg2)",
-    "arrow.core.branch"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SelectiveDeprecation)
 fun <A, B, C> Kind<ForOption, Either<A, B>>.branch(
   arg1: Kind<ForOption, Function1<A, C>>,
   arg2: Kind<ForOption, Function1<B, C>>
@@ -71,14 +65,7 @@ fun <A, B, C> Kind<ForOption, Either<A, B>>.branch(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "whenS(arg1)",
-    "arrow.core.whenS"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SelectiveDeprecation)
 fun <A> Kind<ForOption, Boolean>.whenS(arg1: Kind<ForOption, Function0<Unit>>): Option<Unit> =
   arrow.core.Option.selective().run {
     this@whenS.whenS<A>(arg1) as arrow.core.Option<kotlin.Unit>
@@ -91,14 +78,7 @@ fun <A> Kind<ForOption, Boolean>.whenS(arg1: Kind<ForOption, Function0<Unit>>): 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ifS(arg1, arg2)",
-    "arrow.core.ifS"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SelectiveDeprecation)
 fun <A> Kind<ForOption, Boolean>.ifS(arg1: Kind<ForOption, A>, arg2: Kind<ForOption, A>): Option<A> =
   arrow.core.Option.selective().run {
     this@ifS.ifS<A>(arg1, arg2) as arrow.core.Option<A>
@@ -111,14 +91,7 @@ fun <A> Kind<ForOption, Boolean>.ifS(arg1: Kind<ForOption, A>, arg2: Kind<ForOpt
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "orS(arg1)",
-    "arrow.core.orS"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SelectiveDeprecation)
 fun <A> Kind<ForOption, Boolean>.orS(arg1: Kind<ForOption, Boolean>): Option<Boolean> =
   arrow.core.Option.selective().run {
     this@orS.orS<A>(arg1) as arrow.core.Option<kotlin.Boolean>
