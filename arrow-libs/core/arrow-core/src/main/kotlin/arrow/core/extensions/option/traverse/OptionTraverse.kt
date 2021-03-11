@@ -7,6 +7,7 @@ import arrow.core.Option.Companion
 import arrow.core.extensions.OptionTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 
 /**
  * cached extension
@@ -72,10 +73,7 @@ fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "Applicative and Monad typeclasses are deprecated, Replace with flatTraverse, flatTraverseEither or flatTraverseValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> Kind<ForOption, A>.flatTraverse(
   arg1: Monad<ForOption>,
   arg2: Applicative<G>,

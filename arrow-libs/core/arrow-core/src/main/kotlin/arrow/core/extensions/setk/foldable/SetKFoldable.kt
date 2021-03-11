@@ -10,6 +10,7 @@ import arrow.core.extensions.SetKFoldable
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Function1
@@ -235,7 +236,7 @@ fun <A> orEmpty(arg0: Applicative<ForSetK>, arg1: Monoid<A>): SetK<A> = arrow.co
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with traverseValidated_ or traverseEither_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> Kind<ForSetK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.core.SetK.foldable().run {
     this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
@@ -248,8 +249,7 @@ fun <G, A, B> Kind<ForSetK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceValidated_ or sequenceEither_ from arrow.core.*")
-fun <G, A> Kind<ForSetK, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
+@Deprecated(TraverseDeprecation)fun <G, A> Kind<ForSetK, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
   arrow.core.SetK.foldable().run {
     this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
   }

@@ -7,6 +7,7 @@ import arrow.core.ForConst
 import arrow.core.extensions.ConstTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Deprecated
 import kotlin.Function1
@@ -76,7 +77,7 @@ fun <X, A, B> Kind<Kind<ForConst, X>, A>.map(arg1: Function1<A, B>): Const<X, B>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+@Deprecated(TraverseDeprecation)
 fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.flatTraverse(
   arg1: Monad<Kind<ForConst, X>>,
   arg2: Applicative<G>,

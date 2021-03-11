@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
@@ -674,15 +675,6 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun filter(predicate: (A) -> Boolean): Option<A> =
     flatMap { a -> if (predicate(a)) Some(a) else None }
 
-  inline fun <AA> filterEither(predicate: (A) -> Either<AA, Boolean>): Either<AA, Option<A>> =
-    traverseFilterEither { a -> predicate(a).map { if (it) Some(a) else None } }
-
-  inline fun filterIterable(predicate: (A) -> Iterable<Boolean>): Iterable<Option<A>> =
-    traverseFilter { a -> predicate(a).map { if (it) Some(a) else None } }
-
-  inline fun <AA> filterValidated(predicate: (A) -> Validated<AA, Boolean>): Validated<AA, Option<A>> =
-    traverseFilterValidated { a -> predicate(a).map { if (it) Some(a) else None } }
-
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
    * this $option's value returns false. Otherwise, return $none.
@@ -744,24 +736,6 @@ sealed class Option<out A> : OptionOf<A> {
       is Some -> if (predicate(t)) t else null
       is None -> null
     }
-
-  inline fun <B> flatTraverse(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
-    fold(
-      { emptyList() },
-      { f(it).toList() }
-    )
-
-  inline fun <E, B> flatTraverseEither(f: (A) -> Either<E, Option<B>>): Either<E, Option<B>> =
-    fold(
-      { Right(empty()) },
-      { f(it) }
-    )
-
-  inline fun <E, B> flatTraverseValidated(f: (A) -> Validated<E, Option<B>>): Validated<E, Option<B>> =
-    fold(
-      { Valid(empty()) },
-      { f(it) }
-    )
 
   inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     foldLeft(empty()) { b, a -> b.combine(f(a)) }
@@ -839,35 +813,17 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
     fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
 
-  inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
-    fold({ emptyList() }, { fa(it).void() })
-
   inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
     when (this) {
       is Some -> fa(t).map { Some(it) }
       is None -> Right(this)
     }
 
-  inline fun <AA, B> traverseEither_(fa: (A) -> Either<AA, B>): Either<AA, Unit> =
-    fold({ Right(Unit) }, { fa(it).void() })
-
   inline fun <AA, B> traverseValidated(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
     when (this) {
       is Some -> fa(t).map { Some(it) }
       is None -> Valid(this)
     }
-
-  inline fun <AA, B> traverseValidated_(fa: (A) -> Validated<AA, B>): Validated<AA, Unit> =
-    fold({ Valid(Unit) }, { fa(it).void() })
-
-  inline fun <B> traverseFilter(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
-    this.fold({ emptyList() }, { f(it).toList() })
-
-  inline fun <AA, B> traverseFilterEither(f: (A) -> Either<AA, Option<B>>): Either<AA, Option<B>> =
-    this.fold({ Right(empty()) }, f)
-
-  inline fun <AA, B> traverseFilterValidated(f: (A) -> Validated<AA, Option<B>>): Validated<AA, Option<B>> =
-    this.fold({ Valid(empty()) }, f)
 
   inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
@@ -974,7 +930,8 @@ inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -1014,31 +971,14 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
+@Deprecated(SelectiveDeprecation)
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  branch(f.fix(), Some(::identity))
-
-fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
   flatMap {
     it.fold(
-      { a -> Some(a).ap(fa) },
-      { b -> Some(b).ap(fb) }
+      { a -> Some(a).ap(f.fix()) },
+      { b -> Some(b).ap(Some(::identity)) }
     )
   }
-
-private fun Option<Boolean>.selector(): Option<Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.right(Unit) else Either.left(Unit) }
-
-fun <A> Option<Boolean>.whenS(x: Option<() -> Unit>): Option<Unit> =
-  selector().select(x.map { f -> { _: Unit -> f() } })
-
-fun <A> Option<Boolean>.ifS(fl: Option<A>, fr: Option<A>): Option<A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun Option<Boolean>.orS(f: Option<Boolean>): Option<Boolean> =
-  ifS(Some(true), f)
-
-fun Option<Boolean>.andS(f: Option<Boolean>): Option<Boolean> =
-  ifS(f, Some(false))
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
@@ -1068,15 +1008,6 @@ inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
 
 inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
   if (isEmpty()) f(Unit) else this
-
-inline fun <reified B> Option<*>.traverseFilterIsInstance(): List<Option<B>> =
-  filterIterable { a -> listOf(a is B) }.map { it.map { a -> a as B } }
-
-inline fun <E, reified B> Option<*>.traverseFilterIsInstanceEither(): Either<E, Option<B>> =
-  filterEither { a -> Right(a is B) }.map { it.map { a -> a as B } }
-
-inline fun <E, reified B> Option<*>.traverseFilterIsInstanceValidated(): Validated<E, Option<B>> =
-  filterValidated { a -> Valid(a is B) }.map { it.map { a -> a as B } }
 
 fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
@@ -1145,20 +1076,11 @@ fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B
 fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
   traverse(::identity)
 
-fun <A> Option<Iterable<A>>.sequence_(): List<Unit> =
-  traverse_(::identity)
-
 fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   traverseEither(::identity)
 
-fun <A, B> Option<Either<A, B>>.sequenceEither_(): Either<A, Unit> =
-  traverseEither_(::identity)
-
 fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
   traverseValidated(::identity)
-
-fun <A, B> Option<Validated<A, B>>.sequenceValidated_(): Validated<A, Unit> =
-  traverseValidated_(::identity)
 
 fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
