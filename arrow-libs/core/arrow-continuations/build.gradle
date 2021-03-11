@@ -10,6 +10,7 @@ apply from: "$ANIMALSNIFFER"
 apply plugin: 'kotlinx-atomicfu'
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompileOnly "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testImplementation project(":arrow-core-test")
