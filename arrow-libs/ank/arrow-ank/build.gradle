@@ -9,6 +9,7 @@ apply from: "$PUBLICATION"
 
 dependencies {
     compile project(":arrow-fx-coroutines")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"

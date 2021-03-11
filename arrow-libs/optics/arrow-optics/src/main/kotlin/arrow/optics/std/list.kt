@@ -117,7 +117,7 @@ fun <A> List<A>.uncons(): Pair<A, List<A>>? =
 fun <A> Snoc.Companion.list(): Snoc<List<A>, A> = Snoc {
   object : Prism<List<A>, Pair<List<A>, A>> {
     override fun getOrModify(s: List<A>): Either<List<A>, Pair<List<A>, A>> =
-      Nullable.mapN(s.dropLast(1), s.lastOrNull()) { a, b ->
+      Nullable.zip(s.dropLast(1), s.lastOrNull()) { a, b ->
         Pair(a, b).right()
       } ?: s.left()
 

@@ -9,5 +9,6 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     api "io.kindedj:kindedj:$KINDEDJ_VERSION"
 }

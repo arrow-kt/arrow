@@ -11,6 +11,7 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
 import arrow.fx.coroutines.parMapN
+import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.single
 import arrow.fx.coroutines.singleThreadName
 import arrow.fx.coroutines.suspend
@@ -26,11 +27,15 @@ import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap5Test : ArrowFxSpec(
   spec = {
+    val threadName: suspend CoroutineScope.() -> String =
+      { Thread.currentThread().name }
+
     "parMapN 5 returns to original context" {
       val mapCtxName = "parMap5"
       val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(5, NamedThreadFactory { mapCtxName }) }
@@ -39,7 +44,7 @@ class ParMap5Test : ArrowFxSpec(
           withContext(_single) {
             threadName() shouldBe singleThreadName
 
-            val (s1, s2, s3, s4, s5) = parMapN(
+            val (s1, s2, s3, s4, s5) = parZip(
               _mapCtx, threadName, threadName, threadName, threadName, threadName
             ) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
 
@@ -65,45 +70,45 @@ class ParMap5Test : ArrowFxSpec(
 
             Either.catch {
               when (choose) {
-                1 -> parMapN(
+                1 -> parZip(
                   _mapCtx,
-                  suspend { e.suspend() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() }
+                  { e.suspend() },
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { never<Nothing>() }
                 ) { _, _, _, _, _ -> Unit }
-                2 -> parMapN(
+                2 -> parZip(
                   _mapCtx,
-                  suspend { never<Nothing>() },
-                  suspend { e.suspend() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() }
+                  { never<Nothing>() },
+                  { e.suspend() },
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { never<Nothing>() }
                 ) { _, _, _, _, _ -> Unit }
-                3 -> parMapN(
+                3 -> parZip(
                   _mapCtx,
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { e.suspend() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() }
+                   { never<Nothing>() },
+                   { never<Nothing>() },
+                   { e.suspend() },
+                   { never<Nothing>() },
+                   { never<Nothing>() }
                 ) { _, _, _, _, _ -> Unit }
-                4 -> parMapN(
+                4 -> parZip(
                   _mapCtx,
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { e.suspend() },
-                  suspend { never<Nothing>() }
+                   { never<Nothing>() },
+                   { never<Nothing>() },
+                   { never<Nothing>() },
+                   { e.suspend() },
+                   { never<Nothing>() }
                 ) { _, _, _, _, _ -> Unit }
-                else -> parMapN(
+                else -> parZip(
                   _mapCtx,
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { never<Nothing>() },
-                  suspend { e.suspend() }
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { never<Nothing>() },
+                  { e.suspend() }
                 ) { _, _, _, _, _ -> Unit }
               }
             } should leftException(e)
@@ -122,7 +127,7 @@ class ParMap5Test : ArrowFxSpec(
         val modifyGate3 = CompletableDeferred<Unit>()
         val modifyGate4 = CompletableDeferred<Unit>()
 
-        parMapN(
+        parZip(
           {
             modifyGate2.await()
             r.update { i -> "$i$a" }
@@ -157,7 +162,7 @@ class ParMap5Test : ArrowFxSpec(
     "parMapN 5 finishes on single thread" {
       checkAll(Arb.string()) {
         single.use { ctx ->
-          parMapN(ctx, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e ->
+          parZip(ctx, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e ->
             Tuple5(
               a,
               b,
@@ -179,14 +184,14 @@ class ParMap5Test : ArrowFxSpec(
         val pd = CompletableDeferred<Pair<Int, ExitCase>>()
         val pe = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
-        val loserC = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
-        val loserD = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pd.complete(Pair(d, ex)) } }
-        val loserE = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pe.complete(Pair(e, ex)) } }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+        val loserD: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pd.complete(Pair(d, ex)) } }
+        val loserE: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pe.complete(Pair(e, ex)) } }
 
         val f = async {
-          parMapN(loserA, loserB, loserC, loserD, loserE) { _a, _b, _c, _d, _e ->
+          parZip(loserA, loserB, loserC, loserD, loserE) { _a, _b, _c, _d, _e ->
             Tuple5(
               _a,
               _b,
@@ -240,19 +245,19 @@ class ParMap5Test : ArrowFxSpec(
         val pc = CompletableDeferred<Pair<Int, ExitCase>>()
         val pd = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val winner = suspend { repeat(4) { s.send(Unit) }; throw e }
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
-        val loserC = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
-        val loserD = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pd.complete(Pair(d, ex)) } }
+        val winner: suspend CoroutineScope.() -> Int = { repeat(4) { s.send(Unit) }; throw e }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+        val loserD: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pd.complete(Pair(d, ex)) } }
 
         val r = Either.catch {
           when (winningTask) {
-            1 -> parMapN(winner, loserA, loserB, loserC, loserD) { _, _, _, _, _ -> Unit }
-            2 -> parMapN(loserA, winner, loserB, loserC, loserD) { _, _, _, _, _ -> Unit }
-            3 -> parMapN(loserA, loserB, winner, loserC, loserD) { _, _, _, _, _ -> Unit }
-            4 -> parMapN(loserA, loserB, loserC, winner, loserD) { _, _, _, _, _ -> Unit }
-            else -> parMapN(loserA, loserB, loserC, loserD, winner) { _, _, _, _, _ -> Unit }
+            1 -> parZip(winner, loserA, loserB, loserC, loserD) { _, _, _, _, _ -> Unit }
+            2 -> parZip(loserA, winner, loserB, loserC, loserD) { _, _, _, _, _ -> Unit }
+            3 -> parZip(loserA, loserB, winner, loserC, loserD) { _, _, _, _, _ -> Unit }
+            4 -> parZip(loserA, loserB, loserC, winner, loserD) { _, _, _, _, _ -> Unit }
+            else -> parZip(loserA, loserB, loserC, loserD, winner) { _, _, _, _, _ -> Unit }
           }
         }
 

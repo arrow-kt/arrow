@@ -224,125 +224,6 @@ sealed class Eval<out A> {
 
       return curr.value() as A
     }
-
-    fun <A, B, C> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      map: (A, B) -> C
-    ): Eval<C> =
-      mapN(a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ -> map(aa, bb) }
-
-    fun <A, B, C, D> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      map: (A, B, C) -> D
-    ): Eval<D> =
-      mapN(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
-
-    fun <A, B, C, D, E> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      map: (A, B, C, D) -> E
-    ): Eval<E> =
-      mapN(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
-
-    fun <A, B, C, D, E, F> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      map: (A, B, C, D, E) -> F
-    ): Eval<F> =
-      mapN(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
-
-    fun <A, B, C, D, E, F, G> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      f: Eval<F>,
-      map: (A, B, C, D, E, F) -> G
-    ): Eval<G> =
-      mapN(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
-
-    fun <A, B, C, D, E, F, G, H> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      f: Eval<F>,
-      g: Eval<G>,
-      map: (A, B, C, D, E, F, G) -> H
-    ): Eval<H> =
-      mapN(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
-
-    fun <A, B, C, D, E, F, G, H, I> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      f: Eval<F>,
-      g: Eval<G>,
-      h: Eval<H>,
-      map: (A, B, C, D, E, F, G, H) -> I
-    ): Eval<I> =
-      mapN(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
-
-    fun <A, B, C, D, E, F, G, H, I, J> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      f: Eval<F>,
-      g: Eval<G>,
-      h: Eval<H>,
-      i: Eval<I>,
-      map: (A, B, C, D, E, F, G, H, I) -> J
-    ): Eval<J> =
-      mapN(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
-
-    fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
-      a: Eval<A>,
-      b: Eval<B>,
-      c: Eval<C>,
-      d: Eval<D>,
-      e: Eval<E>,
-      f: Eval<F>,
-      g: Eval<G>,
-      h: Eval<H>,
-      i: Eval<I>,
-      j: Eval<J>,
-      map: (A, B, C, D, E, F, G, H, I, J) -> K
-    ): Eval<K> =
-      a.flatMap { aa ->
-        b.flatMap { bb ->
-          c.flatMap { cc ->
-            d.flatMap { dd ->
-              e.flatMap { ee ->
-                f.flatMap { ff ->
-                  g.flatMap { gg ->
-                    h.flatMap { hh ->
-                      i.flatMap { ii ->
-                        j.map { jj ->
-                          map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
   }
 
   abstract fun value(): A
@@ -493,22 +374,126 @@ fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Ev
   return loop()
 }
 
-fun <A, B, Z> Eval<A>.zip(fb: Eval<B>, f: (A, B) -> Z): Eval<Z> =
-  flatMap { a: A -> fb.map { b: B -> f(a, b) } }
+fun <A, B, Z> Eval<A>.zip(b: Eval<B>, map: (A, B) -> Z): Eval<Z> =
+  flatMap { a: A -> b.map { bb: B -> map(a, bb) } }
 
-fun <A, B> Eval<A>.zip(fb: Eval<B>): Eval<Pair<A, B>> =
-  flatMap { a: A -> fb.map { b: B -> Pair(a, b) } }
+fun <A, B> Eval<A>.zip(b: Eval<B>): Eval<Pair<A, B>> =
+  flatMap { a: A -> b.map { bb: B -> Pair(a, bb) } }
+
+fun <A, B, C, D> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  map: (A, B, C) -> D
+): Eval<D> =
+  zip(b, c, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
+
+fun <A, B, C, D, E> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  map: (A, B, C, D) -> E
+): Eval<E> =
+  zip(b, c, d, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
+
+fun <A, B, C, D, E, F> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  map: (A, B, C, D, E) -> F
+): Eval<F> =
+  zip(b, c, d, e, Eval.unit, Eval.unit, Eval.unit, Eval.unit, Eval.unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
+
+fun <A, B, C, D, E, F, G> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  f: Eval<F>,
+  map: (A, B, C, D, E, F) -> G
+): Eval<G> =
+  zip(b, c, d, e, f, Eval.unit, Eval.unit, Eval.unit, Eval.unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
+
+fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  f: Eval<F>,
+  g: Eval<G>,
+  map: (A, B, C, D, E, F, G) -> H
+): Eval<H> =
+  zip(b, c, d, e, f, g, Eval.unit, Eval.unit, Eval.unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
+
+fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  f: Eval<F>,
+  g: Eval<G>,
+  h: Eval<H>,
+  map: (A, B, C, D, E, F, G, H) -> I
+): Eval<I> =
+  zip(b, c, d, e, f, g, h, Eval.unit, Eval.unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
+
+fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  f: Eval<F>,
+  g: Eval<G>,
+  h: Eval<H>,
+  i: Eval<I>,
+  map: (A, B, C, D, E, F, G, H, I) -> J
+): Eval<J> =
+  zip(b, c, d, e, f, g, h, i, Eval.unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+
+fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
+  b: Eval<B>,
+  c: Eval<C>,
+  d: Eval<D>,
+  e: Eval<E>,
+  f: Eval<F>,
+  g: Eval<G>,
+  h: Eval<H>,
+  i: Eval<I>,
+  j: Eval<J>,
+  map: (A, B, C, D, E, F, G, H, I, J) -> K
+): Eval<K> =
+  flatMap { aa ->
+    b.flatMap { bb ->
+      c.flatMap { cc ->
+        d.flatMap { dd ->
+          e.flatMap { ee ->
+            f.flatMap { ff ->
+              g.flatMap { gg ->
+                h.flatMap { hh ->
+                  i.flatMap { ii ->
+                    j.map { jj ->
+                      map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
 fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> =
   fb.map { zip(it, f) }
 
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.now(emptyList())
-  else Eval.mapN(this, replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
+  else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
 
 fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
   if (n <= 0) Eval.now(MA.empty())
-  else Eval.mapN(this@replicate, replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
+  else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }
 
 fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }

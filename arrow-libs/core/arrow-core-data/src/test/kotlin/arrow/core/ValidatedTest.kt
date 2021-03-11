@@ -177,30 +177,33 @@ class ValidatedTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over homogeneous Validated" {
-      Validated.mapN(
+      Valid("11th").zip(
         Semigroup.string(),
-        Valid("11th"),
         Valid("Doctor"),
         Valid("Who")
       ) { a, b, c -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
     }
 
     "Cartesian builder should build products over heterogeneous Validated" {
-      Validated.mapN(
+      Valid(13).zip(
         Semigroup.string(),
-        Valid(13),
         Valid("Doctor"),
         Valid(false)
       ) { a, b, c -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
     }
 
     "Cartesian builder should build products over Invalid Validated" {
-      Validated.mapN(
+      Invalid("fail1").zip(
         Semigroup.string(),
-        Invalid("fail1"),
         Invalid("fail2"),
         Valid("Who")
       ) { _, _, _ -> "success!" } shouldBe Invalid("fail1fail2")
+    }
+
+    "Cartesian builder for nel doesn't need semigroup parameter" {
+      "fail1".invalidNel().zip(
+        "fail2".invalidNel()
+      ) { _, _ -> "success!" } shouldBe Invalid(nonEmptyListOf("fail1", "fail2"))
     }
 
     "CombineK should combine Valid Validated" {
