@@ -1018,14 +1018,10 @@ fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNul
 
 @Deprecated(SelectiveDeprecation)
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  branch(f.fix(), Some(::identity))
-
-@Deprecated(SelectiveDeprecation)
-fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
   flatMap {
     it.fold(
-      { a -> Some(a).ap(fa) },
-      { b -> Some(b).ap(fb) }
+      { a -> Some(a).ap(f.fix()) },
+      { b -> Some(b).ap(Some(::identity)) }
     )
   }
 
