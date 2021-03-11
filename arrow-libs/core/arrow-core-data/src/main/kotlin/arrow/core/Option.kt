@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 
 /**
@@ -856,7 +855,6 @@ fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
 fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.lastOrNull(predicate).toOption()
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
-
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
