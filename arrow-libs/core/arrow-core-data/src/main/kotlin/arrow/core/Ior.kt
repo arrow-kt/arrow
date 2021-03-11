@@ -560,15 +560,6 @@ sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  inline fun <C> traverse_(fa: (B) -> Iterable<C>): List<Unit> =
-    fold({ emptyList() }, { fa(it).void() }, { _, b -> fa(b).void() })
-
-  inline fun <AA, C> traverseEither_(fa: (B) -> Either<AA, C>): Either<AA, Unit> =
-    fold({ Either.Right(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
-
-  inline fun <AA, C> traverseValidated_(fa: (B) -> Validated<AA, C>): Validated<AA, Unit> =
-    fold({ Valid(Unit) }, { fa(it).void() }, { _, b -> fa(b).void() })
-
   /**
    *  Pairs [C] with [B] returning a Ior<A, Pair<C, B>>
    *
@@ -649,15 +640,6 @@ fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
-fun <A, B> Ior<A, Iterable<B>>.sequence_(): List<Unit> =
-  traverse_(::identity)
-
-fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither_(): Either<B, Unit> =
-  traverseEither_(::identity)
-
-fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated_(): Validated<B, Unit> =
-  traverseValidated_(::identity)
-
 fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
   bitraverse(::identity, ::identity)
 
@@ -693,15 +675,6 @@ fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B
 @Suppress("NOTHING_TO_INLINE")
 inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
-
-inline fun <A, B, C> Ior<A, B>.flatTraverse(SA: Semigroup<A>, f: (B) -> Iterable<Ior<A, C>>): List<Ior<A, C>> =
-  traverse(f).map { it.flatten(SA) }
-
-inline fun <A, B, C, E> Ior<A, B>.flatTraverseEither(SA: Semigroup<A>, f: (B) -> Either<E, Ior<A, C>>): Either<E, Ior<A, C>> =
-  traverseEither(f).map { it.flatten(SA) }
-
-inline fun <A, B, C, E> Ior<A, B>.flatTraverseValidated(SA: Semigroup<A>, f: (B) -> Validated<E, Ior<A, C>>): Validated<E, Ior<A, C>> =
-  traverseValidated(f).map { it.flatten(SA) }
 
 inline fun <A, B> Ior<A, Boolean>.ifM(SA: Semigroup<A>, ifTrue: () -> Ior<A, B>, ifFalse: () -> Ior<A, B>): Ior<A, B> =
   flatMap(SA) { if (it) ifTrue() else ifFalse() }

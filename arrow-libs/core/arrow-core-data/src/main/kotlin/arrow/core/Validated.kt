@@ -514,7 +514,10 @@ sealed class Validated<out E, out A> {
      * }
      * ```
      */
-    inline fun <A, B, C, D> lift(crossinline fl: (A) -> C, crossinline fr: (B) -> D): (Validated<A, B>) -> Validated<C, D> =
+    inline fun <A, B, C, D> lift(
+      crossinline fl: (A) -> C,
+      crossinline fr: (B) -> D
+    ): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
 
     val s = 1.inc()
@@ -620,17 +623,11 @@ sealed class Validated<out E, out A> {
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
-  inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
-    fold({ emptyList() }, { fa(it).void() })
-
   inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> this.right()
     }
-
-  inline fun <EE, B> traverseEither_(fa: (A) -> Either<EE, B>): Either<EE, Unit> =
-    fold({ Either.unit }, { fa(it).void() })
 
   inline fun <B> bifoldLeft(
     c: B,
@@ -781,7 +778,18 @@ inline fun <E, A, B, Z> Validated<E, A>.zip(
   b: Validated<E, B>,
   f: (A, B) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, _, _, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, _, _, _, _, _, _, _, _ ->
     f(a, b)
   }
 
@@ -791,7 +799,18 @@ inline fun <E, A, B, C, Z> Validated<E, A>.zip(
   c: Validated<E, C>,
   f: (A, B, C) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, _, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, _, _, _, _, _, _, _ ->
     f(a, b, c)
   }
 
@@ -802,7 +821,18 @@ inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
   d: Validated<E, D>,
   f: (A, B, C, D) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, _, _, _, _, _, _ ->
     f(a, b, c, d)
   }
 
@@ -814,7 +844,18 @@ inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
   e: Validated<E, EE>,
   f: (A, B, C, D, EE) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, e, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, _, _, _, _, _ ->
     f(a, b, c, d, e)
   }
 
@@ -827,7 +868,18 @@ inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
   ff: Validated<E, FF>,
   f: (A, B, C, D, EE, FF) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, e, ff, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, ff, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    ff,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, ff, _, _, _, _ ->
     f(a, b, c, d, e, ff)
   }
 
@@ -893,16 +945,26 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
     Validated.Valid(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
   } else SE.run {
     var accumulatedError: E? = null
-    accumulatedError = if (this@zip is Validated.Invalid) this@zip.value.maybeCombine(accumulatedError) else accumulatedError
-    accumulatedError = if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.value) } ?: b.value else accumulatedError
-    accumulatedError = if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.value) } ?: c.value else accumulatedError
-    accumulatedError = if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.value) } ?: d.value else accumulatedError
-    accumulatedError = if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.value) } ?: e.value else accumulatedError
-    accumulatedError = if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.value) } ?: ff.value else accumulatedError
-    accumulatedError = if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.value) } ?: g.value else accumulatedError
-    accumulatedError = if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.value) } ?: h.value else accumulatedError
-    accumulatedError = if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.value) } ?: i.value else accumulatedError
-    accumulatedError = if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.value) } ?: j.value else accumulatedError
+    accumulatedError =
+      if (this@zip is Validated.Invalid) this@zip.value.maybeCombine(accumulatedError) else accumulatedError
+    accumulatedError =
+      if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.value) } ?: b.value else accumulatedError
+    accumulatedError =
+      if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.value) } ?: c.value else accumulatedError
+    accumulatedError =
+      if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.value) } ?: d.value else accumulatedError
+    accumulatedError =
+      if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.value) } ?: e.value else accumulatedError
+    accumulatedError =
+      if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.value) } ?: ff.value else accumulatedError
+    accumulatedError =
+      if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.value) } ?: g.value else accumulatedError
+    accumulatedError =
+      if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.value) } ?: h.value else accumulatedError
+    accumulatedError =
+      if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.value) } ?: i.value else accumulatedError
+    accumulatedError =
+      if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.value) } ?: j.value else accumulatedError
     Validated.Invalid(accumulatedError!!)
   }
 
@@ -1048,47 +1110,14 @@ fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
 fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
-fun <E, A> Validated<E, Iterable<A>>.sequence_(): List<Unit> =
-  traverse_(::identity)
-
 fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
-
-fun <E, A, B> Validated<A, Either<E, B>>.traverseEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
 
 operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
     { l1 -> other.fold({ l2 -> l1.compareTo(l2) }, { -1 }) },
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
   )
-
-fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Validated<E, B> =
-  fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> r.valid() }) })
-
-fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
-  when (this) {
-    is Validated.Valid -> when (val either = this.value) {
-      is Either.Left -> fl.map { f -> f(either.value) }
-      is Either.Right -> fr.map { f -> f(either.value) }
-    }
-    is Validated.Invalid -> this
-  }
-
-private fun <E> Validated<E, Boolean>.selector(): Validated<E, Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.leftUnit else Either.unit }
-
-fun <E> Validated<E, Boolean>.whenS(x: Validated<E, () -> Unit>): Validated<E, Unit> =
-  selector().select(x.map { f -> { f() } })
-
-fun <E, A> Validated<E, Boolean>.ifS(fl: Validated<E, A>, fr: Validated<E, A>): Validated<E, A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun <E> Validated<E, Boolean>.orS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(Valid(true), f)
-
-fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(f, Valid(false))
 
 /**
  * Return the Valid value, or the default if Invalid
