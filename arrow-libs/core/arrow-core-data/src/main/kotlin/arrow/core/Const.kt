@@ -170,17 +170,6 @@ data class Const<A, out T>(private val value: A) {
 fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> =
   Const(SG.run { this@combine.value().combine(that.value()) })
 
-@Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
-  ReplaceWith(
-    "this.zip(MA, arg1)",
-    "arrow.core.Const"
-  ),
-  DeprecationLevel.WARNING
-)
-fun <A, T, U> Const<A, T>.ap(SG: Semigroup<A>, ff: Const<A, (T) -> U>): Const<A, U> =
-  retag<U>().combine(SG, ff.retag())
-
 inline fun <A> A.const(): Const<A, Nothing> =
   Const(this)
 
