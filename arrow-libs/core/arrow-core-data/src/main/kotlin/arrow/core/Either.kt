@@ -35,8 +35,7 @@ typealias EitherPartialOf<A> = arrow.Kind<ForEither, A>
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
-inline
-fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
+inline fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
   this as Either<A, B>
 
 /**
