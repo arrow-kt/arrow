@@ -11,6 +11,7 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     api project(":arrow-annotations")
     api project(":arrow-continuations")
     testCompileOnly project(":arrow-syntax")
