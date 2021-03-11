@@ -4,22 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForValidated
 import arrow.core.Validated
-import arrow.core.select
-import arrow.core.branch
 import arrow.core.Validated.Companion
 import arrow.core.extensions.ValidatedSelective
 import arrow.core.fix
-import arrow.core.ifS
-import arrow.core.andS
-import arrow.core.orS
-import arrow.core.whenS
+import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
-import kotlin.Boolean
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 @JvmName("select")
 @Suppress(
@@ -32,8 +21,9 @@ import kotlin.jvm.JvmName
 fun <E, A, B> Kind<Kind<ForValidated, E>, Either<A, B>>.select(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Function1<A, B>>
-): Validated<E, B> =
-  fix().select(arg1.fix())
+): Validated<E, B> = arrow.core.Validated.selective(SE).run {
+  fix().select<A, B>(arg1.fix()) as arrow.core.Validated<E, B>
+}
 
 @JvmName("branch")
 @Suppress(
@@ -42,13 +32,14 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, Either<A, B>>.select(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("branch(arg1, arg2)", "arrow.core.branch"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A, B, C> Kind<Kind<ForValidated, E>, Either<A, B>>.branch(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Function1<A, C>>,
   arg2: Kind<Kind<ForValidated, E>, Function1<B, C>>
-): Validated<E, C> =
-  fix().branch(arg1.fix(), arg2.fix())
+): Validated<E, C> = arrow.core.Validated.selective(SE).run {
+  fix().branch<A, B, C>(arg1.fix(), arg2.fix()) as arrow.core.Validated<E, C>
+}
 
 @JvmName("whenS")
 @Suppress(
@@ -57,12 +48,13 @@ fun <E, A, B, C> Kind<Kind<ForValidated, E>, Either<A, B>>.branch(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("whenS(arg1)", "arrow.core.whenS"))
+@Deprecated(SelectiveDeprecation)
 fun <E> Kind<Kind<ForValidated, E>, Boolean>.whenS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Function0<Unit>>
-): Validated<E, Unit> =
-  fix().whenS(arg1.fix())
+): Validated<E, Unit> = arrow.core.Validated.selective(SE).run {
+  fix().whenS<E>(arg1.fix()) as arrow.core.Validated<E, Unit>
+}
 
 @JvmName("ifS")
 @Suppress(
@@ -71,13 +63,14 @@ fun <E> Kind<Kind<ForValidated, E>, Boolean>.whenS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ifS(arg1, arg2)", "arrow.core.ifS"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.ifS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, A>,
   arg2: Kind<Kind<ForValidated, E>, A>
-): Validated<E, A> =
-  fix().ifS(arg1.fix(), arg2.fix())
+): Validated<E, A> = arrow.core.Validated.selective(SE).run {
+  fix().ifS(arg1.fix(), arg2.fix()) as arrow.core.Validated<E, A>
+}
 
 @JvmName("orS")
 @Suppress(
@@ -86,12 +79,13 @@ fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.ifS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("orS(arg1)", "arrow.core.ifS"))
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.orS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated, E>, Boolean>
-): Validated<E, Boolean> =
-  fix().orS(arg1.fix())
+): Validated<E, Boolean> = arrow.core.Validated.selective(SE).run {
+  fix().orS<A>(arg1.fix()) as arrow.core.Validated<E, Boolean>
+}
 
 @JvmName("andS")
 @Suppress(
@@ -100,20 +94,22 @@ fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.orS(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
+@Deprecated(SelectiveDeprecation)
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.andS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated,
-      E>, Boolean>
-): Validated<E, Boolean> =
-  fix().andS(arg1.fix())
+    E>, Boolean>
+): Validated<E, Boolean> = arrow.core.Validated.selective(SE).run {
+  fix().andS<A>(arg1.fix()) as arrow.core.Validated<E, Boolean>
+}
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
 @Deprecated("Selective typeclasses is deprecated. Use concrete methods on Validated")
-inline fun <E> Companion.selective(SE: Semigroup<E>): ValidatedSelective<E> = object :
-  arrow.core.extensions.ValidatedSelective<E> {
-  override fun SE(): arrow.typeclasses.Semigroup<E> =
-    SE
-}
+inline fun <E> Companion.selective(SE: Semigroup<E>): ValidatedSelective<E> =
+  object : arrow.core.extensions.ValidatedSelective<E> {
+    override fun SE(): arrow.typeclasses.Semigroup<E> =
+      SE
+  }
