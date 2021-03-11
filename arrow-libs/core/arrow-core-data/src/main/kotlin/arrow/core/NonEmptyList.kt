@@ -530,7 +530,6 @@ inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Eit
 fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
   traverseEither(::identity)
 
-
 inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>

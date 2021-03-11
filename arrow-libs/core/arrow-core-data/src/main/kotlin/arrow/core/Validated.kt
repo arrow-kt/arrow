@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.KindDeprecation
-import arrow.core.Validated.Companion.mapN
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -843,7 +842,18 @@ inline fun <E, A, B, Z> Validated<E, A>.zip(
   b: Validated<E, B>,
   f: (A, B) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, _, _, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, _, _, _, _, _, _, _, _ ->
     f(a, b)
   }
 
@@ -853,7 +863,18 @@ inline fun <E, A, B, C, Z> Validated<E, A>.zip(
   c: Validated<E, C>,
   f: (A, B, C) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, _, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, _, _, _, _, _, _, _ ->
     f(a, b, c)
   }
 
@@ -864,7 +885,18 @@ inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
   d: Validated<E, D>,
   f: (A, B, C, D) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, _, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, _, _, _, _, _, _ ->
     f(a, b, c, d)
   }
 
@@ -876,7 +908,18 @@ inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
   e: Validated<E, EE>,
   f: (A, B, C, D, EE) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, e, Validated.unit, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, _, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, _, _, _, _, _ ->
     f(a, b, c, d, e)
   }
 
@@ -889,7 +932,18 @@ inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
   ff: Validated<E, FF>,
   f: (A, B, C, D, EE, FF) -> Z
 ): Validated<E, Z> =
-  zip(SE, b, c, d, e, ff, Validated.unit, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, ff, _, _, _, _ ->
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    ff,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, ff, _, _, _, _ ->
     f(a, b, c, d, e, ff)
   }
 
@@ -955,16 +1009,26 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
     Validated.Valid(f(this.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
   } else SE.run {
     var accumulatedError: E? = null
-    accumulatedError = if (this@zip is Validated.Invalid) this@zip.e.maybeCombine(accumulatedError) else accumulatedError
-    accumulatedError = if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
-    accumulatedError = if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
-    accumulatedError = if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
-    accumulatedError = if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
-    accumulatedError = if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
-    accumulatedError = if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
-    accumulatedError = if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
-    accumulatedError = if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
-    accumulatedError = if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
+    accumulatedError =
+      if (this@zip is Validated.Invalid) this@zip.e.maybeCombine(accumulatedError) else accumulatedError
+    accumulatedError =
+      if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
+    accumulatedError =
+      if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
+    accumulatedError =
+      if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
+    accumulatedError =
+      if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
+    accumulatedError =
+      if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
+    accumulatedError =
+      if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
+    accumulatedError =
+      if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
+    accumulatedError =
+      if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
+    accumulatedError =
+      if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
     Validated.Invalid(accumulatedError!!)
   }
 
