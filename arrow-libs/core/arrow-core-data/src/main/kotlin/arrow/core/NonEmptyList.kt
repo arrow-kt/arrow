@@ -136,6 +136,7 @@ typealias Nel<A> = NonEmptyList<A>
  * ```kotlin:ank:playground
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
+ * import arrow.core.zip
  * import java.util.UUID
  *
  * //sampleStart
