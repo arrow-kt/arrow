@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.TraverseDeprecation
 
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
@@ -102,24 +101,6 @@ fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
       { l, r -> sequenceOf(l) + r }
     )
   }
-
-fun <E, A> Sequence<Either<E, Sequence<A>>>.flatSequenceEither(): Either<E, Sequence<A>> =
-  flatTraverseEither(::identity)
-
-fun <E, A> Sequence<Validated<E, Sequence<A>>>.flatSequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
-  flatTraverseValidated(semigroup, ::identity)
-
-@Deprecated(TraverseDeprecation)
-fun <E, A, B> Sequence<A>.flatTraverseEither(f: (A) -> Either<E, Sequence<B>>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(Eval.now(emptySequence<B>().right())) { a, acc ->
-    f(a).apEval(acc.map { it.map { bs -> { b: Sequence<B> -> b + bs } } })
-  }.value()
-
-@Deprecated(TraverseDeprecation)
-fun <E, A, B> Sequence<A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Sequence<B>>): Validated<E, Sequence<B>> =
-  foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: Sequence<B> -> b + bs } } })
-  }.value()
 
 fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
   flatMap(::identity)
@@ -434,16 +415,8 @@ fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequ
 fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   traverseEither(::identity)
 
-@Deprecated(TraverseDeprecation)
-fun <E> Sequence<Either<E, *>>.sequenceEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
-
 fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
-
-@Deprecated(TraverseDeprecation)
-fun <E> Sequence<Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
-  traverseValidated_(semigroup, ::identity)
 
 fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
@@ -475,23 +448,12 @@ fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequ
     f(a).apEval(acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
   }.value()
 
-@Deprecated(TraverseDeprecation)
-fun <E, A> Sequence<A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
-  val void: (Either<E, Unit>) -> Either<E, (Any?) -> Unit> = { it.map { { Unit } } }
-  return foldRight<A, Either<E, Unit>>(Eval.now(Unit.right())) { a, acc ->
-    f(a).apEval(acc.map(void))
-  }.value()
-}
-
-fun <E, A, B> Sequence<A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, Sequence<B>> =
+fun <E, A, B> Sequence<A>.traverseValidated(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, Sequence<B>> =
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
     f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
-  }.value()
-
-@Deprecated(TraverseDeprecation)
-fun <E, A> Sequence<A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> =
-  foldRight<A, Validated<E, Unit>>(Eval.now(Unit.valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { { Unit } } })
   }.value()
 
 /**
