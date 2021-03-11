@@ -419,110 +419,104 @@ sealed class Option<out A> : OptionOf<A> {
 
     @PublishedApi
     internal val unit: Option<Unit> = Some(Unit)
-
-    inline fun <A, B, C> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      map: (A, B) -> C
-    ): Option<C> =
-      mapN(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-
-    inline fun <A, B, C, D> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      map: (A, B, C) -> D
-    ): Option<D> =
-      mapN(a, b, c, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-    inline fun <A, B, C, D, E> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      map: (A, B, C, D) -> E
-    ): Option<E> =
-      mapN(a, b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
-
-    inline fun <A, B, C, D, E, F> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      map: (A, B, C, D, E) -> F
-    ): Option<F> =
-      mapN(a, b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e) }
-
-    inline fun <A, B, C, D, E, F, G> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      f: Option<F>,
-      map: (A, B, C, D, E, F) -> G
-    ): Option<G> =
-      mapN(a, b, c, d, e, f, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e, f) }
-
-    inline fun <A, B, C, D, E, F, G, H, I> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      f: Option<F>,
-      g: Option<G>,
-      map: (A, B, C, D, E, F, G) -> H
-    ): Option<H> =
-      mapN(a, b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
-
-    inline fun <A, B, C, D, E, F, G, H, I> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      f: Option<F>,
-      g: Option<G>,
-      h: Option<H>,
-      map: (A, B, C, D, E, F, G, H) -> I
-    ): Option<I> =
-      mapN(a, b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      f: Option<F>,
-      g: Option<G>,
-      h: Option<H>,
-      i: Option<I>,
-      map: (A, B, C, D, E, F, G, H, I) -> J
-    ): Option<J> =
-      mapN(a, b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
-
-    inline fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
-      a: Option<A>,
-      b: Option<B>,
-      c: Option<C>,
-      d: Option<D>,
-      e: Option<E>,
-      f: Option<F>,
-      g: Option<G>,
-      h: Option<H>,
-      i: Option<I>,
-      j: Option<J>,
-      map: (A, B, C, D, E, F, G, H, I, J) -> K
-    ): Option<K> =
-      if (a is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
-        Some(map(a.t, b.t, c.t, d.t, e.t, f.t, g.t, h.t, i.t, j.t))
-      } else {
-        None
-      }
   }
+
+  fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
+    zip(other, ::Pair)
+
+  inline fun <B, C> zip(
+    b: Option<B>,
+    map: (A, B) -> C
+  ): Option<C> =
+    zip(b, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+
+  inline fun <B, C, D> zip(
+    b: Option<B>,
+    c: Option<C>,
+    map: (A, B, C) -> D
+  ): Option<D> =
+    zip(b, c, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+  inline fun <B, C, D, E> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    map: (A, B, C, D) -> E
+  ): Option<E> =
+    zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+
+  inline fun <B, C, D, E, F> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    map: (A, B, C, D, E) -> F
+  ): Option<F> =
+    zip(b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e) }
+
+  inline fun <B, C, D, E, F, G> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    f: Option<F>,
+    map: (A, B, C, D, E, F) -> G
+  ): Option<G> =
+    zip(b, c, d, e, f, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e, f) }
+
+  inline fun <B, C, D, E, F, G, H, I> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    f: Option<F>,
+    g: Option<G>,
+    map: (A, B, C, D, E, F, G) -> H
+  ): Option<H> =
+    zip(b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+
+  inline fun <B, C, D, E, F, G, H, I> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    f: Option<F>,
+    g: Option<G>,
+    h: Option<H>,
+    map: (A, B, C, D, E, F, G, H) -> I
+  ): Option<I> =
+    zip(b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+
+  inline fun <B, C, D, E, F, G, H, I, J> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    f: Option<F>,
+    g: Option<G>,
+    h: Option<H>,
+    i: Option<I>,
+    map: (A, B, C, D, E, F, G, H, I) -> J
+  ): Option<J> =
+    zip(b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+
+  inline fun <B, C, D, E, F, G, H, I, J, K> zip(
+    b: Option<B>,
+    c: Option<C>,
+    d: Option<D>,
+    e: Option<E>,
+    f: Option<F>,
+    g: Option<G>,
+    h: Option<H>,
+    i: Option<I>,
+    j: Option<J>,
+    map: (A, B, C, D, E, F, G, H, I, J) -> K
+  ): Option<K> =
+    if (this is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
+      Some(map(this.t, b.t, c.t, d.t, e.t, f.t, g.t, h.t, i.t, j.t))
+    } else {
+      None
+    }
 
   /**
    * Returns true if the option is [None], false otherwise.
@@ -923,12 +917,6 @@ sealed class Option<out A> : OptionOf<A> {
 
   fun void(): Option<Unit> =
     mapConst(Unit)
-
-  fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
-    mapN(this, other) { a, b -> a to b }
-
-  inline fun <B, C> zip(other: Option<B>, f: (A, B) -> C): Option<C> =
-    zip(other).map { a -> f(a.first, a.second) }
 
   inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
     other.map { zip(it).map { a -> f(a.first, a.second) } }
