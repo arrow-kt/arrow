@@ -170,52 +170,19 @@ inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either
     f(a).ap(acc.map { bs: Map<K, B> -> { b: B -> mapOf(k to b) + bs } })
   }
 
-inline fun <K, E, A, B> Map<K, A>.flatTraverseEither(f: (A) -> Either<E, Map<K, B>>): Either<E, Map<K, B>> =
-  foldRight<K, A, Either<E, Map<K, B>>>(emptyMap<K, B>().right()) { (_, a), acc ->
-    f(a).ap(acc.map { bs -> { b: Map<K, B> -> b + bs } })
-  }
-
-inline fun <K, E, A> Map<K, A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight(Either.unit) { (_, a): Map.Entry<K, A>, acc: Either<E, Unit> ->
-    f(a).ap(acc.map(void))
-  }
-}
-
 fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   traverseEither(::identity)
 
-fun <K, E, A> Map<K, Either<E, Map<K, A>>>.flatSequenceEither(): Either<E, Map<K, A>> =
-  flatTraverseEither(::identity)
-
-fun <K, E> Map<K, Either<E, *>>.sequenceEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
-
-inline fun <K, E, A, B> Map<K, A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, Map<K, B>> =
+inline fun <K, E, A, B> Map<K, A>.traverseValidated(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, Map<K, B>> =
   foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (k, a), acc ->
     f(a).ap(semigroup, acc.map { bs -> { b: B -> mapOf(k to b) + bs } })
   }
 
-inline fun <K, E, A, B> Map<K, A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Map<K, B>>): Validated<E, Map<K, B>> =
-  foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (_, a), acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: Map<K, B> -> b + bs } })
-  }
-
-inline fun <K, E, A> Map<K, A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight<K, A, Validated<E, Unit>>(Unit.valid()) { (_, a), acc ->
-    f(a).ap(semigroup, acc.map(void))
-  }
-}
-
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
-
-fun <K, E, A> Map<K, Validated<E, Map<K, A>>>.flatSequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  flatTraverseValidated(semigroup, ::identity)
-
-fun <K, E> Map<K, Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
-  traverseValidated_(semigroup, ::identity)
 
 fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Pair<A, B>> =
   mapValues { (_, a) -> a to f(a) }

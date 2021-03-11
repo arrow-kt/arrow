@@ -7,6 +7,7 @@ import arrow.core.MapK.Companion
 import arrow.core.extensions.MapKTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Deprecated
 import kotlin.Function1
@@ -74,7 +75,7 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.map(arg1: Function1<A, B>): MapK<K, B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <K, G, A, B> Kind<Kind<ForMapK, K>, A>.flatTraverse(
   arg1: Monad<Kind<ForMapK, K>>,
   arg2: Applicative<G>,

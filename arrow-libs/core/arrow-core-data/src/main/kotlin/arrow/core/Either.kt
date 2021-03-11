@@ -13,26 +13,29 @@ import arrow.typeclasses.ShowDeprecation
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) class ForEither private constructor() {
+)
+class ForEither private constructor() {
   companion object
 }
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) typealias EitherOf<A, B> = arrow.Kind2<ForEither, A, B>
+)
+typealias EitherOf<A, B> = arrow.Kind2<ForEither, A, B>
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) typealias EitherPartialOf<A> = arrow.Kind<ForEither, A>
+)
+typealias EitherPartialOf<A> = arrow.Kind<ForEither, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline
-fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
+)
+inline fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
   this as Either<A, B>
 
 /**
@@ -1030,17 +1033,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
     fold({ emptyList() }, { fa(it).map { Right(it) } })
 
-  inline fun <C> traverse_(fa: (B) -> Iterable<C>): List<Unit> =
-    fold({ emptyList() }, { fa(it).void() })
-
   inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
       is Right -> fa(this.b).map { Right(it) }
       is Left -> this.valid()
     }
-
-  inline fun <AA, C> traverseValidated_(fa: (B) -> Validated<AA, C>): Validated<AA, Unit> =
-    fold({ Valid(Unit) }, { fa(it).void() })
 
   inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
@@ -1222,7 +1219,9 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       unrecoverableState: suspend (throwable: Throwable) -> Either<Throwable, Unit>
     ): B =
       catch { f() }
-        .fold({ t: Throwable -> throwable(t) }, { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold(
+          { t: Throwable -> throwable(t) },
+          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
 
@@ -1245,7 +1244,9 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>
     ): B =
       catch(f)
-        .fold({ t: Throwable -> throwable(t) }, { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold(
+          { t: Throwable -> throwable(t) },
+          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
 
@@ -1726,14 +1727,8 @@ inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B)
 fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   traverse(::identity)
 
-fun <A, B> Either<A, Iterable<B>>.sequence_(): List<Unit> =
-  traverse_(::identity)
-
 fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
   traverseValidated(::identity)
-
-fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated_(): Validated<B, Unit> =
-  traverseValidated_(::identity)
 
 fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)

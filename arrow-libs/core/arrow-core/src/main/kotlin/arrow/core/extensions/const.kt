@@ -28,6 +28,7 @@ import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.TraverseDeprecation
 import arrow.typeclasses.TraverseFilter
 import arrow.core.ap as constAp
 import arrow.core.combine as combineAp
@@ -147,6 +148,7 @@ interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTrave
 
   override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
+  @Deprecated(TraverseDeprecation)
   override fun <G, A, B> Kind<ConstPartialOf<X>, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, ConstOf<X, B>> =
     fix().traverseFilter(AP, f)
 }

@@ -7,6 +7,7 @@ import arrow.core.NonEmptyList.Companion
 import arrow.core.extensions.NonEmptyListTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Deprecated
 import kotlin.Function1
 import kotlin.PublishedApi
@@ -82,10 +83,7 @@ fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> Kind<ForNonEmptyList, A>.flatTraverse(
   arg1: Monad<ForNonEmptyList>,
   arg2: Applicative<G>,
