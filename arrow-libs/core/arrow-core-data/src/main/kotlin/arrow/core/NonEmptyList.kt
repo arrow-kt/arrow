@@ -586,21 +586,19 @@ inline fun <A, B, C, D, E, F, G, H, I, J, Z> NonEmptyList<A>.zip(
   i: NonEmptyList<I>,
   j: NonEmptyList<J>,
   map: (A, B, C, D, E, F, G, H, I, J) -> Z
-): NonEmptyList<Z> =
-  NonEmptyList(
-    map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
-    tail.flatMap { aa ->
-      b.tail.flatMap { bb ->
-        c.tail.flatMap { cc ->
-          d.tail.flatMap { dd ->
-            e.tail.flatMap { ee ->
-              f.tail.flatMap { ff ->
-                g.tail.flatMap { gg ->
-                  h.tail.flatMap { hh ->
-                    i.tail.flatMap { ii ->
-                      j.tail.map { jj ->
-                        map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
-                      }
+): NonEmptyList<Z> {
+  val buffer = ArrayList<Z>()
+  for (aa in tail) {
+    for (bb in b.tail) {
+      for (cc in c.tail) {
+        for (dd in d.tail) {
+          for (ee in e.tail) {
+            for (ff in f.tail) {
+              for (gg in g.tail) {
+                for (hh in h.tail) {
+                  for (ii in i.tail) {
+                    for (jj in j.tail) {
+                      buffer.add(map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj))
                     }
                   }
                 }
@@ -610,4 +608,9 @@ inline fun <A, B, C, D, E, F, G, H, I, J, Z> NonEmptyList<A>.zip(
         }
       }
     }
+  }
+  return NonEmptyList(
+    map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
+    buffer
   )
+}
