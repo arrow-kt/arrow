@@ -3,6 +3,123 @@ package arrow.core
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
+fun <B, C, D, E> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  map: (B, C, D) -> E
+): Sequence<E> =
+  zip(c, d, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+fun <B, C, D, E, F> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  map: (B, C, D, E) -> F
+): Sequence<F> =
+  zip(c, d, e, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+fun <B, C, D, E, F, G> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  map: (B, C, D, E, F) -> G
+): Sequence<G> =
+  zip(c, d, e, f, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+fun <B, C, D, E, F, G, H> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  g: Sequence<G>,
+  map: (B, C, D, E, F, G) -> H
+): Sequence<H> =
+  zip(c, d, e, f, g, SequenceK.unit, SequenceK.unit, SequenceK.unit, SequenceK.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  g: Sequence<G>,
+  h: Sequence<H>,
+  map: (B, C, D, E, F, G, H) -> I
+): Sequence<I> =
+  zip(c, d, e, f, g, h, SequenceK.unit, SequenceK.unit, SequenceK.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  g: Sequence<G>,
+  h: Sequence<H>,
+  i: Sequence<I>,
+  map: (B, C, D, E, F, G, H, I) -> J
+): Sequence<J> =
+  zip(c, d, e, f, g, h, i, SequenceK.unit, SequenceK.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  g: Sequence<G>,
+  h: Sequence<H>,
+  i: Sequence<I>,
+  j: Sequence<J>,
+  map: (B, C, D, E, F, G, H, I, J) -> K
+): Sequence<K> =
+  zip(c, d, e, f, g, h, i, j, SequenceK.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
+  c: Sequence<C>,
+  d: Sequence<D>,
+  e: Sequence<E>,
+  f: Sequence<F>,
+  g: Sequence<G>,
+  h: Sequence<H>,
+  i: Sequence<I>,
+  j: Sequence<J>,
+  k: Sequence<K>,
+  map: (B, C, D, E, F, G, H, I, J, K) -> L
+): Sequence<L> =
+  MergingSequence(this, c, d, e, f, g, h, i, j, k, map)
+
+// Ported from Kotlin Std for arity 10
+internal class MergingSequence<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, V> constructor(
+  private val sequence1: Sequence<T1>,
+  private val sequence2: Sequence<T2>,
+  private val sequence3: Sequence<T3>,
+  private val sequence4: Sequence<T4>,
+  private val sequence5: Sequence<T5>,
+  private val sequence6: Sequence<T6>,
+  private val sequence7: Sequence<T7>,
+  private val sequence8: Sequence<T8>,
+  private val sequence9: Sequence<T9>,
+  private val sequence10: Sequence<T10>,
+  private val transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> V
+) : Sequence<V> {
+  override fun iterator(): Iterator<V> = object : Iterator<V> {
+    val iterator1 = sequence1.iterator()
+    val iterator2 = sequence2.iterator()
+    val iterator3 = sequence3.iterator()
+    val iterator4 = sequence4.iterator()
+    val iterator5 = sequence5.iterator()
+    val iterator6 = sequence6.iterator()
+    val iterator7 = sequence7.iterator()
+    val iterator8 = sequence8.iterator()
+    val iterator9 = sequence9.iterator()
+    val iterator10 = sequence10.iterator()
+    override fun next(): V =
+      transform(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next(), iterator9.next(), iterator10.next())
+
+    override fun hasNext(): Boolean =
+      iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext() && iterator9.hasNext() && iterator10.hasNext()
+  }
+}
+
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *
@@ -321,7 +438,7 @@ fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
 
 fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
   if (n <= 0) sequenceOf(MA.empty())
-  else SequenceK.mapN(this@replicate, replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
+  else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
 /**
  * Returns a [Sequence<C>] containing the result of applying some transformation `(A, B?) -> C`
@@ -625,7 +742,7 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
 
-fun <A, B, Z> Sequence<A>.zipEval(other: Eval<Sequence<B>>): Eval<Sequence<Pair<A, B>>> =
+fun <A, B> Sequence<A>.zipEval(other: Eval<Sequence<B>>): Eval<Sequence<Pair<A, B>>> =
   other.map { this.zip(it) }
 
 fun <A, B, Z> Sequence<A>.zipEval(other: Eval<Sequence<B>>, f: (Pair<A, B>) -> Z): Eval<Sequence<Z>> =

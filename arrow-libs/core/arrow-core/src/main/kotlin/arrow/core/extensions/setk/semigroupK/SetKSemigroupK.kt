@@ -26,10 +26,7 @@ internal val semigroupK_singleton: SetKSemigroupK = object : arrow.core.extensio
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "combineK(arg1)",
-    "arrow.core.combineK"
-  ),
+  ReplaceWith("this + arg1"),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSetK, A>.combineK(arg1: Kind<ForSetK, A>): SetK<A> =
@@ -54,12 +51,7 @@ fun <A> algebra(): Semigroup<Kind<ForSetK, A>> = arrow.core.SetK
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Semigroup.set<A>()",
-    "arrow.core.set",
-    "arrow.typeclasses.Semigroup"
-  ),
-  DeprecationLevel.WARNING
+  "Semigroup is no longer support for Set. Use Set#plus from Kotlin Std instead.",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semigroupK(): SetKSemigroupK = semigroupK_singleton

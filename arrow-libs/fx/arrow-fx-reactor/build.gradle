@@ -8,6 +8,7 @@ apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compile project(":arrow-fx")
     compile project(":arrow-annotations")
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

@@ -10,6 +10,7 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compile project(":arrow-core")
 
     kapt project(":arrow-meta")

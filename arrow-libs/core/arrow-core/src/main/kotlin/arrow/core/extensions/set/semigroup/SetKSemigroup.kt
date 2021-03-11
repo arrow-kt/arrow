@@ -55,13 +55,8 @@ object Set {
     "NOTHING_TO_INLINE"
   )
   @Deprecated(
-    "@extension kinded projected functions are deprecated",
-    ReplaceWith(
-      "Semigroup.set<A>()",
-      "arrow.core.set",
-      "arrow.typeclasses.Semigroup"
-    ),
-    DeprecationLevel.WARNING
+    "Semigroup is no longer support for Set. Use Set#plus from Kotlin Std instead.",
+    level = DeprecationLevel.WARNING
   )
   inline fun <A> semigroup(): SetKSemigroup<A> = semigroup_singleton as
     arrow.core.extensions.SetKSemigroup<A>
