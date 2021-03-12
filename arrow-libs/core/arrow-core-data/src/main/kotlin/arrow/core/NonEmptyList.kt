@@ -586,31 +586,8 @@ inline fun <A, B, C, D, E, F, G, H, I, J, Z> NonEmptyList<A>.zip(
   i: NonEmptyList<I>,
   j: NonEmptyList<J>,
   map: (A, B, C, D, E, F, G, H, I, J) -> Z
-): NonEmptyList<Z> {
-  val buffer = ArrayList<Z>()
-  for (aa in tail) {
-    for (bb in b.tail) {
-      for (cc in c.tail) {
-        for (dd in d.tail) {
-          for (ee in e.tail) {
-            for (ff in f.tail) {
-              for (gg in g.tail) {
-                for (hh in h.tail) {
-                  for (ii in i.tail) {
-                    for (jj in j.tail) {
-                      buffer.add(map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj))
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return NonEmptyList(
+): NonEmptyList<Z> =
+  NonEmptyList(
     map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
-    buffer
+    tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail, map)
   )
-}
