@@ -47,29 +47,41 @@ fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * }
  * ```
  */
-inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
-  zip(other, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, _, _, _, _, _, _, _, _ ->
-    map(key, bb, cc)
+inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
+  val destination = LinkedHashMap<Key, C>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(other[key]) { cc -> map(key, bb, cc) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   map: (Key, B, C, D) -> E
-): Map<Key, E> =
-  zip(c, d, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, _, _, _, _, _, _, _ ->
-    map(key, bb, cc, dd)
+): Map<Key, E> {
+  val destination = LinkedHashMap<Key, E>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key]) { cc, dd -> map(key, bb, cc, dd) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
   map: (Key, B, C, D, E) -> F
-): Map<Key, F> =
-  zip(c, d, e, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, _, _, _, _, _, _ ->
-    map(key, bb, cc, dd, ee)
+): Map<Key, F> {
+  val destination = LinkedHashMap<Key, F>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key]) { cc, dd, ee -> map(key, bb, cc, dd, ee) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   c: Map<Key, C>,
@@ -77,10 +89,14 @@ inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   e: Map<Key, E>,
   f: Map<Key, F>,
   map: (Key, B, C, D, E, F) -> G
-): Map<Key, G> =
-  zip(c, d, e, f, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, _, _, _, _, _ ->
-    map(key, bb, cc, dd, ee, ff)
+): Map<Key, G> {
+  val destination = LinkedHashMap<Key, G>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key]) { cc, dd, ee, ff -> map(key, bb, cc, dd, ee, ff) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   c: Map<Key, C>,
@@ -89,10 +105,14 @@ inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   f: Map<Key, F>,
   g: Map<Key, G>,
   map: (Key, B, C, D, E, F, G) -> H
-): Map<Key, H> =
-  zip(c, d, e, f, g, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, _, _, _, _ ->
-    map(key, bb, cc, dd, ee, ff, gg)
+): Map<Key, H> {
+  val destination = LinkedHashMap<Key, H>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key]) { cc, dd, ee, ff, gg -> map(key, bb, cc, dd, ee, ff, gg) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   c: Map<Key, C>,
@@ -102,10 +122,14 @@ inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   g: Map<Key, G>,
   h: Map<Key, H>,
   map: (Key, B, C, D, E, F, G, H) -> I
-): Map<Key, I> =
-  zip(c, d, e, f, g, h, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, _, _, _ ->
-    map(key, bb, cc, dd, ee, ff, gg, hh)
+): Map<Key, I> {
+  val destination = LinkedHashMap<Key, I>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh -> map(key, bb, cc, dd, ee, ff, gg, hh) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   c: Map<Key, C>,
@@ -116,10 +140,14 @@ inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   h: Map<Key, H>,
   i: Map<Key, I>,
   map: (Key, B, C, D, E, F, G, H, I) -> J
-): Map<Key, J> =
-  zip(c, d, e, f, g, h, i, emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, _, _ ->
-    map(key, bb, cc, dd, ee, ff, gg, hh, ii)
+): Map<Key, J> {
+  val destination = LinkedHashMap<Key, J>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii -> map(key, bb, cc, dd, ee, ff, gg, hh, ii) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   c: Map<Key, C>,
@@ -131,10 +159,14 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   i: Map<Key, I>,
   j: Map<Key, J>,
   map: (Key, B, C, D, E, F, G, H, I, J) -> K
-): Map<Key, K> =
-  zip(c, d, e, f, g, h, i, j, emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, jj, _ ->
-    map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+): Map<Key, K> {
+  val destination = LinkedHashMap<Key, K>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key]) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
+      ?.let { l -> destination.put(key, l) }
   }
+  return destination
+}
 
 inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   c: Map<Key, C>,
