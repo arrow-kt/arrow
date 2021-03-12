@@ -9,26 +9,72 @@ import kotlin.collections.foldRight as _foldRight
 inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
-  map: (B, C, D) -> E
-): List<E> =
-  zip(c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  transform: (B, C, D) -> E
+): List<E> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<E>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
-  map: (B, C, D, E) -> F
-): List<F> =
-  zip(c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  transform: (B, C, D, E) -> F
+): List<F> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<F>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
   f: Iterable<F>,
-  map: (B, C, D, E, F) -> G
-): List<G> =
-  zip(c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  transform: (B, C, D, E, F) -> G
+): List<G> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<G>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
   c: Iterable<C>,
@@ -36,9 +82,28 @@ inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
   e: Iterable<E>,
   f: Iterable<F>,
   g: Iterable<G>,
-  map: (B, C, D, E, F, G) -> H
-): List<H> =
-  zip(c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  transform: (B, C, D, E, F, G) -> H
+): List<H> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val gg = g.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10),
+    g.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<H>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
   c: Iterable<C>,
@@ -47,9 +112,30 @@ inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
   f: Iterable<F>,
   g: Iterable<G>,
   h: Iterable<H>,
-  map: (B, C, D, E, F, G, H) -> I
-): List<I> =
-  zip(c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  transform: (B, C, D, E, F, G, H) -> I
+): List<I> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val gg = g.iterator()
+  val hh = h.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10),
+    g.collectionSizeOrDefault(10),
+    h.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<I>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
   c: Iterable<C>,
@@ -59,9 +145,32 @@ inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
   g: Iterable<G>,
   h: Iterable<H>,
   i: Iterable<I>,
-  map: (B, C, D, E, F, G, H, I) -> J
-): List<J> =
-  zip(c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  transform: (B, C, D, E, F, G, H, I) -> J
+): List<J> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val gg = g.iterator()
+  val hh = h.iterator()
+  val ii = i.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10),
+    g.collectionSizeOrDefault(10),
+    h.collectionSizeOrDefault(10),
+    i.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<J>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   c: Iterable<C>,
@@ -72,9 +181,34 @@ inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   h: Iterable<H>,
   i: Iterable<I>,
   j: Iterable<J>,
-  map: (B, C, D, E, F, G, H, I, J) -> K
-): List<K> =
-  zip(c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  transform: (B, C, D, E, F, G, H, I, J) -> K
+): List<K> {
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val gg = g.iterator()
+  val hh = h.iterator()
+  val ii = i.iterator()
+  val jj = j.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10),
+    g.collectionSizeOrDefault(10),
+    h.collectionSizeOrDefault(10),
+    i.collectionSizeOrDefault(10),
+    j.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<K>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next()))
+  }
+  return list
+}
 
 inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   c: Iterable<C>,
@@ -86,32 +220,40 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   i: Iterable<I>,
   j: Iterable<J>,
   k: Iterable<K>,
-  map: (B, C, D, E, F, G, H, I, J, K) -> L
+  transform: (B, C, D, E, F, G, H, I, J, K) -> L
 ): List<L> {
-  val buffer = ArrayList<L>()
-  for (bb in this) {
-    for (cc in c) {
-      for (dd in d) {
-        for (ee in e) {
-          for (ff in f) {
-            for (gg in g) {
-              for (hh in h) {
-                for (ii in i) {
-                  for (jj in j) {
-                    for (kk in k) {
-                      buffer.add(map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk))
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  val bb = iterator()
+  val cc = c.iterator()
+  val dd = d.iterator()
+  val ee = e.iterator()
+  val ff = f.iterator()
+  val gg = g.iterator()
+  val hh = h.iterator()
+  val ii = i.iterator()
+  val jj = j.iterator()
+  val kk = k.iterator()
+  val size = minOf(
+    collectionSizeOrDefault(10),
+    c.collectionSizeOrDefault(10),
+    d.collectionSizeOrDefault(10),
+    e.collectionSizeOrDefault(10),
+    f.collectionSizeOrDefault(10),
+    g.collectionSizeOrDefault(10),
+    h.collectionSizeOrDefault(10),
+    i.collectionSizeOrDefault(10),
+    j.collectionSizeOrDefault(10),
+    k.collectionSizeOrDefault(10)
+  )
+  val list = ArrayList<L>(size)
+  while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext() && kk.hasNext()) {
+    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next(), kk.next()))
   }
-  return buffer
+  return list
 }
+
+@PublishedApi
+internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
+  if (this is Collection<*>) this.size else default
 
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
   when (this) {

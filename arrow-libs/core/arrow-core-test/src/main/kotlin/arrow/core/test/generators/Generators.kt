@@ -11,6 +11,7 @@ import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptyList.Companion.fromListUnsafe
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.SequenceK
@@ -151,7 +152,7 @@ fun <E, A> Gen.Companion.validated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E,
   Gen.either(genE, genA).map { Validated.fromEither(it) }
 
 fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
-  gen.flatMap { head -> Gen.list(gen).map { NonEmptyList(head, it) } }
+  Gen.list(gen).filter(List<A>::isNotEmpty).map(::fromListUnsafe)
 
 fun <K : Comparable<K>, V> Gen.Companion.sortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
   Gen.bind(genK, genV) { k: K, v: V -> sortedMapOf(k to v) }.map { it.k() }
