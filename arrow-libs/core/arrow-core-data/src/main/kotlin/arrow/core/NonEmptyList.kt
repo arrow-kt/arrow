@@ -129,13 +129,14 @@ typealias Nel<A> = NonEmptyList<A>
  * }
  * ```
  *
- * ### mapN
+ * ### zip
  *
  * Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
  *
  * ```kotlin:ank:playground
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
+ * import arrow.core.zip
  * import java.util.UUID
  *
  * //sampleStart
@@ -146,7 +147,7 @@ typealias Nel<A> = NonEmptyList<A>
  * val nelName: NonEmptyList<String> = nonEmptyListOf("William Alvin Howard", "Haskell Curry")
  * val nelYear: NonEmptyList<Int> = nonEmptyListOf(1926, 1900)
  *
- * val value = NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
+ * val value = nelId.zip(nelName, nelYear) { id, name, year ->
  *  Person(id, name, year)
  * }
  * //sampleEnd
@@ -160,7 +161,7 @@ typealias Nel<A> = NonEmptyList<A>
  * - `NonEmptyList` is __used to model lists that guarantee at least one element__
  * - We can easily construct values of `NonEmptyList` with `nonEmptyListOf`
  * - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
- * - `NonEmptyList.mapM(a, b, c) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `mapN`
+ * - `a.zip(b, c) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `zip`
  *
  */
 class NonEmptyList<out A>(
@@ -331,128 +332,6 @@ class NonEmptyList<out A>(
     internal val unit: NonEmptyList<Unit> =
       of(Unit)
 
-    inline fun <B, C, D> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      map: (B, C) -> D
-    ): NonEmptyList<D> =
-      mapN(b, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-
-    inline fun <B, C, D, E> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      map: (B, C, D) -> E
-    ): NonEmptyList<E> =
-      mapN(b, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-    inline fun <B, C, D, E, F> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      map: (B, C, D, E) -> F
-    ): NonEmptyList<F> =
-      mapN(b, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
-
-    inline fun <B, C, D, E, F, G> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      map: (B, C, D, E, F) -> G
-    ): NonEmptyList<G> =
-      mapN(b, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
-
-    inline fun <B, C, D, E, F, G, H> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      g: NonEmptyList<G>,
-      map: (B, C, D, E, F, G) -> H
-    ): NonEmptyList<H> =
-      mapN(b, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
-
-    inline fun <B, C, D, E, F, G, H, I> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      g: NonEmptyList<G>,
-      h: NonEmptyList<H>,
-      map: (B, C, D, E, F, G, H) -> I
-    ): NonEmptyList<I> =
-      mapN(b, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
-
-    inline fun <B, C, D, E, F, G, H, I, J> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      g: NonEmptyList<G>,
-      h: NonEmptyList<H>,
-      i: NonEmptyList<I>,
-      crossinline map: (B, C, D, E, F, G, H, I) -> J
-    ): NonEmptyList<J> =
-      mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      g: NonEmptyList<G>,
-      h: NonEmptyList<H>,
-      i: NonEmptyList<I>,
-      j: NonEmptyList<J>,
-      map: (B, C, D, E, F, G, H, I, J) -> K
-    ): NonEmptyList<K> =
-      mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
-      b: NonEmptyList<B>,
-      c: NonEmptyList<C>,
-      d: NonEmptyList<D>,
-      e: NonEmptyList<E>,
-      f: NonEmptyList<F>,
-      g: NonEmptyList<G>,
-      h: NonEmptyList<H>,
-      i: NonEmptyList<I>,
-      j: NonEmptyList<J>,
-      k: NonEmptyList<K>,
-      map: (B, C, D, E, F, G, H, I, J, K) -> L
-    ): NonEmptyList<L> =
-      NonEmptyList(
-        map(b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head, k.head),
-        b.tail.flatMap { bb ->
-          c.tail.flatMap { cc ->
-            d.tail.flatMap { dd ->
-              e.tail.flatMap { ee ->
-                f.tail.flatMap { ff ->
-                  g.tail.flatMap { gg ->
-                    h.tail.flatMap { hh ->
-                      i.tail.flatMap { ii ->
-                        j.tail.flatMap { jj ->
-                          k.tail.map { kk ->
-                            map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      )
-
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
@@ -479,6 +358,126 @@ class NonEmptyList<out A>(
       return fromListUnsafe(buf)
     }
   }
+
+  fun <B> zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
+    zip(fb, ::Pair)
+
+  inline fun <B, Z> zip(
+    b: NonEmptyList<B>,
+    map: (A, B) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head),
+      tail.zip(b.tail, map)
+    )
+
+  inline fun <B, C, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    map: (A, B, C) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head),
+      tail.zip(b.tail, c.tail, map)
+    )
+
+  inline fun <B, C, D, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    map: (A, B, C, D) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head),
+      tail.zip(b.tail, c.tail, d.tail, map)
+    )
+
+  inline fun <B, C, D, E, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    map: (A, B, C, D, E) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, map)
+    )
+
+  inline fun <B, C, D, E, F, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    f: NonEmptyList<F>,
+    map: (A, B, C, D, E, F) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head, f.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, map)
+    )
+
+  inline fun <B, C, D, E, F, G, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    f: NonEmptyList<F>,
+    g: NonEmptyList<G>,
+    map: (A, B, C, D, E, F, G) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head, f.head, g.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, map)
+    )
+
+  inline fun <B, C, D, E, F, G, H, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    f: NonEmptyList<F>,
+    g: NonEmptyList<G>,
+    h: NonEmptyList<H>,
+    map: (A, B, C, D, E, F, G, H) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, map)
+    )
+
+  inline fun <B, C, D, E, F, G, H, I, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    f: NonEmptyList<F>,
+    g: NonEmptyList<G>,
+    h: NonEmptyList<H>,
+    i: NonEmptyList<I>,
+    map: (A, B, C, D, E, F, G, H, I) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, map)
+    )
+
+  inline fun <B, C, D, E, F, G, H, I, J, Z> zip(
+    b: NonEmptyList<B>,
+    c: NonEmptyList<C>,
+    d: NonEmptyList<D>,
+    e: NonEmptyList<E>,
+    f: NonEmptyList<F>,
+    g: NonEmptyList<G>,
+    h: NonEmptyList<H>,
+    i: NonEmptyList<I>,
+    j: NonEmptyList<J>,
+    map: (A, B, C, D, E, F, G, H, I, J) -> Z
+  ): NonEmptyList<Z> =
+    NonEmptyList(
+      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
+      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail, map)
+    )
 }
 
 fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
@@ -549,9 +548,3 @@ object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
   override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =
     NonEmptyList(this.head, this.tail.plus(b))
 }
-
-fun <A, B, Z> NonEmptyList<A>.zip(fb: NonEmptyList<B>, f: (A, B) -> Z): NonEmptyList<Z> =
-  NonEmptyList(f(head, fb.head), tail.zip(fb.tail, f))
-
-fun <A, B> NonEmptyList<A>.zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
-  zip(fb, ::Pair)
