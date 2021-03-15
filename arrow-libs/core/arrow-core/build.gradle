@@ -13,7 +13,8 @@ apply from: "$ANIMALSNIFFER"
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     api project(":arrow-continuations")
-    
+    api project(":arrow-annotations")
+
     testCompile project(":arrow-core-test")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }
