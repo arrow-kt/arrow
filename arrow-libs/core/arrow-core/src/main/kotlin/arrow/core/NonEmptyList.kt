@@ -6,7 +6,7 @@ typealias Nel<A> = NonEmptyList<A>
 
 /**
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
- * `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
+ * `NonEmptyList` is available in the `arrow-core` module under the `import arrow.core.NonEmptyList`
  *
  * ## nonEmptyListOf
  *

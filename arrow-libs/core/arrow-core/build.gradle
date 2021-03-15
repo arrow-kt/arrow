@@ -3,6 +3,8 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
+apply plugin: 'kotlinx-atomicfu'
+
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
@@ -10,7 +12,8 @@ apply from: "$ANIMALSNIFFER"
 
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    api project(":arrow-core-data")
-    testCompileOnly project(":arrow-core-test")
+    api project(":arrow-continuations")
+    
+    testCompile project(":arrow-core-test")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }
