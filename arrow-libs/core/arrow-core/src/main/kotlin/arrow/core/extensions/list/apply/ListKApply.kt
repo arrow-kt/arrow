@@ -5,7 +5,6 @@ import arrow.core.Eval
 import arrow.core.ap as _ap
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.ForListK
-import arrow.core.zip
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -16,6 +15,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.extensions.ListKApply
+import arrow.core.extensions.listk.apply.apply
 import arrow.core.fix
 import arrow.core.k
 import kotlin.Function1
@@ -24,6 +24,9 @@ import kotlin.Suppress
 import kotlin.collections.List
 import kotlin.jvm.JvmName
 
+const val ListMapNDeprecated =
+  "mapN is no longer supported for List. This operation easily results in extremely big lists, prefer flatMap chains instead."
+
 @JvmName("ap")
 @Suppress(
   "UNCHECKED_CAST",
@@ -31,7 +34,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("_ap(arg1)", "arrow.core.ap"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ap(arg1)", "arrow.core.ap"))
 fun <A, B> List<A>.ap(arg1: List<Function1<A, B>>): List<B> =
   _ap(arg1)
 
@@ -65,13 +68,15 @@ fun <A, B, Z> List<A>.map2Eval(arg1: Eval<Kind<ForListK, B>>, arg2: Function1<Tu
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(, arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, Z> map(
   arg0: List<A>,
   arg1: List<B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): List<Z> =
-  arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -80,13 +85,15 @@ fun <A, B, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): List<Z> =
-  arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -95,14 +102,16 @@ fun <A, B, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, Z> map(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -111,14 +120,16 @@ fun <A, B, C, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -127,7 +138,7 @@ fun <A, B, C, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.zip", "arrow.core.Tuple4"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -135,7 +146,9 @@ fun <A, B, C, D, Z> map(
   arg3: List<D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -144,7 +157,7 @@ fun <A, B, C, D, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.zip", "arrow.core.Tuple4"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -152,7 +165,9 @@ fun <A, B, C, D, Z> mapN(
   arg3: List<D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -161,7 +176,7 @@ fun <A, B, C, D, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -170,7 +185,9 @@ fun <A, B, C, D, E, Z> map(
   arg4: List<E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -179,7 +196,7 @@ fun <A, B, C, D, E, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -188,7 +205,9 @@ fun <A, B, C, D, E, Z> mapN(
   arg4: List<E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -197,7 +216,7 @@ fun <A, B, C, D, E, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.zip", "arrow.core.Tuple6"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -207,7 +226,9 @@ fun <A, B, C, D, E, FF, Z> map(
   arg5: List<FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -216,7 +237,7 @@ fun <A, B, C, D, E, FF, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }", "arrow.core.zip", "arrow.core.Tuple6"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -226,7 +247,9 @@ fun <A, B, C, D, E, FF, Z> mapN(
   arg5: List<FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> arg6(Tuple6(a, b, c, d, e, ff)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -235,7 +258,7 @@ fun <A, B, C, D, E, FF, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -246,7 +269,9 @@ fun <A, B, C, D, E, FF, G, Z> map(
   arg6: List<G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -255,7 +280,7 @@ fun <A, B, C, D, E, FF, G, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -266,7 +291,9 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   arg6: List<G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> arg7(Tuple7(a, b, c, d, e, ff, g)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -275,7 +302,7 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -287,7 +314,9 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   arg7: List<H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -296,7 +325,7 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -308,7 +337,9 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   arg7: List<H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -317,7 +348,7 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> arg8(Tuple8(a, b, c, d, e, ff, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -330,7 +361,9 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   arg8: List<I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> arg9(Tuple9(a, b, c, d, e, ff, g, h, i)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8.k(), arg9) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -339,7 +372,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> arg9(Tuple9(a, b, c, d, e, ff, g, h, i)) }", "arrow.core.zip", "arrow.core.Tuple9"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -352,7 +385,9 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg8: List<I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> arg9(Tuple9(a, b, c, d, e, ff, g, h, i)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8.k(), arg9) as List<Z>
 
 @JvmName("map")
 @Suppress(
@@ -361,7 +396,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg0: List<A>,
   arg1: List<B>,
@@ -375,7 +410,9 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg9: List<J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8.k(), arg9.k(), arg10) as List<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -384,7 +421,7 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg0: List<A>,
   arg1: List<B>,
@@ -398,7 +435,9 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg9: List<J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): List<Z> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, ff, g, h, i, j)) }
+  arrow.core.ListK
+    .apply()
+    .mapN(arg0.k(), arg1.k(), arg2.k(), arg3.k(), arg4.k(), arg5.k(), arg6.k(), arg7.k(), arg8.k(), arg9.k(), arg10) as List<Z>
 
 @JvmName("map2")
 @Suppress(
@@ -407,9 +446,11 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, Z> List<A>.map2(arg1: List<B>, arg2: Function1<Tuple2<A, B>, Z>): List<Z> =
-  zip(arg1) { a, b -> arg2(Tuple2(a, b)) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@map2.k().map2(arg1.k(), arg2) as List<Z>
+  }
 
 @JvmName("product")
 @Suppress(
@@ -418,9 +459,12 @@ fun <A, B, Z> List<A>.map2(arg1: List<B>, arg2: Function1<Tuple2<A, B>, Z>): Lis
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { a, b -> Tuple2(a, b) }", "arrow.core.Tuple2", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B> List<A>.product(arg1: List<B>): List<Tuple2<A, B>> =
-  zip(arg1) { a, b -> Tuple2(a, b) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B>(arg1) as
+      List<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("product1")
 @Suppress(
@@ -429,9 +473,12 @@ fun <A, B> List<A>.product(arg1: List<B>): List<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b), z -> Tuple3(a, b, z)", "arrow.core.Tuple3", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, Z> List<Tuple2<A, B>>.product(arg1: List<Z>): List<Tuple3<A, B, Z>> =
-  zip(arg1) { (a, b), z -> Tuple3(a, b, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, Z>(arg1) as
+      List<arrow.core.Tuple3<A, B, Z>>
+  }
 
 @JvmName("product2")
 @Suppress(
@@ -440,9 +487,12 @@ fun <A, B, Z> List<Tuple2<A, B>>.product(arg1: List<Z>): List<Tuple3<A, B, Z>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c), z -> Tuple4(a, b, c, z) }", "arrow.core.Tuple4", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, Z> List<Tuple3<A, B, C>>.product(arg1: List<Z>): List<Tuple4<A, B, C, Z>> =
-  zip(arg1) { (a, b, c), z -> Tuple4(a, b, c, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, Z>(arg1) as
+      List<arrow.core.Tuple4<A, B, C, Z>>
+  }
 
 @JvmName("product3")
 @Suppress(
@@ -451,9 +501,12 @@ fun <A, B, C, Z> List<Tuple3<A, B, C>>.product(arg1: List<Z>): List<Tuple4<A, B,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }", "arrow.core.Tuple5", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, Z> List<Tuple4<A, B, C, D>>.product(arg1: List<Z>): List<Tuple5<A, B, C, D, Z>> =
-  zip(arg1) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, Z>(arg1) as
+      List<arrow.core.Tuple5<A, B, C, D, Z>>
+  }
 
 @JvmName("product4")
 @Suppress(
@@ -462,9 +515,12 @@ fun <A, B, C, D, Z> List<Tuple4<A, B, C, D>>.product(arg1: List<Z>): List<Tuple5
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Tuple6", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, Z> List<Tuple5<A, B, C, D, E>>.product(arg1: List<Z>): List<Tuple6<A, B, C, D, E, Z>> =
-  zip(arg1) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, E, Z>(arg1) as
+      List<arrow.core.Tuple6<A, B, C, D, E, Z>>
+  }
 
 @JvmName("product5")
 @Suppress(
@@ -473,10 +529,13 @@ fun <A, B, C, D, E, Z> List<Tuple5<A, B, C, D, E>>.product(arg1: List<Z>): List<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff), z -> Tuple7(a, b, c, d, e, ff, z) }", "arrow.core.Tuple7", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> List<Tuple6<A, B, C, D, E, FF>>.product(arg1: List<Z>): List<Tuple7<A, B,
     C, D, E, FF, Z>> =
-  zip(arg1) { (a, b, c, d, e, ff), z -> Tuple7(a, b, c, d, e, ff, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, E, FF, Z>(arg1) as
+      List<arrow.core.Tuple7<A, B, C, D, E, FF, Z>>
+  }
 
 @JvmName("product6")
 @Suppress(
@@ -485,10 +544,13 @@ fun <A, B, C, D, E, FF, Z> List<Tuple6<A, B, C, D, E, FF>>.product(arg1: List<Z>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }", "arrow.core.Tuple8", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> List<Tuple7<A, B, C, D, E, FF, G>>.product(arg1: List<Z>):
   List<Tuple8<A, B, C, D, E, FF, G, Z>> =
-    zip(arg1) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as
+      List<arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
+  }
 
 @JvmName("product7")
 @Suppress(
@@ -497,10 +559,13 @@ fun <A, B, C, D, E, FF, G, Z> List<Tuple7<A, B, C, D, E, FF, G>>.product(arg1: L
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }", "arrow.core.Tuple9", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> List<Tuple8<A, B, C, D, E, FF, G, H>>.product(arg1: List<Z>):
   List<Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    zip(arg1) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as
+      List<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, Z>>
+  }
 
 @JvmName("product8")
 @Suppress(
@@ -509,10 +574,13 @@ fun <A, B, C, D, E, FF, G, H, Z> List<Tuple8<A, B, C, D, E, FF, G, H>>.product(a
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }", "arrow.core.Tuple10", "kotlin.collections.zip"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> List<Tuple9<A, B, C, D, E, FF, G, H, I>>.product(arg1: List<Z>):
   List<Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    zip(arg1) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }
+  arrow.core.extensions.list.apply.List.apply().run {
+    this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as
+      List<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
+  }
 
 @JvmName("tupled")
 @Suppress(
@@ -521,9 +589,12 @@ fun <A, B, C, D, E, FF, G, H, I, Z> List<Tuple9<A, B, C, D, E, FF, G, H, I>>.pro
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> Tuple2(a, b) }", "arrow.core.Tuple2"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B> tupled(arg0: List<A>, arg1: List<B>): List<Tuple2<A, B>> =
-  arg0.zip(arg1) { a, b -> Tuple2(a, b) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1))
+    as List<Tuple2<A, B>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -532,9 +603,12 @@ fun <A, B> tupled(arg0: List<A>, arg1: List<B>): List<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> Tuple2(a, b) }", "arrow.core.Tuple2"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B> tupledN(arg0: List<A>, arg1: List<B>): List<Tuple2<A, B>> =
-  arg0.zip(arg1) { a, b -> Tuple2(a, b) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1))
+    as List<Tuple2<A, B>>
 
 @JvmName("tupled")
 @Suppress(
@@ -543,13 +617,16 @@ fun <A, B> tupledN(arg0: List<A>, arg1: List<B>): List<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.zip", "arrow.core.Tuple3"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C> tupled(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>
 ): List<Tuple3<A, B, C>> =
-  arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2))
+    as List<Tuple3<A, B, C>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -558,13 +635,16 @@ fun <A, B, C> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }", "arrow.core.zip", "arrow.core.Tuple3"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C> tupledN(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>
 ): List<Tuple3<A, B, C>> =
-  arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2))
+    as List<Tuple3<A, B, C>>
 
 @JvmName("tupled")
 @Suppress(
@@ -573,14 +653,17 @@ fun <A, B, C> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D> tupled(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>,
   arg3: List<D>
 ): List<Tuple4<A, B, C, D>> =
-  arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3))
+    as List<Tuple4<A, B, C, D>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -589,14 +672,17 @@ fun <A, B, C, D> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D> tupledN(
   arg0: List<A>,
   arg1: List<B>,
   arg2: List<C>,
   arg3: List<D>
 ): List<Tuple4<A, B, C, D>> =
-  arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3))
+    as List<Tuple4<A, B, C, D>>
 
 @JvmName("tupled")
 @Suppress(
@@ -605,7 +691,7 @@ fun <A, B, C, D> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -613,7 +699,10 @@ fun <A, B, C, D, E> tupled(
   arg3: List<D>,
   arg4: List<E>
 ): List<Tuple5<A, B, C, D, E>> =
-  arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4))
+    as List<Tuple5<A, B, C, D, E>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -622,7 +711,7 @@ fun <A, B, C, D, E> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -630,7 +719,10 @@ fun <A, B, C, D, E> tupledN(
   arg3: List<D>,
   arg4: List<E>
 ): List<Tuple5<A, B, C, D, E>> =
-  arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4))
+    as List<Tuple5<A, B, C, D, E>>
 
 @JvmName("tupled")
 @Suppress(
@@ -639,7 +731,7 @@ fun <A, B, C, D, E> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -648,7 +740,10 @@ fun <A, B, C, D, E, FF> tupled(
   arg4: List<E>,
   arg5: List<FF>
 ): List<Tuple6<A, B, C, D, E, FF>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5))
+    as List<Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -657,7 +752,7 @@ fun <A, B, C, D, E, FF> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -666,7 +761,10 @@ fun <A, B, C, D, E, FF> tupledN(
   arg4: List<E>,
   arg5: List<FF>
 ): List<Tuple6<A, B, C, D, E, FF>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5))
+    as List<Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupled")
 @Suppress(
@@ -675,7 +773,7 @@ fun <A, B, C, D, E, FF> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -685,7 +783,10 @@ fun <A, B, C, D, E, FF, G> tupled(
   arg5: List<FF>,
   arg6: List<G>
 ): List<Tuple7<A, B, C, D, E, FF, G>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6))
+    as List<Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -694,7 +795,7 @@ fun <A, B, C, D, E, FF, G> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -704,7 +805,10 @@ fun <A, B, C, D, E, FF, G> tupledN(
   arg5: List<FF>,
   arg6: List<G>
 ): List<Tuple7<A, B, C, D, E, FF, G>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6))
+    as List<Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupled")
 @Suppress(
@@ -713,7 +817,7 @@ fun <A, B, C, D, E, FF, G> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -724,7 +828,10 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   arg6: List<G>,
   arg7: List<H>
 ): List<Tuple8<A, B, C, D, E, FF, G, H>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7))
+    as List<Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -733,7 +840,7 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -744,7 +851,10 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   arg6: List<G>,
   arg7: List<H>
 ): List<Tuple8<A, B, C, D, E, FF, G, H>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7))
+    as List<Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupled")
 @Suppress(
@@ -753,7 +863,7 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -765,7 +875,10 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   arg7: List<H>,
   arg8: List<I>
 ): List<Tuple9<A, B, C, D, E, FF, G, H, I>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7), arrow.core.ListK(arg8))
+    as List<Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -774,7 +887,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -786,7 +899,10 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   arg7: List<H>,
   arg8: List<I>
 ): List<Tuple9<A, B, C, D, E, FF, G, H, I>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7), arrow.core.ListK(arg8))
+    as List<Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupled")
 @Suppress(
@@ -795,7 +911,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   arg0: List<A>,
   arg1: List<B>,
@@ -808,7 +924,10 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   arg8: List<I>,
   arg9: List<J>
 ): List<Tuple10<A, B, C, D, E, FF, G, H, I, J>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }
+  arrow.core.extensions.list.apply.List
+    .apply()
+    .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7), arrow.core.ListK(arg8), arrow.core.ListK(arg9))
+    as List<Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -817,7 +936,7 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
+@Deprecated(ListMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg0: List<A>,
   arg1: List<B>,
@@ -829,8 +948,10 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg7: List<H>,
   arg8: List<I>,
   arg9: List<J>
-): List<Tuple10<A, B, C, D, E, FF, G, H, I, J>> =
-  arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }
+): List<Tuple10<A, B, C, D, E, FF, G, H, I, J>> = arrow.core.extensions.list.apply.List
+  .apply()
+  .tupledN(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arrow.core.ListK(arg2), arrow.core.ListK(arg3), arrow.core.ListK(arg4), arrow.core.ListK(arg5), arrow.core.ListK(arg6), arrow.core.ListK(arg7), arrow.core.ListK(arg8), arrow.core.ListK(arg9))
+  as List<Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("followedBy")
 @Suppress(
@@ -850,9 +971,9 @@ fun <A, B> List<A>.followedBy(arg1: List<B>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(arg1) { left, _ -> left }"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }"))
 fun <A, B> List<A>.apTap(arg1: List<B>): List<A> =
-  this.zip(arg1) { left, _ -> left }
+  _flatMap { a -> arg1.map { a } }
 
 /**
  * cached extension

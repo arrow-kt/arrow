@@ -122,7 +122,7 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
+nelId.zip(nelName, nelYear) { id, name, year ->
   Person(id, name, year)
 }
 ```

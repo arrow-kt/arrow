@@ -15,6 +15,9 @@ import arrow.core.Tuple9
 import arrow.core.extensions.SequenceKApply
 import kotlin.sequences.Sequence
 
+const val SequenceMapNDeprecated =
+  "mapN is no longer supported for Sequence. This operation easily results in extremely big lists, prefer flatMap chains instead."
+
 @JvmName("ap")
 @Suppress(
   "UNCHECKED_CAST",
@@ -86,15 +89,7 @@ fun <A, B, Z> Sequence<A>.map2Eval(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -111,15 +106,7 @@ fun <A, B, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -136,15 +123,7 @@ fun <A, B, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2) { a, b, c -> arg2(Tuple3(a, b, c)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple3"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -163,15 +142,7 @@ fun <A, B, C, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2) { a, b, c -> arg2(Tuple3(a, b, c)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple3"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -190,15 +161,7 @@ fun <A, B, C, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg2(Tuple4(a, b, c, d)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple4"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -218,15 +181,7 @@ fun <A, B, C, D, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg2(Tuple4(a, b, c, d)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple4"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -246,15 +201,7 @@ fun <A, B, C, D, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg2(Tuple5(a, b, c, d, e)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple5"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -275,15 +222,7 @@ fun <A, B, C, D, E, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg2(Tuple5(a, b, c, d, e)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple5"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -304,15 +243,7 @@ fun <A, B, C, D, E, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg2(Tuple6(a, b, c, d, e, f)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple6"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -334,15 +265,7 @@ fun <A, B, C, D, E, FF, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg2(Tuple6(a, b, c, d, e, f)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple6"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -364,15 +287,7 @@ fun <A, B, C, D, E, FF, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg2(Tuple7(a, b, c, d, e, f, g)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -395,15 +310,7 @@ fun <A, B, C, D, E, FF, G, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg2(Tuple7(a, b, c, d, e, f, g)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -426,15 +333,7 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg2(Tuple8(a, b, c, d, e, f, g, h)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple8"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -458,15 +357,7 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg2(Tuple8(a, b, c, d, e, f, g, h)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple8"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -490,15 +381,7 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg2(Tuple9(a, b, c, d, e, f, g, h, i)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -523,15 +406,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg2(Tuple9(a, b, c, d, e, f, g, h, i)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -556,15 +431,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg2(Tuple10(a, b, c, d, e, f, g, h, i, j)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -590,15 +457,7 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg2(Tuple10(a, b, c, d, e, f, g, h, i, j)) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -626,9 +485,7 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }"
-  ),
+  ReplaceWith("this.flatMap { aa -> b.map { bb -> Tuple2(aa, bb) } }"),
   DeprecationLevel.WARNING
 )
 fun <A, B, Z> Sequence<A>.map2(arg1: Sequence<B>, arg2: Function1<Tuple2<A, B>, Z>): Sequence<Z> =
@@ -644,14 +501,7 @@ fun <A, B, Z> Sequence<A>.map2(arg1: Sequence<B>, arg2: Function1<Tuple2<A, B>, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.Tuple2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   arrow.core.extensions.sequence.apply.Sequence.apply().run {
     arrow.core.SequenceK(this@product).product<A, B>(arrow.core.SequenceK(arg1)) as
@@ -665,14 +515,7 @@ fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b), z -> Tuple3(a, b, z) }",
-    "arrow.core.Tuple3"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, Z> Sequence<Tuple2<A, B>>.product(arg1: Sequence<Z>): Sequence<Tuple3<A, B, Z>> =
   arrow.core.extensions.sequence.apply.Sequence.apply().run {
     arrow.core.SequenceK(this@product).product<A, B, Z>(arrow.core.SequenceK(arg1)) as
@@ -686,14 +529,7 @@ fun <A, B, Z> Sequence<Tuple2<A, B>>.product(arg1: Sequence<Z>): Sequence<Tuple3
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c), z -> Tuple4(a, b, c, z) }",
-    "arrow.core.Tuple4"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, Z> Sequence<Tuple3<A, B, C>>.product(arg1: Sequence<Z>): Sequence<Tuple4<A, B, C, Z>> =
   arrow.core.extensions.sequence.apply.Sequence.apply().run {
     arrow.core.SequenceK(this@product).product<A, B, C, Z>(arrow.core.SequenceK(arg1)) as
@@ -707,14 +543,7 @@ fun <A, B, C, Z> Sequence<Tuple3<A, B, C>>.product(arg1: Sequence<Z>): Sequence<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }",
-    "arrow.core.Tuple5"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, Z> Sequence<Tuple4<A, B, C, D>>.product(arg1: Sequence<Z>): Sequence<Tuple5<A, B,
     C, D, Z>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
   arrow.core.SequenceK(this@product).product<A, B, C, D, Z>(arrow.core.SequenceK(arg1)) as
@@ -728,14 +557,7 @@ fun <A, B, C, D, Z> Sequence<Tuple4<A, B, C, D>>.product(arg1: Sequence<Z>): Seq
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }",
-    "arrow.core.Tuple6"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, Z> Sequence<Tuple5<A, B, C, D, E>>.product(arg1: Sequence<Z>):
   Sequence<Tuple6<A, B, C, D, E, Z>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
     arrow.core.SequenceK(this@product).product<A, B, C, D, E, Z>(arrow.core.SequenceK(arg1)) as
@@ -749,14 +571,7 @@ fun <A, B, C, D, E, Z> Sequence<Tuple5<A, B, C, D, E>>.product(arg1: Sequence<Z>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d, e, f), z -> Tuple7(a, b, c, d, e, f, z) }",
-    "arrow.core.Tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, Z> Sequence<Tuple6<A, B, C, D, E, FF>>.product(arg1: Sequence<Z>):
   Sequence<Tuple7<A, B, C, D, E, FF, Z>> =
     arrow.core.extensions.sequence.apply.Sequence.apply().run {
@@ -771,14 +586,7 @@ fun <A, B, C, D, E, FF, Z> Sequence<Tuple6<A, B, C, D, E, FF>>.product(arg1: Seq
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d, e, f, g), z -> Tuple8(a, b, c, d, e, f, g, z) }",
-    "arrow.core.Tuple8"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, Z> Sequence<Tuple7<A, B, C, D, E, FF, G>>.product(arg1: Sequence<Z>):
   Sequence<Tuple8<A, B, C, D, E, FF, G, Z>> =
     arrow.core.extensions.sequence.apply.Sequence.apply().run {
@@ -793,14 +601,7 @@ fun <A, B, C, D, E, FF, G, Z> Sequence<Tuple7<A, B, C, D, E, FF, G>>.product(arg
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d, e, f, g, h), z -> Tuple9(a, b, c, d, e, f, g, h, z) }",
-    "arrow.core.Tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, Z> Sequence<Tuple8<A, B, C, D, E, FF, G,
     H>>.product(arg1: Sequence<Z>): Sequence<Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   arrow.core.extensions.sequence.apply.Sequence.apply().run {
@@ -815,14 +616,7 @@ fun <A, B, C, D, E, FF, G, H, Z> Sequence<Tuple8<A, B, C, D, E, FF, G,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { (a, b, c, d, e, f, g, h, i), z -> Tuple10(a, b, c, d, e, f, g, h, i, z) }",
-    "arrow.core.Tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, Z> Sequence<Tuple9<A, B, C, D, E, FF, G, H,
     I>>.product(arg1: Sequence<Z>): Sequence<Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
   arrow.core.extensions.sequence.apply.Sequence.apply().run {
@@ -838,15 +632,7 @@ fun <A, B, C, D, E, FF, G, H, I, Z> Sequence<Tuple9<A, B, C, D, E, FF, G, H,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B> tupled(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   arrow.core.extensions.sequence.apply.Sequence
     .apply()
@@ -860,15 +646,7 @@ fun <A, B> tupled(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B> tupledN(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   arrow.core.extensions.sequence.apply.Sequence
     .apply()
@@ -882,15 +660,7 @@ fun <A, B> tupledN(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple3"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -908,15 +678,7 @@ fun <A, B, C> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple3"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -934,15 +696,7 @@ fun <A, B, C> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple4"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -961,15 +715,7 @@ fun <A, B, C, D> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple4"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -988,15 +734,7 @@ fun <A, B, C, D> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple5"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1016,15 +754,7 @@ fun <A, B, C, D, E> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple5"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1044,15 +774,7 @@ fun <A, B, C, D, E> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple6"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1073,15 +795,7 @@ fun <A, B, C, D, E, FF> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple6"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1102,15 +816,7 @@ fun <A, B, C, D, E, FF> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1132,15 +838,7 @@ fun <A, B, C, D, E, FF, G> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1162,15 +860,7 @@ fun <A, B, C, D, E, FF, G> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple8"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1193,15 +883,7 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple8"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1224,15 +906,7 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1256,15 +930,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1288,15 +954,7 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1321,15 +979,7 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    "arrow.core.zip",
-    "arrow.core.Tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(SequenceMapNDeprecated)
 fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg0: Sequence<A>,
   arg1: Sequence<B>,
@@ -1376,10 +1026,7 @@ fun <A, B> Sequence<A>.followedBy(arg1: Sequence<B>): Sequence<B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.zip(arg1) { left, _ -> left }",
-    "arrow.core.zip"
-  ),
+  ReplaceWith("this.flatMap { a -> arg1.map { a } }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.apTap(arg1: Sequence<B>): Sequence<A> =
