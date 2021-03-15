@@ -25,5 +25,137 @@ class NonEmptyListTest : UnitSpec() {
         }
       }
     }
+
+    "zip2" {
+      forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
+        val result = a.zip(b)
+        val expected = a.all.zip(b.all).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip3" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c ->
+        val result = a.zip(b, c, ::Triple)
+        val expected = a.all.zip(b.all, c.all, ::Triple).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip4" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d ->
+        val result = a.zip(b, c, d, ::Tuple4)
+        val expected = a.all.zip(b.all, c.all, d.all, ::Tuple4).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip5" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e ->
+        val result = a.zip(b, c, d, e, ::Tuple5)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, ::Tuple5).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip6" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e, f ->
+        val result = a.zip(b, c, d, e, f, ::Tuple6)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, ::Tuple6).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip7" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e, f, g ->
+        val result = a.zip(b, c, d, e, f, g, ::Tuple7)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, ::Tuple7).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip8" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e, f, g, h ->
+        val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, ::Tuple8).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip9" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e, f, g, h, i ->
+        val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, ::Tuple9).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
+
+    "zip10" {
+      forAll(
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int()),
+        Gen.nonEmptyList(Gen.int())
+      ) { a, b, c, d, e, f, g, h, i, j ->
+        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10).let(NonEmptyList.Companion::fromListUnsafe)
+        result == expected
+      }
+    }
   }
 }

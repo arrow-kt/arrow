@@ -6,6 +6,7 @@ import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptyList.Companion.fromListUnsafe
 import arrow.core.Option
 import arrow.core.Tuple10
 import arrow.core.Tuple4
@@ -118,7 +119,7 @@ fun <E, A> Gen.Companion.validated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E,
   Gen.either(genE, genA).map { Validated.fromEither(it) }
 
 fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
-  gen.flatMap { head -> Gen.list(gen).map { NonEmptyList(head, it) } }
+  Gen.list(gen).filter(List<A>::isNotEmpty).map(::fromListUnsafe)
 
 fun <A> Gen.Companion.sequence(genA: Gen<A>): Gen<Sequence<A>> =
   Gen.list(genA).map { it.asSequence() }
