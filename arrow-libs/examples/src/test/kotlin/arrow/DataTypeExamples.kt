@@ -22,7 +22,7 @@ class DataTypeExamples : FreeSpec() {
 
     init {
         /**
-         * Option http://arrow-kt.io/docs/apidocs/arrow-core-data/arrow.core/-option/
+         * Option http://arrow-kt.io/docs/apidocs/arrow-core/arrow.core/-option/
          ***/
         "Option: Some or None?" - {
             val someValue: Option<Int> = Some(42)
@@ -62,7 +62,7 @@ class DataTypeExamples : FreeSpec() {
             }
         }
 
-        // Either http://arrow.io/docs/apidocs/arrow-core-data/arrow.core/-either/
+        // Either http://arrow.io/docs/apidocs/arrow-core/arrow.core/-either/
         "Either left or right" - {
             fun parse(s: String): ProblemOrInt = try {
                 Right(s.toInt())
