@@ -30,7 +30,7 @@ Monoid.string().run { empty() }
 
 ```kotlin:ank
 Monoid.string().run {
-    listOf("Λ", "R", "R", "O", "W").combineAll()
+  listOf("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
 
@@ -71,16 +71,16 @@ To use this with a function that produces a pair, we can define a Monoid for a p
 import arrow.typeclasses.Monoid
 
 fun <A, B> monoidPair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
-    object : Monoid<Pair<A, B>> {
-    
-        override fun Pair<A, B>.combine(other: Pair<A, B>): Pair<A, B> {
-            val (thisA, thisB) = this
-            val (otherA, otherB) = other
-            return Pair(MA.run { thisA.combine(otherA) }, MB.run { thisB.combine(otherB) })
-        }
-        
-        override fun empty(): Pair<A, B> = Pair(MA.empty(), MB.empty())
+  object : Monoid<Pair<A, B>> {
+
+    override fun Pair<A, B>.combine(other: Pair<A, B>): Pair<A, B> {
+      val (thisA, thisB) = this
+      val (otherA, otherB) = other
+      return Pair(MA.run { thisA.combine(otherA) }, MB.run { thisB.combine(otherB) })
     }
+    
+    override fun empty(): Pair<A, B> = Pair(MA.empty(), MB.empty())
+}
 ```
 
 This way, we are able to combine both values in one pass, hurrah!
@@ -95,6 +95,6 @@ val M = monoidPair(Monoid.int(), Monoid.string())
 val list = listOf(1, 1)
 
 list.foldMap(M) { n: Int ->
-    Pair(n, n.toString())
+  Pair(n, n.toString())
 }
 ```
