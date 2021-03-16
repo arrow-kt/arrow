@@ -81,7 +81,7 @@ fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2Eval(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Either", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.zip", "arrow.core.Tuple2"))
 fun <L, A, B, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -95,7 +95,7 @@ fun <L, A, B, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Either", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.zip", "arrow.core.Tuple2"))
 fun <L, A, B, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -109,7 +109,7 @@ fun <L, A, B, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.Either", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <L, A, B, C, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -124,7 +124,7 @@ fun <L, A, B, C, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.Either", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c)) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <L, A, B, C, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -139,7 +139,7 @@ fun <L, A, B, C, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.Either", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <L, A, B, C, D, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -155,7 +155,7 @@ fun <L, A, B, C, D, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.Either", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d)) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <L, A, B, C, D, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -171,7 +171,7 @@ fun <L, A, B, C, D, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.Either", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, E, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -188,7 +188,7 @@ fun <L, A, B, C, D, E, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.Either", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e)) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, E, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -205,7 +205,7 @@ fun <L, A, B, C, D, E, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }", "arrow.core.Either", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, FF, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -223,7 +223,7 @@ fun <L, A, B, C, D, E, FF, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }", "arrow.core.Either", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f)) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, FF, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -241,7 +241,7 @@ fun <L, A, B, C, D, E, FF, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }", "arrow.core.Either", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, G, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -260,7 +260,7 @@ fun <L, A, B, C, D, E, FF, G, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }", "arrow.core.Either", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g)) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, G, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -279,7 +279,7 @@ fun <L, A, B, C, D, E, FF, G, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }", "arrow.core.Either", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, H, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -299,7 +299,7 @@ fun <L, A, B, C, D, E, FF, G, H, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }", "arrow.core.Either", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h)) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, H, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -319,7 +319,7 @@ fun <L, A, B, C, D, E, FF, G, H, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i)) }", "arrow.core.Either", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i)) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, I, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -340,7 +340,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i)) }", "arrow.core.Either", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i)) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -361,7 +361,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j)) }", "arrow.core.Either", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -383,7 +383,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, J, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j)) }", "arrow.core.Either", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.zip(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j)) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -443,7 +443,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.product(arg1: Kind<Kind<ForEither, L>,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }", "arrow.core.Either", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <L, A, B, Z> Kind<Kind<ForEither, L>, Tuple2<A, B>>.product(arg1: Kind<Kind<ForEither, L>, Z>):
   Either<L, Tuple3<A, B, Z>> =
     fix()._zip(arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }
@@ -455,7 +455,7 @@ fun <L, A, B, Z> Kind<Kind<ForEither, L>, Tuple2<A, B>>.product(arg1: Kind<Kind<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c), z -> Tuple4(a, b, c, z) }", "arrow.core.Either", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c), z -> Tuple4(a, b, c, z) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <L, A, B, C, Z> Kind<Kind<ForEither, L>, Tuple3<A, B, C>>.product(
   arg1: Kind<Kind<ForEither, L>,
     Z>
@@ -469,7 +469,7 @@ fun <L, A, B, C, Z> Kind<Kind<ForEither, L>, Tuple3<A, B, C>>.product(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }", "arrow.core.Either", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, Z> Kind<Kind<ForEither, L>, Tuple4<A, B, C,
     D>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple5<A, B, C, D, Z>> =
   fix()._zip(arg1.fix()) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }
@@ -481,7 +481,7 @@ fun <L, A, B, C, D, Z> Kind<Kind<ForEither, L>, Tuple4<A, B, C,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Either", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, Z> Kind<Kind<ForEither, L>, Tuple5<A, B, C, D,
     E>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple6<A, B, C, D, E, Z>> =
   fix()._zip(arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }
@@ -493,7 +493,7 @@ fun <L, A, B, C, D, E, Z> Kind<Kind<ForEither, L>, Tuple5<A, B, C, D,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Either", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForEither, L>, Tuple6<A, B, C, D, E,
     FF>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple7<A, B, C, D, E, FF, Z>> =
   fix()._zip(arg1.fix()) { (a, b, c, d, e, ff), z -> Tuple7(a, b, c, d, e, ff, z) }
@@ -505,7 +505,7 @@ fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForEither, L>, Tuple6<A, B, C, D, E,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }", "arrow.core.Either", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForEither, L>, Tuple7<A, B, C, D, E, FF,
     G>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple8<A, B, C, D, E, FF, G, Z>> =
   fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }
@@ -517,7 +517,7 @@ fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForEither, L>, Tuple7<A, B, C, D, E, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }", "arrow.core.Either", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForEither, L>, Tuple8<A, B, C, D, E, FF, G,
     H>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }
@@ -529,7 +529,7 @@ fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForEither, L>, Tuple8<A, B, C, D, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }", "arrow.core.Either", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForEither, L>, Tuple9<A, B, C, D, E, FF, G, H,
     I>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple10<A, B, C, D, E, FF, G, H, I,
     Z>> = fix()._zip(arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }
@@ -541,7 +541,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForEither, L>, Tuple9<A, B, C, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.Either", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.zip", "arrow.core.Tuple2"))
 fun <L, A, B> tupled(arg0: Kind<Kind<ForEither, L>, A>, arg1: Kind<Kind<ForEither, L>, B>):
   Either<L, Tuple2<A, B>> = arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }
 
@@ -552,7 +552,7 @@ fun <L, A, B> tupled(arg0: Kind<Kind<ForEither, L>, A>, arg1: Kind<Kind<ForEithe
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.Either", "arrow.core.Tuple2"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.zip", "arrow.core.Tuple2"))
 fun <L, A, B> tupledN(arg0: Kind<Kind<ForEither, L>, A>, arg1: Kind<Kind<ForEither, L>, B>):
   Either<L, Tuple2<A, B>> = arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }
 
@@ -563,7 +563,7 @@ fun <L, A, B> tupledN(arg0: Kind<Kind<ForEither, L>, A>, arg1: Kind<Kind<ForEith
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.Either", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <L, A, B, C> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -577,7 +577,7 @@ fun <L, A, B, C> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.Either", "arrow.core.Tuple3"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }", "arrow.core.zip", "arrow.core.Tuple3"))
 fun <L, A, B, C> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -591,7 +591,7 @@ fun <L, A, B, C> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix()) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.Either", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix()) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <L, A, B, C, D> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -606,7 +606,7 @@ fun <L, A, B, C, D> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix()) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.Either", "arrow.core.Tuple4"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix()) { a, b, c, d -> Tuple4(a, b, c, d) }", "arrow.core.zip", "arrow.core.Tuple4"))
 fun <L, A, B, C, D> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -621,7 +621,7 @@ fun <L, A, B, C, D> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix()) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.Either", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix()) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, E> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -637,7 +637,7 @@ fun <L, A, B, C, D, E> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix()) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.Either", "arrow.core.Tuple5"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix()) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }", "arrow.core.zip", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, E> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -653,7 +653,7 @@ fun <L, A, B, C, D, E> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix()) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.Either", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix()) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, FF> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -670,7 +670,7 @@ fun <L, A, B, C, D, E, FF> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix()) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.Either", "arrow.core.Tuple6"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix()) { a, b, c, d, e, ff -> Tuple6(a, b, c, d, e, ff) }", "arrow.core.zip", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, FF> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -687,7 +687,7 @@ fun <L, A, B, C, D, E, FF> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix()) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.Either", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix()) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, G> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -705,7 +705,7 @@ fun <L, A, B, C, D, E, FF, G> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix()) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.Either", "arrow.core.Tuple7"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix()) { a, b, c, d, e, ff, g -> Tuple7(a, b, c, d, e, ff, g) }", "arrow.core.zip", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, G> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -723,7 +723,7 @@ fun <L, A, B, C, D, E, FF, G> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.Either", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, H> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -742,7 +742,7 @@ fun <L, A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.Either", "arrow.core.Tuple8"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.zip", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, H> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -761,7 +761,7 @@ fun <L, A, B, C, D, E, FF, G, H> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix()) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.Either", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix()) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, I> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -781,7 +781,7 @@ fun <L, A, B, C, D, E, FF, G, H, I> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix()) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.Either", "arrow.core.Tuple9"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix()) { a, b, c, d, e, ff, g, h, i -> Tuple9(a, b, c, d, e, ff, g, h, i) }", "arrow.core.zip", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, I> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -801,7 +801,7 @@ fun <L, A, B, C, D, E, FF, G, H, I> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix(), arg9.fix()) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.Either", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix(), arg9.fix()) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, J> tupled(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -822,7 +822,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, J> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix(), arg9.fix()) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.Either", "arrow.core.Tuple10"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.fix()._zip(arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix(), arg8.fix(), arg9.fix()) { a, b, c, d, e, ff, g, h, i, j -> Tuple10(a, b, c, d, e, ff, g, h, i, j) }", "arrow.core.zip", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
@@ -854,7 +854,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedBy(arg1: Kind<Kind<ForEither, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.Either"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.zip"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.apTap(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   fix()._zip(arg1.fix()) { left, _ -> left }
 
