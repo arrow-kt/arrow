@@ -355,22 +355,6 @@ fun <A> Set<A>.isNotEmpty(): Boolean = arrow.core.extensions.set.foldable.Set.fo
   arrow.core.SetK(this@isNotEmpty).isNotEmpty<A>() as kotlin.Boolean
 }
 
-@JvmName("foldMapA")
-@Suppress(
-  "UNCHECKED_CAST",
-  "USELESS_CAST",
-  "EXTENSION_SHADOWED_BY_MEMBER",
-  "UNUSED_PARAMETER"
-)
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Set")
-fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> Set<A>.foldMapA(
-  arg1: AP,
-  arg2: MO,
-  arg3: Function1<A, Kind<G, B>>
-): Kind<G, B> = arrow.core.extensions.set.foldable.Set.foldable().run {
-  arrow.core.SetK(this@foldMapA).foldMapA<G, A, B, AP, MO>(arg1, arg2, arg3) as arrow.Kind<G, B>
-}
-
 @JvmName("foldMapM")
 @Suppress(
   "UNCHECKED_CAST",

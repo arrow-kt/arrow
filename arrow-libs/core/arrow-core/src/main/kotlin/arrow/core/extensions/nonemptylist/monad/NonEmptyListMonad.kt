@@ -340,11 +340,7 @@ fun <A, B> Kind<ForNonEmptyList, A>.mproduct(arg1: Function1<A, Kind<ForNonEmpty
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "fix().ifM<B>(arg1.fix(), arg2.fix())",
-    "arrow.core.fix",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap { if(it) arg1() else arg2() }"),
   DeprecationLevel.WARNING
 )
 fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
@@ -364,11 +360,7 @@ fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
-    "arrow.core.fix",
-    "arrow.core.selectM"
-  ),
+  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
@@ -387,9 +379,7 @@ fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
-    "arrow.core.fix",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }"
   ),
   DeprecationLevel.WARNING
 )

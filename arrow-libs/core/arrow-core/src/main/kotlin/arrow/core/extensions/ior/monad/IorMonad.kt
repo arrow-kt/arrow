@@ -339,10 +339,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mproduct(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.ifM(SL, arg1, arg2)",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap(SA) { if (it) arg1() else arg2() }"),
   DeprecationLevel.WARNING
 )
 fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
@@ -363,8 +360,7 @@ fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.selectM(SL, arg1)",
-    "arrow.core.selectM"
+    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }"
   ),
   DeprecationLevel.WARNING
 )
@@ -385,8 +381,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.selectM(SL, arg1)",
-    "arrow.core.selectM"
+    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }"
   ),
   DeprecationLevel.WARNING
 )

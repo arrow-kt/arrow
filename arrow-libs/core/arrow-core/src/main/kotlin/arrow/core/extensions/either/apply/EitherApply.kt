@@ -64,7 +64,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.apEval(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map2Eval(arg1, arg2)", "arrow.core.map2Eval"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { zip(it) { a, b -> arg2(Tuple2(a, b)) } }", "arrow.core.Tuple2"))
 fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2Eval(
   arg1: Eval<Kind<Kind<ForEither, L>, B>>,
   arg2: Function1<Tuple2<A, B>, Z>

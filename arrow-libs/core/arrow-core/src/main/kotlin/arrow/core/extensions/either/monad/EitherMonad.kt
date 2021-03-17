@@ -5,8 +5,6 @@ import arrow.core.Either
 import arrow.core.flatMap as _flatMap
 import arrow.core.flatten as _flatten
 import arrow.core.ap as _ap
-import arrow.core.ifM as _ifM
-import arrow.core.selectM as _selectM
 import arrow.core.mproduct as _mproduct
 import arrow.core.Either.Companion
 import arrow.core.Eval
@@ -14,6 +12,7 @@ import arrow.core.ForEither
 import arrow.core.Tuple2
 import arrow.core.extensions.EitherMonad
 import arrow.core.fix
+import arrow.core.right
 import arrow.core.zip
 import kotlin.Any
 import kotlin.Boolean
@@ -204,12 +203,12 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.mproduct(arg1: Function1<A, Kind<Kind<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ifM({ arg1() }, { arg2() })", "arrow.core.ifM"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { if (it) arg1() else arg2() }"))
 fun <L, B> Kind<Kind<ForEither, L>, Boolean>.ifM(
   arg1: Function0<Kind<Kind<ForEither, L>, B>>,
   arg2: Function0<Kind<Kind<ForEither, L>, B>>
 ): Either<L, B> =
-  fix()._ifM({ arg1().fix() }, { arg2().fix() })
+  fix()._flatMap { if (it) arg1().fix() else arg2().fix() }
 
 @JvmName("selectM")
 @Suppress(
@@ -218,12 +217,12 @@ fun <L, B> Kind<Kind<ForEither, L>, Boolean>.ifM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("selectM(arg1)", "arrow.core.selectM"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }"))
 fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.selectM(
   arg1: Kind<Kind<ForEither, L>,
     Function1<A, B>>
 ): Either<L, B> =
-  fix()._selectM(arg1.fix())
+  fix()._flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }
 
 @JvmName("select")
 @Suppress(
@@ -232,12 +231,12 @@ fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.selectM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("selectM(arg1)", "arrow.core.selectM"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }"))
 fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.select(
   arg1: Kind<Kind<ForEither, L>,
     Function1<A, B>>
 ): Either<L, B> =
-  fix()._selectM(arg1.fix())
+  fix()._flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }
 
 /**
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or

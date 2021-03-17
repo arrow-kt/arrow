@@ -566,8 +566,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     ): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
 
-    val s = 1.inc()
-
     @PublishedApi
     internal val unit: Validated<Nothing, Unit> =
       Validated.Valid(Unit)
@@ -591,80 +589,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    */
   fun void(): Validated<E, Unit> =
     map { Unit }
-
-  /**
-   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a pair of the [A] value and the
-   * computed [B] value as result of applying [f]
-   *
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().fproduct { "$it World" }
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  inline fun <B> fproduct(f: (A) -> B): Validated<E, Pair<A, B>> =
-    map { a -> a to f(a) }
-
-  /**
-   * Replaces [A] inside [Validated] with [B] resulting in a Kind<F, B>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".valid().mapConst("...")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> mapConst(b: B): Validated<E, B> =
-    map { b }
-
-  /**
-   * Pairs [B] with [A] returning a Validated<E, Pair<B, A>>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleLeft("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleLeft(b: B): Validated<E, Pair<B, A>> =
-    map { a -> b to a }
-
-  /**
-   * Pairs [A] with [B] returning a Validated<E, Pair<A, B>>
-   *
-   * ```kotlin:ank:playground:extension
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleRight("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleRight(b: B): Validated<E, Pair<A, B>> =
-    map { a -> a to b }
 
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })

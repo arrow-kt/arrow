@@ -205,7 +205,19 @@ inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   )
   val list = ArrayList<K>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext()) {
-    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next()))
+    list.add(
+      transform(
+        bb.next(),
+        cc.next(),
+        dd.next(),
+        ee.next(),
+        ff.next(),
+        gg.next(),
+        hh.next(),
+        ii.next(),
+        jj.next()
+      )
+    )
   }
   return list
 }
@@ -246,7 +258,20 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   )
   val list = ArrayList<L>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext() && kk.hasNext()) {
-    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next(), kk.next()))
+    list.add(
+      transform(
+        bb.next(),
+        cc.next(),
+        dd.next(),
+        ee.next(),
+        ff.next(),
+        gg.next(),
+        hh.next(),
+        ii.next(),
+        jj.next(),
+        kk.next()
+      )
+    )
   }
   return list
 }
@@ -283,11 +308,8 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
 fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <A, B> Iterable<A>.mapConst(b: B): List<B> =
-  map { b }
-
 fun <A> Iterable<A>.void(): List<Unit> =
-  mapConst(Unit)
+  map { Unit }
 
 fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun loop(fa_p: List<A>): Eval<B> = when {
@@ -742,9 +764,7 @@ fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * }
  */
 inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
-  split()?.let { (fa, a) ->
-    ffa(a) + fa.flatMap(ffa)
-  } ?: fb.toList()
+  firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
 
 fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
   flatMap { either ->
@@ -782,69 +802,6 @@ fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>>
 
 fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
-
-inline fun <B> Iterable<Boolean>.ifM(ifFalse: () -> Iterable<B>, ifTrue: () -> Iterable<B>): List<B> =
-  flatMap { bool ->
-    if (bool) ifTrue() else ifFalse()
-  }
-
-fun <A, B> Iterable<Either<A, B>>.selectM(f: Iterable<(A) -> B>): List<B> =
-  flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> listOf(b) }) }
-
-/**
- *  Applies [f] to an [A] inside [Iterable] and returns the [List] structure with a tuple of the [A] value and the
- *  computed [B] value as result of applying [f]
- *
- *  ```kotlin:ank:playground
- * import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello").fproduct { "$it World" }
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-inline fun <A, B> Iterable<A>.fproduct(f: (A) -> B): List<Pair<A, B>> =
-  map { a -> a to f(a) }
-
-/**
- *  Pairs [B] with [A] returning a List<Pair<B, A>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello", "Hello2").tupleLeft("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-fun <A, B> Iterable<A>.tupleLeft(b: B): List<Pair<B, A>> =
-  map { a -> b to a }
-
-/**
- *  Pairs [A] with [B] returning a List<Pair<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello").tupleRight("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-fun <A, B> Iterable<A>.tupleRight(b: B): List<Pair<A, B>> =
-  map { a -> a to b }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Iterable<A> to Iterable<B>

@@ -120,7 +120,7 @@ fun <A> Kind<ForListK, A>.void(): ListK<Unit> = arrow.core.ListK.functor().run {
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("fproduct(arg1)", "arrow.core.fproduct"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1(a)) }", "arrow.core.Tuple2"))
 fun <A, B> Kind<ForListK, A>.fproduct(arg1: Function1<A, B>): ListK<Tuple2<A, B>> =
   arrow.core.ListK.functor().run {
     this@fproduct.fproduct<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
@@ -133,7 +133,7 @@ fun <A, B> Kind<ForListK, A>.fproduct(arg1: Function1<A, B>): ListK<Tuple2<A, B>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("mapConst(arg1)", "arrow.core.mapConst"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { arg1 }"))
 fun <A, B> Kind<ForListK, A>.mapConst(arg1: B): ListK<B> = arrow.core.ListK.functor().run {
   this@mapConst.mapConst<A, B>(arg1) as arrow.core.ListK<B>
 }
@@ -148,7 +148,7 @@ fun <A, B> Kind<ForListK, A>.mapConst(arg1: B): ListK<B> = arrow.core.ListK.func
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("arg1.mapConst(this)", "arrow.core.mapConst"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("arg1.map { this }"))
 fun <A, B> A.mapConst(arg1: Kind<ForListK, B>): ListK<A> = arrow.core.ListK.functor().run {
   this@mapConst.mapConst<A, B>(arg1) as arrow.core.ListK<A>
 }
@@ -160,7 +160,7 @@ fun <A, B> A.mapConst(arg1: Kind<ForListK, B>): ListK<A> = arrow.core.ListK.func
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleLeft(arg1)", "arrow.core.tupleLeft"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { Tuple2(arg1, it) }", "arrow.core.Tuple2"))
 fun <A, B> Kind<ForListK, A>.tupleLeft(arg1: B): ListK<Tuple2<B, A>> =
   arrow.core.ListK.functor().run {
     this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<B, A>>
@@ -173,7 +173,7 @@ fun <A, B> Kind<ForListK, A>.tupleLeft(arg1: B): ListK<Tuple2<B, A>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleRight(arg1)", "arrow.core.tupleRight"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { Tuple2(it, arg1) }", "arrow.core.Tuple2"))
 fun <A, B> Kind<ForListK, A>.tupleRight(arg1: B): ListK<Tuple2<A, B>> =
   arrow.core.ListK.functor().run {
     this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>

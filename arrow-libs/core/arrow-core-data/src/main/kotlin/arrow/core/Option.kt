@@ -552,26 +552,6 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
-  /**
-   *  Replaces [A] inside [Option] with [B] resulting in an Option<B>
-   *
-   *  Option<A> -> Option<B>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".some().mapConst("...")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> mapConst(b: B): Option<B> =
-    map { b }
-
   @Deprecated(
     "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
     ReplaceWith(
@@ -753,27 +733,6 @@ sealed class Option<out A> : OptionOf<A> {
       is None -> initial
     }
 
-  /**
-   *  Applies [f] to an [A] inside [Option] and returns the [Option] structure with a pair of the [A] value and the
-   *  computed [B] value as result of applying [f]
-   *
-   *  Option<A> -> Option<Pair<A, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().fproduct({ "$it World" })
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  inline fun <B> fproduct(f: (A) -> B): Option<Pair<A, B>> =
-    map { a -> Pair(a, f(a)) }
-
   fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
     align(other) { ior ->
       ior.fold(
@@ -830,51 +789,8 @@ sealed class Option<out A> : OptionOf<A> {
 
   fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
-  /**
-   *  Pairs [B] with [A] returning an Option<Pair<B, A>>
-   *
-   *  Option<A> -> Option<Pair<B, A>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().tupleLeft("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> tupleLeft(b: B): Option<Pair<B, A>> =
-    map { a -> Pair(b, a) }
-
-  /**
-   *  Pairs [A] with [B] returning an Option<Pair<A, B>>
-   *
-   *  Option<A> -> Option<Pair<A, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().tupleRight("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> tupleRight(b: B): Option<Pair<A, B>> =
-    map { a -> Pair(a, b) }
-
   fun void(): Option<Unit> =
-    mapConst(Unit)
-
-  inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
-    other.map { zip(it).map { a -> f(a.first, a.second) } }
+    map { Unit }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -1015,17 +931,6 @@ fun <A> Option<Option<A>>.flatten(): Option<A> =
 inline fun <A, B> Option<A>.mproduct(f: (A) -> Option<B>): Option<Pair<A, B>> =
   flatMap { a ->
     f(a).map { b -> a to b }
-  }
-
-inline fun <A> Option<Boolean>.ifM(ifTrue: () -> Option<A>, ifFalse: () -> Option<A>): Option<A> =
-  flatMap { if (it) ifTrue() else ifFalse() }
-
-fun <A, B> Option<Either<A, B>>.selectM(f: Option<(A) -> B>): Option<B> =
-  flatMap {
-    it.fold(
-      { a -> Some(a).ap(f) },
-      { b -> Some(b) }
-    )
   }
 
 inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =

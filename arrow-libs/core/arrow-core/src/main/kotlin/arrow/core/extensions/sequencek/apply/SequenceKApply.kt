@@ -73,8 +73,7 @@ fun <A, B> Kind<ForSequenceK, A>.apEval(arg1: Eval<Kind<ForSequenceK, Function1<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.zipEval(arg1, arg2)",
-    "arrow.core.zipEval"
+    "arg1.map { zip(it) { a, b -> arg2(Tuple2(a, b)) } }", "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

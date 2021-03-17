@@ -164,8 +164,8 @@ fun <A> Kind<ForSequenceK, A>.void(): SequenceK<Unit> = arrow.core.SequenceK.fun
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.fproduct(arg1)",
-    "arrow.core.fproduct"
+    "this.map { a -> Tuple2(a, arg1(a)) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -202,8 +202,7 @@ fun <A, B> Kind<ForSequenceK, A>.fproduct(arg1: Function1<A, B>): SequenceK<Tupl
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.mapConst(arg1)",
-    "arrow.core.mapConst"
+    "this.map { arg1 }"
   ),
   DeprecationLevel.WARNING
 )
@@ -225,8 +224,7 @@ fun <A, B> Kind<ForSequenceK, A>.mapConst(arg1: B): SequenceK<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.mapConst(this)",
-    "arrow.core.mapConst"
+    "arg1.map { this }"
   ),
   DeprecationLevel.WARNING
 )
@@ -263,8 +261,8 @@ fun <A, B> A.mapConst(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.tupleLeft(arg1)",
-    "arrow.core.tupleLeft"
+    "this.map { a -> Tuple2(arg1, a) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -301,8 +299,8 @@ fun <A, B> Kind<ForSequenceK, A>.tupleLeft(arg1: B): SequenceK<Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.tupleRight(arg1)",
-    "arrow.core.tupleRight"
+    "this.map { a -> Tuple2(a, arg1) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

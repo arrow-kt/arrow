@@ -259,7 +259,7 @@ fun <A, B> Sequence<A>.ap(ff: Sequence<(A) -> B>): Sequence<B> =
   flatMap { a -> ff.map { f -> f(a) } }
 
 fun <A, B> Sequence<A>.apEval(ff: Eval<Sequence<(A) -> B>>): Eval<Sequence<B>> =
-  ff.map { this.ap(it) }
+  ff.map { this.flatMap { a -> it.map { f -> f(a) } } }
 
 fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
   this@combineAll.fold(empty()) { acc, a ->
@@ -318,30 +318,6 @@ fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<
     if (hasNext()) f(next(), Eval.defer { loop() }) else lb
   return Eval.defer { this.iterator().loop() }
 }
-
-/**
- *  Applies [f] to an [A] inside [Sequence] and returns the [Sequence] structure with a pair of the [A] value and the
- *  computed [B] value as result of applying [f]
- *
- *  ```kotlin:ank:playground
- * import arrow.core.fproduct
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   sequenceOf("Hello").fproduct { "$it World" }
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.fproduct(f: (A) -> B): Sequence<Pair<A, B>> =
-  map { a -> a to f(a) }
-
-fun <B> Sequence<Boolean>.ifM(ifFalse: () -> Sequence<B>, ifTrue: () -> Sequence<B>): Sequence<B> =
-  flatMap { bool ->
-    if (bool) ifTrue() else ifFalse()
-  }
 
 /**
  * Logical conditional. The equivalent of Prolog's soft-cut.
@@ -445,9 +421,6 @@ fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
 fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
   if (none()) sequenceOf(emptySequence())
   else map { generateSequence { it } }
-
-fun <A, B> Sequence<A>.mapConst(b: B): Sequence<B> =
-  map { b }
 
 fun <A> Sequence<A>.once(): Sequence<A> =
   firstOrNull()?.let { sequenceOf(it) } ?: emptySequence()
@@ -581,9 +554,6 @@ fun <A> Sequence<A>.salign(
   }
 }
 
-fun <A, B> Sequence<Either<A, B>>.selectM(f: Sequence<(A) -> B>): Sequence<B> =
-  flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> sequenceOf(b) }) }
-
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
@@ -651,40 +621,6 @@ fun <E, A, B> Sequence<A>.traverseValidated(
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
     f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
   }.value()
-
-/**
- *  Pairs [B] with [A] returning a Sequence<Pair<B, A>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.tupleLeft
- *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf("Hello", "Hello2").tupleLeft("World")
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.tupleLeft(b: B): Sequence<Pair<B, A>> =
-  map { a -> b to a }
-
-/**
- *  Pairs [A] with [B] returning a Sequence<Pair<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.tupleRight
- *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf("Hello").tupleRight("World")
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.tupleRight(b: B): Sequence<Pair<A, B>> =
-  map { a -> a to b }
 
 /**
  * splits an union into its component parts.
@@ -799,7 +735,7 @@ fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequen
   map(fc).unzip()
 
 fun <A> Sequence<A>.void(): Sequence<Unit> =
-  mapConst(Unit)
+  map { Unit }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Sequence<A> to Sequence<B>
@@ -820,12 +756,6 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  */
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
-
-fun <A, B> Sequence<A>.zipEval(other: Eval<Sequence<B>>): Eval<Sequence<Pair<A, B>>> =
-  other.map { this.zip(it) }
-
-fun <A, B, Z> Sequence<A>.zipEval(other: Eval<Sequence<B>>, f: (Pair<A, B>) -> Z): Eval<Sequence<Z>> =
-  other.map { this.zip(it).map(f) }
 
 fun <A> Semigroup.Companion.sequence(): Semigroup<Sequence<A>> =
   Monoid.sequence()

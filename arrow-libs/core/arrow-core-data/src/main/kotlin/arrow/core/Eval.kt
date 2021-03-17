@@ -601,9 +601,6 @@ fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> =
-  fb.map { zip(it, f) }
-
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.just(emptyList())
   else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }

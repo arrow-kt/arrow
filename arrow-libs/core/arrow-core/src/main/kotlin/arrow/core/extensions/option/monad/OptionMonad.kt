@@ -314,10 +314,7 @@ fun <A, B> Kind<ForOption, A>.mproduct(arg1: Function1<A, Kind<ForOption, B>>): 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ifM(arg1, arg2)",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap { if (it) arg1() else arg2() }"),
   DeprecationLevel.WARNING
 )
 fun <B> Kind<ForOption, Boolean>.ifM(
@@ -337,8 +334,7 @@ fun <B> Kind<ForOption, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "selectM(arg1)",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> Some(a).ap(arg1) }, { b -> Some(b) }) }"
   ),
   DeprecationLevel.WARNING
 )
@@ -357,8 +353,7 @@ fun <A, B> Kind<ForOption, Either<A, B>>.selectM(arg1: Kind<ForOption, Function1
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "selectM(arg1)",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> Some(a).ap(arg1) }, { b -> Some(b) }) }"
   ),
   DeprecationLevel.WARNING
 )

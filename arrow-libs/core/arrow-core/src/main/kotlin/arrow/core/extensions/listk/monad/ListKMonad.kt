@@ -224,7 +224,7 @@ fun <A, B> Kind<ForListK, A>.mproduct(arg1: Function1<A, Kind<ForListK, B>>): Li
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("ifM(arg1, arg2)", "arrow.core.ifM"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { bool -> if (bool) arg1() else arg2() }"))
 fun <B> Kind<ForListK, Boolean>.ifM(
   arg1: Function0<Kind<ForListK, B>>,
   arg2: Function0<Kind<ForListK, B>>
@@ -239,7 +239,7 @@ fun <B> Kind<ForListK, Boolean>.ifM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("selectM(arg1)", "arrow.core.selectM"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> listOf(b) }) }"))
 fun <A, B> Kind<ForListK, Either<A, B>>.selectM(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
   arrow.core.ListK.monad().run {
     this@selectM.selectM<A, B>(arg1) as arrow.core.ListK<B>
@@ -252,7 +252,7 @@ fun <A, B> Kind<ForListK, Either<A, B>>.selectM(arg1: Kind<ForListK, Function1<A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("select(arg1)", "arrow.core.select"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> listOf(b) }) }"))
 fun <A, B> Kind<ForListK, Either<A, B>>.select(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
   arrow.core.ListK.monad().run {
     this@select.select<A, B>(arg1) as arrow.core.ListK<B>

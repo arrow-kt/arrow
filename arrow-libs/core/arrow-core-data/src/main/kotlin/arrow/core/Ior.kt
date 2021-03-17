@@ -183,9 +183,9 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
       { it.bimap(fa, fb) }
 
-    val unit: Ior<Nothing, Unit> = Right(Unit)
-
-    fun <L> unit(): Ior<L, Unit> = unit
+    @PublishedApi
+    internal val unit: Ior<Nothing, Unit> =
+      Right(Unit)
   }
 
   /**
@@ -626,47 +626,9 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       is Both -> if (predicate(this.rightValue)) this.rightValue else null
     }
 
-  /**
-   *  Applies [f] to an [B] inside [Ior] and returns the [Ior] structure with a pair of the [B] value and the
-   *  computed [C] value as result of applying [f]
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   Ior.Right("Hello").fproduct<String>({ "$it World" })
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  inline fun <C> fproduct(f: (B) -> C): Ior<A, Pair<B, C>> =
-    map { b -> b to f(b) }
-
   fun isEmpty(): Boolean = isLeft
 
   fun isNotEmpty(): Boolean = !isLeft
-
-  /**
-   *  Replaces [B] inside [Ior] with [C] resulting in a Ior<A, C>
-   *
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   Ior.Left("Hello World").mapConst<String>("...")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> mapConst(c: C): Ior<A, C> =
-    map { c }
 
   inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
@@ -689,44 +651,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  /**
-   *  Pairs [C] with [B] returning a Ior<A, Pair<C, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   Ior.Right("Hello").tupleLeft<String>("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> tupleLeft(c: C): Ior<A, Pair<C, B>> =
-    map { b -> c to b }
-
-  /**
-   *  Pairs [C] with [B] returning a Ior<A, Pair<B, C>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   Ior.Right("Hello").tupleRight<String>("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> tupleRight(c: C): Ior<A, Pair<B, C>> =
-    map { b -> b to c }
-
   fun void(): Ior<A, Unit> =
-    mapConst(Unit)
+    map { Unit }
 }
 
 /**
@@ -818,9 +744,6 @@ fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B
 inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
-inline fun <A, B> Ior<A, Boolean>.ifM(SA: Semigroup<A>, ifTrue: () -> Ior<A, B>, ifFalse: () -> Ior<A, B>): Ior<A, B> =
-  flatMap(SA) { if (it) ifTrue() else ifFalse() }
-
 inline fun <A, B, C> Ior<A, B>.mproduct(SA: Semigroup<A>, f: (B) -> Ior<A, C>): Ior<A, Pair<B, C>> =
   flatMap(SA) { a ->
     f(a).map { b -> a to b }
@@ -845,14 +768,6 @@ fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, 
     is Ior.Both -> bimap(
       { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
       { MB.run { List(n) { rightValue }.combineAll() } }
-    )
-  }
-
-fun <A, B, C> Ior<A, Either<B, C>>.selectM(SA: Semigroup<A>, f: Ior<A, (B) -> C>): Ior<A, C> =
-  flatMap(SA) {
-    it.fold(
-      { b -> f.map { ff -> ff(b) } },
-      { c -> Ior.Right(c) }
     )
   }
 
@@ -1022,9 +937,6 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
     accumulatedLeft = if (j is Ior.Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
     Ior.Left(accumulatedLeft!!)
   }
-
-fun <A, B, C, Z> Ior<A, B>.zipEval(SA: Semigroup<A>, other: Eval<Ior<A, C>>, f: (B, C) -> Z): Eval<Ior<A, Z>> =
-  other.map { zip(SA, it).map { a -> f(a.first, a.second) } }
 
 fun <A, B> Semigroup.Companion.ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
   IorSemigroup(SA, SB)

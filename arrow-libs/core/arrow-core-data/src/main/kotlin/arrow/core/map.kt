@@ -216,17 +216,8 @@ inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to f(a) }
-
 fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
-
-fun <K, A, B> Map<K, A>.tupleLeft(b: B): Map<K, Pair<B, A>> =
-  mapValues { (_, a) -> b to a }
-
-fun <K, A, B> Map<K, A>.tupleRight(b: B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to b }
 
 fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
