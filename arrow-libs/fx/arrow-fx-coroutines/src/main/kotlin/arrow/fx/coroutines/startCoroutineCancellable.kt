@@ -11,7 +11,7 @@ import kotlin.coroutines.resume
  * Type to constraint [startCoroutineCancellable] to the [CancellableContinuation] constructor.
  */
 @Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
-abstract class CancellableContinuation<A> internal constructor() : Continuation<A>
+interface CancellableContinuation<A> : Continuation<A>
 
 /** Constructor for [CancellableContinuation] */
 @Suppress("FunctionName")
@@ -47,7 +47,7 @@ internal fun <A> CancellableContinuation(
   ctx: CoroutineContext = Dispatchers.Default,
   conn: SuspendConnection,
   resumeWith: (Result<A>) -> Unit
-): CancellableContinuation<A> = object : CancellableContinuation<A>() {
+): CancellableContinuation<A> = object : CancellableContinuation<A> {
   override val context: CoroutineContext = conn + ctx // Faster in case ctx is EmptyCoroutineContext
   override fun resumeWith(result: Result<A>) {
     if (conn.isNotCancelled()) resumeWith(result)
