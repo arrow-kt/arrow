@@ -70,7 +70,7 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
     b: Const<A, B>,
     map: (T, B) -> C
   ): Const<A, C> =
-    b.retag<C>().combine(SG, b.retag())
+    retag<C>().combine(SG, b.retag())
 
   inline fun <B, C, D> zip(
     SG: Semigroup<A>,
@@ -228,14 +228,11 @@ fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T>
 
 @Deprecated(
   "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
-  ReplaceWith(
-    "this.zip(MA, arg1)",
-    "arrow.core.Const"
-  ),
+  ReplaceWith("fix().zip(SG, ff.fix()) { a, f -> f(a) }"),
   DeprecationLevel.WARNING
 )
 fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> =
-  fix().retag<U>().combine(SG, ff.fix().retag())
+  fix().zip<(T) -> U, U>(SG, ff.fix()) { a, f -> f(a) }
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 fun <T, A, G> ConstOf<A, Kind<G, T>>.sequence(GA: Applicative<G>): Kind<G, Const<A, T>> =

@@ -1393,9 +1393,21 @@ inline fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
 fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
   fix().exists { it == elem }
 
+@Deprecated(
+  "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith("zip(ff) { a, f -> f(a) }", "arrow.core.zip")
+)
 fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
-  flatMap { a -> ff.fix().map { f -> f(a) } }
+  fix().zip(ff.fix()) { a, f -> f(a) }
 
+@Deprecated(
+  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith(
+    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
+    "arrow.core.Eval",
+    "arrow.core.left"
+  )
+)
 fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
   fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })
 

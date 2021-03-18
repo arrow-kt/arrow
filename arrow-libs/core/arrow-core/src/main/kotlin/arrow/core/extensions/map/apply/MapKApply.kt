@@ -3,7 +3,6 @@ package arrow.core.extensions.map.apply
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.ForMapK
-import arrow.core.MapK
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -13,9 +12,9 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.ap as _ap
 import arrow.core.extensions.MapKApply
 import arrow.core.fix
+import arrow.core.flatMap
 import arrow.core.k
 import arrow.core.zip
 import kotlin.Any
@@ -35,14 +34,11 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ap(arg1)",
-    "arrow.core.ap"
-  ),
+  ReplaceWith("arg1.flatMap { (_, f) -> this.mapValues { (_, a) -> f(a) } }"),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Map<K, A>.ap(arg1: Map<K, Function1<A, B>>): Map<K, B> =
-  _ap(arg1)
+  arg1.flatMap { (_, f) -> this.mapValues { (_, a) -> f(a) } }
 
 @JvmName("apEval")
 @Suppress(
@@ -54,13 +50,12 @@ fun <K, A, B> Map<K, A>.ap(arg1: Map<K, Function1<A, B>>): Map<K, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.map { ff -> this.ap(ff) }",
-    "arrow.core.ap"
+    "arg1.map { ff -> ff.fix().flatMap { f -> this@apEval.mapValues { (_, a) -> f(a) }.k() } }"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Map<K, A>.apEval(arg1: Eval<Kind<Kind<ForMapK, K>, Function1<A, B>>>): Eval<Kind<Kind<ForMapK, K>, B>> =
-  arg1.map { ff -> this.ap(ff.fix()) }.map { it.k() }
+  arg1.map { ff -> ff.fix().flatMap { f -> this@apEval.mapValues { (_, a) -> f(a) }.k() } }
 
 @JvmName("map2Eval")
 @Suppress(

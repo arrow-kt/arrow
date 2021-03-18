@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
@@ -105,7 +107,15 @@ fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
     val iterator6 = g.iterator()
     val iterator7 = h.iterator()
     override fun next(): I =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext()
@@ -132,7 +142,16 @@ fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
     val iterator7 = h.iterator()
     val iterator8 = i.iterator()
     override fun next(): J =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext()
@@ -161,7 +180,17 @@ fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
     val iterator8 = i.iterator()
     val iterator9 = j.iterator()
     override fun next(): K =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next(), iterator9.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next(),
+        iterator9.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext() && iterator9.hasNext()
@@ -192,7 +221,18 @@ fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
     val iterator9 = j.iterator()
     val iterator10 = k.iterator()
     override fun next(): L =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next(), iterator9.next(), iterator10.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next(),
+        iterator9.next(),
+        iterator10.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext() && iterator9.hasNext() && iterator10.hasNext()
@@ -254,12 +294,6 @@ private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y
     while (rsIterator.hasNext()) yield(rsIterator.next().rightIor())
   }
 }
-
-fun <A, B> Sequence<A>.ap(ff: Sequence<(A) -> B>): Sequence<B> =
-  flatMap { a -> ff.map { f -> f(a) } }
-
-fun <A, B> Sequence<A>.apEval(ff: Eval<Sequence<(A) -> B>>): Eval<Sequence<B>> =
-  ff.map { this.flatMap { a -> it.map { f -> f(a) } } }
 
 fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
   this@combineAll.fold(empty()) { acc, a ->
@@ -610,8 +644,13 @@ fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
 fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, acc ->
-    f(a).apEval(acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, eval ->
+    when (val res = f(a)) {
+      is Right -> eval.map { either ->
+        either.map { bs -> sequenceOf(res.value) + bs }
+      }
+      is Left -> Eval.now(res.value.left())
+    }
   }.value()
 
 fun <E, A, B> Sequence<A>.traverseValidated(

@@ -27,10 +27,7 @@ const val SequenceMapNDeprecated =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.ap(arg1)",
-    "arrow.core.ap"
-  ),
+  ReplaceWith("flatMap { a -> arg1.map { f -> f(a) } }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.ap(arg1: Sequence<Function1<A, B>>): Sequence<B> =
@@ -48,13 +45,14 @@ fun <A, B> Sequence<A>.ap(arg1: Sequence<Function1<A, B>>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.apEval(arg1)",
-    "arrow.core.apEval"
+    "arg1.map { ff -> flatMap { a -> ff.fix().map { f -> f(a) } } }.map { it.k() }",
+    "arrow.core.k()",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, B> Sequence<A>.apEval(arg1: Eval<Kind<ForSequenceK, Function1<A, B>>>):
-  Eval<Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
+fun <A, B> Sequence<A>.apEval(arg1: Eval<Kind<ForSequenceK, Function1<A, B>>>): Eval<Kind<ForSequenceK, B>> =
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
     arrow.core.SequenceK(this@apEval).apEval<A, B>(arg1) as
       arrow.core.Eval<arrow.Kind<arrow.core.ForSequenceK, B>>
   }

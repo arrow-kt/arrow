@@ -1151,24 +1151,23 @@ inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Vali
     { Valid(it) }
   )
 
-/**
- * From Apply:
- * if both the function and this value are Valid, apply the function
- */
+@Deprecated(
+  "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith("zip(ff) { a, f -> f(a) }", "arrow.core.zip")
+)
 inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  when (val value = fix()) {
-    is Validated.Valid -> when (f) {
-      is Validated.Valid -> Valid(f.a(value.a))
-      is Validated.Invalid -> f
-    }
-    is Validated.Invalid -> when (f) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> Invalid(SE.run { value.e.combine(f.e) })
-    }
-  }
+  fix().zip(SE, f) { a, ff -> ff(a) }
 
+@Deprecated(
+  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith(
+    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
+    "arrow.core.Eval",
+    "arrow.core.left"
+  )
+)
 fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
-  ff.map { this.ap(SE, it) }
+  ff.map { f -> zip(SE, f) { a, ff -> ff(a) } }
 
 @Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",

@@ -2,6 +2,8 @@
 
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.foldRight as _foldRight
@@ -286,12 +288,12 @@ inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B)
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
-fun <A, B> Iterable<A>.ap(ff: Iterable<(A) -> B>): List<B> =
-  flatMap { a -> ff.map { f -> f(a) } }
-
 inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   foldRight<A, Either<E, List<B>>>(emptyList<B>().right()) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: B -> listOf(b) + bs } })
+    when (val res = f(a)) {
+      is Right -> acc.map { bs -> listOf(res.value) + bs }
+      is Left -> res
+    }
   }
 
 fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
@@ -302,7 +304,16 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
   foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> listOf(b) + bs } })
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Validated.Valid -> acc.map { bs -> listOf(res.value) + bs }
+        is Validated.Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Validated.Valid -> res
+        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      }
+    }
   }
 
 fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =

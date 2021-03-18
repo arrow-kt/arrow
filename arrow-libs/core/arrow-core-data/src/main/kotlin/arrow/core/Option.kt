@@ -622,11 +622,15 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
+  @Deprecated(
+    "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+    ReplaceWith(
+      "ff.fix().flatMap { this.fix().map(it) }",
+      "arrow.core.fix"
+    )
+  )
   fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
     ff.fix().flatMap { this.fix().map(it) }
-
-  fun <B> apEval(ff: Eval<Option<(A) -> B>>): Eval<Option<B>> =
-    fold({ Eval.now(none()) }, { r -> ff.map { it.map { f -> f(r) } } })
 
   inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {

@@ -50,6 +50,7 @@ import arrow.typeclasses.Monoid
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -112,6 +113,12 @@ class SequenceKTest : UnitSpec() {
         SequenceK.eqK()
       )
     )
+
+    "traverse is stacksafe over very long collections and short circuits properly" {
+      // This has to traverse 30k elements till it reaches None and terminates
+      generateSequence(0) { it + 1 }.map { if (it < 20_000) Right(it) else Left(Unit) }
+        .sequenceEither() shouldBe Left(Unit)
+    }
 
     "zip3" {
       forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c ->

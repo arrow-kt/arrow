@@ -48,7 +48,6 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.hashWithSalt
-import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
 import arrow.core.flatMap as eitherFlatMap
@@ -133,7 +132,7 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
     fix().fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.fix().map { f -> f(r) } } })
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+    eitherFlatMap { a -> ff.fix().map { f -> f(a) } }
 }
 
 @Deprecated(
@@ -156,7 +155,7 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+    flatMap { a -> ff.fix().map { f -> f(a) } }
 
   override fun <A, B> EitherOf<L, A>.flatMap(f: (A) -> EitherOf<L, B>): Either<L, B> =
     fix().eitherFlatMap { f(it).fix() }

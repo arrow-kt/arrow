@@ -42,6 +42,7 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroup
 import io.kotlintest.forAll
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -77,6 +78,13 @@ class IorTest : UnitSpec() {
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK2(), Ior.eqK2())
     )
+
+    "zip identity" {
+      forAll(Gen.ior(Gen.long(), Gen.int())) { ior ->
+        val res = ior.zip(Semigroup.long(), Ior.Right(Unit)) { a, _ -> a }
+        res == ior
+      }
+    }
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->

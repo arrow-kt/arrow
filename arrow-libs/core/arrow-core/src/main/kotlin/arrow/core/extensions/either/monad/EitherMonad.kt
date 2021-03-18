@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.flatMap as _flatMap
 import arrow.core.flatten as _flatten
-import arrow.core.ap as _ap
 import arrow.core.mproduct as _mproduct
 import arrow.core.Either.Companion
 import arrow.core.Eval
@@ -71,9 +70,9 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.map(arg1: Function1<A, B>): Either<L, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ap(arg1)", "arrow.core.ap"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("_flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.flatMap"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.ap(arg1: Kind<Kind<ForEither, L>, Function1<A, B>>): Either<L, B> =
-  _ap(arg1)
+  _flatMap { a -> arg1.fix().map { f -> f(a) } }
 
 @JvmName("flatten")
 @Suppress(

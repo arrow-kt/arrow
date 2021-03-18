@@ -309,12 +309,15 @@ sealed class Eval<out A> : EvalOf<A> {
   inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
 
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Eval instead")
+  @Deprecated(
+    "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+    ReplaceWith(
+      "ff.fix().flatMap { f -> map(f) }",
+      "arrow.core.fix"
+    )
+  )
   fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    ff.fix().flatMap { f -> map(f) }.fix()
-
-  fun <B> ap(ff: Eval<(A) -> B>): Eval<B> =
-    ff.flatMap { f -> map(f) }
+    ff.fix().flatMap { f -> map(f) }
 
   @JvmName("flatMapKind")
   @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for Eval instead")
@@ -609,11 +612,3 @@ fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
   if (n <= 0) Eval.just(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }
-
-fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }
-
-fun <A, B> Eval<A>.apTap(fb: Eval<B>): Eval<A> =
-  flatTap { fb }
-
-fun <A, B> Eval<A>.flatTap(f: (A) -> Eval<B>): Eval<A> =
-  flatMap { a -> f(a).map { a } }
