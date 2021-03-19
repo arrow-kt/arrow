@@ -1635,11 +1635,6 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
     }
   }
 
-inline fun <A, B, C> Either<A, B>.mproduct(f: (B) -> Either<A, C>): Either<A, Pair<B, C>> =
-  flatMap { a ->
-    f(a).map { b -> a to b }
-  }
-
 inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   when (this) {
     is Right -> if (predicate(this.b)) this else error().left()

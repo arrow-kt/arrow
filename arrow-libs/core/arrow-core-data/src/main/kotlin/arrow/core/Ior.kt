@@ -759,11 +759,6 @@ fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B
 inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
-inline fun <A, B, C> Ior<A, B>.mproduct(SA: Semigroup<A>, f: (B) -> Ior<A, C>): Ior<A, Pair<B, C>> =
-  flatMap(SA) { a ->
-    f(a).map { b -> a to b }
-  }
-
 fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
   if (n <= 0) Ior.Right(emptyList())
   else when (this) {

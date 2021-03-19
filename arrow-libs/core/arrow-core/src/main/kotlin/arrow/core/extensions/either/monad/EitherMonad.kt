@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.flatMap as _flatMap
 import arrow.core.flatten as _flatten
-import arrow.core.mproduct as _mproduct
 import arrow.core.Either.Companion
 import arrow.core.Eval
 import arrow.core.ForEither
@@ -36,7 +35,7 @@ internal val monad_singleton: EitherMonad<Any?> = object : EitherMonad<Any?> {}
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap(arg1)", "arrow.core.flatMap"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.flatMap(arg1: Function1<A, Kind<Kind<ForEither, L>, B>>): Either<L, B> =
-  fix()._flatMap{ arg1(it).fix() }
+  fix()._flatMap { arg1(it).fix() }
 
 @JvmName("tailRecM")
 @Suppress(
@@ -45,7 +44,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.flatMap(arg1: Function1<A, Kind<Kind<F
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.tailRecM(arg0, arg1)", "arrow.core.tailRecM"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("Either.tailRecM(arg0, arg1)", "arrow.core.tailRecM")
+)
 fun <L, A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<Kind<ForEither, L>, Either<A, B>>>): Either<L, B> =
   Either.tailRecM(arg0, arg1)
 
@@ -70,7 +72,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.map(arg1: Function1<A, B>): Either<L, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("_flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("_flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.ap(arg1: Kind<Kind<ForEither, L>, Function1<A, B>>): Either<L, B> =
   _flatMap { a -> arg1.fix().map { f -> f(a) } }
 
@@ -92,7 +97,10 @@ fun <L, A> Kind<Kind<ForEither, L>, Kind<Kind<ForEither, L>, A>>.flatten(): Eith
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { arg1 }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { arg1 }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedBy(arg1: Kind<Kind<ForEither, L>, B>): Either<L, B> =
   _flatMap { arg1.fix() }
 
@@ -103,7 +111,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedBy(arg1: Kind<Kind<ForEither, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.mapN"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.mapN")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.apTap(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   fix().zip(arg1.fix()) { left, _ -> left }
 
@@ -114,7 +125,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.apTap(arg1: Kind<Kind<ForEither, L>, B
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { arg1.value() }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { arg1.value() }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedByEval(arg1: Eval<Kind<Kind<ForEither, L>, B>>): Either<L, B> =
   _flatMap { arg1.value().fix() }
 
@@ -125,7 +139,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedByEval(arg1: Eval<Kind<Kind<Fo
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1(a).map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1(a).map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.effectM(arg1: Function1<A, Kind<Kind<ForEither, L>, B>>): Either<L, A> =
   _flatMap { a -> arg1(a).map { a } }
 
@@ -136,7 +153,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.effectM(arg1: Function1<A, Kind<Kind<F
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1(a).map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1(a).map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.flatTap(arg1: Function1<A, Kind<Kind<ForEither, L>, B>>): Either<L, A> =
   _flatMap { a -> arg1(a).map { a } }
 
@@ -147,7 +167,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.flatTap(arg1: Function1<A, Kind<Kind<F
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1.map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.productL(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   _flatMap { a -> arg1.map { a } }
 
@@ -158,7 +181,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.productL(arg1: Kind<Kind<ForEither, L>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1.map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.forEffect(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   _flatMap { a -> arg1.map { a } }
 
@@ -169,7 +195,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.forEffect(arg1: Kind<Kind<ForEither, L
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.value().map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1.value().map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.productLEval(arg1: Eval<Kind<Kind<ForEither, L>, B>>): Either<L, A> =
   _flatMap { a -> arg1.value().map { a } }
 
@@ -180,7 +209,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.productLEval(arg1: Eval<Kind<Kind<ForE
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.value().map { a } }", "arrow.core.flatMap"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { a -> arg1.value().map { a } }", "arrow.core.flatMap")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.forEffectEval(arg1: Eval<Kind<Kind<ForEither, L>, B>>): Either<L, A> =
   _flatMap { a -> arg1.value().map { a } }
 
@@ -191,9 +223,15 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.forEffectEval(arg1: Eval<Kind<Kind<For
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("mproduct { arg1(it) }", "arrow.core.mproduct"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated", ReplaceWith(
+    "flatMap { a -> arg1(a).map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2",
+    "arrow.core.flatMap"
+  )
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.mproduct(arg1: Function1<A, Kind<Kind<ForEither, L>, B>>): Either<L, Tuple2<A, B>> =
-  fix()._mproduct { arg1(it).fix() }.map { (a, b) -> Tuple2(a, b) }
+  flatMap { a -> arg1(a).map { b -> Tuple2(a, b) } }
 
 @JvmName("ifM")
 @Suppress(
@@ -202,7 +240,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.mproduct(arg1: Function1<A, Kind<Kind<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { if (it) arg1() else arg2() }"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { if (it) arg1() else arg2() }")
+)
 fun <L, B> Kind<Kind<ForEither, L>, Boolean>.ifM(
   arg1: Function0<Kind<Kind<ForEither, L>, B>>,
   arg2: Function0<Kind<Kind<ForEither, L>, B>>
@@ -216,7 +257,10 @@ fun <L, B> Kind<Kind<ForEither, L>, Boolean>.ifM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.selectM(
   arg1: Kind<Kind<ForEither, L>,
     Function1<A, B>>
@@ -230,7 +274,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.selectM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> b.right() }) }")
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.select(
   arg1: Kind<Kind<ForEither, L>,
     Function1<A, B>>

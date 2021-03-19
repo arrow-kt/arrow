@@ -295,8 +295,8 @@ fun <A, B> Kind<ForOption, A>.forEffectEval(arg1: Eval<Kind<ForOption, B>>): Opt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "mproduct(arg1)",
-    "arrow.core.mproduct"
+    "flatMap { a -> f(a).map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

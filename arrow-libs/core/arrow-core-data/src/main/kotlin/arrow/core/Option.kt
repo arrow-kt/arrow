@@ -932,11 +932,6 @@ inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
 fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
-inline fun <A, B> Option<A>.mproduct(f: (A) -> Option<B>): Option<Pair<A, B>> =
-  flatMap { a ->
-    f(a).map { b -> a to b }
-  }
-
 inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
   map(fb).handleError(fe)
 
