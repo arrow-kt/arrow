@@ -381,6 +381,7 @@ sealed class Option<out A> : OptionOf<A> {
     )
     fun <A> just(a: A): Option<A> = Some(a)
 
+    @Deprecated(TailRecMDeprecation)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
       when (val option = f(a).fix()) {
         is Some -> {

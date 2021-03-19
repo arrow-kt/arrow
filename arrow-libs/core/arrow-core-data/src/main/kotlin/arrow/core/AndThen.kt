@@ -229,6 +229,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       else -> Single(f, 0)
     }
 
+    @Deprecated(TailRecMDeprecation)
     fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
       AndThen { t: I -> step(a, t, f) }
 

@@ -516,29 +516,6 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
 fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
 
-@Suppress("UNCHECKED_CAST")
-private tailrec fun <A, B> go(
-  buf: MutableList<B>,
-  f: (A) -> Iterable<Either<A, B>>,
-  v: List<Either<A, B>>
-) {
-  if (v.isNotEmpty()) {
-    when (val head: Either<A, B> = v.first()) {
-      is Either.Right -> {
-        buf += head.b
-        go(buf, f, v.drop(1))
-      }
-      is Either.Left -> go(buf, f, (f(head.a) + v.drop(1)))
-    }
-  }
-}
-
-fun <A, B> tailRecMIterable(a: A, f: (A) -> Iterable<Either<A, B>>): List<B> {
-  val buf = mutableListOf<B>()
-  go(buf, f, f(a).toList())
-  return ListK(buf)
-}
-
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *

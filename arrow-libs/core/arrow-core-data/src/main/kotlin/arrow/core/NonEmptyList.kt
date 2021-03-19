@@ -353,6 +353,7 @@ class NonEmptyList<out A>(
       }
     }
 
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())

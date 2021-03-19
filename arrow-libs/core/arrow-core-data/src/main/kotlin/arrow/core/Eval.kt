@@ -85,23 +85,9 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
 sealed class Eval<out A> : EvalOf<A> {
 
   companion object {
-
-    @JvmName("tailRecMKind")
-    @Deprecated(
-      "Kind is deprecated, and will be removed in 0.13.0. Please use the tailRecM method defined for Eval instead",
-      ReplaceWith("tailRecM(f)"),
-      DeprecationLevel.WARNING
-    )
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
       f(a).fix().flatMap { eval: Either<A, B> ->
-        when (eval) {
-          is Either.Left -> tailRecM(eval.a, f)
-          is Either.Right -> just(eval.b)
-        }
-      }
-
-    fun <A, B> tailRecM(a: A, f: (A) -> Eval<Either<A, B>>): Eval<B> =
-      f(a).flatMap { eval: Either<A, B> ->
         when (eval) {
           is Either.Left -> tailRecM(eval.a, f)
           is Either.Right -> just(eval.b)

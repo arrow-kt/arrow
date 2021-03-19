@@ -17,3 +17,6 @@ internal object ArrowCoreInternalException : RuntimeException(
 ) {
   override fun fillInStackTrace(): Throwable = this
 }
+
+const val TailRecMDeprecation: String =
+  "tailRecM is deprecated together with the Monad hierarchy since it's meant for writing polymorphic stack-safe programs."

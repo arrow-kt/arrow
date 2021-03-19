@@ -160,6 +160,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       }
     }
 
+    @Deprecated(TailRecMDeprecation)
     fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
       SL.run { loop(f(a).fix(), f) }
 
