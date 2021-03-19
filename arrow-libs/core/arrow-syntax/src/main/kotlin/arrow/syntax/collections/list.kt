@@ -2,7 +2,7 @@ package arrow.syntax.collections
 
 import arrow.core.Option
 import arrow.core.tail as _tail
-import arrow.core.flatten as _flatten
+import arrow.core.filterOption
 import arrow.core.prependTo as _prependTo
 
 /**
@@ -31,7 +31,7 @@ fun <T> List<T>.destructured(): Pair<T, List<T>> =
 
 @Deprecated(
   "arrow.syntax.collections package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("flatten()", "arrow.core.flatten")
+  ReplaceWith("filterOption()", "arrow.core.filterOption")
 )
 fun <T> List<Option<T>>.flatten(): List<T> =
-  _flatten()
+  filterOption()
