@@ -2,6 +2,9 @@ package arrow.core
 
 import arrow.KindDeprecation
 
+const val AndThenDeprecation =
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe"
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -71,10 +74,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```
  *
  */
-@Deprecated(
-  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
