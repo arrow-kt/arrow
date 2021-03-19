@@ -929,34 +929,34 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
 
   val leftValue: A? = SA.run {
     var accumulatedLeft: A? = null
-    accumulatedLeft = if (this@zip is Left) value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (this@zip is Left) value.maybeCombine(accumulatedLeft) else accumulatedLeft
     accumulatedLeft = if (this@zip is Both) leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (c is Left) c.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (c is Left) return Left(c.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (c is Both) c.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (d is Left) d.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (d is Left) return Left(d.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (d is Both) d.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (e is Left) e.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (e is Left) return Left(e.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (e is Both) e.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (f is Left) f.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (f is Left) return Left(f.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (f is Both) f.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (g is Left) g.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (g is Left) return Left(g.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (g is Both) g.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (h is Left) h.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (h is Left) return Left(h.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (h is Both) h.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (i is Left) i.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (i is Left) return Left(i.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (i is Both) i.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (j is Left) j.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (j is Left) return Left(j.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (j is Both) j.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
-    accumulatedLeft = if (k is Left) k.value.maybeCombine(accumulatedLeft) else accumulatedLeft
+    if (k is Left) return Left(k.value.maybeCombine(accumulatedLeft))
     accumulatedLeft = if (k is Both) k.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
 
     accumulatedLeft

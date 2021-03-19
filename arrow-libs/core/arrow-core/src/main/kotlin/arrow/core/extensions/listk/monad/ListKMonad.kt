@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListK.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKMonad
 import kotlin.Boolean
@@ -41,7 +42,7 @@ fun <A, B> Kind<ForListK, A>.flatMap(arg1: Function1<A, Kind<ForListK, B>>): Lis
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tailRecMIterable(arg0) { arg1(it) }"))
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForListK, Either<A, B>>>): ListK<B> =
   arrow.core.ListK
     .monad()

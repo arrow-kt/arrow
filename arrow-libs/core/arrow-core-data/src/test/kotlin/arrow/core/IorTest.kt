@@ -86,6 +86,14 @@ class IorTest : UnitSpec() {
       }
     }
 
+    "zip short-circuits on left & accumulates with both" {
+      forAll(Gen.ior(Gen.long(), Gen.int()).filterNot(Ior<Long, Int>::isLeft), Gen.long()) { ior, l ->
+        val res = ior.zip(Semigroup.long(), Ior.Left(l)) { a, _ -> a }
+        val expected = ior.leftOrNull()?.let { Semigroup.long().run { Ior.Left(it.combine(l)) } } ?: Ior.Left(l)
+        res == expected
+      }
+    }
+    
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->
         Ior.Right(b).bimap({ "5" }, { a * 2 }) == Ior.Right(a * 2) &&

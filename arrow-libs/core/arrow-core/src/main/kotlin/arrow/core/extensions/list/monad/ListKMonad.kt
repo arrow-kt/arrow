@@ -4,10 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKMonad
 import arrow.core.fix
-import arrow.core.tailRecMIterable
 import kotlin.Boolean
 import kotlin.collections.flatMap as _flatMap
 import kotlin.Function0
@@ -35,9 +36,9 @@ fun <A, B> List<A>.flatMap(arg1: Function1<A, Kind<ForListK, B>>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tailRecMIterable(arg0) { arg1(it) }"))
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForListK, Either<A, B>>>): List<B> =
-  tailRecMIterable(arg0) { arg1(it).fix() }
+  ListK.tailRecM(arg0, arg1)
 
 @JvmName("map")
 @Suppress(
