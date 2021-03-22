@@ -335,7 +335,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mproduct(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("flatMap(SA) { if (it) arg1() else arg2() }"), "arrow.core.flatMap"
+  ReplaceWith("flatMap(SA) { if (it) arg1() else arg2() }", "arrow.core.flatMap"),
   DeprecationLevel.WARNING
 )
 fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
