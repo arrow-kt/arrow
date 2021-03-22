@@ -72,7 +72,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.map(arg1: Function1<A, B>): Either<L, 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("_flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.flatMap")
+  ReplaceWith("flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.flatMap")
 )
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.ap(arg1: Kind<Kind<ForEither, L>, Function1<A, B>>): Either<L, B> =
   _flatMap { a -> arg1.fix().map { f -> f(a) } }
