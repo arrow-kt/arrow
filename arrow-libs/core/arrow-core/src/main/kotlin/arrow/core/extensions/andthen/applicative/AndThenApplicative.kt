@@ -3,6 +3,7 @@ package arrow.core.extensions.andthen.applicative
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.AndThen.Companion
+import arrow.core.AndThenDeprecation
 import arrow.core.ForAndThen
 import arrow.core.extensions.AndThenApplicative
 import arrow.typeclasses.Monoid
@@ -29,14 +30,7 @@ internal val applicative_singleton: AndThenApplicative<Any?> = object : AndThenA
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "just()",
-    "arrow.core.just"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> A.just(): AndThen<X, A> = arrow.core.AndThen.applicative<X>().run {
   this@just.just<A>() as arrow.core.AndThen<X, A>
 }
@@ -48,14 +42,7 @@ fun <X, A> A.just(): AndThen<X, A> = arrow.core.AndThen.applicative<X>().run {
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "unit()",
-    "arrow.core.AndThen.unit"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X> unit(): AndThen<X, Unit> = arrow.core.AndThen
   .applicative<X>()
   .unit() as arrow.core.AndThen<X, kotlin.Unit>
@@ -67,14 +54,7 @@ fun <X> unit(): AndThen<X, Unit> = arrow.core.AndThen
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg1)",
-    "arrow.core.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X, B> =
   arrow.core.AndThen.applicative<X>().run {
     this@map.map<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -87,14 +67,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "replicate(arg1)",
-    "arrow.core.replicate"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> Kind<Kind<ForAndThen, X>, A>.replicate(arg1: Int): AndThen<X, List<A>> =
   arrow.core.AndThen.applicative<X>().run {
     this@replicate.replicate<A>(arg1) as arrow.core.AndThen<X, kotlin.collections.List<A>>
@@ -107,14 +80,7 @@ fun <X, A> Kind<Kind<ForAndThen, X>, A>.replicate(arg1: Int): AndThen<X, List<A>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "replicate(arg1, arg2)",
-    "arrow.core.replicate"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> Kind<Kind<ForAndThen, X>, A>.replicate(arg1: Int, arg2: Monoid<A>): AndThen<X, A> =
   arrow.core.AndThen.applicative<X>().run {
     this@replicate.replicate<A>(arg1, arg2) as arrow.core.AndThen<X, A>
@@ -127,14 +93,7 @@ fun <X, A> Kind<Kind<ForAndThen, X>, A>.replicate(arg1: Int, arg2: Monoid<A>): A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "just(a)",
-    "arrow.core.AndThen.just"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> just(a: A): AndThen<X, A> = arrow.core.AndThen
   .applicative<X>()
   .just<A>(a) as arrow.core.AndThen<X, A>
@@ -143,5 +102,6 @@ fun <X, A> just(a: A): AndThen<X, A> = arrow.core.AndThen
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(AndThenDeprecation)
 inline fun <X> Companion.applicative(): AndThenApplicative<X> = applicative_singleton as
   arrow.core.extensions.AndThenApplicative<X>

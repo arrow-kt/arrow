@@ -392,22 +392,6 @@ fun <A> Kind<ForSetK, A>.size(arg1: Monoid<Long>): Long = arrow.core.SetK.foldab
   this@size.size<A>(arg1) as kotlin.Long
 }
 
-@JvmName("foldMapA")
-@Suppress(
-  "UNCHECKED_CAST",
-  "USELESS_CAST",
-  "EXTENSION_SHADOWED_BY_MEMBER",
-  "UNUSED_PARAMETER"
-)
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Set")
-fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<ForSetK, A>.foldMapA(
-  arg1: AP,
-  arg2: MO,
-  arg3: Function1<A, Kind<G, B>>
-): Kind<G, B> = arrow.core.SetK.foldable().run {
-  this@foldMapA.foldMapA<G, A, B, AP, MO>(arg1, arg2, arg3) as arrow.Kind<G, B>
-}
-
 @JvmName("foldMapM")
 @Suppress(
   "UNCHECKED_CAST",

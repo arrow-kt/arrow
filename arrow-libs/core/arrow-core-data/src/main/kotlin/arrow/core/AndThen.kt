@@ -2,6 +2,9 @@ package arrow.core
 
 import arrow.KindDeprecation
 
+const val AndThenDeprecation =
+  "`AndThen` is deprecated in favor of the function `andThen` used to provide stack safe function composition."
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -71,10 +74,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```
  *
  */
-@Deprecated(
-  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
@@ -229,6 +229,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       else -> Single(f, 0)
     }
 
+    @Deprecated(TailRecMDeprecation)
     fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
       AndThen { t: I -> step(a, t, f) }
 

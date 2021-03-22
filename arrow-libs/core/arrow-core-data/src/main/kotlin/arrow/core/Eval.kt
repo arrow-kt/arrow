@@ -85,23 +85,9 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
 sealed class Eval<out A> : EvalOf<A> {
 
   companion object {
-
-    @JvmName("tailRecMKind")
-    @Deprecated(
-      "Kind is deprecated, and will be removed in 0.13.0. Please use the tailRecM method defined for Eval instead",
-      ReplaceWith("tailRecM(f)"),
-      DeprecationLevel.WARNING
-    )
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
       f(a).fix().flatMap { eval: Either<A, B> ->
-        when (eval) {
-          is Either.Left -> tailRecM(eval.a, f)
-          is Either.Right -> just(eval.b)
-        }
-      }
-
-    fun <A, B> tailRecM(a: A, f: (A) -> Eval<Either<A, B>>): Eval<B> =
-      f(a).flatMap { eval: Either<A, B> ->
         when (eval) {
           is Either.Left -> tailRecM(eval.a, f)
           is Either.Right -> just(eval.b)
@@ -309,12 +295,15 @@ sealed class Eval<out A> : EvalOf<A> {
   inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
 
-  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Eval instead")
+  @Deprecated(
+    "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+    ReplaceWith(
+      "ff.fix().flatMap { f -> map(f) }",
+      "arrow.core.fix"
+    )
+  )
   fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    ff.fix().flatMap { f -> map(f) }.fix()
-
-  fun <B> ap(ff: Eval<(A) -> B>): Eval<B> =
-    ff.flatMap { f -> map(f) }
+    ff.fix().flatMap { f -> map(f) }
 
   @JvmName("flatMapKind")
   @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for Eval instead")
@@ -601,9 +590,6 @@ fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> =
-  fb.map { zip(it, f) }
-
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.just(emptyList())
   else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
@@ -612,11 +598,3 @@ fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
   if (n <= 0) Eval.just(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }
-
-fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }
-
-fun <A, B> Eval<A>.apTap(fb: Eval<B>): Eval<A> =
-  flatTap { fb }
-
-fun <A, B> Eval<A>.flatTap(f: (A) -> Eval<B>): Eval<A> =
-  flatMap { a -> f(a).map { a } }

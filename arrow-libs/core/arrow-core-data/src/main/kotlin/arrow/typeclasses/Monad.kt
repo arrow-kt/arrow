@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.documented
@@ -38,6 +39,7 @@ interface Monad<F> : Selective<F> {
 
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
+  @Deprecated(TailRecMDeprecation)
   fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
 
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =

@@ -34,7 +34,7 @@ internal val apply_singleton: ListKApply = object : arrow.core.extensions.ListKA
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ap(arg1)", "arrow.core.ap"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fix().flatMap { a -> arg1.map { f -> f(a) } }", "arrow.core.fix"))
 fun <A, B> Kind<ForListK, A>.ap(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
   arrow.core.ListK.apply().run {
     this@ap.ap<A, B>(arg1) as arrow.core.ListK<B>
@@ -47,9 +47,9 @@ fun <A, B> Kind<ForListK, A>.ap(arg1: Kind<ForListK, Function1<A, B>>): ListK<B>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { this.ap(it.fix()) }.map { it.k() }", "arrow.core.k", "arrow.core.fix"))
-fun <A, B> Kind<ForListK, A>.apEval(arg1: Eval<Kind<ForListK, Function1<A, B>>>):
-  Eval<Kind<ForListK, B>> = arrow.core.ListK.apply().run {
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { ff -> flatMap { a -> ff.fix().map { f -> f(a) } } }.map { it.k() }", "arrow.core.k", "arrow.core.fix"))
+fun <A, B> Kind<ForListK, A>.apEval(arg1: Eval<Kind<ForListK, Function1<A, B>>>): Eval<Kind<ForListK, B>> =
+  arrow.core.ListK.apply().run {
     this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.core.ForListK, B>>
   }
 

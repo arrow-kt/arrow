@@ -32,10 +32,7 @@ internal val apply_singleton: SequenceKApply = object : arrow.core.extensions.Se
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.ap(arg1)",
-    "arrow.core.ap"
-  ),
+  ReplaceWith("flatMap { a -> arg1.map { f -> f(a) } }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.ap(arg1: Kind<ForSequenceK, Function1<A, B>>): SequenceK<B> =
@@ -53,8 +50,9 @@ fun <A, B> Kind<ForSequenceK, A>.ap(arg1: Kind<ForSequenceK, Function1<A, B>>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.apEval(arg1)",
-    "arrow.core.apEval"
+    "arg1.map { ff -> flatMap { a -> ff.fix().map { f -> f(a) } } }.map { it.k() }",
+    "arrow.core.k()",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -73,8 +71,7 @@ fun <A, B> Kind<ForSequenceK, A>.apEval(arg1: Eval<Kind<ForSequenceK, Function1<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.zipEval(arg1, arg2)",
-    "arrow.core.zipEval"
+    "arg1.map { zip(it) { a, b -> arg2(Tuple2(a, b)) } }", "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

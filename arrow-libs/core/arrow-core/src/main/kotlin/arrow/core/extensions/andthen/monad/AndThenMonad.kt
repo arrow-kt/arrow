@@ -3,9 +3,11 @@ package arrow.core.extensions.andthen.monad
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.AndThen.Companion
+import arrow.core.AndThenDeprecation
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForAndThen
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.AndThenMonad
 import kotlin.Any
@@ -30,14 +32,7 @@ internal val monad_singleton: AndThenMonad<Any?> = object : AndThenMonad<Any?> {
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "flatMap(arg1)",
-    "arrow.core.flatMap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.flatMap(
   arg1: Function1<A, Kind<Kind<ForAndThen, X>, B>>
 ): AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
@@ -51,14 +46,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.flatMap(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tailRecM(arg0, arg1)",
-    "arrow.core.AndThen.tailRecM"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <X, A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<Kind<ForAndThen, X>, Either<A, B>>>):
   AndThen<X, B> = arrow.core.AndThen
     .monad<X>()
@@ -71,14 +59,7 @@ fun <X, A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<Kind<ForAndThen, X>, Eit
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg1)",
-    "arrow.core.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X, B> =
   arrow.core.AndThen.monad<X>().run {
     this@map.map<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -94,14 +75,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ap(arg1)",
-    "arrow.core.ap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.ap(arg1: Kind<Kind<ForAndThen, X>, Function1<A, B>>):
   AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
     this@ap.ap<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -114,14 +88,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.ap(arg1: Kind<Kind<ForAndThen, X>, Fu
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "flatten()",
-    "arrow.core.flatten"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> Kind<Kind<ForAndThen, X>, Kind<Kind<ForAndThen, X>, A>>.flatten(): AndThen<X, A> =
   arrow.core.AndThen.monad<X>().run {
     this@flatten.flatten<A>() as arrow.core.AndThen<X, A>
@@ -134,14 +101,7 @@ fun <X, A> Kind<Kind<ForAndThen, X>, Kind<Kind<ForAndThen, X>, A>>.flatten(): An
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "followedBy(arg1)",
-    "arrow.core.followedBy"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedBy(arg1: Kind<Kind<ForAndThen, X>, B>):
   AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
     this@followedBy.followedBy<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -154,14 +114,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedBy(arg1: Kind<Kind<ForAndThen
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "apTap(arg1)",
-    "arrow.core.apTap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apTap(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X, A> =
   arrow.core.AndThen.monad<X>().run {
     this@apTap.apTap<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -174,14 +127,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apTap(arg1: Kind<Kind<ForAndThen, X>,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "followedByEval(arg1)",
-    "arrow.core.followedByEval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedByEval(arg1: Eval<Kind<Kind<ForAndThen, X>, B>>):
   AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
     this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -194,14 +140,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedByEval(arg1: Eval<Kind<Kind<F
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "effectM(arg1)",
-    "arrow.core.effectM"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.effectM(
   arg1: Function1<A, Kind<Kind<ForAndThen, X>, B>>
 ): AndThen<X, A> = arrow.core.AndThen.monad<X>().run {
@@ -215,14 +154,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.effectM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "flatTap(arg1)",
-    "arrow.core.flatTap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.flatTap(
   arg1: Function1<A, Kind<Kind<ForAndThen, X>, B>>
 ): AndThen<X, A> = arrow.core.AndThen.monad<X>().run {
@@ -236,14 +168,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.flatTap(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "productL(arg1)",
-    "arrow.core.productL"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.productL(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X,
   A> = arrow.core.AndThen.monad<X>().run {
   this@productL.productL<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -256,14 +181,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.productL(arg1: Kind<Kind<ForAndThen, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "forEffect(arg1)",
-    "arrow.core.forEffect"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.forEffect(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X,
   A> = arrow.core.AndThen.monad<X>().run {
   this@forEffect.forEffect<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -276,14 +194,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.forEffect(arg1: Kind<Kind<ForAndThen,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "productLEval(arg1)",
-    "arrow.core.productLEval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.productLEval(arg1: Eval<Kind<Kind<ForAndThen, X>, B>>):
   AndThen<X, A> = arrow.core.AndThen.monad<X>().run {
     this@productLEval.productLEval<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -296,14 +207,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.productLEval(arg1: Eval<Kind<Kind<For
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "forEffectEval(arg1)",
-    "arrow.core.forEffectEval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.forEffectEval(arg1: Eval<Kind<Kind<ForAndThen, X>, B>>):
   AndThen<X, A> = arrow.core.AndThen.monad<X>().run {
     this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -316,14 +220,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.forEffectEval(arg1: Eval<Kind<Kind<Fo
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mproduct(arg1)",
-    "arrow.core.mproduct"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.mproduct(
   arg1: Function1<A, Kind<Kind<ForAndThen, X>, B>>
 ): AndThen<X, Tuple2<A, B>> = arrow.core.AndThen.monad<X>().run {
@@ -337,14 +234,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.mproduct(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ifM(arg1, arg2)",
-    "arrow.core.ifM"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, B> Kind<Kind<ForAndThen, X>, Boolean>.ifM(
   arg1: Function0<Kind<Kind<ForAndThen, X>, B>>,
   arg2: Function0<Kind<Kind<ForAndThen, X>, B>>
@@ -360,14 +250,7 @@ fun <X, B> Kind<Kind<ForAndThen, X>, Boolean>.ifM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "selectM(arg1)",
-    "arrow.core.selectM"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, Either<A, B>>.selectM(
   arg1: Kind<Kind<ForAndThen, X>, Function1<A, B>>
 ): AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
@@ -381,14 +264,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, Either<A, B>>.selectM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "select(arg1)",
-    "arrow.core.select"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, Either<A, B>>.select(
   arg1: Kind<Kind<ForAndThen, X>, Function1<A, B>>
 ): AndThen<X, B> = arrow.core.AndThen.monad<X>().run {
@@ -410,5 +286,6 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, Either<A, B>>.select(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(AndThenDeprecation)
 inline fun <X> Companion.monad(): AndThenMonad<X> = monad_singleton as
   arrow.core.extensions.AndThenMonad<X>

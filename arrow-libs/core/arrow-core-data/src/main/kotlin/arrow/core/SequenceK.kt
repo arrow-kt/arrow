@@ -116,7 +116,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     internal val unit: Sequence<Unit> =
       sequenceOf(Unit)
 
-    @Deprecated("tailRecM for Sequence is a terminal operator that breaks the Sequence semantics and will be no longer be supported")
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> SequenceKOf<Either<A, B>>): SequenceK<B> {
       tailrec fun <A, B> go(
         buf: MutableList<B>,
