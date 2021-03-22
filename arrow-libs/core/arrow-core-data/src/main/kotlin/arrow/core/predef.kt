@@ -19,4 +19,4 @@ internal object ArrowCoreInternalException : RuntimeException(
 }
 
 const val TailRecMDeprecation: String =
-  "tailRecM is deprecated together with the Monad hierarchy since it's meant for writing polymorphic stack-safe programs."
+  "tailRecM is deprecated together with the Kind type classes since it's meant for writing kind-based polymorphic stack-safe programs."

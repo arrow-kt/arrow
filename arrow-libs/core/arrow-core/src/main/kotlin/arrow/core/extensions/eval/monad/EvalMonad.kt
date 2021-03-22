@@ -140,7 +140,7 @@ fun <A, B> Kind<ForEval, A>.followedBy(arg1: Kind<ForEval, B>): Eval<B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("fix().flatMap { arg1.fix() }", "arrow.core.fix()"),
+  ReplaceWith("fix().flatMap { arg1.fix() }", "arrow.core.fix", "arrow.core.flatMap"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.apTap(arg1: Kind<ForEval, B>): Eval<A> =

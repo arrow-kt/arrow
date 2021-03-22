@@ -29,7 +29,7 @@ class IterableTest : UnitSpec() {
         .sequenceValidated(Semigroup.string()) shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated short-circuit" {
+    "traverseValidated acummulates" {
       forAll(Gen.list(Gen.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequenceValidated()

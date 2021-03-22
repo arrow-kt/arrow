@@ -3,7 +3,7 @@ package arrow.core
 import arrow.KindDeprecation
 
 const val AndThenDeprecation =
-  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe"
+  "`AndThen` is deprecated in favor of the function `andThen` used to provide stack safe function composition."
 
 @Deprecated(
   message = KindDeprecation,
