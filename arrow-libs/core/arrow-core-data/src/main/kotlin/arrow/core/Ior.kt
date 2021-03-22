@@ -686,7 +686,7 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
   "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
   ReplaceWith(
     "zip(SG, ff.fix()) { a, f -> f(a) }",
-    "arrow.core.zip"
+    "arrow.core.zip", "arrow.core.fix"
   )
 )
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =

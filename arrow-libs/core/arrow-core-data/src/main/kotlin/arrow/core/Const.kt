@@ -228,7 +228,7 @@ fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T>
 
 @Deprecated(
   "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
-  ReplaceWith("fix().zip(SG, ff.fix()) { a, f -> f(a) }"),
+  ReplaceWith("fix().zip(SG, ff.fix()) { a, f -> f(a) }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> =
