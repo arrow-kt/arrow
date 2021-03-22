@@ -1,7 +1,5 @@
 package arrow.syntax.function
 
-import arrow.core.partially
-
 private const val PartialApplicationDeprecated =
   "Partial application is no longer supported out-of-the-box for arities above 5"
 
@@ -17,98 +15,98 @@ private fun <T> partial(): Partial<T> = CACHED as Partial<T>
 
 @Deprecated(
   "Partially applying parameters through invoke is deprecated",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 @Suppress("UNUSED_PARAMETER")
-operator fun <P1, P2, R> ((P1, P2) -> R).invoke(p1: P1, partial2: Partial<P2> = partial()): (P2) -> R = partially(p1)
+operator fun <P1, P2, R> ((P1, P2) -> R).invoke(p1: P1, partial2: Partial<P2> = partial()): (P2) -> R = partially1(p1)
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, R> ((P1, P2) -> R).invoke(partial1: Partial<P1> = partial(), p2: P2): (P1) -> R = { p1: P1 -> this(p1, p2) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, R> ((P1, P2, P3) -> R).invoke(p1: P1, partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial()): (P2, P3) -> R = { p2: P2, p3: P3 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, R> ((P1, P2, P3) -> R).invoke(partial1: Partial<P1> = partial(), p2: P2, partial3: Partial<P3> = partial()): (P1, P3) -> R = { p1: P1, p3: P3 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, R> ((P1, P2, P3) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), p3: P3): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).invoke(p1: P1, partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial(), partial4: Partial<P4> = partial()): (P2, P3, P4) -> R = { p2: P2, p3: P3, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).invoke(partial1: Partial<P1> = partial(), p2: P2, partial3: Partial<P3> = partial(), partial4: Partial<P4> = partial()): (P1, P3, P4) -> R = { p1: P1, p3: P3, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), p3: P3, partial4: Partial<P4> = partial()): (P1, P2, P4) -> R = { p1: P1, p2: P2, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p4)", "arrow.core.partially")
+  ReplaceWith("partially4(p4)", "arrow.core.partially4")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial(), p4: P4): (P1, P2, P3) -> R = { p1: P1, p2: P2, p3: P3 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).invoke(p1: P1, partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial(), partial4: Partial<P4> = partial(), partial5: Partial<P5> = partial()): (P2, P3, P4, P5) -> R = { p2: P2, p3: P3, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).invoke(partial1: Partial<P1> = partial(), p2: P2, partial3: Partial<P3> = partial(), partial4: Partial<P4> = partial(), partial5: Partial<P5> = partial()): (P1, P3, P4, P5) -> R = { p1: P1, p3: P3, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), p3: P3, partial4: Partial<P4> = partial(), partial5: Partial<P5> = partial()): (P1, P2, P4, P5) -> R = { p1: P1, p2: P2, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p4)", "arrow.core.partially")
+  ReplaceWith("partially4(p4)", "arrow.core.partially4")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial(), p4: P4, partial5: Partial<P5> = partial()): (P1, P2, P3, P5) -> R = { p1: P1, p2: P2, p3: P3, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p5)", "arrow.core.partially")
+  ReplaceWith("partially5(p5)", "arrow.core.partially5")
 )
 @Suppress("UNUSED_PARAMETER")
 operator fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).invoke(partial1: Partial<P1> = partial(), partial2: Partial<P2> = partial(), partial3: Partial<P3> = partial(), partial4: Partial<P4> = partial(), p5: P5): (P1, P2, P3, P4) -> R = { p1: P1, p2: P2, p3: P3, p4: P4 -> this(p1, p2, p3, p4, p5) }
@@ -1067,97 +1065,97 @@ operator fun <P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, 
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
-fun <P1, R> ((P1) -> R).bind(p1: P1): () -> R = partially(p1)
+fun <P1, R> ((P1) -> R).bind(p1: P1): () -> R = partially1(p1)
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 fun <P1, R> ((P1) -> R).partially1(p1: P1): () -> R = { this(p1) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 fun <P1, P2, R> ((P1, P2) -> R).partially1(p1: P1): (P2) -> R = { p2: P2 -> this(p1, p2) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 fun <P1, P2, R> ((P1, P2) -> R).partially2(p2: P2): (P1) -> R = { p1: P1 -> this(p1, p2) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 fun <P1, P2, P3, R> ((P1, P2, P3) -> R).partially1(p1: P1): (P2, P3) -> R = { p2: P2, p3: P3 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 fun <P1, P2, P3, R> ((P1, P2, P3) -> R).partially2(p2: P2): (P1, P3) -> R = { p1: P1, p3: P3 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 fun <P1, P2, P3, R> ((P1, P2, P3) -> R).partially3(p3: P3): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1, p2, p3) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).partially1(p1: P1): (P2, P3, P4) -> R = { p2: P2, p3: P3, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).partially2(p2: P2): (P1, P3, P4) -> R = { p1: P1, p3: P3, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).partially3(p3: P3): (P1, P2, P4) -> R = { p1: P1, p2: P2, p4: P4 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p4)", "arrow.core.partially")
+  ReplaceWith("partially4(p4)", "arrow.core.partially4")
 )
 fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).partially4(p4: P4): (P1, P2, P3) -> R = { p1: P1, p2: P2, p3: P3 -> this(p1, p2, p3, p4) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p1)", "arrow.core.partially")
+  ReplaceWith("partially1(p1)", "arrow.core.partially1")
 )
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).partially1(p1: P1): (P2, P3, P4, P5) -> R = { p2: P2, p3: P3, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p2)", "arrow.core.partially")
+  ReplaceWith("partially2(p2)", "arrow.core.partially2")
 )
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).partially2(p2: P2): (P1, P3, P4, P5) -> R = { p1: P1, p3: P3, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p3)", "arrow.core.partially")
+  ReplaceWith("partially3(p3)", "arrow.core.partially3")
 )
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).partially3(p3: P3): (P1, P2, P4, P5) -> R = { p1: P1, p2: P2, p4: P4, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p4)", "arrow.core.partially")
+  ReplaceWith("partially4(p4)", "arrow.core.partially4")
 )
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).partially4(p4: P4): (P1, P2, P3, P5) -> R = { p1: P1, p2: P2, p3: P3, p5: P5 -> this(p1, p2, p3, p4, p5) }
 
 @Deprecated(
   "arrow.syntax.function package is deprecated. Use arrow.core package instead.",
-  ReplaceWith("partially(p5)", "arrow.core.partially")
+  ReplaceWith("partially5(p5)", "arrow.core.partially5")
 )
 fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).partially5(p5: P5): (P1, P2, P3, P4) -> R = { p1: P1, p2: P2, p3: P3, p4: P4 -> this(p1, p2, p3, p4, p5) }
 
