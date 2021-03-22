@@ -932,3 +932,9 @@ operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int 
         else -> acc
       }
     }
+
+infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
+  listOf(this) + list
+
+fun <T> Iterable<Option<T>>.filterOption(): List<T> =
+  flatMap { it.fold(::emptyList, ::listOf) }

@@ -7,7 +7,6 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
@@ -64,26 +63,6 @@ class ResourceTest : ArrowFxSpec(
       }
     }
 
-    "traverseFilterResource: identity" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, String?>(Arb.nullable(Arb.string()))
-      ) { list, f ->
-        list.traverseFilterResource { Resource.just(f(it)) } resourceShouldBe Resource.just(list.mapNotNull(f))
-      }
-    }
-
-    "flatTraverseFilterResource: identity" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, List<String?>>(Arb.list(Arb.nullable(Arb.string())))
-      ) { list, f ->
-        list.flatTraverseFilterResource { Resource.just(f(it)) } resourceShouldBe Resource.just(
-          list.flatMap(f).filterNotNull()
-        )
-      }
-    }
-
     "traverseResource: identity" {
       checkAll(
         Arb.list(Arb.int()),
@@ -101,16 +80,6 @@ class ResourceTest : ArrowFxSpec(
         list.traverseResource(f) resourceShouldBe list.map(f).sequence()
       }
     }
-
-    "flatTraverseResource: map + flatSequence == flatTraverse" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.list(Arb.string()).map { { _: Int -> Resource.just(it) } }
-      ) { list, f ->
-        list.flatTraverseResource(f) resourceShouldBe list.map(f).flatSequence()
-      }
-    }
-
     "traverseResource: parallelComposition" {
       checkAll(
         Arb.list(Arb.int()),
@@ -126,17 +95,6 @@ class ResourceTest : ArrowFxSpec(
         }
 
         list.traverseResource { Resource.just(f(it) to g(it)) } resourceShouldBe result
-      }
-    }
-
-    "traverseResource: sequentialComposition" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, String>(Arb.string()),
-        Arb.functionAToB<String, Long>(Arb.long())
-      ) { list, f, g ->
-        list.traverseResource { Resource.just(f(it)) }
-          .map { it.map(g) } resourceShouldBe list.traverseFilterResource { Resource.just(g(f(it))) }
       }
     }
 

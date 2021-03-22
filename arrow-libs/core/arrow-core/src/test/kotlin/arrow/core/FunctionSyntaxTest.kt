@@ -15,14 +15,6 @@ class FunctionSyntaxTest : UnitSpec() {
 
   init {
 
-    "complement" {
-      val isEven = { x: Int -> x % 2 == 0 }
-      isEven(2) shouldBe true
-
-      val notEven = isEven.complement()
-      notEven(2) shouldBe false
-    }
-
     "it should compose function correctly (andThen)" {
       val potato = "potato"
       val ninja = "ninja"
@@ -81,18 +73,6 @@ class FunctionSyntaxTest : UnitSpec() {
       sum2ints(2, 4) shouldBe 6
     }
 
-    "testTupling" {
-      val sum2ints = { x: Int, y: Int -> x + y }
-      val tupled = sum2ints.paired()
-      tupled(Pair(2, 4)) shouldBe 6
-    }
-
-    "testUntupling" {
-      val sum2ints = { t: Pair<Int, Int> -> t.first + t.second }
-      val untupled = sum2ints.unpaired()
-      untupled(2, 4) shouldBe 6
-    }
-
     "memoize" {
       var counterA = 0
       var counterB = 0
@@ -119,31 +99,6 @@ class FunctionSyntaxTest : UnitSpec() {
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once
-    }
-
-    "testPaired" {
-      val sum2ints = { x: Int, y: Int -> x + y }
-
-      val paired = sum2ints.paired()
-      val unpaired = paired.unpaired()
-
-      sum2ints(5, 9) shouldBe paired(5 to 9)
-      paired(5 to 9) shouldBe unpaired(5, 9)
-    }
-
-    "testTripled" {
-      val sum3ints = { x: Int, y: Int, z: Int -> x + y + z }
-
-      val tripled = sum3ints.tripled()
-      val untripled = tripled.untripled()
-
-      sum3ints(1, 2, 3) shouldBe tripled(Triple(1, 2, 3))
-      tripled(Triple(9, 8, 7)) shouldBe untripled(9, 8, 7)
-    }
-
-    "testReverse" {
-      val j: (String, List<String>) -> List<String> = f.partially2(1)
-      j("x", listOf("a", "b", "c")) shouldBe j.reverse()(listOf("a", "b", "c"), "x")
     }
 
     "partially" {
