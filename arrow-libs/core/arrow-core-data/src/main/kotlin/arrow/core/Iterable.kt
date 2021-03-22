@@ -302,7 +302,7 @@ fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
 inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
+): Validated<E, List<B>> = semigroup.run {
   foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
     when (val res = f(a)) {
       is Validated.Valid -> when (acc) {
@@ -311,13 +311,20 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
       }
       is Validated.Invalid -> when (acc) {
         is Validated.Valid -> res
-        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+        is Validated.Invalid -> Invalid(res.value.combine(acc.value))
       }
     }
   }
+}
+
+inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
+  traverseValidated(Semigroup.nonEmptyList(), f)
 
 fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(semigroup, ::identity)
+
+fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
+  traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
 fun <A> Iterable<A>.void(): List<Unit> =
   map { Unit }

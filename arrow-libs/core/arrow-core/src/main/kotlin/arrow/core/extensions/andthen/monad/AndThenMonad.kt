@@ -7,6 +7,7 @@ import arrow.core.AndThenDeprecation
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForAndThen
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.AndThenMonad
 import kotlin.Any
@@ -45,7 +46,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.flatMap(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(AndThenDeprecation)
+@Deprecated(TailRecMDeprecation)
 fun <X, A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<Kind<ForAndThen, X>, Either<A, B>>>):
   AndThen<X, B> = arrow.core.AndThen
     .monad<X>()

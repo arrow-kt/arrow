@@ -135,25 +135,6 @@ fun <A> Kind<ForSequenceK, A>.void(): SequenceK<Unit> = arrow.core.SequenceK.fun
   this@void.void<A>() as arrow.core.SequenceK<kotlin.Unit>
 }
 
-/**
- *  Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
- *  computed [B] value as result of applying [f]
- *
- *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.extensions.sequencek.applicative.just
- *  import arrow.core.fproduct
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   "Hello".just().fproduct({ "$it World" })
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
 @JvmName("fproduct")
 @Suppress(
   "UNCHECKED_CAST",
@@ -174,24 +155,6 @@ fun <A, B> Kind<ForSequenceK, A>.fproduct(arg1: Function1<A, B>): SequenceK<Tupl
     this@fproduct.fproduct<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
   }
 
-/**
- *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
- *
- *  Kind<F, A> -> Kind<F, B>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.extensions.sequencek.applicative.just
- *  import arrow.core.mapConst
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   "Hello World".just().mapConst("...")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
 @JvmName("mapConst")
 @Suppress(
   "UNCHECKED_CAST",
@@ -233,24 +196,6 @@ fun <A, B> A.mapConst(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
     this@mapConst.mapConst<A, B>(arg1) as arrow.core.SequenceK<A>
   }
 
-/**
- *  Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
- *
- *  Kind<F, A> -> Kind<F, Tuple2<B, A>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.extensions.sequencek.applicative.just
- *  import arrow.core.tupleLeft
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   "Hello".just().tupleLeft("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
 @JvmName("tupleLeft")
 @Suppress(
   "UNCHECKED_CAST",
@@ -271,24 +216,6 @@ fun <A, B> Kind<ForSequenceK, A>.tupleLeft(arg1: B): SequenceK<Tuple2<B, A>> =
     this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<B, A>>
   }
 
-/**
- *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
- *
- *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.extensions.sequencek.applicative.just
- *  import arrow.core.tupleRight
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   "Hello".just().tupleRight("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
 @JvmName("tupleRight")
 @Suppress(
   "UNCHECKED_CAST",

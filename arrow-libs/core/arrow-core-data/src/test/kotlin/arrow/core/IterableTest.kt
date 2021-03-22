@@ -32,7 +32,7 @@ class IterableTest : UnitSpec() {
     "traverseValidated short-circuit" {
       forAll(Gen.list(Gen.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequenceValidated(Semigroup.nonEmptyList())
+          .sequenceValidated()
 
         val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
           .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })

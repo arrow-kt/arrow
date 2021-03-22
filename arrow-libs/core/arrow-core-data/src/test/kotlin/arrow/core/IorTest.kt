@@ -93,7 +93,7 @@ class IorTest : UnitSpec() {
         res == expected
       }
     }
-    
+
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->
         Ior.Right(b).bimap({ "5" }, { a * 2 }) == Ior.Right(a * 2) &&

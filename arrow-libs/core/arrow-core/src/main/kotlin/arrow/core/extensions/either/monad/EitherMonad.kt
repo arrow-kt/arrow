@@ -7,6 +7,7 @@ import arrow.core.flatten as _flatten
 import arrow.core.Either.Companion
 import arrow.core.Eval
 import arrow.core.ForEither
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.EitherMonad
 import arrow.core.fix
@@ -44,10 +45,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.flatMap(arg1: Function1<A, Kind<Kind<F
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith("Either.tailRecM(arg0, arg1)", "arrow.core.tailRecM")
-)
+@Deprecated(TailRecMDeprecation)
 fun <L, A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<Kind<ForEither, L>, Either<A, B>>>): Either<L, B> =
   Either.tailRecM(arg0, arg1)
 

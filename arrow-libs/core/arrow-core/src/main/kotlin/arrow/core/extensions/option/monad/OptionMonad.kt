@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionMonad
 
@@ -41,14 +42,7 @@ fun <A, B> Kind<ForOption, A>.flatMap(arg1: Function1<A, Kind<ForOption, B>>): O
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Option.tailRecM(arg0, arg1)",
-    "arrow.core.Option"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForOption, Either<A, B>>>): Option<B> =
   arrow.core.Option
     .monad()

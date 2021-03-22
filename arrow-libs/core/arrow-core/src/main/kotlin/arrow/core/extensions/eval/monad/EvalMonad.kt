@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Eval.Companion
 import arrow.core.ForEval
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.EvalMonad
 
@@ -41,14 +42,7 @@ fun <A, B> Kind<ForEval, A>.flatMap(arg1: Function1<A, Kind<ForEval, B>>): Eval<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Eval.tailRecM(arg0, arg1)",
-    "arrow.core.Eval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForEval, Either<A, B>>>): Eval<B> =
   arrow.core.Eval
     .monad()

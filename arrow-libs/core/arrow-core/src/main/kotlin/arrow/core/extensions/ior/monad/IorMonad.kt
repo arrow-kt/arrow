@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.Ior.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.IorMonad
 import arrow.typeclasses.Semigroup
@@ -39,13 +40,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.flatMap(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.tailRecM(SL, arg0, arg1)"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <L, A, B> tailRecM(
   SL: Semigroup<L>,
   arg0: A,

@@ -80,49 +80,49 @@ object Nullable {
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, fn", "arrow.core.Nullable")
 )
 inline fun <A, R> mapN(a: A?, fn: (A) -> R): R? =
   Nullable.zip(a, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, R> mapN(a: A?, b: B?, fn: (A, B) -> R): R? =
   Nullable.zip(a, b, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, R> mapN(a: A?, b: B?, c: C?, fn: (A, B, C) -> R): R? =
   Nullable.zip(a, b, c, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, R> mapN(a: A?, b: B?, c: C?, d: D?, fn: (A, B, C, D) -> R): R? =
   Nullable.zip(a, b, c, d, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, e, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, e, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, E, R> mapN(a: A?, b: B?, c: C?, d: D?, e: E?, fn: (A, B, C, D, E) -> R): R? =
   Nullable.zip(a, b, c, d, e, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, e, f, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, e, f, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, E, F, R> mapN(a: A?, b: B?, c: C?, d: D?, e: E?, f: F?, fn: (A, B, C, D, E, F) -> R): R? =
   Nullable.zip(a, b, c, d, e, f, fn)
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, E, F, G, R> mapN(
   a: A?,
@@ -138,7 +138,7 @@ inline fun <A, B, C, D, E, F, G, R> mapN(
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, h, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, h, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, E, F, G, H, R> mapN(
   a: A?,
@@ -155,7 +155,7 @@ inline fun <A, B, C, D, E, F, G, H, R> mapN(
 
 @Deprecated(
   "Top-level mapN function for A? conflicts with other types such as List<A> and Map<K, V>",
-  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, h, i, fn", "arrow.core.mapN")
+  ReplaceWith("Nullable.zip(a, b, c, d, e, f, g, h, i, fn", "arrow.core.Nullable")
 )
 inline fun <A, B, C, D, E, F, G, H, I, R> mapN(
   a: A?,

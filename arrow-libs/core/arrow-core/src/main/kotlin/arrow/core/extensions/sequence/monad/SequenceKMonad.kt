@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForSequenceK
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonad
 import kotlin.sequences.Sequence
@@ -34,14 +35,7 @@ fun <A, B> Sequence<A>.flatMap(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "SequenceK.tailRecM(arg0, arg1)",
-    "arrow.core.SequenceK"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSequenceK, Either<A, B>>>): Sequence<B> =
   arrow.core.extensions.sequence.monad.Sequence
     .monad()
