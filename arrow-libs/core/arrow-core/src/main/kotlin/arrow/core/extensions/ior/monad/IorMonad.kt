@@ -382,7 +382,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }"
+    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
