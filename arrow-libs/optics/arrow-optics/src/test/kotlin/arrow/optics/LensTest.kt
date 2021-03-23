@@ -1,9 +1,9 @@
 package arrow.optics
 
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.ListK
 import arrow.core.Option
-import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq

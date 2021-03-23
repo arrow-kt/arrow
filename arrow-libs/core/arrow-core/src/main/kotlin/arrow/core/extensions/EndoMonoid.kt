@@ -7,7 +7,7 @@ import arrow.typeclasses.Monoid
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.endo<A>()", "arrow.core.endo", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.endo<A>()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface EndoMonoid<A> : Monoid<Endo<A>> {

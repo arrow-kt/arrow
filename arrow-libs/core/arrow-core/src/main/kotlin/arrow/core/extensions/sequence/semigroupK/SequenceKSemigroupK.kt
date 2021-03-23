@@ -37,7 +37,6 @@ fun <A> Sequence<A>.combineK(arg1: Sequence<A>): Sequence<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.sequence<A>()",
-    "arrow.core.sequence",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

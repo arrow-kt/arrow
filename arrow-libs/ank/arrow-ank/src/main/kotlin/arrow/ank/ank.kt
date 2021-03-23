@@ -1,16 +1,8 @@
 package arrow.ank
 
-import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.ValidatedNel
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.nonemptylist.semigroup.semigroup
-import arrow.core.extensions.validated.applicative.applicative
-import arrow.core.fix
-import arrow.core.invalidNel
-import arrow.core.toT
-import arrow.core.validNel
-import arrow.fx.coroutines.nonFatalOrThrow
+import arrow.core.sequenceValidated
 import java.nio.file.Path
 import kotlin.math.ln
 import kotlin.math.pow
@@ -25,13 +17,6 @@ fun Long.humanBytes(): String {
   val pre = ("KMGTPE")[exp - 1] + "i"
   return String.format("%.1f %sB", this / unit.toDouble().pow(exp.toDouble()), pre)
 }
-
-suspend fun <A> Validated.Companion.catchNel(f: suspend () -> A): ValidatedNel<Throwable, A> =
-  try {
-    f().validNel()
-  } catch (e: Throwable) {
-    e.nonFatalOrThrow().invalidNel()
-  }
 
 suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Unit = with(ankOps) {
   printConsole(colored(ANSI_PURPLE, AnkHeader))
@@ -50,14 +35,14 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
       printConsole(colored(ANSI_GREEN, message))
       val lines = p.toFile().readLines().asSequence()
       val (processed, snippets) = extractCode(lines)
-      val compiledResult = compileCode(p toT snippets, compilerArgs)
+      val compiledResult = compileCode(p to snippets, compilerArgs)
       val result = replaceAnkToLang(processed, compiledResult)
       val generatedPath = generateFile(p, result)
       generatedPath
     }
 
     acc + res
-  }.sequence(ValidatedNel.applicative(NonEmptyList.semigroup<Throwable>())).fix()
+  }.sequenceValidated()
 
   validatedPaths.fold({ errors ->
     val separator = "\n----------------------------------------------------------------\n"
@@ -69,7 +54,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
         it.msg
       })
   }, { paths ->
-    val message = colored(ANSI_GREEN, "Ank Processed ${paths.fix().size} files")
+    val message = colored(ANSI_GREEN, "Ank Processed ${paths.size} files")
     printConsole(message)
   })
 }

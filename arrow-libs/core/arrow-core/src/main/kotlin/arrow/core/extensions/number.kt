@@ -16,17 +16,17 @@ import arrow.typeclasses.ShowDeprecation
 // ////////
 // Byte
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.byte()", "arrow.core.Semigroup", "arrow.core.byte"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.byte()", "arrow.core.Semigroup"))
 interface ByteSemigroup : Semigroup<Byte> {
   override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.byte()", "arrow.core.Monoid", "arrow.core.byte"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.byte()", "arrow.core.Monoid"))
 interface ByteMonoid : Monoid<Byte>, ByteSemigroup {
   override fun empty(): Byte = 0
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.byte()", "arrow.core.Semiring", "arrow.core.byte"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.byte()", "arrow.core.Semiring"))
 interface ByteSemiring : Semiring<Byte> {
   override fun one(): Byte = 1
   override fun zero(): Byte = 0
@@ -72,32 +72,32 @@ fun Byte.Companion.eq(): Eq<Byte> =
 fun Byte.Companion.order(): Order<Byte> =
   object : ByteOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.byte()", "arrow.core.Semigroup", "arrow.core.byte"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.byte()", "arrow.core.Semigroup"))
 fun Byte.Companion.semigroup(): Semigroup<Byte> =
   object : ByteSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.byte()", "arrow.core.Monoid", "arrow.core.byte"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.byte()", "arrow.core.Monoid"))
 fun Byte.Companion.monoid(): Monoid<Byte> =
   object : ByteMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.byte()", "arrow.core.Semiring", "arrow.core.byte"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.byte()", "arrow.core.Semiring"))
 fun Byte.Companion.semiring(): Semiring<Byte> =
   object : ByteSemiring {}
 
 // ////////
 // Double
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.double()", "arrow.core.Semigroup", "arrow.core.double"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.double()", "arrow.core.Semigroup"))
 interface DoubleSemigroup : Semigroup<Double> {
   override fun Double.combine(b: Double): Double = this + b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.double()", "arrow.core.Monoid", "arrow.core.double"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.double()", "arrow.core.Monoid"))
 interface DoubleMonoid : Monoid<Double>, DoubleSemigroup {
   override fun empty(): Double = .0
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.double()", "arrow.core.Semiring", "arrow.core.double"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.double()", "arrow.core.Semiring"))
 interface DoubleSemiring : Semiring<Double> {
   override fun one(): Double = 1.0
   override fun zero(): Double = 0.0
@@ -143,32 +143,32 @@ fun Double.Companion.eq(): Eq<Double> =
 fun Double.Companion.order(): Order<Double> =
   object : DoubleOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.double()", "arrow.core.Semigroup", "arrow.core.double"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.double()", "arrow.core.Semigroup"))
 fun Double.Companion.semigroup(): Semigroup<Double> =
   object : DoubleSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.double()", "arrow.core.Monoid", "arrow.core.double"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.double()", "arrow.core.Monoid"))
 fun Double.Companion.monoid(): Monoid<Double> =
   object : DoubleMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.double()", "arrow.core.Semiring", "arrow.core.double"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.double()", "arrow.core.Semiring"))
 fun Double.Companion.semiring(): Semiring<Double> =
   object : DoubleSemiring {}
 
 // ////////
 // Int
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.int()", "arrow.core.Semigroup", "arrow.core.int"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.int()", "arrow.core.Semigroup"))
 interface IntSemigroup : Semigroup<Int> {
   override fun Int.combine(b: Int): Int = this + b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.int()", "arrow.core.Monoid", "arrow.core.int"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.int()", "arrow.core.Monoid"))
 interface IntMonoid : Monoid<Int>, IntSemigroup {
   override fun empty(): Int = 0
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.int()", "arrow.core.Semiring", "arrow.core.int"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.int()", "arrow.core.Semiring"))
 interface IntSemiring : Semiring<Int> {
   override fun one(): Int = 1
   override fun zero(): Int = 0
@@ -213,32 +213,32 @@ fun Int.Companion.eq(): Eq<Int> =
 fun Int.Companion.order(): Order<Int> =
   object : IntOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.int()", "arrow.core.Semigroup", "arrow.core.int"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.int()", "arrow.core.Semigroup"))
 fun Int.Companion.semigroup(): Semigroup<Int> =
   object : IntSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.int()", "arrow.core.Monoid", "arrow.core.int"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.int()", "arrow.core.Monoid"))
 fun Int.Companion.monoid(): Monoid<Int> =
   object : IntMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.int()", "arrow.core.Semiring", "arrow.core.int"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.int()", "arrow.core.Semiring"))
 fun Int.Companion.semiring(): Semiring<Int> =
   object : IntSemiring {}
 
 // ////////
 // Long
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.long()", "arrow.core.Semigroup", "arrow.core.long"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.long()", "arrow.core.Semigroup"))
 interface LongSemigroup : Semigroup<Long> {
   override fun Long.combine(b: Long): Long = this + b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.long()", "arrow.core.Monoid", "arrow.core.long"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.long()", "arrow.core.Monoid"))
 interface LongMonoid : Monoid<Long>, LongSemigroup {
   override fun empty(): Long = 0L
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.long()", "arrow.core.Semiring", "arrow.core.long"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.long()", "arrow.core.Semiring"))
 interface LongSemiring : Semiring<Long> {
   override fun one(): Long = 1
   override fun zero(): Long = 0
@@ -284,32 +284,32 @@ fun Long.Companion.eq(): Eq<Long> =
 fun Long.Companion.order(): Order<Long> =
   object : LongOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.long()", "arrow.core.Semigroup", "arrow.core.long"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.long()", "arrow.core.Semigroup"))
 fun Long.Companion.semigroup(): Semigroup<Long> =
   object : LongSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.long()", "arrow.core.Monoid", "arrow.core.long"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.long()", "arrow.core.Monoid"))
 fun Long.Companion.monoid(): Monoid<Long> =
   object : LongMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.long()", "arrow.core.Semiring", "arrow.core.long"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.long()", "arrow.core.Semiring"))
 fun Long.Companion.semiring(): Semiring<Long> =
   object : LongSemiring {}
 
 // ////////
 // Short
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.short()", "arrow.core.Semigroup", "arrow.core.short"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.short()", "arrow.core.Semigroup"))
 interface ShortSemigroup : Semigroup<Short> {
   override fun Short.combine(b: Short): Short = (this + b).toShort()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.short()", "arrow.core.Monoid", "arrow.core.short"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.short()", "arrow.core.Monoid"))
 interface ShortMonoid : Monoid<Short>, ShortSemigroup {
   override fun empty(): Short = 0
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.short()", "arrow.core.Semiring", "arrow.core.short"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.short()", "arrow.core.Semiring"))
 interface ShortSemiring : Semiring<Short> {
   override fun one(): Short = 1
   override fun zero(): Short = 0
@@ -355,32 +355,32 @@ fun Short.Companion.eq(): Eq<Short> =
 fun Short.Companion.order(): Order<Short> =
   object : ShortOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.short()", "arrow.core.Semigroup", "arrow.core.short"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.short()", "arrow.core.Semigroup"))
 fun Short.Companion.semigroup(): Semigroup<Short> =
   object : ShortSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.short()", "arrow.core.Monoid", "arrow.core.short"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.short()", "arrow.core.Monoid"))
 fun Short.Companion.monoid(): Monoid<Short> =
   object : ShortMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.short()", "arrow.core.Semiring", "arrow.core.short"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.short()", "arrow.core.Semiring"))
 fun Short.Companion.semiring(): Semiring<Short> =
   object : ShortSemiring {}
 
 // ////////
 // Float
 // ////////
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.float()", "arrow.core.Semigroup", "arrow.core.float"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.float()", "arrow.core.Semigroup"))
 interface FloatSemigroup : Semigroup<Float> {
   override fun Float.combine(b: Float): Float = this + b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.float()", "arrow.core.Monoid", "arrow.core.float"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.float()", "arrow.core.Monoid"))
 interface FloatMonoid : Monoid<Float>, FloatSemigroup {
   override fun empty(): Float = 0f
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.float()", "arrow.core.Semiring", "arrow.core.float"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semiring.float()", "arrow.core.Semiring"))
 interface FloatSemiring : Semiring<Float> {
   override fun one(): Float = 1f
   override fun zero(): Float = 0f
@@ -426,14 +426,14 @@ fun Float.Companion.eq(): Eq<Float> =
 fun Float.Companion.order(): Order<Float> =
   object : FloatOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.float()", "arrow.core.Semigroup", "arrow.core.float"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.float()", "arrow.core.Semigroup"))
 fun Float.Companion.semigroup(): Semigroup<Float> =
   object : FloatSemigroup {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.float()", "arrow.core.Monoid", "arrow.core.float"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Monoid.float()", "arrow.core.Monoid"))
 fun Float.Companion.monoid(): Monoid<Float> =
   object : FloatMonoid {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.float()", "arrow.core.Semiring", "arrow.core.float"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semiring.float()", "arrow.core.Semiring"))
 fun Float.Companion.semiring(): Semiring<Float> =
   object : FloatSemiring {}
