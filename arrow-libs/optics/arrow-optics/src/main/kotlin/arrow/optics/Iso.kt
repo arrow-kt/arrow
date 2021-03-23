@@ -8,6 +8,9 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.Validated
+import arrow.core.Validated.Invalid
+import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
@@ -16,13 +19,16 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
 
 @Deprecated(KindDeprecation)
-class ForPIso private constructor() { companion object }
+class ForPIso private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias PIsoOf<S, T, A, B> = arrow.Kind4<ForPIso, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias PIsoPartialOf<S, T, A> = arrow.Kind3<ForPIso, S, T, A>
 @Deprecated(KindDeprecation)
 typealias PIsoKindedJ<S, T, A, B> = arrow.HkJ4<ForPIso, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> PIsoOf<S, T, A, B>.fix(): PIso<S, T, A, B> =
@@ -101,6 +107,23 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     @JvmStatic
     fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> =
       listToPOptionNel()
+
+    /**
+     * [PIso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
+      PIso(
+        get = { it.fold(::Invalid, ::Valid) },
+        reverseGet = Validated<A2, B2>::toEither
+      )
+
+    /**
+     * [Iso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
+      eitherToPValidated()
   }
 
   /**
@@ -147,10 +170,11 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * Pair two disjoint [PIso]
    */
-  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> = PIso(
-    { (a, c) -> get(a) toT other.get(c) },
-    { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
-  )
+  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
+    PIso(
+      { (a, c) -> get(a) toT other.get(c) },
+      { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
+    )
 
   /**
    * Create a pair of the [PIso] and a type [C]

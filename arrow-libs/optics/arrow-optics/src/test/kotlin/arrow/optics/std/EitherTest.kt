@@ -1,14 +1,13 @@
 package arrow.optics.std
 
-import arrow.core.Either
 import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
-import arrow.optics.toValidated
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.validated
+import arrow.optics.Iso
 import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
@@ -38,7 +37,7 @@ class EitherTest : UnitSpec() {
     }
     testLaws(
       IsoLaws.laws(
-        iso = Either.toValidated(),
+        iso = Iso.eitherToValidated(),
         aGen = Gen.either(Gen.string(), Gen.int()),
         bGen = Gen.validated(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),

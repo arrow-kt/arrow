@@ -10,8 +10,10 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.AndMonoid
 import arrow.core.extensions.const.applicative.applicative
+import arrow.core.extensions.either.traverse.traverse
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
+import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.value
@@ -23,13 +25,16 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
 
 @Deprecated(KindDeprecation)
-class ForPTraversal private constructor() { companion object }
+class ForPTraversal private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias PTraversalOf<S, T, A, B> = arrow.Kind4<ForPTraversal, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias PTraversalPartialOf<S, T, A> = arrow.Kind3<ForPTraversal, S, T, A>
 @Deprecated(KindDeprecation)
 typealias PTraversalKindedJ<S, T, A, B> = arrow.HkJ4<ForPTraversal, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> PTraversalOf<S, T, A, B>.fix(): PTraversal<S, T, A, B> =
@@ -65,9 +70,10 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     fun <S> id() = PIso.id<S>().asTraversal()
 
     fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
-      override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> = FA.run {
-        s.bimap(f, f).fold({ fa -> fa.map { a -> Either.Left(a) } }, { fa -> fa.map { a -> Either.Right(a) } })
-      }
+      override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> =
+        FA.run {
+          s.bimap(f, f).fold({ fa -> fa.map { a -> Either.Left(a) } }, { fa -> fa.map { a -> Either.Right(a) } })
+        }
     }
 
     /**
@@ -86,12 +92,13 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     /**
      * [PTraversal] constructor from multiple getters of the same source.
      */
-    operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-      override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
-        FA.mapN(
-          f(get1(s)), f(get2(s))
-        ) { (b1, b2) -> set(b1, b2, s) }
-    }
+    operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> =
+      object : PTraversal<S, T, A, B> {
+        override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
+          FA.mapN(
+            f(get1(s)), f(get2(s))
+          ) { (b1, b2) -> set(b1, b2, s) }
+      }
 
     operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -213,7 +220,16 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     ): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
       override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> =
         FA.mapN(
-          f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s))
+          f(get1(s)),
+          f(get2(s)),
+          f(get3(s)),
+          f(get4(s)),
+          f(get5(s)),
+          f(get6(s)),
+          f(get7(s)),
+          f(get8(s)),
+          f(get9(s)),
+          f(get10(s))
         ) { (b1, b2, b3, b4, b5, b6, b7, b8, b9, b10) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, s) }
     }
 
@@ -225,6 +241,21 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
       object : Traversal<List<A>, A> {
         override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
           s.k().traverse(FA, f)
+      }
+
+    /**
+     * [Traversal] for [Either] that has focus in each [Either.Right].
+     *
+     * @receiver [Traversal.Companion] to make it statically available.
+     * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
+     */
+    @JvmStatic
+    fun <L, R> either(): Traversal<Either<L, R>, R> =
+      object : Traversal<Either<L, R>, R> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Either<L, R>, f: (R) -> Kind<F, R>): Kind<F, Either<L, R>> =
+          with(Either.traverse<L>()) {
+            FA.run { s.traverse(FA, f).map { it.fix() } }
+          }
       }
   }
 
@@ -279,14 +310,16 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    */
   fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
-  fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
-    override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = FA.run {
-      s.fold(
-        { a -> this@PTraversal.modifyF(FA, a, f).map { Either.Left(it) } },
-        { u -> other.modifyF(FA, u, f).map { Either.Right(it) } }
-      )
+  fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
+    object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
+      override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> =
+        FA.run {
+          s.fold(
+            { a -> this@PTraversal.modifyF(FA, a, f).map { Either.Left(it) } },
+            { u -> other.modifyF(FA, u, f).map { Either.Right(it) } }
+          )
+        }
     }
-  }
 
   /**
    * Compose a [PTraversal] with a [PTraversal]
@@ -387,8 +420,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Lens] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-    this@every.compose(this@PTraversal)
+  val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B>
+    get() =
+      this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Iso] for a structure [S] to see all its foci [A]
@@ -396,8 +430,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Iso] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-    this@every.compose(this@PTraversal)
+  val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B>
+    get() =
+      this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
@@ -405,8 +440,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Prism] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-    this.compose(this@PTraversal)
+  val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
+    get() =
+      this.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]
@@ -414,8 +450,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Optional] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-    this.compose(this@PTraversal)
+  val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
+    get() =
+      this.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Setter] for a structure [S] to see all its foci [A]
@@ -423,8 +460,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Setter] with a focus in [S]
    * @return [Setter] with a focus in [A]
    */
-  val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B> get() =
-    this.compose(this@PTraversal)
+  val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B>
+    get() =
+      this.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Traversal] for a structure [S] to see all its foci [A]
@@ -432,8 +470,9 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @receiver [Traversal] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-    this.compose(this@PTraversal)
+  val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
+    get() =
+      this.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Fold] for a structure [S] to see all its foci [A]
