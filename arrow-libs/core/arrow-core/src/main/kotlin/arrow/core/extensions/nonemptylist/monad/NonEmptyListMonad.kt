@@ -354,7 +354,7 @@ fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }"),
+  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> nonEmptyListOf(b) }) }", "arrow.core.nonEmptyListOf"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
