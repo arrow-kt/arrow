@@ -32,31 +32,31 @@ interface Semigroup<A> {
     fun string(): Semigroup<String> = Monoid.string()
 
     @JvmStatic
-    @JvmName("bool")
+    @JvmName("Boolean")
     fun boolean(): Semigroup<Boolean> = Monoid.boolean()
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Byte")
     fun byte(): Semigroup<Byte> = Monoid.byte()
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Double")
     fun double(): Semigroup<Double> = Monoid.double()
 
     @JvmStatic
-    @JvmName("integer")
+    @JvmName("Integer")
     fun int(): Semigroup<Int> = Monoid.int()
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Long")
     fun long(): Semigroup<Long> = Monoid.long()
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Short")
     fun short(): Semigroup<Short> = Monoid.short()
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Float")
     fun float(): Semigroup<Float> = Monoid.float()
 
     @JvmStatic
@@ -74,7 +74,7 @@ interface Semigroup<A> {
       }
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("constant")
     fun <A, T> const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
       object : Semigroup<Const<A, T>> {
         override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =

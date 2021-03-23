@@ -1,20 +1,12 @@
 package arrow.typeclasses;
 
-import kotlin.sequences.Sequence;
-
-import java.util.List;
-
 public class SemiringUsageTest {
 
     public void testUsage() {
-        Semiring<Integer> integer = Semiring.integer();
-
-        // TODO fix
-//        Semiring.byte();
-//        Semiring.double();
-//        Semiring.float();
-//        Semiring.short();
+        Semiring<Integer> integer = Semiring.Integer();
+        Semiring<Byte> aByte = Semiring.Byte();
+        Semiring<Double> aDouble = Semiring.Double();
+        Semiring<Float> aFloat = Semiring.Float();
+        Semiring<Short> aShort = Semiring.Short();
     }
-
-
 }
