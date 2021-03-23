@@ -9,7 +9,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
 private const val OptionExtensionDeprecated =
-  "This extension method for Either is deprecated, use the concrete method instead."
+  "This extension method for Option is deprecated, use the concrete method instead."
 
 @Deprecated(
   message = KindDeprecation,

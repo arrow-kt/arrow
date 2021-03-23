@@ -8,6 +8,9 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+private const val ValidatedExtensionDeprecated =
+  "This extension method for Validated is deprecated, use the concrete method instead."
+
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
 typealias Invalid<E> = Validated.Invalid<E>
@@ -568,7 +571,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     @PublishedApi
     internal val unit: Validated<Nothing, Unit> =
-      Validated.Valid(Unit)
+      Valid(Unit)
   }
 
   /**
@@ -756,205 +759,298 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   fun swap(): Validated<A, E> =
     fold(::Valid, ::Invalid)
+
+  fun or(SE: Semigroup<@UnsafeVariance E>, y: Validated<@UnsafeVariance E, @UnsafeVariance A>): Validated<E, A> {
+    return when (this) {
+      is Valid -> this
+      is Invalid -> when (y) {
+        is Invalid -> Invalid(SE.run { this@Validated.value.combine(y.value) })
+        is Valid -> y
+      }
+    }
+  }
+
+  /**
+   * Return this if it is Valid, or else fall back to the given default.
+   * The functionality is similar to that of [findValid] except for failure accumulation,
+   * where here only the error on the right is preserved and the error on the left is ignored.
+   */
+  inline fun orElse(default: () -> Validated<@UnsafeVariance E, @UnsafeVariance A>): Validated<E, A> =
+    fold({ default() }, { Valid(it) })
+
+  /**
+   * Return the Valid value, or the default if Invalid
+   */
+  inline fun getOrElse(default: () -> @UnsafeVariance A): A =
+    fold({ default() }, ::identity)
+
+  /**
+   * Return the Valid value, or null if Invalid
+   */
+  fun orNull(): A? =
+    fold({ null }, ::identity)
+
+  /**
+   * Return the Valid value, or the result of f if Invalid
+   */
+  inline fun valueOr(f: (E) -> @UnsafeVariance A): A =
+    fold({ f(it) }, ::identity)
+
+  /**
+   * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
+   * This is similar to [orElse] except that here failures are accumulated.
+   */
+  inline fun findValid(
+    SE: Semigroup<@UnsafeVariance E>,
+    that: () -> Validated<@UnsafeVariance E, @UnsafeVariance A>
+  ): Validated<E, A> =
+    fix().fold(
+      { e ->
+        that().fold(
+          { ee -> Invalid(SE.run { e.combine(ee) }) },
+          { Valid(it) }
+        )
+      },
+      { Valid(it) }
+    )
+
+  fun combine(
+    SE: Semigroup<@UnsafeVariance E>,
+    SA: Semigroup<@UnsafeVariance A>,
+    y: Validated<@UnsafeVariance E, @UnsafeVariance A>
+  ): Validated<E, A> =
+    when {
+      this is Valid && y is Valid -> Valid(SA.run { value.combine(y.value) })
+      this is Invalid && y is Invalid -> Invalid(SE.run { value.combine(y.value) })
+      this is Invalid -> this
+      else -> y
+    }
+
+  inline fun <B> redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
+    when (this) {
+      is Valid -> map(fa)
+      is Invalid -> Valid(fe(this.e))
+    }
+
+  fun attempt(): Validated<Nothing, Either<E, A>> =
+    map<Either<E, A>> { Either.Right(it) }.handleError { Either.Left(it) }
+
+  inline fun handleErrorWith(f: (E) -> Validated<@UnsafeVariance E, @UnsafeVariance A>): Validated<E, A> =
+    when (this) {
+      is Valid -> this
+      is Invalid -> f(value).fix()
+    }
+
+  inline fun handleError(f: (E) -> @UnsafeVariance A): Validated<Nothing, A> =
+    when (this) {
+      is Valid -> this
+      is Invalid -> Valid(f(value))
+    }
+
+  fun combineAll(MA: Monoid<@UnsafeVariance A>): A = MA.run {
+    foldLeft(empty()) { acc, a -> acc.combine(a) }
+  }
+
+
+  fun <B> zip(SE: Semigroup<@UnsafeVariance E>, fb: Validated<@UnsafeVariance E, B>): Validated<E, Pair<A, B>> =
+    zip(SE, fb, ::Pair)
+
+  inline fun <B, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    f: (A, B) -> Z
+  ): Validated<E, Z> =
+    zip(
+      SE,
+      b,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit
+    ) { a, b, _, _, _, _, _, _, _, _ ->
+      f(a, b)
+    }
+
+  inline fun <B, C, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    f: (A, B, C) -> Z
+  ): Validated<E, Z> =
+    zip(
+      SE,
+      b,
+      c,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit
+    ) { a, b, c, _, _, _, _, _, _, _ ->
+      f(a, b, c)
+    }
+
+  inline fun <B, C, D, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    f: (A, B, C, D) -> Z
+  ): Validated<E, Z> =
+    zip(
+      SE,
+      b,
+      c,
+      d,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit
+    ) { a, b, c, d, _, _, _, _, _, _ ->
+      f(a, b, c, d)
+    }
+
+  inline fun <B, C, D, EE, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    f: (A, B, C, D, EE) -> Z
+  ): Validated<E, Z> =
+    zip(
+      SE,
+      b,
+      c,
+      d,
+      e,
+      unit,
+      unit,
+      unit,
+      unit,
+      unit
+    ) { a, b, c, d, e, _, _, _, _, _ ->
+      f(a, b, c, d, e)
+    }
+
+  inline fun <B, C, D, EE, FF, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    ff: Validated<@UnsafeVariance E, FF>,
+    f: (A, B, C, D, EE, FF) -> Z
+  ): Validated<E, Z> =
+    zip(
+      SE,
+      b,
+      c,
+      d,
+      e,
+      ff,
+      unit,
+      unit,
+      unit,
+      unit
+    ) { a, b, c, d, e, ff, _, _, _, _ ->
+      f(a, b, c, d, e, ff)
+    }
+
+  inline fun <B, C, D, EE, F, G, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    ff: Validated<@UnsafeVariance E, F>,
+    g: Validated<@UnsafeVariance E, G>,
+    f: (A, B, C, D, EE, F, G) -> Z
+  ): Validated<E, Z> =
+    zip(SE, b, c, d, e, ff, g, unit, unit, unit) { a, b, c, d, e, ff, g, _, _, _ ->
+      f(a, b, c, d, e, ff, g)
+    }
+
+  inline fun <B, C, D, EE, F, G, H, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    ff: Validated<@UnsafeVariance E, F>,
+    g: Validated<@UnsafeVariance E, G>,
+    h: Validated<@UnsafeVariance E, H>,
+    f: (A, B, C, D, EE, F, G, H) -> Z
+  ): Validated<E, Z> =
+    zip(SE, b, c, d, e, ff, g, h, unit, unit) { a, b, c, d, e, ff, g, h, _, _ ->
+      f(a, b, c, d, e, ff, g, h)
+    }
+
+  inline fun <B, C, D, EE, F, G, H, I, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    ff: Validated<@UnsafeVariance E, F>,
+    g: Validated<@UnsafeVariance E, G>,
+    h: Validated<@UnsafeVariance E, H>,
+    i: Validated<@UnsafeVariance E, I>,
+    f: (A, B, C, D, EE, F, G, H, I) -> Z
+  ): Validated<E, Z> =
+    zip(SE, b, c, d, e, ff, g, h, i, unit) { a, b, c, d, e, ff, g, h, i, _ ->
+      f(a, b, c, d, e, ff, g, h, i)
+    }
+
+  inline fun <B, C, D, EE, F, G, H, I, J, Z> zip(
+    SE: Semigroup<@UnsafeVariance E>,
+    b: Validated<@UnsafeVariance E, B>,
+    c: Validated<@UnsafeVariance E, C>,
+    d: Validated<@UnsafeVariance E, D>,
+    e: Validated<@UnsafeVariance E, EE>,
+    ff: Validated<@UnsafeVariance E, F>,
+    g: Validated<@UnsafeVariance E, G>,
+    h: Validated<@UnsafeVariance E, H>,
+    i: Validated<@UnsafeVariance E, I>,
+    j: Validated<@UnsafeVariance E, J>,
+    f: (A, B, C, D, EE, F, G, H, I, J) -> Z
+  ): Validated<E, Z> =
+    if (this is Valid && b is Valid && c is Valid && d is Valid && e is Valid && ff is Valid && g is Valid && h is Valid && i is Valid && j is Valid) {
+      Valid(f(this.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
+    } else SE.run {
+      var accumulatedError: E? = null
+      accumulatedError =
+        if (this@Validated is Invalid) this@Validated.e.maybeCombine(accumulatedError) else accumulatedError
+      accumulatedError =
+        if (b is Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
+      accumulatedError =
+        if (c is Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
+      accumulatedError =
+        if (d is Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
+      accumulatedError =
+        if (e is Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
+      accumulatedError =
+        if (ff is Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
+      accumulatedError =
+        if (g is Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
+      accumulatedError =
+        if (h is Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
+      accumulatedError =
+        if (i is Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
+      accumulatedError =
+        if (j is Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
+      Invalid(accumulatedError!!)
+    }
 }
 
-fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
-  zip(SE, fb, ::Pair)
-
-inline fun <E, A, B, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  f: (A, B) -> Z
-): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit
-  ) { a, b, _, _, _, _, _, _, _, _ ->
-    f(a, b)
-  }
-
-inline fun <E, A, B, C, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  f: (A, B, C) -> Z
-): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    c,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit
-  ) { a, b, c, _, _, _, _, _, _, _ ->
-    f(a, b, c)
-  }
-
-inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  f: (A, B, C, D) -> Z
-): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    c,
-    d,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit
-  ) { a, b, c, d, _, _, _, _, _, _ ->
-    f(a, b, c, d)
-  }
-
-inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  f: (A, B, C, D, EE) -> Z
-): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    c,
-    d,
-    e,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit
-  ) { a, b, c, d, e, _, _, _, _, _ ->
-    f(a, b, c, d, e)
-  }
-
-inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  ff: Validated<E, FF>,
-  f: (A, B, C, D, EE, FF) -> Z
-): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    c,
-    d,
-    e,
-    ff,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit,
-    Validated.unit
-  ) { a, b, c, d, e, ff, _, _, _, _ ->
-    f(a, b, c, d, e, ff)
-  }
-
-inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  ff: Validated<E, F>,
-  g: Validated<E, G>,
-  f: (A, B, C, D, EE, F, G) -> Z
-): Validated<E, Z> =
-  zip(SE, b, c, d, e, ff, g, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, ff, g, _, _, _ ->
-    f(a, b, c, d, e, ff, g)
-  }
-
-inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  ff: Validated<E, F>,
-  g: Validated<E, G>,
-  h: Validated<E, H>,
-  f: (A, B, C, D, EE, F, G, H) -> Z
-): Validated<E, Z> =
-  zip(SE, b, c, d, e, ff, g, h, Validated.unit, Validated.unit) { a, b, c, d, e, ff, g, h, _, _ ->
-    f(a, b, c, d, e, ff, g, h)
-  }
-
-inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  ff: Validated<E, F>,
-  g: Validated<E, G>,
-  h: Validated<E, H>,
-  i: Validated<E, I>,
-  f: (A, B, C, D, EE, F, G, H, I) -> Z
-): Validated<E, Z> =
-  zip(SE, b, c, d, e, ff, g, h, i, Validated.unit) { a, b, c, d, e, ff, g, h, i, _ ->
-    f(a, b, c, d, e, ff, g, h, i)
-  }
-
-inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
-  SE: Semigroup<E>,
-  b: Validated<E, B>,
-  c: Validated<E, C>,
-  d: Validated<E, D>,
-  e: Validated<E, EE>,
-  ff: Validated<E, F>,
-  g: Validated<E, G>,
-  h: Validated<E, H>,
-  i: Validated<E, I>,
-  j: Validated<E, J>,
-  f: (A, B, C, D, EE, F, G, H, I, J) -> Z
-): Validated<E, Z> =
-  if (this is Validated.Valid && b is Validated.Valid && c is Validated.Valid && d is Validated.Valid && e is Validated.Valid && ff is Validated.Valid && g is Validated.Valid && h is Validated.Valid && i is Validated.Valid && j is Validated.Valid) {
-    Validated.Valid(f(this.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
-  } else SE.run {
-    var accumulatedError: E? = null
-    accumulatedError =
-      if (this@zip is Validated.Invalid) this@zip.e.maybeCombine(accumulatedError) else accumulatedError
-    accumulatedError =
-      if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
-    accumulatedError =
-      if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
-    accumulatedError =
-      if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
-    accumulatedError =
-      if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
-    accumulatedError =
-      if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
-    accumulatedError =
-      if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
-    accumulatedError =
-      if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
-    accumulatedError =
-      if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
-    accumulatedError =
-      if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
-    Validated.Invalid(accumulatedError!!)
-  }
 
 inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
@@ -1088,13 +1184,6 @@ fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A
 fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
   bitraverseEither(::identity, ::identity)
 
-fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
-  foldLeft(empty()) { acc, a -> acc.combine(a) }
-}
-
-fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
-  fold(MA)
-
 fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
@@ -1107,28 +1196,19 @@ operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(ot
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
   )
 
-/**
- * Return the Valid value, or the default if Invalid
- */
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.getOrElse(default: () -> A): A =
   fix().fold({ default() }, ::identity)
 
-/**
- * Return the Valid value, or null if Invalid
- */
+@Deprecated(ValidatedExtensionDeprecated)
 fun <E, A> ValidatedOf<E, A>.orNull(): A? =
   getOrElse { null }
 
-/**
- * Return the Valid value, or the result of f if Invalid
- */
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.valueOr(f: (E) -> A): A =
   fix().fold({ f(it) }, ::identity)
 
-/**
- * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
- * This is similar to [orElse] except that here failures are accumulated.
- */
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
   fix().fold(
     { e ->
@@ -1140,11 +1220,7 @@ inline fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Vali
     { Valid(it) }
   )
 
-/**
- * Return this if it is Valid, or else fall back to the given default.
- * The functionality is similar to that of [findValid] except for failure accumulation,
- * where here only the error on the right is preserved and the error on the left is ignored.
- */
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
   fix().fold(
     { default() },
@@ -1165,26 +1241,19 @@ inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) 
 inline fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   handleErrorWith(f)
 
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.handleErrorWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   when (val value = fix()) {
     is Validated.Valid -> value
     is Validated.Invalid -> f(value.e).fix()
   }
 
+@Deprecated(ValidatedExtensionDeprecated)
 inline fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
   when (val value = fix()) {
     is Validated.Valid -> value
     is Validated.Invalid -> Valid(f(value.e))
   }
-
-inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
-  when (this) {
-    is Validated.Valid -> map(fa)
-    is Validated.Invalid -> Valid(fe(this.e))
-  }
-
-fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
-  map { Right(it) }.handleError { Left(it) }
 
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverse or traverseEither from arrow.core.*")
 fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
@@ -1196,6 +1265,7 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(ValidatedExtensionDeprecated)
 fun <E, A> ValidatedOf<E, A>.combine(
   SE: Semigroup<E>,
   SA: Semigroup<A>,
@@ -1210,6 +1280,7 @@ fun <E, A> ValidatedOf<E, A>.combine(
     }
   }
 
+@Deprecated(ValidatedExtensionDeprecated)
 fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): Validated<E, A> {
   val xev = fix()
   val yev = y.fix()

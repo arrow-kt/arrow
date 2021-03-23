@@ -6,8 +6,6 @@ import arrow.core.ForValidated
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.fold as _fold
-import arrow.core.combineAll as _combineAll
 import arrow.core.Validated
 import arrow.core.Validated.Companion
 import arrow.core.extensions.ValidatedFoldable
@@ -64,9 +62,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.foldRight(arg1: Eval<B>, arg2: Func
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fold(arg1)", "arrow.core.fold"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("combineAll(arg1)"))
 fun <E, A> Kind<Kind<ForValidated, E>, A>.fold(arg1: Monoid<A>): A =
-  fix()._fold(arg1)
+  fix().combineAll(arg1)
 
 @JvmName("reduceLeftToOption")
 @Suppress(
@@ -125,9 +123,9 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.reduceRightOption(arg1: Function2<A, E
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("combineAll(arg1)", "arrow.core.combineAll"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("combineAll(arg1)"))
 fun <E, A> Kind<Kind<ForValidated, E>, A>.combineAll(arg1: Monoid<A>): A =
-  fix()._combineAll(arg1)
+  fix().combineAll(arg1)
 
 @JvmName("foldMap")
 @Suppress(
