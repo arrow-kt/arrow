@@ -143,8 +143,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.followedBy(SL: Semigroup<L>, arg1: Kind<K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "Ior.mapN(SL, this, arg1) { left, _ -> left }",
-    "arrow.core.Ior"
+    "this.zip(SL, arg1) { left, _ -> left }"
   ),
   DeprecationLevel.WARNING
 )

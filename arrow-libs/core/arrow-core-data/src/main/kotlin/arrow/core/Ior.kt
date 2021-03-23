@@ -10,6 +10,9 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
+private const val IorExtensionDeprecated =
+  "This extension method for Either is deprecated, use the concrete method instead."
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -662,13 +665,210 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
 
   fun void(): Ior<A, Unit> =
     map { Unit }
+
+  fun <C> zip(SA: Semigroup<@UnsafeVariance A>, fb: Ior<@UnsafeVariance A, C>): Ior<A, Pair<B, C>> =
+    zip(SA, fb, ::Pair)
+
+  inline fun <C, D> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    map: (B, C) -> D
+  ): Ior<A, D> =
+    zip(SA, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+
+  inline fun <C, D, E> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    map: (B, C, D) -> E
+  ): Ior<A, E> =
+    zip(SA, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+  inline fun <C, D, E, F> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    map: (B, C, D, E) -> F
+  ): Ior<A, F> =
+    zip(SA, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+  inline fun <C, D, E, F, G> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    map: (B, C, D, E, F) -> G
+  ): Ior<A, G> =
+    zip(SA, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+  inline fun <C, D, E, F, G, H> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    g: Ior<@UnsafeVariance A, G>,
+    map: (B, C, D, E, F, G) -> H
+  ): Ior<A, H> =
+    zip(SA, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+  inline fun <C, D, E, F, G, H, I> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    g: Ior<@UnsafeVariance A, G>,
+    h: Ior<@UnsafeVariance A, H>,
+    map: (B, C, D, E, F, G, H) -> I
+  ): Ior<A, I> =
+    zip(SA, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+  inline fun <C, D, E, F, G, H, I, J> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    g: Ior<@UnsafeVariance A, G>,
+    h: Ior<@UnsafeVariance A, H>,
+    i: Ior<@UnsafeVariance A, I>,
+    map: (B, C, D, E, F, G, H, I) -> J
+  ): Ior<A, J> =
+    zip(SA, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+  inline fun <C, D, E, F, G, H, I, J, K> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    g: Ior<@UnsafeVariance A, G>,
+    h: Ior<@UnsafeVariance A, H>,
+    i: Ior<@UnsafeVariance A, I>,
+    j: Ior<@UnsafeVariance A, J>,
+    map: (B, C, D, E, F, G, H, I, J) -> K
+  ): Ior<A, K> =
+    zip(SA, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+  inline fun <C, D, E, F, G, H, I, J, K, L> zip(
+    SA: Semigroup<@UnsafeVariance A>,
+    c: Ior<@UnsafeVariance A, C>,
+    d: Ior<@UnsafeVariance A, D>,
+    e: Ior<@UnsafeVariance A, E>,
+    f: Ior<@UnsafeVariance A, F>,
+    g: Ior<@UnsafeVariance A, G>,
+    h: Ior<@UnsafeVariance A, H>,
+    i: Ior<@UnsafeVariance A, I>,
+    j: Ior<@UnsafeVariance A, J>,
+    k: Ior<@UnsafeVariance A, K>,
+    map: (B, C, D, E, F, G, H, I, J, K) -> L
+  ): Ior<A, L> {
+    val rightValue: L? = Nullable.zip(
+      (this as? Right)?.value ?: (this as? Both)?.rightValue,
+      (c as? Right)?.value ?: (c as? Both)?.rightValue,
+      (d as? Right)?.value ?: (d as? Both)?.rightValue,
+      (e as? Right)?.value ?: (e as? Both)?.rightValue,
+      (f as? Right)?.value ?: (f as? Both)?.rightValue,
+      (g as? Right)?.value ?: (g as? Both)?.rightValue,
+      (h as? Right)?.value ?: (h as? Both)?.rightValue,
+      (i as? Right)?.value ?: (i as? Both)?.rightValue,
+      (j as? Right)?.value ?: (j as? Both)?.rightValue,
+      (k as? Right)?.value ?: (k as? Both)?.rightValue,
+      map
+    )
+
+    val leftValue: A? = SA.run {
+      var accumulatedLeft: A? = null
+      if (this is Left<*>) (value as A).maybeCombine(accumulatedLeft) else accumulatedLeft
+      accumulatedLeft = if (this is Both<*, *>) (leftValue as A).maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (c is Left) return Left(c.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (c is Both) c.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (d is Left) return Left(d.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (d is Both) d.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (e is Left) return Left(e.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (e is Both) e.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (f is Left) return Left(f.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (f is Both) f.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (g is Left) return Left(g.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (g is Both) g.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (h is Left) return Left(h.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (h is Both) h.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (i is Left) return Left(i.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (i is Both) i.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (j is Left) return Left(j.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (j is Both) j.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (k is Left) return Left(k.value.maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (k is Both) k.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      accumulatedLeft
+    }
+
+    return when {
+      rightValue != null && leftValue == null -> Right(rightValue)
+      rightValue != null && leftValue != null -> Both(leftValue, rightValue)
+      rightValue == null && leftValue != null -> Left(leftValue)
+      else -> throw ArrowCoreInternalException
+    }
+  }
+
+  /**
+   * Binds the given function across [Ior.Right].
+   *
+   * @param f The function to bind across [Ior.Right].
+   */
+  inline fun <D> flatMap(SG: Semigroup<@UnsafeVariance A>, f: (B) -> Ior<@UnsafeVariance A, D>): Ior<A, D> =
+    when (this) {
+      is Left -> this@Ior
+      is Right -> f(this@Ior.value)
+      is Both -> with(SG) {
+        f(this@Ior.rightValue).fold(
+          { a -> Left(this@Ior.leftValue.combine(a)) },
+          { d -> Both(this@Ior.leftValue, d) },
+          { ll, rr -> Both(this@Ior.leftValue.combine(ll), rr) }
+        )
+      }
+    }
+
+  inline fun getOrElse(default: () -> @UnsafeVariance B): B =
+    fold({ default() }, ::identity, { _, b -> b })
+
+  fun combine(SA: Semigroup<@UnsafeVariance A>, SB: Semigroup<@UnsafeVariance B>, other: Ior<@UnsafeVariance A, @UnsafeVariance B>): Ior<A, B> =
+    with(SA) {
+      with(SB) {
+        when (val a = this@Ior) {
+          is Left -> when (other) {
+            is Left -> Left(a.value + other.value)
+            is Right -> Both(a.value, other.value)
+            is Both -> Both(a.value + other.leftValue, other.rightValue)
+          }
+          is Right -> when (other) {
+            is Left -> Both(other.value, a.value)
+            is Right -> Right(a.value + other.value)
+            is Both -> Both(other.leftValue, a.value + other.rightValue)
+          }
+          is Both -> when (other) {
+            is Left -> Both(a.leftValue + other.value, a.rightValue)
+            is Right -> Both(a.leftValue, a.rightValue + other.value)
+            is Both -> Both(a.leftValue + other.leftValue, a.rightValue + other.rightValue)
+          }
+        }
+      }
+    }
 }
 
-/**
- * Binds the given function across [Ior.Right].
- *
- * @param f The function to bind across [Ior.Right].
- */
+@Deprecated(IorExtensionDeprecated)
 inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> =
   when (this) {
     is Left -> this
@@ -692,6 +892,7 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
   zip(SG, ff.fix()) { a, f -> f(a) }
 
+@Deprecated(IorExtensionDeprecated)
 inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity, { _, b -> b })
 
@@ -702,17 +903,17 @@ inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
 fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
   fix().traverse(GA, ::identity)
 
-fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
+fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Both(this.first, this.second)
 
 @Deprecated(
   "Tuple2 is deprecated in favor of Kotlin's Pair. Please use the bothIor method defined for Pair instead.",
   level = DeprecationLevel.WARNING
 )
-fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
+fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Both(this.a, this.b)
 
-fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
+fun <A> A.leftIor(): Ior<A, Nothing> = Left(this)
 
-fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
+fun <A> A.rightIor(): Ior<Nothing, A> = Right(this)
 
 fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
   bitraverse(::identity, ::identity)
@@ -723,50 +924,27 @@ fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<A, Ior<
 fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
   bitraverseValidated(SA, ::identity, ::identity)
 
-fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
-  with(SA) {
-    with(SB) {
-      when (val a = this@combine) {
-        is Ior.Left -> when (other) {
-          is Ior.Left -> Ior.Left(a.value + other.value)
-          is Ior.Right -> Ior.Both(a.value, other.value)
-          is Ior.Both -> Ior.Both(a.value + other.leftValue, other.rightValue)
-        }
-        is Ior.Right -> when (other) {
-          is Ior.Left -> Ior.Both(other.value, a.value)
-          is Ior.Right -> Ior.Right(a.value + other.value)
-          is Ior.Both -> Ior.Both(other.leftValue, a.value + other.rightValue)
-        }
-        is Ior.Both -> when (other) {
-          is Ior.Left -> Ior.Both(a.leftValue + other.value, a.rightValue)
-          is Ior.Right -> Ior.Both(a.leftValue, a.rightValue + other.value)
-          is Ior.Both -> Ior.Both(a.leftValue + other.leftValue, a.rightValue + other.rightValue)
-        }
-      }
-    }
-  }
-
 @Suppress("NOTHING_TO_INLINE")
 inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
 fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
-  if (n <= 0) Ior.Right(emptyList())
+  if (n <= 0) Right(emptyList())
   else when (this) {
-    is Ior.Right -> Ior.Right(List(n) { value })
-    is Ior.Left -> this
-    is Ior.Both -> bimap(
+    is Right -> Right(List(n) { value })
+    is Left -> this
+    is Both -> bimap(
       { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
       { List(n) { rightValue } }
     )
   }
 
 fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
-  if (n <= 0) Ior.Right(MB.empty())
+  if (n <= 0) Right(MB.empty())
   else when (this) {
-    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.combineAll() })
-    is Ior.Left -> this
-    is Ior.Both -> bimap(
+    is Right -> Right(MB.run { List(n) { value }.combineAll() })
+    is Left -> this
+    is Both -> bimap(
       { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
       { MB.run { List(n) { rightValue }.combineAll() } }
     )
@@ -802,163 +980,6 @@ fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
 
 fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
-
-fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
-  zip(SA, fb, ::Pair)
-
-inline fun <A, B, C, D> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  map: (B, C) -> D
-): Ior<A, D> =
-  zip(SA, c, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-
-inline fun <A, B, C, D, E> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  map: (B, C, D) -> E
-): Ior<A, E> =
-  zip(SA, c, d, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  map: (B, C, D, E) -> F
-): Ior<A, F> =
-  zip(SA, c, d, e, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
-
-inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  map: (B, C, D, E, F) -> G
-): Ior<A, G> =
-  zip(SA, c, d, e, f, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
-
-inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  g: Ior<A, G>,
-  map: (B, C, D, E, F, G) -> H
-): Ior<A, H> =
-  zip(SA, c, d, e, f, g, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
-
-inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  g: Ior<A, G>,
-  h: Ior<A, H>,
-  map: (B, C, D, E, F, G, H) -> I
-): Ior<A, I> =
-  zip(SA, c, d, e, f, g, h, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  g: Ior<A, G>,
-  h: Ior<A, H>,
-  i: Ior<A, I>,
-  map: (B, C, D, E, F, G, H, I) -> J
-): Ior<A, J> =
-  zip(SA, c, d, e, f, g, h, i, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  g: Ior<A, G>,
-  h: Ior<A, H>,
-  i: Ior<A, I>,
-  j: Ior<A, J>,
-  map: (B, C, D, E, F, G, H, I, J) -> K
-): Ior<A, K> =
-  zip(SA, c, d, e, f, g, h, i, j, Ior.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
-  SA: Semigroup<A>,
-  c: Ior<A, C>,
-  d: Ior<A, D>,
-  e: Ior<A, E>,
-  f: Ior<A, F>,
-  g: Ior<A, G>,
-  h: Ior<A, H>,
-  i: Ior<A, I>,
-  j: Ior<A, J>,
-  k: Ior<A, K>,
-  map: (B, C, D, E, F, G, H, I, J, K) -> L
-): Ior<A, L> {
-  val rightValue: L? = Nullable.zip(
-    (this@zip as? Right)?.value ?: (this@zip as? Both)?.rightValue,
-    (c as? Right)?.value ?: (c as? Both)?.rightValue,
-    (d as? Right)?.value ?: (d as? Both)?.rightValue,
-    (e as? Right)?.value ?: (e as? Both)?.rightValue,
-    (f as? Right)?.value ?: (f as? Both)?.rightValue,
-    (g as? Right)?.value ?: (g as? Both)?.rightValue,
-    (h as? Right)?.value ?: (h as? Both)?.rightValue,
-    (i as? Right)?.value ?: (i as? Both)?.rightValue,
-    (j as? Right)?.value ?: (j as? Both)?.rightValue,
-    (k as? Right)?.value ?: (k as? Both)?.rightValue,
-    map
-  )
-
-  val leftValue: A? = SA.run {
-    var accumulatedLeft: A? = null
-    if (this@zip is Left) value.maybeCombine(accumulatedLeft) else accumulatedLeft
-    accumulatedLeft = if (this@zip is Both) leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (c is Left) return Left(c.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (c is Both) c.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (d is Left) return Left(d.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (d is Both) d.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (e is Left) return Left(e.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (e is Both) e.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (f is Left) return Left(f.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (f is Both) f.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (g is Left) return Left(g.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (g is Both) g.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (h is Left) return Left(h.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (h is Both) h.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (i is Left) return Left(i.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (i is Both) i.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (j is Left) return Left(j.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (j is Both) j.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    if (k is Left) return Left(k.value.maybeCombine(accumulatedLeft))
-    accumulatedLeft = if (k is Both) k.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
-
-    accumulatedLeft
-  }
-
-  return when {
-    rightValue != null && leftValue == null -> Right(rightValue)
-    rightValue != null && leftValue != null -> Both(leftValue, rightValue)
-    rightValue == null && leftValue != null -> Left(leftValue)
-    else -> throw ArrowCoreInternalException
-  }
-}
 
 fun <A, B> Semigroup.Companion.ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
   IorSemigroup(SA, SB)

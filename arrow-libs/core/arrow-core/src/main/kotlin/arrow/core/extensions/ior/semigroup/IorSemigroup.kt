@@ -15,8 +15,7 @@ import arrow.typeclasses.Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.combine(SGL, SGR, arg1)",
-    "arrow.core.combine"
+    "this.combine(SGL, SGR, arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,8 +37,7 @@ fun <L, R> Ior<L, R>.plus(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.combine(SGL, SGR, arg1)",
-    "arrow.core.combine"
+    "this.combine(SGL, SGR, arg1)"
   ),
   DeprecationLevel.WARNING
 )
