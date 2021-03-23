@@ -1,3 +1,5 @@
+@file:JvmName("Iterable")
+@file:JvmMultifileClass
 package arrow.core
 
 /**

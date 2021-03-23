@@ -129,6 +129,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
      * @return [null] if both [a] and [b] are [null]. Otherwise
      * an [Ior.Left], [Ior.Right], or [Ior.Both] if [a], [b], or both are defined (respectively).
      */
+    @JvmStatic
     fun <A, B> fromNullables(a: A?, b: B?): Ior<A, B>? =
       when (a != null) {
         true -> when (b != null) {
@@ -164,8 +165,10 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fun <L, A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>, SL: Semigroup<L>): Ior<L, B> =
       SL.run { loop(f(a).fix(), f) }
 
+    @JvmStatic
     fun <A, B> leftNel(a: A): IorNel<A, B> = Left(NonEmptyList.of(a))
 
+    @JvmStatic
     fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(NonEmptyList.of(a), b)
 
     /**
@@ -185,9 +188,11 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
      *  }
      *  ```
      */
+    @JvmStatic
     fun <A, B, C> lift(f: (B) -> C): (Ior<A, B>) -> Ior<A, C> =
       { it.map(f) }
 
+    @JvmStatic
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
       { it.bimap(fa, fb) }
 

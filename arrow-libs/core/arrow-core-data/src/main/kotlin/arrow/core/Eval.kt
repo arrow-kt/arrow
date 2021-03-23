@@ -120,6 +120,7 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * It will return 2.
      */
+    @JvmStatic
     fun <A> now(a: A): Eval<A> =
       Now(a)
 
@@ -141,6 +142,7 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
+    @JvmStatic
     inline fun <A> later(crossinline f: () -> A): Later<A> =
       Later { f() }
 
@@ -162,12 +164,15 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */
+    @JvmStatic
     inline fun <A> always(crossinline f: () -> A) =
       Always { f() }
 
+    @JvmStatic
     inline fun <A> defer(crossinline f: () -> Eval<A>): Eval<A> =
       Defer { f() }
 
+    @JvmStatic
     fun raise(t: Throwable): Eval<Nothing> =
       defer { throw t }
 
