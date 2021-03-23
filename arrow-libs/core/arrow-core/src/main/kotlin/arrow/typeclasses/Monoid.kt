@@ -32,31 +32,31 @@ interface Monoid<A> : Semigroup<A> {
 
   companion object {
     @JvmStatic
-    @JvmName("bool")
+    @JvmName("Boolean")
     fun boolean(): Monoid<Boolean> = AndMonoid
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Byte")
     fun byte(): Monoid<Byte> = ByteMonoid
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Double")
     fun double(): Monoid<Double> = DoubleMonoid
 
     @JvmStatic
-    @JvmName("integer")
+    @JvmName("Integer")
     fun int(): Monoid<Int> = IntMonoid
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Long")
     fun long(): Monoid<Long> = LongMonoid
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Short")
     fun short(): Monoid<Short> = ShortMonoid
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Float")
     fun float(): Monoid<Float> = FloatMonoid
 
     @JvmStatic
@@ -80,7 +80,7 @@ interface Monoid<A> : Semigroup<A> {
       }
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("constant")
     fun <A, T> const(MA: Monoid<A>): Monoid<Const<A, T>> =
       object : Monoid<Const<A, T>> {
         override fun empty(): Const<A, T> = Const(MA.empty())

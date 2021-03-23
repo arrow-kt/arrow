@@ -9,24 +9,22 @@ import java.util.Map;
 public class SemigroupUsageTest {
 
     public void testUsage() {
-        Semigroup<Boolean> bool = Semigroup.bool();
-        Semigroup<Integer> integer = Semigroup.integer();
+        Semigroup<Boolean> bool = Semigroup.Boolean();
+        Semigroup<Integer> integer = Semigroup.Integer();
         Semigroup<List<Integer>> list = Semigroup.list();
         Semigroup<String> string = Semigroup.string();
         Semigroup<Sequence<Integer>> sequence = Semigroup.sequence();
-        Semigroup<Either<Boolean, Integer>> either = Semigroup.either(Semigroup.bool(), Semigroup.integer());
-        Semigroup<Ior<Boolean, Integer>> ior = Semigroup.ior(Semigroup.bool(), Semigroup.integer());
+        Semigroup<Either<Boolean, Integer>> either = Semigroup.either(Semigroup.Boolean(), Semigroup.Integer());
+        Semigroup<Ior<Boolean, Integer>> ior = Semigroup.ior(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<Endo<Integer>> endo = Semigroup.endo();
-        Semigroup<Map<String, Integer>> map = Semigroup.map(Semigroup.integer());
-        Semigroup<Option<Integer>> option = Semigroup.option(Semigroup.integer());
-        Semigroup<Validated<Boolean, Integer>> validated = Semigroup.validated(Semigroup.bool(), Semigroup.integer());
+        Semigroup<Map<String, Integer>> map = Semigroup.map(Semigroup.Integer());
+        Semigroup<Option<Integer>> option = Semigroup.option(Semigroup.Integer());
+        Semigroup<Validated<Boolean, Integer>> validated = Semigroup.validated(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<NonEmptyList<Integer>> nonEmptyList = Semigroup.nonEmptyList();
-
-        // TODO fix
-//        Semigroup.const(Semigroup.integer());
-//        Semigroup.byte();
-//        Semigroup.double();
-//        Semigroup.float();
-//        Semigroup.short();
+        Semigroup<Const<Integer, Object>> constant = Semigroup.constant(Semigroup.Integer());
+        Semigroup<Byte> aByte = Semigroup.Byte();
+        Semigroup<Double> aDouble = Semigroup.Double();
+        Semigroup<Float> aFloat = Semigroup.Float();
+        Semigroup<Short> aShort = Semigroup.Short();
     }
 }

@@ -12,22 +12,22 @@ import java.util.Map;
 public class MonoidUsageTest {
 
     public void testUsage() {
-        Monoid<Boolean> bool = Monoid.bool();
-        Monoid<Integer> integer = Monoid.integer();
-        Monoid<List<Integer>> list = Monoid.list();
-        Monoid<String> string = Monoid.string();
-        Monoid<Sequence<Integer>> sequence = Monoid.sequence();
-        Monoid<Either<Boolean, Integer>> either = Monoid.either(Monoid.bool(), Monoid.integer());
-        Monoid<Endo<Integer>> endo = Monoid.endo();
-        Monoid<Map<String, Integer>> map = Monoid.map(Semigroup.integer());
-        Monoid<Option<Integer>> option = Monoid.option(Semigroup.integer());
-        Monoid<Validated<Integer, Boolean>> validated = Monoid.validated(Semigroup.integer(), Monoid.bool());
+        Monoid<Byte> aByte = Monoid.Byte();
+        Monoid<Double> aDouble = Monoid.Double();
+        Monoid<Float> aFloat = Monoid.Float();
+        Monoid<Short> aShort = Monoid.Short();
+        Monoid<Boolean> bool = Monoid.Boolean();
+        Monoid<Integer> integer = Monoid.Integer();
 
-        // TODO fix
-//        Monoid.const(Monoid.integer());
-//        Monoid.byte();
-//        Monoid.double();
-//        Monoid.float();
-//        Monoid.short();
+        Monoid<String> string = Monoid.string();
+        Monoid<List<Integer>> list = Monoid.list();
+        Monoid<Sequence<Integer>> sequence = Monoid.sequence();
+        Monoid<Either<Boolean, Integer>> either = Monoid.either(Monoid.Boolean(), Monoid.Integer());
+        Monoid<Endo<Integer>> endo = Monoid.endo();
+        Monoid<Map<String, Integer>> map = Monoid.map(Semigroup.Integer());
+        Monoid<Option<Integer>> option = Monoid.option(Semigroup.Integer());
+        Monoid<Validated<Integer, Boolean>> validated = Monoid.validated(Semigroup.Integer(), Monoid.Boolean());
+
+        Monoid.constant(Monoid.Integer());
     }
 }

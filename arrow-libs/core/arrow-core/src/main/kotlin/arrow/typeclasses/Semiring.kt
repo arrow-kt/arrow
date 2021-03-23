@@ -62,27 +62,27 @@ interface Semiring<A> {
 
   companion object {
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Float")
     fun float(): Semiring<Float> = FloatSemiring
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Short")
     fun short(): Semiring<Short> = ShortSemiring
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Long")
     fun long(): Semiring<Long> = LongSemiring
 
     @JvmStatic
-    @JvmName("integer")
+    @JvmName("Integer")
     fun int(): Semiring<Int> = IntSemiring
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Double")
     fun double(): Semiring<Double> = DoubleSemiring
 
     @JvmStatic
-    // @JvmName("?")
+    @JvmName("Byte")
     fun byte(): Semiring<Byte> = ByteSemiring
 
     private object ByteSemiring : Semiring<Byte> {
