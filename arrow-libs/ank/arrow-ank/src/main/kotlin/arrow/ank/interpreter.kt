@@ -3,8 +3,11 @@ package arrow.ank
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.Tuple3
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
+import arrow.core.toT
 import arrow.fx.coroutines.IOPool
 import arrow.fx.coroutines.evalOn
 import java.io.PrintWriter
@@ -108,11 +111,11 @@ val interpreter: AnkOps = object : AnkOps {
   val fenceRegexStart = "```(.*):ank.*".toRegex()
   val fenceRegexEnd = "```.*".toRegex()
 
-  override fun extractCode(content: Sequence<String>): Pair<Sequence<String>, Sequence<Snippet>> {
-    val result: Triple<SnippetParserState, Sequence<String>, Sequence<Snippet>> =
+  override fun extractCode(content: Sequence<String>): Tuple2<Sequence<String>, Sequence<Snippet>> {
+    val result: Tuple3<SnippetParserState, Sequence<String>, Sequence<Snippet>> =
       content
         .fold(
-          Triple(SnippetParserState.Searching as SnippetParserState, emptySequence(), emptySequence())
+          Tuple3(SnippetParserState.Searching as SnippetParserState, emptySequence(), emptySequence())
         ) { (state: SnippetParserState, lines, snippets), line ->
           when (state) {
             is SnippetParserState.Searching -> {
@@ -120,38 +123,38 @@ val interpreter: AnkOps = object : AnkOps {
               if (startMatch != null) { // found a fence start
                 val lang = startMatch.groupValues[1].trim()
                 val snippet = Snippet(line, lang, "")
-                Triple(SnippetParserState.CollectingCode(snippet), lines + line, snippets)
-              } else Triple(state, lines + line, snippets) // we are still searching
+                Tuple3(SnippetParserState.CollectingCode(snippet), lines + line, snippets)
+              } else Tuple3(state, lines + line, snippets) // we are still searching
             }
             is SnippetParserState.CollectingCode -> {
               val endMatch = fenceRegexEnd.matchEntire(line)
               if (endMatch != null) { // found a fence end
-                Triple(SnippetParserState.Searching, lines + line, snippets + state.snippet.copy(fence = state.snippet.fence + "\n" + line))
+                Tuple3(SnippetParserState.Searching, lines + line, snippets + state.snippet.copy(fence = state.snippet.fence + "\n" + line))
               } else { // accumulating code inside a fence
                 val modifiedSnippet = state.snippet.copy(
                   fence = state.snippet.fence + "\n" + line,
                   code = state.snippet.code + (if (state.snippet.code.isEmpty()) "" else "\n") + line
                 )
-                Triple(state.copy(snippet = modifiedSnippet), lines + line, snippets)
+                Tuple3(state.copy(snippet = modifiedSnippet), lines + line, snippets)
               }
             }
           }
         }
-    return result.second to result.third
+    return result.b toT result.c
   }
 
-  override suspend fun compileCode(snippets: Pair<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> =
-    getEngineCache(snippets.second, compilerArgs).let { engineCache ->
+  override suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> =
+    getEngineCache(snippets.b, compilerArgs).let { engineCache ->
       // run each snipped and handle its result
-      snippets.second.mapIndexed { i, snip ->
+      snippets.b.mapIndexed { i, snip ->
         val result = try {
           if (snip.isPlaygroundExtension) ""
           else engineCache.getOrElse(snip.lang) {
             throw CompilationException(
-              path = snippets.first,
+              path = snippets.a,
               snippet = snip,
               underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
-              msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.first} ]")
+              msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
             )
           }.eval(snip.code)
         } catch (e: Exception) {
@@ -162,9 +165,9 @@ val interpreter: AnkOps = object : AnkOps {
             e.printStackTrace(pw)
             return@mapIndexed snip.copy(result = sw.toString().some())
           } else {
-            println(colored(ANSI_RED, "[✗ ${snippets.first} [${i + 1}]"))
-            throw CompilationException(snippets.first, snip, e, msg = "\n" + """
-                    | File located at: ${snippets.first}
+            println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
+            throw CompilationException(snippets.a, snip, e, msg = "\n" + """
+                    | File located at: ${snippets.a}
                     |
                     |```
                     |${snip.code}
@@ -185,7 +188,7 @@ val interpreter: AnkOps = object : AnkOps {
               // write result to a new file
               snip.isOutFile -> {
                 val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
-                val dir = snippets.first.parent
+                val dir = snippets.a.parent
                 Files.write(dir.resolve(fileName), result.toString().toByteArray())
                 Some("")
               }

@@ -76,7 +76,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Calculate the number of targets
    */
-  fun size(s: S) = foldMap(Monoid.int(), s = s, f = { _ -> 1 })
+  fun size(s: S) = foldMap(Int.monoid(), s = s, f = { _ -> 1 })
 
   /**
    * Check if all targets satisfy the predicate
