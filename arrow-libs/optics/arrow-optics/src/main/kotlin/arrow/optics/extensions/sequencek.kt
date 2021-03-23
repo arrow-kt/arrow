@@ -56,7 +56,7 @@ interface SequenceKEach<A> : Each<SequenceK<A>, A> {
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "FilterIndex.sequence<A>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -77,7 +77,7 @@ interface SequenceKFilterIndex<A> : FilterIndex<SequenceK<A>, Int, A> {
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Index.sequence<A>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )

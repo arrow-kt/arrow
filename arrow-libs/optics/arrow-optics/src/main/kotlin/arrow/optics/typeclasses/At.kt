@@ -2,11 +2,13 @@ package arrow.optics.typeclasses
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.getOption
 import arrow.optics.Fold
 import arrow.optics.Getter
 import arrow.optics.Iso
 import arrow.optics.Lens
 import arrow.optics.Optional
+import arrow.optics.PLens
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
@@ -111,6 +113,20 @@ fun interface At<S, I, A> {
      */
     fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> =
       At { i -> iso compose AT.at(i) }
+
+    @JvmStatic
+    fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
+      At { i ->
+        PLens(
+          get = { it.getOption(i) },
+          set = { map, optV ->
+            optV.fold(
+              { map - i },
+              { map + (i to it) }
+            )
+          }
+        )
+      }
   }
 }
 

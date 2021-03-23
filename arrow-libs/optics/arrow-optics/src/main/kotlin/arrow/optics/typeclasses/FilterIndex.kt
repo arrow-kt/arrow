@@ -65,5 +65,18 @@ fun interface FilterIndex<S, I, A> {
             }
         }
       }
+
+    @JvmStatic
+    fun <K, V> map(): FilterIndex<Map<K, V>, K, V> = FilterIndex { p ->
+      object : Traversal<Map<K, V>, V> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
+          s.toList().k().traverse(FA) { (k, v) ->
+            (if (p(k)) f(v) else just(v)).map {
+              k to it
+            }
+          }.map { it.toMap() }
+        }
+      }
+    }
   }
 }

@@ -124,6 +124,16 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     @JvmStatic
     fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
       eitherToPValidated()
+
+    /**
+     * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
+     */
+    @JvmStatic
+    fun <K> mapToSet(): Iso<Map<K, Unit>, Set<K>> =
+      Iso(
+        get = { it.keys },
+        reverseGet = { keys -> keys.map { it to Unit }.toMap() }
+      )
   }
 
   /**

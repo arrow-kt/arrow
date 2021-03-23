@@ -155,7 +155,6 @@ fun interface Index<S, I, A> {
   operator fun <T> Fold<T, S>.get(i: I): Fold<T, A> = this.compose(this@Index.index(i))
 
   companion object {
-
     /**
      * Lift an instance of [Index] using an [Iso].
      *
@@ -175,6 +174,15 @@ fun interface Index<S, I, A> {
         POptional(
           getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
           set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } }
+        )
+      }
+
+    @JvmStatic
+    fun <K, V> map(): Index<Map<K, V>, K, V> =
+      Index { i ->
+        POptional(
+          getOrModify = { it[i]?.right() ?: it.left() },
+          set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
         )
       }
   }
