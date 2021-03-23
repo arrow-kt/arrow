@@ -11,13 +11,13 @@ import arrow.core.IorOf
 import arrow.core.IorPartialOf
 import arrow.core.LT
 import arrow.core.Ordering
-import arrow.core.ap
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix
 import arrow.core.flatMap
 import arrow.core.leftIor
 import arrow.core.rightIor
+import arrow.core.zip
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -103,16 +103,12 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
-    fix().ap(SL(), ff)
+    fix().zip(SL(), ff.fix()) { a, f -> f(a) }
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.apEval(ff: Eval<Kind<IorPartialOf<L>, (A) -> B>>): Eval<Kind<IorPartialOf<L>, B>> =
     fix().fold(
-      { l ->
-        Eval.now(l.leftIor())
-      },
-      { r ->
-        ff.map { it.fix().map { f -> f(r) } }
-      },
+      { l -> Eval.now(l.leftIor()) },
+      { r -> ff.map { it.fix().map { f -> f(r) } } },
       { l, r ->
         ff.map {
           it.fix().fold(
@@ -144,7 +140,7 @@ interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorApply<L> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
-    fix().ap(SL(), ff)
+    fix().zip(SL(), ff.fix()) { a, f -> f(a) }
 }
 
 @Deprecated(
@@ -161,7 +157,7 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
     fix().flatMap(SL()) { f(it).fix() }
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
-    fix().ap(SL(), ff)
+    fix().zip(SL(), ff.fix()) { a, f -> f(a) }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())

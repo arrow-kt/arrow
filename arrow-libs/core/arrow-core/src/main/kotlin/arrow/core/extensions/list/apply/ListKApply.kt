@@ -2,7 +2,6 @@ package arrow.core.extensions.list.apply
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.core.ap as _ap
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.ForListK
 import arrow.core.Tuple10
@@ -34,9 +33,9 @@ const val ListMapNDeprecated =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ap(arg1)", "arrow.core.ap"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("flatMap { a -> ff.map { f -> f(a) } }"))
 fun <A, B> List<A>.ap(arg1: List<Function1<A, B>>): List<B> =
-  _ap(arg1)
+  _flatMap { a -> arg1.map { f -> f(a) } }
 
 @JvmName("apEval")
 @Suppress(
@@ -45,9 +44,9 @@ fun <A, B> List<A>.ap(arg1: List<Function1<A, B>>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { this.ap(it.fix()) }.map { it.k() }", "arrow.core.k", "arrow.core.fix"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { ff -> flatMap { a -> ff.fix().map { f -> f(a) } } }.map { it.k() }", "arrow.core.k", "arrow.core.fix"))
 fun <A, B> List<A>.apEval(arg1: Eval<Kind<ForListK, Function1<A, B>>>): Eval<Kind<ForListK, B>> =
-  arg1.map { this.ap(it.fix()) }.map { it.k() }
+  arg1.map { ff -> _flatMap { a -> ff.fix().map { f -> f(a) } } }.map { it.k() }
 
 @JvmName("map2Eval")
 @Suppress(

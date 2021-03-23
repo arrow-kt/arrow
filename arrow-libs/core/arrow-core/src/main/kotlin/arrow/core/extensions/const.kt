@@ -30,7 +30,6 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseDeprecation
 import arrow.typeclasses.TraverseFilter
-import arrow.core.ap as constAp
 import arrow.core.combine as combineAp
 
 @Deprecated(
@@ -95,7 +94,7 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    fix().zip<(T) -> U, U>(MA(), ff.fix()) { a, f -> f(a) }
 }
 
 @Deprecated(
@@ -114,7 +113,7 @@ interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
   }.empty().fix()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    fix().zip<(T) -> U, U>(MA(), ff.fix()) { a, f -> f(a) }
 }
 
 @Deprecated(

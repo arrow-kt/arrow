@@ -7,6 +7,7 @@ import kotlinx.atomicfu.atomic
  * An eager Promise implementation to bridge results across processes internally.
  * @see ForkAndForget
  */
+@Deprecated("UnsafePromise is deprecated. Same use-cases covered by KotlinX CompletableDeferred.")
 class UnsafePromise<A> {
 
   private sealed class State<out A> {

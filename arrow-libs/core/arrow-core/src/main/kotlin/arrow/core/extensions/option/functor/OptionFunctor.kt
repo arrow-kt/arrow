@@ -155,7 +155,8 @@ fun <A> Kind<ForOption, A>.void(): Option<Unit> = arrow.core.Option.functor().ru
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "fproduct(arg1)"
+    "map { a -> Tuple2(a, arg1(a)) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -192,7 +193,7 @@ fun <A, B> Kind<ForOption, A>.fproduct(arg1: Function1<A, B>): Option<Tuple2<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "mapConst(arg1)"
+    "map { arg1 }"
   ),
   DeprecationLevel.WARNING
 )
@@ -213,7 +214,7 @@ fun <A, B> Kind<ForOption, A>.mapConst(arg1: B): Option<B> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.mapConst(this)"
+    "arg1.map { this }"
   ),
   DeprecationLevel.WARNING
 )
@@ -249,7 +250,8 @@ fun <A, B> A.mapConst(arg1: Kind<ForOption, B>): Option<A> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "tupleLeft(arg1)"
+    "map { a -> Tuple2(arg1, a) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -286,7 +288,8 @@ fun <A, B> Kind<ForOption, A>.tupleLeft(arg1: B): Option<Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "tupleRight(arg1)"
+    "map { a -> Tuple2(a, arg1) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

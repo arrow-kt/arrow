@@ -32,7 +32,7 @@ internal val apply_singleton: OptionApply = object : arrow.core.extensions.Optio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "ap(arg1)"
+    "ff.fix().flatMap { this.fix().map(it) }", "arrow.core.fix()"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,12 +51,14 @@ fun <A, B> Kind<ForOption, A>.ap(arg1: Kind<ForOption, Function1<A, B>>): Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "apEval(arg1)"
+    "arg1.map { ff -> ff.fix().flatMap { this.fix().map(it) } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.apEval(arg1: Eval<Kind<ForOption, Function1<A, B>>>):
-  Eval<Kind<ForOption, B>> = arrow.core.Option.apply().run {
+  Eval<Kind<ForOption, B>> =
+  arrow.core.Option.apply().run {
   this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.core.ForOption, B>>
 }
 
@@ -70,16 +72,16 @@ fun <A, B> Kind<ForOption, A>.apEval(arg1: Eval<Kind<ForOption, Function1<A, B>>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "zipEval(arg1) { b, c -> arg2(Tuple2(b, c)) }",
-    "arrow.core.Tuple2",
-    "arrow.core.zipEval"
+    "arg1.map { fb -> fix().zip(fb.fix()) { a, b -> arg2(Tuple2(a, b)) } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, Z> Kind<ForOption, A>.map2Eval(
   arg1: Eval<Kind<ForOption, B>>,
   arg2: Function1<Tuple2<A, B>, Z>
-): Eval<Kind<ForOption, Z>> = arrow.core.Option.apply().run {
+): Eval<Kind<ForOption, Z>> =
+  arrow.core.Option.apply().run {
   this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as arrow.core.Eval<arrow.Kind<arrow.core.ForOption,
     Z>>
 }

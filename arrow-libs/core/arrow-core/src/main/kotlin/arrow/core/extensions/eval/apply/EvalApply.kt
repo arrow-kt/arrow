@@ -30,10 +30,7 @@ internal val apply_singleton: EvalApply = object : arrow.core.extensions.EvalApp
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ap(arg1)",
-    "arrow.core.ap"
-  ),
+  ReplaceWith("arg1.fix().flatMap { f -> map(f) }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.ap(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
@@ -50,10 +47,7 @@ fun <A, B> Kind<ForEval, A>.ap(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "apEval(arg1)",
-    "arrow.core.apEval"
-  ),
+  ReplaceWith("arg1.map { ff -> ff.fix().flatMap { f -> fix().map(f) } }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.apEval(arg1: Eval<Kind<ForEval, Function1<A, B>>>): Eval<Kind<ForEval, B>> =
@@ -71,8 +65,7 @@ fun <A, B> Kind<ForEval, A>.apEval(arg1: Eval<Kind<ForEval, Function1<A, B>>>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "map2Eval(arg1, arg2)",
-    "arrow.core.map2Eval"
+    "arg1.map { zip(it) { a, b -> arg2(Tuple2(a, b)) } }", "arrow.core.Tuple2", "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
 )

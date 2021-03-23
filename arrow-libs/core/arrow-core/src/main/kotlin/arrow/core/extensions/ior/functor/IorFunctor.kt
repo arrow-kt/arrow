@@ -100,7 +100,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.void(): Ior<L, Unit> = arrow.core.Ior.functo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.fproduct(arg1)"
+    "map { b -> b to arg1(b) }"
   ),
   DeprecationLevel.WARNING
 )
@@ -119,7 +119,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.fproduct(arg1: Function1<A, B>): Ior<L, T
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.mapConst(arg1)"
+    "this.map { arg1 }"
   ),
   DeprecationLevel.WARNING
 )
@@ -138,7 +138,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mapConst(arg1: B): Ior<L, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.mapConst(this)"
+    "arg1.map { this }"
   ),
   DeprecationLevel.WARNING
 )
@@ -156,9 +156,7 @@ fun <L, A, B> A.mapConst(arg1: Kind<Kind<ForIor, L>, B>): Ior<L, A> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.tupleLeft(arg1)"
-  ),
+  ReplaceWith("map { b -> arg1 to b }"),
   DeprecationLevel.WARNING
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.tupleLeft(arg1: B): Ior<L, Tuple2<B, A>> =
@@ -176,7 +174,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.tupleLeft(arg1: B): Ior<L, Tuple2<B, A>> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.tupleRight(arg1)"
+    " map { b -> b to arg1 }"
   ),
   DeprecationLevel.WARNING
 )

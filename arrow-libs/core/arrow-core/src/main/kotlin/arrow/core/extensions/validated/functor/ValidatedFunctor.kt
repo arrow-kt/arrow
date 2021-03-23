@@ -79,9 +79,9 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.void(): Validated<E, Unit> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fproduct(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1(a)) }", "arrow.core.Tuple2"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.fproduct(arg1: Function1<A, B>): Validated<E, Tuple2<A, B>> =
-  fix().fproduct(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(a, arg1(a)) }
 
 @JvmName("mapConst")
 @Suppress(
@@ -90,9 +90,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.fproduct(arg1: Function1<A, B>): Va
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("mapConst(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { arg1 }"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.mapConst(arg1: B): Validated<E, B> =
-  fix().mapConst(arg1)
+  map { arg1 }
 
 @JvmName("mapConst")
 @Suppress(
@@ -101,9 +101,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.mapConst(arg1: B): Validated<E, B> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.mapConst(this)", "arrow.core.mapConst"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { this }"))
 fun <E, A, B> A.mapConst(arg1: Kind<Kind<ForValidated, E>, B>): Validated<E, A> =
-  arg1.fix().mapConst(this)
+  arg1.map { this }
 
 @JvmName("tupleLeft")
 @Suppress(
@@ -112,9 +112,9 @@ fun <E, A, B> A.mapConst(arg1: Kind<Kind<ForValidated, E>, B>): Validated<E, A> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleLeft(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(arg1, a) }"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleLeft(arg1: B): Validated<E, Tuple2<B, A>> =
-  fix().tupleLeft(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(arg1, a) }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -123,9 +123,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleLeft(arg1: B): Validated<E, Tu
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleRight(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1) }"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleRight(arg1: B): Validated<E, Tuple2<A, B>> =
-  fix().tupleRight(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(a, arg1) }
 
 @JvmName("widen")
 @Suppress(

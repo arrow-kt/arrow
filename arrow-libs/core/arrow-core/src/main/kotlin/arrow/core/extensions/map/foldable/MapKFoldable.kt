@@ -329,22 +329,6 @@ fun <K, A> Map<K, A>.nonEmpty(): Boolean =
 fun <K, A> Map<K, A>.isNotEmpty(): Boolean =
   _isNotEmpty()
 
-@JvmName("foldMapA")
-@Suppress(
-  "UNCHECKED_CAST",
-  "USELESS_CAST",
-  "EXTENSION_SHADOWED_BY_MEMBER",
-  "UNUSED_PARAMETER"
-)
-@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Map")
-fun <K, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Map<K, A>.foldMapA(
-  arg1: AP,
-  arg2: MO,
-  arg3: Function1<A, Kind<G, B>>
-): Kind<G, B> = arrow.core.extensions.map.foldable.Map.foldable<K>().run {
-  arrow.core.MapK(this@foldMapA).foldMapA<G, A, B, AP, MO>(arg1, arg2, arg3) as arrow.Kind<G, B>
-}
-
 @JvmName("foldMapM")
 @Suppress(
   "UNCHECKED_CAST",

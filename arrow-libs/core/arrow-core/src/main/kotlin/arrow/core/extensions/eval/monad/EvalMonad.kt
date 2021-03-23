@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Eval.Companion
 import arrow.core.ForEval
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.EvalMonad
 
@@ -41,14 +42,7 @@ fun <A, B> Kind<ForEval, A>.flatMap(arg1: Function1<A, Kind<ForEval, B>>): Eval<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Eval.tailRecM(arg0, arg1)",
-    "arrow.core.Eval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForEval, Either<A, B>>>): Eval<B> =
   arrow.core.Eval
     .monad()
@@ -146,10 +140,7 @@ fun <A, B> Kind<ForEval, A>.followedBy(arg1: Kind<ForEval, B>): Eval<B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "apTap(arg1)",
-    "arrow.core.apTap"
-  ),
+  ReplaceWith("fix().flatMap { arg1.fix() }", "arrow.core.fix", "arrow.core.flatMap"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.apTap(arg1: Kind<ForEval, B>): Eval<A> =
@@ -186,10 +177,7 @@ fun <A, B> Kind<ForEval, A>.followedByEval(arg1: Eval<Kind<ForEval, B>>): Eval<B
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "flatTap(arg1)",
-    "arrow.core.flatTap"
-  ),
+  ReplaceWith("flatMap { a -> arg1(a).fix().map { a } }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.effectM(arg1: Function1<A, Kind<ForEval, B>>): Eval<A> =
@@ -206,10 +194,7 @@ fun <A, B> Kind<ForEval, A>.effectM(arg1: Function1<A, Kind<ForEval, B>>): Eval<
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "flatTap(arg1)",
-    "arrow.core.flatTap"
-  ),
+  ReplaceWith("flatMap { a -> arg1(a).fix().map { a } }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.flatTap(arg1: Function1<A, Kind<ForEval, B>>): Eval<A> =

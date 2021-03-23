@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyList.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.NonEmptyListMonad
 import kotlin.Boolean
@@ -51,14 +52,7 @@ fun <A, B> Kind<ForNonEmptyList, A>.flatMap(arg1: Function1<A, Kind<ForNonEmptyL
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "NonEmptyList.tailRecM(arg0) { arg1(it) }",
-    "arrow.core.NonEmptyList"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForNonEmptyList, Either<A, B>>>):
   NonEmptyList<B> = arrow.core.NonEmptyList
     .monad()
@@ -340,11 +334,7 @@ fun <A, B> Kind<ForNonEmptyList, A>.mproduct(arg1: Function1<A, Kind<ForNonEmpty
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "fix().ifM<B>(arg1.fix(), arg2.fix())",
-    "arrow.core.fix",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap { if(it) arg1() else arg2() }"),
   DeprecationLevel.WARNING
 )
 fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
@@ -364,11 +354,7 @@ fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
-    "arrow.core.fix",
-    "arrow.core.selectM"
-  ),
+  ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
@@ -387,9 +373,7 @@ fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
-    "arrow.core.fix",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }"
   ),
   DeprecationLevel.WARNING
 )

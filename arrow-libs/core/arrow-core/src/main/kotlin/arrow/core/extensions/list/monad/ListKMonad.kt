@@ -4,10 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKMonad
 import arrow.core.fix
-import arrow.core.tailRecMIterable
 import kotlin.Boolean
 import kotlin.collections.flatMap as _flatMap
 import kotlin.Function0
@@ -35,9 +36,9 @@ fun <A, B> List<A>.flatMap(arg1: Function1<A, Kind<ForListK, B>>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tailRecMIterable(arg0) { arg1(it) }"))
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForListK, Either<A, B>>>): List<B> =
-  tailRecMIterable(arg0) { arg1(it).fix() }
+  ListK.tailRecM(arg0, arg1)
 
 @JvmName("map")
 @Suppress(
@@ -221,7 +222,7 @@ fun <A, B> List<A>.mproduct(arg1: Function1<A, Kind<ForListK, B>>): List<Tuple2<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("ifM(arg1, arg2)", "arrow.core.ifM"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { bool -> if (bool) arg1() else arg2() }"))
 fun <B> List<Boolean>.ifM(arg1: Function0<Kind<ForListK, B>>, arg2: Function0<Kind<ForListK, B>>):
   List<B> = arrow.core.extensions.list.monad.List.monad().run {
     arrow.core.ListK(this@ifM).ifM<B>(arg1, arg2) as kotlin.collections.List<B>
@@ -234,7 +235,7 @@ fun <B> List<Boolean>.ifM(arg1: Function0<Kind<ForListK, B>>, arg2: Function0<Ki
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("selectM(arg1)", "arrow.core.selectM"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> listOf(b) }) }"))
 fun <A, B> List<Either<A, B>>.selectM(arg1: List<Function1<A, B>>): List<B> =
   arrow.core.extensions.list.monad.List.monad().run {
     arrow.core.ListK(this@selectM).selectM<A, B>(arrow.core.ListK(arg1)) as kotlin.collections.List<B>
@@ -247,7 +248,7 @@ fun <A, B> List<Either<A, B>>.selectM(arg1: List<Function1<A, B>>): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("select(arg1)", "arrow.core.select"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> listOf(b) }) }"))
 fun <A, B> List<Either<A, B>>.select(arg1: List<Function1<A, B>>): List<B> =
   arrow.core.extensions.list.monad.List.monad().run {
     arrow.core.ListK(this@select).select<A, B>(arrow.core.ListK(arg1)) as kotlin.collections.List<B>
