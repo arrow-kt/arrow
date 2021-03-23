@@ -3,13 +3,9 @@ package arrow.core.extensions.either.applicativeError
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.handleErrorWith as _handleErrorWith
-import arrow.core.handleError as _handleError
-import arrow.core.redeem as _redeem
 import arrow.core.Either.Companion
 import arrow.core.ForEither
 import arrow.core.ForOption
-import arrow.core.Left
-import arrow.core.Right
 import arrow.core.extensions.EitherApplicativeError
 import arrow.core.fix
 import arrow.core.left
@@ -37,7 +33,7 @@ internal val applicativeError_singleton: EitherApplicativeError<Any?> = object :
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("handleErrorWith(arg1)", "arrow.core.handleErrorWith"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("handleErrorWith(arg1)"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.handleErrorWith(
   arg1: Function1<L, Kind<Kind<ForEither, L>,
       A>>
@@ -86,7 +82,7 @@ fun <L, A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, L>): Either<L, A> =
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("handleError(arg1)"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.handleError(arg1: Function1<L, A>): Either<L, A> =
-  fix()._handleError(arg1)
+  fix().handleError(arg1)
 
 @JvmName("redeem")
 @Suppress(
@@ -97,7 +93,7 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.handleError(arg1: Function1<L, A>): Eithe
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("redeem(arg1, arg2)"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.redeem(arg1: Function1<L, B>, arg2: Function1<A, B>): Either<L, B> =
-  fix()._redeem(arg1, arg2)
+  fix().redeem(arg1, arg2)
 
 @JvmName("attempt")
 @Suppress(
@@ -106,9 +102,10 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.redeem(arg1: Function1<L, B>, arg2: Fu
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { it.right() }.handleErrorWith { it.left().right() }", "arrow.core.right", "arrow.core.left", "arrow.core.handleErrorWith"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { it.right() as Either<L, A> }.handleErrorWith { it.left().right() }", "arrow.core.right", "arrow.core.left"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.attempt(): Either<L, Either<L, A>> =
-  fix().map { Right(it) }.handleErrorWith { Left(it).right() }
+  fix().map { it.right() as Either<L, A> }
+    .handleErrorWith { it.left().right() }
 
 @JvmName("catch")
 @Suppress(

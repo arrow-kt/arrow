@@ -14,7 +14,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("combine(SGL, SGR, arg1)", "arrow.core.combine"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("combine(SGL, SGR, arg1)"))
 fun <L, R> Either<L, R>.plus(
   SGL: Semigroup<L>,
   SGR: Semigroup<R>,
@@ -30,7 +30,7 @@ fun <L, R> Either<L, R>.plus(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("maybeCombine(SGL, SGR, arg1)", "arrow.core.combine"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("maybeCombine(SGL, SGR, arg1)"))
 fun <L, R> Either<L, R>.maybeCombine(
   SGL: Semigroup<L>,
   SGR: Semigroup<R>,

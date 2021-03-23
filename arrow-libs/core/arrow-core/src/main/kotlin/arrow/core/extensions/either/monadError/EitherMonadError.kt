@@ -2,8 +2,6 @@ package arrow.core.extensions.either.monadError
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.ensure as _ensure
-import arrow.core.redeemWith as _redeemWith
 import arrow.core.flatten as _flatten
 import arrow.core.Either.Companion
 import arrow.core.ForEither
@@ -30,10 +28,10 @@ internal val monadError_singleton: EitherMonadError<Any?> = object : EitherMonad
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ensure(arg1, arg2)", "arrow.core.ensure"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ensure(arg1, arg2)"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.ensure(arg1: Function0<L>, arg2: Function1<A, Boolean>):
   Either<L, A> =
-    fix()._ensure(arg1, arg2)
+    fix().ensure(arg1, arg2)
 
 @JvmName("redeemWith")
 @Suppress(
@@ -42,13 +40,13 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.ensure(arg1: Function0<L>, arg2: Function
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("redeemWith(arg1, arg2)", "arrow.core.redeemWith"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("redeemWith(arg1, arg2)"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.redeemWith(
   arg1: Function1<L, Kind<Kind<ForEither, L>,
       B>>,
   arg2: Function1<A, Kind<Kind<ForEither, L>, B>>
 ): Either<L, B> =
-  fix()._redeemWith({ arg1(it).fix() }, { arg2(it).fix() })
+  fix().redeemWith({ arg1(it).fix() }, { arg2(it).fix() })
 
 @JvmName("rethrow")
 @Suppress(

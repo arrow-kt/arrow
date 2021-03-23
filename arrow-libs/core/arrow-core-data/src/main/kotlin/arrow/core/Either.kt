@@ -10,6 +10,9 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+private const val EitherExtensionDeprecated =
+  "This extension method for Either is deprecated, use the concrete method instead."
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -1222,6 +1225,282 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
   fun void(): Either<A, Unit> =
     map { Unit }
+
+  /**
+   * Binds the given function across [Either.Right].
+   *
+   * @param f The function to bind across [Either.Right].
+   */
+  inline fun <C> flatMap(f: (B) -> Either<@UnsafeVariance A, C>): Either<A, C> =
+    when (this) {
+      is Right -> f(value)
+      is Left -> this
+    }
+
+  /**
+   * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
+   *
+   * Example:
+   * ```
+   * Right(12).getOrElse(17) // Result: 12
+   * Left(12).getOrElse(17)  // Result: 17
+   * ```
+   */
+  inline fun getOrElse(default: () -> @UnsafeVariance B): B =
+    fold({ default() }, ::identity)
+
+  /**
+   * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
+   * the value of [Either.Left].
+   *
+   * Example:
+   * ```
+   * Right(12).getOrHandle { 17 } // Result: 12
+   * Left(12).getOrHandle { it + 5 } // Result: 17
+   * ```
+   */
+  inline fun getOrHandle(default: (A) -> @UnsafeVariance B): B =
+    fold({ default(it) }, ::identity)
+
+  /**
+   * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
+   * holds for the right value.<br>
+   *
+   * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not
+   * hold for the right value.<br>
+   *
+   * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
+   *
+   * Example:
+   * ```
+   * Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
+   * Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
+   *
+   * val left: Either<Int, Int> = Left(12)
+   * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
+   * ```
+   */
+  inline fun filterOrElse(predicate: (B) -> Boolean, default: () -> @UnsafeVariance A): Either<A, B> =
+    flatMap { if (predicate(it)) Right(it) else Left(default()) }
+
+  /**
+   * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
+   * predicate holds for the right value.<br>
+   *
+   * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
+   * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
+   * did not pass the filter<br>
+   *
+   * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
+   *
+   * Example:
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.core.*
+   *
+   * Right(12).filterOrOther({ it > 10 }, { -1 })
+   * ```
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * Right(7).filterOrOther({ it > 10 }, { "Value '$it' not greater than 10" })
+   * ```
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * val left: Either<Int, Int> = Left(12)
+   * left.filterOrOther({ it > 10 }, { -1 })
+   * ```
+   */
+  inline fun filterOrOther(predicate: (B) -> Boolean, default: (B) -> @UnsafeVariance A): Either<A, B> =
+    flatMap {
+      if (predicate(it)) Right(it)
+      else Left(default(it))
+    }
+
+  /**
+   * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
+   * returns `false` otherwise.
+   *
+   * Example:
+   * ```
+   * Right("something").contains("something") // Result: true
+   * Right("something").contains("anything")  // Result: false
+   * Left("something").contains("something")  // Result: false
+   *  ```
+   *
+   * @param elem the element to test.
+   * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
+   */
+  fun contains(elem: @UnsafeVariance B): Boolean =
+    exists { it == elem }
+
+  fun orElse(y: Either<@UnsafeVariance A, @UnsafeVariance B>): Either<A, B> =
+    when (this) {
+      is Left -> y
+      else -> this
+    }
+
+  /**
+   * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
+   * This is like `flatMap` for the exception.
+   */
+  inline fun <C> handleErrorWith(f: (A) -> Either<C, @UnsafeVariance B>): Either<C, B> =
+    when (this) {
+      is Left -> f(value)
+      is Right -> this
+    }
+
+  inline fun handleError(f: (A) -> @UnsafeVariance B): Either<A, B> =
+    when (this) {
+      is Left -> f(value).right()
+      is Right -> this
+    }
+
+  inline fun <C> redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
+    when (this) {
+      is Left -> fe(value).right()
+      is Right -> map(fa)
+    }
+
+  inline fun ensure(error: () -> @UnsafeVariance A, predicate: (B) -> Boolean): Either<A, B> =
+    when (this) {
+      is Right -> if (predicate(this.value)) this else error().left()
+      is Left -> this
+    }
+
+  inline fun <C, D> redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
+    when (this) {
+      is Left -> fa(this.value)
+      is Right -> fb(this.value)
+    }
+
+  fun combine(
+    SGA: Semigroup<@UnsafeVariance A>,
+    SGB: Semigroup<@UnsafeVariance B>,
+    b: Either<@UnsafeVariance A, @UnsafeVariance B>
+  ): Either<A, B> =
+    when (this) {
+      is Left -> when (b) {
+        is Left -> Left(SGA.run { value.combine(b.value) })
+        is Right -> this
+      }
+      is Right -> when (b) {
+        is Left -> b
+        is Right -> Right(SGB.run { value.combine(b.value) })
+      }
+    }
+
+  fun <C, D> zip(fb: Either<@UnsafeVariance A, C>, f: (B, C) -> D): Either<A, D> =
+    flatMap { b -> fb.map { c -> f(b, c) } }
+
+  fun <C> zip(fb: Either<@UnsafeVariance A, C>): Either<A, Pair<B, C>> =
+    flatMap { a -> fb.map { b -> Pair(a, b) } }
+
+  inline fun <C, D, E> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    map: (B, C, D) -> E
+  ): Either<A, E> =
+    zip(c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+  inline fun <C, D, E, F> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    map: (B, C, D, E) -> F
+  ): Either<A, F> =
+    zip(c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+  inline fun <C, D, E, F, G> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    map: (B, C, D, E, F) -> G
+  ): Either<A, G> =
+    zip(c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+  inline fun <C, D, E, F, G, H> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    g: Either<@UnsafeVariance A, G>,
+    map: (B, C, D, E, F, G) -> H
+  ): Either<A, H> =
+    zip(c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+  inline fun <C, D, E, F, G, H, I> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    g: Either<@UnsafeVariance A, G>,
+    h: Either<@UnsafeVariance A, H>,
+    map: (B, C, D, E, F, G, H) -> I
+  ): Either<A, I> =
+    zip(c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+  inline fun <C, D, E, F, G, H, I, J> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    g: Either<@UnsafeVariance A, G>,
+    h: Either<@UnsafeVariance A, H>,
+    i: Either<@UnsafeVariance A, I>,
+    map: (B, C, D, E, F, G, H, I) -> J
+  ): Either<A, J> =
+    zip(c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+  inline fun <C, D, E, F, G, H, I, J, K> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    g: Either<@UnsafeVariance A, G>,
+    h: Either<@UnsafeVariance A, H>,
+    i: Either<@UnsafeVariance A, I>,
+    j: Either<@UnsafeVariance A, J>,
+    map: (B, C, D, E, F, G, H, I, J) -> K
+  ): Either<A, K> =
+    zip(c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+  inline fun <C, D, E, F, G, H, I, J, K, L> zip(
+    c: Either<@UnsafeVariance A, C>,
+    d: Either<@UnsafeVariance A, D>,
+    e: Either<@UnsafeVariance A, E>,
+    f: Either<@UnsafeVariance A, F>,
+    g: Either<@UnsafeVariance A, G>,
+    h: Either<@UnsafeVariance A, H>,
+    i: Either<@UnsafeVariance A, I>,
+    j: Either<@UnsafeVariance A, J>,
+    k: Either<@UnsafeVariance A, K>,
+    map: (B, C, D, E, F, G, H, I, J, K) -> L
+  ): Either<A, L> =
+    flatMap { bb ->
+      c.flatMap { cc ->
+        d.flatMap { dd ->
+          e.flatMap { ee ->
+            f.flatMap { ff ->
+              g.flatMap { gg ->
+                h.flatMap { hh ->
+                  i.flatMap { ii ->
+                    j.flatMap { jj ->
+                      k.map { kk ->
+                        map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Left(left)", "arrow.core.Either"))
@@ -1236,11 +1515,7 @@ fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semig
 fun <A, B> Monoid.Companion.either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
   EitherMonoid(MA, MB)
 
-/**
- * Binds the given function across [Either.Right].
- *
- * @param f The function to bind across [Either.Right].
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   fix().let {
     when (it) {
@@ -1252,99 +1527,25 @@ inline fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C
 fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
 
-/**
- * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
- *
- * Example:
- * ```
- * Right(12).getOrElse(17) // Result: 12
- * Left(12).getOrElse(17)  // Result: 17
- * ```
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <B> EitherOf<*, B>.getOrElse(default: () -> B): B =
   fix().fold({ default() }, ::identity)
 
-/**
- * Returns the value from this [Either.Right] or null if this is a [Either.Left].
- *
- * Example:
- * ```
- * Right(12).orNull() // Result: 12
- * Left(12).orNull()  // Result: null
- * ```
- */
+@Deprecated(EitherExtensionDeprecated)
 fun <B> EitherOf<*, B>.orNull(): B? =
-  getOrElse { null }
+  fix().orNull()
 
-/**
- * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
- * the value of [Either.Left].
- *
- * Example:
- * ```
- * Right(12).getOrHandle { 17 } // Result: 12
- * Left(12).getOrHandle { it + 5 } // Result: 17
- * ```
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
-  fix().fold({ default(it) }, ::identity)
+  fix().getOrHandle(default)
 
-/**
- * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
- * holds for the right value.<br>
- *
- * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not
- * hold for the right value.<br>
- *
- * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
- *
- * Example:
- * ```
- * Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
- * Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
- *
- * val left: Either<Int, Int> = Left(12)
- * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
- * ```
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
-  flatMap { if (predicate(it)) Right(it) else Left(default()) }
+  fix().filterOrElse(predicate, default)
 
-/**
- * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
- * predicate holds for the right value.<br>
- *
- * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
- * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
- * did not pass the filter<br>
- *
- * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
- *
- * Example:
- *
- * {: data-executable='true'}
- * ```kotlin:ank
- * import arrow.core.*
- *
- * Right(12).filterOrOther({ it > 10 }, { -1 })
- * ```
- *
- * {: data-executable='true'}
- * ```kotlin:ank
- * Right(7).filterOrOther({ it > 10 }, { "Value '$it' not greater than 10" })
- * ```
- *
- * {: data-executable='true'}
- * ```kotlin:ank
- * val left: Either<Int, Int> = Left(12)
- * left.filterOrOther({ it > 10 }, { -1 })
- * ```
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
-  flatMap {
-    if (predicate(it)) Right(it)
-    else Left(default(it))
-  }
+  fix().filterOrOther(predicate, default)
 
 /**
  * Returns the value from this [Either.Right] or [Either.Left].
@@ -1377,20 +1578,7 @@ inline fun <A> EitherOf<A, A>.merge(): A =
 inline fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   fix().flatMap { it.rightIfNotNull { default() } }
 
-/**
- * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
- * returns `false` otherwise.
- *
- * Example:
- * ```
- * Right("something").contains("something") // Result: true
- * Right("something").contains("anything")  // Result: false
- * Left("something").contains("something")  // Result: false
- *  ```
- *
- * @param elem the element to test.
- * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
- */
+@Deprecated(EitherExtensionDeprecated)
 fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
   fix().exists { it == elem }
 
@@ -1401,6 +1589,10 @@ fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
 fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   fix().zip(ff.fix()) { a, f -> f(a) }
 
+@Deprecated(
+  EitherExtensionDeprecated,
+  ReplaceWith("orElse(y)")
+)
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Left -> y.fix()
@@ -1435,26 +1627,11 @@ inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (t
   else -> Left(default())
 }
 
-/**
- * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
- * This is like `flatMap` for the exception.
- */
+@Deprecated(EitherExtensionDeprecated)
 inline fun <A, B, C> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<C, B>): Either<C, B> =
   when (val either = fix()) {
     is Left -> f(either.a).fix()
     is Right -> either
-  }
-
-inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  when (this) {
-    is Left -> f(a).right()
-    is Right -> this
-  }
-
-inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  when (this) {
-    is Left -> fe(a).right()
-    is Right -> map(fa)
   }
 
 operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
@@ -1462,18 +1639,6 @@ operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other
     { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }) },
     { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
   )
-
-fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  when (this) {
-    is Left -> when (b) {
-      is Left -> Left(SGA.run { a.combine(b.a) })
-      is Right -> this
-    }
-    is Right -> when (b) {
-      is Left -> b
-      is Right -> Either.right(SGB.run { this@combine.b.combine(b.b) })
-    }
-  }
 
 fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
   fold(Right(MB.empty()) as Either<A, B>) { acc, e ->
@@ -1502,120 +1667,6 @@ fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
 fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
-fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
-  flatMap { b ->
-    fb.map { c -> f(b, c) }
-  }
-
-fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
-  flatMap { a ->
-    fb.map { b -> Pair(a, b) }
-  }
-
-inline fun <A, B, C, D, E> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  map: (B, C, D) -> E
-): Either<A, E> =
-  zip(c, d, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-
-inline fun <A, B, C, D, E, F> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  map: (B, C, D, E) -> F
-): Either<A, F> =
-  zip(c, d, e, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
-
-inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  map: (B, C, D, E, F) -> G
-): Either<A, G> =
-  zip(c, d, e, f, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
-
-inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  g: Either<A, G>,
-  map: (B, C, D, E, F, G) -> H
-): Either<A, H> =
-  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
-
-inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  g: Either<A, G>,
-  h: Either<A, H>,
-  map: (B, C, D, E, F, G, H) -> I
-): Either<A, I> =
-  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  g: Either<A, G>,
-  h: Either<A, H>,
-  i: Either<A, I>,
-  map: (B, C, D, E, F, G, H, I) -> J
-): Either<A, J> =
-  zip(c, d, e, f, g, h, i, Either.unit, Either.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  g: Either<A, G>,
-  h: Either<A, H>,
-  i: Either<A, I>,
-  j: Either<A, J>,
-  map: (B, C, D, E, F, G, H, I, J) -> K
-): Either<A, K> =
-  zip(c, d, e, f, g, h, i, j, Either.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
-
-inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
-  c: Either<A, C>,
-  d: Either<A, D>,
-  e: Either<A, E>,
-  f: Either<A, F>,
-  g: Either<A, G>,
-  h: Either<A, H>,
-  i: Either<A, I>,
-  j: Either<A, J>,
-  k: Either<A, K>,
-  map: (B, C, D, E, F, G, H, I, J, K) -> L
-): Either<A, L> =
-  flatMap { bb ->
-    c.flatMap { cc ->
-      d.flatMap { dd ->
-        e.flatMap { ee ->
-          f.flatMap { ff ->
-            g.flatMap { gg ->
-              h.flatMap { hh ->
-                i.flatMap { ii ->
-                  j.flatMap { jj ->
-                    k.map { kk ->
-                      map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
 fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()
   else MB.run {
@@ -1623,18 +1674,6 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
       is Left -> this@replicate
       is Right -> List(n) { this@replicate.b }.combineAll().right()
     }
-  }
-
-inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
-  when (this) {
-    is Right -> if (predicate(this.b)) this else error().left()
-    is Left -> this
-  }
-
-inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
-  when (this) {
-    is Left -> fa(this.a)
-    is Right -> fb(this.b)
   }
 
 fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =

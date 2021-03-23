@@ -111,7 +111,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.followedBy(arg1: Kind<Kind<ForEither, 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("this.zip(fb) { left, _ -> left }", "arrow.core.zip")
+  ReplaceWith("this.zip(fb) { left, _ -> left }")
 )
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.apTap(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   fix().zip(arg1.fix()) { left, _ -> left }
