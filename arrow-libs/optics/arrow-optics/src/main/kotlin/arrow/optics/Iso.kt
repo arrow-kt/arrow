@@ -46,6 +46,12 @@ typealias IsoOf<S, A> = PIsoOf<S, S, A, A>
 typealias IsoPartialOf<S> = Kind<ForIso, S>
 typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
 
+private val stringToList: Iso<String, List<Char>> =
+  Iso(
+    get = CharSequence::toList,
+    reverseGet = { it.joinToString(separator = "") }
+  )
+
 /**
  * An [Iso] is a loss less invertible optic that defines an isomorphism between a type [S] and [A]
  * i.e. a data class and its properties represented by TupleN
@@ -168,6 +174,13 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     @JvmStatic
     fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> =
       optionToPEither()
+
+    /**
+     * [Iso] that defines equality between String and [List] of [Char]
+     */
+    @JvmStatic
+    fun stringToList(): Iso<String, List<Char>> =
+      stringToList
   }
 
   /**

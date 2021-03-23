@@ -75,5 +75,17 @@ fun interface Cons<S, A> {
           reverseGet = { (a, aas) -> listOf(a) + aas }
         )
       }
+
+    /**
+     * [Cons] instance for [String].
+     */
+    @JvmStatic
+    fun string(): Cons<String, Char> =
+      Cons {
+        Prism(
+          getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
+          reverseGet = { (h, t) -> h + t }
+        )
+      }
   }
 }

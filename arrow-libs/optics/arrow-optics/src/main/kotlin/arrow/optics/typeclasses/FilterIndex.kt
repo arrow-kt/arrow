@@ -112,5 +112,18 @@ fun interface FilterIndex<S, I, A> {
             }
         }
       }
+
+    /**
+     * [FilterIndex] instance for [String].
+     * It allows filtering of every [Char] in a [String] by its index's position.
+     *
+     * @receiver [FilterIndex.Companion] to make the instance statically available.
+     * @return [FilterIndex] instance
+     */
+    @JvmStatic
+    fun string(): FilterIndex<String, Int, Char> =
+      FilterIndex { p ->
+        Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
+      }
   }
 }

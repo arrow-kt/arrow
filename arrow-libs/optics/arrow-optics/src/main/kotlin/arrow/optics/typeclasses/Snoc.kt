@@ -6,6 +6,8 @@ import arrow.core.Tuple2
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.left
+import arrow.core.right
 import arrow.core.toOption
 import arrow.optics.Iso
 import arrow.optics.Optional
@@ -86,6 +88,18 @@ fun interface Snoc<S, A> {
           override fun reverseGet(b: Tuple2<List<A>, A>): List<A> =
             b.a + b.b
         }
+      }
+
+    /**
+     * [Snoc] instance for [String].
+     */
+    @JvmStatic
+    fun string(): Snoc<String, Char> =
+      Snoc {
+        Prism(
+          getOrModify = { if (it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left() },
+          reverseGet = { (i, l) -> i + l }
+        )
       }
   }
 }

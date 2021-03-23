@@ -305,6 +305,20 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
         override fun <F> modifyF(FA: Applicative<F>, s: Sequence<A>, f: (A) -> Kind<F, A>): Kind<F, Sequence<A>> =
           FA.run { s.k().traverse(FA, f) }
       }
+
+    /**
+     * [Traversal] for [String] that focuses in each [Char] of the source [String].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [String] and foci every [Char] in the source.
+     */
+    @JvmStatic
+    fun string(): Traversal<String, Char> =
+      object : Traversal<String, Char> {
+        override fun <F> modifyF(FA: Applicative<F>, s: String, f: (Char) -> Kind<F, Char>): Kind<F, String> = FA.run {
+          s.toList().k().traverse(FA, f).map { it.joinToString(separator = "") }
+        }
+      }
   }
 
   /**

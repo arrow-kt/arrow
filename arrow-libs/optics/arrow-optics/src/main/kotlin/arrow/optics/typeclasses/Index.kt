@@ -211,5 +211,18 @@ fun interface Index<S, I, A> {
           set = { s, a -> s.mapIndexed { index, aa -> if (index == i) a else aa } }
         )
       }
+
+    /**
+     * [Index] instance for [String].
+     * It allows access to every [Char] in a [String] by its index's position.
+     *
+     * @receiver [Index.Companion] to make the instance statically available.
+     * @return [Index] instance
+     */
+    @JvmStatic
+    fun string(): Index<String, Int, Char> =
+      Index { i ->
+        Iso.stringToList() compose Index.list<Char>().index(i)
+      }
   }
 }
