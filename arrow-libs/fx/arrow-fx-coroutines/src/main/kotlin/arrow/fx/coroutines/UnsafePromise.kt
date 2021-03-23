@@ -8,7 +8,7 @@ import kotlinx.atomicfu.atomic
  * @see ForkAndForget
  */
 @Deprecated("UnsafePromise is deprecated. Same use-cases covered by KotlinX CompletableDeferred.")
-class UnsafePromise<A> {
+internal class UnsafePromise<A> {
 
   private sealed class State<out A> {
     object Empty : State<Nothing>()
