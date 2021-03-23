@@ -7,20 +7,23 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) class ForEval private constructor() {
+)
+class ForEval private constructor() {
   companion object
 }
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-) typealias EvalOf<A> = arrow.Kind<ForEval, A>
+)
+typealias EvalOf<A> = arrow.Kind<ForEval, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline
+)
+inline
 fun <A> EvalOf<A>.fix(): Eval<A> =
   this as Eval<A>
 
@@ -472,113 +475,119 @@ sealed class Eval<out A> : EvalOf<A> {
 
   override fun toString(): String =
     "Eval(...)"
-}
 
-fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-  fun loop(): Eval<B> =
-    Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
-  return loop()
-}
+  fun <B, Z> zip(b: Eval<B>, map: (A, B) -> Z): Eval<Z> =
+    flatMap { a: A -> b.map { bb: B -> map(a, bb) } }
 
-fun <A, B, Z> Eval<A>.zip(b: Eval<B>, map: (A, B) -> Z): Eval<Z> =
-  flatMap { a: A -> b.map { bb: B -> map(a, bb) } }
+  fun <B> zip(b: Eval<B>): Eval<Pair<A, B>> =
+    flatMap { a: A -> b.map { bb: B -> Pair(a, bb) } }
 
-fun <A, B> Eval<A>.zip(b: Eval<B>): Eval<Pair<A, B>> =
-  flatMap { a: A -> b.map { bb: B -> Pair(a, bb) } }
+  fun <B, C, D> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    map: (A, B, C) -> D
+  ): Eval<D> =
+    zip(b, c, Unit, Unit, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
 
-fun <A, B, C, D> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  map: (A, B, C) -> D
-): Eval<D> =
-  zip(b, c, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
+  fun <B, C, D, E> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    map: (A, B, C, D) -> E
+  ): Eval<E> =
+    zip(b, c, d, Unit, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
 
-fun <A, B, C, D, E> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  map: (A, B, C, D) -> E
-): Eval<E> =
-  zip(b, c, d, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
+  fun <B, C, D, E, F> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    map: (A, B, C, D, E) -> F
+  ): Eval<F> =
+    zip(b, c, d, e, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
 
-fun <A, B, C, D, E, F> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  map: (A, B, C, D, E) -> F
-): Eval<F> =
-  zip(b, c, d, e, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
+  fun <B, C, D, E, F, G> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    f: Eval<F>,
+    map: (A, B, C, D, E, F) -> G
+  ): Eval<G> =
+    zip(b, c, d, e, f, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
 
-fun <A, B, C, D, E, F, G> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  f: Eval<F>,
-  map: (A, B, C, D, E, F) -> G
-): Eval<G> =
-  zip(b, c, d, e, f, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
+  fun <B, C, D, E, F, G, H> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    f: Eval<F>,
+    g: Eval<G>,
+    map: (A, B, C, D, E, F, G) -> H
+  ): Eval<H> =
+    zip(b, c, d, e, f, g, Unit, Unit, Unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
 
-fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  f: Eval<F>,
-  g: Eval<G>,
-  map: (A, B, C, D, E, F, G) -> H
-): Eval<H> =
-  zip(b, c, d, e, f, g, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
+  fun <B, C, D, E, F, G, H, I> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    f: Eval<F>,
+    g: Eval<G>,
+    h: Eval<H>,
+    map: (A, B, C, D, E, F, G, H) -> I
+  ): Eval<I> =
+    zip(b, c, d, e, f, g, h, Unit, Unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
 
-fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  f: Eval<F>,
-  g: Eval<G>,
-  h: Eval<H>,
-  map: (A, B, C, D, E, F, G, H) -> I
-): Eval<I> =
-  zip(b, c, d, e, f, g, h, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
+  fun <B, C, D, E, F, G, H, I, J> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    f: Eval<F>,
+    g: Eval<G>,
+    h: Eval<H>,
+    i: Eval<I>,
+    map: (A, B, C, D, E, F, G, H, I) -> J
+  ): Eval<J> =
+    zip(b, c, d, e, f, g, h, i, Unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+      map(
+        aa,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh,
+        ii
+      )
+    }
 
-fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  f: Eval<F>,
-  g: Eval<G>,
-  h: Eval<H>,
-  i: Eval<I>,
-  map: (A, B, C, D, E, F, G, H, I) -> J
-): Eval<J> =
-  zip(b, c, d, e, f, g, h, i, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
-
-fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
-  b: Eval<B>,
-  c: Eval<C>,
-  d: Eval<D>,
-  e: Eval<E>,
-  f: Eval<F>,
-  g: Eval<G>,
-  h: Eval<H>,
-  i: Eval<I>,
-  j: Eval<J>,
-  map: (A, B, C, D, E, F, G, H, I, J) -> K
-): Eval<K> =
-  flatMap { aa ->
-    b.flatMap { bb ->
-      c.flatMap { cc ->
-        d.flatMap { dd ->
-          e.flatMap { ee ->
-            f.flatMap { ff ->
-              g.flatMap { gg ->
-                h.flatMap { hh ->
-                  i.flatMap { ii ->
-                    j.map { jj ->
-                      map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+  fun <B, C, D, E, F, G, H, I, J, K> zip(
+    b: Eval<B>,
+    c: Eval<C>,
+    d: Eval<D>,
+    e: Eval<E>,
+    f: Eval<F>,
+    g: Eval<G>,
+    h: Eval<H>,
+    i: Eval<I>,
+    j: Eval<J>,
+    map: (A, B, C, D, E, F, G, H, I, J) -> K
+  ): Eval<K> =
+    flatMap { aa ->
+      b.flatMap { bb ->
+        c.flatMap { cc ->
+          d.flatMap { dd ->
+            e.flatMap { ee ->
+              f.flatMap { ff ->
+                g.flatMap { gg ->
+                  h.flatMap { hh ->
+                    i.flatMap { ii ->
+                      j.map { jj ->
+                        map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+                      }
                     }
                   }
                 }
@@ -588,7 +597,13 @@ fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
         }
       }
     }
-  }
+}
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+  fun loop(): Eval<B> =
+    Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
+  return loop()
+}
 
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.just(emptyList())
