@@ -65,8 +65,7 @@ fun <A, B> Kind<ForOption, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "combineAll(arg1)",
-    "arrow.core.combineAll"
+    "combineAll(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -171,8 +170,7 @@ fun <A> Kind<ForOption, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "combineAll(arg1)",
-    "arrow.core.combineAll"
+    "combineAll(arg1)"
   ),
   DeprecationLevel.WARNING
 )

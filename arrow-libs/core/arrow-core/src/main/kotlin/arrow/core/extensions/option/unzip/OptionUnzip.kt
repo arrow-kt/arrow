@@ -22,8 +22,7 @@ internal val unzip_singleton: OptionUnzip = object : arrow.core.extensions.Optio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "unzip()",
-    "arrow.core.unzip"
+    "unzip()"
   ),
   DeprecationLevel.WARNING
 )

@@ -8,6 +8,9 @@ import arrow.typeclasses.SelectiveDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
+private const val OptionExtensionDeprecated =
+  "This extension method for Either is deprecated, use the concrete method instead."
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -819,6 +822,83 @@ sealed class Option<out A> : OptionOf<A> {
     { "Option.None" },
     { "Option.Some($it)" }
   )
+
+  fun combine(SGA: Semigroup<@UnsafeVariance A>, b: Option<@UnsafeVariance A>): Option<A> =
+    when (this) {
+      is Some -> when (b) {
+        is Some -> Some(SGA.run { t.combine(b.t) })
+        None -> this
+      }
+      None -> b
+    }
+
+  /**
+   * Returns the option's value if the option is nonempty, otherwise
+   * return the result of evaluating `default`.
+   *
+   * @param default the default expression.
+   */
+  inline fun getOrElse(default: () -> @UnsafeVariance A): A =
+    fold({ default() }, ::identity)
+
+  /**
+   * Returns this option's if the option is nonempty, otherwise
+   * returns another option provided lazily by `default`.
+   *
+   * @param alternative the default option if this is empty.
+   */
+  inline fun orElse(alternative: () -> Option<@UnsafeVariance A>): Option<A> =
+    if (isEmpty()) alternative() else this
+
+  infix fun or(value: Option<@UnsafeVariance A>): Option<A> =
+    if (isEmpty()) value else this
+
+  fun combineAll(MA: Monoid<@UnsafeVariance A>): A = MA.run {
+    foldLeft(empty()) { acc, a -> acc.combine(a) }
+  }
+
+  inline fun ensure(predicate: (A) -> Boolean): Option<A> =
+    when (this) {
+      is Some ->
+        if (predicate(value)) this
+        else None
+      is None -> this
+    }
+
+  inline fun handleError(f: (Unit) -> @UnsafeVariance A): Option<A> =
+    handleErrorWith { Some(f(Unit)) }
+
+  inline fun handleErrorWith(f: (Unit) -> Option<@UnsafeVariance A>): Option<A> =
+    if (isEmpty()) f(Unit) else this
+
+  inline fun <B> redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
+    map(fb).handleError(fe)
+
+  inline fun <B> redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
+    flatMap(fb).handleErrorWith(fe)
+
+  fun salign(SA: Semigroup<@UnsafeVariance A>, b: Option<@UnsafeVariance A>): Option<A> =
+    align(b) {
+      it.fold(::identity, ::identity) { a, b ->
+        SA.run { a.combine(b) }
+      }
+    }
+
+  inline fun <B, C> unalign(f: (A) -> Ior<B, C>): Pair<Option<B>, Option<C>> =
+    when (val option = this.map(f)) {
+      is None -> None to None
+      is Some -> when (val v = option.value) {
+        is Ior.Left -> Some(v.value) to None
+        is Ior.Right -> None to Some(v.value)
+        is Ior.Both -> Some(v.leftValue) to Some(v.rightValue)
+      }
+    }
+
+  inline fun <B, C> unzip(f: (A) -> Pair<B, C>): Pair<Option<B>, Option<C>> =
+    fold(
+      { Option.empty<B>() to Option.empty() },
+      { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
+    )
 }
 
 object None : Option<Nothing>() {
@@ -837,30 +917,19 @@ data class Some<out T>(
   override fun toString(): String = "Option.Some($t)"
 }
 
-/**
- * Returns the option's value if the option is nonempty, otherwise
- * return the result of evaluating `default`.
- *
- * @param default the default expression.
- */
+@Deprecated(OptionExtensionDeprecated)
 inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
 
-/**
- * Returns this option's if the option is nonempty, otherwise
- * returns another option provided lazily by `default`.
- *
- * @param alternative the default option if this is empty.
- */
+@Deprecated(OptionExtensionDeprecated)
 inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> =
-  if (fix().isEmpty()) alternative() else fix()
+  fix().orElse(alternative)
 
-infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
-  value
-} else {
-  fix()
-}
+@Deprecated(OptionExtensionDeprecated)
+infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> =
+  fix().or(value)
 
-fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
+fun <T> T?.toOption(): Option<T> =
+  this?.let { Some(it) } ?: None
 
 inline fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
@@ -901,21 +970,6 @@ fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
     )
   }
 
-fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
-  foldLeft(empty()) { acc, a -> acc.combine(a) }
-}
-
-inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
-  when (this) {
-    is Some ->
-      if (predicate(t)) this
-      else {
-        error()
-        None
-      }
-    is None -> this
-  }
-
 /**
  * Returns an Option containing all elements that are instances of specified type parameter R.
  */
@@ -924,20 +978,8 @@ inline fun <reified B> Option<*>.filterIsInstance(): Option<B> {
   return this.mapNotNull(f)
 }
 
-inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
-  handleErrorWith { Some(f(Unit)) }
-
-inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
-  if (isEmpty()) f(Unit) else this
-
 fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
-
-inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
-  map(fb).handleError(fe)
-
-inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
-  flatMap(fb).handleErrorWith(fe)
 
 fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   if (n <= 0) Some(empty())
@@ -946,13 +988,6 @@ fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
 
 fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
-
-fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
-  align(b) {
-    it.fold(::identity, ::identity) { a, b ->
-      SA.run { a.combine(b) }
-    }
-  }
 
 /**
  * Separate the inner [Either] value into the [Either.Left] and [Either.Right].
@@ -990,16 +1025,6 @@ fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> 
 fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
 
-inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
-  when (val option = this.map(f)) {
-    is None -> None to None
-    is Some -> when (val v = option.t) {
-      is Ior.Left -> Some(v.value) to None
-      is Ior.Right -> None to Some(v.value)
-      is Ior.Both -> Some(v.leftValue) to Some(v.rightValue)
-    }
-  }
-
 fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
   map { iterable ->
     iterable.fold(MA)
@@ -1017,12 +1042,6 @@ fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
 
 fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
   unzip(::identity)
-
-inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
-  fold(
-    { Option.empty<A>() to Option.empty() },
-    { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
-  )
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
@@ -1045,15 +1064,6 @@ inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Opti
  */
 fun <B, A : B> Option<A>.widen(): Option<B> =
   this
-
-fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
-  when (this) {
-    is Some -> when (b) {
-      is Some -> Some(SGA.run { t.combine(b.t) })
-      None -> this
-    }
-    None -> b
-  }
 
 fun <A> Monoid.Companion.option(MA: Monoid<A>): Monoid<Option<A>> =
   OptionMonoid(MA)

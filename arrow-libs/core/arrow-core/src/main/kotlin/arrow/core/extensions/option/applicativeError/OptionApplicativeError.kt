@@ -107,8 +107,7 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Unit>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "handleError(arg1)",
-    "arrow.core.handleError"
+    "handleError(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -128,7 +127,6 @@ fun <A> Kind<ForOption, A>.handleError(arg1: Function1<Unit, A>): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "redeem(arg1, arg2)",
-    "arrow.core.redeem"
   ),
   DeprecationLevel.WARNING
 )
@@ -149,8 +147,7 @@ fun <A, B> Kind<ForOption, A>.redeem(arg1: Function1<Unit, B>, arg2: Function1<A
   ReplaceWith(
     "map<Either<Unit, A>> { Right(it) }.handleError<Either<Unit, A>> { Left(it) }",
     "arrow.core.Left",
-    "arrow.core.Right",
-    "arrow.core.handleError"
+    "arrow.core.Right"
   ),
   DeprecationLevel.WARNING
 )

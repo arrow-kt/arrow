@@ -23,8 +23,7 @@ internal val unalign_singleton: OptionUnalign = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg0.unalign()",
-    "arrow.core.unalign"
+    "arg0.unalign()"
   ),
   DeprecationLevel.WARNING
 )

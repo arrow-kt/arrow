@@ -24,8 +24,7 @@ internal val monadError_singleton: OptionMonadError = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "ensure(arg1, arg2)",
-    "arrow.core.ensure"
+    "ensure(arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -44,8 +43,7 @@ fun <A> Kind<ForOption, A>.ensure(arg1: Function0<Unit>, arg2: Function1<A, Bool
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "redeemWith(arg1, arg2)",
-    "arrow.core.redeemWith"
+    "redeemWith(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
