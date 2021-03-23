@@ -24,8 +24,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "just(a)",
-    "arrow.core.just"
+    "Const(a)",
+    "arrow.core.Const"
   ),
   DeprecationLevel.WARNING
 )
@@ -44,8 +44,8 @@ fun <A> A.just(MA: Monoid<A>): Const<A, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "unit(MA)",
-    "arrow.core.unit"
+    "Const(MA.empty())",
+    "arrow.core.Const"
   ),
   DeprecationLevel.WARNING
 )
@@ -62,10 +62,7 @@ fun <A> unit(MA: Monoid<A>): Const<A, Unit> = arrow.core.Const
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(MA, arg1)",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map(arg1)"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.map(MA: Monoid<A>, arg1: Function1<A, B>): Const<A, B> =
@@ -82,10 +79,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.map(MA: Monoid<A>, arg1: Function1<A, B>):
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "replicate(MA, arg1)",
-    "arrow.core.replicate"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForConst, A>, A>.replicate(MA: Monoid<A>, arg1: Int): Const<A, List<A>> =
@@ -102,10 +96,7 @@ fun <A> Kind<Kind<ForConst, A>, A>.replicate(MA: Monoid<A>, arg1: Int): Const<A,
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "replicate(MA, arg1, arg2)",
-    "arrow.core.replicate"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForConst, A>, A>.replicate(

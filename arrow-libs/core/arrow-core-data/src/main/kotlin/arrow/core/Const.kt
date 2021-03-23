@@ -214,6 +214,9 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
 
   override fun toString(): String =
     "$Const($value)"
+
+  fun combine(SG: Semigroup<A>, that: Const<A, @UnsafeVariance T>): Const<A, T> =
+    Const(SG.run { value().combine(that.value()) })
 }
 
 @Deprecated(
@@ -221,9 +224,6 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   level = DeprecationLevel.WARNING
 )
 fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> =
-  Const(SG.run { value().combine(that.value()) })
-
-fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> =
   Const(SG.run { value().combine(that.value()) })
 
 @Deprecated(

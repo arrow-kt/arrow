@@ -27,10 +27,7 @@ internal val invariant_singleton: ConstInvariant<Any?> = object : ConstInvariant
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "retag()",
-    "arrow.core.retag"
-  ),
+  ReplaceWith("retag()"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Const<A, B> =

@@ -31,8 +31,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "ap(MA, arg1)",
-    "arrow.core.ap"
+    "fix().zip(SG, ff.fix()) { a, f -> f(a) }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )

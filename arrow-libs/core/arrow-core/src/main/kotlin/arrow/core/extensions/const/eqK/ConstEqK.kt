@@ -5,6 +5,7 @@ import arrow.core.Const.Companion
 import arrow.core.ForConst
 import arrow.core.extensions.ConstEqK
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -18,11 +19,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "eqv(EQA, arg1)",
-    "arrow.core.eqv"
-  ),
+  EqDeprecation,
+  ReplaceWith("this == arg1"),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForConst, A>, A>.eqK(

@@ -27,10 +27,7 @@ internal val contravariant_singleton: ConstContravariant<Any?> = object : ConstC
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "contramap(arg1)",
-    "arrow.core.contramap"
-  ),
+  ReplaceWith("retag<B>()"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.contramap(arg1: Function1<B, A>): Const<A, B> =

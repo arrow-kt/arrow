@@ -51,10 +51,7 @@ internal val functor_singleton: ConstFunctor<Any?> = object : ConstFunctor<Any?>
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg1)",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map(arg1)"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.map(arg1: Function1<A, B>): Const<A, B> =
@@ -71,10 +68,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.map(arg1: Function1<A, B>): Const<A, B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg1)",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map(arg1)"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Const<A, B> =
@@ -129,10 +123,7 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForConst, A>, A>, Ki
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { Unit }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { Unit }"),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForConst, A>, A>.void(): Const<A, Unit> =
@@ -173,10 +164,7 @@ fun <A> Kind<Kind<ForConst, A>, A>.void(): Const<A, Unit> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { a -> Tuple2(a, f(a)) }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { a -> Tuple2(a, f(a)) }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.fproduct(arg1: Function1<A, B>): Const<A, Tuple2<A, B>> =
@@ -216,10 +204,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.fproduct(arg1: Function1<A, B>): Const<A, 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { arg1 }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { arg1 }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.mapConst(arg1: B): Const<A, B> =
@@ -239,10 +224,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.mapConst(arg1: B): Const<A, B> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { this }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { this }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> A.mapConst(arg1: Kind<Kind<ForConst, A>, B>): Const<A, A> =
@@ -282,10 +264,7 @@ fun <A, B> A.mapConst(arg1: Kind<Kind<ForConst, A>, B>): Const<A, A> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { a -> Tuple2(arg1, a) }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { a -> Tuple2(arg1, a) }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.tupleLeft(arg1: B): Const<A, Tuple2<B, A>> =
@@ -325,10 +304,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.tupleLeft(arg1: B): Const<A, Tuple2<B, A>>
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map { a -> Tuple2(a, arg1) }",
-    "arrow.core.map"
-  ),
+  ReplaceWith("map { a -> Tuple2(a, arg1) }"),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.tupleRight(arg1: B): Const<A, Tuple2<A, B>> =
