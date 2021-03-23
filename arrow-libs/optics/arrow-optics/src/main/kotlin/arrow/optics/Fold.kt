@@ -1,10 +1,7 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.boolean
 import arrow.core.identity
-import arrow.core.int
-import arrow.core.list
 import arrow.typeclasses.Monoid
 
 /**

@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen

@@ -2,8 +2,6 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.int
-import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.LensLaws

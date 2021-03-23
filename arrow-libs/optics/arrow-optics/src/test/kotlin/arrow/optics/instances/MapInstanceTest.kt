@@ -1,7 +1,5 @@
 package arrow.optics.instances
 
-import arrow.core.int
-import arrow.core.option
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall

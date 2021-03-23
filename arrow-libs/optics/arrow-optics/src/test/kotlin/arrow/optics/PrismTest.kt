@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.core.string
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB

@@ -1,11 +1,5 @@
 package arrow.core.extensions
 
-import arrow.core.byte
-import arrow.core.double
-import arrow.core.float
-import arrow.core.int
-import arrow.core.long
-import arrow.core.short
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.byte
 import arrow.core.test.generators.byteSmall

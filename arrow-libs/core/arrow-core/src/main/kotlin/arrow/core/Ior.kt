@@ -792,21 +792,6 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   }
 }
 
-fun <A, B> Semigroup.Companion.ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
-  IorSemigroup(SA, SB)
-
-private class IorSemigroup<A, B>(
-  private val SGA: Semigroup<A>,
-  private val SGB: Semigroup<B>
-) : Semigroup<Ior<A, B>> {
-
-  override fun Ior<A, B>.combine(b: Ior<A, B>): Ior<A, B> =
-    combine(SGA, SGB, b)
-
-  override fun Ior<A, B>.maybeCombine(b: Ior<A, B>?): Ior<A, B> =
-    b?.let { combine(SGA, SGB, it) } ?: this
-}
-
 operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(other: Ior<A, B>): Int = fold(
   { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }, { _, _ -> -1 }) },
   { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }, { _, _ -> -1 }) },
