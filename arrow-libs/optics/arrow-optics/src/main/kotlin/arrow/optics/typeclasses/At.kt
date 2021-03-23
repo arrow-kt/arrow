@@ -127,6 +127,18 @@ fun interface At<S, I, A> {
           }
         )
       }
+
+    /**
+     * [At] instance definition for [Set].
+     */
+    @JvmStatic
+    fun <A> set(): At<Set<A>, A, Boolean> =
+      At { i ->
+        PLens(
+          get = { it.contains(i) },
+          set = { s, b -> (if (b) s + i else s - i) }
+        )
+      }
   }
 }
 
