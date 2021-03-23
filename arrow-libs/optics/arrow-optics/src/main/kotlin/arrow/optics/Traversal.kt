@@ -14,6 +14,7 @@ import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
@@ -275,8 +276,27 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     @JvmStatic
     fun <A> nonEmptyList(): Traversal<NonEmptyList<A>, A> =
       object : Traversal<NonEmptyList<A>, A> {
-        override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> =
+        override fun <F> modifyF(
+          FA: Applicative<F>,
+          s: NonEmptyList<A>,
+          f: (A) -> Kind<F, A>
+        ): Kind<F, NonEmptyList<A>> =
           s.traverse(FA, f)
+      }
+
+    /**
+     * [Traversal] for [Option] that has focus in each [arrow.core.Some].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
+     */
+    @JvmStatic
+    fun <A> option(): Traversal<Option<A>, A> =
+      object : Traversal<Option<A>, A> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Option<A>, f: (A) -> Kind<F, A>): Kind<F, Option<A>> =
+          with(Option.traverse()) {
+            s.traverse(FA, f)
+          }
       }
   }
 

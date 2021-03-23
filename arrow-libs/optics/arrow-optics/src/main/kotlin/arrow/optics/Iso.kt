@@ -6,6 +6,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.Validated
@@ -134,6 +135,39 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
         get = { it.keys },
         reverseGet = { keys -> keys.map { it to Unit }.toMap() }
       )
+
+    /**
+     * [PIso] that defines the equality between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A, B> optionToPNullable(): PIso<Option<A>, Option<B>, A?, B?> =
+      PIso(
+        get = { it.fold({ null }, ::identity) },
+        reverseGet = Option.Companion::fromNullable
+      )
+
+    /**
+     * [PIso] that defines the isomorphic relationship between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A> optionToNullable(): Iso<Option<A>, A?> = optionToPNullable()
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A, B> optionToPEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> =
+      PIso(
+        get = { opt -> opt.fold({ Either.Left(Unit) }, ::Right) },
+        reverseGet = { either -> either.fold({ None }, ::Some) }
+      )
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> =
+      optionToPEither()
   }
 
   /**
