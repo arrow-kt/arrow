@@ -658,7 +658,7 @@ fun <E, A, B> Sequence<A>.traverseValidated(
   f: (A) -> Validated<E, B>
 ): Validated<E, Sequence<B>> =
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+    acc.map { f(a).zip(semigroup, it) { b, bs -> sequenceOf(b) + bs } }
   }.value()
 
 /**

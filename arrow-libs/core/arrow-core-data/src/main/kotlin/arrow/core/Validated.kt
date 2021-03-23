@@ -1151,17 +1151,6 @@ inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) 
   fix().zip(SE, f) { a, ff -> ff(a) }
 
 @Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
-    "arrow.core.Eval",
-    "arrow.core.left"
-  )
-)
-fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
-  ff.map { f -> zip(SE, f) { a, ff -> ff(a) } }
-
-@Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
   ReplaceWith("handleErrorWith(f)")
 )
