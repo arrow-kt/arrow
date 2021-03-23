@@ -52,7 +52,7 @@ fun <A> combineAll(arg0: List<SequenceK<A>>): SequenceK<A> = arrow.core.Sequence
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith("Monoid.sequence<A>()", "arrow.core.sequence", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.sequence<A>()", "arrow.typeclasses.Monoid"),
   level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.monoid(): SequenceKMonoid<A> = monoid_singleton as

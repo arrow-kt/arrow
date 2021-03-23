@@ -68,7 +68,7 @@ import arrow.core.combineK as sequenceCombineK
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.sequence()", "arrow.core.sequence", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.sequence()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
@@ -94,7 +94,7 @@ interface SequenceKMonoidal : Monoidal<ForSequenceK>, SequenceKSemigroupal {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.sequence()", "arrow.core.sequence", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.sequence()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface SequenceKMonoid<A> : Monoid<SequenceK<A>>, SequenceKSemigroup<A> {

@@ -56,7 +56,7 @@ fun <A> combineAll(arg0: List<Endo<A>>): Endo<A> =
 )
 @Deprecated(
   "Extension projections are deprecated. Use endo on Monoid.",
-  ReplaceWith("Monoid.endo()", "arrow.typeclasses.Monoid", "arrow.core.endo")
+  ReplaceWith("Monoid.endo()", "arrow.typeclasses.Monoid")
 )
 inline fun <A> Companion.monoid(): EndoMonoid<A> = monoid_singleton as
   arrow.core.extensions.EndoMonoid<A>

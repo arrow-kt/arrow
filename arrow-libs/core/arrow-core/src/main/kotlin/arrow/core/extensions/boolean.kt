@@ -49,7 +49,7 @@ fun Boolean.Companion.order(): Order<Boolean> =
 fun Boolean.Companion.hash(): Hash<Boolean> =
   object : BooleanHash {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.boolean()", "arrow.core.Monoid", "arrow.core.boolean"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.boolean()", "arrow.core.Monoid"))
 object AndMonoid : Monoid<Boolean> {
   override fun Boolean.combine(b: Boolean): Boolean = this && b
   override fun empty(): Boolean = true

@@ -52,7 +52,6 @@ fun <A> combineAll(SG: Semigroup<A>, arg0: List<Option<A>>): Option<A> = arrow.c
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Monoid.option<A>(SG)",
-    "arrow.core.option",
     "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING

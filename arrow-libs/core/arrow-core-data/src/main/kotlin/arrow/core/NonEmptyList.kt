@@ -550,12 +550,3 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   traverseValidated(semigroup, ::identity)
-
-@Suppress("UNCHECKED_CAST")
-fun <A> Semigroup.Companion.nonEmptyList(): Semigroup<NonEmptyList<A>> =
-  NonEmptyListSemigroup as Semigroup<NonEmptyList<A>>
-
-object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
-  override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =
-    NonEmptyList(this.head, this.tail.plus(b))
-}
