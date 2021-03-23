@@ -1395,17 +1395,6 @@ fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
 fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   fix().zip(ff.fix()) { a, f -> f(a) }
 
-@Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
-    "arrow.core.Eval",
-    "arrow.core.left"
-  )
-)
-fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
-  fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })
-
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Left -> y.fix()

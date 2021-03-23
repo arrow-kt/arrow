@@ -692,16 +692,6 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
   zip(SG, ff.fix()) { a, f -> f(a) }
 
-@Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "ff.map { fff -> zip(SG, fff) { a, f -> f(a) } }",
-    "arrow.core.zip"
-  )
-)
-fun <A, B, D> Ior<A, B>.apEval(SG: Semigroup<A>, ff: Eval<Ior<A, (B) -> D>>): Eval<Ior<A, D>> =
-  ff.map { fff -> zip(SG, fff) { a, f -> f(a) } }
-
 inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity, { _, b -> b })
 
