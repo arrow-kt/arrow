@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
 
 typealias Nel<A> = NonEmptyList<A>
@@ -165,9 +167,6 @@ class NonEmptyList<out A>(
   inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
     f(head) + tail.flatMap { f(it).all }
 
-  fun <B> ap(ff: NonEmptyList<(A) -> B>): NonEmptyList<B> =
-    flatMap { a -> ff.map { f -> f(a) } }
-
   operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     NonEmptyList(all + l.all)
 
@@ -259,6 +258,7 @@ class NonEmptyList<out A>(
       }
     }
 
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyList<Either<A, B>>): NonEmptyList<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a))
@@ -414,8 +414,11 @@ fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>,
   }
 
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  foldRight(f(head).map { nonEmptyListOf(it) }) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: B -> nonEmptyListOf(b) + bs } })
+  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+    when (val res = f(a)) {
+      is Right -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
+      is Left -> res
+    }
   }
 
 fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
@@ -425,8 +428,17 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  foldRight(f(head).map { nonEmptyListOf(it) }) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> nonEmptyListOf(b) + bs } })
+  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Validated.Valid -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
+        is Validated.Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Validated.Valid -> res
+        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      }
+    }
   }
 
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =

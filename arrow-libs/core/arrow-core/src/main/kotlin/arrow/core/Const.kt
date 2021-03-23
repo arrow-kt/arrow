@@ -25,7 +25,7 @@ data class Const<A, out T>(private val value: A) {
     b: Const<A, B>,
     map: (T, B) -> C
   ): Const<A, C> =
-    b.retag<C>().combine(SG, b.retag())
+    retag<C>().combine(SG, b.retag())
 
   inline fun <B, C, D> zip(
     SG: Semigroup<A>,

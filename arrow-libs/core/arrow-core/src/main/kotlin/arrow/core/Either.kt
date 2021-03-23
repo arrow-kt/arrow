@@ -918,61 +918,6 @@ sealed class Either<out A, out B> {
    */
   fun orNull(): B? = fold({ null }, { it })
 
-  /**
-   *  Applies [f] to an [B] inside [Either] and returns the [Either] structure with a tuple of the [B] value and the
-   *  computed [C] value as result of applying [f]
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".right().fproduct<String>({ "$it World" })
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> fproduct(f: (B) -> C): Either<A, Pair<B, C>> =
-    map { b -> b to f(b) }
-
-  /**
-   *  Pairs [C] with [B] returning a Either<A, Pair<C, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".left().tupleLeft<String>("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> tupleLeft(c: C): Either<A, Pair<C, B>> =
-    map { b -> c to b }
-
-  /**
-   *  Pairs [C] with [B] returning a Either<A, Pair<B, C>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".left().tupleRight<String>("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> tupleRight(c: C): Either<A, Pair<B, C>> =
-    map { b -> b to c }
-
   fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) emptyList<B>().right()
     else when (this) {
@@ -1057,6 +1002,7 @@ sealed class Either<out A, out B> {
 
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
+    @Deprecated(TailRecMDeprecation)
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Either<L, Either<A, B>>): Either<L, B> {
       return when (val ev = f(a)) {
         is Left -> Left(ev.value)
@@ -1150,28 +1096,8 @@ sealed class Either<out A, out B> {
       { it.bimap(fa, fb) }
   }
 
-  /**
-   *  Replaces [B] inside [Either] with [C] resulting in a Either<A, C>
-   *
-   *  Kind<F, A> -> Kind<F, B>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.*
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".left().mapConst<String>("...")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <C> mapConst(c: C): Either<A, C> =
-    map { c }
-
   fun void(): Either<A, Unit> =
-    mapConst(Unit)
+    map { Unit }
 }
 
 fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
@@ -1339,9 +1265,14 @@ inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
 fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   exists { it == elem }
 
-fun <A, B, C> Either<A, B>.ap(ff: Either<A, (B) -> C>): Either<A, C> =
-  flatMap { a -> ff.map { f -> f(a) } }
-
+@Deprecated(
+  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith(
+    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
+    "arrow.core.Eval",
+    "arrow.core.left"
+  )
+)
 fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
   fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })
 
@@ -1560,9 +1491,6 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
     }
   }
 
-fun <A, B, C, Z> Either<A, B>.zipEval(fb: Eval<Either<A, C>>, f: (B, C) -> Z): Eval<Either<A, Z>> =
-  fb.map { zip(it, f) }
-
 fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()
   else MB.run {
@@ -1571,17 +1499,6 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
       is Right -> List(n) { this@replicate.value }.combineAll().right()
     }
   }
-
-inline fun <A, B, C> Either<A, B>.mproduct(f: (B) -> Either<A, C>): Either<A, Pair<B, C>> =
-  flatMap { a ->
-    f(a).map { b -> a to b }
-  }
-
-inline fun <A, B> Either<A, Boolean>.ifM(ifTrue: () -> Either<A, B>, ifFalse: () -> Either<A, B>): Either<A, B> =
-  flatMap { if (it) ifTrue() else ifFalse() }
-
-fun <A, B, C> Either<A, Either<B, C>>.selectM(f: Either<A, (B) -> C>): Either<A, C> =
-  flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> b.right() }) }
 
 inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   when (this) {

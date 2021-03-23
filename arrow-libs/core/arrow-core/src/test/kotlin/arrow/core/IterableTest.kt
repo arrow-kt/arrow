@@ -2,13 +2,44 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.equalUnderTheLaw
+import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
 class IterableTest : UnitSpec() {
   init {
+    "traverseEither stack-safe" {
+      (0..20_000).map { Either.Right(it) }
+        .sequenceEither() shouldBe Either.Right((0..20_000).toList())
+    }
+
+    "traverseEither short-circuit" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        (ints.map { Either.Right(it) } + Either.Left(Unit))
+          .sequenceEither() == Either.Left(Unit)
+      }
+    }
+
+    "traverseValidated stack-safe" {
+      (0..20_000).map { Validated.Valid(it) }
+        .sequenceValidated(Semigroup.string()) shouldBe Validated.Valid((0..20_000).toList())
+    }
+
+    "traverseValidated acummulates" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          .sequenceValidated()
+
+        val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
+          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+
+        res == expected
+      }
+    }
+
     "zip3" {
       forAll(Gen.list(Gen.int()), Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)

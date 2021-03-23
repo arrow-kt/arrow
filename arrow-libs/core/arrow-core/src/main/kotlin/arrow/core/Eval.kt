@@ -59,14 +59,6 @@ sealed class Eval<out A> {
 
   companion object {
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Eval<Either<A, B>>): Eval<B> =
-      f(a).flatMap { eval: Either<A, B> ->
-        when (eval) {
-          is Either.Left -> tailRecM(eval.value, f)
-          is Either.Right -> now(eval.value)
-        }
-      }
-
     /**
      * Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
      *
@@ -232,9 +224,6 @@ sealed class Eval<out A> {
 
   inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
-
-  fun <B> ap(ff: Eval<(A) -> B>): Eval<B> =
-    ff.flatMap { f -> map(f) }
 
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
   fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
@@ -484,9 +473,6 @@ fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> =
-  fb.map { zip(it, f) }
-
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.now(emptyList())
   else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
@@ -495,11 +481,3 @@ fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
   if (n <= 0) Eval.now(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }
-
-fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }
-
-fun <A, B> Eval<A>.apTap(fb: Eval<B>): Eval<A> =
-  flatTap { fb }
-
-fun <A, B> Eval<A>.flatTap(f: (A) -> Eval<B>): Eval<A> =
-  flatMap { a -> f(a).map { a } }

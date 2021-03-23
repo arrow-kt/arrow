@@ -329,17 +329,6 @@ sealed class Option<out A> {
 
   companion object {
 
-    tailrec fun <A, B> tailRecM(a: A, f: (A) -> Option<Either<A, B>>): Option<B> =
-      when (val option = f(a)) {
-        is Some -> {
-          when (option.value) {
-            is Either.Left -> tailRecM(option.value.value, f)
-            is Either.Right -> Some(option.value.value)
-          }
-        }
-        is None -> None
-      }
-
     fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 
     operator fun <A> invoke(a: A): Option<A> = Some(a)
@@ -490,26 +479,6 @@ sealed class Option<out A> {
   inline fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
-  /**
-   *  Replaces [A] inside [Option] with [B] resulting in an Option<B>
-   *
-   *  Option<A> -> Option<B>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".some().mapConst("...")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> mapConst(b: B): Option<B> =
-    map { b }
-
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
     is Some<A> -> ifSome(value)
@@ -558,11 +527,15 @@ sealed class Option<out A> {
   inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
+  @Deprecated(
+    "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+    ReplaceWith(
+      "ff.fix().flatMap { this.fix().map(it) }",
+      "arrow.core.fix"
+    )
+  )
   fun <B> ap(ff: Option<(A) -> B>): Option<B> =
     ff.flatMap { this.map(it) }
-
-  fun <B> apEval(ff: Eval<Option<(A) -> B>>): Eval<Option<B>> =
-    fold({ Eval.now(none()) }, { r -> ff.map { it.map { f -> f(r) } } })
 
   inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
@@ -654,27 +627,6 @@ sealed class Option<out A> {
       is None -> initial
     }
 
-  /**
-   *  Applies [f] to an [A] inside [Option] and returns the [Option] structure with a pair of the [A] value and the
-   *  computed [B] value as result of applying [f]
-   *
-   *  Option<A> -> Option<Pair<A, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().fproduct({ "$it World" })
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  inline fun <B> fproduct(f: (A) -> B): Option<Pair<A, B>> =
-    map { a -> Pair(a, f(a)) }
-
   fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
     align(other) { ior ->
       ior.fold(
@@ -731,51 +683,8 @@ sealed class Option<out A> {
 
   fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
-  /**
-   *  Pairs [B] with [A] returning an Option<Pair<B, A>>
-   *
-   *  Option<A> -> Option<Pair<B, A>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().tupleLeft("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> tupleLeft(b: B): Option<Pair<B, A>> =
-    map { a -> Pair(b, a) }
-
-  /**
-   *  Pairs [A] with [B] returning an Option<Pair<A, B>>
-   *
-   *  Option<A> -> Option<Pair<A, B>>
-   *
-   *  ```kotlin:ank:playground
-   *  import arrow.core.some
-   *
-   *  fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".some().tupleRight("World")
-   *   //sampleEnd
-   *   println(result)
-   *  }
-   *  ```
-   */
-  fun <B> tupleRight(b: B): Option<Pair<A, B>> =
-    map { a -> Pair(a, b) }
-
   fun void(): Option<Unit> =
-    mapConst(Unit)
-
-  inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
-    other.map { zip(it).map { a -> f(a.first, a.second) } }
+    map { Unit }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -887,22 +796,6 @@ inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
 
 fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
-
-inline fun <A, B> Option<A>.mproduct(f: (A) -> Option<B>): Option<Pair<A, B>> =
-  flatMap { a ->
-    f(a).map { b -> a to b }
-  }
-
-inline fun <A> Option<Boolean>.ifM(ifTrue: () -> Option<A>, ifFalse: () -> Option<A>): Option<A> =
-  flatMap { if (it) ifTrue() else ifFalse() }
-
-fun <A, B> Option<Either<A, B>>.selectM(f: Option<(A) -> B>): Option<B> =
-  flatMap {
-    it.fold(
-      { a -> Some(a).ap(f) },
-      { b -> Some(b) }
-    )
-  }
 
 inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
   map(fb).handleError(fe)

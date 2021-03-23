@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
@@ -188,12 +190,12 @@ fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-fun <K, A, B> Map<K, A>.ap(ff: Map<K, (A) -> B>): Map<K, B> =
-  ff.flatMap { (_, f) -> this.mapValues { (_, a) -> f(a) } }
-
 inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
   foldRight(emptyMap<K, B>().right()) { (k, a), acc: Either<E, Map<K, B>> ->
-    f(a).ap(acc.map { bs: Map<K, B> -> { b: B -> mapOf(k to b) + bs } })
+    when (val res = f(a)) {
+      is Right -> acc.map { bs: Map<K, B> -> mapOf(k to res.value) + bs }
+      is Left -> res
+    }
   }
 
 fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
@@ -204,23 +206,23 @@ inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
   foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (k, a), acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> mapOf(k to b) + bs } })
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Validated.Valid -> acc.map { bs -> mapOf(k to res.value) + bs }
+        is Validated.Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Validated.Valid -> res
+        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      }
+    }
   }
 
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to f(a) }
-
 fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
-
-fun <K, A, B> Map<K, A>.tupleLeft(b: B): Map<K, Pair<B, A>> =
-  mapValues { (_, a) -> b to a }
-
-fun <K, A, B> Map<K, A>.tupleRight(b: B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to b }
 
 fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this

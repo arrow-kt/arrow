@@ -105,22 +105,20 @@ class ValidatedTest : UnitSpec() {
       Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
     }
 
-    val plusIntSemigroup: Semigroup<Int> = Semigroup.int()
-
     "findValid should return the first Valid value or combine or Invalid values otherwise" {
-      Valid(10).findValid(plusIntSemigroup) { fail("None should not be called") } shouldBe Valid(10)
-      Invalid(10).findValid(plusIntSemigroup) { Valid(5) } shouldBe Valid(5)
-      Invalid(10).findValid(plusIntSemigroup) { Invalid(5) } shouldBe Invalid(15)
+      Valid(10).findValid(Semigroup.int()) { fail("None should not be called") } shouldBe Valid(10)
+      Invalid(10).findValid(Semigroup.int()) { Valid(5) } shouldBe Valid(5)
+      Invalid(10).findValid(Semigroup.int()) { Invalid(5) } shouldBe Invalid(15)
     }
 
-    "ap should return Valid(f(a)) if both are Valid" {
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
+    "zip should return Valid(f(a)) if both are Valid" {
+      Valid(10).zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Valid(15)
     }
 
-    "ap should return first Invalid found if is unique or combine both otherwise" {
-      Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
-      Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
+    "zip should return first Invalid found if is unique or combine both otherwise" {
+      Invalid(10).zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Invalid(10)
+      Valid(10).zip<Int, Int, (Int) -> Int, Int>(Semigroup.int(), Invalid(5)) { a, ff -> ff(a) } shouldBe Invalid(5)
+      Invalid(10).zip<Int, Int, (Int) -> Int, Int>(Semigroup.int(), Invalid(5)) { a, ff -> ff(a) } shouldBe Invalid(15)
     }
 
     data class MyException(val msg: String) : Exception()
