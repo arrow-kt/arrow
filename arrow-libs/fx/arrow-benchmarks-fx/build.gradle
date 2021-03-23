@@ -2,7 +2,7 @@ buildscript {
     repositories {
         maven { url "https://dl.bintray.com/47deg/hood" }
     }
-    
+
     dependencies {
         classpath "com.47deg:hood:$HOOD_VERSION"
     }
@@ -15,6 +15,7 @@ buildscript {
 plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jlleitschuh.gradle.ktlint"
+    id "jacoco"
     id "me.champeau.gradle.jmh" version "$JMH_PLUGIN_VERSION"
     id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
 }
@@ -53,7 +54,7 @@ jmh {
 //            'arrow.benchmarks.Pure',
 //            'arrow.benchmarks.RacePair',
 //            'arrow.benchmarks.Uncancellable',
-            'arrow.benchmarks.Queue'
+'arrow.benchmarks.Queue'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')

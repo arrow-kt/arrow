@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jlleitschuh.gradle.ktlint"
+    id "jacoco"
     id "scala"
 }
 

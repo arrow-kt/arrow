@@ -1,7 +1,8 @@
 plugins {
     id 'java-gradle-plugin'
     id "org.jetbrains.kotlin.jvm"
-    id "org.jlleitschuh.gradle.ktlint"
+  id "org.jlleitschuh.gradle.ktlint"
+  id "jacoco"
 }
 
 apply from: "$SUB_PROJECT"
