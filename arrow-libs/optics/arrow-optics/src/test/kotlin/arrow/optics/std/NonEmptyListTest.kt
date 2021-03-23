@@ -5,8 +5,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
 import arrow.optics.Lens
-import arrow.optics.nonEmptyListHead
-import arrow.optics.nonEmptyListTail
 import arrow.optics.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid

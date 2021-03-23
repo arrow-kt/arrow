@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -14,13 +15,16 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
 
 @Deprecated(KindDeprecation)
-class ForPLens private constructor() { companion object }
+class ForPLens private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias PLensOf<S, T, A, B> = arrow.Kind4<ForPLens, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias PLensPartialOf<S, T, A> = arrow.Kind3<ForPLens, S, T, A>
 @Deprecated(KindDeprecation)
 typealias PLensKindedJ<S, T, A, B> = arrow.HkJ4<ForPLens, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> PLensOf<S, T, A, B>.fix(): PLens<S, T, A, B> =
@@ -79,6 +83,26 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
 
       override fun set(s: S, b: B): T = set(s, b)
     }
+
+    /**
+     * [Lens] to operate on the head of a [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> nonEmptyListHead(): Lens<NonEmptyList<A>, A> =
+      Lens(
+        get = NonEmptyList<A>::head,
+        set = { nel, newHead -> NonEmptyList(newHead, nel.tail) }
+      )
+
+    /**
+     * [Lens] to operate on the tail of a [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> nonEmptyListTail(): Lens<NonEmptyList<A>, List<A>> =
+      Lens(
+        get = NonEmptyList<A>::tail,
+        set = { nel, newTail -> NonEmptyList(nel.head, newTail) }
+      )
   }
 
   /**

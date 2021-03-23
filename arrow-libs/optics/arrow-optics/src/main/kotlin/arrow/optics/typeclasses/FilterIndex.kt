@@ -1,6 +1,7 @@
 package arrow.optics.typeclasses
 
 import arrow.Kind
+import arrow.core.NonEmptyList
 import arrow.core.Predicate
 import arrow.core.Tuple2
 import arrow.core.k
@@ -67,16 +68,36 @@ fun interface FilterIndex<S, I, A> {
       }
 
     @JvmStatic
-    fun <K, V> map(): FilterIndex<Map<K, V>, K, V> = FilterIndex { p ->
-      object : Traversal<Map<K, V>, V> {
-        override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-          s.toList().k().traverse(FA) { (k, v) ->
-            (if (p(k)) f(v) else just(v)).map {
-              k to it
+    fun <K, V> map(): FilterIndex<Map<K, V>, K, V> =
+      FilterIndex { p ->
+        object : Traversal<Map<K, V>, V> {
+          override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
+            FA.run {
+              s.toList().k().traverse(FA) { (k, v) ->
+                (if (p(k)) f(v) else just(v)).map {
+                  k to it
+                }
+              }.map { it.toMap() }
             }
-          }.map { it.toMap() }
         }
       }
-    }
+
+    /**
+     * [FilterIndex] instance definition for [NonEmptyList].
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): FilterIndex<NonEmptyList<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<NonEmptyList<A>, A> {
+          override fun <F> modifyF(
+            FA: Applicative<F>,
+            s: NonEmptyList<A>,
+            f: (A) -> Kind<F, A>
+          ): Kind<F, NonEmptyList<A>> =
+            s.all.mapIndexed { index, a -> a toT index }
+              .let(NonEmptyList.Companion::fromListUnsafe)
+              .traverse(FA) { (a, j) -> if (p(j)) f(a) else FA.just(a) }
+        }
+      }
   }
 }

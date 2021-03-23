@@ -5,6 +5,7 @@ import arrow.KindDeprecation
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.ListK
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -264,6 +265,19 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
         s.k().traverse(FA, f)
       }
     }
+
+    /**
+     * [Traversal] for [NonEmptyList] that has focus in each [A].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [NonEmptyList] and focus every [A] of the source.
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): Traversal<NonEmptyList<A>, A> =
+      object : Traversal<NonEmptyList<A>, A> {
+        override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> =
+          s.traverse(FA, f)
+      }
   }
 
   /**

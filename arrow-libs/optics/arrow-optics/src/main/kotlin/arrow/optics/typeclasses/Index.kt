@@ -1,5 +1,6 @@
 package arrow.optics.typeclasses
 
+import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.Fold
@@ -185,5 +186,20 @@ fun interface Index<S, I, A> {
           set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
         )
       }
+
+    /**
+     * [Index] instance definition for [NonEmptyList].
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> = Index { i ->
+      POptional(
+        getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
+        set = { l, a ->
+          NonEmptyList.fromListUnsafe(
+            l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+          )
+        }
+      )
+    }
   }
 }

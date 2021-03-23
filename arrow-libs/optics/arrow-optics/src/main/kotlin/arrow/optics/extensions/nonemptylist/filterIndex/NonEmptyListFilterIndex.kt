@@ -32,7 +32,7 @@ internal val filterIndex_singleton: FilterIndex<NonEmptyList<Any?>, Int, Any?> =
   "arrow.optics.extensions package is being deprecated. Use the function from the instance exposed in the typeclass' companion object instead.",
   ReplaceWith(
     "FilterIndex.nonEmptyList<A>().filter(p)",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,7 +50,7 @@ fun <A> filter(p: Function1<Int, Boolean>): PTraversal<NonEmptyList<A>, NonEmpty
   "Typeclass instance have been moved to the companion object of the typeclass",
   ReplaceWith(
     "FilterIndex.nonEmptyList<A>()",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
