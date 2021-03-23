@@ -181,6 +181,23 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     @JvmStatic
     fun stringToList(): Iso<String, List<Char>> =
       stringToList
+
+    /**
+     * [PIso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
+      PIso(
+        get = Validated<A1, B1>::toEither,
+        reverseGet = Validated.Companion::fromEither
+      )
+
+    /**
+     * [Iso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
+      validatedToPEither()
   }
 
   /**
