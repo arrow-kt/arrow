@@ -322,7 +322,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
  *  val valid = config.parse(Read.stringRead, "url").zip(
- *    NonEmptyList.semigroup<ConfigError>(),
+ *    Semigroup.nonEmptyList<ConfigError>(),
  *    config.parse(Read.intRead, "port")
  *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
@@ -339,7 +339,6 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -383,7 +382,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
  *
  * val valid = config.parse(Read.stringRead, "url").zip(
- *  NonEmptyList.semigroup<ConfigError>(),
+ *  Semigroup.nonEmptyList<ConfigError>(),
  *  config.parse(Read.intRead, "port")
  * ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
