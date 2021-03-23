@@ -99,5 +99,18 @@ fun interface FilterIndex<S, I, A> {
               .traverse(FA) { (a, j) -> if (p(j)) f(a) else FA.just(a) }
         }
       }
+
+    @JvmStatic
+    fun <A> sequence(): FilterIndex<Sequence<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<Sequence<A>, A> {
+          override fun <F> modifyF(FA: Applicative<F>, s: Sequence<A>, f: (A) -> Kind<F, A>): Kind<F, Sequence<A>> =
+            FA.run {
+              s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
+                if (p(j)) f(a) else just(a)
+              }
+            }
+        }
+      }
   }
 }

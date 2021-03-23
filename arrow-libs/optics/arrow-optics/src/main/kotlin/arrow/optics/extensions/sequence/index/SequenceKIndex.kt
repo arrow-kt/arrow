@@ -16,7 +16,7 @@ import arrow.optics.extensions.SequenceKIndex
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for Sequence from the companion object of the typeclass instead.",
   ReplaceWith(
     "Index.sequence<A>().index(i)",
-    "arrow.optics.sequence", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,7 +36,7 @@ fun <A> index(i: Int): POptional<SequenceK<A>, SequenceK<A>, A, A> =
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose Index.sequence<A>().index(i)",
-    "arrow.optics.compose", "arrow.optics.sequence", "arrow.optics.typeclasses.Index"
+    "arrow.optics.compose", "arrow.optics.typeclasses.Index"
   ),
   level = DeprecationLevel.WARNING
 )
@@ -61,7 +61,7 @@ object Sequence {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "Index.sequence<A>()",
-      "arrow.optics.sequence", "arrow.optics.typeclasses.Index"
+      "arrow.optics.typeclasses.Index"
     ),
     DeprecationLevel.WARNING
   )

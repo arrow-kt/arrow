@@ -191,15 +191,25 @@ fun interface Index<S, I, A> {
      * [Index] instance definition for [NonEmptyList].
      */
     @JvmStatic
-    fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> = Index { i ->
-      POptional(
-        getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
-        set = { l, a ->
-          NonEmptyList.fromListUnsafe(
-            l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
-          )
-        }
-      )
-    }
+    fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> =
+      Index { i ->
+        POptional(
+          getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
+          set = { l, a ->
+            NonEmptyList.fromListUnsafe(
+              l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+            )
+          }
+        )
+      }
+
+    @JvmStatic
+    fun <A> sequence(): Index<Sequence<A>, Int, A> =
+      Index { i ->
+        POptional(
+          getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
+          set = { s, a -> s.mapIndexed { index, aa -> if (index == i) a else aa } }
+        )
+      }
   }
 }

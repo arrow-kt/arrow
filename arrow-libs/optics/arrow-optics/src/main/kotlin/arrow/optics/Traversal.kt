@@ -298,6 +298,13 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
             s.traverse(FA, f)
           }
       }
+
+    @JvmStatic
+    fun <A> sequence(): Traversal<Sequence<A>, A> =
+      object : Traversal<Sequence<A>, A> {
+        override fun <F> modifyF(FA: Applicative<F>, s: Sequence<A>, f: (A) -> Kind<F, A>): Kind<F, Sequence<A>> =
+          FA.run { s.k().traverse(FA, f) }
+      }
   }
 
   /**

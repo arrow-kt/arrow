@@ -24,7 +24,7 @@ import arrow.typeclasses.Applicative
   "SequenceK is being deprecated. Use the instance for Sequence from the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : T
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
