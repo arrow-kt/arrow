@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -83,6 +84,23 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
 
       override fun reverseGet(b: B): T = reverseGet(b)
     }
+
+    /**
+     * [PIso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A, B> listToPOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> =
+      PIso(
+        get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
+        reverseGet = { optNel -> optNel.fold({ emptyList() }, NonEmptyList<B>::all) }
+      )
+
+    /**
+     * [Iso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> =
+      listToPOptionNel()
   }
 
   /**

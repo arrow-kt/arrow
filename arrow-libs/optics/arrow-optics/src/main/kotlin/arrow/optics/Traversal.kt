@@ -13,6 +13,7 @@ import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
 import arrow.core.identity
+import arrow.core.k
 import arrow.core.value
 import arrow.optics.typeclasses.Id
 import arrow.optics.typeclasses.fix
@@ -215,6 +216,16 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
           f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s))
         ) { (b1, b2, b3, b4, b5, b6, b7, b8, b9, b10) -> set(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, s) }
     }
+
+    /**
+     * [Traversal] for [List] that focuses in each [A] of the source [List].
+     */
+    @JvmStatic
+    fun <A> list(): Traversal<List<A>, A> =
+      object : Traversal<List<A>, A> {
+        override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+          s.k().traverse(FA, f)
+      }
   }
 
   /**

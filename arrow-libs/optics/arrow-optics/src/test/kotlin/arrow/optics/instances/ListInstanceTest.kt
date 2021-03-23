@@ -17,7 +17,6 @@ import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.listk.snoc.snoc
 import arrow.optics.extensions.traversal
-import arrow.optics.list
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws

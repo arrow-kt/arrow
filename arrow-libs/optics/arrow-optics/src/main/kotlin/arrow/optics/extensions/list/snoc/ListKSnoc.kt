@@ -18,7 +18,7 @@ import kotlin.collections.List
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Snoc.list<A>().initOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+    "arrow.optics.typeclasses.Snoc"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,7 +39,7 @@ fun <A> initOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> =
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Snoc.list<A>().lastOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+    "arrow.optics.typeclasses.Snoc"
   ),
   DeprecationLevel.WARNING
 )
@@ -104,7 +104,7 @@ object List {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "Snoc.list<A>()",
-      "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+      "arrow.optics.typeclasses.Snoc"
     ),
     DeprecationLevel.WARNING
   )

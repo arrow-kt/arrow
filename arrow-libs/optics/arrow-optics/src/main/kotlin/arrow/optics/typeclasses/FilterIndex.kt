@@ -3,6 +3,8 @@ package arrow.optics.typeclasses
 import arrow.Kind
 import arrow.core.Predicate
 import arrow.core.Tuple2
+import arrow.core.k
+import arrow.core.toT
 import arrow.optics.Iso
 import arrow.optics.Traversal
 import arrow.typeclasses.Applicative
@@ -33,7 +35,10 @@ fun interface FilterIndex<S, I, A> {
     /**
      * Create an instance of [FilterIndex] from a [Traverse] and a function `Kind<S, A>) -> Kind<S, Tuple2<A, Int>>`
      */
-    fun <S, A> fromTraverse(zipWithIndex: (Kind<S, A>) -> Kind<S, Tuple2<A, Int>>, traverse: Traverse<S>): FilterIndex<Kind<S, A>, Int, A> =
+    fun <S, A> fromTraverse(
+      zipWithIndex: (Kind<S, A>) -> Kind<S, Tuple2<A, Int>>,
+      traverse: Traverse<S>
+    ): FilterIndex<Kind<S, A>, Int, A> =
       FilterIndex { p ->
         object : Traversal<Kind<S, A>, A> {
           override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
@@ -43,6 +48,20 @@ fun interface FilterIndex<S, I, A> {
                   if (p(j)) f(a) else just(a)
                 }
               }
+            }
+        }
+      }
+
+    /**
+     * [FilterIndex] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): FilterIndex<List<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<List<A>, A> {
+          override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+            s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
+              if (p(j)) f(a) else FA.just(a)
             }
         }
       }

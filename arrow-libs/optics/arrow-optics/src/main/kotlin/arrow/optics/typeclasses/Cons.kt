@@ -2,8 +2,11 @@ package arrow.optics.typeclasses
 
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
 import arrow.optics.Iso
 import arrow.optics.Optional
+import arrow.optics.PPrism
 import arrow.optics.Prism
 import arrow.optics.first
 import arrow.optics.second
@@ -60,5 +63,17 @@ fun interface Cons<S, A> {
 
     operator fun <S, A> invoke(prism: Prism<S, Tuple2<A, S>>): Cons<S, A> =
       Cons { prism }
+
+    /**
+     * [Cons] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): Cons<List<A>, A> =
+      Cons {
+        PPrism(
+          getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1)) }?.right() ?: list.left() },
+          reverseGet = { (a, aas) -> listOf(a) + aas }
+        )
+      }
   }
 }

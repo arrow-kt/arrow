@@ -1,7 +1,12 @@
 package arrow.optics.typeclasses
 
+import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.toOption
 import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.Prism
@@ -65,5 +70,22 @@ fun interface Snoc<S, A> {
      */
     operator fun <S, A> invoke(prism: Prism<S, Tuple2<S, A>>): Snoc<S, A> =
       Snoc { prism }
+
+    /**
+     * [Snoc] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): Snoc<List<A>, A> =
+      Snoc {
+        object : Prism<List<A>, Tuple2<List<A>, A>> {
+          override fun getOrModify(s: List<A>): Either<List<A>, Tuple2<List<A>, A>> =
+            Option.applicative().mapN(Option.just(s.dropLast(1)), s.lastOrNull().toOption(), ::identity)
+              .fix()
+              .toEither { s }
+
+          override fun reverseGet(b: Tuple2<List<A>, A>): List<A> =
+            b.a + b.b
+        }
+      }
   }
 }
