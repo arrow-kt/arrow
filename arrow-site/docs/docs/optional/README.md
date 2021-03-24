@@ -119,7 +119,7 @@ Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that 
 
 ```kotlin:ank
 val pprism = PPrism.pSome<Tuple2<Int, String>, Tuple2<String, String>>()
-val plens = PLens.tuple2PFirst<Int, String, String>()
+val plens = Tuple2.pFirst<Int, String, String>()
 
 val someTuple2: POptional<Option<Tuple2<Int, String>>, Option<Tuple2<String, String>>, Int, String> =
     pprism compose plens
