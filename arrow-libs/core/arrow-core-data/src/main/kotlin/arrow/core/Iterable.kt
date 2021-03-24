@@ -1,7 +1,4 @@
-@file:JvmName("Iterable")
-@file:JvmMultifileClass
 @file:Suppress("unused", "FunctionName")
-
 package arrow.core
 
 import arrow.core.Either.Left
