@@ -36,7 +36,7 @@ fun <A> index(i: Int): POptional<SequenceK<A>, SequenceK<A>, A, A> =
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose Index.sequence<A>().index(i)",
-    "arrow.optics.compose", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   level = DeprecationLevel.WARNING
 )

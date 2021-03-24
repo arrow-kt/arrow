@@ -23,7 +23,7 @@ internal val at_singleton: MapKAt<Any?, Any?> = object : MapKAt<Any?, Any?> {}
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose At.map<K, V>().at(i)",
-    "arrow.optics.typeclasses.At", "arrow.optics.compose"
+    "arrow.optics.typeclasses.At"
   ),
   level = DeprecationLevel.WARNING
 )

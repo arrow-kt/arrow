@@ -119,7 +119,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * [PIso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
-    fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
+    fun <A1, A2, B1, B2> pValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
       PIso(
         get = { it.fold(::Invalid, ::Valid) },
         reverseGet = Validated<A2, B2>::toEither
@@ -129,8 +129,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * [Iso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
-    fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
-      eitherToPValidated()
+    fun <A, B> validated(): Iso<Either<A, B>, Validated<A, B>> =
+      pValidated()
 
     /**
      * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
@@ -186,7 +186,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * [PIso] that defines equality between [Validated] and [Either]
      */
     @JvmStatic
-    fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
+    fun <A1, A2, B1, B2> pEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
       PIso(
         get = Validated<A1, B1>::toEither,
         reverseGet = Validated.Companion::fromEither
@@ -196,8 +196,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
      * [Iso] that defines equality between [Validated] and [Either]
      */
     @JvmStatic
-    fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
-      validatedToPEither()
+    fun <A, B> either(): Iso<Validated<A, B>, Either<A, B>> =
+      pEither()
   }
 
   /**

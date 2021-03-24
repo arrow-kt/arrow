@@ -16,7 +16,7 @@ import arrow.optics.extensions.MapKIndex
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose Index.map<K, V>().index(i)",
-    "arrow.optics.typeclasses.Index", "arrow.optics.compose"
+    "arrow.optics.typeclasses.Index"
   ),
   level = DeprecationLevel.WARNING
 )

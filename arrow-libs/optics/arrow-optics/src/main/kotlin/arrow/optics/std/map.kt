@@ -8,7 +8,7 @@ import arrow.core.k
  * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
  */
 @Deprecated(
-  "MapK is being deprMapInstanceTest.ktecated, use the function defined for Map instead.",
+  "MapK is being deprecated, use the function defined for Map instead.",
   ReplaceWith(
     "Iso.mapToSet<K>()",
     "arrow.optics.Iso"

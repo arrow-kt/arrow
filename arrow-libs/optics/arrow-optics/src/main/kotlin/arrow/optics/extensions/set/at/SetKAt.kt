@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose At.set<A>().at(i)",
-    "arrow.optics.typeclasses.At", "arrow.optics.compose"
+    "arrow.optics.typeclasses.At"
   ),
   DeprecationLevel.WARNING
 )
