@@ -75,6 +75,7 @@ sealed class Ior<out A, out B> {
      * @return [null] if both [a] and [b] are [null]. Otherwise
      * an [Ior.Left], [Ior.Right], or [Ior.Both] if [a], [b], or both are defined (respectively).
      */
+    @JvmStatic
     fun <A, B> fromNullables(a: A?, b: B?): Ior<A, B>? =
       when (a != null) {
         true -> when (b != null) {
@@ -87,8 +88,10 @@ sealed class Ior<out A, out B> {
         }
       }
 
+    @JvmStatic
     fun <A, B> leftNel(a: A): IorNel<A, B> = Left(nonEmptyListOf(a))
 
+    @JvmStatic
     fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(nonEmptyListOf(a), b)
 
     /**
@@ -108,9 +111,11 @@ sealed class Ior<out A, out B> {
      *  }
      *  ```
      */
+    @JvmStatic
     fun <A, B, C> lift(f: (B) -> C): (Ior<A, B>) -> Ior<A, C> =
       { it.map(f) }
 
+    @JvmStatic
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
       { it.bimap(fa, fb) }
 

@@ -9,6 +9,11 @@ data class Const<A, out T>(private val value: A) {
     this as Const<A, U>
 
   companion object {
+
+    @Deprecated(
+      "This constructor is duplicated with Const. Use Const instead.",
+      ReplaceWith("Const(a)", "arrow.core.Const")
+    )
     fun <A, T> just(a: A): Const<A, T> =
       Const(a)
   }

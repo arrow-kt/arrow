@@ -1000,6 +1000,7 @@ sealed class Either<out A, out B> {
     @PublishedApi
     internal val unit: Either<Nothing, Unit> = Right(Unit)
 
+    @JvmStatic
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
     @Deprecated(TailRecMDeprecation)
@@ -1027,9 +1028,12 @@ sealed class Either<out A, out B> {
      *
      * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
      */
+    @JvmStatic
     inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) Right(ifTrue()) else Left(ifFalse())
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <R> catch(f: () -> R): Either<Throwable, R> =
       try {
         f().right()
@@ -1037,9 +1041,13 @@ sealed class Either<out A, out B> {
         t.nonFatalOrThrow().left()
       }
 
+    @JvmStatic
+    @JvmName("tryCatchAndFlatten")
     inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
       catch(f).fold({ it.left() }, { it })
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
       try {
         f().right()
@@ -1058,6 +1066,7 @@ sealed class Either<out A, out B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
+    @JvmStatic
     inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
       success: (a: A) -> Either<Throwable, B>,
@@ -1089,9 +1098,11 @@ sealed class Either<out A, out B> {
      *  }
      *  ```
      */
+    @JvmStatic
     fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
       { it.map(f) }
 
+    @JvmStatic
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
   }

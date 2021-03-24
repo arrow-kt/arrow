@@ -1,3 +1,4 @@
+@file:JvmName("Composition")
 package arrow.core
 
 infix fun <P1, P2, IP, R> ((P1, P2) -> IP).andThen(f: (IP) -> R): (P1, P2) -> R =

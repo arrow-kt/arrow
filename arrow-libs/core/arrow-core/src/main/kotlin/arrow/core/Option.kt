@@ -329,10 +329,14 @@ sealed class Option<out A> {
 
   companion object {
 
+    @JvmStatic
     fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 
+    @JvmStatic
     operator fun <A> invoke(a: A): Option<A> = Some(a)
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
       try {
         Some(f())
@@ -341,6 +345,7 @@ sealed class Option<out A> {
         None
       }
 
+    @JvmStatic
     fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
 

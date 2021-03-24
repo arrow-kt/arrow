@@ -431,19 +431,23 @@ sealed class Validated<out E, out A> {
 
   companion object {
 
+    @JvmStatic
     fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
+    @JvmStatic
     fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
+    @JvmStatic
     fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
     /**
      * Converts an `Option<A>` to a `Validated<E, A>`, where the provided `ifNone` output value is returned as [Invalid]
      * when the specified `Option` is `None`.
      */
+    @JvmStatic
     inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
       o.fold(
         { Invalid(ifNone()) },
@@ -454,9 +458,12 @@ sealed class Validated<out E, out A> {
      * Converts a nullable `A?` to a `Validated<E, A>`, where the provided `ifNull` output value is returned as [Invalid]
      * when the specified value is null.
      */
+    @JvmStatic
     inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
       try {
         f().valid()
@@ -464,9 +471,12 @@ sealed class Validated<out E, out A> {
         e.nonFatalOrThrow().invalid()
       }
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
       catch(f).mapLeft(recover)
 
+    @JvmStatic
     inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
@@ -491,6 +501,7 @@ sealed class Validated<out E, out A> {
      * }
      * ```
      */
+    @JvmStatic
     inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
       { fa -> fa.map(f) }
 
@@ -511,6 +522,7 @@ sealed class Validated<out E, out A> {
      * }
      * ```
      */
+    @JvmStatic
     inline fun <A, B, C, D> lift(
       crossinline fl: (A) -> C,
       crossinline fr: (B) -> D
