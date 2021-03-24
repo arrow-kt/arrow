@@ -8,6 +8,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.Tuple3
 import arrow.core.identity
 import arrow.core.toT
 import arrow.typeclasses.Applicative
@@ -103,6 +104,176 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
         get = NonEmptyList<A>::tail,
         set = { nel, newTail -> NonEmptyList(nel.head, newTail) }
       )
+
+    /**
+     * [PLens] to focus into the first value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B, R> pairPFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> =
+      PLens(
+        get = { it.first },
+        set = { (_, b), r -> r to b }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B> pairFirst(): Lens<Pair<A, B>, A> =
+      pairPFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B, R> pairPSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
+      PLens(
+        get = { it.second },
+        set = { (a, _), r -> a to r }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B> pairSecond(): Lens<Pair<A, B>, B> =
+      pairPSecond()
+
+    /**
+     * [PLens] to focus into the first value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePFirst(): PLens<Triple<A, B, C>, Triple<R, B, C>, A, R> =
+      PLens(
+        get = { it.first },
+        set = { (_, b, c), r -> Triple(r, b, c) }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleFirst(): Lens<Triple<A, B, C>, A> =
+      triplePFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePSecond(): PLens<Triple<A, B, C>, Triple<A, R, C>, B, R> =
+      PLens(
+        get = { it.second },
+        set = { (a, _, c), r -> Triple(a, r, c) }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleSecond(): Lens<Triple<A, B, C>, B> =
+      triplePSecond()
+
+    /**
+     * [PLens] to focus into the third value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePThird(): PLens<Triple<A, B, C>, Triple<A, B, R>, C, R> =
+      PLens(
+        get = { it.third },
+        set = { (a, b, _), r -> Triple(a, b, r) }
+      )
+
+    /**
+     * [Lens] to focus into the third value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
+      triplePThird()
+
+    /**
+     * [PLens] to focus into the first value of a [arrow.core.Tuple2]
+     */
+    @JvmStatic
+    fun <A, B, R> tuple2PFirst(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> =
+      PLens(
+        get = { it.a },
+        set = { (_, b), r -> r toT b }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [arrow.core.Tuple2]
+     */
+    @JvmStatic
+    fun <A, B> tuple2First(): Lens<Tuple2<A, B>, A> =
+      tuple2PFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [arrow.core.Tuple2]
+     */
+    @JvmStatic
+    fun <A, B, R> tuple2PSecond(): PLens<Tuple2<A, B>, Tuple2<A, R>, B, R> =
+      PLens(
+        get = { it.b },
+        set = { (a, _), r -> a toT r }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [arrow.core.Tuple2]
+     */
+    @JvmStatic
+    fun <A, B> tuple2Second(): Lens<Tuple2<A, B>, B> =
+      tuple2PSecond()
+
+    /**
+     * [PLens] to focus into the first value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C, R> tuple3PFirst(): PLens<Tuple3<A, B, C>, Tuple3<R, B, C>, A, R> =
+      PLens(
+        get = { it.a },
+        set = { (_, b, c), r -> Tuple3(r, b, c) }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C> tuple3First(): Lens<Tuple3<A, B, C>, A> =
+      tuple3PFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C, R> tuple3PSecond(): PLens<Tuple3<A, B, C>, Tuple3<A, R, C>, B, R> =
+      PLens(
+        get = { it.b },
+        set = { (a, _, c), r -> Tuple3(a, r, c) }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C> tuple3Second(): Lens<Tuple3<A, B, C>, B> =
+      tuple3PSecond()
+
+    /**
+     * [PLens] to focus into the third value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C, R> tuple3PThird(): PLens<Tuple3<A, B, C>, Tuple3<A, B, R>, C, R> =
+      PLens(
+        get = { it.c },
+        set = { (a, b, _), r -> Tuple3(a, b, r) }
+      )
+
+    /**
+     * [Lens] to focus into the third value of a [arrow.core.Tuple3]
+     */
+    @JvmStatic
+    fun <A, B, C> tuple3Third(): Lens<Tuple3<A, B, C>, C> =
+      tuple3PThird()
   }
 
   /**

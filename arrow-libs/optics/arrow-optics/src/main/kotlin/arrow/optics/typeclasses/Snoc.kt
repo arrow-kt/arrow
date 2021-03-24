@@ -11,9 +11,8 @@ import arrow.core.right
 import arrow.core.toOption
 import arrow.optics.Iso
 import arrow.optics.Optional
+import arrow.optics.PLens
 import arrow.optics.Prism
-import arrow.optics.first
-import arrow.optics.second
 
 typealias Conj<S, A> = Snoc<S, A>
 
@@ -34,12 +33,12 @@ fun interface Snoc<S, A> {
   /**
    * Provides an [Optional] between [S] and its init [S].
    */
-  fun initOption(): Optional<S, S> = snoc() compose Tuple2.first()
+  fun initOption(): Optional<S, S> = snoc() compose PLens.tuple2First()
 
   /**
    * Provides an [Optional] between [S] and its last element [A].
    */
-  fun lastOption(): Optional<S, A> = snoc() compose Tuple2.second()
+  fun lastOption(): Optional<S, A> = snoc() compose PLens.tuple2Second()
 
   /**
    * Selects all elements except the last.

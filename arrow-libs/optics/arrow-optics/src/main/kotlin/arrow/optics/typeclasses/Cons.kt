@@ -5,11 +5,10 @@ import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.Iso
+import arrow.optics.Lens
 import arrow.optics.Optional
 import arrow.optics.PPrism
 import arrow.optics.Prism
-import arrow.optics.first
-import arrow.optics.second
 
 /**
  * [Cons] provides a [Prism] between [S] and its first element [A] and tail [S].
@@ -29,13 +28,13 @@ fun interface Cons<S, A> {
    * Provides an [Optional] between [S] and its first element [A].
    */
   fun firstOption(): Optional<S, A> =
-    cons() compose Tuple2.first()
+    cons() compose Lens.tuple2First()
 
   /**
    * Provides an [Optional] between [S] and its tail [S].
    */
   fun tailOption(): Optional<S, S> =
-    cons() compose Tuple2.second()
+    cons() compose Lens.tuple2Second()
 
   /**
    * Prepend an element [A] to the first element of [S].
