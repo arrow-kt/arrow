@@ -59,7 +59,7 @@ object Sequence {
   )
   @Deprecated(
     "@extension kinded projected functions are deprecated",
-    ReplaceWith("Monoid.sequence<A>()", "arrow.core.sequence", "arrow.typeclasses.Monoid"),
+    ReplaceWith("Monoid.sequence<A>()", "arrow.typeclasses.Monoid"),
     level = DeprecationLevel.WARNING
   )
   inline fun <A> monoid(): SequenceKMonoid<A> = monoid_singleton as

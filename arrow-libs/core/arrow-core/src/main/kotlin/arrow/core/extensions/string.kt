@@ -2,41 +2,44 @@ package arrow.core.extensions
 
 import arrow.core.Ordering
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.string()", "arrow.core.Semigroup", "arrow.core.string"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Semigroup.string()", "arrow.core.Semigroup"))
 interface StringSemigroup : Semigroup<String> {
   override fun String.combine(b: String): String = "${this}$b"
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.string()", "arrow.core.Semigroup", "arrow.core.string"))
+@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Semigroup.string()", "arrow.core.Semigroup"))
 fun String.Companion.semigroup(): Semigroup<String> =
   object : StringSemigroup {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Monoid.string()", "arrow.core.Monoid"))
 interface StringMonoid : Monoid<String>, StringSemigroup {
   override fun empty(): String = ""
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
+@Deprecated(ShowDeprecation)
 fun String.Companion.monoid(): Monoid<String> =
   object : StringMonoid {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
+@Deprecated(EqDeprecation)
 interface StringEq : Eq<String> {
   override fun String.eqv(b: String): Boolean = this == b
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
+@Deprecated(EqDeprecation)
 fun String.Companion.eq(): Eq<String> =
   object : StringEq {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
+@Deprecated(ShowDeprecation)
 interface StringShow : Show<String> {
   override fun String.show(): String = "\"${this.escape()}\""
 
@@ -46,7 +49,7 @@ interface StringShow : Show<String> {
       .replace("\t", "\\t").replace("\b", "\\b")
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
+@Deprecated(ShowDeprecation)
 fun String.Companion.show(): Show<String> =
   object : StringShow {}
 
@@ -62,12 +65,12 @@ interface StringOrder : Order<String> {
 fun String.Companion.order(): Order<String> =
   object : StringOrder {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
+@Deprecated(HashDeprecation)
 interface StringHash : Hash<String>, StringEq {
   override fun String.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
+@Deprecated(HashDeprecation)
 fun String.Companion.hash(): Hash<String> =
   object : StringHash {}
 

@@ -55,7 +55,7 @@ object Map {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.map(SG)", "arrow.core.map", "arrow.core.Monoid"))
+  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.map(SG)", "arrow.core.Monoid"))
   inline fun <K, A> monoid(SG: Semigroup<A>): MapKMonoid<K, A> = object :
     arrow.core.extensions.MapKMonoid<K, A> {
     override fun SG(): arrow.typeclasses.Semigroup<A> =
