@@ -3,7 +3,6 @@ package arrow.fx.coroutines.stream
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
-import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
@@ -289,7 +288,7 @@ internal tailrec suspend fun go(
                   null -> Result.fromEither(r)
                   else -> {
                     val (interruptedScopeId, err) = res.interruptedScope
-                    val err1 = Platform.composeErrors(err, r.swap().getOrElse { null })
+                    val err1 = Platform.composeErrors(err, r.swap().orNull())
                     if (ancestor.findSelfOrAncestor(interruptedScopeId) != null) {
                       // we still have scopes to interrupt, lets build interrupted tail
                       Result.Interrupted(interruptedScopeId, err1)

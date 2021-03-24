@@ -208,7 +208,9 @@ class IorTest : UnitSpec() {
     "getOrElse() should return value" {
       forAll { a: Int, b: Int ->
         Ior.Right(a).getOrElse { b } == a &&
-          Ior.Left(a).getOrElse { b } == b &&
+          Ior.Left(a)
+            .widen<Int, Int, Int>()
+            .getOrElse { b } == b &&
           Ior.Both(a, b).getOrElse { a * 2 } == b
       }
     }

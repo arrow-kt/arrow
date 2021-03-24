@@ -851,7 +851,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     foldLeft(empty()) { acc, a -> acc.combine(a) }
   }
 
-
   fun <B> zip(SE: Semigroup<@UnsafeVariance E>, fb: Validated<@UnsafeVariance E, B>): Validated<E, Pair<A, B>> =
     zip(SE, fb, ::Pair)
 
@@ -1050,7 +1049,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       Invalid(accumulatedError!!)
     }
 }
-
 
 inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,

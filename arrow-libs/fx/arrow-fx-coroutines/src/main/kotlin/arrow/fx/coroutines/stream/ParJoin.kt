@@ -26,8 +26,8 @@ suspend fun <O> stop(
   done.update {
     when (it) {
       is Some -> {
-        it.t.map { e -> Some(Platform.composeErrors(e, rslt.orNull())) }
-          .orElse { Some(rslt) }
+        it.t.map { e -> Option(Platform.composeErrors(e, rslt.orNull())) }
+          .orElse { Option(rslt) }
       }
       else -> Some(rslt)
     }

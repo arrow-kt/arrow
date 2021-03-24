@@ -142,7 +142,9 @@ class ValidatedTest : UnitSpec() {
 
     "getOrElse should return value if is Valid or default otherwise" {
       Valid(13).getOrElse { fail("None should not be called") } shouldBe 13
-      Invalid(13).getOrElse { "defaultValue" } shouldBe "defaultValue"
+      Invalid(13)
+        .widen<Int, String, String>()
+        .getOrElse { "defaultValue" } shouldBe "defaultValue"
     }
 
     "orNull should return value if is Valid or null otherwise" {
@@ -153,13 +155,15 @@ class ValidatedTest : UnitSpec() {
 
     "valueOr should return value if is Valid or the the result of f otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
-      Invalid(13).valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
+      Invalid(13)
+        .widen<Int, String, String>()
+        .valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
     }
 
     "orElse should return Valid(value) if is Valid or the result of default otherwise" {
       Valid(13).orElse { fail("None should not be called") } shouldBe Valid(13)
-      Invalid(13).orElse { Valid("defaultValue") } shouldBe Valid("defaultValue")
-      Invalid(13).orElse { Invalid("defaultValue") } shouldBe Invalid("defaultValue")
+      Invalid(13).widen<Int, String, String>().orElse { Valid("defaultValue") } shouldBe Valid("defaultValue")
+      Invalid(13).leftWiden<Any, Int, Double>().orElse { Invalid("defaultValue") } shouldBe Invalid("defaultValue")
     }
 
     "foldLeft should return b when is Invalid" {
@@ -197,18 +201,27 @@ class ValidatedTest : UnitSpec() {
 
     "findValid should return the first Valid value or combine or Invalid values otherwise" {
       Valid(10).findValid(Semigroup.int()) { fail("None should not be called") } shouldBe Valid(10)
-      Invalid(10).findValid(Semigroup.int()) { Valid(5) } shouldBe Valid(5)
+      Invalid(10).widen<Int, Int, Int>().findValid(Semigroup.int()) { Valid(5) } shouldBe Valid(5)
       Invalid(10).findValid(Semigroup.int()) { Invalid(5) } shouldBe Invalid(15)
     }
 
     "zip should return Valid(f(a)) if both are Valid" {
-      Valid(10).zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Valid(15)
+      Valid(10).widen<Int, Int, Int>()
+        .zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Valid(15)
     }
 
     "zip should return first Invalid found if is unique or combine both otherwise" {
-      Invalid(10).zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Invalid(10)
-      Valid(10).zip<Int, Int, (Int) -> Int, Int>(Semigroup.int(), Invalid(5)) { a, ff -> ff(a) } shouldBe Invalid(5)
-      Invalid(10).zip<Int, Int, (Int) -> Int, Int>(Semigroup.int(), Invalid(5)) { a, ff -> ff(a) } shouldBe Invalid(15)
+      Invalid(10)
+        .widen<Int, Int, Int>()
+        .zip(Semigroup.int(), Valid { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Invalid(10)
+
+      Valid(10)
+        .widen<Int, Int, Int>()
+        .zip(Semigroup.int(), Invalid(5)) { a, ff: (Int) -> Int -> ff(a) } shouldBe Invalid(5)
+
+      Invalid(10)
+        .widen<Int, Int, Int>()
+        .zip(Semigroup.int(), Invalid(5)) { a, ff: (Int) -> Int -> ff(a) } shouldBe Invalid(15)
     }
 
     data class MyException(val msg: String) : Exception()
@@ -216,6 +229,8 @@ class ValidatedTest : UnitSpec() {
     "fromEither should return Valid if is Either.Right or Failure otherwise" {
       Validated.fromEither(Right(10)) shouldBe Valid(10)
       Validated.fromEither(Left(10)) shouldBe Invalid(10)
+
+      Invalid(10).map { "String" }
     }
 
     "fromOption should return Valid if is Some or Invalid otherwise" {
@@ -265,19 +280,23 @@ class ValidatedTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over homogeneous Validated" {
-      Valid("11th").zip(
-        Semigroup.string(),
-        Valid("Doctor"),
-        Valid("Who")
-      ) { a, b, c -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
+      Valid("11th")
+        .widen<String, String, String>()
+        .zip(
+          Semigroup.string(),
+          Valid("Doctor"),
+          Valid("Who")
+        ) { a, b, c -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
     }
 
     "Cartesian builder should build products over heterogeneous Validated" {
-      Valid(13).zip(
-        Semigroup.string(),
-        Valid("Doctor"),
-        Valid(false)
-      ) { a, b, c -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
+      Valid(13)
+        .widen<String, Int, Int>()
+        .zip(
+          Semigroup.string(),
+          Valid("Doctor"),
+          Valid(false)
+        ) { a, b, c -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
     }
 
     "Cartesian builder should build products over Invalid Validated" {

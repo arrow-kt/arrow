@@ -7,12 +7,10 @@ import arrow.core.ForValidated
 import arrow.core.Validated
 import arrow.core.handleErrorWith as _handleErrorWith
 import arrow.core.handleError as _handleError
-import arrow.core.attempt as _attempt
 import arrow.core.Validated.Companion
 import arrow.core.extensions.ValidatedApplicativeError
 import arrow.core.fix
 import arrow.core.invalid
-import arrow.core.redeem
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Semigroup
 import kotlin.Function0
@@ -100,7 +98,7 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.redeem(
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("attempt()", "arrow.core.attempt"))
 fun <E, A> Kind<Kind<ForValidated, E>, A>.attempt(SE: Semigroup<E>): Validated<E, Either<E, A>> =
-  fix()._attempt()
+  fix().attempt()
 
 @JvmName("catch")
 @Suppress(

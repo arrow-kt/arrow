@@ -130,7 +130,9 @@ class EitherTest : UnitSpec() {
     "getOrElse should return value" {
       forAll { a: Int, b: Int ->
         Right(a).getOrElse { b } == a &&
-          Left(a).getOrElse { b } == b
+          Left(a)
+            .widen<Int, Int, Int>()
+            .getOrElse { b } == b
       }
     }
 
@@ -143,7 +145,9 @@ class EitherTest : UnitSpec() {
     "getOrHandle should return value" {
       forAll { a: Int, b: Int ->
         Right(a).getOrHandle { b } == a &&
-          Left(a).getOrHandle { it + b } == a + b
+          Left(a)
+            .widen<Int, Int, Int>()
+            .getOrHandle { it + b } == a + b
       }
     }
 
@@ -151,8 +155,12 @@ class EitherTest : UnitSpec() {
       forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a) &&
-          Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b) &&
+        Right(a)
+          .widen<Int, Int, Int>()
+          .filterOrElse({ it > a - 1 }, { b }) == Right(a) &&
+          Right(a)
+            .widen<Int, Int, Int>()
+            .filterOrElse({ it > a + 1 }, { b }) == Left(b) &&
           left.filterOrElse({ it > a - 1 }, { b }) == Left(a) &&
           left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
       }
@@ -162,8 +170,12 @@ class EitherTest : UnitSpec() {
       forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).filterOrOther({ it > a - 1 }, { b + a }) == Right(a) &&
-          Right(a).filterOrOther({ it > a + 1 }, { b + a }) == Left(b + a) &&
+        Right(a)
+          .widen<Int, Int, Int>()
+          .filterOrOther({ it > a - 1 }, { b + a }) == Right(a) &&
+          Right(a)
+            .widen<Int, Int, Int>()
+            .filterOrOther({ it > a + 1 }, { b + a }) == Left(b + a) &&
           left.filterOrOther({ it > a - 1 }, { b + a }) == Left(a) &&
           left.filterOrOther({ it > a + 1 }, { b + a }) == Left(a)
       }
@@ -240,8 +252,12 @@ class EitherTest : UnitSpec() {
 
     "handleErrorWith should handle left instance otherwise return Right" {
       forAll { a: Int, b: String ->
-        Left(a).handleErrorWith { Right(b) } == Right(b) &&
-          Right(a).handleErrorWith { Right(b) } == Right(a) &&
+        Left(a)
+          .widen<Int, String, String>()
+          .handleErrorWith { Right(b) } == Right(b) &&
+          Right(a)
+            .widen<String, Any, Int>()
+            .handleErrorWith { Right(b) } == Right(a) &&
           Left(a).handleErrorWith { Left(b) } == Left(b)
       }
     }

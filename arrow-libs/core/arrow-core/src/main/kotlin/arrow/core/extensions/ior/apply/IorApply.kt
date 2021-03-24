@@ -95,7 +95,6 @@ fun <L, A, B, Z> Kind<Kind<ForIor, L>, A>.map2Eval(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1) { a, b -> arg2(Tuple2(a, b))}",
-    
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -120,7 +119,6 @@ fun <L, A, B, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1) { a, b -> arg2(Tuple2(a, b))}",
-    
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -145,7 +143,6 @@ fun <L, A, B, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c))}",
-    
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -171,7 +168,6 @@ fun <L, A, B, C, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2) { a, b, c -> arg3(Tuple3(a, b, c))}",
-    
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -197,7 +193,6 @@ fun <L, A, B, C, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d))}",
-    
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -224,7 +219,6 @@ fun <L, A, B, C, D, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3) { a, b, c, d -> arg4(Tuple4(a, b, c, d))}",
-    
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -251,7 +245,6 @@ fun <L, A, B, C, D, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e))}",
-    
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -279,7 +272,6 @@ fun <L, A, B, C, D, E, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg5(Tuple5(a, b, c, d, e))}",
-    
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -307,7 +299,6 @@ fun <L, A, B, C, D, E, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f))}",
-    
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -336,7 +327,6 @@ fun <L, A, B, C, D, E, FF, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg6(Tuple6(a, b, c, d, e, f))}",
-    
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -365,7 +355,6 @@ fun <L, A, B, C, D, E, FF, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g))}",
-    
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -396,7 +385,6 @@ fun <L, A, B, C, D, E, FF, G, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg7(Tuple7(a, b, c, d, e, f, g))}",
-    
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -427,7 +415,6 @@ fun <L, A, B, C, D, E, FF, G, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h))}",
-    
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -459,7 +446,6 @@ fun <L, A, B, C, D, E, FF, G, H, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg8(Tuple8(a, b, c, d, e, f, g, h))}",
-    
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -491,7 +477,6 @@ fun <L, A, B, C, D, E, FF, G, H, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i))}",
-    
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -524,7 +509,6 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg9(Tuple9(a, b, c, d, e, f, g, h, i))}",
-    
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -557,7 +541,6 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j))}",
-    
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
@@ -591,7 +574,6 @@ fun <L, A, B, C, D, E, FF, G, H, I, J, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg10(Tuple10(a, b, c, d, e, f, g, h, i, j))}",
-    
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
@@ -653,8 +635,8 @@ fun <L, A, B, Z> Kind<Kind<ForIor, L>, A>.map2(
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, B>):
   Ior<L, Tuple2<A, B>> = arrow.core.Ior.apply<L>(SL).run {
-    this@product.product<A, B>(arg1) as arrow.core.Ior<L, arrow.core.Tuple2<A, B>>
-  }
+  this@product.product<A, B>(arg1) as arrow.core.Ior<L, arrow.core.Tuple2<A, B>>
+}
 
 @JvmName("product1")
 @Suppress(
@@ -667,7 +649,6 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.product(SL: Semigroup<L>, arg1: Kind<Kind
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b), z -> Tuple3(a, b, z) }",
-    
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -690,7 +671,6 @@ fun <L, A, B, Z> Kind<Kind<ForIor, L>, Tuple2<A, B>>.product(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c), z -> Tuple4(a, b, c, z) }",
-    
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -713,7 +693,6 @@ fun <L, A, B, C, Z> Kind<Kind<ForIor, L>, Tuple3<A, B, C>>.product(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }",
-    
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -737,7 +716,6 @@ fun <L, A, B, C, D, Z> Kind<Kind<ForIor, L>, Tuple4<A, B, C, D>>.product(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }",
-    
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -748,7 +726,7 @@ fun <L, A, B, C, D, E, Z> Kind<Kind<ForIor, L>, Tuple5<A, B, C, D, E>>.product(
 ): Ior<L, Tuple6<A, B, C, D, E, Z>> =
   arrow.core.Ior.apply<L>(SL).run {
     this@product.product<A, B, C, D, E, Z>(arg1) as arrow.core.Ior<L, arrow.core.Tuple6<A, B, C, D, E,
-        Z>>
+      Z>>
   }
 
 @JvmName("product5")
@@ -762,16 +740,15 @@ fun <L, A, B, C, D, E, Z> Kind<Kind<ForIor, L>, Tuple5<A, B, C, D, E>>.product(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d, e, f), z -> Tuple7(a, b, c, d, e, f, z) }",
-    
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForIor, L>, Tuple6<A, B, C, D, E,
-    FF>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple7<A, B, C, D, E, FF,
-    Z>> = arrow.core.Ior.apply<L>(SL).run {
+  FF>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple7<A, B, C, D, E, FF,
+  Z>> = arrow.core.Ior.apply<L>(SL).run {
   this@product.product<A, B, C, D, E, FF, Z>(arg1) as arrow.core.Ior<L, arrow.core.Tuple7<A, B, C,
-      D, E, FF, Z>>
+    D, E, FF, Z>>
 }
 
 @JvmName("product6")
@@ -785,16 +762,15 @@ fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForIor, L>, Tuple6<A, B, C, D, E,
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d, e, f, g), z -> Tuple8(a, b, c, d, e, f, g, z) }",
-    
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForIor, L>, Tuple7<A, B, C, D, E, FF,
-    G>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple8<A, B, C, D, E, FF,
-    G, Z>> = arrow.core.Ior.apply<L>(SL).run {
+  G>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple8<A, B, C, D, E, FF,
+  G, Z>> = arrow.core.Ior.apply<L>(SL).run {
   this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as arrow.core.Ior<L, arrow.core.Tuple8<A, B,
-      C, D, E, FF, G, Z>>
+    C, D, E, FF, G, Z>>
 }
 
 @JvmName("product7")
@@ -808,16 +784,15 @@ fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForIor, L>, Tuple7<A, B, C, D, E, FF,
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d, e, f, g, h), z -> Tuple9(a, b, c, d, e, f, g, h, z) }",
-    
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForIor, L>, Tuple8<A, B, C, D, E, FF, G,
-    H>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple9<A, B, C, D, E, FF,
-    G, H, Z>> = arrow.core.Ior.apply<L>(SL).run {
+  H>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple9<A, B, C, D, E, FF,
+  G, H, Z>> = arrow.core.Ior.apply<L>(SL).run {
   this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as arrow.core.Ior<L, arrow.core.Tuple9<A,
-      B, C, D, E, FF, G, H, Z>>
+    B, C, D, E, FF, G, H, Z>>
 }
 
 @JvmName("product8")
@@ -831,14 +806,13 @@ fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForIor, L>, Tuple8<A, B, C, D, E, 
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.zip(SL, arg1) { (a, b, c, d, e, f, g, h, i), z -> Tuple10(a, b, c, d, e, f, g, h, i, z) }",
-    
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForIor, L>, Tuple9<A, B, C, D, E, FF, G, H,
-    I>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple10<A, B, C, D, E, FF,
-    G, H, I, Z>> = arrow.core.Ior.apply<L>(SL).run {
+  I>>.product(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, Z>): Ior<L, Tuple10<A, B, C, D, E, FF,
+  G, H, I, Z>> = arrow.core.Ior.apply<L>(SL).run {
   this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as arrow.core.Ior<L,
     arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
 }
@@ -854,7 +828,6 @@ fun <L, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForIor, L>, Tuple9<A, B, C, D, 
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1) { a, b -> Tuple2(a, b) }",
-    
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -878,7 +851,6 @@ fun <L, A, B> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1) { a, b -> Tuple2(a, b) }",
-    
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -902,7 +874,6 @@ fun <L, A, B> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -927,7 +898,6 @@ fun <L, A, B, C> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    
     "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
@@ -952,7 +922,6 @@ fun <L, A, B, C> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -978,7 +947,6 @@ fun <L, A, B, C, D> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    
     "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
@@ -1004,7 +972,6 @@ fun <L, A, B, C, D> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -1019,7 +986,7 @@ fun <L, A, B, C, D, E> tupled(
 ): Ior<L, Tuple5<A, B, C, D, E>> = arrow.core.Ior
   .apply<L>(SL)
   .tupled<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.Ior<L, arrow.core.Tuple5<A, B,
-    C, D, E>>
+  C, D, E>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1032,7 +999,6 @@ fun <L, A, B, C, D, E> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    
     "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
@@ -1047,7 +1013,7 @@ fun <L, A, B, C, D, E> tupledN(
 ): Ior<L, Tuple5<A, B, C, D, E>> = arrow.core.Ior
   .apply<L>(SL)
   .tupledN<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.Ior<L, arrow.core.Tuple5<A,
-    B, C, D, E>>
+  B, C, D, E>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1060,7 +1026,6 @@ fun <L, A, B, C, D, E> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -1089,7 +1054,6 @@ fun <L, A, B, C, D, E, FF> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    
     "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
@@ -1118,7 +1082,6 @@ fun <L, A, B, C, D, E, FF> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -1148,7 +1111,6 @@ fun <L, A, B, C, D, E, FF, G> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    
     "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
@@ -1178,7 +1140,6 @@ fun <L, A, B, C, D, E, FF, G> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -1209,7 +1170,6 @@ fun <L, A, B, C, D, E, FF, G, H> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    
     "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
@@ -1240,7 +1200,6 @@ fun <L, A, B, C, D, E, FF, G, H> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -1272,7 +1231,6 @@ fun <L, A, B, C, D, E, FF, G, H, I> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    
     "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
@@ -1304,7 +1262,6 @@ fun <L, A, B, C, D, E, FF, G, H, I> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
@@ -1338,7 +1295,6 @@ fun <L, A, B, C, D, E, FF, G, H, I, J> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "arg0.zip(SL, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    
     "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
@@ -1378,8 +1334,8 @@ fun <L, A, B, C, D, E, FF, G, H, I, J> tupledN(
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.followedBy(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, B>):
   Ior<L, B> = arrow.core.Ior.apply<L>(SL).run {
-    this@followedBy.followedBy<A, B>(arg1) as arrow.core.Ior<L, B>
-  }
+  this@followedBy.followedBy<A, B>(arg1) as arrow.core.Ior<L, B>
+}
 
 @JvmName("apTap")
 @Suppress(
@@ -1397,8 +1353,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.followedBy(SL: Semigroup<L>, arg1: Kind<K
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.apTap(SL: Semigroup<L>, arg1: Kind<Kind<ForIor, L>, B>):
   Ior<L, A> = arrow.core.Ior.apply<L>(SL).run {
-    this@apTap.apTap<A, B>(arg1) as arrow.core.Ior<L, A>
-  }
+  this@apTap.apTap<A, B>(arg1) as arrow.core.Ior<L, A>
+}
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -1409,4 +1365,6 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.apTap(SL: Semigroup<L>, arg1: Kind<Kind<F
   level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.apply(SL: Semigroup<L>): IorApply<L> = object :
-  arrow.core.extensions.IorApply<L> { override fun SL(): arrow.typeclasses.Semigroup<L> = SL }
+  arrow.core.extensions.IorApply<L> {
+  override fun SL(): arrow.typeclasses.Semigroup<L> = SL
+}

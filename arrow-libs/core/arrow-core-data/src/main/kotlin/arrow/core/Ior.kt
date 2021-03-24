@@ -782,8 +782,9 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
 
     val leftValue: A? = SA.run {
       var accumulatedLeft: A? = null
-      if (this is Left<*>) (value as A).maybeCombine(accumulatedLeft) else accumulatedLeft
-      accumulatedLeft = if (this is Both<*, *>) (leftValue as A).maybeCombine(accumulatedLeft) else accumulatedLeft
+
+      if (this@Ior is Left<*>) return Left((this@Ior.value as A).maybeCombine(accumulatedLeft))
+      accumulatedLeft = if (this@Ior is Both<*, *>) (this@Ior.leftValue as A).maybeCombine(accumulatedLeft) else accumulatedLeft
 
       if (c is Left) return Left(c.value.maybeCombine(accumulatedLeft))
       accumulatedLeft = if (c is Both) c.leftValue.maybeCombine(accumulatedLeft) else accumulatedLeft
