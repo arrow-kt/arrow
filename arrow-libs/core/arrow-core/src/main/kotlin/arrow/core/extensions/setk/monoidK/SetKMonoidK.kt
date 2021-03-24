@@ -23,15 +23,7 @@ internal val monoidK_singleton: SetKMonoidK = object : arrow.core.extensions.Set
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Monoid.set<A>()",
-    "arrow.typeclasses.Monoid",
-    "arrow.core.set"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Monoid for Set is deprecated. Please use Monoid for List instead.")
 fun <A> algebra(): Monoid<Kind<ForSetK, A>> = arrow.core.SetK
   .monoidK()
   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForSetK, A>>

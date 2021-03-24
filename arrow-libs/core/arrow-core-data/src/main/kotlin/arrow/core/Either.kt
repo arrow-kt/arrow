@@ -1241,12 +1241,6 @@ fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Right(right)", "arrow.core.Either"))
 fun <R> Right(right: R): Either<Nothing, R> = Right(right)
 
-fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
-  EitherSemigroup(SA, SB)
-
-fun <A, B> Monoid.Companion.either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
-  EitherMonoid(MA, MB)
-
 /**
  * Binds the given function across [Either.Right].
  *
@@ -1528,7 +1522,17 @@ inline fun <A, B, C, D, E> Either<A, B>.zip(
   d: Either<A, D>,
   map: (B, C, D) -> E
 ): Either<A, E> =
-  zip(c, d, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  zip(
+    c,
+    d,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
 inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1536,7 +1540,17 @@ inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   e: Either<A, E>,
   map: (B, C, D, E) -> F
 ): Either<A, F> =
-  zip(c, d, e, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  zip(
+    c,
+    d,
+    e,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
 inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1545,7 +1559,17 @@ inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   f: Either<A, F>,
   map: (B, C, D, E, F) -> G
 ): Either<A, G> =
-  zip(c, d, e, f, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  zip(
+    c,
+    d,
+    e,
+    f,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
 inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1555,7 +1579,16 @@ inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H
 ): Either<A, H> =
-  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ ->
+    map(
+      b,
+      c,
+      d,
+      e,
+      f,
+      g
+    )
+  }
 
 inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1566,7 +1599,17 @@ inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I
 ): Either<A, I> =
-  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ ->
+    map(
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h
+    )
+  }
 
 inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1659,28 +1702,3 @@ fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
 
 fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)
-
-private open class EitherSemigroup<L, R>(
-  private val SGL: Semigroup<L>,
-  private val SGR: Semigroup<R>
-) : Semigroup<Either<L, R>> {
-
-  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
-    combine(SGL, SGR, b)
-
-  override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
-    b?.let { combine(SGL, SGR, it) } ?: this
-}
-
-private class EitherMonoid<L, R>(
-  private val MOL: Monoid<L>,
-  private val MOR: Monoid<R>
-) : Monoid<Either<L, R>>, EitherSemigroup<L, R>(MOL, MOR) {
-  override fun empty(): Either<L, R> = Right(MOR.empty())
-
-  override fun Collection<Either<L, R>>.combineAll(): Either<L, R> =
-    combineAll(MOL, MOR)
-
-  override fun combineAll(elems: List<Either<L, R>>): Either<L, R> =
-    elems.combineAll(MOL, MOR)
-}

@@ -4,7 +4,6 @@ import arrow.core.Tuple2
 import arrow.core.Tuple2.Companion
 import arrow.core.combineAll
 import arrow.core.extensions.Tuple2Monoid
-import arrow.core.pair
 import arrow.typeclasses.Monoid
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -25,7 +24,6 @@ import kotlin.jvm.JvmName
     "map { (a, b) -> Pair(a, b) } .combineAll(Monoid.pair(MA, MB)).let { (a, b) -> Tuple2(a, b) }",
     "arrow.core.combineAll",
     "arrow.core.Monoid",
-    "arrow.core.pair",
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -46,7 +44,6 @@ fun <A, B> Collection<Tuple2<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Tu
     "arg0.map { (a, b) -> Pair(a, b) }.combineAll(Monoid.pair(MA, MB)).let { (a, b) -> Tuple2(a, b) }",
     "arrow.core.combineAll",
     "arrow.core.Monoid",
-    "arrow.core.pair",
     "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
@@ -66,8 +63,7 @@ fun <A, B> combineAll(
   "Tuple2 is deprecated in favor of Kotlin's Pair. ReplaceWith Pair and use Pair instance of Show",
   ReplaceWith(
     "Monoid.pair(MA, MB)",
-    "arrow.core.Monoid",
-    "arrow.core.pair"
+    "arrow.core.Monoid"
   ),
   DeprecationLevel.WARNING
 )

@@ -9,9 +9,11 @@ import arrow.core.extensions.setk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -19,12 +21,13 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.hashWithSalt
 import arrow.core.combineK as setCombineK
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.set<A>()", "arrow.core.set", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.set<A>()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
@@ -32,20 +35,12 @@ interface SetKSemigroup<A> : Semigroup<SetK<A>> {
     this.fix().setCombineK(b)
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.set<A>()", "arrow.core.set", "arrow.typeclasses.Monoid"),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Monoid for Set is deprecated. Please use Monoid for List instead.")
 interface SetKMonoid<A> : Monoid<SetK<A>>, SetKSemigroup<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Eq.set<A>()", "arrow.core.set", "arrow.typeclasses.Eq"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(EqDeprecation)
 interface SetKEq<A> : Eq<SetK<A>> {
 
   fun EQ(): Eq<A>
@@ -59,11 +54,7 @@ interface SetKEq<A> : Eq<SetK<A>> {
     else false
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Show.set<A>()", "arrow.core.set", "arrow.typeclasses.Show"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(ShowDeprecation)
 interface SetKShow<A> : Show<SetK<A>> {
   fun SA(): Show<A>
   override fun SetK<A>.show(): String = show(SA())
@@ -122,11 +113,7 @@ interface SetKMonoidK : MonoidK<ForSetK> {
     fix().setCombineK(y)
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Hash.set<A>()", "arrow.core.set", "arrow.typeclasses.Hash"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 interface SetKHash<A> : Hash<SetK<A>> {
   fun HA(): Hash<A>
 
