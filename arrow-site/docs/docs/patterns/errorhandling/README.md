@@ -230,7 +230,6 @@ import arrow.core.ValidatedNel
 import arrow.core.computations.either
 import arrow.core.handleErrorWith
 import arrow.core.invalidNel
-import arrow.core.nonEmptyList
 import arrow.core.traverseEither
 import arrow.core.traverseValidated
 import arrow.core.validNel

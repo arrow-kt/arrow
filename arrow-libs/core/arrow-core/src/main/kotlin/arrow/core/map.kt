@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
 
@@ -409,16 +408,6 @@ fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(S
 
 fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
-
-fun <K, A> Monoid.Companion.map(SG: Semigroup<A>): Monoid<Map<K, A>> =
-  MapMonoid(SG)
-
-private class MapMonoid<K, A>(private val SG: Semigroup<A>) : Monoid<Map<K, A>> {
-  override fun empty(): Map<K, A> = emptyMap()
-
-  override fun Map<K, A>.combine(b: Map<K, A>): Map<K, A> =
-    combine(SG, b)
-}
 
 inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
   this.entries.reversed().fold(b) { x, y: Map.Entry<K, A> -> f(y, x) }

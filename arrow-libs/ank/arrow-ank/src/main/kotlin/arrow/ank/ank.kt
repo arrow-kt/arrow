@@ -3,11 +3,9 @@ package arrow.ank
 import arrow.core.Validated
 import arrow.core.ValidatedNel
 import arrow.core.invalidNel
-import arrow.core.nonEmptyList
 import arrow.core.sequenceValidated
 import arrow.core.validNel
 import arrow.fx.coroutines.nonFatalOrThrow
-import arrow.typeclasses.Semigroup
 import java.nio.file.Path
 import kotlin.math.ln
 import kotlin.math.pow
@@ -54,7 +52,7 @@ suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: 
     }
 
     acc + res
-  }.sequenceValidated(Semigroup.nonEmptyList())
+  }.sequenceValidated()
 
   validatedPaths.fold({ errors ->
     val separator = "\n----------------------------------------------------------------\n"

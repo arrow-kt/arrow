@@ -399,9 +399,6 @@ operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A
 fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
   this.flatMap(::identity)
 
-fun <A, B> NonEmptyList<Either<A, B>>.selectM(f: NonEmptyList<(A) -> B>): NonEmptyList<B> =
-  this.flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> nonEmptyListOf(b) }) }
-
 fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
 
@@ -443,12 +440,3 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   traverseValidated(semigroup, ::identity)
-
-@Suppress("UNCHECKED_CAST")
-fun <A> Semigroup.Companion.nonEmptyList(): Semigroup<NonEmptyList<A>> =
-  NonEmptyListSemigroup as Semigroup<NonEmptyList<A>>
-
-object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
-  override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =
-    NonEmptyList(this.head, this.tail.plus(b))
-}

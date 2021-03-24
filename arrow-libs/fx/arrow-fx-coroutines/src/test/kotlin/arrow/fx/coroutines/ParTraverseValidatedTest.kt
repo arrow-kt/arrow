@@ -5,7 +5,6 @@ import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.invalidNel
-import arrow.core.nonEmptyList
 import arrow.core.sequenceValidated
 import arrow.core.validNel
 import arrow.typeclasses.Semigroup

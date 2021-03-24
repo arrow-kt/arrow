@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.core.int
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen

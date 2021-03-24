@@ -5,6 +5,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.completeWith
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -20,7 +21,7 @@ class PredefTest : ArrowFxSpec(
         val x = i.suspended()
           .startCoroutineUninterceptedOrReturn(
             Continuation(EmptyCoroutineContext) {
-              it.fold(promise::complete, promise::completeExceptionally)
+              promise.completeWith(it)
             }
           )
 

@@ -527,16 +527,6 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
     }
   }
 
-@Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "ff.map { fff -> zip(SG, fff) { a, f -> f(a) } }",
-    "arrow.core.zip"
-  )
-)
-fun <A, B, D> Ior<A, B>.apEval(SG: Semigroup<A>, ff: Eval<Ior<A, (B) -> D>>): Eval<Ior<A, D>> =
-  ff.map { fff -> zip(SG, fff) { a, f -> f(a) } }
-
 inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity, { _, b -> b })
 
@@ -790,21 +780,6 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
     rightValue == null && leftValue != null -> Left(leftValue)
     else -> throw ArrowCoreInternalException
   }
-}
-
-fun <A, B> Semigroup.Companion.ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
-  IorSemigroup(SA, SB)
-
-private class IorSemigroup<A, B>(
-  private val SGA: Semigroup<A>,
-  private val SGB: Semigroup<B>
-) : Semigroup<Ior<A, B>> {
-
-  override fun Ior<A, B>.combine(b: Ior<A, B>): Ior<A, B> =
-    combine(SGA, SGB, b)
-
-  override fun Ior<A, B>.maybeCombine(b: Ior<A, B>?): Ior<A, B> =
-    b?.let { combine(SGA, SGB, it) } ?: this
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(other: Ior<A, B>): Int = fold(

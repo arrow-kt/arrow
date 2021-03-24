@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 data class Const<A, out T>(private val value: A) {
@@ -178,18 +177,3 @@ fun <A, T, U> Const<A, T>.contramap(f: (U) -> T): Const<A, U> =
 
 operator fun <A : Comparable<A>, T> Const<A, T>.compareTo(other: Const<A, T>): Int =
   value().compareTo(other.value())
-
-fun <A, T> Semigroup.Companion.const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
-  object : Semigroup<Const<A, T>> {
-    override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
-      this.combine(SA, b)
-  }
-
-fun <A, T> Monoid.Companion.const(MA: Monoid<A>): Monoid<Const<A, T>> =
-  object : Monoid<Const<A, T>> {
-    override fun empty(): Const<A, T> =
-      Const(MA.empty())
-
-    override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
-      this.combine(MA, b)
-  }

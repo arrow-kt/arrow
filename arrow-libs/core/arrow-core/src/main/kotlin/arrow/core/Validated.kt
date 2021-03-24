@@ -210,7 +210,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.validNel
  * import arrow.core.zip
  * import arrow.typeclasses.Semigroup
- * import arrow.core.nonEmptyList
  *
  * //sampleStart
  * val parallelValidate =
@@ -246,7 +245,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.nonEmptyList
  * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
@@ -309,7 +307,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.nonEmptyList
  * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
@@ -982,12 +979,6 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, j, f)
 
-fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
-  ValidatedSemigroup(SE, SA)
-
-fun <E, A> Semigroup.Companion.monoid(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
-  ValidatedMonoid(SE, MA)
-
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
  *
@@ -1087,17 +1078,6 @@ inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Valida
     { Valid(it) }
   )
 
-@Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
-    "arrow.core.Eval",
-    "arrow.core.left"
-  )
-)
-fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
-  ff.map { f -> zip(SE, f) { a, ff -> ff(a) } }
-
 inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
   when (this) {
     is Validated.Valid -> this
@@ -1158,21 +1138,3 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-private open class ValidatedSemigroup<A, B>(
-  private val SA: Semigroup<A>,
-  private val SB: Semigroup<B>
-) : Semigroup<Validated<A, B>> {
-  override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
-    combine(SA, SB, b)
-}
-
-private class ValidatedMonoid<A, B>(
-  SA: Semigroup<A>,
-  MB: Monoid<B>
-) : Monoid<Validated<A, B>>, ValidatedSemigroup<A, B>(SA, MB) {
-  private val empty = Valid(MB.empty())
-
-  override fun empty(): Validated<A, B> =
-    empty
-}
