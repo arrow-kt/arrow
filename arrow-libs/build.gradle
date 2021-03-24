@@ -16,7 +16,6 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION" apply false
     id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
     id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
-    id "jacoco"
 }
 
 apply from: "gradle/$ROOT_PROJECT"
