@@ -45,7 +45,6 @@ fun <A> Kind<ForOption, A>.combineK(arg1: Kind<ForOption, A>): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.option<A>()",
-    "arrow.core.option",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

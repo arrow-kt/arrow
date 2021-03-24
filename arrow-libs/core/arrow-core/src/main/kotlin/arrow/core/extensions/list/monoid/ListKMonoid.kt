@@ -45,7 +45,7 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.list<A>()", "arrow.core.list", "arrow.core.Monoid"))
+  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.list<A>()", "arrow.core.Monoid"))
   inline fun <A> monoid(): ListKMonoid<A> = monoid_singleton as
     arrow.core.extensions.ListKMonoid<A>
 }

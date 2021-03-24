@@ -53,7 +53,7 @@ fun <K, A> combineAll(SG: Semigroup<A>, arg0: List<MapK<K, A>>): MapK<K, A> = ar
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.map(SG)", "arrow.core.map", "arrow.core.Monoid"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.map(SG)", "arrow.core.Monoid"))
 inline fun <K, A> Companion.monoid(SG: Semigroup<A>): MapKMonoid<K, A> = object :
   arrow.core.extensions.MapKMonoid<K, A> {
   override fun SG(): arrow.typeclasses.Semigroup<A> = SG

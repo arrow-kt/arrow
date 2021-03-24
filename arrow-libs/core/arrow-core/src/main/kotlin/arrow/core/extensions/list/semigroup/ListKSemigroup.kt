@@ -46,7 +46,7 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.list", "arrow.core.Semigroup"))
+  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.Semigroup"))
   inline fun <A> semigroup(): ListKSemigroup<A> = semigroup_singleton as
     arrow.core.extensions.ListKSemigroup<A>
 }
