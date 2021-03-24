@@ -19,8 +19,4 @@ plugins {
     id "jacoco"
 }
 
-jacoco {
-    toolVersion = "$JACOCO_VERSION"
-}
-
 apply from: "gradle/$ROOT_PROJECT"

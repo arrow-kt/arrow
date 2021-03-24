@@ -1,8 +1,7 @@
 plugins {
     id 'java-gradle-plugin'
     id "org.jetbrains.kotlin.jvm"
-  id "org.jlleitschuh.gradle.ktlint"
-  id "jacoco"
+    id "org.jlleitschuh.gradle.ktlint"
 }
 
 apply from: "$SUB_PROJECT"
@@ -34,5 +33,7 @@ gradlePlugin {
 }
 
 tasks.whenTaskAdded { task ->
-    if (task.name.matches('.*Plugin.*MavenPublication.*')) { task.enabled = false }
+    if (task.name.matches('.*Plugin.*MavenPublication.*')) {
+        task.enabled = false
+    }
 }

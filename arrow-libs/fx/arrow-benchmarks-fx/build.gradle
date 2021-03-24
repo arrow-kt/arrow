@@ -15,7 +15,6 @@ buildscript {
 plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jlleitschuh.gradle.ktlint"
-    id "jacoco"
     id "me.champeau.gradle.jmh" version "$JMH_PLUGIN_VERSION"
     id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
 }
