@@ -1,3 +1,4 @@
+@file:JvmName("Partials")
 package arrow.core
 
 fun <P1, R> ((P1) -> R).partially1(p1: P1): () -> R =

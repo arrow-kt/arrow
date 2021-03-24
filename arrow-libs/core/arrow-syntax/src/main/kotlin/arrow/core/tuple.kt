@@ -1,3 +1,4 @@
+@file:JvmName("TupleN")
 package arrow.core
 
 operator fun <A, B, C> Pair<A, B>.plus(c: C): Triple<A, B, C> = Triple(this.first, this.second, c)
