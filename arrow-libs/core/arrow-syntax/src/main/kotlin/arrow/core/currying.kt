@@ -1,3 +1,4 @@
+@file:JvmName("Currying")
 package arrow.core
 
 fun <P1, P2, R> ((P1, P2) -> R).curried(): (P1) -> (P2) -> R =
