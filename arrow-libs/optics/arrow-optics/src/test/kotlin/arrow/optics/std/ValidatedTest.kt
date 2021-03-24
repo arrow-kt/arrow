@@ -19,7 +19,7 @@ class ValidatedTest : UnitSpec() {
 
     testLaws(
       IsoLaws.laws(
-        iso = Iso.validatedToEither(),
+        iso = Iso.either(),
         aGen = Gen.validated(Gen.string(), Gen.int()),
         bGen = Gen.either(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),

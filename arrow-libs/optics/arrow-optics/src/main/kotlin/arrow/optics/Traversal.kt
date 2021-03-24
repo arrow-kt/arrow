@@ -9,15 +9,6 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Tuple10
-import arrow.core.Tuple2
-import arrow.core.Tuple3
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
 import arrow.core.extensions.AndMonoid
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.either.traverse.traverse
@@ -27,7 +18,6 @@ import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
-import arrow.core.toT
 import arrow.core.value
 import arrow.optics.typeclasses.Id
 import arrow.optics.typeclasses.fix
