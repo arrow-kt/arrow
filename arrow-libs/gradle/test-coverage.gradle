@@ -18,10 +18,6 @@ jacoco {
     toolVersion = "$JACOCO_VERSION"
 }
 
-test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
-}
-
 jacocoTestReport {
     reports {
         xml.enabled true
