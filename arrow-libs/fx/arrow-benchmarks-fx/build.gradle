@@ -53,7 +53,7 @@ jmh {
 //            'arrow.benchmarks.Pure',
 //            'arrow.benchmarks.RacePair',
 //            'arrow.benchmarks.Uncancellable',
-'arrow.benchmarks.Queue'
+            'arrow.benchmarks.Queue'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')
