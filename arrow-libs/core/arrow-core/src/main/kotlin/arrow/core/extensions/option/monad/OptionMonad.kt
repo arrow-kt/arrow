@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionMonad
 
@@ -41,14 +42,7 @@ fun <A, B> Kind<ForOption, A>.flatMap(arg1: Function1<A, Kind<ForOption, B>>): O
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Option.tailRecM(arg0, arg1)",
-    "arrow.core.Option"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForOption, Either<A, B>>>): Option<B> =
   arrow.core.Option
     .monad()
@@ -295,8 +289,8 @@ fun <A, B> Kind<ForOption, A>.forEffectEval(arg1: Eval<Kind<ForOption, B>>): Opt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "mproduct(arg1)",
-    "arrow.core.mproduct"
+    "flatMap { a -> f(a).map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -314,10 +308,7 @@ fun <A, B> Kind<ForOption, A>.mproduct(arg1: Function1<A, Kind<ForOption, B>>): 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ifM(arg1, arg2)",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap { if (it) arg1() else arg2() }"),
   DeprecationLevel.WARNING
 )
 fun <B> Kind<ForOption, Boolean>.ifM(
@@ -337,8 +328,7 @@ fun <B> Kind<ForOption, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "selectM(arg1)",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> Some(a).ap(arg1) }, { b -> Some(b) }) }"
   ),
   DeprecationLevel.WARNING
 )
@@ -357,8 +347,7 @@ fun <A, B> Kind<ForOption, Either<A, B>>.selectM(arg1: Kind<ForOption, Function1
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "selectM(arg1)",
-    "arrow.core.selectM"
+    "flatMap { it.fold({ a -> Some(a).ap(arg1) }, { b -> Some(b) }) }"
   ),
   DeprecationLevel.WARNING
 )

@@ -64,8 +64,7 @@ fun <A> NonEmptyList<A>.maybeCombine(arg1: NonEmptyList<A>): NonEmptyList<A> =
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Semigroup.nonEmptyList<A>()",
-    "arrow.core.Semigroup",
-    "arrow.core.nonEmptyList"
+    "arrow.core.Semigroup"
   ),
   DeprecationLevel.WARNING
 )

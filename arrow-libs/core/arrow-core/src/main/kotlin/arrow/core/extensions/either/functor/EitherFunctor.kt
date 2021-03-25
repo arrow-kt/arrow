@@ -141,9 +141,9 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.void(): Either<L, Unit> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fproduct(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1(a)) }", "arrow.core.Tuple2"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.fproduct(arg1: Function1<A, B>): Either<L, Tuple2<A, B>> =
-  fix().fproduct(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(a, arg1(a)) }
 
 /**
  *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -174,9 +174,9 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.fproduct(arg1: Function1<A, B>): Eithe
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("mapConst(arg1)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { arg1 }"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.mapConst(arg1: B): Either<L, B> =
-  fix().mapConst(arg1)
+  map { arg1 }
 
 /**
  *  Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
@@ -188,9 +188,9 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.mapConst(arg1: B): Either<L, B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.mapConst(this)"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { this }"))
 fun <L, A, B> A.mapConst(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
-  arg1.fix().mapConst(this)
+  arg1.map { this }
 
 /**
  *  Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
@@ -221,9 +221,9 @@ fun <L, A, B> A.mapConst(arg1: Kind<Kind<ForEither, L>, B>): Either<L, A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleLeft(arg1"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(arg1, a) }"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.tupleLeft(arg1: B): Either<L, Tuple2<B, A>> =
-  fix().tupleLeft(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(arg1, a) }
 
 /**
  *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -254,9 +254,9 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.tupleLeft(arg1: B): Either<L, Tuple2<B
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleRight(arg1"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1) }"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.tupleRight(arg1: B): Either<L, Tuple2<A, B>> =
-  fix().tupleRight(arg1).map { (a, b) -> Tuple2(a, b) }
+  map { a -> Tuple2(a, arg1) }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>

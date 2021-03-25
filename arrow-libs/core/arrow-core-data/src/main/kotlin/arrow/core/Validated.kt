@@ -242,7 +242,6 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.validNel
  * import arrow.core.zip
  * import arrow.typeclasses.Semigroup
- * import arrow.core.nonEmptyList
  *
  * //sampleStart
  * val parallelValidate =
@@ -278,7 +277,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -323,7 +322,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
  *  val valid = config.parse(Read.stringRead, "url").zip(
- *    NonEmptyList.semigroup<ConfigError>(),
+ *    Semigroup.nonEmptyList<ConfigError>(),
  *    config.parse(Read.intRead, "port")
  *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
@@ -340,7 +339,6 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -384,7 +382,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
  *
  * val valid = config.parse(Read.stringRead, "url").zip(
- *  NonEmptyList.semigroup<ConfigError>(),
+ *  Semigroup.nonEmptyList<ConfigError>(),
  *  config.parse(Read.intRead, "port")
  * ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
@@ -464,19 +462,23 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   companion object {
 
+    @JvmStatic
     fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
+    @JvmStatic
     fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
+    @JvmStatic
     fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
     /**
      * Converts an `Option<A>` to a `Validated<E, A>`, where the provided `ifNone` output value is returned as [Invalid]
      * when the specified `Option` is `None`.
      */
+    @JvmStatic
     inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
       o.fold(
         { Invalid(ifNone()) },
@@ -487,9 +489,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * Converts a nullable `A?` to a `Validated<E, A>`, where the provided `ifNull` output value is returned as [Invalid]
      * when the specified value is null.
      */
+    @JvmStatic
     inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
       try {
         f().valid()
@@ -505,9 +510,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         e.nonFatalOrThrow().invalid()
       }
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
       catch(f).mapLeft(recover)
 
+    @JvmStatic
     inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
@@ -540,6 +548,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * }
      * ```
      */
+    @JvmStatic
     inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
       { fa -> fa.map(f) }
 
@@ -560,13 +569,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * }
      * ```
      */
+    @JvmStatic
     inline fun <A, B, C, D> lift(
       crossinline fl: (A) -> C,
       crossinline fr: (B) -> D
     ): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
-
-    val s = 1.inc()
 
     @PublishedApi
     internal val unit: Validated<Nothing, Unit> =
@@ -591,80 +599,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    */
   fun void(): Validated<E, Unit> =
     map { Unit }
-
-  /**
-   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a pair of the [A] value and the
-   * computed [B] value as result of applying [f]
-   *
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().fproduct { "$it World" }
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  inline fun <B> fproduct(f: (A) -> B): Validated<E, Pair<A, B>> =
-    map { a -> a to f(a) }
-
-  /**
-   * Replaces [A] inside [Validated] with [B] resulting in a Kind<F, B>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".valid().mapConst("...")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> mapConst(b: B): Validated<E, B> =
-    map { b }
-
-  /**
-   * Pairs [B] with [A] returning a Validated<E, Pair<B, A>>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleLeft("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleLeft(b: B): Validated<E, Pair<B, A>> =
-    map { a -> b to a }
-
-  /**
-   * Pairs [A] with [B] returning a Validated<E, Pair<A, B>>
-   *
-   * ```kotlin:ank:playground:extension
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleRight("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleRight(b: B): Validated<E, Pair<A, B>> =
-    map { a -> a to b }
 
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
@@ -1008,28 +942,29 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
   if (this is Validated.Valid && b is Validated.Valid && c is Validated.Valid && d is Validated.Valid && e is Validated.Valid && ff is Validated.Valid && g is Validated.Valid && h is Validated.Valid && i is Validated.Valid && j is Validated.Valid) {
     Validated.Valid(f(this.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
   } else SE.run {
-    var accumulatedError: E? = null
+    var accumulatedError: Any? = EmptyValue
     accumulatedError =
-      if (this@zip is Validated.Invalid) this@zip.e.maybeCombine(accumulatedError) else accumulatedError
+      if (this@zip is Validated.Invalid) this@zip.e else accumulatedError
     accumulatedError =
-      if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
+      if (b is Validated.Invalid) emptyCombine(accumulatedError, b.e) else accumulatedError
     accumulatedError =
-      if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
+      if (c is Validated.Invalid) emptyCombine(accumulatedError, c.e) else accumulatedError
     accumulatedError =
-      if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
+      if (d is Validated.Invalid) emptyCombine(accumulatedError, d.e) else accumulatedError
     accumulatedError =
-      if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
+      if (e is Validated.Invalid) emptyCombine(accumulatedError, e.e) else accumulatedError
     accumulatedError =
-      if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
+      if (ff is Validated.Invalid) emptyCombine(accumulatedError, ff.e) else accumulatedError
     accumulatedError =
-      if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
+      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.e)else accumulatedError
     accumulatedError =
-      if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
+      if (h is Validated.Invalid) emptyCombine(accumulatedError, h.e) else accumulatedError
     accumulatedError =
-      if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
+      if (i is Validated.Invalid) emptyCombine(accumulatedError, i.e) else accumulatedError
     accumulatedError =
-      if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
-    Validated.Invalid(accumulatedError!!)
+      if (j is Validated.Invalid) emptyCombine(accumulatedError, j.e) else accumulatedError
+
+    Validated.Invalid(accumulatedError as E)
   }
 
 inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
@@ -1121,12 +1056,6 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
   f: (A, B, C, D, EE, F, G, H, I, J) -> Z
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, j, f)
-
-fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
-  ValidatedSemigroup(SE, SA)
-
-fun <E, A> Semigroup.Companion.monoid(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
-  ValidatedMonoid(SE, MA)
 
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
@@ -1227,24 +1156,12 @@ inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Vali
     { Valid(it) }
   )
 
-/**
- * From Apply:
- * if both the function and this value are Valid, apply the function
- */
+@Deprecated(
+  "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith("zip(ff) { a, f -> f(a) }", "arrow.core.zip")
+)
 inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  when (val value = fix()) {
-    is Validated.Valid -> when (f) {
-      is Validated.Valid -> Valid(f.a(value.a))
-      is Validated.Invalid -> f
-    }
-    is Validated.Invalid -> when (f) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> Invalid(SE.run { value.e.combine(f.e) })
-    }
-  }
-
-fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
-  ff.map { this.ap(SE, it) }
+  fix().zip(SE, f) { a, ff -> ff(a) }
 
 @Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
@@ -1327,21 +1244,3 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-private open class ValidatedSemigroup<A, B>(
-  private val SA: Semigroup<A>,
-  private val SB: Semigroup<B>
-) : Semigroup<Validated<A, B>> {
-  override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
-    combine(SA, SB, b)
-}
-
-private class ValidatedMonoid<A, B>(
-  SA: Semigroup<A>,
-  MB: Monoid<B>
-) : Monoid<Validated<A, B>>, ValidatedSemigroup<A, B>(SA, MB) {
-  private val empty = Valid(MB.empty())
-
-  override fun empty(): Validated<A, B> =
-    empty
-}

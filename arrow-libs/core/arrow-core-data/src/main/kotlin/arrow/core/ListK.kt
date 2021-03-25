@@ -476,7 +476,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       }
     }
 
-    @Deprecated(ListKDeprecation, ReplaceWith("tailRecMIterable(a, f)"))
+    @Deprecated(TailRecMDeprecation)
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListK, Either<A, B>>): ListK<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())

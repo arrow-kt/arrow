@@ -44,7 +44,6 @@ fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.sequence<A>()",
-    "arrow.core.sequence",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

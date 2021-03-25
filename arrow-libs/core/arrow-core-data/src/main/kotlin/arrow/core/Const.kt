@@ -3,7 +3,6 @@ package arrow.core
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -55,6 +54,11 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
     GA.just(retag())
 
   companion object {
+
+    @Deprecated(
+      "This constructor is duplicated with Const. Use Const instead.",
+      ReplaceWith("Const(a)", "arrow.core.Const")
+    )
     fun <A, T> just(a: A): Const<A, T> =
       Const(a)
   }
@@ -70,7 +74,7 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
     b: Const<A, B>,
     map: (T, B) -> C
   ): Const<A, C> =
-    b.retag<C>().combine(SG, b.retag())
+    retag<C>().combine(SG, b.retag())
 
   inline fun <B, C, D> zip(
     SG: Semigroup<A>,
@@ -228,14 +232,11 @@ fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T>
 
 @Deprecated(
   "Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Const instead",
-  ReplaceWith(
-    "this.zip(MA, arg1)",
-    "arrow.core.Const"
-  ),
+  ReplaceWith("fix().zip(SG, ff.fix()) { a, f -> f(a) }", "arrow.core.fix"),
   DeprecationLevel.WARNING
 )
 fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> =
-  fix().retag<U>().combine(SG, ff.fix().retag())
+  fix().zip<(T) -> U, U>(SG, ff.fix()) { a, f -> f(a) }
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 fun <T, A, G> ConstOf<A, Kind<G, T>>.sequence(GA: Applicative<G>): Kind<G, Const<A, T>> =
@@ -249,18 +250,3 @@ fun <A, T, U> Const<A, T>.contramap(f: (U) -> T): Const<A, U> =
 
 operator fun <A : Comparable<A>, T> Const<A, T>.compareTo(other: Const<A, T>): Int =
   value().compareTo(other.value())
-
-fun <A, T> Semigroup.Companion.const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
-  object : Semigroup<Const<A, T>> {
-    override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
-      this.combine(SA, b)
-  }
-
-fun <A, T> Monoid.Companion.const(MA: Monoid<A>): Monoid<Const<A, T>> =
-  object : Monoid<Const<A, T>> {
-    override fun empty(): Const<A, T> =
-      Const(MA.empty())
-
-    override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
-      this.combine(MA, b)
-  }

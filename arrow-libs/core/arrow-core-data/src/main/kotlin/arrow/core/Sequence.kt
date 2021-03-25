@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
@@ -105,7 +107,15 @@ fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
     val iterator6 = g.iterator()
     val iterator7 = h.iterator()
     override fun next(): I =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext()
@@ -132,7 +142,16 @@ fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
     val iterator7 = h.iterator()
     val iterator8 = i.iterator()
     override fun next(): J =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext()
@@ -161,7 +180,17 @@ fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
     val iterator8 = i.iterator()
     val iterator9 = j.iterator()
     override fun next(): K =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next(), iterator9.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next(),
+        iterator9.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext() && iterator9.hasNext()
@@ -192,7 +221,18 @@ fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
     val iterator9 = j.iterator()
     val iterator10 = k.iterator()
     override fun next(): L =
-      map(iterator1.next(), iterator2.next(), iterator3.next(), iterator4.next(), iterator5.next(), iterator6.next(), iterator7.next(), iterator8.next(), iterator9.next(), iterator10.next())
+      map(
+        iterator1.next(),
+        iterator2.next(),
+        iterator3.next(),
+        iterator4.next(),
+        iterator5.next(),
+        iterator6.next(),
+        iterator7.next(),
+        iterator8.next(),
+        iterator9.next(),
+        iterator10.next()
+      )
 
     override fun hasNext(): Boolean =
       iterator1.hasNext() && iterator2.hasNext() && iterator3.hasNext() && iterator4.hasNext() && iterator5.hasNext() && iterator6.hasNext() && iterator7.hasNext() && iterator8.hasNext() && iterator9.hasNext() && iterator10.hasNext()
@@ -255,12 +295,6 @@ private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y
   }
 }
 
-fun <A, B> Sequence<A>.ap(ff: Sequence<(A) -> B>): Sequence<B> =
-  flatMap { a -> ff.map { f -> f(a) } }
-
-fun <A, B> Sequence<A>.apEval(ff: Eval<Sequence<(A) -> B>>): Eval<Sequence<B>> =
-  ff.map { this.ap(it) }
-
 fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
   this@combineAll.fold(empty()) { acc, a ->
     acc.combine(a)
@@ -318,30 +352,6 @@ fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<
     if (hasNext()) f(next(), Eval.defer { loop() }) else lb
   return Eval.defer { this.iterator().loop() }
 }
-
-/**
- *  Applies [f] to an [A] inside [Sequence] and returns the [Sequence] structure with a pair of the [A] value and the
- *  computed [B] value as result of applying [f]
- *
- *  ```kotlin:ank:playground
- * import arrow.core.fproduct
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   sequenceOf("Hello").fproduct { "$it World" }
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.fproduct(f: (A) -> B): Sequence<Pair<A, B>> =
-  map { a -> a to f(a) }
-
-fun <B> Sequence<Boolean>.ifM(ifFalse: () -> Sequence<B>, ifTrue: () -> Sequence<B>): Sequence<B> =
-  flatMap { bool ->
-    if (bool) ifTrue() else ifFalse()
-  }
 
 /**
  * Logical conditional. The equivalent of Prolog's soft-cut.
@@ -445,9 +455,6 @@ fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
 fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
   if (none()) sequenceOf(emptySequence())
   else map { generateSequence { it } }
-
-fun <A, B> Sequence<A>.mapConst(b: B): Sequence<B> =
-  map { b }
 
 fun <A> Sequence<A>.once(): Sequence<A> =
   firstOrNull()?.let { sequenceOf(it) } ?: emptySequence()
@@ -581,9 +588,6 @@ fun <A> Sequence<A>.salign(
   }
 }
 
-fun <A, B> Sequence<Either<A, B>>.selectM(f: Sequence<(A) -> B>): Sequence<B> =
-  flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> sequenceOf(b) }) }
-
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
@@ -640,8 +644,13 @@ fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
 fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, acc ->
-    f(a).apEval(acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+  foldRight<A, Either<E, Sequence<B>>>(Eval.now(sequenceOf<B>().right())) { a, eval ->
+    when (val res = f(a)) {
+      is Right -> eval.map { either ->
+        either.map { bs -> sequenceOf(res.value) + bs }
+      }
+      is Left -> Eval.now(res.value.left())
+    }
   }.value()
 
 fun <E, A, B> Sequence<A>.traverseValidated(
@@ -649,42 +658,8 @@ fun <E, A, B> Sequence<A>.traverseValidated(
   f: (A) -> Validated<E, B>
 ): Validated<E, Sequence<B>> =
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+    acc.map { f(a).zip(semigroup, it) { b, bs -> sequenceOf(b) + bs } }
   }.value()
-
-/**
- *  Pairs [B] with [A] returning a Sequence<Pair<B, A>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.tupleLeft
- *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf("Hello", "Hello2").tupleLeft("World")
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.tupleLeft(b: B): Sequence<Pair<B, A>> =
-  map { a -> b to a }
-
-/**
- *  Pairs [A] with [B] returning a Sequence<Pair<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.tupleRight
- *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf("Hello").tupleRight("World")
- *   //sampleEnd
- *   println(result.toList())
- *  }
- *  ```
- */
-fun <A, B> Sequence<A>.tupleRight(b: B): Sequence<Pair<A, B>> =
-  map { a -> a to b }
 
 /**
  * splits an union into its component parts.
@@ -799,7 +774,7 @@ fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequen
   map(fc).unzip()
 
 fun <A> Sequence<A>.void(): Sequence<Unit> =
-  mapConst(Unit)
+  map { Unit }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Sequence<A> to Sequence<B>
@@ -820,20 +795,3 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  */
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
-
-fun <A, B> Sequence<A>.zipEval(other: Eval<Sequence<B>>): Eval<Sequence<Pair<A, B>>> =
-  other.map { this.zip(it) }
-
-fun <A, B, Z> Sequence<A>.zipEval(other: Eval<Sequence<B>>, f: (Pair<A, B>) -> Z): Eval<Sequence<Z>> =
-  other.map { this.zip(it).map(f) }
-
-fun <A> Semigroup.Companion.sequence(): Semigroup<Sequence<A>> =
-  Monoid.sequence()
-
-fun <A> Monoid.Companion.sequence(): Monoid<Sequence<A>> =
-  SequenceMonoid as Monoid<Sequence<A>>
-
-object SequenceMonoid : Monoid<Sequence<Any?>> {
-  override fun empty(): Sequence<Any?> = emptySequence()
-  override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = sequenceOf(this, b).flatten()
-}

@@ -3,14 +3,9 @@ package arrow.core.extensions.list.functor
 import arrow.Kind
 import arrow.core.ForListK
 import arrow.core.void as _void
-import arrow.core.fproduct as _fproduct
-import arrow.core.mapConst as _mapConst
-import arrow.core.tupleLeft as _tupleLeft
-import arrow.core.tupleRight as _tupleRight
 import arrow.core.widen as _widen
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKFunctor
-import arrow.core.toT
 import kotlin.Function1
 import kotlin.collections.map as _map
 import kotlin.PublishedApi
@@ -117,9 +112,9 @@ fun <A> List<A>.void(): List<Unit> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("fproduct(arg1)", "arrow.core.fproduct"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { a -> Tuple2(a, arg1(a)) }", "arrow.core.Tuple2"))
 fun <A, B> List<A>.fproduct(arg1: Function1<A, B>): List<Tuple2<A, B>> =
-  _fproduct(arg1)._map { it.first toT it.second }
+  map { a -> Tuple2(a, arg1(a)) }
 
 @JvmName("mapConst")
 @Suppress(
@@ -128,9 +123,9 @@ fun <A, B> List<A>.fproduct(arg1: Function1<A, B>): List<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("mapConst(arg1)", "arrow.core.mapConst"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { arg1 }"))
 fun <A, B> List<A>.mapConst(arg1: B): List<B> =
-  _mapConst(arg1)
+  map { arg1 }
 
 /**
  *  Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
@@ -142,9 +137,9 @@ fun <A, B> List<A>.mapConst(arg1: B): List<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("arg1.mapConst(this)", "arrow.core.mapConst"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("arg1.map { this }"))
 fun <A, B> A.mapConst(arg1: List<B>): List<A> =
-  arg1._mapConst(this)
+  arg1.map { this }
 
 @JvmName("tupleLeft")
 @Suppress(
@@ -153,9 +148,9 @@ fun <A, B> A.mapConst(arg1: List<B>): List<A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleLeft(arg1)", "arrow.core.tupleLeft"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { Tuple2(arg1, it) }", "arrow.core.Tuple2"))
 fun <A, B> List<A>.tupleLeft(arg1: B): List<Tuple2<B, A>> =
-  _tupleLeft(arg1)._map { it.first toT it.second }
+  map { Tuple2(arg1, it) }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -164,9 +159,9 @@ fun <A, B> List<A>.tupleLeft(arg1: B): List<Tuple2<B, A>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleRight(arg1)", "arrow.core.tupleRight"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("map { Tuple2(it, arg1) }", "arrow.core.Tuple2"))
 fun <A, B> List<A>.tupleRight(arg1: B): List<Tuple2<A, B>> =
-  _tupleRight(arg1)._map { it.first toT it.second }
+  map { Tuple2(it, arg1) }
 
 @JvmName("widen")
 @Suppress(

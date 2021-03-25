@@ -90,8 +90,8 @@ fun <K, A> Map<K, A>.void(): Map<K, Unit> = arrow.core.extensions.map.functor.Ma
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "fproduct(arg1)",
-    "arrow.core.fproduct"
+    "mapValues { (_, a) -> Tuple2(a, arg1(a)) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -145,8 +145,8 @@ fun <K, A, B> A.mapConst(arg1: Map<K, B>): Map<K, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "tupleLeft(arg1)",
-    "arrow.core.tupleLeft"
+    "mapValues { (_, a) -> Tuple2(b, arg1) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -166,8 +166,8 @@ fun <K, A, B> Map<K, A>.tupleLeft(arg1: B): Map<K, Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "tupleRight(arg1)",
-    "arrow.core.tupleRight"
+    "mapValues { (_, a) -> Tuple2(a, arg1) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

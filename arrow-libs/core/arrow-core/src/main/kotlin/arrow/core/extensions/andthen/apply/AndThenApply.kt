@@ -3,6 +3,7 @@ package arrow.core.extensions.andthen.apply
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.AndThen.Companion
+import arrow.core.AndThenDeprecation
 import arrow.core.Eval
 import arrow.core.ForAndThen
 import arrow.core.Tuple10
@@ -35,14 +36,7 @@ internal val apply_singleton: AndThenApply<Any?> = object : AndThenApply<Any?> {
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "ap(arg1)",
-    "arrow.core.ap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.ap(arg1: Kind<Kind<ForAndThen, X>, Function1<A, B>>):
   AndThen<X, B> = arrow.core.AndThen.apply<X>().run {
     this@ap.ap<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -55,14 +49,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.ap(arg1: Kind<Kind<ForAndThen, X>, Fu
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "apEval(arg1)",
-    "arrow.core.apEval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apEval(arg1: Eval<Kind<Kind<ForAndThen, X>, Function1<A, B>>>):
   Eval<Kind<Kind<ForAndThen, X>, B>> = arrow.core.AndThen.apply<X>().run {
     this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.core.ForAndThen, X>,
@@ -76,14 +63,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apEval(arg1: Eval<Kind<Kind<ForAndThe
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map2Eval(arg1, arg2)",
-    "arrow.core.map2Eval"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, A>.map2Eval(
   arg1: Eval<Kind<Kind<ForAndThen, X>, B>>,
   arg2: Function1<Tuple2<A, B>, Z>
@@ -100,14 +80,7 @@ fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, A>.map2Eval(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -123,14 +96,7 @@ fun <X, A, B, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -146,14 +112,7 @@ fun <X, A, B, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -170,14 +129,7 @@ fun <X, A, B, C, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -194,14 +146,7 @@ fun <X, A, B, C, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -219,14 +164,7 @@ fun <X, A, B, C, D, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -244,14 +182,7 @@ fun <X, A, B, C, D, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -270,14 +201,7 @@ fun <X, A, B, C, D, E, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -296,14 +220,7 @@ fun <X, A, B, C, D, E, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5, arg6)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -323,14 +240,7 @@ fun <X, A, B, C, D, E, FF, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -350,14 +260,7 @@ fun <X, A, B, C, D, E, FF, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -379,14 +282,7 @@ fun <X, A, B, C, D, E, FF, G, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -408,14 +304,7 @@ fun <X, A, B, C, D, E, FF, G, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -438,14 +327,7 @@ fun <X, A, B, C, D, E, FF, G, H, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -468,14 +350,7 @@ fun <X, A, B, C, D, E, FF, G, H, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -499,14 +374,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -530,14 +398,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)",
-    "arrow.core.AndThen.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -563,14 +424,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, J, Z> map(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)",
-    "arrow.core.AndThen.mapN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -596,14 +450,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map2(arg1, arg2)",
-    "arrow.core.map2"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, A>.map2(
   arg1: Kind<Kind<ForAndThen, X>, B>,
   arg2: Function1<Tuple2<A, B>, Z>
@@ -618,14 +465,7 @@ fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, A>.map2(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.product(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X,
   Tuple2<A, B>> = arrow.core.AndThen.apply<X>().run {
   this@product.product<A, B>(arg1) as arrow.core.AndThen<X, arrow.core.Tuple2<A, B>>
@@ -638,14 +478,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.product(arg1: Kind<Kind<ForAndThen, X
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, Tuple2<A, B>>.product(
   arg1: Kind<Kind<ForAndThen, X>, Z>
 ): AndThen<X, Tuple3<A, B, Z>> = arrow.core.AndThen.apply<X>().run {
@@ -659,14 +492,7 @@ fun <X, A, B, Z> Kind<Kind<ForAndThen, X>, Tuple2<A, B>>.product(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, Z> Kind<Kind<ForAndThen, X>, Tuple3<A, B, C>>.product(
   arg1: Kind<Kind<ForAndThen, X>, Z>
 ): AndThen<X, Tuple4<A, B, C, Z>> = arrow.core.AndThen.apply<X>().run {
@@ -680,14 +506,7 @@ fun <X, A, B, C, Z> Kind<Kind<ForAndThen, X>, Tuple3<A, B, C>>.product(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, Z> Kind<Kind<ForAndThen, X>, Tuple4<A, B, C,
     D>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple5<A, B, C, D, Z>> =
   arrow.core.AndThen.apply<X>().run {
@@ -702,14 +521,7 @@ fun <X, A, B, C, D, Z> Kind<Kind<ForAndThen, X>, Tuple4<A, B, C,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, Z> Kind<Kind<ForAndThen, X>, Tuple5<A, B, C, D,
     E>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple6<A, B, C, D, E, Z>> =
   arrow.core.AndThen.apply<X>().run {
@@ -724,14 +536,7 @@ fun <X, A, B, C, D, E, Z> Kind<Kind<ForAndThen, X>, Tuple5<A, B, C, D,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, Z> Kind<Kind<ForAndThen, X>, Tuple6<A, B, C, D, E,
     FF>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple7<A, B, C, D, E, FF, Z>> =
   arrow.core.AndThen.apply<X>().run {
@@ -746,14 +551,7 @@ fun <X, A, B, C, D, E, FF, Z> Kind<Kind<ForAndThen, X>, Tuple6<A, B, C, D, E,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, Z> Kind<Kind<ForAndThen, X>, Tuple7<A, B, C, D, E, FF,
     G>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple8<A, B, C, D, E, FF, G, Z>> =
   arrow.core.AndThen.apply<X>().run {
@@ -768,14 +566,7 @@ fun <X, A, B, C, D, E, FF, G, Z> Kind<Kind<ForAndThen, X>, Tuple7<A, B, C, D, E,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForAndThen, X>, Tuple8<A, B, C, D, E, FF, G,
     H>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   arrow.core.AndThen.apply<X>().run {
@@ -790,14 +581,7 @@ fun <X, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForAndThen, X>, Tuple8<A, B, C, D,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "product(arg1)",
-    "arrow.core.product"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForAndThen, X>, Tuple9<A, B, C, D, E, FF, G, H,
     I>>.product(arg1: Kind<Kind<ForAndThen, X>, Z>): AndThen<X, Tuple10<A, B, C, D, E, FF, G, H, I,
     Z>> = arrow.core.AndThen.apply<X>().run {
@@ -812,14 +596,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForAndThen, X>, Tuple9<A, B, C,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> tupled(arg0: Kind<Kind<ForAndThen, X>, A>, arg1: Kind<Kind<ForAndThen, X>, B>):
   AndThen<X, Tuple2<A, B>> = arrow.core.AndThen
     .apply<X>()
@@ -832,14 +609,7 @@ fun <X, A, B> tupled(arg0: Kind<Kind<ForAndThen, X>, A>, arg1: Kind<Kind<ForAndT
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> tupledN(arg0: Kind<Kind<ForAndThen, X>, A>, arg1: Kind<Kind<ForAndThen, X>, B>):
   AndThen<X, Tuple2<A, B>> = arrow.core.AndThen
     .apply<X>()
@@ -852,14 +622,7 @@ fun <X, A, B> tupledN(arg0: Kind<Kind<ForAndThen, X>, A>, arg1: Kind<Kind<ForAnd
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -875,14 +638,7 @@ fun <X, A, B, C> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -898,14 +654,7 @@ fun <X, A, B, C> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -923,14 +672,7 @@ fun <X, A, B, C, D> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -948,14 +690,7 @@ fun <X, A, B, C, D> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -974,14 +709,7 @@ fun <X, A, B, C, D, E> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1000,14 +728,7 @@ fun <X, A, B, C, D, E> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4, arg5)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1027,14 +748,7 @@ fun <X, A, B, C, D, E, FF> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4, arg5)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1054,14 +768,7 @@ fun <X, A, B, C, D, E, FF> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4, arg5, arg6)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1082,14 +789,7 @@ fun <X, A, B, C, D, E, FF, G> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4, arg5, arg6)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1110,14 +810,7 @@ fun <X, A, B, C, D, E, FF, G> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1139,14 +832,7 @@ fun <X, A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1168,14 +854,7 @@ fun <X, A, B, C, D, E, FF, G, H> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1198,14 +877,7 @@ fun <X, A, B, C, D, E, FF, G, H, I> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1228,14 +900,7 @@ fun <X, A, B, C, D, E, FF, G, H, I> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupled(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)",
-    "arrow.core.AndThen.tupled"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, J> tupled(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1260,14 +925,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, J> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupledN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)",
-    "arrow.core.AndThen.tupledN"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg0: Kind<Kind<ForAndThen, X>, A>,
   arg1: Kind<Kind<ForAndThen, X>, B>,
@@ -1292,14 +950,7 @@ fun <X, A, B, C, D, E, FF, G, H, I, J> tupledN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "followedBy(arg1)",
-    "arrow.core.followedBy"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedBy(arg1: Kind<Kind<ForAndThen, X>, B>):
   AndThen<X, B> = arrow.core.AndThen.apply<X>().run {
     this@followedBy.followedBy<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -1312,14 +963,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.followedBy(arg1: Kind<Kind<ForAndThen
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "apTap(arg1)",
-    "arrow.core.apTap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apTap(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X, A> =
   arrow.core.AndThen.apply<X>().run {
     this@apTap.apTap<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -1329,5 +973,6 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.apTap(arg1: Kind<Kind<ForAndThen, X>,
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(AndThenDeprecation)
 inline fun <X> Companion.apply(): AndThenApply<X> = apply_singleton as
   arrow.core.extensions.AndThenApply<X>

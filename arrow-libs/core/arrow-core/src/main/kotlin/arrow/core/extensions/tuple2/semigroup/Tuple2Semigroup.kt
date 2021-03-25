@@ -67,8 +67,7 @@ fun <A, B> Tuple2<A, B>.maybeCombine(
   "Tuple2 is deprecated in favor of Kotlin's Pair. ReplaceWith Pair and use Pair instance of Show",
   ReplaceWith(
     "Semigroup.pair(SA, SB)",
-    "arrow.core.Semigroup",
-    "arrow.core.pair"
+    "arrow.core.Semigroup"
   ),
   DeprecationLevel.WARNING
 )

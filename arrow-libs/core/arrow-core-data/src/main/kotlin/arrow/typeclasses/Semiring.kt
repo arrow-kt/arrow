@@ -109,5 +109,77 @@ interface Semiring<A> {
     if (this == null) one()
     else b?.let { combineMultiplicate(it) } ?: this
 
-  companion object
+  companion object {
+    @JvmStatic
+    @JvmName("Float")
+    fun float(): Semiring<Float> = FloatSemiring
+
+    @JvmStatic
+    @JvmName("Short")
+    fun short(): Semiring<Short> = ShortSemiring
+
+    @JvmStatic
+    @JvmName("Long")
+    fun long(): Semiring<Long> = LongSemiring
+
+    @JvmStatic
+    @JvmName("Integer")
+    fun int(): Semiring<Int> = IntSemiring
+
+    @JvmStatic
+    @JvmName("Double")
+    fun double(): Semiring<Double> = DoubleSemiring
+
+    @JvmStatic
+    @JvmName("Byte")
+    fun byte(): Semiring<Byte> = ByteSemiring
+
+    private object ByteSemiring : Semiring<Byte> {
+      override fun one(): Byte = 1
+      override fun zero(): Byte = 0
+
+      override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
+      override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
+    }
+
+    private object DoubleSemiring : Semiring<Double> {
+      override fun one(): Double = 1.0
+      override fun zero(): Double = 0.0
+
+      override fun Double.combine(b: Double): Double = this + b
+      override fun Double.combineMultiplicate(b: Double): Double = this * b
+    }
+
+    private object IntSemiring : Semiring<Int> {
+      override fun one(): Int = 1
+      override fun zero(): Int = 0
+
+      override fun Int.combine(b: Int): Int = this + b
+      override fun Int.combineMultiplicate(b: Int): Int = this * b
+    }
+
+    private object LongSemiring : Semiring<Long> {
+      override fun one(): Long = 1
+      override fun zero(): Long = 0
+
+      override fun Long.combine(b: Long): Long = this + b
+      override fun Long.combineMultiplicate(b: Long): Long = this * b
+    }
+
+    private object ShortSemiring : Semiring<Short> {
+      override fun one(): Short = 1
+      override fun zero(): Short = 0
+
+      override fun Short.combine(b: Short): Short = (this + b).toShort()
+      override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
+    }
+
+    private object FloatSemiring : Semiring<Float> {
+      override fun one(): Float = 1f
+      override fun zero(): Float = 0f
+
+      override fun Float.combine(b: Float): Float = this + b
+      override fun Float.combineMultiplicate(b: Float): Float = this * b
+    }
+  }
 }

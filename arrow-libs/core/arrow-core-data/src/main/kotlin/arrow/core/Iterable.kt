@@ -1,7 +1,8 @@
 @file:Suppress("unused", "FunctionName")
-
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.foldRight as _foldRight
@@ -205,7 +206,19 @@ inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   )
   val list = ArrayList<K>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext()) {
-    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next()))
+    list.add(
+      transform(
+        bb.next(),
+        cc.next(),
+        dd.next(),
+        ee.next(),
+        ff.next(),
+        gg.next(),
+        hh.next(),
+        ii.next(),
+        jj.next()
+      )
+    )
   }
   return list
 }
@@ -246,7 +259,20 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   )
   val list = ArrayList<L>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext() && kk.hasNext()) {
-    list.add(transform(bb.next(), cc.next(), dd.next(), ee.next(), ff.next(), gg.next(), hh.next(), ii.next(), jj.next(), kk.next()))
+    list.add(
+      transform(
+        bb.next(),
+        cc.next(),
+        dd.next(),
+        ee.next(),
+        ff.next(),
+        gg.next(),
+        hh.next(),
+        ii.next(),
+        jj.next(),
+        kk.next()
+      )
+    )
   }
   return list
 }
@@ -261,12 +287,12 @@ inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B)
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
-fun <A, B> Iterable<A>.ap(ff: Iterable<(A) -> B>): List<B> =
-  flatMap { a -> ff.map { f -> f(a) } }
-
 inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   foldRight<A, Either<E, List<B>>>(emptyList<B>().right()) { a, acc ->
-    f(a).ap(acc.map { bs -> { b: B -> listOf(b) + bs } })
+    when (val res = f(a)) {
+      is Right -> acc.map { bs -> listOf(res.value) + bs }
+      is Left -> res
+    }
   }
 
 fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
@@ -275,19 +301,32 @@ fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
 inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
+): Validated<E, List<B>> = semigroup.run {
   foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> listOf(b) + bs } })
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Validated.Valid -> acc.map { bs -> listOf(res.value) + bs }
+        is Validated.Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Validated.Valid -> res
+        is Validated.Invalid -> Invalid(res.value.combine(acc.value))
+      }
+    }
   }
+}
+
+inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
+  traverseValidated(Semigroup.nonEmptyList(), f)
 
 fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <A, B> Iterable<A>.mapConst(b: B): List<B> =
-  map { b }
+fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
+  traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
 fun <A> Iterable<A>.void(): List<Unit> =
-  mapConst(Unit)
+  map { Unit }
 
 fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun loop(fa_p: List<A>): Eval<B> = when {
@@ -482,29 +521,6 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
  */
 fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
-
-@Suppress("UNCHECKED_CAST")
-private tailrec fun <A, B> go(
-  buf: MutableList<B>,
-  f: (A) -> Iterable<Either<A, B>>,
-  v: List<Either<A, B>>
-) {
-  if (v.isNotEmpty()) {
-    when (val head: Either<A, B> = v.first()) {
-      is Either.Right -> {
-        buf += head.b
-        go(buf, f, v.drop(1))
-      }
-      is Either.Left -> go(buf, f, (f(head.a) + v.drop(1)))
-    }
-  }
-}
-
-fun <A, B> tailRecMIterable(a: A, f: (A) -> Iterable<Either<A, B>>): List<B> {
-  val buf = mutableListOf<B>()
-  go(buf, f, f(a).toList())
-  return ListK(buf)
-}
 
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
@@ -742,9 +758,7 @@ fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * }
  */
 inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
-  split()?.let { (fa, a) ->
-    ffa(a) + fa.flatMap(ffa)
-  } ?: fb.toList()
+  firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
 
 fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
   flatMap { either ->
@@ -782,69 +796,6 @@ fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>>
 
 fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
-
-inline fun <B> Iterable<Boolean>.ifM(ifFalse: () -> Iterable<B>, ifTrue: () -> Iterable<B>): List<B> =
-  flatMap { bool ->
-    if (bool) ifTrue() else ifFalse()
-  }
-
-fun <A, B> Iterable<Either<A, B>>.selectM(f: Iterable<(A) -> B>): List<B> =
-  flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> listOf(b) }) }
-
-/**
- *  Applies [f] to an [A] inside [Iterable] and returns the [List] structure with a tuple of the [A] value and the
- *  computed [B] value as result of applying [f]
- *
- *  ```kotlin:ank:playground
- * import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello").fproduct { "$it World" }
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-inline fun <A, B> Iterable<A>.fproduct(f: (A) -> B): List<Pair<A, B>> =
-  map { a -> a to f(a) }
-
-/**
- *  Pairs [B] with [A] returning a List<Pair<B, A>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello", "Hello2").tupleLeft("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-fun <A, B> Iterable<A>.tupleLeft(b: B): List<Pair<B, A>> =
-  map { a -> b to a }
-
-/**
- *  Pairs [A] with [B] returning a List<Pair<A, B>>
- *
- *  ```kotlin:ank:playground
- *  import arrow.core.*
- *
- *  fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   listOf("Hello").tupleRight("World")
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- */
-fun <A, B> Iterable<A>.tupleRight(b: B): List<Pair<A, B>> =
-  map { a -> a to b }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Iterable<A> to Iterable<B>

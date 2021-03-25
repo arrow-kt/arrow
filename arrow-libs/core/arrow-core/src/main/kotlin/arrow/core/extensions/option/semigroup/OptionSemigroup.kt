@@ -53,7 +53,6 @@ fun <A> Option<A>.maybeCombine(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Semigroup.option<A>(EQ)",
-    "arrow.core.option",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
