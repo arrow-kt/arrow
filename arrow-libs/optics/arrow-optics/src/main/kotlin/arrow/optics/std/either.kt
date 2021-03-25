@@ -28,7 +28,7 @@ fun <A1, A2, B1, B2> Either.Companion.toPValidated(): PIso<Either<A1, B1>, Eithe
 @Deprecated(
   "Use the validated function exposed in the Iso' companion object",
   ReplaceWith(
-    "Iso.validated()",
+    "Iso.eitherToValidated()",
     "arrow.optics.Iso"
   ),
   DeprecationLevel.WARNING
