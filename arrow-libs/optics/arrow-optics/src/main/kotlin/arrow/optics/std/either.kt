@@ -11,7 +11,7 @@ import arrow.core.Validated
 @Deprecated(
   "Use the pValidated function exposed in the Iso' companion object",
   ReplaceWith(
-    "Iso.pValidated()",
+    "Iso.eitherToPValidated()",
     "arrow.optics.Iso"
   ),
   DeprecationLevel.WARNING

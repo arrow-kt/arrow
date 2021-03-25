@@ -220,6 +220,14 @@ fun <A> Tuple3.Companion.traversal(): Traversal<Tuple3<A, A, A>, A> = pTraversal
 /**
  * [PTraversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
  */
+@Deprecated(
+  "Use the tuple4PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple4PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple4.Companion.pTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -231,11 +239,27 @@ fun <A, B> Tuple4.Companion.pTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<
 /**
  * [Traversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
  */
+@Deprecated(
+  "Use the tuple4Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple4Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple4.Companion.traversal(): Traversal<Tuple4<A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
  */
+@Deprecated(
+  "Use the tuple5PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple5PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple5.Companion.pTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -248,11 +272,27 @@ fun <A, B> Tuple5.Companion.pTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tupl
 /**
  * [Traversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
  */
+@Deprecated(
+  "Use the tuple5Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple5Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple5.Companion.traversal(): Traversal<Tuple5<A, A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
  */
+@Deprecated(
+  "Use the tuple6PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple6PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple6.Companion.pTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -266,11 +306,27 @@ fun <A, B> Tuple6.Companion.pTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, T
 /**
  * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
  */
+@Deprecated(
+  "Use the tuple6Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple6Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple6.Companion.traversal(): Traversal<Tuple6<A, A, A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
  */
+@Deprecated(
+  "Use the tuple7PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple7PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple7.Companion.pTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -285,11 +341,27 @@ fun <A, B> Tuple7.Companion.pTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>
 /**
  * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
  */
+@Deprecated(
+  "Use the tuple7Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple7Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple7.Companion.traversal(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
  */
+@Deprecated(
+  "Use the tuple8PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple8PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple8.Companion.pTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -305,11 +377,27 @@ fun <A, B> Tuple8.Companion.pTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A,
 /**
  * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
  */
+@Deprecated(
+  "Use the tuple8Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple8Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple8.Companion.traversal(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
  */
+@Deprecated(
+  "Use the tuple9PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple9PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple9.Companion.pTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -326,11 +414,27 @@ fun <A, B> Tuple9.Companion.pTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A,
 /**
  * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
  */
+@Deprecated(
+  "Use the tuple9Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple9Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple9.Companion.traversal(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
  * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
  */
+@Deprecated(
+  "Use the tuple10PTraversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple10PTraversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Tuple10.Companion.pTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
   get2 = { it.b },
@@ -348,4 +452,12 @@ fun <A, B> Tuple10.Companion.pTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, 
 /**
  * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
  */
+@Deprecated(
+  "Use the tuple10Traversal function exposed in the Traversal' companion object",
+  ReplaceWith(
+    "Traversal.tuple10Traversal()",
+    "arrow.optics.Traversal"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Tuple10.Companion.traversal(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> = pTraversal()
