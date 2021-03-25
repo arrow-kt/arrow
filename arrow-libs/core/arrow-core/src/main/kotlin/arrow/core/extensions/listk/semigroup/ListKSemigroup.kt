@@ -3,10 +3,6 @@ package arrow.core.extensions.listk.semigroup
 import arrow.core.ListK
 import arrow.core.ListK.Companion
 import arrow.core.extensions.ListKSemigroup
-import kotlin.Any
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -42,6 +38,6 @@ fun <A> ListK<A>.maybeCombine(arg1: ListK<A>): ListK<A> = arrow.core.ListK.semig
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.list", "arrow.core.Semigroup"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.Semigroup"))
 inline fun <A> Companion.semigroup(): ListKSemigroup<A> = semigroup_singleton as
   arrow.core.extensions.ListKSemigroup<A>

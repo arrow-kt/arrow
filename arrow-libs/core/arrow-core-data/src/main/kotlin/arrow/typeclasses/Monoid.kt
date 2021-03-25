@@ -1,9 +1,12 @@
 package arrow.typeclasses
 
 import arrow.KindDeprecation
+import kotlin.collections.plus as _plus
 
 @Deprecated(KindDeprecation)
-class ForMonoid private constructor() { companion object }
+class ForMonoid private constructor() {
+  companion object
+}
 
 @Deprecated(KindDeprecation)
 typealias MonoidOf<A> = arrow.Kind<ForMonoid, A>
@@ -28,5 +31,13 @@ interface Monoid<A> : Semigroup<A>, MonoidOf<A> {
    */
   fun combineAll(elems: List<A>): A = elems.combineAll()
 
-  companion object
+  companion object {
+    fun <A> list(): Monoid<List<A>> =
+      ListMonoid as Monoid<List<A>>
+  }
+}
+
+object ListMonoid : Monoid<List<Any?>> {
+  override fun empty(): List<Any?> = emptyList()
+  override fun List<Any?>.combine(b: List<Any?>): List<Any?> = this._plus(b)
 }

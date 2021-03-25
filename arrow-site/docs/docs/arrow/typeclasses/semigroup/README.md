@@ -38,7 +38,6 @@ Semigroup.int().run { 1.combine(2) }
 ```
 
 ```kotlin:ank
-import arrow.core.list
 import arrow.typeclasses.Semigroup
 
 Semigroup.list<Int>().run {

@@ -12,5 +12,8 @@ interface Semigroup<A> {
   fun A.maybeCombine(b: A?): A =
     b?.let { combine(it) } ?: this
 
-  companion object
+  companion object {
+    fun <A> list(): Semigroup<List<A>> =
+      Monoid.list()
+  }
 }
