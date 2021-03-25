@@ -37,7 +37,7 @@ class EitherTest : UnitSpec() {
     }
     testLaws(
       IsoLaws.laws(
-        iso = Iso.validated(),
+        iso = Iso.eitherToValidated(),
         aGen = Gen.either(Gen.string(), Gen.int()),
         bGen = Gen.validated(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
