@@ -22,7 +22,6 @@ Having `empty` defined allows us to combine all the elements of some potentially
 Let's see the instance of Monoid<String> in action:
 
 ```kotlin:ank
-import arrow.core.string
 import arrow.typeclasses.Monoid
 
 Monoid.string().run { empty() }
@@ -37,8 +36,6 @@ Monoid.string().run {
 ```kotlin:ank
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.int
-import arrow.core.option
 import arrow.typeclasses.Monoid
 
 Monoid.option(Monoid.int()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
@@ -51,7 +48,6 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.core.foldMap
 import arrow.core.identity
-import arrow.core.int
 import arrow.typeclasses.Monoid
 
 listOf(1, 2, 3, 4, 5).foldMap(Monoid.int(), ::identity)
@@ -59,7 +55,6 @@ listOf(1, 2, 3, 4, 5).foldMap(Monoid.int(), ::identity)
 
 ```kotlin:ank
 import arrow.core.foldMap
-import arrow.core.string
 import arrow.typeclasses.Monoid
 
 listOf(1, 2, 3, 4, 5).foldMap(Monoid.string()) { it.toString() }
@@ -87,8 +82,6 @@ This way, we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
 import arrow.core.foldMap
-import arrow.core.int
-import arrow.core.string
 import arrow.typeclasses.Monoid
 
 val M = monoidPair(Monoid.int(), Monoid.string())

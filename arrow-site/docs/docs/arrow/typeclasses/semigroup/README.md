@@ -31,14 +31,12 @@ For example, `Int` values are combined using addition by default, but multiplica
 Now that you've learned about the Semigroup instance for Int, try to guess how it works in the following examples:
 
 ```kotlin:ank
-import arrow.core.int
 import arrow.typeclasses.Semigroup
 
 Semigroup.int().run { 1.combine(2) }
 ```
 
 ```kotlin:ank
-import arrow.core.list
 import arrow.typeclasses.Semigroup
 
 Semigroup.list<Int>().run {
@@ -48,8 +46,6 @@ Semigroup.list<Int>().run {
 
 ```kotlin:ank
 import arrow.core.Option
-import arrow.core.int
-import arrow.core.option
 import arrow.typeclasses.Semigroup
 
 Semigroup.option(Semigroup.int()).run {
@@ -60,8 +56,6 @@ Semigroup.option(Semigroup.int()).run {
 ```kotlin:ank
 import arrow.core.Option
 import arrow.core.None
-import arrow.core.int
-import arrow.core.option
 import arrow.typeclasses.Semigroup
 
 Semigroup.option(Semigroup.int()).run {

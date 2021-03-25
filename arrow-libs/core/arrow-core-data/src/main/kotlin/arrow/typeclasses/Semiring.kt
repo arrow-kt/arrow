@@ -27,7 +27,6 @@ import arrow.documented
  * Here a some examples:
  *
  * ```kotlin:ank:playground
- * import arrow.core.int
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -40,7 +39,6 @@ import arrow.documented
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.int
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -55,7 +53,6 @@ import arrow.documented
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
  * ```kotlin:ank:playground
- * import arrow.core.int
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
