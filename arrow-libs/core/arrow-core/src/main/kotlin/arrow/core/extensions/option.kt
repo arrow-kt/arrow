@@ -68,7 +68,7 @@ import arrow.core.select as optionSelect
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.option()", "arrow.core.option", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.option()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -104,7 +104,7 @@ interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.option()", "arrow.core.option", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.option()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {

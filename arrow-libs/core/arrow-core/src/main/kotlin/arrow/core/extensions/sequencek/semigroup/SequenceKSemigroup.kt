@@ -56,7 +56,6 @@ fun <A> SequenceK<A>.maybeCombine(arg1: SequenceK<A>): SequenceK<A> =
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Semigroup.sequence<A>()",
-    "arrow.core.sequence",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

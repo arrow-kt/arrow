@@ -393,10 +393,14 @@ sealed class Option<out A> : OptionOf<A> {
         is None -> None
       }
 
+    @JvmStatic
     fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 
+    @JvmStatic
     operator fun <A> invoke(a: A): Option<A> = Some(a)
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
       try {
         Some(f())
@@ -415,6 +419,7 @@ sealed class Option<out A> : OptionOf<A> {
     )
     fun <A> empty(): Option<A> = None
 
+    @JvmStatic
     fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
 
@@ -1054,36 +1059,6 @@ fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
     }
     None -> b
   }
-
-fun <A> Monoid.Companion.option(MA: Monoid<A>): Monoid<Option<A>> =
-  OptionMonoid(MA)
-
-fun <A> Semigroup.Companion.option(SGA: Semigroup<A>): Semigroup<Option<A>> =
-  OptionSemigroup(SGA)
-
-private class OptionMonoid<A>(
-  private val MA: Monoid<A>
-) : Monoid<Option<A>> {
-
-  override fun Option<A>.combine(b: Option<A>): Option<A> =
-    combine(MA, b)
-
-  override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
-    b?.let { combine(MA, it) } ?: this
-
-  override fun empty(): Option<A> = None
-}
-
-private class OptionSemigroup<A>(
-  private val SGA: Semigroup<A>
-) : Semigroup<Option<A>> {
-
-  override fun Option<A>.combine(b: Option<A>): Option<A> =
-    combine(SGA, b)
-
-  override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
-    b?.let { combine(SGA, it) } ?: this
-}
 
 operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },

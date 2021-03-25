@@ -658,7 +658,7 @@ fun <E, A, B> Sequence<A>.traverseValidated(
   f: (A) -> Validated<E, B>
 ): Validated<E, Sequence<B>> =
   foldRight<A, Validated<E, Sequence<B>>>(Eval.now(emptySequence<B>().valid())) { a, acc ->
-    f(a).apEval(semigroup, acc.map { it.map { bs -> { b: B -> sequenceOf(b) + bs } } })
+    acc.map { f(a).zip(semigroup, it) { b, bs -> sequenceOf(b) + bs } }
   }.value()
 
 /**
@@ -795,14 +795,3 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  */
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
-
-fun <A> Semigroup.Companion.sequence(): Semigroup<Sequence<A>> =
-  Monoid.sequence()
-
-fun <A> Monoid.Companion.sequence(): Monoid<Sequence<A>> =
-  SequenceMonoid as Monoid<Sequence<A>>
-
-object SequenceMonoid : Monoid<Sequence<Any?>> {
-  override fun empty(): Sequence<Any?> = emptySequence()
-  override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = sequenceOf(this, b).flatten()
-}

@@ -61,7 +61,6 @@ object Sequence {
     "@extension projected functions are deprecated",
     ReplaceWith(
       "Semigroup.sequence<A>()",
-      "arrow.core.sequence",
       "arrow.typeclasses.Semigroup"
     ),
     DeprecationLevel.WARNING

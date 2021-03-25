@@ -1082,6 +1082,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     @PublishedApi
     internal val unit: Either<Nothing, Unit> = right(Unit)
 
+    @JvmStatic
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
     @Deprecated(TailRecMDeprecation)
@@ -1120,6 +1121,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
      *
      * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
      */
+    @JvmStatic
     inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) right(ifTrue()) else left(ifFalse())
 
@@ -1127,6 +1129,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     suspend inline fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
       catch { f() }
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <R> catch(f: () -> R): Either<Throwable, R> =
       try {
         f().right()
@@ -1138,6 +1142,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     suspend inline fun <R> catchAndFlatten(f: suspend () -> Either<Throwable, R>): Either<Throwable, R> =
       catchAndFlatten { f() }
 
+    @JvmStatic
+    @JvmName("tryCatchAndFlatten")
     inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
       catch(f).fold({ it.left() }, { it })
 
@@ -1149,6 +1155,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
         fe(t.nonFatalOrThrow()).left()
       }
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
       try {
         f().right()
@@ -1182,6 +1190,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
+    @JvmStatic
     inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
       success: (a: A) -> Either<Throwable, B>,
@@ -1213,9 +1222,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
      *  }
      *  ```
      */
+    @JvmStatic
     fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
       { it.map(f) }
 
+    @JvmStatic
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
   }
@@ -1229,12 +1240,6 @@ fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 
 @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Right(right)", "arrow.core.Either"))
 fun <R> Right(right: R): Either<Nothing, R> = Right(right)
-
-fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
-  EitherSemigroup(SA, SB)
-
-fun <A, B> Monoid.Companion.either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
-  EitherMonoid(MA, MB)
 
 /**
  * Binds the given function across [Either.Right].
@@ -1401,17 +1406,6 @@ fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
 fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   fix().zip(ff.fix()) { a, f -> f(a) }
 
-@Deprecated(
-  "apEval is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-  ReplaceWith(
-    "fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })",
-    "arrow.core.Eval",
-    "arrow.core.left"
-  )
-)
-fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
-  fold({ l -> Eval.now(l.left()) }, { r -> ff.map { it.map { f -> f(r) } } })
-
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Left -> y.fix()
@@ -1528,7 +1522,17 @@ inline fun <A, B, C, D, E> Either<A, B>.zip(
   d: Either<A, D>,
   map: (B, C, D) -> E
 ): Either<A, E> =
-  zip(c, d, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  zip(
+    c,
+    d,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
 inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1536,7 +1540,17 @@ inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   e: Either<A, E>,
   map: (B, C, D, E) -> F
 ): Either<A, F> =
-  zip(c, d, e, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  zip(
+    c,
+    d,
+    e,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
 inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1545,7 +1559,17 @@ inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   f: Either<A, F>,
   map: (B, C, D, E, F) -> G
 ): Either<A, G> =
-  zip(c, d, e, f, Either.unit, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  zip(
+    c,
+    d,
+    e,
+    f,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit,
+    Either.unit
+  ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
 inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1555,7 +1579,16 @@ inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H
 ): Either<A, H> =
-  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ ->
+    map(
+      b,
+      c,
+      d,
+      e,
+      f,
+      g
+    )
+  }
 
 inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1566,7 +1599,17 @@ inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I
 ): Either<A, I> =
-  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ ->
+    map(
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h
+    )
+  }
 
 inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1659,28 +1702,3 @@ fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
 
 fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)
-
-private open class EitherSemigroup<L, R>(
-  private val SGL: Semigroup<L>,
-  private val SGR: Semigroup<R>
-) : Semigroup<Either<L, R>> {
-
-  override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
-    combine(SGL, SGR, b)
-
-  override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
-    b?.let { combine(SGL, SGR, it) } ?: this
-}
-
-private class EitherMonoid<L, R>(
-  private val MOL: Monoid<L>,
-  private val MOR: Monoid<R>
-) : Monoid<Either<L, R>>, EitherSemigroup<L, R>(MOL, MOR) {
-  override fun empty(): Either<L, R> = Right(MOR.empty())
-
-  override fun Collection<Either<L, R>>.combineAll(): Either<L, R> =
-    combineAll(MOL, MOR)
-
-  override fun combineAll(elems: List<Either<L, R>>): Either<L, R> =
-    elems.combineAll(MOL, MOR)
-}

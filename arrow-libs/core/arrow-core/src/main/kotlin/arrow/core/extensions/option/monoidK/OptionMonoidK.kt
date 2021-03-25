@@ -23,7 +23,6 @@ internal val monoidK_singleton: OptionMonoidK = object : arrow.core.extensions.O
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Monoid.option<A>()",
-    "arrow.core.option",
     "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING

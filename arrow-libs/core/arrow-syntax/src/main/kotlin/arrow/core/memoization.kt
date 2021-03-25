@@ -1,3 +1,4 @@
+@file:JvmName("Memoization")
 package arrow.core
 
 import kotlinx.atomicfu.atomic

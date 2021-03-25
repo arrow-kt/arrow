@@ -43,7 +43,7 @@ import arrow.typeclasses.hashWithSalt
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.ior()", "arrow.core.ior", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.ior()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface IorSemigroup<L, R> : Semigroup<Ior<L, R>> {

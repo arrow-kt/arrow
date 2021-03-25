@@ -4,7 +4,6 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -90,30 +89,8 @@ operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(other: 
   else first
 }
 
-fun <A, B> Semigroup.Companion.pair(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Pair<A, B>> =
-  PairSemigroup(SA, SB)
-
 fun <A, B> Pair<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, b: Pair<A, B>): Pair<A, B> {
   val (xa, xb) = this
   val (ya, yb) = b
   return Pair(SA.run { xa.combine(ya) }, SB.run { xb.combine(yb) })
-}
-
-private open class PairSemigroup<A, B>(
-  private val SA: Semigroup<A>,
-  private val SB: Semigroup<B>
-) : Semigroup<Pair<A, B>> {
-  override fun Pair<A, B>.combine(b: Pair<A, B>): Pair<A, B> =
-    combine(SA, SB, b)
-}
-
-fun <A, B> Monoid.Companion.pair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
-  PairMonoid(MA, MB)
-
-private class PairMonoid<A, B>(
-  private val MA: Monoid<A>,
-  private val MB: Monoid<B>
-) : Monoid<Pair<A, B>>, PairSemigroup<A, B>(MA, MB) {
-  override fun empty(): Pair<A, B> =
-    Pair(MA.empty(), MB.empty())
 }

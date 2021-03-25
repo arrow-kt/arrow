@@ -77,7 +77,7 @@ fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.either()", "arrow.core.either", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.either()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
@@ -90,7 +90,7 @@ interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.either()", "arrow.core.either", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.either()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {

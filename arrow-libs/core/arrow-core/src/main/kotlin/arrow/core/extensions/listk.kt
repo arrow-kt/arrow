@@ -63,7 +63,7 @@ import kotlin.collections.zip as listZip
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.list()", "arrow.core.list", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.list()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
@@ -73,7 +73,7 @@ interface ListKSemigroup<A> : Semigroup<ListK<A>> {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.list()", "arrow.core.list", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.list()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface ListKMonoid<A> : Monoid<ListK<A>>, ListKSemigroup<A> {
