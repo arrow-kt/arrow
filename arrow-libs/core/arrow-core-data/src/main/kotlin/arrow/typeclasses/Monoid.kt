@@ -1,5 +1,6 @@
 package arrow.typeclasses
 
+import arrow.KindDeprecation
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
@@ -11,8 +12,6 @@ import arrow.core.combineAll
 import arrow.core.compose
 import arrow.core.flatten
 import arrow.core.identity
-import kotlin.collections.plus as _plus
-import arrow.KindDeprecation
 import kotlin.collections.plus as _plus
 
 @Deprecated(KindDeprecation)
