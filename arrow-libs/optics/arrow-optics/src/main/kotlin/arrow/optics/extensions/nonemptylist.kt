@@ -23,7 +23,7 @@ import arrow.typeclasses.Applicative
   "Typeclass instance have been moved to the companion object of the typeclass",
   ReplaceWith(
     "Traversal.nonEmptyList<A>()",
-    "arrow.optics.Traversal", "arrow.optics.nonEmptyList"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,7 +39,7 @@ fun <A> NonEmptyList.Companion.traversal(): Traversal<NonEmptyList<A>, A> = obje
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Traversal.nonEmptyList<A>()",
-    "arrow.optics.Traversal", "arrow.optics.nonEmptyList"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -55,7 +55,7 @@ interface NonEmptyListEach<A> : Each<NonEmptyList<A>, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "FilterIndex.nonEmptyList<A>()",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -75,7 +75,7 @@ interface NonEmptyListFilterIndex<A> : FilterIndex<NonEmptyList<A>, Int, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "Index.nonEmptyList<A>()",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )

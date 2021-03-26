@@ -22,7 +22,7 @@ internal val each_singleton: SequenceKEach<Any?> = object : SequenceKEach<Any?> 
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,7 +38,7 @@ fun <A> each(): PTraversal<SequenceK<A>, SequenceK<A>, A, A> = arrow.core.Sequen
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )

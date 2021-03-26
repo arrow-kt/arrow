@@ -15,7 +15,7 @@ import arrow.optics.extensions.ListKIndex
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Index.list<A>().index(i)",
-    "arrow.optics.list", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,7 +39,7 @@ object List {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "Index.list<A>()",
-      "arrow.optics.list", "arrow.optics.typeclasses.Index"
+      "arrow.optics.typeclasses.Index"
     ),
     DeprecationLevel.WARNING
   )

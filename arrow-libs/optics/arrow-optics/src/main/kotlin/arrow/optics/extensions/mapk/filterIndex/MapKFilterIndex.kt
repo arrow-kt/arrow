@@ -23,7 +23,7 @@ internal val filterIndex_singleton: MapKFilterIndex<Any?, Any?> = object : MapKF
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for Map from the companion object of the typeclass instead.",
   ReplaceWith(
     "FilterIndex.map<K, V>().filter(p)",
-    "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ fun <K, V> filter(p: Function1<K, Boolean>): PTraversal<MapK<K, V>, MapK<K, V>, 
   "MapK is being deprecated. Use the instance for Map from the companion object of the typeclass.",
   ReplaceWith(
     "FilterIndex.map<K, V>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )

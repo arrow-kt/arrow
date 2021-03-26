@@ -5,15 +5,13 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.monoid.monoid
-import arrow.optics.none
-import arrow.optics.some
-import arrow.optics.toEither
-import arrow.optics.toNullable
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.option
 import arrow.core.zip
+import arrow.optics.Iso
+import arrow.optics.Prism
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.typeclasses.Eq
@@ -26,7 +24,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = Option.some(),
+        prism = Prism.some(),
         aGen = Gen.option(Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
@@ -37,7 +35,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = Option.none(),
+        prism = Prism.none(),
         aGen = Gen.option(Gen.int()),
         bGen = Gen.create { Unit },
         funcGen = Gen.functionAToB(Gen.create { Unit }),
@@ -48,7 +46,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       IsoLaws.laws(
-        iso = Option.toNullable<Int>().reverse(),
+        iso = Iso.optionToNullable<Int>().reverse(),
         aGen = Gen.int().orNull(),
         bGen = Gen.option(Gen.int()),
         EQA = Eq.any(),
@@ -60,7 +58,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       IsoLaws.laws(
-        iso = Option.toEither(),
+        iso = Iso.optionToEither(),
         aGen = Gen.option(Gen.int()),
         bGen = Gen.either(Gen.create { Unit }, Gen.int()),
         funcGen = Gen.functionAToB(Gen.either(Gen.create { Unit }, Gen.int())),

@@ -35,7 +35,7 @@ import arrow.typeclasses.Applicative
   "ListK is being deprecated. Use the instance for List from the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,7 +51,7 @@ fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -66,7 +66,7 @@ interface ListKEach<A> : Each<ListK<A>, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "FilterIndex.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -87,7 +87,7 @@ interface ListKFilterIndex<A> : FilterIndex<ListK<A>, Int, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "Index.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -105,7 +105,7 @@ interface ListKIndex<A> : Index<ListK<A>, Int, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "Cons.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -123,7 +123,7 @@ interface ListKCons<A> : Cons<ListK<A>, A> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "Snoc.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+    "arrow.optics.typeclasses.Snoc"
   ),
   DeprecationLevel.WARNING
 )

@@ -15,7 +15,7 @@ import arrow.optics.extensions.MapKEach
   "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,7 +39,7 @@ object Map {
     "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.map<K, V>()",
-      "arrow.optics.Traversal", "arrow.optics.map"
+      "arrow.optics.Traversal"
     ),
     DeprecationLevel.WARNING
   )
