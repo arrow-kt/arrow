@@ -6,7 +6,6 @@ plugins {
 
 apply from: "../$DOC_CREATION"
 apply from: "../$SUB_PROJECT"
-apply from: "../$TEST_COVERAGE"
 
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
