@@ -7,6 +7,7 @@ import arrow.core.identity
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.toOption
+import arrow.optics.test.generators.iterable
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
@@ -20,7 +21,7 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead(),
-      aGen = Gen.list(Gen.int()),
+      aGen = Gen.iterable(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
     ))
@@ -34,35 +35,35 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().first(),
-      aGen = Gen.pair(Gen.list(Gen.int()), Gen.bool()),
+      aGen = Gen.pair(Gen.iterable(Gen.int()), Gen.bool()),
       bGen = Gen.pair(Gen.int(), Gen.bool()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().first(),
-      aGen = Gen.pair(Gen.list(Gen.int()), Gen.bool()),
+      aGen = Gen.pair(Gen.iterable(Gen.int()), Gen.bool()),
       bGen = Gen.pair(Gen.int(), Gen.bool()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().second(),
-      aGen = Gen.pair(Gen.bool(), Gen.list(Gen.int())),
+      aGen = Gen.pair(Gen.bool(), Gen.iterable(Gen.int())),
       bGen = Gen.pair(Gen.bool(), Gen.int()),
       funcGen = Gen.functionAToB(Gen.pair(Gen.bool(), Gen.int())),
     ))
 
     testLaws(TraversalLaws.laws(
       traversal = Optional.listHead<Int>(),
-      aGen = Gen.list(Gen.int()),
+      aGen = Gen.iterable(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
     ))
 
     testLaws(SetterLaws.laws(
       setter = Optional.listHead<Int>(),
-      aGen = Gen.list(Gen.int()),
+      aGen = Gen.iterable(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
     ))

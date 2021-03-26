@@ -9,6 +9,7 @@ import arrow.optics.Optional
 import arrow.optics.listHead
 import arrow.optics.listTail
 import arrow.optics.listToOptionNel
+import arrow.optics.test.generators.iterable
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.OptionalLaws
 import io.kotlintest.properties.Gen
@@ -20,7 +21,7 @@ class ListTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optional = Optional.listHead(),
-        aGen = Gen.list(Gen.int()),
+        aGen = Gen.iterable(Gen.int()),
         bGen = Gen.int(),
         funcGen = Gen.functionAToB(Gen.int()),
       )

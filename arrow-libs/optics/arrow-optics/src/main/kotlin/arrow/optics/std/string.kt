@@ -53,7 +53,8 @@ fun PEvery.Companion.string(): Every<String, Char> =
  */
 fun FilterIndex.Companion.string(): FilterIndex<String, Int, Char> =
   FilterIndex { p ->
-    Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
+//    Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
+    TODO("Fix: Composition broken here. Not sure why???")
   }
 
 /**

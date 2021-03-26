@@ -4,6 +4,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
 import arrow.optics.list
+import arrow.optics.test.generators.iterable
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
@@ -20,7 +21,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Gen.list(Gen.string()),
+        aGen = Gen.iterable(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -29,7 +30,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Gen.list(Gen.string()),
+        aGen = Gen.iterable(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -38,7 +39,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.list<String>().filter { true },
-        aGen = Gen.list(Gen.string()),
+        aGen = Gen.iterable(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )

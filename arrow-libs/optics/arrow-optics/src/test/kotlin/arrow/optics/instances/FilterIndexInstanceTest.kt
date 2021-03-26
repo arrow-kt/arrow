@@ -9,6 +9,7 @@ import arrow.optics.map
 import arrow.optics.nonEmptyList
 import arrow.optics.string
 import arrow.optics.test.generators.char
+import arrow.optics.test.generators.iterable
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
 import io.kotlintest.properties.Gen
@@ -18,7 +19,7 @@ class FilterIndexInstanceTest : UnitSpec() {
   init {
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.list<String>().filter { true },
-      aGen = Gen.list(Gen.string()),
+      aGen = Gen.iterable(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -27,7 +28,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.list<String>().filter { true },
-        aGen = Gen.list(Gen.string()),
+        aGen = Gen.iterable(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )

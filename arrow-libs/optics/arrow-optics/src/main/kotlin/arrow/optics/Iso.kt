@@ -113,6 +113,19 @@ interface PIso<in S, out T, out A, in B> : PPrism<S, T, A, B>, PLens<S, T, A, B>
     this::reverseGet compose other::reverseGet
   )
 
+  /**
+   * Compose a [PIso] with a [PIso]
+   */
+
+  infix fun <C, D> composeEvery(other: PEvery<A, B, C, D>): PEvery<S, T, C, D> =
+    object : PEvery<S, T, C, D> {
+      override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: C) -> R): R =
+        other.foldMap(M, this@PIso.get(source), map)
+
+      override fun modify(source: S, map: (focus: C) -> D): T =
+        this@PIso.reverseGet(other.modify(this@PIso.get(source), map))
+    }
+
   operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> =
     this compose other
 
