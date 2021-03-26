@@ -5,7 +5,10 @@ import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.core.test.generators.validated
 import io.kotlintest.fail
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 @Suppress("RedundantSuspendModifier")
@@ -109,6 +112,60 @@ class ValidatedTest : UnitSpec() {
       Valid(10).findValid(Semigroup.int()) { fail("None should not be called") } shouldBe Valid(10)
       Invalid(10).findValid(Semigroup.int()) { Valid(5) } shouldBe Valid(5)
       Invalid(10).findValid(Semigroup.int()) { Invalid(5) } shouldBe Invalid(15)
+    }
+
+    val nullableLongSemigroup = object : Monoid<Long?> {
+      override fun empty(): Long? = 0
+      override fun Long?.combine(b: Long?): Long? =
+        Nullable.zip(this@combine, b) { a, bb -> a + bb }
+    }
+
+    "zip identity" {
+      forAll(Gen.validated(Gen.long().orNull(), Gen.int().orNull())) { validated ->
+        val res = validated.zip(nullableLongSemigroup, Valid(Unit)) { a, _ -> a }
+        res == validated
+      }
+    }
+
+    "zip is derived from flatMap" {
+      forAll(
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.validated(Gen.long().orNull(), Gen.int().orNull())
+      ) { a, b, c, d, e, f, g, h, i, j ->
+        val res = a.zip(
+          nullableLongSemigroup,
+          b, c, d, e, f, g, h, i, j
+        ) { a, b, c, d, e, f, g, h, i, j ->
+          Nullable.zip(
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+            i,
+            j
+          ) { a, b, c, d, e, f, g, h, i, j -> a + b + c + d + e + f + g + h + i + j }
+        }
+
+        val all = listOf(a, b, c, d, e, f, g, h, i, j)
+        val isValid = all.all(Validated<Long?, Int?>::isValid)
+        val expected: Validated<Long?, Int?> =
+          if (isValid) Valid(all.fold<Validated<Long?, Int?>, Int?>(0) { acc, validated -> Nullable.zip(acc, validated.orNull()) { a, b -> a + b } })
+          else Invalid(all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup))
+
+        res == expected
+      }
     }
 
     "zip should return Valid(f(a)) if both are Valid" {

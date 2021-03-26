@@ -877,28 +877,29 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
   if (this is Validated.Valid && b is Validated.Valid && c is Validated.Valid && d is Validated.Valid && e is Validated.Valid && ff is Validated.Valid && g is Validated.Valid && h is Validated.Valid && i is Validated.Valid && j is Validated.Valid) {
     Validated.Valid(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
   } else SE.run {
-    var accumulatedError: E? = null
+    var accumulatedError: Any? = EmptyValue
     accumulatedError =
-      if (this@zip is Validated.Invalid) this@zip.value.maybeCombine(accumulatedError) else accumulatedError
+      if (this@zip is Validated.Invalid) this@zip.value else accumulatedError
     accumulatedError =
-      if (b is Validated.Invalid) accumulatedError?.let { it.combine(b.value) } ?: b.value else accumulatedError
+      if (b is Validated.Invalid) emptyCombine(accumulatedError, b.value) else accumulatedError
     accumulatedError =
-      if (c is Validated.Invalid) accumulatedError?.let { it.combine(c.value) } ?: c.value else accumulatedError
+      if (c is Validated.Invalid) emptyCombine(accumulatedError, c.value) else accumulatedError
     accumulatedError =
-      if (d is Validated.Invalid) accumulatedError?.let { it.combine(d.value) } ?: d.value else accumulatedError
+      if (d is Validated.Invalid) emptyCombine(accumulatedError, d.value) else accumulatedError
     accumulatedError =
-      if (e is Validated.Invalid) accumulatedError?.let { it.combine(e.value) } ?: e.value else accumulatedError
+      if (e is Validated.Invalid) emptyCombine(accumulatedError, e.value) else accumulatedError
     accumulatedError =
-      if (ff is Validated.Invalid) accumulatedError?.let { it.combine(ff.value) } ?: ff.value else accumulatedError
+      if (ff is Validated.Invalid) emptyCombine(accumulatedError, ff.value) else accumulatedError
     accumulatedError =
-      if (g is Validated.Invalid) accumulatedError?.let { it.combine(g.value) } ?: g.value else accumulatedError
+      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.value)else accumulatedError
     accumulatedError =
-      if (h is Validated.Invalid) accumulatedError?.let { it.combine(h.value) } ?: h.value else accumulatedError
+      if (h is Validated.Invalid) emptyCombine(accumulatedError, h.value) else accumulatedError
     accumulatedError =
-      if (i is Validated.Invalid) accumulatedError?.let { it.combine(i.value) } ?: i.value else accumulatedError
+      if (i is Validated.Invalid) emptyCombine(accumulatedError, i.value) else accumulatedError
     accumulatedError =
-      if (j is Validated.Invalid) accumulatedError?.let { it.combine(j.value) } ?: j.value else accumulatedError
-    Validated.Invalid(accumulatedError!!)
+      if (j is Validated.Invalid) emptyCombine(accumulatedError, j.value) else accumulatedError
+
+    Validated.Invalid(accumulatedError as E)
   }
 
 inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
