@@ -22,7 +22,6 @@ import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
 import arrow.optics.extensions.sequencek.filterIndex.filterIndex
-import arrow.optics.list
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex

@@ -7,7 +7,6 @@ import arrow.optics.extensions.setk.at.at
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.genSetK
-import arrow.optics.set
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.typeclasses.At
 import arrow.typeclasses.Eq

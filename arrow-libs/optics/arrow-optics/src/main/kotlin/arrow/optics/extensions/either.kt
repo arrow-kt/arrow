@@ -16,7 +16,7 @@ import arrow.typeclasses.Applicative
  */
 @Deprecated(
   "arrow.optics.extensions package is being deprecated, function is being moved to arrow.optics.traversal",
-  ReplaceWith("Either.traversal<L, R>()", "arrow.core.Either", "arrow.optics.traversal"),
+  ReplaceWith("Traversal.either<L, R>()", "arrow.optics.Traversal"),
   DeprecationLevel.WARNING
 )
 fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : Traversal<Either<L, R>, R> {
@@ -30,7 +30,7 @@ fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : T
  */
 @Deprecated(
   "Each is being deprecated. Use Traversal directly instead.",
-  ReplaceWith("Either.traversal<L, R>()", "arrow.core.Either", "arrow.optics.traversal"),
+  ReplaceWith("Traversal.either<L, R>()", "arrow.optics.Traversal"),
   DeprecationLevel.WARNING
 )
 interface EitherEach<L, R> : Each<Either<L, R>, R> {

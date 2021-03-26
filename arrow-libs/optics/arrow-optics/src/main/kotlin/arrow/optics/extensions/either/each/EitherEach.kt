@@ -22,7 +22,7 @@ internal val each_singleton: EitherEach<Any?, Any?> = object : EitherEach<Any?, 
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Traversal.either<L, R>()",
-    "arrow.optics.Traversal", "arrow.optics.either"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,7 +38,7 @@ fun <L, R> each(): PTraversal<Either<L, R>, Either<L, R>, R, R> = arrow.core.Eit
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Traversal.either<L, R>()",
-    "arrow.optics.Traversal", "arrow.optics.either"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )

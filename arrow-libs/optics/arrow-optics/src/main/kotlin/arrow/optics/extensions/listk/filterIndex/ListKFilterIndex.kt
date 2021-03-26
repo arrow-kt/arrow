@@ -30,7 +30,7 @@ internal val filterIndex_singleton: ListKFilterIndex<Any?> = object : ListKFilte
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "FilterIndex.list<A>().filter(p)",
-    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -46,7 +46,7 @@ fun <A> filter(p: Function1<Int, Boolean>): PTraversal<ListK<A>, ListK<A>, A, A>
   "ListK is being deprecated. Use the instance for List from the companion object of the typeclass.",
   ReplaceWith(
     "FilterIndex.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
