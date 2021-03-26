@@ -24,7 +24,6 @@ dependencies {
     kaptTest "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     testCompileOnly "com.google.testing.compile:compile-testing:$GOOGLE_COMPILE_TESTING_VERSION"
     testCompileOnly fileTree(dir: './src/test/libs', includes: ['*.jar'])
-//    testCompileOnly project(":arrow-meta:arrow-meta-test-models")
     testCompileOnly("junit:junit:$JUNIT_VERSION")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
     testImplementation "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow

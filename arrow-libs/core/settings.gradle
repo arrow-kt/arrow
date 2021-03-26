@@ -2,7 +2,6 @@
 
 rootProject.name = 'arrow-core-libs'
 
-// include 'arrow-meta:arrow-meta-test-models'
 include 'arrow-meta'
 include 'arrow-annotations'
 include 'arrow-syntax'

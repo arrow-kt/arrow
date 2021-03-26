@@ -4,7 +4,6 @@ plugins {
 }
 
 apply from: "$SUB_PROJECT"
-apply from: "$TEST_COVERAGE"
 apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
