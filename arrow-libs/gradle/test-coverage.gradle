@@ -26,4 +26,5 @@ jacocoTestReport {
         html.enabled true
     }
     dependsOn test // tests are required to run before generating the report
+    mustRunAfter test
 }
