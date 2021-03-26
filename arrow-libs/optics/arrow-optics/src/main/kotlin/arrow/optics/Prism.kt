@@ -5,6 +5,7 @@ import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.compose
@@ -17,13 +18,16 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 
 @Deprecated(KindDeprecation)
-class ForPPrism private constructor() { companion object }
+class ForPPrism private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias PPrismOf<S, T, A, B> = arrow.Kind4<ForPPrism, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias PPrismPartialOf<S, T, A> = arrow.Kind3<ForPPrism, S, T, A>
 @Deprecated(KindDeprecation)
 typealias PPrismKindedJ<S, T, A, B> = arrow.HkJ4<ForPPrism, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> PPrismOf<S, T, A, B>.fix(): PPrism<S, T, A, B> =
@@ -69,11 +73,12 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
      * Can also be used to construct [Prism]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) = object : PPrism<S, T, A, B> {
-      override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
+    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) =
+      object : PPrism<S, T, A, B> {
+        override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
-      override fun reverseGet(b: B): T = reverseGet(b)
-    }
+        override fun reverseGet(b: B): T = reverseGet(b)
+      }
 
     /**
      * A [PPrism] that checks for equality with a given value [a]
@@ -82,6 +87,33 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
       getOrModify = { a2 -> (if (EQA.run { a.eqv(a2) }) Either.Left(a) else Either.Right(Unit)) },
       reverseGet = { a }
     )
+
+    /**
+     * [PPrism] to focus into an [arrow.core.Some]
+     */
+    @JvmStatic
+    fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
+      PPrism(
+        getOrModify = { option -> option.fold({ Either.Left(None) }, ::Right) },
+        reverseGet = ::Some
+      )
+
+    /**
+     * [Prism] to focus into an [arrow.core.Some]
+     */
+    @JvmStatic
+    fun <A> some(): Prism<Option<A>, A> =
+      pSome()
+
+    /**
+     * [Prism] to focus into an [arrow.core.None]
+     */
+    @JvmStatic
+    fun <A> none(): Prism<Option<A>, Unit> =
+      Prism(
+        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
+        reverseGet = { _ -> None }
+      )
   }
 
   /**
@@ -184,7 +216,11 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    * Create a sum of the [PPrism] and a type [C]
    */
   fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PPrism(
-    { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
+    {
+      it.fold(
+        { a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) },
+        { c -> Either.Right(Either.Right(c)) })
+    },
     {
       when (it) {
         is Either.Left -> Either.Left(reverseGet(it.a))
@@ -197,7 +233,11 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    * Create a sum of a type [C] and the [PPrism]
    */
   fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PPrism(
-    { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
+    {
+      it.fold(
+        { c -> Either.Right(Either.Left(c)) },
+        { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) })
+    },
     { it.map(this::reverseGet) }
   )
 

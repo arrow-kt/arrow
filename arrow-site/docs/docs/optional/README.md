@@ -72,8 +72,6 @@ An `Optional` instance can be manually constructed from any default or custom `I
 We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Option<User>`. So, we first want to look into `Option`, which **optionally** could be a `Some`. And then we want to look into `User`, which optionally filled in his email.
 
 ```kotlin:ank
-import arrow.optics.some
-
 data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
@@ -81,7 +79,7 @@ val participantEmail: Optional<Participant, String> = Optional(
         set = { participant, email -> participant.copy(email = email) }
 )
 
-val optEmail: Optional<Option<Participant>, String> = Option.some<Participant>() compose participantEmail
+val optEmail: Optional<Option<Participant>, String> = PPrism.some<Participant>() compose participantEmail
 
 optEmail.getOption(Some(Participant("test", "email")))
 ```
@@ -120,7 +118,7 @@ A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }
 Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-val pprism = Option.PSome<Tuple2<Int, String>, Tuple2<String, String>>()
+val pprism = PPrism.pSome<Tuple2<Int, String>, Tuple2<String, String>>()
 val plens = Tuple2.pFirst<Int, String, String>()
 
 val someTuple2: POptional<Option<Tuple2<Int, String>>, Option<Tuple2<String, String>>, Int, String> =

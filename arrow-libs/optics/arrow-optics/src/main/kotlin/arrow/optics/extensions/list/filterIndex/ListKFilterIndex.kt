@@ -15,7 +15,7 @@ import arrow.optics.extensions.ListKFilterIndex
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "FilterIndex.list<A>().filter(p)",
-    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ object List {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "FilterIndex.list<A>()",
-      "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+      "arrow.optics.typeclasses.FilterIndex"
     ),
     DeprecationLevel.WARNING
   )

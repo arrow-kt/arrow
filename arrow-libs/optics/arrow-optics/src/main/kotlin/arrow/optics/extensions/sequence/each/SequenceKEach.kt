@@ -15,7 +15,7 @@ import arrow.optics.extensions.SequenceKEach
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ object Sequence {
     "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.sequence<A>()",
-      "arrow.optics.Traversal", "arrow.optics.sequence"
+      "arrow.optics.Traversal"
     ),
     DeprecationLevel.WARNING
   )

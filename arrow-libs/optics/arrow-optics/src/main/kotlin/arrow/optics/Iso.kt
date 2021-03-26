@@ -3,10 +3,15 @@ package arrow.optics
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.Validated
+import arrow.core.Validated.Invalid
+import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
@@ -15,13 +20,16 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
 
 @Deprecated(KindDeprecation)
-class ForPIso private constructor() { companion object }
+class ForPIso private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias PIsoOf<S, T, A, B> = arrow.Kind4<ForPIso, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias PIsoPartialOf<S, T, A> = arrow.Kind3<ForPIso, S, T, A>
 @Deprecated(KindDeprecation)
 typealias PIsoKindedJ<S, T, A, B> = arrow.HkJ4<ForPIso, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> PIsoOf<S, T, A, B>.fix(): PIso<S, T, A, B> =
@@ -37,6 +45,12 @@ typealias ForIso = ForPIso
 typealias IsoOf<S, A> = PIsoOf<S, S, A, A>
 typealias IsoPartialOf<S> = Kind<ForIso, S>
 typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
+
+private val stringToList: Iso<String, List<Char>> =
+  Iso(
+    get = CharSequence::toList,
+    reverseGet = { it.joinToString(separator = "") }
+  )
 
 /**
  * An [Iso] is a loss less invertible optic that defines an isomorphism between a type [S] and [A]
@@ -83,6 +97,107 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
 
       override fun reverseGet(b: B): T = reverseGet(b)
     }
+
+    /**
+     * [PIso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A, B> listToPOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> =
+      PIso(
+        get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
+        reverseGet = { optNel -> optNel.fold({ emptyList() }, NonEmptyList<B>::all) }
+      )
+
+    /**
+     * [Iso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> =
+      listToPOptionNel()
+
+    /**
+     * [PIso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
+      PIso(
+        get = { it.fold(::Invalid, ::Valid) },
+        reverseGet = Validated<A2, B2>::toEither
+      )
+
+    /**
+     * [Iso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
+      eitherToPValidated()
+
+    /**
+     * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
+     */
+    @JvmStatic
+    fun <K> mapToSet(): Iso<Map<K, Unit>, Set<K>> =
+      Iso(
+        get = { it.keys },
+        reverseGet = { keys -> keys.map { it to Unit }.toMap() }
+      )
+
+    /**
+     * [PIso] that defines the equality between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A, B> optionToPNullable(): PIso<Option<A>, Option<B>, A?, B?> =
+      PIso(
+        get = { it.fold({ null }, ::identity) },
+        reverseGet = Option.Companion::fromNullable
+      )
+
+    /**
+     * [PIso] that defines the isomorphic relationship between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A> optionToNullable(): Iso<Option<A>, A?> = optionToPNullable()
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A, B> optionToPEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> =
+      PIso(
+        get = { opt -> opt.fold({ Either.Left(Unit) }, ::Right) },
+        reverseGet = { either -> either.fold({ None }, ::Some) }
+      )
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> =
+      optionToPEither()
+
+    /**
+     * [Iso] that defines equality between String and [List] of [Char]
+     */
+    @JvmStatic
+    fun stringToList(): Iso<String, List<Char>> =
+      stringToList
+
+    /**
+     * [PIso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
+      PIso(
+        get = Validated<A1, B1>::toEither,
+        reverseGet = Validated.Companion::fromEither
+      )
+
+    /**
+     * [Iso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
+      validatedToPEither()
   }
 
   /**
@@ -129,10 +244,11 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * Pair two disjoint [PIso]
    */
-  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> = PIso(
-    { (a, c) -> get(a) toT other.get(c) },
-    { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
-  )
+  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
+    PIso(
+      { (a, c) -> get(a) toT other.get(c) },
+      { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
+    )
 
   /**
    * Create a pair of the [PIso] and a type [C]

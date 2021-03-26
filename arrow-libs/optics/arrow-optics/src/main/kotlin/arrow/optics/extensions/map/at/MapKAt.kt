@@ -16,7 +16,7 @@ import arrow.optics.extensions.MapKAt
   "arrow.optics.extensions package is being deprecated, and it will be removed in 0.13.",
   ReplaceWith(
     "this compose At.map<K, V>().at(i)",
-    "arrow.optics.map", "arrow.optics.typeclasses.At", "arrow.optics.compose"
+    "arrow.optics.typeclasses.At"
   ),
   level = DeprecationLevel.WARNING
 )
@@ -41,7 +41,7 @@ object Map {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "At.map<K, V>()",
-      "arrow.optics.map", "arrow.optics.typeclasses.At"
+      "arrow.optics.typeclasses.At"
     ),
     DeprecationLevel.WARNING
   )

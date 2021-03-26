@@ -17,7 +17,7 @@ import arrow.typeclasses.Applicative
   "arrow.optics.extension package is being deprecated, function is being moved to arrow.optics.traversal.",
   ReplaceWith(
     "Option.traversal<A>()",
-    "arrow.core.Option", "arrow.optics.traversal"
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -34,7 +34,7 @@ fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> = object : Travers
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Option.traversal<A>()",
-    "arrow.core.Option", "arrow.optics.traversal"
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )

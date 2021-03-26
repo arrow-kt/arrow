@@ -15,13 +15,16 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 
 @Deprecated(KindDeprecation)
-class ForPOptional private constructor() { companion object }
+class ForPOptional private constructor() {
+  companion object
+}
 @Deprecated(KindDeprecation)
 typealias POptionalOf<S, T, A, B> = arrow.Kind4<ForPOptional, S, T, A, B>
 @Deprecated(KindDeprecation)
 typealias POptionalPartialOf<S, T, A> = arrow.Kind3<ForPOptional, S, T, A>
 @Deprecated(KindDeprecation)
 typealias POptionalKindedJ<S, T, A, B> = arrow.HkJ4<ForPOptional, S, T, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(KindDeprecation)
 inline fun <S, T, A, B> POptionalOf<S, T, A, B>.fix(): POptional<S, T, A, B> =
@@ -108,7 +111,10 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (source: S) -> Either<T, A>, set: (source: S, focus: B) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
+    operator fun <S, T, A, B> invoke(
+      getOrModify: (source: S) -> Either<T, A>,
+      set: (source: S, focus: B) -> T
+    ): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
       override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
 
       override fun set(source: S, focus: B): T = set(source, focus)
@@ -120,6 +126,28 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
     fun <A, B> void(): Optional<A, B> = POptional(
       { Either.Left(it) },
       { source, _ -> source }
+    )
+
+    /**
+     * [Optional] to safely operate on the head of a list
+     */
+    @JvmStatic
+    fun <A> listHead(): Optional<List<A>, A> = Optional(
+      getOption = { Option.fromNullable(it.firstOrNull()) },
+      set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
+    )
+
+    /**
+     * [Optional] to safely operate on the tail of a list
+     */
+    @JvmStatic
+    fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
+      getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
+      set = { list, newTail ->
+        list.firstOrNull()?.let {
+          listOf(it) + newTail
+        } ?: emptyList()
+      }
     )
   }
 

@@ -11,7 +11,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.tuple2
 import arrow.optics.Traversal
-import arrow.optics.string
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws

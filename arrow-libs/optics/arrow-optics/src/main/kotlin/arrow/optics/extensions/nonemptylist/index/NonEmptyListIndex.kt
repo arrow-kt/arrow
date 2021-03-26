@@ -30,7 +30,7 @@ internal val index_singleton: Index<NonEmptyList<Any?>, Int, Any?> = object : No
   "arrow.optics.extensions package is being deprecated. Use the function from the instance exposed in the typeclass' companion object instead.",
   ReplaceWith(
     "Index.nonEmptyList<A>().index(i)",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -66,7 +66,7 @@ operator fun <A, T> PLens<T, T, NonEmptyList<A>, NonEmptyList<A>>.get(i: Int): P
   "Typeclass instance have been moved to the companion object of the typeclass",
   ReplaceWith(
     "Index.nonEmptyList<A>()",
-    "arrow.optics.nonEmptyList", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )

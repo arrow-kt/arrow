@@ -15,7 +15,7 @@ import arrow.optics.extensions.ListKEach
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,7 +39,7 @@ object List {
     "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.list<A>()",
-      "arrow.optics.Traversal", "arrow.optics.list"
+      "arrow.optics.Traversal"
     ),
     DeprecationLevel.WARNING
   )

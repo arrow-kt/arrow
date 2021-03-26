@@ -30,7 +30,7 @@ internal val cons_singleton: ListKCons<Any?> = object : ListKCons<Any?> {}
   "ListK is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().firstOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,7 +49,7 @@ fun <A> firstOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
   "ListK is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().tailOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -107,7 +107,7 @@ fun <A> ListK<A>.uncons(): Option<Tuple2<A, ListK<A>>> = arrow.core.ListK.cons<A
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().cons()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -125,7 +125,7 @@ fun <A> cons(): PPrism<ListK<A>, ListK<A>, Tuple2<A, ListK<A>>, Tuple2<A, ListK<
   "ListK is being deprecated. Use the instance for List from the companion object of the typeclass.",
   ReplaceWith(
     "Cons.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )

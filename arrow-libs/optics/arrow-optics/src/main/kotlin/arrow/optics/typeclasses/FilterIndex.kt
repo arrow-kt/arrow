@@ -1,8 +1,11 @@
 package arrow.optics.typeclasses
 
 import arrow.Kind
+import arrow.core.NonEmptyList
 import arrow.core.Predicate
 import arrow.core.Tuple2
+import arrow.core.k
+import arrow.core.toT
 import arrow.optics.Iso
 import arrow.optics.Traversal
 import arrow.typeclasses.Applicative
@@ -33,7 +36,10 @@ fun interface FilterIndex<S, I, A> {
     /**
      * Create an instance of [FilterIndex] from a [Traverse] and a function `Kind<S, A>) -> Kind<S, Tuple2<A, Int>>`
      */
-    fun <S, A> fromTraverse(zipWithIndex: (Kind<S, A>) -> Kind<S, Tuple2<A, Int>>, traverse: Traverse<S>): FilterIndex<Kind<S, A>, Int, A> =
+    fun <S, A> fromTraverse(
+      zipWithIndex: (Kind<S, A>) -> Kind<S, Tuple2<A, Int>>,
+      traverse: Traverse<S>
+    ): FilterIndex<Kind<S, A>, Int, A> =
       FilterIndex { p ->
         object : Traversal<Kind<S, A>, A> {
           override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
@@ -45,6 +51,79 @@ fun interface FilterIndex<S, I, A> {
               }
             }
         }
+      }
+
+    /**
+     * [FilterIndex] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): FilterIndex<List<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<List<A>, A> {
+          override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
+            s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
+              if (p(j)) f(a) else FA.just(a)
+            }
+        }
+      }
+
+    @JvmStatic
+    fun <K, V> map(): FilterIndex<Map<K, V>, K, V> =
+      FilterIndex { p ->
+        object : Traversal<Map<K, V>, V> {
+          override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
+            FA.run {
+              s.toList().k().traverse(FA) { (k, v) ->
+                (if (p(k)) f(v) else just(v)).map {
+                  k to it
+                }
+              }.map { it.toMap() }
+            }
+        }
+      }
+
+    /**
+     * [FilterIndex] instance definition for [NonEmptyList].
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): FilterIndex<NonEmptyList<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<NonEmptyList<A>, A> {
+          override fun <F> modifyF(
+            FA: Applicative<F>,
+            s: NonEmptyList<A>,
+            f: (A) -> Kind<F, A>
+          ): Kind<F, NonEmptyList<A>> =
+            s.all.mapIndexed { index, a -> a toT index }
+              .let(NonEmptyList.Companion::fromListUnsafe)
+              .traverse(FA) { (a, j) -> if (p(j)) f(a) else FA.just(a) }
+        }
+      }
+
+    @JvmStatic
+    fun <A> sequence(): FilterIndex<Sequence<A>, Int, A> =
+      FilterIndex { p ->
+        object : Traversal<Sequence<A>, A> {
+          override fun <F> modifyF(FA: Applicative<F>, s: Sequence<A>, f: (A) -> Kind<F, A>): Kind<F, Sequence<A>> =
+            FA.run {
+              s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
+                if (p(j)) f(a) else just(a)
+              }
+            }
+        }
+      }
+
+    /**
+     * [FilterIndex] instance for [String].
+     * It allows filtering of every [Char] in a [String] by its index's position.
+     *
+     * @receiver [FilterIndex.Companion] to make the instance statically available.
+     * @return [FilterIndex] instance
+     */
+    @JvmStatic
+    fun string(): FilterIndex<String, Int, Char> =
+      FilterIndex { p ->
+        Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
       }
   }
 }

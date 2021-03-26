@@ -22,7 +22,7 @@ internal val each_singleton: MapKEach<Any?, Any?> = object : MapKEach<Any?, Any?
   "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,7 +38,7 @@ fun <K, V> each(): PTraversal<MapK<K, V>, MapK<K, V>, V, V> = arrow.core.MapK
   "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )

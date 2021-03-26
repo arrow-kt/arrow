@@ -13,7 +13,7 @@ import arrow.optics.typeclasses.At
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "At.set<A>()",
-    "arrow.optics.set", "arrow.optics.typeclasses.At"
+    "arrow.optics.typeclasses.At"
   ),
   DeprecationLevel.WARNING
 )
