@@ -26,7 +26,8 @@ typealias Lens<S, A> = PLens<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+interface PLens<in S, out T, out A, in B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>,
+  PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   override fun get(source: S): A
 
@@ -41,10 +42,11 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
   /**
    * Join two [PLens] with the same focus in [A]
    */
-  infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
-    { ss -> ss.fold(this::get, other::get) },
-    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
-  )
+  infix fun <S1, T1> choice(other: PLens<S1, T1, @UnsafeVariance A, @UnsafeVariance B>): PLens<Either<S, S1>, Either<T, T1>, A, B> =
+    PLens(
+      { ss -> ss.fold(this::get, other::get) },
+      { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
+    )
 
   /**
    * Pair two disjoint [PLens]

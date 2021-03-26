@@ -14,7 +14,7 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Getter]
  * @param A the focus of a [Getter]
  */
-fun interface Getter<S, A> : Fold<S, A> {
+fun interface Getter<in S, out A> : Fold<S, A> {
 
   /**
    * Get the focus of a [Getter]
@@ -51,7 +51,7 @@ fun interface Getter<S, A> : Fold<S, A> {
   /**
    * Join two [Getter] with the same focus
    */
-  infix fun <C> choice(other: Getter<C, A>): Getter<Either<S, C>, A> =
+  infix fun <C> choice(other: Getter<C, @UnsafeVariance A>): Getter<Either<S, C>, A> =
     Getter { s -> s.fold(this::get, other::get) }
 
   /**
@@ -63,7 +63,7 @@ fun interface Getter<S, A> : Fold<S, A> {
   /**
    * Zip two [Getter] optics with the same source [S]
    */
-  infix fun <C> zip(other: Getter<S, C>): Getter<S, Pair<A, C>> =
+  infix fun <C> zip(other: Getter<@UnsafeVariance S, C>): Getter<S, Pair<A, C>> =
     Getter { s -> get(s) to other.get(s) }
 
   /**

@@ -19,11 +19,11 @@ typealias Traversal<S, A> = PTraversal<S, S, A, A>
  * @param A the target of a [PTraversal]
  * @param B the modified target of a [PTraversal]
  */
-fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
+fun interface PTraversal<in S, out T, out A, in B> : PSetter<S, T, A, B> {
 
   override fun modify(source: S, map: (focus: A) -> B): T
 
-  fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
+  fun <U, V> choice(other: PTraversal<U, V, @UnsafeVariance A, @UnsafeVariance B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
     PTraversal { s, f ->
       s.fold(
         { a -> Either.Left(this@PTraversal.modify(a, f)) },

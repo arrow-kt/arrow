@@ -8,7 +8,7 @@ typealias Every<S, A> = PEvery<S, S, A, A>
  * Composition of Fold and Traversal
  * It combines their powers
  */
-interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T, A, B> {
+interface PEvery<in S, out T, out A, in B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T, A, B> {
 
   /**
    * Map each target to a type R and use a Monoid to fold the results
@@ -46,7 +46,7 @@ interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T,
    * @receiver [Lens] with a focus in [S]
    * @return [Every] with a focus in [A]
    */
-  val <U, V> PLens<U, V, S, T>.every: PEvery<U, V, A, B>
+  val <U, V> PLens<U, V, @UnsafeVariance S, @UnsafeVariance T>.every: PEvery<U, V, A, B>
     get() = this@every.compose(this@PEvery)
 
   /**
@@ -55,7 +55,7 @@ interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T,
    * @receiver [Iso] with a focus in [S]
    * @return [Every] with a focus in [A]
    */
-  val <U, V> PIso<U, V, S, T>.every: PEvery<U, V, A, B>
+  val <U, V> PIso<U, V, @UnsafeVariance S, @UnsafeVariance T>.every: PEvery<U, V, A, B>
     get() = this@every.compose(this@PEvery)
 
   /**
@@ -64,7 +64,7 @@ interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T,
    * @receiver [Prism] with a focus in [S]
    * @return [Every] with a focus in [A]
    */
-  val <U, V> PPrism<U, V, S, T>.every: PEvery<U, V, A, B>
+  val <U, V> PPrism<U, V, @UnsafeVariance S, @UnsafeVariance T>.every: PEvery<U, V, A, B>
     get() = this.compose(this@PEvery)
 
   /**

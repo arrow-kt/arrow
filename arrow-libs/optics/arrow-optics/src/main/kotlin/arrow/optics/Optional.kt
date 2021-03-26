@@ -54,7 +54,7 @@ fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus:
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+interface POptional<in S, out T, out A, in B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   /**
    * Get the modified source of a [POptional]
@@ -98,7 +98,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Join two [POptional] with the same focus [B]
    */
-  infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
+  infix fun <S1, T1> choice(other: POptional<S1, T1, @UnsafeVariance A, @UnsafeVariance B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
     POptional(
       { sources ->
         sources.fold(

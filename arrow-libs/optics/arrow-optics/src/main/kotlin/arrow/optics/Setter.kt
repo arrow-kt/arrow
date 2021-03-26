@@ -23,7 +23,7 @@ typealias Setter<S, A> = PSetter<S, S, A, A>
  * @param A the focus of a [PSetter]
  * @param B the modified focus of a [PSetter]
  */
-fun interface PSetter<S, T, A, B> {
+fun interface PSetter<in S, out T, out A, in B> {
 
   /**
    * Modify polymorphically the focus of a [PSetter] with a function [map].
@@ -45,7 +45,7 @@ fun interface PSetter<S, T, A, B> {
   /**
    * Join two [PSetter] with the same target
    */
-  infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> =
+  infix fun <U, V> choice(other: PSetter<U, V, @UnsafeVariance A, @UnsafeVariance B>): PSetter<Either<S, U>, Either<T, V>, A, B> =
     PSetter { su, f ->
       su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) })
     }

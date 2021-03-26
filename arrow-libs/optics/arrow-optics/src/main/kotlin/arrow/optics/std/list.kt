@@ -17,7 +17,7 @@ import arrow.typeclasses.Monoid
 /**
  * [Optional] to safely operate on the head of a list
  */
-fun <A> POptional.Companion.listHead(): Optional<List<A>, A> =
+fun <A> POptional.Companion.listHead(): Optional<Iterable<A>, A> =
   Optional(
     getOption = { Option.fromNullable(it.firstOrNull()) },
     set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
@@ -54,31 +54,31 @@ fun <A> PIso.Companion.listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> 
 /**
  * [Traversal] for [List] that focuses in each [A] of the source [List].
  */
-fun <A> PTraversal.Companion.list(): Traversal<List<A>, A> =
+fun <A> PTraversal.Companion.list(): Traversal<Iterable<A>, A> =
   Every.list()
 
-fun <A> Fold.Companion.list(): Fold<List<A>, A> =
+fun <A> Fold.Companion.list(): Fold<Iterable<A>, A> =
   Every.list()
 
-fun <A> PEvery.Companion.list(): Every<List<A>, A> = object : Every<List<A>, A> {
-  override fun <R> foldMap(M: Monoid<R>, s: List<A>, map: (A) -> R): R =
+fun <A> PEvery.Companion.list(): Every<Iterable<A>, A> = object : Every<Iterable<A>, A> {
+  override fun <R> foldMap(M: Monoid<R>, s: Iterable<A>, map: (A) -> R): R =
     M.run { s.fold(empty()) { acc, a -> acc.combine(map(a)) } }
 
-  override fun modify(s: List<A>, map: (focus: A) -> A): List<A> =
+  override fun modify(s: Iterable<A>, map: (focus: A) -> A): List<A> =
     s.map(map)
 }
 
 /**
  * [FilterIndex] instance definition for [List].
  */
-fun <A> FilterIndex.Companion.list(): FilterIndex<List<A>, Int, A> =
+fun <A> FilterIndex.Companion.list(): FilterIndex<Iterable<A>, Int, A> =
   FilterIndex { p ->
-    object : Every<List<A>, A> {
-      override fun <R> foldMap(M: Monoid<R>, s: List<A>, map: (A) -> R): R = M.run {
+    object : Every<Iterable<A>, A> {
+      override fun <R> foldMap(M: Monoid<R>, s: Iterable<A>, map: (A) -> R): R = M.run {
         s.foldIndexed(empty()) { index, acc, a -> if (p(index)) acc.combine(map(a)) else acc }
       }
 
-      override fun modify(s: List<A>, map: (focus: A) -> A): List<A> =
+      override fun modify(s: Iterable<A>, map: (focus: A) -> A): List<A> =
         s.mapIndexed { index, a -> if (p(index)) map(a) else a }
     }
   }

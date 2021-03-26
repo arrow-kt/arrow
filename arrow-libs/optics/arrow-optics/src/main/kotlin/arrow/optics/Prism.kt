@@ -29,7 +29,7 @@ typealias Prism<S, A> = PPrism<S, S, A, A>
  * @param A the focus of a [PPrism]
  * @param B the modified focus of a [PPrism]
  */
-interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+interface PPrism<in S, out T, out A, in B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   override fun getOrModify(source: S): Either<T, A>
 

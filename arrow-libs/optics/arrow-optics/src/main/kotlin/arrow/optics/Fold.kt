@@ -12,7 +12,7 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
  */
-interface Fold<S, A> {
+interface Fold<in S, out A> {
 
   /**
    * Map each target to a type R and use a Monoid to fold the results
@@ -64,13 +64,13 @@ interface Fold<S, A> {
   /**
    * Fold using the given [Monoid] instance.
    */
-  fun fold(M: Monoid<A>, source: S): A =
+  fun fold(M: Monoid<@UnsafeVariance A>, source: S): A =
     foldMap(M, source, ::identity)
 
   /**
    * Alias for fold.
    */
-  fun combineAll(M: Monoid<A>, source: S): A =
+  fun combineAll(M: Monoid<@UnsafeVariance A>, source: S): A =
     foldMap(M, source, ::identity)
 
   /**
@@ -96,7 +96,7 @@ interface Fold<S, A> {
   /**
    * Join two [Fold] with the same target
    */
-  infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> =
+  infix fun <C> choice(other: Fold<C, @UnsafeVariance A>): Fold<Either<S, C>, A> =
     object : Fold<Either<S, C>, A> {
       override fun <R> foldMap(M: Monoid<R>, source: Either<S, C>, map: (focus: A) -> R): R =
         source.fold({ ac -> this@Fold.foldMap(M, ac, map) }, { c -> other.foldMap(M, c, map) })
