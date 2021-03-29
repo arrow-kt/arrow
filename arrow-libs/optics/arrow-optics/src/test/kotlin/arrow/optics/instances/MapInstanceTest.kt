@@ -5,7 +5,6 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.option
 import arrow.optics.Traversal
-import arrow.optics.map
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws

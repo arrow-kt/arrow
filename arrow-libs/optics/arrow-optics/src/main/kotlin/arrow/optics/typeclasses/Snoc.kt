@@ -1,11 +1,13 @@
 package arrow.optics.typeclasses
 
+import arrow.core.Either
+import arrow.core.Nullable
+import arrow.core.left
+import arrow.core.right
 import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.Prism
-import arrow.optics.pairFirst
-import arrow.optics.pairSecond
 
 typealias Conj<S, A> = Snoc<S, A>
 
@@ -64,5 +66,32 @@ fun interface Snoc<S, A> {
      */
     operator fun <S, A> invoke(prism: Prism<S, Pair<S, A>>): Snoc<S, A> =
       Snoc { prism }
+
+    /**
+     * [Snoc] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): Snoc<List<A>, A> =
+      Snoc {
+        object : Prism<List<A>, Pair<List<A>, A>> {
+          override fun getOrModify(s: List<A>): Either<List<A>, Pair<List<A>, A>> =
+            Nullable.zip(s.dropLast(1), s.lastOrNull(), ::Pair)?.right() ?: s.left()
+
+          override fun reverseGet(b: Pair<List<A>, A>): List<A> =
+            b.first + b.second
+        }
+      }
+
+    /**
+     * [Snoc] instance for [String].
+     */
+    @JvmStatic
+    fun string(): Snoc<String, Char> =
+      Snoc {
+        Prism(
+          getOrModify = { if (it.isNotEmpty()) Pair(it.dropLast(1), it.last()).right() else it.left() },
+          reverseGet = { (i, l) -> i + l }
+        )
+      }
   }
 }

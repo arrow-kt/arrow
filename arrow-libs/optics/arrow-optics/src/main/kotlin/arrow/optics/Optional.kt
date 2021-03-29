@@ -1,7 +1,9 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
@@ -147,8 +149,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
 
   companion object {
 
-    fun <S> id(): POptional<S, S, S, S> =
-      PIso.id()
+    fun <S> id() = PIso.id<S>()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
@@ -162,12 +163,14 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (source: S) -> Either<T, A>, set: (source: S, focus: B) -> T): POptional<S, T, A, B> =
-      object : POptional<S, T, A, B> {
-        override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
+    operator fun <S, T, A, B> invoke(
+      getOrModify: (source: S) -> Either<T, A>,
+      set: (source: S, focus: B) -> T
+    ): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
+      override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
 
-        override fun set(source: S, focus: B): T = set(source, focus)
-      }
+      override fun set(source: S, focus: B): T = set(source, focus)
+    }
 
     /**
      * [POptional] that never sees its focus
@@ -175,6 +178,28 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
     fun <A, B> void(): Optional<A, B> = POptional(
       { Either.Left(it) },
       { source, _ -> source }
+    )
+
+    /**
+     * [Optional] to safely operate on the head of a list
+     */
+    @JvmStatic
+    fun <A> listHead(): Optional<List<A>, A> = Optional(
+      getOption = { Option.fromNullable(it.firstOrNull()) },
+      set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
+    )
+
+    /**
+     * [Optional] to safely operate on the tail of a list
+     */
+    @JvmStatic
+    fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
+      getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
+      set = { list, newTail ->
+        list.firstOrNull()?.let {
+          listOf(it) + newTail
+        } ?: emptyList()
+      }
     )
   }
 }

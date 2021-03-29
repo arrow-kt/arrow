@@ -4,10 +4,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.nonEmptyList
-import arrow.optics.list
-import arrow.optics.map
-import arrow.optics.nonEmptyList
-import arrow.optics.string
+import arrow.core.test.generators.sequence
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
@@ -26,11 +23,11 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = FilterIndex.list<String>().filter { true },
-        aGen = Gen.list(Gen.string()),
+        traversal = FilterIndex.sequence<String>().filter { true },
+        aGen = Gen.sequence(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-      )
+      ) { a, b -> a.toList() == b.toList() }
     )
 
     testLaws(TraversalLaws.laws(

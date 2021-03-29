@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.typeclasses.Monoid
 
@@ -84,26 +85,129 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
 
   companion object {
 
-    fun <S> id(): PLens<S, S, S, S> =
-      PIso.id()
+    fun <S> id() = PIso.id<S>()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <S> codiagonal(): Lens<Either<S, S>, S> =
-      Lens(
-        get = { it.fold(::identity, ::identity) },
-        set = { s, b -> s.bimap({ b }, { b }) }
-      )
+    fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
+      get = { it.fold(::identity, ::identity) },
+      set = { s, b -> s.bimap({ b }, { b }) }
+    )
 
     /**
      * Invoke operator overload to create a [PLens] of type `S` with target `A`.
      * Can also be used to construct [Lens]
      */
-    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T) =
-      object : PLens<S, T, A, B> {
-        override fun get(s: S): A = get(s)
-        override fun set(source: S, focus: B): T = set(source, focus)
-      }
+    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T) = object : PLens<S, T, A, B> {
+      override fun get(s: S): A = get(s)
+
+      override fun set(s: S, b: B): T = set(s, b)
+    }
+
+    /**
+     * [Lens] to operate on the head of a [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> nonEmptyListHead(): Lens<NonEmptyList<A>, A> =
+      Lens(
+        get = NonEmptyList<A>::head,
+        set = { nel, newHead -> NonEmptyList(newHead, nel.tail) }
+      )
+
+    /**
+     * [Lens] to operate on the tail of a [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> nonEmptyListTail(): Lens<NonEmptyList<A>, List<A>> =
+      Lens(
+        get = NonEmptyList<A>::tail,
+        set = { nel, newTail -> NonEmptyList(nel.head, newTail) }
+      )
+
+    /**
+     * [PLens] to focus into the first value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B, R> pairPFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> =
+      PLens(
+        get = { it.first },
+        set = { (_, b), r -> r to b }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B> pairFirst(): Lens<Pair<A, B>, A> =
+      pairPFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B, R> pairPSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
+      PLens(
+        get = { it.second },
+        set = { (a, _), r -> a to r }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [Pair]
+     */
+    @JvmStatic
+    fun <A, B> pairSecond(): Lens<Pair<A, B>, B> =
+      pairPSecond()
+
+    /**
+     * [PLens] to focus into the first value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePFirst(): PLens<Triple<A, B, C>, Triple<R, B, C>, A, R> =
+      PLens(
+        get = { it.first },
+        set = { (_, b, c), r -> Triple(r, b, c) }
+      )
+
+    /**
+     * [Lens] to focus into the first value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleFirst(): Lens<Triple<A, B, C>, A> =
+      triplePFirst()
+
+    /**
+     * [PLens] to focus into the second value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePSecond(): PLens<Triple<A, B, C>, Triple<A, R, C>, B, R> =
+      PLens(
+        get = { it.second },
+        set = { (a, _, c), r -> Triple(a, r, c) }
+      )
+
+    /**
+     * [Lens] to focus into the second value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleSecond(): Lens<Triple<A, B, C>, B> =
+      triplePSecond()
+
+    /**
+     * [PLens] to focus into the third value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C, R> triplePThird(): PLens<Triple<A, B, C>, Triple<A, B, R>, C, R> =
+      PLens(
+        get = { it.third },
+        set = { (a, b, _), r -> Triple(a, b, r) }
+      )
+
+    /**
+     * [Lens] to focus into the third value of a [Triple]
+     */
+    @JvmStatic
+    fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
+      triplePThird()
   }
 }

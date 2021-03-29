@@ -26,11 +26,13 @@ class TraversalTest : UnitSpec() {
       )
     )
 
-    testLaws(TraversalLaws.laws(
-      traversal = Traversal({ it.first }, { it.second }, { a, b, _ -> a to b }),
-      aGen = Gen.pair(Gen.float(), Gen.float()),
-      bGen = Gen.float(),
-      funcGen = Gen.functionAToB(Gen.float()),
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = Traversal({ it.first }, { it.second }, { a, b, _ -> a to b }),
+        aGen = Gen.pair(Gen.float(), Gen.float()),
+        bGen = Gen.float(),
+        funcGen = Gen.functionAToB(Gen.float()),
+      )
+    )
   }
 }

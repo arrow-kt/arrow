@@ -4,7 +4,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.sequence
 import arrow.optics.Traversal
-import arrow.optics.sequence
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex

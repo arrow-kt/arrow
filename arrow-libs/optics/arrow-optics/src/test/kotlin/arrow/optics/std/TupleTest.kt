@@ -11,22 +11,8 @@ import arrow.core.test.generators.tuple8
 import arrow.core.test.generators.tuple9
 import arrow.optics.Lens
 import arrow.optics.Traversal
-import arrow.optics.pair
-import arrow.optics.pairFirst
-import arrow.optics.pairSecond
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
-import arrow.optics.triple
-import arrow.optics.tripleFirst
-import arrow.optics.tripleSecond
-import arrow.optics.tripleThird
-import arrow.optics.tuple10
-import arrow.optics.tuple4
-import arrow.optics.tuple5
-import arrow.optics.tuple6
-import arrow.optics.tuple7
-import arrow.optics.tuple8
-import arrow.optics.tuple9
 import io.kotlintest.properties.Gen
 
 class TupleTest : UnitSpec() {

@@ -1,7 +1,9 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
@@ -111,17 +113,17 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
 
   companion object {
 
-    fun <S> id(): PPrism<S, S, S, S> =
-      PIso.id()
+    fun <S> id() = PIso.id<S>()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
      * Can also be used to construct [Prism]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (source: S) -> Either<T, A>, reverseGet: (focus: B) -> T) =
+    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) =
       object : PPrism<S, T, A, B> {
-        override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
-        override fun reverseGet(focus: B): T = reverseGet(focus)
+        override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
+
+        override fun reverseGet(b: B): T = reverseGet(b)
       }
 
     /**
@@ -131,6 +133,33 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
       getOrModify = { a2 -> (if (eq(a, a2)) Either.Left(a) else Either.Right(Unit)) },
       reverseGet = { a }
     )
+
+    /**
+     * [PPrism] to focus into an [arrow.core.Some]
+     */
+    @JvmStatic
+    fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
+      PPrism(
+        getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
+        reverseGet = ::Some
+      )
+
+    /**
+     * [Prism] to focus into an [arrow.core.Some]
+     */
+    @JvmStatic
+    fun <A> some(): Prism<Option<A>, A> =
+      pSome()
+
+    /**
+     * [Prism] to focus into an [arrow.core.None]
+     */
+    @JvmStatic
+    fun <A> none(): Prism<Option<A>, Unit> =
+      Prism(
+        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
+        reverseGet = { _ -> None }
+      )
   }
 }
 

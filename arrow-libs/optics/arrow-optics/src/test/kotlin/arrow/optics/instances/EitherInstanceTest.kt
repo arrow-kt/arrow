@@ -4,7 +4,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
-import arrow.optics.either
 import arrow.optics.test.laws.TraversalLaws
 import io.kotlintest.properties.Gen
 

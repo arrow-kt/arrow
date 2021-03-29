@@ -1,6 +1,14 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Either.Right
+import arrow.core.Some
+import arrow.core.Validated
+import arrow.core.Validated.Invalid
+import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.typeclasses.Monoid
@@ -10,6 +18,12 @@ import arrow.typeclasses.Monoid
  * and restricts the [PIso] to monomorphic updates.
  */
 typealias Iso<S, A> = PIso<S, S, A, A>
+
+private val stringToList: Iso<String, List<Char>> =
+  Iso(
+    get = CharSequence::toList,
+    reverseGet = { it.joinToString(separator = "") }
+  )
 
 /**
  * An [Iso] is a loss less invertible optic that defines an isomorphism between a type [S] and [A]
@@ -123,17 +137,118 @@ interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>
      * Id is the zero element of optics composition, for any optic o of type O (e.g. PLens, Prism, POptional, ...):
      * o compose Iso.id == o
      */
-    fun <S> id(): Iso<S, S> =
-      Iso(::identity, ::identity)
+    fun <S> id(): Iso<S, S> = Iso(::identity, ::identity)
 
     /**
      * Invoke operator overload to create a [PIso] of type `S` with target `A`.
      * Can also be used to construct [Iso]
      */
-    operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) =
-      object : PIso<S, T, A, B> {
-        override fun get(source: S): A = get(source)
-        override fun reverseGet(focus: B): T = reverseGet(focus)
-      }
+    operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T) = object : PIso<S, T, A, B> {
+
+      override fun get(s: S): A = get(s)
+
+      override fun reverseGet(b: B): T = reverseGet(b)
+    }
+
+    /**
+     * [PIso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A, B> listToPOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> =
+      PIso(
+        get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
+        reverseGet = { optNel -> optNel.fold({ emptyList() }, NonEmptyList<B>::all) }
+      )
+
+    /**
+     * [Iso] that defines equality between a [List] and [Option] [NonEmptyList]
+     */
+    @JvmStatic
+    fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> =
+      listToPOptionNel()
+
+    /**
+     * [PIso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
+      PIso(
+        get = { it.fold(::Invalid, ::Valid) },
+        reverseGet = Validated<A2, B2>::toEither
+      )
+
+    /**
+     * [Iso] that defines the equality between [Either] and [Validated]
+     */
+    @JvmStatic
+    fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
+      eitherToPValidated()
+
+    /**
+     * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
+     */
+    @JvmStatic
+    fun <K> mapToSet(): Iso<Map<K, Unit>, Set<K>> =
+      Iso(
+        get = { it.keys },
+        reverseGet = { keys -> keys.map { it to Unit }.toMap() }
+      )
+
+    /**
+     * [PIso] that defines the equality between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A, B> optionToPNullable(): PIso<Option<A>, Option<B>, A?, B?> =
+      PIso(
+        get = { it.fold({ null }, ::identity) },
+        reverseGet = Option.Companion::fromNullable
+      )
+
+    /**
+     * [PIso] that defines the isomorphic relationship between [Option] and the nullable platform type.
+     */
+    @JvmStatic
+    fun <A> optionToNullable(): Iso<Option<A>, A?> = optionToPNullable()
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A, B> optionToPEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> =
+      PIso(
+        get = { opt -> opt.fold({ Either.Left(Unit) }, ::Right) },
+        reverseGet = { either -> either.fold({ None }, ::Some) }
+      )
+
+    /**
+     * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
+     */
+    @JvmStatic
+    fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> =
+      optionToPEither()
+
+    /**
+     * [Iso] that defines equality between String and [List] of [Char]
+     */
+    @JvmStatic
+    fun stringToList(): Iso<String, List<Char>> =
+      stringToList
+
+    /**
+     * [PIso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
+      PIso(
+        get = Validated<A1, B1>::toEither,
+        reverseGet = Validated.Companion::fromEither
+      )
+
+    /**
+     * [Iso] that defines equality between [Validated] and [Either]
+     */
+    @JvmStatic
+    fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
+      validatedToPEither()
   }
 }

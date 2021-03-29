@@ -6,9 +6,6 @@ import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.generators.option
 import arrow.optics.Iso
 import arrow.optics.Optional
-import arrow.optics.listHead
-import arrow.optics.listTail
-import arrow.optics.listToOptionNel
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.OptionalLaws
 import io.kotlintest.properties.Gen

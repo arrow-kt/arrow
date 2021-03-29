@@ -3,7 +3,6 @@ package arrow.optics.std
 import arrow.optics.test.generators.char
 import arrow.core.test.UnitSpec
 import arrow.optics.Iso
-import arrow.optics.stringToList
 import arrow.optics.test.laws.IsoLaws
 import io.kotlintest.properties.Gen
 

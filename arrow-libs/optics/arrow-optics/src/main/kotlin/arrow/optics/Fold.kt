@@ -1,6 +1,15 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.Tuple10
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
 import arrow.core.identity
 import arrow.typeclasses.Monoid
 
@@ -158,5 +167,123 @@ interface Fold<S, A> {
      */
     fun <A, B> void(): Fold<A, B> =
       POptional.void()
+
+    /**
+     * [Traversal] for [List] that focuses in each [A] of the source [List].
+     */
+    @JvmStatic
+    fun <A> list(): Fold<List<A>, A> =
+      Every.list()
+
+    /**
+     * [Traversal] for [Either] that has focus in each [Either.Right].
+     *
+     * @receiver [Traversal.Companion] to make it statically available.
+     * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
+     */
+    @JvmStatic
+    fun <L, R> either(): Fold<Either<L, R>, R> =
+      Every.either()
+
+    @JvmStatic
+    fun <K, V> map(): Fold<Map<K, V>, V> =
+      Every.map()
+
+    /**
+     * [Traversal] for [NonEmptyList] that has focus in each [A].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [NonEmptyList] and focus every [A] of the source.
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): Fold<NonEmptyList<A>, A> =
+      Every.nonEmptyList()
+
+    /**
+     * [Traversal] for [Option] that has focus in each [arrow.core.Some].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
+     */
+    @JvmStatic
+    fun <A> option(): Fold<Option<A>, A> =
+      Every.option()
+
+    @JvmStatic
+    fun <A> sequence(): Fold<Sequence<A>, A> =
+      Every.sequence()
+
+    /**
+     * [Traversal] for [String] that focuses in each [Char] of the source [String].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [String] and foci every [Char] in the source.
+     */
+    @JvmStatic
+    fun string(): Fold<String, Char> =
+      Every.string()
+
+    /**
+     * [Traversal] to focus into the first and second value of a [Pair]
+     */
+    @JvmStatic
+    fun <A> pair(): Fold<Pair<A, A>, A> =
+      Every.pair()
+
+    /**
+     * [Traversal] to focus into the first, second and third value of a [Triple]
+     */
+    @JvmStatic
+    fun <A> triple(): Fold<Triple<A, A, A>, A> =
+      Every.triple()
+
+    /**
+     * [Traversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
+     */
+    @JvmStatic
+    fun <A> tuple4(): Fold<Tuple4<A, A, A, A>, A> =
+      Every.tuple4()
+
+    /**
+     * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
+     */
+    @JvmStatic
+    fun <A> tuple5(): Fold<Tuple5<A, A, A, A, A>, A> =
+      Every.tuple5()
+
+    /**
+     * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
+     */
+    @JvmStatic
+    fun <A> tuple6(): Fold<Tuple6<A, A, A, A, A, A>, A> =
+      Every.tuple6()
+
+    /**
+     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
+     */
+    @JvmStatic
+    fun <A> tuple7(): Fold<Tuple7<A, A, A, A, A, A, A>, A> =
+      Every.tuple7()
+
+    /**
+     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
+     */
+    @JvmStatic
+    fun <A> tuple8(): Fold<Tuple8<A, A, A, A, A, A, A, A>, A> =
+      Every.tuple8()
+
+    /**
+     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
+     */
+    @JvmStatic
+    fun <A> tuple9(): Fold<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
+      Every.tuple9()
+
+    /**
+     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
+     */
+    @JvmStatic
+    fun <A> tuple10(): Fold<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
+      Every.tuple10()
   }
 }

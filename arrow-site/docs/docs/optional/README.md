@@ -52,8 +52,6 @@ An `Optional` instance can be manually constructed from any default or custom `I
 We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Option<User>`. So, we first want to look into `Option`, which **optionally** could be a `Some`. And then we want to look into `User`, which optionally filled in his email.
 
 ```kotlin:ank
-import arrow.optics.option
-
 data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
@@ -61,7 +59,7 @@ val participantEmail: Optional<Participant, String> = Optional(
         set = { participant, email -> participant.copy(email = email) }
 )
 
-val optEmail: Optional<Option<Participant>, String> = PPrism.option<Participant>() compose participantEmail
+val optEmail: Optional<Option<Participant>, String> = PPrism.some<Participant>() compose participantEmail
 
 optEmail.getOrNull(Some(Participant("test", "email")))
 ```
@@ -100,7 +98,7 @@ A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }
 Given a `PPrism` with a focus into `Some` of `Option<Pair<Int, String>>` that can polymorphically change its content to `Pair<String, String>` and a `PLens` with a focus into the `Pair<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Pair` within.
 
 ```kotlin:ank
-val pprism = PPrism.pOption<Pair<Int, String>, Pair<String, String>>()
+val pprism = PPrism.pSome<Pair<Int, String>, Pair<String, String>>()
 val plens = PLens.pPairFirst<Int, String, String>()
 
 val somePair: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>, Int, String> =

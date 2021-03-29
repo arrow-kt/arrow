@@ -7,6 +7,7 @@ import arrow.optics.Getter
 import arrow.optics.Iso
 import arrow.optics.Lens
 import arrow.optics.Optional
+import arrow.optics.PLens
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
@@ -113,6 +114,33 @@ fun interface At<S, I, A> {
      */
     fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> =
       At { i -> iso compose AT.at(i) }
+
+    @JvmStatic
+    fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
+      At { i ->
+        PLens(
+          get = { Option.fromNullable(it[i]) },
+          set = { map, optV ->
+            optV.fold({
+              (map - i)
+            }, {
+              (map + (i to it))
+            })
+          }
+        )
+      }
+
+    /**
+     * [At] instance definition for [Set].
+     */
+    @JvmStatic
+    fun <A> set(): At<Set<A>, A, Boolean> =
+      At { i ->
+        PLens(
+          get = { it.contains(i) },
+          set = { s, b -> (if (b) s + i else s - i) }
+        )
+      }
   }
 }
 

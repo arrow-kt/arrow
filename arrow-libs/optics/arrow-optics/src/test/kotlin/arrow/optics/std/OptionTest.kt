@@ -1,15 +1,11 @@
 package arrow.optics.std
 
-import arrow.optics.none
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.option
 import arrow.optics.Iso
 import arrow.optics.Prism
-import arrow.optics.option
-import arrow.optics.optionToEither
-import arrow.optics.optionToNullable
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
 import io.kotlintest.properties.Gen
@@ -19,7 +15,7 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(PrismLaws.laws(
-      prism = Prism.option(),
+      prism = Prism.some(),
       aGen = Gen.option(Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),

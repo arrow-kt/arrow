@@ -3,7 +3,6 @@ package arrow.optics.instances
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
-import arrow.optics.string
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws

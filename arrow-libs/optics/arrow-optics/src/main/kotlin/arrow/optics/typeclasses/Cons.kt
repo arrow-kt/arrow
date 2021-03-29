@@ -1,11 +1,12 @@
 package arrow.optics.typeclasses
 
+import arrow.core.left
+import arrow.core.right
 import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
+import arrow.optics.PPrism
 import arrow.optics.Prism
-import arrow.optics.pairFirst
-import arrow.optics.pairSecond
 
 /**
  * [Cons] provides a [Prism] between [S] and its first element [A] and tail [S].
@@ -59,5 +60,29 @@ fun interface Cons<S, A> {
 
     operator fun <S, A> invoke(prism: Prism<S, Pair<A, S>>): Cons<S, A> =
       Cons { prism }
+
+    /**
+     * [Cons] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): Cons<List<A>, A> =
+      Cons {
+        PPrism(
+          getOrModify = { list -> list.firstOrNull()?.let { Pair(it, list.drop(1)) }?.right() ?: list.left() },
+          reverseGet = { (a, aas) -> listOf(a) + aas }
+        )
+      }
+
+    /**
+     * [Cons] instance for [String].
+     */
+    @JvmStatic
+    fun string(): Cons<String, Char> =
+      Cons {
+        Prism(
+          getOrModify = { if (it.isNotEmpty()) Pair(it.first(), it.drop(1)).right() else it.left() },
+          reverseGet = { (h, t) -> h + t }
+        )
+      }
   }
 }

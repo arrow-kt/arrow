@@ -31,32 +31,35 @@ For example, `Int` values are combined using addition by default, but multiplica
 Now that you've learned about the Semigroup instance for Int, try to guess how it works in the following examples:
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.typeclasses.*
+import arrow.typeclasses.Semigroup
 
 Semigroup.int().run { 1.combine(2) }
 ```
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.typeclasses.*
+import arrow.typeclasses.Semigroup
 
 Semigroup.list<Int>().run {
-  listOf(1, 2, 3).combine(listOf(4, 5, 6))
+    listOf(1, 2, 3).combine(listOf(4, 5, 6))
 }
 ```
 
 ```kotlin:ank
-import arrow.core.*
+import arrow.core.Option
+import arrow.typeclasses.Semigroup
 
 Semigroup.option(Semigroup.int()).run {
-  Option(1).combine(Option(2))
+    Option(1).combine(Option(2))
 }
 ```
 
 ```kotlin:ank
+import arrow.core.Option
+import arrow.core.None
+import arrow.typeclasses.Semigroup
+
 Semigroup.option(Semigroup.int()).run {
-  Option(1).combine(None)
+    Option(1).combine(None)
 }
 ```
 
@@ -66,7 +69,7 @@ Additionally, `Semigroup` adds `+` syntax to all types for which a Semigroup ins
 
 ```kotlin:ank
 Semigroup.option(Semigroup.int()).run {
-  Option(1) + Option(2)
+    Option(1) + Option(2)
 }
 ```
 
