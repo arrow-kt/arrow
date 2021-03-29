@@ -233,24 +233,39 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * ### Improving the validation
  *
  * Kotlin says that our match is not exhaustive and we have to add `else`. To solve this, we would need to nest our when,
- * but that would complicate the code. To achieve this, Arrow provides [mapN] & [tupledN].
+ * but that would complicate the code. To achieve this, Arrow provides [zip].
  * This function combines [Validated]s by accumulating errors in a tuple, which we can then map.
  * The above function can be rewritten as follows:
  *
  * ```kotlin:ank:silent
  * import arrow.core.Validated
  * import arrow.core.validNel
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.core.zip
+ * import arrow.typeclasses.Semigroup
  *
  * //sampleStart
- * val parallelValidate = Validated
- *   .mapN(NonEmptyList.semigroup<ConfigError>(), 1.validNel(), 2.validNel())
+ * val parallelValidate =
+ *    1.validNel().zip(Semigroup.nonEmptyList<ConfigError>(), 2.validNel())
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
  *
- * Note that there are multiple `tupledN` functions with more arities, so we could easily add more parameters without worrying about
+ * Note that there are multiple `zip` functions with more arities, so we could easily add more parameters without worrying about
  * the function blowing up in complexity.
+ *
+ * When working with `NonEmptyList` in the `Invalid` side, there is no need to supply `Semigroup` as shown in the example above.
+ *
+ * ```kotlin:ank:silent
+ * import arrow.core.Validated
+ * import arrow.core.validNel
+ * import arrow.core.zip
+ *
+ * //sampleStart
+ * val parallelValidate =
+ *   1.validNel().zip(2.validNel())
+ *     { a, b -> /* combine the result */ }
+ * //sampleEnd
+ * ```
  *
  * ---
  *
@@ -262,7 +277,7 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
+ * import arrow.typeclasses.Semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -306,9 +321,8 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * //sampleStart
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
- *  val valid = Validated.mapN(
- *    NonEmptyList.semigroup<ConfigError>(),
- *    config.parse(Read.stringRead, "url"),
+ *  val valid = config.parse(Read.stringRead, "url").zip(
+ *    Semigroup.nonEmptyList<ConfigError>(),
  *    config.parse(Read.intRead, "port")
  *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
@@ -325,7 +339,6 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -368,11 +381,10 @@ fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
  * //sampleStart
  * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
  *
- * val valid = Validated.mapN(
- *  NonEmptyList.semigroup<ConfigError>(),
- *  config.parse(Read.stringRead, "url"),
+ * val valid = config.parse(Read.stringRead, "url").zip(
+ *  Semigroup.nonEmptyList<ConfigError>(),
  *  config.parse(Read.intRead, "port")
- *  ) { url, port -> ConnectionParams(url, port) }
+ * ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
  *  println("valid = $valid")
  * }
@@ -450,19 +462,23 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   companion object {
 
+    @JvmStatic
     fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
 
+    @JvmStatic
     fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
+    @JvmStatic
     fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
     /**
      * Converts an `Option<A>` to a `Validated<E, A>`, where the provided `ifNone` output value is returned as [Invalid]
      * when the specified `Option` is `None`.
      */
+    @JvmStatic
     inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
       o.fold(
         { Invalid(ifNone()) },
@@ -473,9 +489,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * Converts a nullable `A?` to a `Validated<E, A>`, where the provided `ifNull` output value is returned as [Invalid]
      * when the specified value is null.
      */
+    @JvmStatic
     inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
       try {
         f().valid()
@@ -491,9 +510,12 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         e.nonFatalOrThrow().invalid()
       }
 
+    @JvmStatic
+    @JvmName("tryCatch")
     inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
       catch(f).mapLeft(recover)
 
+    @JvmStatic
     inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
@@ -526,6 +548,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * }
      * ```
      */
+    @JvmStatic
     inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
       { fa -> fa.map(f) }
 
@@ -546,153 +569,16 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * }
      * ```
      */
-    inline fun <A, B, C, D> lift(crossinline fl: (A) -> C, crossinline fr: (B) -> D): (Validated<A, B>) -> Validated<C, D> =
+    @JvmStatic
+    inline fun <A, B, C, D> lift(
+      crossinline fl: (A) -> C,
+      crossinline fr: (B) -> D
+    ): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
-
-    val s = 1.inc()
 
     @PublishedApi
     internal val unit: Validated<Nothing, Unit> =
       Validated.Valid(Unit)
-
-    inline fun <E, A, B, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      f: (A, B) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { a, b, _, _, _, _, _, _, _, _ ->
-        f(a, b)
-      }
-
-    inline fun <E, A, B, C, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      f: (A, B, C) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, unit, unit, unit, unit, unit, unit, unit) { a, b, c, _, _, _, _, _, _, _ ->
-        f(a, b, c)
-      }
-
-    inline fun <E, A, B, C, D, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      f: (A, B, C, D) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ ->
-        f(a, b, c, d)
-      }
-
-    inline fun <E, A, B, C, D, EE, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: (A, B, C, D, EE) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
-        f(a, b, c, d, e)
-      }
-
-    inline fun <E, A, B, C, D, EE, FF, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      ff: Validated<E, FF>,
-      f: (A, B, C, D, EE, FF) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, e, ff, unit, unit, unit, unit) { a, b, c, d, e, ff, _, _, _, _ ->
-        f(a, b, c, d, e, ff)
-      }
-
-    inline fun <E, A, B, C, D, EE, F, G, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      ff: Validated<E, F>,
-      g: Validated<E, G>,
-      f: (A, B, C, D, EE, F, G) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, e, ff, g, unit, unit, unit) { a, b, c, d, e, ff, g, _, _, _ ->
-        f(a, b, c, d, e, ff, g)
-      }
-
-    inline fun <E, A, B, C, D, EE, F, G, H, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      ff: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>,
-      f: (A, B, C, D, EE, F, G, H) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, e, ff, g, h, unit, unit) { a, b, c, d, e, ff, g, h, _, _ ->
-        f(a, b, c, d, e, ff, g, h)
-      }
-
-    inline fun <E, A, B, C, D, EE, F, G, H, I, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      ff: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>,
-      i: Validated<E, I>,
-      f: (A, B, C, D, EE, F, G, H, I) -> Z
-    ): Validated<E, Z> =
-      mapN(SE, a, b, c, d, e, ff, g, h, i, unit) { a, b, c, d, e, ff, g, h, i, _ ->
-        f(a, b, c, d, e, ff, g, h, i)
-      }
-
-    inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> mapN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      ff: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>,
-      i: Validated<E, I>,
-      j: Validated<E, J>,
-      f: (A, B, C, D, EE, F, G, H, I, J) -> Z
-    ): Validated<E, Z> =
-      if (a is Valid && b is Valid && c is Valid && d is Valid && e is Valid && ff is Valid && g is Valid && h is Valid && i is Valid && j is Valid) {
-        Valid(f(a.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
-      } else SE.run {
-        var accumulatedError: E? = null
-        accumulatedError = if (a is Invalid) a.e.maybeCombine(accumulatedError) else accumulatedError
-        accumulatedError = if (b is Invalid) accumulatedError?.let { it.combine(b.e) } ?: b.e else accumulatedError
-        accumulatedError = if (c is Invalid) accumulatedError?.let { it.combine(c.e) } ?: c.e else accumulatedError
-        accumulatedError = if (d is Invalid) accumulatedError?.let { it.combine(d.e) } ?: d.e else accumulatedError
-        accumulatedError = if (e is Invalid) accumulatedError?.let { it.combine(e.e) } ?: e.e else accumulatedError
-        accumulatedError = if (ff is Invalid) accumulatedError?.let { it.combine(ff.e) } ?: ff.e else accumulatedError
-        accumulatedError = if (g is Invalid) accumulatedError?.let { it.combine(g.e) } ?: g.e else accumulatedError
-        accumulatedError = if (h is Invalid) accumulatedError?.let { it.combine(h.e) } ?: h.e else accumulatedError
-        accumulatedError = if (i is Invalid) accumulatedError?.let { it.combine(i.e) } ?: i.e else accumulatedError
-        accumulatedError = if (j is Invalid) accumulatedError?.let { it.combine(j.e) } ?: j.e else accumulatedError
-        Invalid(accumulatedError!!)
-      }
   }
 
   /**
@@ -714,94 +600,14 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   fun void(): Validated<E, Unit> =
     map { Unit }
 
-  /**
-   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a pair of the [A] value and the
-   * computed [B] value as result of applying [f]
-   *
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().fproduct { "$it World" }
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  inline fun <B> fproduct(f: (A) -> B): Validated<E, Pair<A, B>> =
-    map { a -> a to f(a) }
-
-  /**
-   * Replaces [A] inside [Validated] with [B] resulting in a Kind<F, B>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello World".valid().mapConst("...")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> mapConst(b: B): Validated<E, B> =
-    map { b }
-
-  /**
-   * Pairs [B] with [A] returning a Validated<E, Pair<B, A>>
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleLeft("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleLeft(b: B): Validated<E, Pair<B, A>> =
-    map { a -> b to a }
-
-  /**
-   * Pairs [A] with [B] returning a Validated<E, Pair<A, B>>
-   *
-   * ```kotlin:ank:playground:extension
-   * import arrow.core.*
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   "Hello".valid().tupleRight("World")
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <B> tupleRight(b: B): Validated<E, Pair<A, B>> =
-    map { a -> a to b }
-
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
-
-  inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
-    fold({ emptyList() }, { fa(it).void() })
 
   inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.a).map { Valid(it) }
       is Invalid -> this.right()
     }
-
-  inline fun <EE, B> traverseEither_(fa: (A) -> Either<EE, B>): Either<EE, Unit> =
-    fold({ Either.right(Unit) }, { fa(it).void() })
 
   inline fun <B> bifoldLeft(
     c: B,
@@ -962,11 +768,294 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     fold(::Valid, ::Invalid)
 }
 
-fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
-  ValidatedSemigroup(SE, SA)
+fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
+  zip(SE, fb, ::Pair)
 
-fun <E, A> Semigroup.Companion.monoid(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
-  ValidatedMonoid(SE, MA)
+inline fun <E, A, B, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  f: (A, B) -> Z
+): Validated<E, Z> =
+  zip(
+    SE,
+    b,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, _, _, _, _, _, _, _, _ ->
+    f(a, b)
+  }
+
+inline fun <E, A, B, C, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  f: (A, B, C) -> Z
+): Validated<E, Z> =
+  zip(
+    SE,
+    b,
+    c,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, _, _, _, _, _, _, _ ->
+    f(a, b, c)
+  }
+
+inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  f: (A, B, C, D) -> Z
+): Validated<E, Z> =
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, _, _, _, _, _, _ ->
+    f(a, b, c, d)
+  }
+
+inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  f: (A, B, C, D, EE) -> Z
+): Validated<E, Z> =
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, _, _, _, _, _ ->
+    f(a, b, c, d, e)
+  }
+
+inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  ff: Validated<E, FF>,
+  f: (A, B, C, D, EE, FF) -> Z
+): Validated<E, Z> =
+  zip(
+    SE,
+    b,
+    c,
+    d,
+    e,
+    ff,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit,
+    Validated.unit
+  ) { a, b, c, d, e, ff, _, _, _, _ ->
+    f(a, b, c, d, e, ff)
+  }
+
+inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  ff: Validated<E, F>,
+  g: Validated<E, G>,
+  f: (A, B, C, D, EE, F, G) -> Z
+): Validated<E, Z> =
+  zip(SE, b, c, d, e, ff, g, Validated.unit, Validated.unit, Validated.unit) { a, b, c, d, e, ff, g, _, _, _ ->
+    f(a, b, c, d, e, ff, g)
+  }
+
+inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  ff: Validated<E, F>,
+  g: Validated<E, G>,
+  h: Validated<E, H>,
+  f: (A, B, C, D, EE, F, G, H) -> Z
+): Validated<E, Z> =
+  zip(SE, b, c, d, e, ff, g, h, Validated.unit, Validated.unit) { a, b, c, d, e, ff, g, h, _, _ ->
+    f(a, b, c, d, e, ff, g, h)
+  }
+
+inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  ff: Validated<E, F>,
+  g: Validated<E, G>,
+  h: Validated<E, H>,
+  i: Validated<E, I>,
+  f: (A, B, C, D, EE, F, G, H, I) -> Z
+): Validated<E, Z> =
+  zip(SE, b, c, d, e, ff, g, h, i, Validated.unit) { a, b, c, d, e, ff, g, h, i, _ ->
+    f(a, b, c, d, e, ff, g, h, i)
+  }
+
+inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Validated<E, B>,
+  c: Validated<E, C>,
+  d: Validated<E, D>,
+  e: Validated<E, EE>,
+  ff: Validated<E, F>,
+  g: Validated<E, G>,
+  h: Validated<E, H>,
+  i: Validated<E, I>,
+  j: Validated<E, J>,
+  f: (A, B, C, D, EE, F, G, H, I, J) -> Z
+): Validated<E, Z> =
+  if (this is Validated.Valid && b is Validated.Valid && c is Validated.Valid && d is Validated.Valid && e is Validated.Valid && ff is Validated.Valid && g is Validated.Valid && h is Validated.Valid && i is Validated.Valid && j is Validated.Valid) {
+    Validated.Valid(f(this.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
+  } else SE.run {
+    var accumulatedError: Any? = EmptyValue
+    accumulatedError =
+      if (this@zip is Validated.Invalid) this@zip.e else accumulatedError
+    accumulatedError =
+      if (b is Validated.Invalid) emptyCombine(accumulatedError, b.e) else accumulatedError
+    accumulatedError =
+      if (c is Validated.Invalid) emptyCombine(accumulatedError, c.e) else accumulatedError
+    accumulatedError =
+      if (d is Validated.Invalid) emptyCombine(accumulatedError, d.e) else accumulatedError
+    accumulatedError =
+      if (e is Validated.Invalid) emptyCombine(accumulatedError, e.e) else accumulatedError
+    accumulatedError =
+      if (ff is Validated.Invalid) emptyCombine(accumulatedError, ff.e) else accumulatedError
+    accumulatedError =
+      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.e)else accumulatedError
+    accumulatedError =
+      if (h is Validated.Invalid) emptyCombine(accumulatedError, h.e) else accumulatedError
+    accumulatedError =
+      if (i is Validated.Invalid) emptyCombine(accumulatedError, i.e) else accumulatedError
+    accumulatedError =
+      if (j is Validated.Invalid) emptyCombine(accumulatedError, j.e) else accumulatedError
+
+    Validated.Invalid(accumulatedError as E)
+  }
+
+inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  f: (A, B) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, f)
+
+inline fun <E, A, B, C, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  f: (A, B, C) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, f)
+
+inline fun <E, A, B, C, D, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  f: (A, B, C, D) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, f)
+
+inline fun <E, A, B, C, D, EE, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  f: (A, B, C, D, EE) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, f)
+
+inline fun <E, A, B, C, D, EE, FF, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  ff: ValidatedNel<E, FF>,
+  f: (A, B, C, D, EE, FF) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, ff, f)
+
+inline fun <E, A, B, C, D, EE, F, G, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  ff: ValidatedNel<E, F>,
+  g: ValidatedNel<E, G>,
+  f: (A, B, C, D, EE, F, G) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, f)
+
+inline fun <E, A, B, C, D, EE, F, G, H, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  ff: ValidatedNel<E, F>,
+  g: ValidatedNel<E, G>,
+  h: ValidatedNel<E, H>,
+  f: (A, B, C, D, EE, F, G, H) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, f)
+
+inline fun <E, A, B, C, D, EE, F, G, H, I, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  ff: ValidatedNel<E, F>,
+  g: ValidatedNel<E, G>,
+  h: ValidatedNel<E, H>,
+  i: ValidatedNel<E, I>,
+  f: (A, B, C, D, EE, F, G, H, I) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, f)
+
+inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
+  b: ValidatedNel<E, B>,
+  c: ValidatedNel<E, C>,
+  d: ValidatedNel<E, D>,
+  e: ValidatedNel<E, EE>,
+  ff: ValidatedNel<E, F>,
+  g: ValidatedNel<E, G>,
+  h: ValidatedNel<E, H>,
+  i: ValidatedNel<E, I>,
+  j: ValidatedNel<E, J>,
+  f: (A, B, C, D, EE, F, G, H, I, J) -> Z
+): ValidatedNel<E, Z> =
+  zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, j, f)
 
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
@@ -992,11 +1081,11 @@ fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
 
 fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
   if (n <= 0) emptyList<A>().valid()
-  else Validated.mapN(SE, this, replicate(SE, n - 1)) { a, xs -> listOf(a) + xs }
+  else this.zip(SE, replicate(SE, n - 1)) { a, xs -> listOf(a) + xs }
 
 fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): Validated<E, A> =
   if (n <= 0) MA.empty().valid()
-  else Validated.mapN(SE, this@replicate, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
+  else this@replicate.zip(SE, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
 fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
   bitraverse(::identity, ::identity)
@@ -1014,47 +1103,14 @@ fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
 fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
-fun <E, A> Validated<E, Iterable<A>>.sequence_(): List<Unit> =
-  traverse_(::identity)
-
 fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
-
-fun <E, A, B> Validated<A, Either<E, B>>.traverseEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
 
 operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
     { l1 -> other.fold({ l2 -> l1.compareTo(l2) }, { -1 }) },
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
   )
-
-fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Validated<E, B> =
-  fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> r.valid() }) })
-
-fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
-  when (this) {
-    is Validated.Valid -> when (val either = this.a) {
-      is Either.Left -> fl.map { f -> f(either.a) }
-      is Either.Right -> fr.map { f -> f(either.b) }
-    }
-    is Validated.Invalid -> this
-  }
-
-private fun <E> Validated<E, Boolean>.selector(): Validated<E, Either<Unit, Unit>> =
-  map { bool -> if (bool) Either.leftUnit else Either.unit }
-
-fun <E> Validated<E, Boolean>.whenS(x: Validated<E, () -> Unit>): Validated<E, Unit> =
-  selector().select(x.map { f -> { f() } })
-
-fun <E, A> Validated<E, Boolean>.ifS(fl: Validated<E, A>, fr: Validated<E, A>): Validated<E, A> =
-  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
-
-fun <E> Validated<E, Boolean>.orS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(Valid(true), f)
-
-fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boolean> =
-  ifS(f, Valid(false))
 
 /**
  * Return the Valid value, or the default if Invalid
@@ -1100,24 +1156,12 @@ inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Vali
     { Valid(it) }
   )
 
-/**
- * From Apply:
- * if both the function and this value are Valid, apply the function
- */
+@Deprecated(
+  "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
+  ReplaceWith("zip(ff) { a, f -> f(a) }", "arrow.core.zip")
+)
 inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  when (val value = fix()) {
-    is Validated.Valid -> when (f) {
-      is Validated.Valid -> Valid(f.a(value.a))
-      is Validated.Invalid -> f
-    }
-    is Validated.Invalid -> when (f) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> Invalid(SE.run { value.e.combine(f.e) })
-    }
-  }
-
-fun <E, A, B> Validated<E, A>.apEval(SE: Semigroup<E>, ff: Eval<Validated<E, (A) -> B>>): Eval<Validated<E, B>> =
-  ff.map { this.ap(SE, it) }
+  fix().zip(SE, f) { a, ff -> ff(a) }
 
 @Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
@@ -1148,9 +1192,10 @@ fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverse or traverseEither from arrow.core.*")
-fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
-  fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
-}
+fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
+  GA.run {
+    fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
+  }
 
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequence or sequenceEither from arrow.core.*")
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
@@ -1199,27 +1244,3 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-private open class ValidatedSemigroup<A, B>(
-  private val SA: Semigroup<A>,
-  private val SB: Semigroup<B>
-) : Semigroup<Validated<A, B>> {
-  override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
-    combine(SA, SB, b)
-}
-
-private class ValidatedMonoid<A, B>(
-  SA: Semigroup<A>,
-  MB: Monoid<B>
-) : Monoid<Validated<A, B>>, ValidatedSemigroup<A, B>(SA, MB) {
-  private val empty = Valid(MB.empty())
-
-  override fun empty(): Validated<A, B> =
-    empty
-}
-
-fun <E, A, B, Z> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>, f: (A, B) -> Z): Validated<E, Z> =
-  zip(SE, fb).map { ab: Pair<A, B> -> f(ab.first, ab.second) }
-
-fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
-  ap(SE, fb.map { b: B -> { a: A -> Pair(a, b) } })

@@ -50,6 +50,7 @@ import arrow.typeclasses.Monoid
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -112,6 +113,169 @@ class SequenceKTest : UnitSpec() {
         SequenceK.eqK()
       )
     )
+
+    "traverseEither is stacksafe over very long collections and short circuits properly" {
+      // This has to traverse 30k elements till it reaches None and terminates
+      generateSequence(0) { it + 1 }.map { if (it < 20_000) Right(it) else Left(Unit) }
+        .sequenceEither() shouldBe Left(Unit)
+    }
+
+    "zip3" {
+      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c ->
+        val result = a.zip(b, c, ::Triple)
+        val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip4" {
+      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c, d ->
+        val result = a.zip(b, c, d, ::Tuple4)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip5" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e ->
+        val result = a.zip(b, c, d, e, ::Tuple5)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip6" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e, f ->
+        val result = a.zip(b, c, d, e, f, ::Tuple6)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip7" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e, f, g ->
+        val result = a.zip(b, c, d, e, f, g, ::Tuple7)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip8" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e, f, g, h ->
+        val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip9" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e, f, g, h, i ->
+        val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
+          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "zip10" {
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d, e, f, g, h, i, j ->
+        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
+        val expected = a.zip(b, ::Pair)
+          .zip(c) { (a, b), c -> Triple(a, b, c) }
+          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
+          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
+          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
+
+        result.toList() == expected.toList()
+      }
+    }
 
     "can align sequences" {
       forAll(Gen.sequenceK(Gen.int()), Gen.sequenceK(Gen.string())) { a, b ->

@@ -33,30 +33,6 @@ Some<Either<Int, String>>(Right("2"))
   .select(Some({ a: Int -> a.toString() }))
 ```
 
-#### Kind<F, Either<A, B>>#branch
-
-Applies an effectful computation to either side of the branch.
-
-```kotlin:ank
-import arrow.core.extensions.option.selective.branch
-
-Some<Either<Int, String>>(Left(1))
-  .branch(Some({ a: Int ->
-    listOf(a.toString())
-  }), Some({ b: String ->
-    listOf(b)
-  }))
-```
-
-```kotlin:ank
-Some<Either<Int, String>>(Right("0"))
-  .branch(Some({ a: Int ->
-    listOf(a.toString())
-  }), Some({ b: String ->
-    listOf(b)
-  }))
-```
-
 ### Laws
 
 Arrow provides [`SelectiveLaws`][selective_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Selective instances.

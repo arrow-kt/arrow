@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.Ior.Companion
+import arrow.core.TailRecMDeprecation
 import arrow.core.Tuple2
 import arrow.core.extensions.IorMonad
 import arrow.typeclasses.Semigroup
@@ -39,13 +40,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.flatMap(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.tailRecM(SL, arg0, arg1)"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(TailRecMDeprecation)
 fun <L, A, B> tailRecM(
   SL: Semigroup<L>,
   arg0: A,
@@ -318,8 +313,9 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.forEffectEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.mproduct(SL, arg1)",
-    "arrow.core.mproduct"
+    "flatMap(SL) { a -> f(a).map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -339,10 +335,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mproduct(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.ifM(SL, arg1, arg2)",
-    "arrow.core.ifM"
-  ),
+  ReplaceWith("flatMap(SA) { if (it) arg1() else arg2() }", "arrow.core.flatMap"),
   DeprecationLevel.WARNING
 )
 fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
@@ -363,8 +356,8 @@ fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.selectM(SL, arg1)",
-    "arrow.core.selectM"
+    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -385,8 +378,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.selectM(SL, arg1)",
-    "arrow.core.selectM"
+    "flatMap(SA) { it.fold({ b -> arg1.map { ff -> ff(b) } }, { c -> Ior.Right(c) }) }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )

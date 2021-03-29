@@ -145,7 +145,7 @@ option.eager<Int> {
 ```kotlin:ank
 import arrow.core.Option
 
-Option.mapN(Option(1), Option(2), Option(3)) { one, two, three ->
+Option(1).zip(Option(2), Option(3)) { one, two, three ->
   one + two + three
 }
 ```
@@ -171,7 +171,7 @@ option.eager<Int> {
 ```kotlin:ank:silent
 import arrow.core.Option
 
-Option.mapN(Some(1), Some(2), Some(3)) { one, two, three ->
+Some(1).zip(Some(2), Some(3)) { one, two, three ->
   one + two + three
 }
 ```

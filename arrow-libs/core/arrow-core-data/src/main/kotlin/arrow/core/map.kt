@@ -1,6 +1,7 @@
 package arrow.core
 
-import arrow.typeclasses.Monoid
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
 
@@ -10,77 +11,223 @@ object MapInstances
 @Deprecated("Receiver SortedMapInstances object is deprecated, prefer to turn SortedMap functions into top-level functions")
 object SortedMapInstances
 
+/**
+ * Combines to structures by taking the intersection of their shapes
+ * and using `Pair` to hold the elements.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result =
+ *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3"))
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ */
+fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
+  zip(other) { _, a, b -> Pair(a, b) }
+
+/**
+ * Combines to structures by taking the intersection of their shapes
+ * and combining the elements with the given function.
+ *
+ * ```kotlin:ank
+ * import arrow.core.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result =
+ *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
+ *      key, a, b -> "$key -> $a # $b"
+ *    }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ */
+inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
+  val destination = LinkedHashMap<Key, C>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(other[key]) { cc -> map(key, bb, cc) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  map: (Key, B, C, D) -> E
+): Map<Key, E> {
+  val destination = LinkedHashMap<Key, E>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key]) { cc, dd -> map(key, bb, cc, dd) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  map: (Key, B, C, D, E) -> F
+): Map<Key, F> {
+  val destination = LinkedHashMap<Key, F>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key]) { cc, dd, ee -> map(key, bb, cc, dd, ee) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  map: (Key, B, C, D, E, F) -> G
+): Map<Key, G> {
+  val destination = LinkedHashMap<Key, G>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key]) { cc, dd, ee, ff -> map(key, bb, cc, dd, ee, ff) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  map: (Key, B, C, D, E, F, G) -> H
+): Map<Key, H> {
+  val destination = LinkedHashMap<Key, H>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key]) { cc, dd, ee, ff, gg -> map(key, bb, cc, dd, ee, ff, gg) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  map: (Key, B, C, D, E, F, G, H) -> I
+): Map<Key, I> {
+  val destination = LinkedHashMap<Key, I>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh -> map(key, bb, cc, dd, ee, ff, gg, hh) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  map: (Key, B, C, D, E, F, G, H, I) -> J
+): Map<Key, J> {
+  val destination = LinkedHashMap<Key, J>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii -> map(key, bb, cc, dd, ee, ff, gg, hh, ii) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  j: Map<Key, J>,
+  map: (Key, B, C, D, E, F, G, H, I, J) -> K
+): Map<Key, K> {
+  val destination = LinkedHashMap<Key, K>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key]) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
+      ?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
+inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
+  c: Map<Key, C>,
+  d: Map<Key, D>,
+  e: Map<Key, E>,
+  f: Map<Key, F>,
+  g: Map<Key, G>,
+  h: Map<Key, H>,
+  i: Map<Key, I>,
+  j: Map<Key, J>,
+  k: Map<Key, K>,
+  map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
+): Map<Key, L> {
+  val destination = LinkedHashMap<Key, L>(size)
+  for ((key, bb) in this) {
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+      map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+    }?.let { l -> destination.put(key, l) }
+  }
+  return destination
+}
+
 fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   _flatMap { entry ->
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-fun <K, A, B> Map<K, A>.ap(ff: Map<K, (A) -> B>): Map<K, B> =
-  ff.flatMap { (_, f) -> this.mapValues { (_, a) -> f(a) } }
-
 inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
   foldRight(emptyMap<K, B>().right()) { (k, a), acc: Either<E, Map<K, B>> ->
-    f(a).ap(acc.map { bs: Map<K, B> -> { b: B -> mapOf(k to b) + bs } })
+    when (val res = f(a)) {
+      is Right -> acc.map { bs: Map<K, B> -> mapOf(k to res.value) + bs }
+      is Left -> res
+    }
   }
-
-inline fun <K, E, A, B> Map<K, A>.flatTraverseEither(f: (A) -> Either<E, Map<K, B>>): Either<E, Map<K, B>> =
-  foldRight<K, A, Either<E, Map<K, B>>>(emptyMap<K, B>().right()) { (_, a), acc ->
-    f(a).ap(acc.map { bs -> { b: Map<K, B> -> b + bs } })
-  }
-
-inline fun <K, E, A> Map<K, A>.traverseEither_(f: (A) -> Either<E, *>): Either<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight(Either.unit) { (_, a): Map.Entry<K, A>, acc: Either<E, Unit> ->
-    f(a).ap(acc.map(void))
-  }
-}
 
 fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   traverseEither(::identity)
 
-fun <K, E, A> Map<K, Either<E, Map<K, A>>>.flatSequenceEither(): Either<E, Map<K, A>> =
-  flatTraverseEither(::identity)
-
-fun <K, E> Map<K, Either<E, *>>.sequenceEither_(): Either<E, Unit> =
-  traverseEither_(::identity)
-
-inline fun <K, E, A, B> Map<K, A>.traverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, B>): Validated<E, Map<K, B>> =
+inline fun <K, E, A, B> Map<K, A>.traverseValidated(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, Map<K, B>> =
   foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (k, a), acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: B -> mapOf(k to b) + bs } })
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Validated.Valid -> acc.map { bs -> mapOf(k to res.value) + bs }
+        is Validated.Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Validated.Valid -> res
+        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      }
+    }
   }
-
-inline fun <K, E, A, B> Map<K, A>.flatTraverseValidated(semigroup: Semigroup<E>, f: (A) -> Validated<E, Map<K, B>>): Validated<E, Map<K, B>> =
-  foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (_, a), acc ->
-    f(a).ap(semigroup, acc.map { bs -> { b: Map<K, B> -> b + bs } })
-  }
-
-inline fun <K, E, A> Map<K, A>.traverseValidated_(semigroup: Semigroup<E>, f: (A) -> Validated<E, *>): Validated<E, Unit> {
-  val void = { _: Unit -> { _: Any? -> Unit } }
-  return foldRight<K, A, Validated<E, Unit>>(Unit.valid()) { (_, a), acc ->
-    f(a).ap(semigroup, acc.map(void))
-  }
-}
 
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <K, E, A> Map<K, Validated<E, Map<K, A>>>.flatSequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  flatTraverseValidated(semigroup, ::identity)
-
-fun <K, E> Map<K, Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
-  traverseValidated_(semigroup, ::identity)
-
-fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to f(a) }
-
 fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
-
-fun <K, A, B> Map<K, A>.tupleLeft(b: B): Map<K, Pair<B, A>> =
-  mapValues { (_, a) -> b to a }
-
-fun <K, A, B> Map<K, A>.tupleRight(b: B): Map<K, Pair<A, B>> =
-  mapValues { (_, a) -> a to b }
 
 fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
@@ -260,50 +407,6 @@ fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
 fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
 
-/**
- * Combines to structures by taking the intersection of their shapes
- * and using `Pair` to hold the elements.
- *
- * ```kotlin:ank:playground
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3"))
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- */
-fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
-  keys.intersect(other.keys).mapNotNull { key ->
-    Nullable.mapN(this[key], other[key]) { a, b -> key to (a to b) }
-  }.toMap()
-
-/**
- * Combines to structures by taking the intersection of their shapes
- * and combining the elements with the given function.
- *
- * ```kotlin:ank
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
- *      key, a, b -> "$key -> $a # $b"
- *    }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- */
-fun <K, A, B, C> Map<K, A>.zip(other: Map<K, B>, f: (K, A, B) -> C): Map<K, C> =
-  keys.intersect(other.keys).mapNotNull { key ->
-    Nullable.mapN(this[key], other[key]) { a, b -> key to f(key, a, b) }
-  }.toMap()
-
 fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
   if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
   else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
@@ -311,16 +414,6 @@ fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(S
 
 fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
-
-fun <K, A> Monoid.Companion.map(SG: Semigroup<A>): Monoid<Map<K, A>> =
-  MapMonoid(SG)
-
-private class MapMonoid<K, A>(private val SG: Semigroup<A>) : Monoid<Map<K, A>> {
-  override fun empty(): Map<K, A> = emptyMap()
-
-  override fun Map<K, A>.combine(b: Map<K, A>): Map<K, A> =
-    combine(SG, b)
-}
 
 inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
   this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }

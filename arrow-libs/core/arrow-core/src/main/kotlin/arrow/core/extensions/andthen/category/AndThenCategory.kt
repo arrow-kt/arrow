@@ -3,6 +3,7 @@ package arrow.core.extensions.andthen.category
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.AndThen.Companion
+import arrow.core.AndThenDeprecation
 import arrow.core.ForAndThen
 import arrow.core.extensions.AndThenCategory
 import kotlin.Deprecated
@@ -23,14 +24,7 @@ internal val category_singleton: AndThenCategory = object : arrow.core.extension
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "compose(arg1)",
-    "arrow.core.compose"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <A, B, C> Kind<Kind<ForAndThen, B>, C>.compose(arg1: Kind<Kind<ForAndThen, A>, B>): AndThen<A,
   C> = arrow.core.AndThen.category().run {
   this@compose.compose<A, B, C>(arg1) as arrow.core.AndThen<A, C>
@@ -43,14 +37,7 @@ fun <A, B, C> Kind<Kind<ForAndThen, B>, C>.compose(arg1: Kind<Kind<ForAndThen, A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "andThen(arg1)",
-    "arrow.core.andThen"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <A, B, C> Kind<Kind<ForAndThen, A>, B>.andThen(arg1: Kind<Kind<ForAndThen, B>, C>): AndThen<A,
   C> = arrow.core.AndThen.category().run {
   this@andThen.andThen<A, B, C>(arg1) as arrow.core.AndThen<A, C>
@@ -60,4 +47,5 @@ fun <A, B, C> Kind<Kind<ForAndThen, A>, B>.andThen(arg1: Kind<Kind<ForAndThen, B
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(AndThenDeprecation)
 inline fun Companion.category(): AndThenCategory = category_singleton

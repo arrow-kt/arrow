@@ -18,7 +18,6 @@ import arrow.optics.extensions.mapk.at.at
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.index.index
 import arrow.optics.extensions.traversal
-import arrow.optics.map
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws

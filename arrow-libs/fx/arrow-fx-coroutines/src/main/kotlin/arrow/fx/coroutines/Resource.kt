@@ -168,6 +168,124 @@ sealed class Resource<out A> {
   fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     zip(other, ::Pair)
 
+  inline fun <B, C, D> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    crossinline map: (A, B, C) -> D
+  ): Resource<D> =
+    zip(b, c, unit, unit, unit, unit, unit, unit, unit) { a, b, c, _, _, _, _, _, _, _ ->
+      map(a, b, c)
+    }
+
+  inline fun <B, C, D, E> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    crossinline map: (A, B, C, D) -> E
+  ): Resource<E> =
+    zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
+      map(a, b, c, d)
+    }
+
+  inline fun <B, C, D, E, F, G> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    crossinline map: (A, B, C, D, E) -> G
+  ): Resource<G> =
+    zip(b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
+      map(a, b, c, d, e)
+    }
+
+  inline fun <B, C, D, E, F, G, H> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    crossinline map: (A, B, C, D, E, F) -> G
+  ): Resource<G> =
+    zip(b, c, d, e, f, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ ->
+      map(b, c, d, e, f, g)
+    }
+
+  inline fun <B, C, D, E, F, G, H> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    crossinline map: (A, B, C, D, E, F, G) -> H
+  ): Resource<H> =
+    zip(b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ ->
+      map(a, b, c, d, e, f, g)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    crossinline map: (A, B, C, D, E, F, G, H) -> I
+  ): Resource<I> =
+    zip(b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ ->
+      map(a, b, c, d, e, f, g, h)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I, J> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    i: Resource<I>,
+    crossinline map: (A, B, C, D, E, F, G, H, I) -> J
+  ): Resource<J> =
+    zip(b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ ->
+      map(a, b, c, d, e, f, g, h, i)
+    }
+
+  inline fun <B, C, D, E, F, G, H, I, J, K> zip(
+    b: Resource<B>,
+    c: Resource<C>,
+    d: Resource<D>,
+    e: Resource<E>,
+    f: Resource<F>,
+    g: Resource<G>,
+    h: Resource<H>,
+    i: Resource<I>,
+    j: Resource<J>,
+    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K
+  ): Resource<K> =
+    flatMap { aa ->
+      b.flatMap { bb ->
+        c.flatMap { cc ->
+          d.flatMap { dd ->
+            e.flatMap { ee ->
+              f.flatMap { ff ->
+                g.flatMap { gg ->
+                  h.flatMap { hh ->
+                    i.flatMap { ii ->
+                      j.map { jj ->
+                        map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
   class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
 
   class Allocate<A>(
@@ -178,7 +296,9 @@ sealed class Resource<out A> {
   class Defer<A>(val resource: suspend () -> Resource<A>) : Resource<A>()
 
   companion object {
-    val unit: Resource<Unit> = just(Unit)
+
+    @PublishedApi
+    internal val unit: Resource<Unit> = just(Unit)
 
     /**
      * Construct a [Resource] from a allocating function [acquire] and a release function [release].
@@ -323,141 +443,6 @@ sealed class Resource<out A> {
 
       return loop(f(a))
     }
-
-    inline fun <B, C, D> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      crossinline map: (B, C) -> D
-    ): Resource<D> =
-      mapN(b, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ ->
-        map(b, c)
-      }
-
-    inline fun <B, C, D, E> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      crossinline map: (B, C, D) -> E
-    ): Resource<E> =
-      mapN(b, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ ->
-        map(b, c, d)
-      }
-
-    inline fun <B, C, D, E, F> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      crossinline map: (B, C, D, E) -> F
-    ): Resource<F> =
-      mapN(b, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ ->
-        map(b, c, d, e)
-      }
-
-    inline fun <B, C, D, E, F, G> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      crossinline map: (B, C, D, E, F) -> G
-    ): Resource<G> =
-      mapN(b, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ ->
-        map(b, c, d, e, f)
-      }
-
-    inline fun <B, C, D, E, F, G, H> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      crossinline map: (B, C, D, E, F, G) -> H
-    ): Resource<H> =
-      mapN(b, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ ->
-        map(b, c, d, e, f, g)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      crossinline map: (B, C, D, E, F, G, H) -> I
-    ): Resource<I> =
-      mapN(b, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ ->
-        map(b, c, d, e, f, g, h)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      crossinline map: (B, C, D, E, F, G, H, I) -> J
-    ): Resource<J> =
-      mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ ->
-        map(b, c, d, e, f, g, h, i)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      j: Resource<J>,
-      crossinline map: (B, C, D, E, F, G, H, I, J) -> K
-    ): Resource<K> =
-      mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ ->
-        map(b, c, d, e, f, g, h, i, j)
-      }
-
-    inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
-      b: Resource<B>,
-      c: Resource<C>,
-      d: Resource<D>,
-      e: Resource<E>,
-      f: Resource<F>,
-      g: Resource<G>,
-      h: Resource<H>,
-      i: Resource<I>,
-      j: Resource<J>,
-      k: Resource<K>,
-      crossinline map: (B, C, D, E, F, G, H, I, J, K) -> L
-    ): Resource<L> =
-      b.flatMap { bb ->
-        c.flatMap { cc ->
-          d.flatMap { dd ->
-            e.flatMap { ee ->
-              f.flatMap { ff ->
-                g.flatMap { gg ->
-                  h.flatMap { hh ->
-                    i.flatMap { ii ->
-                      j.flatMap { jj ->
-                        k.map { kk ->
-                          map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
   }
 
   private suspend fun continueLoop(
@@ -582,59 +567,6 @@ inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>
   }
 
 /**
- * Traverses and filters nullable resources
- * @see traverseResource
- */
-inline fun <A, B> Iterable<A>.traverseFilterResource(crossinline f: (A) -> Resource<B?>): Resource<List<B>> =
-  traverseResource(f).map { it.filterNotNull() }
-
-/**
- * Traverse this [Iterable] and flattens the resulting `Resource<List<B>>` of [f] into a `Resource<List<B>>`.
- *
- * ```kotlin:ank:playground
- * import arrow.fx.coroutines.*
- *
- * class File(url: String) {
- *   suspend fun open(): File = this
- *   suspend fun close(): Unit {}
- *   override fun toString(): String = "This file contains some interesting content!"
- * }
- *
- * suspend fun openFile(uri: String): File = File(uri).open()
- * suspend fun closeFile(file: File): Unit = file.close()
- * suspend fun fileToString(file: File): String = file.toString()
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   val res: List<String> = listOf(
- *     "data.json",
- *     "user.json",
- *     "resource.json"
- *   ).flatTraverseResource { uri ->
- *     resource {
- *      listOf(openFile(uri))
- *     } release { files ->
- *       files.forEach { closeFile(it) }
- *     }
- *   }.use { files ->
- *     files.map { fileToString(it) }
- *   }
- *   //sampleEnd
- *   res.forEach(::println)
- * }
- * ```
- */
-inline fun <A, B> Iterable<A>.flatTraverseResource(crossinline f: (A) -> Resource<List<B>>): Resource<List<B>> =
-  traverseResource(f).map { it.flatten() }
-
-/**
- * Traverse this [Iterable] and flattens and filters out nullable elements of the resulting `Resource<List<B?>>` in [f] into a `Resource<List<B>>`.
- * @see flatTraverseResource
- */
-inline fun <A, B> Iterable<A>.flatTraverseFilterResource(crossinline f: (A) -> Resource<List<B?>>): Resource<List<B>> =
-  flatTraverseResource { f(it).map { list -> list.filterNotNull() } }
-
-/**
  * Sequences this [Iterable] of [Resource]s.
  * [Iterable.map] and [sequence] is equivalent to [traverseResource].
  *
@@ -674,44 +606,3 @@ inline fun <A, B> Iterable<A>.flatTraverseFilterResource(crossinline f: (A) -> R
 @Suppress("NOTHING_TO_INLINE")
 inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
   traverseResource(::identity)
-
-/**
- * Sequences this [Iterable] and flattens the [Resource] elements.
- * [Iterable.map] and [flatSequence] is equivalent to [flatTraverseResource].
- *
- * ```kotlin:ank:playground
- * import arrow.fx.coroutines.*
- *
- * class File(url: String) {
- *   suspend fun open(): File = this
- *   suspend fun close(): Unit {}
- *   override fun toString(): String = "This file contains some interesting content!"
- * }
- *
- * suspend fun openFile(uri: String): File = File(uri).open()
- * suspend fun closeFile(file: File): Unit = file.close()
- * suspend fun fileToString(file: File): String = file.toString()
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   val res: List<String> = listOf(
- *     "data.json",
- *     "user.json",
- *     "resource.json"
- *   ).map { uri ->
- *     resource {
- *      listOf(openFile(uri))
- *     } release { files ->
- *       files.forEach { closeFile(it) }
- *     }
- *   }.flatSequence().use { files ->
- *     files.map { fileToString(it) }
- *   }
- *   //sampleEnd
- *   res.forEach(::println)
- * }
- * ```
- */
-@Suppress("NOTHING_TO_INLINE")
-inline fun <A> Iterable<Resource<Iterable<A>>>.flatSequence(): Resource<List<A>> =
-  sequence().map { it.flatten() }

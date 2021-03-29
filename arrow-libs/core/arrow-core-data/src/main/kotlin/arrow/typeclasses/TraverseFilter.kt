@@ -16,6 +16,7 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
    * Returns [F]<[B]> in [G] context by applying [AP] on a selector function [f], which returns [Option] of [B]
    * in [G] context.
    */
+  @Deprecated(TraverseDeprecation)
   fun <G, A, B> Kind<F, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>
 
   override fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B> =

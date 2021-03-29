@@ -5,6 +5,7 @@ import arrow.core.ForSequenceK
 import arrow.core.extensions.SequenceKTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.sequences.Sequence
 
 @JvmName("traverse")
@@ -67,10 +68,7 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> Sequence<A>.flatTraverse(
   arg1: Monad<ForSequenceK>,
   arg2: Applicative<G>,

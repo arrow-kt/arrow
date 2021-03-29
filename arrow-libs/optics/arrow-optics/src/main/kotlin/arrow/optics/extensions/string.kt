@@ -29,7 +29,7 @@ import arrow.typeclasses.Applicative
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.string()",
-    "arrow.optics.Traversal", "arrow.optics.string"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,7 +49,7 @@ fun String.Companion.traversal(): Traversal<String, Char> = object : Traversal<S
   "Each is being deprecated. Use the instance for String from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.string()",
-    "arrow.optics.Traversal", "arrow.optics.string"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -62,7 +62,7 @@ fun String.Companion.each(): Each<String, Char> = StringEach()
   "Each is being deprecated. Use the instance for String from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.string()",
-    "arrow.optics.Traversal", "arrow.optics.string"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,7 +90,7 @@ interface StringEach : Each<String, Char> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "FilterIndex.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -104,7 +104,7 @@ fun String.Companion.filterIndex(): FilterIndex<String, Int, Char> = StringFilte
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "FilterIndex.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -133,7 +133,7 @@ interface StringFilterIndex : FilterIndex<String, Int, Char> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Index.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -147,7 +147,7 @@ fun String.Companion.index(): Index<String, Int, Char> = StringIndex()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Index.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )
@@ -172,7 +172,7 @@ interface StringIndex : Index<String, Int, Char> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Cons.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -182,7 +182,7 @@ fun String.Companion.cons(): Cons<String, Char> = StringCons()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Cons.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -209,7 +209,7 @@ interface StringCons : Cons<String, Char> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Snoc.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Snoc"
+    "arrow.optics.typeclasses.Snoc"
   ),
   DeprecationLevel.WARNING
 )
@@ -219,7 +219,7 @@ fun String.Companion.snoc(): Snoc<String, Char> = StringSnoc()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Snoc.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Snoc"
+    "arrow.optics.typeclasses.Snoc"
   ),
   DeprecationLevel.WARNING
 )

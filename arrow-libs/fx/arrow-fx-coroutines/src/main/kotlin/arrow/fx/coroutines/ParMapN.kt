@@ -2,8 +2,6 @@ package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -33,11 +31,18 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * @see parMapN for a function that can run on any [CoroutineContext]
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }) { a, b -> f(a, b) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline f: suspend (A, B) -> C
-): C = parMapN(Dispatchers.Default, fa, fb, f)
+): C = parZip(Dispatchers.Default, { fa() }, { fb() }) { a, b -> f(a, b) }
 
 /**
  * Runs [fa], [fb] in parallel on [ctx] and combines their results using the provided function.
@@ -70,16 +75,20 @@ suspend inline fun <A, B, C> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }) { a, b -> f(a, b) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline f: suspend (A, B) -> C
-): C = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  f(a.await(), b.await())
-}
+): C =
+  parZip(ctx, { fa() }, { fb() }) { a, b -> f(a, b) }
 
 /**
  * Runs [fa], [fb], [fc] in parallel on [Dispatchers.Default] and combines their results using the provided function.
@@ -108,12 +117,20 @@ suspend inline fun <A, B, C> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }, { fc() }) { a, b, c -> f(a, b, c) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline fc: suspend () -> C,
   crossinline f: suspend (A, B, C) -> D
-): D = parMapN(Dispatchers.Default, fa, fb, fc, f)
+): D =
+  parZip(Dispatchers.Default, { fa() }, { fb() }, { fc() }) { a, b, c -> f(a, b, c) }
 
 /**
  * Runs [fa], [fb], [fc] in parallel on [ctx] and combines their results using the provided function.
@@ -148,19 +165,23 @@ suspend inline fun <A, B, C, D> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-// TODO provide efficient impls like below for N-arity.
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }) { a, b, c -> f(a, b, c) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline fc: suspend () -> C,
   crossinline f: suspend (A, B, C) -> D
-): D = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  f(a.await(), b.await(), c.await())
-}
+): D =
+  parZip(ctx, { fa() }, { fb() }, { fc() }) { a, b, c ->
+    f(a, b, c)
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [Dispatchers.Default] and combines their results using the provided function.
@@ -191,13 +212,21 @@ suspend inline fun <A, B, C, D> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(Dispatchers.Default, { fa() }, { fb() }, { fc() }, { fd() }) { a, b, c, d -> f(a, b, c, d) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline fc: suspend () -> C,
   crossinline fd: suspend () -> D,
   crossinline f: suspend (A, B, C, D) -> E
-): E = parMapN(Dispatchers.Default, fa, fb, fc, fd, f)
+): E =
+  parZip({ fa() }, { fb() }, { fc() }, { fd() }) { a, b, c, d -> f(a, b, c, d) }
 
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [ctx] and combines their results using the provided function.
@@ -235,6 +264,13 @@ suspend inline fun <A, B, C, D, E> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }) { a, b, c, d -> f(a, b, c, d) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
@@ -242,13 +278,10 @@ suspend inline fun <A, B, C, D, E> parMapN(
   crossinline fc: suspend () -> C,
   crossinline fd: suspend () -> D,
   crossinline f: suspend (A, B, C, D) -> E
-): E = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  val d = async(ctx) { fd() }
-  f(a.await(), b.await(), c.await(), d.await())
-}
+): E =
+  parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }) { a, b, c, d ->
+    f(a, b, c, d)
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [Dispatchers.Default] and combines
@@ -282,6 +315,13 @@ suspend inline fun <A, B, C, D, E> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }, { fc() }, { fd() }, { fe() }) { a, b, c, d, e -> f(a, b, c, d, e) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
@@ -289,7 +329,8 @@ suspend inline fun <A, B, C, D, E, F> parMapN(
   crossinline fd: suspend () -> D,
   crossinline fe: suspend () -> E,
   crossinline f: suspend (A, B, C, D, E) -> F
-): F = parMapN(Dispatchers.Default, fa, fb, fc, fd, fe, f)
+): F =
+  parZip(Dispatchers.Default, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }) { a, b, c, d, e -> f(a, b, c, d, e) }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [ctx] and combines their results using the provided function.
@@ -329,6 +370,13 @@ suspend inline fun <A, B, C, D, E, F> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }) { a, b, c, d, e -> f(a, b, c, d, e) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
@@ -337,14 +385,10 @@ suspend inline fun <A, B, C, D, E, F> parMapN(
   crossinline fd: suspend () -> D,
   crossinline fe: suspend () -> E,
   crossinline f: suspend (A, B, C, D, E) -> F
-): F = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  val d = async(ctx) { fd() }
-  val e = async(ctx) { fe() }
-  f(a.await(), b.await(), c.await(), d.await(), e.await())
-}
+): F =
+  parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }) { a, b, c, d, e ->
+    f(a, b, c, d, e)
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [Dispatchers.Default] and combines
@@ -380,6 +424,13 @@ suspend inline fun <A, B, C, D, E, F> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }) { a, b, c, d, e, ff -> f(a, b, c, d, e, ff) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
@@ -388,7 +439,17 @@ suspend inline fun <A, B, C, D, E, F, G> parMapN(
   crossinline fe: suspend () -> E,
   crossinline ff: suspend () -> F,
   crossinline f: suspend (A, B, C, D, E, F) -> G
-): G = parMapN(Dispatchers.Default, fa, fb, fc, fd, fe, ff, f)
+): G =
+  parZip(Dispatchers.Default, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }) { a, b, c, d, e, ff ->
+    f(
+      a,
+      b,
+      c,
+      d,
+      e,
+      ff
+    )
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [ctx] and combines their results using the provided function.
@@ -430,6 +491,13 @@ suspend inline fun <A, B, C, D, E, F, G> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }) { a, b, c, d, e, ff -> f(a, b, c, d, e, ff) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
@@ -439,15 +507,10 @@ suspend inline fun <A, B, C, D, E, F, G> parMapN(
   crossinline fe: suspend () -> E,
   crossinline ff: suspend () -> F,
   crossinline f: suspend (A, B, C, D, E, F) -> G
-): G = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  val d = async(ctx) { fd() }
-  val e = async(ctx) { fe() }
-  val g = async(ctx) { ff() }
-  f(a.await(), b.await(), c.await(), d.await(), e.await(), g.await())
-}
+): G =
+  parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }) { a, b, c, d, e, ff ->
+    f(a, b, c, d, e, ff)
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [Dispatchers.Default] and combines
@@ -485,6 +548,13 @@ suspend inline fun <A, B, C, D, E, F, G> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }, { fg() }) { a, b, c, d, e, ff, g -> f(a, b, c, d, e, ff, g) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
@@ -494,7 +564,16 @@ suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
   crossinline ff: suspend () -> F,
   crossinline fg: suspend () -> G,
   crossinline f: suspend (A, B, C, D, E, F, G) -> H
-): H = parMapN(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, f)
+): H =
+  parZip(
+    Dispatchers.Default,
+    { fa() },
+    { fb() },
+    { fc() },
+    { fd() },
+    { fe() },
+    { ff() },
+    { fg() }) { a, b, c, d, e, ff, g -> f(a, b, c, d, e, ff, g) }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [ctx] and combines their results using the provided function.
@@ -538,6 +617,13 @@ suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }, { fg() }) { a, b, c, d, e, ff, g -> f(a, b, c, d, e, ff, g) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
@@ -548,16 +634,10 @@ suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
   crossinline ff: suspend () -> F,
   crossinline fg: suspend () -> G,
   crossinline f: suspend (A, B, C, D, E, F, G) -> H
-): H = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  val d = async(ctx) { fd() }
-  val e = async(ctx) { fe() }
-  val fDef = async(ctx) { ff() }
-  val g = async(ctx) { fg() }
-  f(a.await(), b.await(), c.await(), d.await(), e.await(), fDef.await(), g.await())
-}
+): H =
+  parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }, { fg() }) { a, b, c, d, e, ff, g ->
+    f(a, b, c, d, e, ff, g)
+  }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [Dispatchers.Default] and combines
@@ -597,6 +677,13 @@ suspend inline fun <A, B, C, D, E, F, G, H> parMapN(
  *
  * @see parMapN for a function that can run on any [CoroutineContext].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip({ fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }, { fg() }, { fh() }) { a, b, c, d, e, f, g, h -> f(a, b, c, d, e, f, g, h) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G, H, I> parMapN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
@@ -607,7 +694,17 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parMapN(
   crossinline fg: suspend () -> G,
   crossinline fh: suspend () -> H,
   crossinline f: suspend (A, B, C, D, E, F, G, H) -> I
-): I = parMapN(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, fh, f)
+): I =
+  parZip(
+    Dispatchers.Default,
+    { fa() },
+    { fb() },
+    { fc() },
+    { fd() },
+    { fe() },
+    { ff() },
+    { fg() },
+    { fh() }) { a, b, c, d, e, f, g, h -> f(a, b, c, d, e, f, g, h) }
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [ctx] and combines their results using the provided function.
@@ -652,6 +749,13 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parMapN(
  *
  * @see parMapN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Deprecated(
+  "parMapN has been deprecated in favor of parZip with CoroutineScope enabled lambdas",
+  ReplaceWith(
+    "parZip(ctx, { fa() }, { fb() }, { fc() }, { fd() }, { fe() }, { ff() }, { fg() }, { fh() }) { a, b, c, d, e, f, g, h -> f(a, b, c, d, e, f, g, h) }",
+    "arrow.core.parZip"
+  )
+)
 suspend inline fun <A, B, C, D, E, F, G, H, I> parMapN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
@@ -663,14 +767,16 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parMapN(
   crossinline fg: suspend () -> G,
   crossinline fh: suspend () -> H,
   crossinline f: suspend (A, B, C, D, E, F, G, H) -> I
-): I = coroutineScope {
-  val a = async(ctx) { fa() }
-  val b = async(ctx) { fb() }
-  val c = async(ctx) { fc() }
-  val d = async(ctx) { fd() }
-  val e = async(ctx) { fe() }
-  val fDef = async(ctx) { ff() }
-  val g = async(ctx) { fg() }
-  val h = async(ctx) { fh() }
-  f(a.await(), b.await(), c.await(), d.await(), e.await(), fDef.await(), g.await(), h.await())
-}
+): I =
+  parZip(
+    ctx,
+    { fa() },
+    { fb() },
+    { fc() },
+    { fd() },
+    { fe() },
+    { ff() },
+    { fg() },
+    { fh() }) { a, b, c, d, e, ff, g, h ->
+    f(a, b, c, d, e, ff, g, h)
+  }

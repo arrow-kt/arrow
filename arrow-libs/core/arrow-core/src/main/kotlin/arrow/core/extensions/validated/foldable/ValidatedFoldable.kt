@@ -17,6 +17,7 @@ import arrow.core.valid
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Function1
@@ -157,7 +158,7 @@ fun <E, A> orEmpty(arg0: Applicative<Kind<ForValidated, E>>, arg1: Monoid<A>): V
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with traverse_ or traverseEither_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <E, G, A, B> Kind<Kind<ForValidated, E>, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G, Unit> = arrow.core.Validated.foldable<E>().run {
   this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
 }
@@ -169,7 +170,7 @@ fun <E, G, A, B> Kind<Kind<ForValidated, E>, A>.traverse_(arg1: Applicative<G>, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with sequence_ or sequenceEither_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <E, G, A> Kind<Kind<ForValidated, E>, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> = arrow.core.Validated.foldable<E>().run {
   this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
 }
@@ -261,22 +262,6 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.isNotEmpty(): Boolean =
 @Deprecated("@extension kinded projected functions are deprecated.", ReplaceWith("fold({ 0 }, { 1 })"))
 fun <E, A> Kind<Kind<ForValidated, E>, A>.size(arg1: Monoid<Long>): Long =
   fix().fold({ 0 }, { 1 })
-
-@JvmName("foldMapA")
-@Suppress(
-  "UNCHECKED_CAST",
-  "USELESS_CAST",
-  "EXTENSION_SHADOWED_BY_MEMBER",
-  "UNUSED_PARAMETER"
-)
-@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
-fun <E, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForValidated, E>, A>.foldMapA(
-  arg1: AP,
-  arg2: MO,
-  arg3: Function1<A, Kind<G, B>>
-): Kind<G, B> = arrow.core.Validated.foldable<E>().run {
-  this@foldMapA.foldMapA<G, A, B, AP, MO>(arg1, arg2, arg3) as arrow.Kind<G, B>
-}
 
 @JvmName("foldMapM")
 @Suppress(

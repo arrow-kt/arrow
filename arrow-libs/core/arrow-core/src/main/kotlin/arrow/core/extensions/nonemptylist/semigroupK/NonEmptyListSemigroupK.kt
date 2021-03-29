@@ -49,7 +49,6 @@ fun <A> Kind<ForNonEmptyList, A>.combineK(arg1: Kind<ForNonEmptyList, A>): NonEm
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.nonEmptyList<A>()",
-    "arrow.core.nonEmptyList",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

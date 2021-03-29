@@ -24,7 +24,7 @@ import arrow.typeclasses.Applicative
   "SequenceK is being deprecated. Use the instance for Sequence from the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : T
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -56,7 +56,7 @@ interface SequenceKEach<A> : Each<SequenceK<A>, A> {
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "FilterIndex.sequence<A>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -77,7 +77,7 @@ interface SequenceKFilterIndex<A> : FilterIndex<SequenceK<A>, Int, A> {
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Index.sequence<A>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )

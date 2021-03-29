@@ -28,7 +28,7 @@ internal val each_singleton: Each<NonEmptyList<Any?>, Any?> = object : NonEmptyL
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Traversal.nonEmptyList<A>()",
-    "arrow.optics.Traversal", "arrow.optics.nonEmptyList"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -44,7 +44,7 @@ fun <A> each(): PTraversal<NonEmptyList<A>, NonEmptyList<A>, A, A> = arrow.core.
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
     "Traversal.nonEmptyList<A>()",
-    "arrow.optics.Traversal", "arrow.optics.nonEmptyList"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )

@@ -15,7 +15,7 @@ import arrow.optics.extensions.SequenceKFilterIndex
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for Sequence from the companion object of the typeclass instead.",
   ReplaceWith(
     "FilterIndex.sequence<A>().filter(p)",
-    "arrow.optics.sequence", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -41,7 +41,7 @@ object Sequence {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "FilterIndex.sequence<A>()",
-      "arrow.optics.sequence", "arrow.optics.typeclasses.FilterIndex"
+      "arrow.optics.typeclasses.FilterIndex"
     ),
     DeprecationLevel.WARNING
   )

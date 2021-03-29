@@ -115,6 +115,7 @@ interface Foldable<F> {
    * This method is primarily useful when G<_> represents an action or effect, and the specific A aspect of G<A> is
    * not otherwise needed.
    */
+  @Deprecated(TraverseDeprecation)
   fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
     foldRight(always { GA.just(Unit) }) { a, acc -> GA.run { f(a).apEval(acc.map { it.map { { _: B -> Unit } } }) } }.value()
 
@@ -123,6 +124,7 @@ interface Foldable<F> {
    *
    * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
    */
+  @Deprecated(TraverseDeprecation)
   fun <G, A> Kind<F, Kind<G, A>>.sequence_(GA: Applicative<G>): Kind<G, Unit> =
     traverse_(GA, ::identity)
 
@@ -179,12 +181,6 @@ interface Foldable<F> {
    */
   fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long =
     foldMap(MN) { 1 }
-
-  /**
-   * Applicative folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.
-   */
-  fun <G, A, B, AP, MO> Kind<F, A>.foldMapA(ap: AP, mo: MO, f: (A) -> Kind<G, B>): Kind<G, B>
-    where AP : Applicative<G>, MO : Monoid<B> = foldMap(mo.lift(ap), f)
 
   /**
    * Monadic folding on F by mapping A values to G<B>, combining the B values using the given Monoid<B> instance.

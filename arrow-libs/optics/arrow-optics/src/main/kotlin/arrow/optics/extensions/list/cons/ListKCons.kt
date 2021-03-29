@@ -19,7 +19,7 @@ import kotlin.collections.List
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().firstOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,7 +38,7 @@ fun <A> firstOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.optics.extens
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().tailOption()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -100,7 +100,7 @@ fun <A> List<A>.uncons(): Option<Tuple2<A, ListK<A>>> =
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for List from the companion object of the typeclass instead.",
   ReplaceWith(
     "Cons.list<A>().cons()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+    "arrow.optics.typeclasses.Cons"
   ),
   DeprecationLevel.WARNING
 )
@@ -126,7 +126,7 @@ object List {
     "Typeclass instance have been moved to the companion object of the typeclass.",
     ReplaceWith(
       "Cons.list<A>()",
-      "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+      "arrow.optics.typeclasses.Cons"
     ),
     DeprecationLevel.WARNING
   )

@@ -26,7 +26,7 @@ import arrow.typeclasses.Applicative
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "At.map<K, V>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.At"
+    "arrow.optics.typeclasses.At"
   ),
   DeprecationLevel.WARNING
 )
@@ -56,7 +56,7 @@ interface MapKAt<K, V> : At<MapK<K, V>, K, Option<V>> {
   "MapK is being deprecated. Use the instance for Map from the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -72,7 +72,7 @@ fun <K, V> MapK.Companion.traversal(): Traversal<MapK<K, V>, V> = object : Trave
   "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"
+    "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
 )
@@ -88,7 +88,7 @@ interface MapKEach<K, V> : Each<MapK<K, V>, V> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "FilterIndex.map<K, V>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -111,7 +111,7 @@ interface MapKFilterIndex<K, V> : FilterIndex<MapK<K, V>, K, V> {
   "Typeclass interface implementation will not be exposed directly anymore",
   ReplaceWith(
     "Index.map<K, V>()",
-    "arrow.optics.map", "arrow.optics.typeclasses.Index"
+    "arrow.optics.typeclasses.Index"
   ),
   DeprecationLevel.WARNING
 )

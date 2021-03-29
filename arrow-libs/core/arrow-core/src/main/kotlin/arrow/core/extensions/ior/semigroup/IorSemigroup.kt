@@ -59,7 +59,6 @@ fun <L, R> Ior<L, R>.maybeCombine(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.ior(SGL, SGR)",
-    "arrow.core.ior",
     "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING

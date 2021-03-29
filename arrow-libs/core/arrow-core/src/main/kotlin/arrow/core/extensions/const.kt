@@ -17,19 +17,22 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Invariant
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.TraverseDeprecation
 import arrow.typeclasses.TraverseFilter
-import arrow.core.ap as constAp
 import arrow.core.combine as combineAp
 
 @Deprecated(
@@ -94,7 +97,7 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    fix().zip<(T) -> U, U>(MA(), ff.fix()) { a, f -> f(a) }
 }
 
 @Deprecated(
@@ -113,7 +116,7 @@ interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
   }.empty().fix()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    fix().zip<(T) -> U, U>(MA(), ff.fix()) { a, f -> f(a) }
 }
 
 @Deprecated(
@@ -147,13 +150,14 @@ interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTrave
 
   override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
+  @Deprecated(TraverseDeprecation)
   override fun <G, A, B> Kind<ConstPartialOf<X>, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, ConstOf<X, B>> =
     fix().traverseFilter(AP, f)
 }
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.const()", "arrow.core.const", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.const()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
@@ -166,7 +170,7 @@ interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.const()", "arrow.core.const", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.const()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
@@ -178,11 +182,7 @@ interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
   override fun empty(): Const<A, T> = Const(MA().empty())
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Eq.const()", "arrow.core.const", "arrow.typeclasses.Eq"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(EqDeprecation)
 interface ConstEq<A, T> : Eq<Const<A, T>> {
 
   fun EQ(): Eq<A>
@@ -214,21 +214,13 @@ interface ConstEqK<A> : EqK<ConstPartialOf<A>> {
     }
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Show.const()", "arrow.core.const", "arrow.typeclasses.Show"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(ShowDeprecation)
 interface ConstShow<A, T> : Show<Const<A, T>> {
   fun SA(): Show<A>
   override fun Const<A, T>.show(): String = show(SA())
 }
 
-@Deprecated(
-  "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Hash.const()", "arrow.core.const", "arrow.typeclasses.Hash"),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 interface ConstHash<A, T> : Hash<Const<A, T>> {
   fun HA(): Hash<A>
 

@@ -3,6 +3,7 @@ package arrow.core.extensions.andthen.functor
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.AndThen.Companion
+import arrow.core.AndThenDeprecation
 import arrow.core.ForAndThen
 import arrow.core.Tuple2
 import arrow.core.extensions.AndThenFunctor
@@ -48,14 +49,7 @@ internal val functor_singleton: AndThenFunctor<Any?> = object : AndThenFunctor<A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "map(arg1)",
-    "arrow.core.map"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X, B> =
   arrow.core.AndThen.functor<X>().run {
     this@map.map<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -68,14 +62,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.map(arg1: Function1<A, B>): AndThen<X
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "imap(arg1, arg2)",
-    "arrow.core.imap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
   AndThen<X, B> = arrow.core.AndThen.functor<X>().run {
     this@imap.imap<A, B>(arg1, arg2) as arrow.core.AndThen<X, B>
@@ -111,14 +98,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.imap(arg1: Function1<A, B>, arg2: Fun
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "lift(arg0)",
-    "arrow.core.AndThen.lift"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForAndThen, X>, A>,
   Kind<Kind<ForAndThen, X>, B>> = arrow.core.AndThen
   .functor<X>()
@@ -132,14 +112,7 @@ fun <X, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForAndThen, X>, A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "void()",
-    "arrow.core.void"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A> Kind<Kind<ForAndThen, X>, A>.void(): AndThen<X, Unit> =
   arrow.core.AndThen.functor<X>().run {
     this@void.void<A>() as arrow.core.AndThen<X, kotlin.Unit>
@@ -175,14 +148,7 @@ fun <X, A> Kind<Kind<ForAndThen, X>, A>.void(): AndThen<X, Unit> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "fproduct(arg1)",
-    "arrow.core.fproduct"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.fproduct(arg1: Function1<A, B>): AndThen<X, Tuple2<A, B>> =
   arrow.core.AndThen.functor<X>().run {
     this@fproduct.fproduct<A, B>(arg1) as arrow.core.AndThen<X, arrow.core.Tuple2<A, B>>
@@ -217,14 +183,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.fproduct(arg1: Function1<A, B>): AndT
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapConst(arg1)",
-    "arrow.core.mapConst"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.mapConst(arg1: B): AndThen<X, B> =
   arrow.core.AndThen.functor<X>().run {
     this@mapConst.mapConst<A, B>(arg1) as arrow.core.AndThen<X, B>
@@ -240,14 +199,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.mapConst(arg1: B): AndThen<X, B> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "mapConst(arg1)",
-    "arrow.core.mapConst"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> A.mapConst(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X, A> =
   arrow.core.AndThen.functor<X>().run {
     this@mapConst.mapConst<A, B>(arg1) as arrow.core.AndThen<X, A>
@@ -282,14 +234,7 @@ fun <X, A, B> A.mapConst(arg1: Kind<Kind<ForAndThen, X>, B>): AndThen<X, A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupleLeft(arg1)",
-    "arrow.core.tupleLeft"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.tupleLeft(arg1: B): AndThen<X, Tuple2<B, A>> =
   arrow.core.AndThen.functor<X>().run {
     this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.AndThen<X, arrow.core.Tuple2<B, A>>
@@ -324,14 +269,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.tupleLeft(arg1: B): AndThen<X, Tuple2
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "tupleRight(arg1)",
-    "arrow.core.tupleRight"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.tupleRight(arg1: B): AndThen<X, Tuple2<A, B>> =
   arrow.core.AndThen.functor<X>().run {
     this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.AndThen<X, arrow.core.Tuple2<A, B>>
@@ -368,14 +306,7 @@ fun <X, A, B> Kind<Kind<ForAndThen, X>, A>.tupleRight(arg1: B): AndThen<X, Tuple
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "widen()",
-    "arrow.core.widen"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(AndThenDeprecation)
 fun <X, B, A : B> Kind<Kind<ForAndThen, X>, A>.widen(): AndThen<X, B> =
   arrow.core.AndThen.functor<X>().run {
     this@widen.widen<B, A>() as arrow.core.AndThen<X, B>
@@ -385,5 +316,6 @@ fun <X, B, A : B> Kind<Kind<ForAndThen, X>, A>.widen(): AndThen<X, B> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(AndThenDeprecation)
 inline fun <X> Companion.functor(): AndThenFunctor<X> = functor_singleton as
   arrow.core.extensions.AndThenFunctor<X>

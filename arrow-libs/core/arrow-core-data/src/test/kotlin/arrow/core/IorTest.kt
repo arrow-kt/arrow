@@ -42,6 +42,7 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroup
 import io.kotlintest.forAll
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -77,6 +78,67 @@ class IorTest : UnitSpec() {
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK2(), Ior.eqK2())
     )
+
+    val nullableLongSemigroup = object : Semigroup<Long?> {
+      override fun Long?.combine(b: Long?): Long? =
+        Nullable.zip(this, b) { a, bb -> a + bb }
+    }
+
+    "zip identity" {
+      forAll(Gen.ior(Gen.long().orNull(), Gen.int().orNull())) { ior ->
+        val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
+        res == ior
+      }
+    }
+
+    "zip is derived from flatMap" {
+      forAll(
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
+        Gen.ior(Gen.long().orNull(), Gen.int().orNull())
+      ) { a, b, c, d, e, f, g, h, i, j ->
+        val res = a.zip(
+          nullableLongSemigroup,
+          b, c, d, e, f, g, h, i, j
+        ) { a, b, c, d, e, f, g, h, i, j ->
+          Nullable.zip(
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+            i,
+            j
+          ) { a, b, c, d, e, f, g, h, i, j -> a + b + c + d + e + f + g + h + i + j }
+        }
+
+        val expected = listOf(a, b, c, d, e, f, g, h, i, j)
+          .fold<Ior<Long?, Int?>, Ior<Long?, Int?>>(Ior.Right(0)) { acc, ior ->
+            val mid = acc.flatMap(nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
+            mid
+          }
+
+        res == expected
+      }
+    }
+
+    "zip should combine left values in correct order" {
+      Ior.Both("fail1", -1).zip(
+        Semigroup.string(),
+        Ior.Left("fail2"),
+        Ior.Right(-1)
+      ) { _, _, _ -> "success!" } shouldBe Ior.Left("fail1fail2")
+    }
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->

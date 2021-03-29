@@ -6,6 +6,7 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionTraverseFilter
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.TraverseDeprecation
 
 /**
  * cached extension
@@ -21,10 +22,7 @@ internal val traverseFilter_singleton: OptionTraverseFilter = object :
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "Applicative typeclass is deprecated, Replace with traverseFilter, traverseFilterEither or traverseFilterValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <G, A, B> Kind<ForOption, A>.traverseFilter(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, Option<B>>>

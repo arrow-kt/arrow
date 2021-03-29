@@ -1,9 +1,13 @@
 package arrow.optics.typeclasses
 
+import arrow.core.NonEmptyList
+import arrow.core.left
+import arrow.core.right
 import arrow.optics.Fold
 import arrow.optics.Iso
 import arrow.optics.Lens
 import arrow.optics.Optional
+import arrow.optics.POptional
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
@@ -152,7 +156,6 @@ fun interface Index<S, I, A> {
   operator fun <T> Fold<T, S>.get(i: I): Fold<T, A> = this.compose(this@Index.index(i))
 
   companion object {
-
     /**
      * Lift an instance of [Index] using an [Iso].
      *
@@ -162,5 +165,64 @@ fun interface Index<S, I, A> {
      */
     fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> =
       Index { i -> iso compose ID.index(i) }
+
+    /**
+     * [Index] instance definition for [List].
+     */
+    @JvmStatic
+    fun <A> list(): Index<List<A>, Int, A> =
+      Index { i ->
+        POptional(
+          getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
+          set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } }
+        )
+      }
+
+    @JvmStatic
+    fun <K, V> map(): Index<Map<K, V>, K, V> =
+      Index { i ->
+        POptional(
+          getOrModify = { it[i]?.right() ?: it.left() },
+          set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
+        )
+      }
+
+    /**
+     * [Index] instance definition for [NonEmptyList].
+     */
+    @JvmStatic
+    fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> =
+      Index { i ->
+        POptional(
+          getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
+          set = { l, a ->
+            NonEmptyList.fromListUnsafe(
+              l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+            )
+          }
+        )
+      }
+
+    @JvmStatic
+    fun <A> sequence(): Index<Sequence<A>, Int, A> =
+      Index { i ->
+        POptional(
+          getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
+          set = { s, a -> s.mapIndexed { index, aa -> if (index == i) a else aa } }
+        )
+      }
+
+    /**
+     * [Index] instance for [String].
+     * It allows access to every [Char] in a [String] by its index's position.
+     *
+     * @receiver [Index.Companion] to make the instance statically available.
+     * @return [Index] instance
+     */
+    @JvmStatic
+    fun string(): Index<String, Int, Char> =
+      Index { i ->
+        Iso.stringToList() compose Index.list<Char>().index(i)
+      }
   }
 }

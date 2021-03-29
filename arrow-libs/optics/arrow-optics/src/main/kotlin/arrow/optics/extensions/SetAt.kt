@@ -10,7 +10,7 @@ import arrow.optics.typeclasses.At
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "At.set<A>()",
-    "arrow.optics.typeclasses.At", "arrow.optics.set"
+    "arrow.optics.typeclasses.At"
   ),
   DeprecationLevel.WARNING
 )

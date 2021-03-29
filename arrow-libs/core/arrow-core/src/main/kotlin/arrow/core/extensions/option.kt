@@ -56,6 +56,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.TraverseDeprecation
 import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
@@ -67,7 +68,7 @@ import arrow.core.select as optionSelect
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Semigroup.option()", "arrow.core.option", "arrow.typeclasses.Semigroup"),
+  ReplaceWith("Semigroup.option()", "arrow.typeclasses.Semigroup"),
   DeprecationLevel.WARNING
 )
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -103,7 +104,7 @@ interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
 
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
-  ReplaceWith("Monoid.option()", "arrow.core.option", "arrow.typeclasses.Monoid"),
+  ReplaceWith("Monoid.option()", "arrow.typeclasses.Monoid"),
   DeprecationLevel.WARNING
 )
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
@@ -305,10 +306,7 @@ fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Ki
 fun <A, G> OptionOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Option<A>> =
   optionTraverse(GA, ::identity)
 
-@Deprecated(
-  "Applicative typeclass is deprecated, Replace with traverseFilter, traverseFilterEither or traverseFilterValidated from arrow.core.*",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(TraverseDeprecation)
 fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> = GA.run {
   fix().fold({ just(None) }, f)
 }
@@ -449,6 +447,7 @@ interface OptionTraverseFilter : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
 
+  @Deprecated(TraverseDeprecation)
   override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> =
     optionTraverseFilter(AP, f)
 

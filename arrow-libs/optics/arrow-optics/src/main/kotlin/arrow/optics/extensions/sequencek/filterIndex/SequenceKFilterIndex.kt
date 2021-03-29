@@ -23,7 +23,7 @@ internal val filterIndex_singleton: SequenceKFilterIndex<Any?> = object : Sequen
   "arrow.optics.extensions package is being deprecated. Use the exposed function in the instance for Sequence from the companion object of the typeclass instead.",
   ReplaceWith(
     "FilterIndex.sequence<A>().filter(p)",
-    "arrow.optics.sequence", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,7 +40,7 @@ fun <A> filter(p: Function1<Int, Boolean>): PTraversal<SequenceK<A>, SequenceK<A
   "SequenceK is being deprecated. Use the instance for Sequence from the companion object of the typeclass.",
   ReplaceWith(
     "FilterIndex.sequence<A>()",
-    "arrow.optics.sequence", "arrow.optics.typeclasses.FilterIndex"
+    "arrow.optics.typeclasses.FilterIndex"
   ),
   DeprecationLevel.WARNING
 )

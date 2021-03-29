@@ -15,6 +15,7 @@ import arrow.core.right
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.TraverseDeprecation
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Function1
@@ -158,7 +159,7 @@ fun <L, A> orEmpty(arg0: Applicative<Kind<ForEither, L>>, arg1: Monoid<A>): Eith
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with traverse_ or traverseValidated_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <L, G, A, B> Kind<Kind<ForEither, L>, A>.traverse_(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, B>>
@@ -173,7 +174,7 @@ fun <L, G, A, B> Kind<Kind<ForEither, L>, A>.traverse_(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated. Replace with sequence_ or sequenceValidated_ from arrow.core.*")
+@Deprecated(TraverseDeprecation)
 fun <L, G, A> Kind<Kind<ForEither, L>, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
   arrow.core.Either.foldable<L>().run {
     this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
@@ -266,22 +267,6 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.isNotEmpty(): Boolean =
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fold({ 0 }, { 1 })"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.size(arg1: Monoid<Long>): Long =
   fix().fold({ 0 }, { 1 })
-
-@JvmName("foldMapA")
-@Suppress(
-  "UNCHECKED_CAST",
-  "USELESS_CAST",
-  "EXTENSION_SHADOWED_BY_MEMBER",
-  "UNUSED_PARAMETER"
-)
-@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
-fun <L, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForEither, L>, A>.foldMapA(
-  arg1: AP,
-  arg2: MO,
-  arg3: Function1<A, Kind<G, B>>
-): Kind<G, B> = arrow.core.Either.foldable<L>().run {
-  this@foldMapA.foldMapA<G, A, B, AP, MO>(arg1, arg2, arg3) as arrow.Kind<G, B>
-}
 
 @JvmName("foldMapM")
 @Suppress(
