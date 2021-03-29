@@ -67,8 +67,6 @@ Add the dependencies into the project's `build.gradle`:
 ##### Arrow Core
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
 def arrow_version = "0.13.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
