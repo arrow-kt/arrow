@@ -19,7 +19,8 @@ interface Semigroup<A> {
   operator fun A.plus(b: A): A =
     this.combine(b)
 
-  fun A.maybeCombine(b: A?): A = Option.fromNullable(b).fold({ this }, { combine(it) })
+  fun A.maybeCombine(b: A?): A =
+    b?.let { combine(it) } ?: this
 
   companion object {
     @JvmStatic
