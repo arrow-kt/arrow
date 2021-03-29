@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-apply plugin: 'jacoco'
+// Uncomment this line to check for test coverage in all modules
+// apply plugin: 'jacoco'
 
 jacoco {
     toolVersion = "$JACOCO_VERSION"
