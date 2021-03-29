@@ -29,7 +29,7 @@ By leveraging the power of KotlinX Coroutines and the compiler support for CPS t
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 Optics also offers all the base types such as [Lens]({{ '/optics/lens/' | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
 
-## [Meta]({{ '/meta/' | relative_url }})
+## [Meta](https://meta.arrow-kt.io)
 Arrow Meta is a general purpose library for meta-programming in Kotlin to build compiler plugins.
 Some type system features proposed by Arrow such as union types, product types, proof derivation, and others are built with Arrow Meta and serve as examples of what could be incorporated in the Kotlin compiler.
 
