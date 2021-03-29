@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-apply plugin: 'jacoco'
-
-jacoco {
-    toolVersion = "$JACOCO_VERSION"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled true
-    }
-    dependsOn test // tests are required to run before generating the report
-    mustRunAfter test
-}
+// TODO: Investigate Code Coverage Intellij plugin: https://www.jetbrains.com/help/idea/code-coverage.html
+// Uncomment these lines and execute `jacocoTestReport` task for checking code coverate
+//apply plugin: 'jacoco'
+//
+//jacoco {
+//    toolVersion = "$JACOCO_VERSION"
+//}
+//
+//jacocoTestReport {
+//    reports {
+//        xml.enabled true
+//        html.enabled true
+//    }
+//    dependsOn test // tests are required to run before generating the report
+//    mustRunAfter test
+//}
