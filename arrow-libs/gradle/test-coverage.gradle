@@ -15,18 +15,17 @@
  */
 
 // Uncomment these lines to check for test coverage in all modules
-apply plugin: 'jacoco'
-apply plugin: 'java'
-
-jacoco {
-    toolVersion = "$JACOCO_VERSION"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled true
-    }
-    dependsOn test // tests are required to run before generating the report
-    mustRunAfter test
-}
+// apply plugin: 'jacoco'
+//
+// jacoco {
+//    toolVersion = "$JACOCO_VERSION"
+// }
+//
+// jacocoTestReport {
+//    reports {
+//        xml.enabled true
+//        html.enabled true
+//    }
+//    dependsOn test // tests are required to run before generating the report
+//    mustRunAfter test
+// }
