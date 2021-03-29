@@ -25,7 +25,7 @@ Core also includes the base continuation effects system, which includes patterns
 Arrow Fx is a full-featured, high-performance, asynchronous framework that brings functional operators to Kotlin's `suspend` functions.
 By leveraging the power of KotlinX Coroutines and the compiler support for CPS transformations, Arrow Fx results in optimal async programs with increased throughput and decreased allocations.
 
-## [Optics]({{ '/optics/' | relative_url }})
+## [Optics]({{ '/optics/dsl/' | relative_url }})
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 Optics also offers all the base types such as [Lens]({{ '/optics/lens/' | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
 
