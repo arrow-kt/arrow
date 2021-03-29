@@ -195,6 +195,20 @@ interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>
       )
 
     /**
+     * [PIso] that defines the equality between the nullable platform type and [Option].
+     */
+    @JvmStatic
+    fun <A, B> nullableToPOption(): PIso<A?, B?, Option<A>, Option<B>> =
+      PIso(
+        get = Option.Companion::fromNullable,
+        reverseGet = { it.fold({ null }, ::identity) }
+      )
+
+    @JvmStatic
+    fun <A, B> nullableToOption(): PIso<A?, B?, Option<A>, Option<B>> =
+      pNullableToOption()
+
+    /**
      * [PIso] that defines the equality between [Option] and the nullable platform type.
      */
     @JvmStatic
