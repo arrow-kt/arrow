@@ -3,7 +3,7 @@ library: fx
 ---
 ```kotlin:ank:playground
 import arrow.fx.coroutines.parTraverse
-import arrow.fx.coroutines.parMapN
+import arrow.fx.coroutines.parZip
 
 data class Street(val name: String) 
 data class Company(val name: String) 
@@ -29,8 +29,8 @@ suspend fun main() {
 
 
     //maps each function to `::employee` in parallel
-    val audrey = parMapN({ "Audrey" }, { company("Arrow") }, ::employee) 
-    val pepe   = parMapN({  "Pepe"  }, { company("Arrow") }, ::employee)
+    val audrey = parZip({ "Audrey" }, { company("Arrow") }) { name, company -> Employee(name, company) }
+    val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { name, company -> Employee(name, company) }
     val candidates = listOf(audrey, pepe)
     val employees = candidates.parTraverse(::hire) //hires in parallel
     //sampleEnd

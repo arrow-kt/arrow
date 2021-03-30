@@ -9,7 +9,6 @@ import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
-import arrow.fx.coroutines.parMapN
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.single
 import arrow.fx.coroutines.singleThreadName

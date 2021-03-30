@@ -3,8 +3,8 @@ package arrow.fx.stm
 import arrow.fx.coroutines.ArrowFxSpec
 import kotlin.time.microseconds
 import kotlin.time.milliseconds
-import arrow.fx.coroutines.parMapN
 import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.ints.shouldBeExactly
@@ -211,7 +211,7 @@ class STMTest : ArrowFxSpec(
       checkAll {
         val acc1 = TVar.new(100)
         val acc2 = TVar.new(200)
-        parMapN(
+        parZip(
           {
             // transfer acc1 to acc2
             val amount = 50
@@ -236,7 +236,7 @@ class STMTest : ArrowFxSpec(
     "concurrent example 2" {
       checkAll {
         val tq = TQueue.new<Int>()
-        parMapN(
+        parZip(
           {
             // producers
             (0..4).parTraverse {
