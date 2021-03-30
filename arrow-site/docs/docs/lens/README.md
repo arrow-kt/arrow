@@ -140,7 +140,7 @@ fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
         { ab, r -> r to ab.second }
 )
 
-PLens.pPairFirst<Int, String, String>().set(5 to "World", "Hello, ")
+PLens.pairPFirst<Int, String, String>().set(5 to "World", "Hello, ")
 ```
 
 ### Laws

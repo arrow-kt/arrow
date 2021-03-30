@@ -15,7 +15,6 @@ If, for a structure `S`, the optionally focus `A` can be indexed by `I`, then `I
 We can use that `Optional` to safely operate on that focus `S` (i.e., operating on items in a `List` based on the index position).
 
 ```kotlin:ank
-import arrow.optics.list
 import arrow.optics.typeclasses.Index
 
 val thirdListItemOptional = Index.list<String>().index(3)

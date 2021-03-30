@@ -17,7 +17,6 @@ A `MapK<Int, String>` can be indexed by its keys `Int`, but not for every index 
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.optics.map
 import arrow.optics.typeclasses.At
 
 val mapAt = At.map<Int, String>().at(2)

@@ -206,7 +206,7 @@ interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>
 
     @JvmStatic
     fun <A, B> nullableToOption(): PIso<A?, B?, Option<A>, Option<B>> =
-      pNullableToOption()
+      nullableToPOption()
 
     /**
      * [PIso] that defines the equality between [Option] and the nullable platform type.

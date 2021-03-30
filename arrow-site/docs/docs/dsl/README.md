@@ -73,7 +73,6 @@ The DSL also has special support for [Each]({{ '/optics/each' | relative_url }})
 ```
 
 ```kotlin:ank
-import arrow.optics.list
 import arrow.optics.Every
 
 val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
@@ -101,7 +100,6 @@ Every.list<Employee>().run {
 Here we focus into the value of a given key in `MapK`.
 
 ```kotlin:ank
-import arrow.optics.map
 import arrow.optics.typeclasses.At
 
 val db = Db(mapOf(
@@ -127,7 +125,6 @@ At.map<Int, String>().run {
 
 
 ```kotlin:ank
-import arrow.optics.list
 import arrow.optics.typeclasses.Index
 
 val updatedJohn = Employees.employees.index(Index.list(), 0).company.address.street.name.modify(employees, String::capitalize)

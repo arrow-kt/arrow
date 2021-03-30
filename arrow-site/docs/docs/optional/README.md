@@ -99,7 +99,7 @@ Given a `PPrism` with a focus into `Some` of `Option<Pair<Int, String>>` that ca
 
 ```kotlin:ank
 val pprism = PPrism.pSome<Pair<Int, String>, Pair<String, String>>()
-val plens = PLens.pPairFirst<Int, String, String>()
+val plens = PLens.pairPFirst<Int, String, String>()
 
 val somePair: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>, Int, String> =
     pprism compose plens

@@ -42,7 +42,6 @@ filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello"))
 Arrow provides `FilterIndex` instances for some common datatypes in both Arrow and the Kotlin stdlib that can be filtered by index, like `ListK`, and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
-import arrow.optics.list
 import arrow.optics.typeclasses.FilterIndex
 
 FilterIndex.list<Int>().filter { index -> index % 2 == 0 }

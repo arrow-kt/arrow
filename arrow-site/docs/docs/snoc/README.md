@@ -12,7 +12,6 @@ permalink: /optics/snoc/
 It can be constructed by providing the `Prism`.
 
 ```kotlin:ank
-import arrow.optics.list
 import arrow.optics.typeclasses.Snoc
 
 val listLast = Snoc.list<Int>().snoc()
