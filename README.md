@@ -22,7 +22,6 @@ Use the list below to learn more about Λrrow's main features.
 
 #### Curated external links
 
-- [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
 If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo. 
@@ -42,33 +41,24 @@ Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Setup
 
-### Next development version
-
-If you want to try the last features, replace `0.11.0` by `0.12.0-SNAPSHOT` in the following guideline.
-
 ### JDK
 
 Make sure to have the latest version of JDK 1.8 installed.
 
 ### Android
 
-Arrow supports Android out of the box starting on API 21 and up.
-
-We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
+Arrow supports Android starting on API 21 and up.
 
 ### Gradle
 
 #### Basic Setup
 
-In your project's root `build.gradle`, append these repositories to your list:
+In your project's root `build.gradle`, append this repository to your list:
 
 ```groovy
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" } // for SNAPSHOT builds
     }
 }
 ```
@@ -202,9 +192,9 @@ Add the dependencies that you want to use:
 </dependency>
 ```
 
-#### Enabling kapt
+#### Enabling kapt for the Optics DSL
 
-Enable annotation processing using Kotlin plugin:
+For the Optics DSL, enable annotation processing using Kotlin plugin:
 ```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -271,6 +261,19 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
   <dependencies>
     ...
   </dependencies>
+```
+
+## Next development version
+
+If you want to try the latest features, replace `0.11.0` with `0.12.0-SNAPSHOT` and add this repository:
+
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    }
+}
 ```
 
 ## License
