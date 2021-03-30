@@ -331,7 +331,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [PTraversal] to focus into the first and second value of a [Pair]
      */
     @JvmStatic
-    fun <A, B> pairPTraversal(): PTraversal<Pair<A, A>, Pair<B, B>, A, B> =
+    fun <A, B> pPair(): PTraversal<Pair<A, A>, Pair<B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -342,14 +342,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first and second value of a [Pair]
      */
     @JvmStatic
-    fun <A> pairTraversal(): Traversal<Pair<A, A>, A> =
-      pairPTraversal()
+    fun <A> pair(): Traversal<Pair<A, A>, A> =
+      pPair()
 
     /**
      * [PTraversal] to focus into the first, second and third value of a [Triple]
      */
     @JvmStatic
-    fun <A, B> triplePTraversal(): PTraversal<Triple<A, A, A>, Triple<B, B, B>, A, B> =
+    fun <A, B> pTriple(): PTraversal<Triple<A, A, A>, Triple<B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -361,14 +361,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second and third value of a [Triple]
      */
     @JvmStatic
-    fun <A> tripleTraversal(): Traversal<Triple<A, A, A>, A> =
-      triplePTraversal()
+    fun <A> triple(): Traversal<Triple<A, A, A>, A> =
+      pTriple()
 
     /**
      * [PTraversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
      */
     @JvmStatic
-    fun <A, B> tuple4PTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> =
+    fun <A, B> pTuple4(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -381,14 +381,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
      */
     @JvmStatic
-    fun <A> tuple4Traversal(): Traversal<Tuple4<A, A, A, A>, A> =
-      tuple4PTraversal()
+    fun <A> tuple4(): Traversal<Tuple4<A, A, A, A>, A> =
+      pTuple4()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
      */
     @JvmStatic
-    fun <A, B> tuple5PTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple5(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -402,14 +402,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
      */
     @JvmStatic
-    fun <A> tuple5Traversal(): Traversal<Tuple5<A, A, A, A, A>, A> =
-      tuple5PTraversal()
+    fun <A> tuple5(): Traversal<Tuple5<A, A, A, A, A>, A> =
+      pTuple5()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
      */
     @JvmStatic
-    fun <A, B> tuple6PTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple6(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -424,14 +424,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
      */
     @JvmStatic
-    fun <A> tuple6Traversal(): Traversal<Tuple6<A, A, A, A, A, A>, A> =
-      tuple6PTraversal()
+    fun <A> tuple6(): Traversal<Tuple6<A, A, A, A, A, A>, A> =
+      pTuple6()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
      */
     @JvmStatic
-    fun <A, B> tuple7PTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple7(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -447,14 +447,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
      */
     @JvmStatic
-    fun <A> tuple7Traversal(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> =
-      tuple7PTraversal()
+    fun <A> tuple7(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> =
+      pTuple7()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
      */
     @JvmStatic
-    fun <A, B> tuple8PTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple8(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -471,14 +471,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
      */
     @JvmStatic
-    fun <A> tuple8Traversal(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> =
-      tuple8PTraversal()
+    fun <A> tuple8(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> =
+      pTuple8()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
      */
     @JvmStatic
-    fun <A, B> tuple9PTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple9(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -496,14 +496,14 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
      */
     @JvmStatic
-    fun <A> tuple9Traversal(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
-      tuple9PTraversal()
+    fun <A> tuple9(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
+      pTuple9()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
      */
     @JvmStatic
-    fun <A, B> tuple10PTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
+    fun <A, B> pTuple10(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.a },
         get2 = { it.b },
@@ -522,8 +522,8 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
      */
     @JvmStatic
-    fun <A> tuple10Traversal(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
-      tuple10PTraversal()
+    fun <A> tuple10(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
+      pTuple10()
   }
 
   /**

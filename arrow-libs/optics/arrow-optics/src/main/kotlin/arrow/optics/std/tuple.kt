@@ -73,9 +73,9 @@ fun <A, B> Tuple2.Companion.second(): Lens<Tuple2<A, B>, B> = pSecond()
  * [PTraversal] to focus into the first and second value of a [arrow.core.Tuple2]
  */
 @Deprecated(
-  "Use the pairPTraversal function exposed in the Traversal' companion object",
+  "Use the `pPair` function exposed in the `Traversal` companion object",
   ReplaceWith(
-    "Traversal.pairPTraversal()",
+    "Traversal.pPair()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -92,7 +92,7 @@ fun <A, B> Tuple2.Companion.pTraversal(): PTraversal<Tuple2<A, A>, Tuple2<B, B>,
 @Deprecated(
   "Use the pairTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.pairTraversal()",
+    "Traversal.pair()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -192,7 +192,7 @@ fun <A, B, C> Tuple3.Companion.third(): Lens<Tuple3<A, B, C>, C> = pThird()
 @Deprecated(
   "Use the triplePTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.triplePTraversal()",
+    "Traversal.pTriple()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -210,7 +210,7 @@ fun <A, B> Tuple3.Companion.pTraversal(): PTraversal<Tuple3<A, A, A>, Tuple3<B, 
 @Deprecated(
   "Use the tripleTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tripleTraversal()",
+    "Traversal.triple()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -223,7 +223,7 @@ fun <A> Tuple3.Companion.traversal(): Traversal<Tuple3<A, A, A>, A> = pTraversal
 @Deprecated(
   "Use the tuple4PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple4PTraversal()",
+    "Traversal.pTuple4()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -242,7 +242,7 @@ fun <A, B> Tuple4.Companion.pTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<
 @Deprecated(
   "Use the tuple4Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple4Traversal()",
+    "Traversal.tuple4()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -255,7 +255,7 @@ fun <A> Tuple4.Companion.traversal(): Traversal<Tuple4<A, A, A, A>, A> = pTraver
 @Deprecated(
   "Use the tuple5PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple5PTraversal()",
+    "Traversal.pTuple5()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -275,7 +275,7 @@ fun <A, B> Tuple5.Companion.pTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tupl
 @Deprecated(
   "Use the tuple5Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple5Traversal()",
+    "Traversal.tuple5()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -288,7 +288,7 @@ fun <A> Tuple5.Companion.traversal(): Traversal<Tuple5<A, A, A, A, A>, A> = pTra
 @Deprecated(
   "Use the tuple6PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple6PTraversal()",
+    "Traversal.pTuple6()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -309,7 +309,7 @@ fun <A, B> Tuple6.Companion.pTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, T
 @Deprecated(
   "Use the tuple6Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple6Traversal()",
+    "Traversal.tuple6()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -322,7 +322,7 @@ fun <A> Tuple6.Companion.traversal(): Traversal<Tuple6<A, A, A, A, A, A>, A> = p
 @Deprecated(
   "Use the tuple7PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple7PTraversal()",
+    "Traversal.pTuple7()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -344,7 +344,7 @@ fun <A, B> Tuple7.Companion.pTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>
 @Deprecated(
   "Use the tuple7Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple7Traversal()",
+    "Traversal.tuple7()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -357,7 +357,7 @@ fun <A> Tuple7.Companion.traversal(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> 
 @Deprecated(
   "Use the tuple8PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple8PTraversal()",
+    "Traversal.pTuple8()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -380,7 +380,7 @@ fun <A, B> Tuple8.Companion.pTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A,
 @Deprecated(
   "Use the tuple8Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple8Traversal()",
+    "Traversal.tuple8()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -393,7 +393,7 @@ fun <A> Tuple8.Companion.traversal(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, 
 @Deprecated(
   "Use the tuple9PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple9PTraversal()",
+    "Traversal.pTuple9()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -417,7 +417,7 @@ fun <A, B> Tuple9.Companion.pTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A,
 @Deprecated(
   "Use the tuple9Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple9Traversal()",
+    "Traversal.tuple9()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -430,7 +430,7 @@ fun <A> Tuple9.Companion.traversal(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A
 @Deprecated(
   "Use the tuple10PTraversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple10PTraversal()",
+    "Traversal.pTuple10()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
@@ -455,7 +455,7 @@ fun <A, B> Tuple10.Companion.pTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, 
 @Deprecated(
   "Use the tuple10Traversal function exposed in the Traversal' companion object",
   ReplaceWith(
-    "Traversal.tuple10Traversal()",
+    "Traversal.tuple10()",
     "arrow.optics.Traversal"
   ),
   DeprecationLevel.WARNING
