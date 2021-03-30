@@ -21,6 +21,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Set env
+      run: |
+        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
