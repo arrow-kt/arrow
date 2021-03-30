@@ -5,12 +5,7 @@ permalink: /patterns/dependency_injection/
 video: CR5h2Wq1yPE
 ---
 
-If you would like to know about using the [`Reader`]({{ '/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
-
 ## Dependency Injection using the `Typeclassless` technique
-
-
-
 
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.

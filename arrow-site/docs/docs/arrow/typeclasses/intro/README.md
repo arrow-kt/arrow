@@ -174,16 +174,6 @@ We will list them by their hierarchy.
 
 - [`Traverse`]({{ '/apidocs/arrow-core-data/arrow.typeclasses/-traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
 
-#### Effects
-
-Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
-
-- [`MonadDefer`]({{ '/effects/monaddefer/' | relative_url }}) - can evaluate functions lazily
-
-- [`Async`]({{ '/effects/async/' | relative_url }}) - can be created using an asynchronous callback function
-
-- [`Effect`]({{ '/effects/effect/' | relative_url }}) - can extract a value from an asynchronous function
-
 #### MTL
 
 The Monad Template Library module gives more specialized version of existing typeclasses
@@ -196,12 +186,6 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadCombine`]({{ '/arrow/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
-- [`MonadReader`]({{ '/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/arrow/mtl/reader/' | relative_url }})
-
-- [`MonadWriter`]({{ '/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/arrow/mtl/writert/' | relative_url }})
-
-- [`MonadState`]({{ '/arrow/mtl/typeclasses/monadstate' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/arrow/mtl/state/' | relative_url }})
-
 #### Optics
 
 - [`At`]({{ '/optics/at/' | relative_url }}) - provides a [`Lens`]({{ '/optics/lens/' | relative_url }}) for a structure with an indexable focus
@@ -211,11 +195,3 @@ The Monad Template Library module gives more specialized version of existing typ
 - [`Index`]({{ '/optics/index/' | relative_url }}) - provides an [`Optional`]({{ '/optics/optional/' | relative_url }}) for a structure with an indexable optional focus
 
 - [`Each`]({{ '/optics/each/' | relative_url }}) - provides a [`Traversal`]({{ '/optics/traversal/' | relative_url }})
-
-#### Recursion
-
-- [`Corecursive`]({{ '/recursion/corecursive/' | relative_url }}) - traverses a structure forwards from the starting case
-
-- [`Recursive`]({{ '/recursion/recursive/' | relative_url }}) - traverses a structure backwards from the base case
-
-- [`Birecursive`]({{ '/recursion/birecursive/' | relative_url }}) - it is both recursive and corecursive
