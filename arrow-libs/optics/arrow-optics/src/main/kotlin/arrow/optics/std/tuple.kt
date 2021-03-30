@@ -73,7 +73,7 @@ fun <A, B> Tuple2.Companion.second(): Lens<Tuple2<A, B>, B> = pSecond()
  * [PTraversal] to focus into the first and second value of a [arrow.core.Tuple2]
  */
 @Deprecated(
-  "Use the pairPTraversal function exposed in the Traversal' companion object",
+  "Use the `pPair` function exposed in the `Traversal` companion object",
   ReplaceWith(
     "Traversal.pPair()",
     "arrow.optics.Traversal"
