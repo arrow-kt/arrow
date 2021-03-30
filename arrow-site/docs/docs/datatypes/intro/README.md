@@ -39,11 +39,11 @@ We will list all the datatypes available in Arrow by the module they belong to, 
 Core contains the datatypes that are also used by the public API of several [typeclasses]({{ '/patterns/glossary/' | relative_url }}),
 so they are always required.
 
-- [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/apidocs/arrow-core/arrow.core/-option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
-- [`Eval`]({{ '/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
+- [`Eval`]({{ '/apidocs/arrow-core/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
 - `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
 
@@ -53,17 +53,17 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### General use
 
-- [`NonEmptyList`]({{ '/apidocs/arrow-core-data/arrow.core/-non-empty-list/' | relative_url }}) - a homogeneous list that has at least 1 value
+- [`NonEmptyList`]({{ '/apidocs/arrow-core/arrow.core/-non-empty-list/' | relative_url }}) - a homogeneous list that has at least 1 value
 
-- [`Ior`]({{ '/apidocs/arrow-core-data/arrow.core/-ior/' | relative_url }}) - a branch in execution for three possible paths: One, two, or both
+- [`Ior`]({{ '/apidocs/arrow-core/arrow.core/-ior/' | relative_url }}) - a branch in execution for three possible paths: One, two, or both
 
 - [`Const`]({{ '/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 
 ##### Error handling
 
-- [`Validated`]({{ '/apidocs/arrow-core-data/arrow.core/-validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 
-- [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
 #### Effects
 

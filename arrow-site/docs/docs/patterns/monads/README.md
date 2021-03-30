@@ -411,7 +411,7 @@ My first example was with nullable `?`. The full pattern containing either 0 or 
 
 While nullable types are faster, Option is still required in some cases for interoperability with Java and polymorphism where you may want to represent nesting with `Option<Option<A>>`. Having said that we still recommend you use nullable types over Option where possible as the Kotlin language provides direct support for them in the type system.
 
-Option is yet another approach to dealing with absence of a value, an alternative to the concept of `null`. You can read more about [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implements it.
+Option is yet another approach to dealing with absence of a value, an alternative to the concept of `null`. You can read more about [`Option`]({{ '/apidocs/arrow-core/arrow.core/-option/' | relative_url }}) to see how Arrow implements it.
 
 When null is not allowed, any API contract gets more explicit: Either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.

@@ -62,7 +62,7 @@ We can rewrite this code with our generated DSL.
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
 
-The DSL also has special support for [Each]({{ '/optics/each' | relative_url }}), [At]({{ '/optics/at' | relative_url }}), and [Index]({{ '/optics/index' | relative_url }}).
+The DSL also has special support for [At]({{ '/optics/at' | relative_url }}), and [Index]({{ '/optics/index' | relative_url }}).
 
 ### Each
 

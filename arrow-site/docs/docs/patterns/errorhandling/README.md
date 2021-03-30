@@ -164,7 +164,7 @@ In the next example, we are going to use `Either` to deal with potentially throw
 
 ### Either
 
-When dealing with a known alternate path, we model return types as [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
+When dealing with a known alternate path, we model return types as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
 

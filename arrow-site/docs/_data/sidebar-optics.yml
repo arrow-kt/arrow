@@ -45,9 +45,6 @@ options:
       - title: FilterIndex
         url: /optics/filterindex/
 
-      - title: Each
-        url: /optics/each/
-
   - title: Media
     url: https://media.arrow-kt.io/tags/optics/
 
