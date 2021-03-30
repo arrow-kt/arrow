@@ -11,8 +11,7 @@ package arrow.fx.coroutines
  *  queue is pivoted by replacing the ''out'' list by ''in.reverse'', and ''in'' by ''Nil''.
  *
  */
-// TODO should we move this to Arrow Core? There is no such class in the Kotlin Std.
-// All classes that need this are deprecated
+@Deprecated("IQueue is a collection type internal to Arrow Fx Coroutines, and will no longer be exposed in 0.13.0")
 data class IQueue<A> internal constructor(
   private val listIn: List<A>,
   private val listOut: List<A>,
@@ -73,7 +72,11 @@ data class IQueue<A> internal constructor(
     }
 
   fun drop(n: Int): IQueue<A> = when {
-    listOut.isEmpty() && listIn.isNotEmpty() -> IQueue(emptyList(), listIn.reversed().drop(n), size - n.coerceAtLeast(0))
+    listOut.isEmpty() && listIn.isNotEmpty() -> IQueue(
+      emptyList(),
+      listIn.reversed().drop(n),
+      size - n.coerceAtLeast(0)
+    )
     listOut.isNotEmpty() -> IQueue(listIn, listOut.drop(n), size - n.coerceAtLeast(0))
     else -> empty()
   }
