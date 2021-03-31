@@ -38,12 +38,18 @@
         </a>
       </li>
 
+      <li>
+        <a href="https://arrow-kt.io/docs/0.9/">
+          <span>v0.9.0</span>
+        </a>
+      </li>
+
       {% for item in site.data.doc-versions.docVersions %}
       {% if item.url != stable_version.url
             and item.url != next_version.url
             and item.url != previous_version.url %}
       <li>
-        <a href="{{ item.url }}">
+        <a href="{{ item.url | append: doc-link }}">
           <span>{{ item.title }}</span>
         </a>
       </li>
