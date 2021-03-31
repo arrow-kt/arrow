@@ -17,7 +17,6 @@ dependencies {
         api "io.arrow-kt:arrow-annotations:$VERSION_NAME"
         api "io.arrow-kt:arrow-continuations:$VERSION_NAME"
         api "io.arrow-kt:arrow-core:$VERSION_NAME"
-        api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-retrofit:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
