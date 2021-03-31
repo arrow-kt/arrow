@@ -1,36 +1,50 @@
 ---
 layout: docs-optics
-title: Traversal
-permalink: /optics/traversal/
+title: Every
+permalink: /optics/every/
 ---
 
-## Traversal
+## Every
 
-A `Traversal` is an optic that can see into a structure and set, or modify 0 to N foci.
-And thus a `Traversal` is useful when you want to focus into a structure that has 0 to N elements, such as collections etc. 
+`Every` is an optic that can see into a structure and get, set, or modify 0 to N foci.
+It is useful when you want to focus into a structure that has 0 to N elements, such as collections etc.
 
-It is a generalization of `map`.
-A structure `S` that has a focus `A` to which we can apply a function `(A) -> B` to `S` and get `T`.
-For example, `S == List<Int>` to which we apply `(Int) -> String` and we get `T == List<String>`
+`Every` is a composition of both `Traversal` and `Fold`, which means it's a generalization of both `map` and `foldMap`.
 
-A `Traversal` can simply be created by providing the `map` function.
+A structure `S` that has a focus `A`:
+ - to which we can apply a function `(A) -> B` to `S` and get `T`. For example, `S == List<Int>` to which we apply `(Int) -> String` and we get `T == List<String>`
+ - to which we can apply a function `(A) -> R` with `Monoid<R>` to `S` and get `R`. For example, `S == List<Int>` to which we apply `(Int) -> String` with `Monoid<String>` and we get `R == String`
+
+An `Every` can simply be created by providing the `map` & `foldMap` function.
 
 ```kotlin:ank:playground
 import arrow.optics.*
+import arrow.core.foldMap
+import arrow.typeclasses.Monoid
 
 fun main(): Unit {
   //startSample
-  val traversal: PTraversal<List<Int>, List<String>, Int, String> =
-    PTraversal { s, f -> s.map(f) }
+  val every: Every<List<Int>, Int> =
+      object : Every<List<Int>, Int> {
+        override fun modify(source: List<Int>, map: (focus: Int) -> Int): List<Int> =
+          source.map(map)
+
+        override fun <R> foldMap(M: Monoid<R>, source: List<Int>, map: (focus: Int) -> R): R =
+          source.foldMap(M, map)
+      }
   
   val source = listOf(1, 2, 3, 4)
-  val target = traversal.modify(source, Int::toString)
+  val target = every.modify(source, Int::inc)
   //endSample
   println(target)
 } 
 ```
 
-Or by using any of the constructors of `Traversal`.
+Or by using any of the pre-defined of `Every` on its `Companion` object.
+
+```kotlin:ank:playground
+Every.list<Int>().modify(listOf(1, 2, 3, 4), Int::inc)
+```
 
 Arrow optics also provides a number of predefined `Traversal` optics.
 
@@ -76,7 +90,7 @@ val employees: Lens<Employees, List<Employee>> = Lens(
   set = { employee, company -> employee.copy(company = company) }
 )
 
-val everyEmployee = Traversal.list<Employee>()
+val everyEmployee = Every.list<Employee>()
 
 val employeeCompany: Lens<Employee, Company> = Lens(
         get = { it.company },
@@ -100,27 +114,21 @@ val streetName: Lens<Street, String> = Lens(
 
 val employeesStreetName: Lens<Employee, String> = employees compose everyEmployee compose employeeCompany compose companyAddress compose addressStrees compose streetName
 
-employeesStreetName.modify(employee, String::capitalize)
+employeesStreetName.getAll(employee)
 ```
 
 ## Composition
 
-Composing `Traversal` can be used for accessing and modifying foci in nested structures.
+Composing `Every` can be used for accessing and modifying foci in nested structures.
 
 `Traversal` can be composed with all optics, and results in the following optics:
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
-| Traversal | Traversal | Traversal | Traversal | Traversal | Fold | Setter | Fold | Traversal |
+| Every | Every | Every | Every | Every | Every | Every | Every | Every |
 
-### Polymorphic Traversal
+### Polymorphic Every
 
-When dealing with polymorphic types, we can also have polymorphic `Traversal`s that allow us to morph the type of the foci.
-Previously, we used a `Traversal<List<Int>, Int>`; it was able to morph the `Int` values in the constructed type `List<Int>`.
-With a `PTraversal<List<Int>, List<String>, Int, String>`, we can morph an `Int` to a `String`, and thus, also morph the type from `List<Int>` to `List<String>`.
-
-### Laws
-
-Arrow provides [`TraversalLaws`][traversal_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own traversal.
-
-[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/TraversalLaws.kt
+When dealing with polymorphic types, we can also have polymorphic `Every`s that allow us to morph the type of the foci.
+Previously, we used a `Every<List<Int>, Int>`; it was able to morph the `Int` values in the constructed type `List<Int>`.
+With a `PEvery<List<Int>, List<String>, Int, String>`, we can morph an `Int` to a `String`, and thus, also morph the type from `List<Int>` to `List<String>`.

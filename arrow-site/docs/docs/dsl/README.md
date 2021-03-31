@@ -62,9 +62,9 @@ We can rewrite this code with our generated DSL.
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
 
-The DSL also has special support for [At]({{ '/optics/at' | relative_url }}), and [Index]({{ '/optics/index' | relative_url }}).
+The DSL also has special support for [Every]({{ '/optics/every' | relative_url }}), [At]({{ '/optics/at' | relative_url }}), [Index]({{ '/optics/index' | relative_url }}), etc.
 
-### Each
+### Every
 
 `Every` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
 
