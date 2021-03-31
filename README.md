@@ -70,7 +70,7 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -83,7 +83,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -96,7 +96,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -109,7 +109,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
@@ -129,7 +129,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.12.0"
 dependencies {
     ...
     kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
@@ -184,7 +184,7 @@ Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>0.11.0</arrow.version>
+    <arrow.version>0.12.0</arrow.version>
 </properties>
 ```
 
@@ -275,7 +275,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ## Next development version
 
-If you want to try the latest features, replace `0.11.0` with `0.12.0-SNAPSHOT` and add this repository:
+If you want to try the latest features, replace `0.12.0` with `0.13.0-SNAPSHOT` and add this repository:
 
 ```groovy
 allprojects {
