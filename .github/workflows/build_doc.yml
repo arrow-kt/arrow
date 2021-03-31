@@ -6,26 +6,29 @@ jobs:
   build_doc:
 
     env:
+      BASEDIR: ${{github.workspace}}/arrow-libs
       JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: macos-latest
     timeout-minutes: 60
 
     steps:
-    - name: Set env
-      run: |
-        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Create APIdoc
+    - name: "Setup"
+      run: brew install grep
+    - name: "Set env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+    - name: "Show env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+    - name: "Create APIdoc"
       working-directory: arrow-libs
       run: ./gradlew dokka
-    - name: Validate documentation
+    - name: "Validate documentation"
       working-directory: arrow-site
       run: ./gradlew runAnk
-    - name: Build site
+    - name: "Build site"
       working-directory: arrow-site
       run: |
          bundle install --gemfile Gemfile --path vendor/bundle
