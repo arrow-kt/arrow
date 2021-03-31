@@ -718,62 +718,6 @@ import arrow.typeclasses.Semigroup
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  *
- * [`Functor`](../../../../arrow/typeclasses/functor/)
- *
- * Transforming the inner contents
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either.Left
- *
- * val value =
- * //sampleStart
- *  Right(1).map{ it + 1 }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- *
- * [`Applicative`](../../../../arrow/typeclasses/applicative/)
- *
- * Computing over independent values
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.zip
- *
- * val value =
- * //sampleStart
- *  Either.Right(1).zip(Either.Right("a"), Either.Right(2.0), ::Triple)
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- *
- * [`Monad`](../../../../arrow/typeclasses/monad/)
- *
- * Computing over dependent values ignoring absence
- *
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.computations.either
- *
- * suspend fun main() {
- * val value =
- * //sampleStart
- *  either<Int, Int> {
- *   val a = Either.Right(1).bind()
- *   val b = Either.Right(1 + a).bind()
- *   val c = Either.Right(1 + b).bind()
- *   a + b + c
- *  }
- * //sampleEnd
- *  println(value)
- * }
- * ```
- *
  */
 sealed class Either<out A, out B> {
 

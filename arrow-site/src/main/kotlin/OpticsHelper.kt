@@ -39,6 +39,11 @@ data class Employee(val name: String, val company: Company) {
 }
 
 @optics
+data class Employees(val employees: List<Employee>) {
+  companion object
+}
+
+@optics
 sealed class Shape {
   companion object
 

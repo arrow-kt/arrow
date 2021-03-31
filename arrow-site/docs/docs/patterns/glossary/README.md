@@ -22,8 +22,8 @@ can be found for examples [in JavaScript](https://github.com/hemanth/functional-
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalized for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
-branching in code with [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/apidocs/arrow-core/arrow.core/-option/' | relative_url }}),
+branching in code with [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}),
 or interacting with the platform the program runs in using `suspend`.
 
 Some of these patterns are implemented using a mix of `sealed` classes, where each inheritor is a `data` class.
