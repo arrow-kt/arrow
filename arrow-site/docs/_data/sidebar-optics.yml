@@ -30,6 +30,9 @@ options:
       - title: Traversal
         url: /optics/traversal/
 
+      - title: Every
+        url: /optics/every/
+
       - title: Cons
         url: /optics/cons/
 
