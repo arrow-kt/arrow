@@ -56,7 +56,6 @@ jobs:
     - name: "Create release notes"
       if: steps.versions.outputs.new-release-version-exists == '1'
       run: |
-        # TODO: enable after 0.12.0 release
         export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-release-version }}
         export RELEASE_VERSION=${{ steps.versions.outputs.release-version }}
-        #.github/scripts/create-release-notes.sh
+        .github/scripts/create-release-notes.sh
