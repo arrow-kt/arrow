@@ -13,7 +13,30 @@ inline val Target.targetNames inline get() = foci.map(Focus::className)
 
 private fun processElement(iso: AnnotatedElement, target: Target): String {
   val foci = target.foci
-  val letters = ('a'..'v').toList()
+  val letters = listOf(
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth",
+    "seventh",
+    "eighth",
+    "ninth",
+    "tenth",
+    "eleventh",
+    "twelfth",
+    "thirteenth",
+    "fourteenth",
+    "fifteenth",
+    "sixteenth",
+    "seventeenth",
+    "eighteenth",
+    "nineteenth",
+    "twentieth",
+    "twentyFirst",
+    "twentySecond"
+  )
 
   fun Focus.format(): String =
     "${iso.sourceName}.${paramName.plusIfNotBlank(prefix = "`", postfix = "`")}"
