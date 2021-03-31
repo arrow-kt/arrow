@@ -2,7 +2,7 @@ buildscript {
     repositories {
         maven { url "https://dl.bintray.com/47deg/hood" }
     }
-    
+
     dependencies {
         classpath "com.47deg:hood:$HOOD_VERSION"
     }

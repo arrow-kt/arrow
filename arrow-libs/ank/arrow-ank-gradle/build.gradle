@@ -33,5 +33,7 @@ gradlePlugin {
 }
 
 tasks.whenTaskAdded { task ->
-    if (task.name.matches('.*Plugin.*MavenPublication.*')) { task.enabled = false }
+    if (task.name.matches('.*Plugin.*MavenPublication.*')) {
+        task.enabled = false
+    }
 }
