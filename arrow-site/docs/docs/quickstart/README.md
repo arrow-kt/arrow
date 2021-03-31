@@ -17,7 +17,7 @@ Arrow complements the Kotlin standard library and KotlinX Coroutines libraries w
 
 Arrow is composed of 4 main modular libraries:
 
-* [**Core**]({{ '/core/' | relative_url }}): Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core-data/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core-data/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
+* [**Core**]({{ '/core/' | relative_url }}): Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
 
 * [**Fx**]({{ '/fx/' | relative_url }}): Arrow Fx is a full-featured, high-performance, asynchronous framework that brings functional operators to Kotlin's `suspend` functions.

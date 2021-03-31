@@ -41,7 +41,7 @@ They allow us to write sequenced code that can be run asynchronously over multip
 The abstraction of sequencing execution of code is summarized in a single function that, in Arrow, is called `invoke`,
 although you may find it referred to in other languages as `andThen`, `then`, `bind`, `flatMap` or `SelectMany`. Arrow chooses `invoke` over functions like flatMap because Kotlin is able to perform monad bind in place thanks to its continuation system.
 
-Arrow provides concrete Monad impls for all data types that can support `F<A> -> A` The [typeclass]({{ '/typeclasses/intro' | relative_url }}) interface that abstracts Delimited Scopes and allows us to implement the `suspend operator fun <A> F<A>.invoke(): A` sequenced execution of code via `fold`, `flatMap` and others is called a `Effect`,
+Arrow provides concrete Monad impls for all data types that can support `F<A> -> A` The typeclass interface that abstracts Delimited Scopes and allows us to implement the `suspend operator fun <A> F<A>.invoke(): A` sequenced execution of code via `fold`, `flatMap` and others is called a `Effect`,
 for which we also have a [tutorial]({{ '/patterns/monads' | relative_url }}).
 
 Implementations of `Effect` are available for internal types like `Either`, `Option` and others.
@@ -50,8 +50,8 @@ Let's see one example of the block `either` that uses Effect to implement monad 
 ```kotlin:ank:playground
 import arrow.core.computations.either
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */
@@ -137,7 +137,7 @@ suspend fun main() {
 
 Anything in the function inside `either` can be imperative and sequential code that'll be executed when the data type decides.
 
-In the case of [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), it is strictly running and implemented in terms of fold. Let's expand the example by adding a second operation:
+In the case of [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), it is strictly running and implemented in terms of fold. Let's expand the example by adding a second operation:
 
 ```kotlin
 import arrow.core.computations.either
@@ -149,13 +149,13 @@ either {
 // Compiler error: the type of one is Either<Nothing, Int>, cannot add 1 to it
 ```
 
-This is our first challenge. We've created an instance of [`Right`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), and we cannot get the value from inside it.
+This is our first challenge. We've created an instance of [`Right`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), and we cannot get the value from inside it.
 From the previous snippet, the first intuition would be to call `fold` on `one` to get the value and otherwise throw an exception if it was a `Left`.
 This will blow up the stack and won't be obvious to users that our method can fail with an exceptions. What we want instead is to suspend and short-circuit on Left values and continue computing over Right values.
 
 ```kotlin:ank:playground
 import arrow.core.computations.either
-import arrow.core.Right
+import arrow.core.Either.Left
 
 suspend fun test(): Either<String, Int> =
  either {
@@ -174,7 +174,7 @@ The equivalent code without using comprehensions would look like:
 
 ```kotlin:ank:playground
 import arrow.core.flatMap
-import arrow.core.Right
+import arrow.core.Either.Left
 
 //sampleStart
 val x: Either<String, Int> = Right(1)
@@ -192,8 +192,8 @@ With this new style, we can rewrite our original example of database fetching as
 ```kotlin:ank:playground
 import arrow.core.computations.either
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.flatMap
 
 /* A simple model of student and a university */

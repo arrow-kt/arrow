@@ -2,7 +2,6 @@ package arrow.optics.typeclasses
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.getOption
 import arrow.optics.Fold
 import arrow.optics.Getter
 import arrow.optics.Iso
@@ -37,7 +36,8 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Lens] with a focus in [A] at given index [I].
    */
-  fun <T> Lens<T, S>.at(i: I): Lens<T, A> = this.compose(this@At.at(i))
+  fun <T> Lens<T, S>.at(i: I): Lens<T, A> =
+    this@at.compose(this@At.at(i))
 
   /**
    *  DSL to compose [At] with an [Iso] for a structure [S] to focus in on [A] at given index [I].
@@ -46,7 +46,8 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Lens] with a focus in [A] at given index [I].
    */
-  fun <T> Iso<T, S>.at(i: I): Lens<T, A> = this.compose(this@At.at(i))
+  fun <T> Iso<T, S>.at(i: I): Lens<T, A> =
+    this.compose(this@At.at(i))
 
   /**
    *  DSL to compose [At] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
@@ -118,12 +119,13 @@ fun interface At<S, I, A> {
     fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
       At { i ->
         PLens(
-          get = { it.getOption(i) },
+          get = { Option.fromNullable(it[i]) },
           set = { map, optV ->
-            optV.fold(
-              { map - i },
-              { map + (i to it) }
-            )
+            optV.fold({
+              (map - i)
+            }, {
+              (map + (i to it))
+            })
           }
         )
       }

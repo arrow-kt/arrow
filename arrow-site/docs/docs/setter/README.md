@@ -9,13 +9,14 @@ permalink: /optics/setter/
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
-It is a generalization of [`Functor#map`]({{'/arrow/typeclasses/functor' | relative_url }}). Given a `Functor<F>`, we can apply a function `(A) -> B` to `Kind<F, A>` and get `Kind<F, B>`. We can think of `Kind<F, A>` as a structure `S` that has a focus `A`.
-So, given a `PSetter<S, T, A, B>`, we can apply a function `(A) -> B` to `S` and get `T`.
+It is a generalization of `map`.
+A structure `S` that has a focus `A` to which we can apply a function `(A) -> B` to `S` and get `T`.
+For example, `S == List<Int>` to which we apply `(Int) -> String` and we get `T == List<String>`.
 
-- `Functor.map(fa: Kind<F, A>, f: (A) -> B) -> Kind<F, B>`
-- `PSetter.modify(s: S, f: (A) -> B): T`
+- `List<Int>.map(f: (Int) -> String): List<String>`
+- `PSetter#modify(s: List<Int>, f: (Int) -> String): List<String>`
 
-You can get a `Setter` for any existing `Functor`.
+You can get a `Setter` for any existing `map`.
 
 To create your own `Setter`, you need to define how to apply `(A) -> B` to `S`.
 
@@ -34,8 +35,8 @@ Unlike a regular `set` function, a `Setter` composes. Similar to a [`Lens`]({{'/
 ### Polymorphic setter
 
 When dealing with polymorphic types, we can also have polymorphic setters that allow us to morph the type of the focus.
-Previously, when we used a `Setter<ListKOf<Int>, Int>`, it was able to morph the `Int` values in the constructed type `ListK<Int>`.
-With a `PSetter<ListKOf<Int>, ListKOf<String>, Int, String>`, we can morph an `Int` value to a `String` value and thus also morph the type from `ListK<Int>` to `ListK<String>`.
+Previously, when we used a `Setter<List<Int>, Int>`, it was able to morph the `Int` values in the constructed type `List<Int>`.
+With a `PSetter<List<Int>, List<String>, Int, String>`, we can morph an `Int` value to a `String` value and thus also morph the type from `List<Int>` to `List<String>`.
 
 ### Laws
 

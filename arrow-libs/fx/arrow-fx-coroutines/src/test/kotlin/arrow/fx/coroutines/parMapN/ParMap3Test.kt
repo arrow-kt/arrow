@@ -4,15 +4,11 @@ import arrow.core.Either
 import arrow.fx.coroutines.ArrowFxSpec
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.NamedThreadFactory
-import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
-import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
-import arrow.fx.coroutines.parMapN
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.single
 import arrow.fx.coroutines.singleThreadName
@@ -26,6 +22,9 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -93,16 +92,16 @@ class ParMap3Test : ArrowFxSpec(
     "parMapN 3 runs in parallel" {
       checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
         val r = Atomic("")
-        val modifyGate1 = Promise<Unit>()
-        val modifyGate2 = Promise<Unit>()
+        val modifyGate1 = CompletableDeferred<Unit>()
+        val modifyGate2 = CompletableDeferred<Unit>()
 
         parZip(
           {
-            modifyGate2.get()
+            modifyGate2.await()
             r.update { i -> "$i$a" }
           },
           {
-            modifyGate1.get()
+            modifyGate1.await()
             r.update { i -> "$i$b" }
             modifyGate2.complete(Unit)
           },
@@ -128,29 +127,31 @@ class ParMap3Test : ArrowFxSpec(
 
     "Cancelling parMapN 3 cancels all participants" {
       checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
-        val s = Semaphore(0L)
-        val pa = Promise<Pair<Int, ExitCase>>()
-        val pb = Promise<Pair<Int, ExitCase>>()
-        val pc = Promise<Pair<Int, ExitCase>>()
+        val s = Channel<Unit>()
+        val pa = CompletableDeferred<Pair<Int, ExitCase>>()
+        val pb = CompletableDeferred<Pair<Int, ExitCase>>()
+        val pc = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
-        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.release(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
 
-        val f = ForkAndForget { parZip(loserA, loserB, loserC) { _a, _b, _c -> Triple(_a, _b, _c) } }
+        val f = async { parZip(loserA, loserB, loserC) { _a, _b, _c -> Triple(_a, _b, _c) } }
 
-        s.acquireN(3) // Suspend until all racers started
+        s.send(Unit) // Suspend until all racers started
+        s.send(Unit)
+        s.send(Unit)
         f.cancel()
 
-        pa.get().let { (res, exit) ->
+        pa.await().let { (res, exit) ->
           res shouldBe a
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
-        pb.get().let { (res, exit) ->
+        pb.await().let { (res, exit) ->
           res shouldBe b
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
-        pc.get().let { (res, exit) ->
+        pc.await().let { (res, exit) ->
           res shouldBe c
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
@@ -164,13 +165,13 @@ class ParMap3Test : ArrowFxSpec(
         Arb.int(),
         Arb.int()
       ) { e, winningTask, a, b ->
-        val s = Semaphore(0L)
-        val pa = Promise<Pair<Int, ExitCase>>()
-        val pb = Promise<Pair<Int, ExitCase>>()
+        val s = Channel<Unit>()
+        val pa = CompletableDeferred<Pair<Int, ExitCase>>()
+        val pb = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val winner: suspend CoroutineScope.() -> Int = { s.acquireN(2); throw e }
-        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val winner: suspend CoroutineScope.() -> Int = { s.send(Unit); s.send(Unit); throw e }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
 
         val r = Either.catch {
           when (winningTask) {
@@ -180,11 +181,11 @@ class ParMap3Test : ArrowFxSpec(
           }
         }
 
-        pa.get().let { (res, exit) ->
+        pa.await().let { (res, exit) ->
           res shouldBe a
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
-        pb.get().let { (res, exit) ->
+        pb.await().let { (res, exit) ->
           res shouldBe b
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }

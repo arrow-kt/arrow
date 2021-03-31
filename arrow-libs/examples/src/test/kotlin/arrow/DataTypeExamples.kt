@@ -5,18 +5,14 @@ import arrow.Problem.noReciprocal
 import arrow.Problem.somethingExploded
 import arrow.Problem.somethingWentWRong
 import arrow.core.Either
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Tuple3
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.applicativeError.handleError
-import arrow.core.extensions.either.functor.functor
-import arrow.core.extensions.fx
-import arrow.core.extensions.option.applicative.applicative
 import arrow.core.flatMap
 import arrow.core.getOrElse
+import arrow.core.handleError
 import arrow.core.handleErrorWith
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -26,7 +22,7 @@ class DataTypeExamples : FreeSpec() {
 
     init {
         /**
-         * Option http://arrow-kt.io/docs/apidocs/arrow-core-data/arrow.core/-option/
+         * Option http://arrow-kt.io/docs/apidocs/arrow-core/arrow.core/-option/
          ***/
         "Option: Some or None?" - {
             val someValue: Option<Int> = Some(42)
@@ -64,44 +60,19 @@ class DataTypeExamples : FreeSpec() {
                 someValue.fold({ 1 }, { it * 3 }) shouldBe 126
                 noneValue.fold({ 1 }, { it * 3 }) shouldBe 1
             }
-
-            "Applicative" {
-                // Computing over independent values
-                val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
-                tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
-            }
-
-            "Monad" {
-                // Computing over dependent values ignoring absence
-                val six = Option.fx {
-                    val a = !Option(1)
-                    val b = !Option(1 + a)
-                    val c = !Option(1 + b)
-                    a + b + c
-                }
-                six shouldBe Some(6)
-
-                val none = Option.fx {
-                    val a = !Option(1)
-                    val b = !noneValue
-                    val c = !Option(1 + b)
-                    a + b + c
-                }
-                none shouldBe None
-            }
         }
 
-        // Either http://arrow.io/docs/apidocs/arrow-core-data/arrow.core/-either/
+        // Either http://arrow.io/docs/apidocs/arrow-core/arrow.core/-either/
         "Either left or right" - {
             fun parse(s: String): ProblemOrInt = try {
-                Either.right(s.toInt())
+                Right(s.toInt())
             } catch (e: Throwable) {
-                Either.left(invalidInt)
+                Left(invalidInt)
             }
 
             fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
                 0 -> Left(noReciprocal)
-                else -> Either.Right(1.0 / i)
+                else -> Right(1.0 / i)
             }
 
             fun magic(s: String): Either<Problem, String> =
@@ -110,11 +81,11 @@ class DataTypeExamples : FreeSpec() {
             var either: ProblemOrInt
 
             "Right" {
-                either = Either.right(5)
-                either shouldBe Either.Right(5)
+                either = Right(5)
+                either shouldBe Right(5)
                 either.getOrElse { 0 } shouldBe 5
-                either.map { it + 1 } shouldBe Either.right(6)
-                either.flatMap { Either.right(6) } shouldBe Either.right(6)
+                either.map { it + 1 } shouldBe Right(6)
+                either.flatMap { Right(6) } shouldBe Right(6)
                 either.flatMap { Left(somethingWentWRong) } shouldBe Left(somethingWentWRong)
             }
 
@@ -129,13 +100,13 @@ class DataTypeExamples : FreeSpec() {
 
             "Either rather than exception" {
                 parse("Not an number") shouldBe Left(invalidInt)
-                parse("2") shouldBe Either.right(2)
+                parse("2") shouldBe Right(2)
             }
 
             "Combinators" {
                 magic("0") shouldBe Left(noReciprocal)
                 magic("Not a number") shouldBe Left(invalidInt)
-                magic("1") shouldBe Either.right("1.0")
+                magic("1") shouldBe Right("1.0")
             }
 
             "Fold" {
@@ -148,25 +119,6 @@ class DataTypeExamples : FreeSpec() {
 
                 val jackPot = Either.catch { playLottery(42) }
                 jackPot.fold({ error("not expected") }, { it * 100 }) shouldBe 100_000
-            }
-
-            "Functor" {
-                // Transforming the value, if the computation is a success:
-                val actual = Either.functor<Int>().run {
-                    (try {
-                        Either.right("3".toInt())
-                    } catch (e: Throwable) {
-                        Either.left(e)
-                    }).map { it + 1 }
-                }
-                actual shouldBe Either.Right(4)
-            }
-
-            "Applicative" {
-                // Computing over independent values:
-                val exception = IllegalArgumentException("")
-                val tryHarder = Either.applicative<Throwable>().tupledN(Either.Right(5), Either.Right(3), Either.Left(exception))
-                tryHarder shouldBe Left(exception)
             }
         }
 
@@ -191,14 +143,14 @@ class DataTypeExamples : FreeSpec() {
 
             "Recover" {
                 val gain = Either.catch { playLottery(99) }
-                gain.handleError { 0 } shouldBe Either.Right(0)
+                gain.handleError { 0 } shouldBe Right(0)
                 gain.handleErrorWith {
                     try {
-                        Either.Right(playLottery(42))
+                        Right(playLottery(42))
                     } catch (e: Throwable) {
                         Either.Left(e)
                     }
-                } shouldBe Either.Right(1000)
+                } shouldBe Right(1000)
             }
         }
     }

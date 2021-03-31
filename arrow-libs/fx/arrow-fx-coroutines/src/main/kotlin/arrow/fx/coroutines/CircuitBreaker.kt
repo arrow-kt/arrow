@@ -6,12 +6,8 @@ import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.Continuation
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import arrow.fx.coroutines.Duration as FxDuration
-import arrow.fx.coroutines.nanoseconds as oldNanoseconds
 
 class CircuitBreaker
 private constructor(
@@ -25,35 +21,6 @@ private constructor(
   private val onHalfOpen: suspend () -> Unit,
   private val onOpen: suspend () -> Unit
 ) {
-
-  @Deprecated(
-    "$DeprecateDuration and please use the #of constructor instead",
-    ReplaceWith(
-      "of(maxFailures, resetTimeout.nanoseconds.toDouble(), exponentialBackoffFactor, maxResetTimeout.nanoseconds.toDouble(), onRejected, onClosed, onHalfOpen, onOpen)",
-      "arrow.fx.coroutines.CircuitBreaker"
-    )
-  )
-  constructor(
-    state: AtomicRefW<State>,
-    maxFailures: Int,
-    resetTimeout: FxDuration,
-    exponentialBackoffFactor: Double,
-    maxResetTimeout: FxDuration,
-    onRejected: suspend () -> Unit,
-    onClosed: suspend () -> Unit,
-    onHalfOpen: suspend () -> Unit,
-    onOpen: suspend () -> Unit
-  ) : this(
-    state,
-    maxFailures,
-    resetTimeout.nanoseconds.toDouble(),
-    exponentialBackoffFactor,
-    maxResetTimeout.nanoseconds.toDouble(),
-    onRejected,
-    onClosed,
-    onHalfOpen,
-    onOpen
-  )
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
@@ -73,14 +40,6 @@ private constructor(
       is Open -> curr.awaitClose.await()
       is State.HalfOpen -> curr.awaitClose.await()
     }
-
-  /**
-   * Returns a new task that upon execution will execute the given
-   * task, but with the protection of this circuit breaker.
-   */
-  @Deprecated("#protect is being renamed to protectOrThrow", ReplaceWith("protectOrThrow(fa)"))
-  suspend fun <A> protect(fa: suspend () -> A): A =
-    protectOrThrow(fa)
 
   /**
    * Returns a new task that upon execution will execute the given
@@ -146,11 +105,11 @@ private constructor(
       is Closed -> {
         when (result) {
           is Either.Right -> {
-            if (curr.failures == 0) result.b
+            if (curr.failures == 0) result.value
             else { // In case of success, must reset the failures counter!
               val update = Closed(0)
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
-              else result.b
+              else result.value
             }
           }
           is Either.Left -> {
@@ -160,7 +119,7 @@ private constructor(
               // It's fine, just increment the failures count
               val update = Closed(curr.failures + 1)
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
-              else throw result.a
+              else throw result.value
             } else {
               // N.B. this could be canceled, however we don't care
               val now = System.currentTimeMillis()
@@ -170,7 +129,7 @@ private constructor(
               if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry
               else {
                 onOpen.invoke()
-                throw result.a
+                throw result.value
               }
             }
           }
@@ -388,26 +347,13 @@ private constructor(
        */
       constructor(startedAt: Long, resetTimeoutNanos: Double) : this(startedAt, resetTimeoutNanos, CompletableDeferred())
 
-      @Deprecated(
-        DeprecateDuration,
-        ReplaceWith(
-          "CircuitBreaker.State.Open(startedAt, resetTimeout.nanoseconds.toDouble())",
-          "arrow.fx.coroutines.CircuitBreaker"
-        )
-      )
-      constructor(startedAt: Long, resetTimeout: FxDuration, awaitClose: Promise<Unit>) :
-        this(startedAt, resetTimeout.nanoseconds.toDouble(), awaitClose.asCompletableDeferred())
-
-      @Deprecated(DeprecateDuration)
-      val resetTimeout: FxDuration = resetTimeoutNanos.toLong().oldNanoseconds
-
       /** The timestamp in milliseconds since the epoch, specifying
        * when the `Open` state is to transition to [HalfOpen].
        *
        * It is calculated as:
        * `startedAt + resetTimeout`
        */
-      val expiresAt: Long = startedAt + resetTimeout.millis
+      val expiresAt: Long = startedAt + (resetTimeoutNanos.toLong() / 1_000_000)
 
       override fun equals(other: Any?): Boolean =
         if (other is Open) this.startedAt == startedAt &&
@@ -416,7 +362,7 @@ private constructor(
         else false
 
       override fun toString(): String =
-        "CircuitBreaker.State.Open(startedAt=$startedAt, resetTimeout=$resetTimeout, expiresAt=$expiresAt)"
+        "CircuitBreaker.State.Open(startedAt=$startedAt, resetTimeoutNanos=$resetTimeoutNanos, expiresAt=$expiresAt)"
 
       override fun hashCode(): Int {
         var result = startedAt.hashCode()
@@ -451,20 +397,6 @@ private constructor(
        *        `Open`, in case the reset attempt fails.
        */
       constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos, CompletableDeferred())
-
-      @Deprecated(
-        DeprecateDuration,
-        ReplaceWith(
-          "CircuitBreaker.State.HalfOpen(resetTimeout.nanoseconds.toDouble())",
-          "arrow.fx.coroutines.CircuitBreaker"
-        )
-      )
-      constructor(resetTimeout: FxDuration, awaitClose: Promise<Unit>) :
-        this(resetTimeout.nanoseconds.toDouble(), awaitClose.asCompletableDeferred())
-
-      @Deprecated(DeprecateDuration)
-      val resetTimeout: FxDuration =
-        resetTimeoutNanos.toLong().oldNanoseconds
 
       override fun hashCode(): Int =
         resetTimeoutNanos.hashCode()
@@ -584,42 +516,5 @@ private constructor(
         onHalfOpen,
         onOpen
       )
-
-    @Deprecated(
-      DeprecateDuration,
-      ReplaceWith("of(maxFailures, resetTimeout.nanoseconds.toDouble(), exponentialBackoffFactor, maxResetTimeout.nanoseconds.toDouble(), onRejected, onClosed, onHalfOpen, onOpen)")
-    )
-    suspend fun of(
-      maxFailures: Int,
-      resetTimeout: FxDuration,
-      exponentialBackoffFactor: Double = 1.0,
-      maxResetTimeout: FxDuration = FxDuration.INFINITE,
-      onRejected: suspend () -> Unit = suspend { Unit },
-      onClosed: suspend () -> Unit = suspend { Unit },
-      onHalfOpen: suspend () -> Unit = suspend { Unit },
-      onOpen: suspend () -> Unit = suspend { Unit }
-    ): CircuitBreaker? =
-      of(
-        maxFailures,
-        resetTimeout.nanoseconds.toDouble(),
-        exponentialBackoffFactor,
-        maxResetTimeout.nanoseconds.toDouble(),
-        onRejected,
-        onClosed,
-        onHalfOpen,
-        onOpen
-      )
-  }
-}
-
-// Temporary fix until  `Promise` is removed
-private fun <A> Promise<A>.asCompletableDeferred(): CompletableDeferred<A> {
-  val default = CompletableDeferred<A>()
-  return object : CompletableDeferred<A> by default {
-    override fun complete(value: A): Boolean {
-      suspend { this@asCompletableDeferred.complete(value) }
-        .startCoroutineUnintercepted(Continuation(Dispatchers.Default) { })
-      return default.complete(value)
-    }
   }
 }

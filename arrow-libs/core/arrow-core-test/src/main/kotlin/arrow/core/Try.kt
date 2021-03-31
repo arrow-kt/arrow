@@ -1,14 +1,11 @@
 package arrow.core
 
-import arrow.higherkind
-
 typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 
 /**
  * TODO Used only for tests runtime until Kotlintest is upgraded to Kotest
  */
-@higherkind
 sealed class Try<out A> : TryOf<A> {
 
   companion object {
@@ -22,8 +19,8 @@ sealed class Try<out A> : TryOf<A> {
         is Success -> {
           val b: Either<A, B> = ev.value
           when (b) {
-            is Either.Left -> tailRecM(b.a, f)
-            is Either.Right -> Success(b.b)
+            is Either.Left -> tailRecM(b.value, f)
+            is Either.Right -> Success(b.value)
           }
         }
       }
@@ -93,7 +90,7 @@ sealed class Try<out A> : TryOf<A> {
 
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
-  fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
+  fun toEither(): Either<Throwable, A> = fold({ Either.Left(it) }, { Either.Right(it) })
 
   fun <B> toEither(onLeft: (Throwable) -> B): Either<B, A> = this.toEither().fold({ onLeft(it).left() }, { it.right() })
 

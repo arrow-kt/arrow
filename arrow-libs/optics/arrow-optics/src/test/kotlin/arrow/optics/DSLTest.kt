@@ -1,12 +1,8 @@
 package arrow.optics
 
 import arrow.core.None
-import arrow.core.MapK
-import arrow.core.k
-import arrow.optics.dsl.at
-import arrow.optics.extensions.mapk.at.at
-import arrow.optics.extensions.traversal
 import arrow.core.test.UnitSpec
+import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Index
 import io.kotlintest.shouldBe
 
@@ -42,7 +38,7 @@ object Three : Keys()
 object Four : Keys()
 
 @optics
-data class Db(val content: MapK<Keys, String>) {
+data class Db(val content: Map<Keys, String>) {
   companion object
 }
 
@@ -59,7 +55,7 @@ class BoundedTest : UnitSpec() {
       Company("Kategory", Address("Functional city", Street(42, "lambda street")))
     )
 
-    val employees = CompanyEmployees(listOf(john, jane).k())
+    val employees = CompanyEmployees(listOf(john, jane))
 
     val db = Db(
       mapOf(
@@ -67,19 +63,17 @@ class BoundedTest : UnitSpec() {
         Two to "two",
         Three to "three",
         Four to "four"
-      ).k()
+      )
     )
 
     "@optics generate DSL properly" {
       Employee.company.address.street.name.modify(
         john,
         String::toUpperCase
-      ) shouldBe (
-        Employee.company compose
-          Company.address compose
-          Address.street compose
-          Street.name
-        ).modify(john, String::toUpperCase)
+      ) shouldBe (Employee.company compose
+        Company.address compose
+        Address.street compose
+        Street.name).modify(john, String::toUpperCase)
     }
 
     "Index enables special Index syntax" {
@@ -88,26 +82,24 @@ class BoundedTest : UnitSpec() {
           employees,
           String::toUpperCase
         )
-      } shouldBe (
-        CompanyEmployees.employees compose
-          Index.list<Employee>().index(1) compose
-          Employee.company compose
-          Company.address compose
-          Address.street compose
-          Street.name
-        ).modify(employees, String::toUpperCase)
+      } shouldBe (CompanyEmployees.employees compose
+        Index.list<Employee>().index(1) compose
+        Employee.company compose
+        Company.address compose
+        Address.street compose
+        Street.name).modify(employees, String::toUpperCase)
     }
 
     "Working with At in Optics should be same as in DSL" {
-      MapK.at<Keys, String>().run {
-        Db.content.at(MapK.at(), One).set(db, None)
-      } shouldBe (Db.content compose MapK.at<Keys, String>().at(One)).set(db, None)
+      At.map<Keys, String>().run {
+        Db.content.at(One).set(db, None)
+      } shouldBe (Db.content compose At.map<Keys, String>().at(One)).set(db, None)
     }
 
-    "Working with Traversal in Optics should be same as in DSL" {
-      MapK.traversal<Keys, String>().run {
+    "Working with Every in Optics should be same as in DSL" {
+      Every.map<Keys, String>().run {
         Db.content.every.modify(db, String::toUpperCase)
-      } shouldBe (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
+      } shouldBe (Db.content compose Every.map()).modify(db, String::toUpperCase)
     }
   }
 }

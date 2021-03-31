@@ -1,7 +1,5 @@
 package arrow.benchmarks
 
-import arrow.fx.IO
-import arrow.fx.IODispatchers
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -21,15 +19,6 @@ open class Async {
 
   @Param("3000")
   var size: Int = 0
-
-  private fun ioAsyncLoop(i: Int): IO<Int> =
-    IO.unit.continueOn(IODispatchers.CommonPool).followedBy(
-      if (i > size) IO.just(i) else ioAsyncLoop(i + 1)
-    )
-
-  @Benchmark
-  fun io(): Int =
-    ioAsyncLoop(0).unsafeRunSync()
 
   @Benchmark
   fun catsIO(): Int =

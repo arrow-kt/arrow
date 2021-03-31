@@ -73,7 +73,6 @@ apply plugin: 'kotlin-kapt'
 def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -86,7 +85,6 @@ apply plugin: 'kotlin-kapt'
 def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -99,7 +97,6 @@ apply plugin: 'kotlin-kapt'
 def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -113,7 +110,6 @@ def arrow_version = "0.12.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -171,7 +167,6 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
     implementation "io.arrow-kt:arrow-core"
     implementation "io.arrow-kt:arrow-fx"
-    implementation "io.arrow-kt:arrow-syntax"
     ...
 ```
 
@@ -193,11 +188,6 @@ Add the dependencies that you want to use:
 <dependency>
     <groupId>io.arrow-kt</groupId>
     <artifactId>arrow-core</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-syntax</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 ```

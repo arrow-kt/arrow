@@ -1,14 +1,13 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.Dispatchers
-import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -26,22 +25,22 @@ class ParTraverseTest : ArrowFxSpec(
     }
 
     "parTraverse runs in parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit)
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit)
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get()
+          promiseC.await()
         }
       ).parSequence()
     }
@@ -80,17 +79,6 @@ class ParTraverseTest : ArrowFxSpec(
       }
     }
 
-    "parTraverseN throws validation error as semaphore limit is greater than Int max value" {
-      val ref = Atomic(0)
-      shouldThrowExactly<ArithmeticException> {
-        (0 until 100).parTraverseN(Long.MAX_VALUE) {
-          ref.update { it + 1 }
-        }
-
-        ref.get() shouldBe 100
-      }
-    }
-
     "parTraverseN can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverseN(5) {
@@ -110,44 +98,44 @@ class ParTraverseTest : ArrowFxSpec(
     }
 
     "parTraverseN(3) runs in (3) parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit)
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit)
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get()
+          promiseC.await()
         }
       ).parSequenceN(3)
     }
 
     "parTraverseN(1) times out running 3 tasks" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       withTimeoutOrNull(10.milliseconds) {
         listOf(
           suspend {
-            promiseA.get()
+            promiseA.await()
             promiseC.complete(Unit)
           },
           suspend {
-            promiseB.get()
+            promiseB.await()
             promiseA.complete(Unit)
           },
           suspend {
             promiseB.complete(Unit)
-            promiseC.get()
+            promiseC.await()
           }
         ).parSequenceN(1)
       } shouldBe null
@@ -177,17 +165,6 @@ class ParTraverseTest : ArrowFxSpec(
       val count = 20_000
       val l = (0 until count).parTraverseN(20) { it }
       l shouldBe (0 until count).toList()
-    }
-
-    "parSequenceN throws validation error as semaphore limit is greater than Int max value" {
-      val ref = Atomic(0)
-      shouldThrowExactly<ArithmeticException> {
-        (0 until 100)
-          .map { suspend { ref.update { it + 1 } } }
-          .parSequenceN(Long.MAX_VALUE)
-
-        ref.get() shouldBe 100
-      }
     }
 
     "parSequenceN can traverse effect full computations" {

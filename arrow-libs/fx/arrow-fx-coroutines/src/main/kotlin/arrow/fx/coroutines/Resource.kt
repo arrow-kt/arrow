@@ -151,17 +151,8 @@ sealed class Resource<out A> {
   fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
     Bind(this, f)
 
-  @Deprecated(
-    "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
-    ReplaceWith("zip(other, combine)")
-  )
-  fun <B, C> map2(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
-    flatMap { r ->
-      other.map { r2 -> combine(r, r2) }
-    }
-
   fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
-    flatMap { r ->
+   flatMap { r ->
       other.map { r2 -> combine(r, r2) }
     }
 
@@ -401,12 +392,13 @@ sealed class Resource<out A> {
      *
      * ```kotlin:ank:playground
      * import arrow.fx.coroutines.*
+     * import kotlinx.coroutines.withContext
      *
      * val singleCtx = Resource.singleThreadContext("single")
      *
      * suspend fun main(): Unit =
      *   singleCtx.use { ctx ->
-     *     evalOn(ctx) {
+     *     withContext(ctx) {
      *       println("I am running on ${Thread.currentThread().name}")
      *     }
      *   }
@@ -433,9 +425,9 @@ sealed class Resource<out A> {
           when (res) {
             is Either.Left -> {
               r.release(res, ExitCase.Completed)
-              tailRecM(res.a, f)
+              tailRecM(res.value, f)
             }
-            is Either.Right -> Allocate({ res.b }, { _, ec -> r.release(res, ec) })
+            is Either.Right -> Allocate({ res.value }, { _, ec -> r.release(res, ec) })
           }
         }
         is Defer -> Defer { loop(r.resource.invoke()) }

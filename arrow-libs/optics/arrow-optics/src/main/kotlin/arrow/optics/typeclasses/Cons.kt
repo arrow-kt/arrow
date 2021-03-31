@@ -1,15 +1,12 @@
 package arrow.optics.typeclasses
 
-import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.Iso
 import arrow.optics.Optional
+import arrow.optics.PLens
 import arrow.optics.PPrism
 import arrow.optics.Prism
-import arrow.optics.first
-import arrow.optics.second
 
 /**
  * [Cons] provides a [Prism] between [S] and its first element [A] and tail [S].
@@ -23,19 +20,19 @@ fun interface Cons<S, A> {
   /**
    * Provides a [Prism] between [S] and its first element [A] and tail [S].
    */
-  fun cons(): Prism<S, Tuple2<A, S>>
+  fun cons(): Prism<S, Pair<A, S>>
 
   /**
    * Provides an [Optional] between [S] and its first element [A].
    */
   fun firstOption(): Optional<S, A> =
-    cons() compose Tuple2.first()
+    cons() compose PLens.pairFirst()
 
   /**
    * Provides an [Optional] between [S] and its tail [S].
    */
   fun tailOption(): Optional<S, S> =
-    cons() compose Tuple2.second()
+    cons() compose PLens.pairSecond()
 
   /**
    * Prepend an element [A] to the first element of [S].
@@ -43,15 +40,15 @@ fun interface Cons<S, A> {
    * @receiver [A] element to prepend or attach on left side of [tail].
    */
   infix fun A.cons(tail: S): S =
-    cons().reverseGet(Tuple2(this, tail))
+    cons().reverseGet(Pair(this, tail))
 
   /**
    * Deconstruct an [S] to its optional first element [A] and tail [S].
    *
    * @receiver [S] structure to uncons into its first element [A] and tail [S].
    */
-  fun S.uncons(): Option<Tuple2<A, S>> =
-    cons().getOption(this)
+  fun S.uncons(): Pair<A, S>? =
+    cons().getOrNull(this)
 
   companion object {
 
@@ -61,7 +58,7 @@ fun interface Cons<S, A> {
     fun <S, A, B> fromIso(C: Cons<A, B>, iso: Iso<S, A>): Cons<S, B> =
       Cons { iso compose C.cons() compose iso.reverse().second() }
 
-    operator fun <S, A> invoke(prism: Prism<S, Tuple2<A, S>>): Cons<S, A> =
+    operator fun <S, A> invoke(prism: Prism<S, Pair<A, S>>): Cons<S, A> =
       Cons { prism }
 
     /**
@@ -71,7 +68,7 @@ fun interface Cons<S, A> {
     fun <A> list(): Cons<List<A>, A> =
       Cons {
         PPrism(
-          getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1)) }?.right() ?: list.left() },
+          getOrModify = { list -> list.firstOrNull()?.let { Pair(it, list.drop(1)) }?.right() ?: list.left() },
           reverseGet = { (a, aas) -> listOf(a) + aas }
         )
       }
@@ -83,7 +80,7 @@ fun interface Cons<S, A> {
     fun string(): Cons<String, Char> =
       Cons {
         Prism(
-          getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
+          getOrModify = { if (it.isNotEmpty()) Pair(it.first(), it.drop(1)).right() else it.left() },
           reverseGet = { (h, t) -> h + t }
         )
       }

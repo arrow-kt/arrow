@@ -19,14 +19,9 @@ includeBuild('../arrow-libs/') {
     dependencySubstitution {
         substitute module('io.arrow-kt:arrow-ank-gradle') with project(':arrow-ank-gradle')
         substitute module('io.arrow-kt:arrow-ank') with project(':arrow-ank')
-        substitute module('io.arrow-kt:arrow-core-data') with project(':arrow-core-data')
-        substitute module('io.arrow-kt:arrow-syntax') with project(':arrow-syntax')
+        substitute module('io.arrow-kt:arrow-core') with project(':arrow-core')
         substitute module('io.arrow-kt:arrow-meta') with project(':arrow-meta')
-        substitute module('io.arrow-kt:arrow-fx') with project(':arrow-fx')
         substitute module('io.arrow-kt:arrow-fx-stm') with project(':arrow-fx-stm')
-        substitute module('io.arrow-kt:arrow-fx-rx2') with project(':arrow-fx-rx2')
-        substitute module('io.arrow-kt:arrow-fx-kotlinx-coroutines') with project(':arrow-fx-kotlinx-coroutines')
-        substitute module('io.arrow-kt:arrow-fx-reactor') with project(':arrow-fx-reactor')
         substitute module('io.arrow-kt:arrow-fx-coroutines') with project(':arrow-fx-coroutines')
         substitute module('io.arrow-kt:arrow-optics') with project(':arrow-optics')
     }

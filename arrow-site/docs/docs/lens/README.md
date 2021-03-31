@@ -43,21 +43,6 @@ val lift: (Player) -> Player = playerLens.lift { it + 10 }
 lift(player)
 ```
 
-We can also `modify` and `lift` the focus of a `Lens` using a `Functor`.
-
-```kotlin:ank
-import arrow.*
-import arrow.core.*
-import arrow.core.extensions.option.functor.*
-
-playerLens.modifyF(Option.functor(), player) { it.some() }.fix()
-```
-
-```kotlin:ank
-val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (it + 1).some() }
-liftF(player)
-```
-
 ### Composition
 
 By composing lenses, we can create a telescope that allows us to focus in on nested structures.
@@ -147,16 +132,15 @@ val balanceLens: Lens<Account, Int> = Account.balance
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
-When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `pFirstTuple2<A, B, R>()` in the `arrow.optics` package.
+When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `PLens.pPairFirst<A, B, R>()` in the `arrow.optics` package.
 
-```kotlin
-fun <A, B, R> tuple2(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
-        { it.a },
-        { ab, r -> r toT ab.b }
+```kotlin:ank
+fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
+        { it.first },
+        { ab, r -> r to ab.second }
 )
 
-pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")
-//Tuple2(a=Hello, , b=World)
+PLens.pairPFirst<Int, String, String>().set(5 to "World", "Hello, ")
 ```
 
 ### Laws

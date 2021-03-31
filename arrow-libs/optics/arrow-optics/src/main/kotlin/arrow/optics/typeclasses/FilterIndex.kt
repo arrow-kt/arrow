@@ -1,29 +1,24 @@
 package arrow.optics.typeclasses
 
-import arrow.Kind
 import arrow.core.NonEmptyList
 import arrow.core.Predicate
-import arrow.core.Tuple2
-import arrow.core.k
-import arrow.core.toT
+import arrow.optics.Every
 import arrow.optics.Iso
-import arrow.optics.Traversal
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.Monoid
 
 /**
- * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
+ * [FilterIndex] provides a [Every] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
- * @param S source of [Traversal]
- * @param I index that uniquely identifies every focus of the [Traversal]
+ * @param S source of [Every]
+ * @param I index that uniquely identifies every focus of the [Every]
  * @param A focus that is supposed to be unique for a given pair [S] and [I]
  */
 fun interface FilterIndex<S, I, A> {
 
   /**
-   * Filter the foci [A] of a [Traversal] with the predicate [p].
+   * Filter the foci [A] of a [Every] with the predicate [p].
    */
-  fun filter(p: Predicate<I>): Traversal<S, A>
+  fun filter(p: Predicate<I>): Every<S, A>
 
   companion object {
 
@@ -34,51 +29,33 @@ fun interface FilterIndex<S, I, A> {
       FilterIndex { p -> iso compose FI.filter(p) }
 
     /**
-     * Create an instance of [FilterIndex] from a [Traverse] and a function `Kind<S, A>) -> Kind<S, Tuple2<A, Int>>`
-     */
-    fun <S, A> fromTraverse(
-      zipWithIndex: (Kind<S, A>) -> Kind<S, Tuple2<A, Int>>,
-      traverse: Traverse<S>
-    ): FilterIndex<Kind<S, A>, Int, A> =
-      FilterIndex { p ->
-        object : Traversal<Kind<S, A>, A> {
-          override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
-            traverse.run {
-              FA.run {
-                zipWithIndex(s).traverse(this) { (a, j) ->
-                  if (p(j)) f(a) else just(a)
-                }
-              }
-            }
-        }
-      }
-
-    /**
      * [FilterIndex] instance definition for [List].
      */
     @JvmStatic
     fun <A> list(): FilterIndex<List<A>, Int, A> =
       FilterIndex { p ->
-        object : Traversal<List<A>, A> {
-          override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
-            s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
-              if (p(j)) f(a) else FA.just(a)
-            }
+        object : Every<List<A>, A> {
+          override fun <R> foldMap(M: Monoid<R>, s: List<A>, map: (A) -> R): R = M.run {
+            s.foldIndexed(empty()) { index, acc, a -> if (p(index)) acc.combine(map(a)) else acc }
+          }
+
+          override fun modify(s: List<A>, map: (focus: A) -> A): List<A> =
+            s.mapIndexed { index, a -> if (p(index)) map(a) else a }
         }
       }
 
     @JvmStatic
     fun <K, V> map(): FilterIndex<Map<K, V>, K, V> =
       FilterIndex { p ->
-        object : Traversal<Map<K, V>, V> {
-          override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> =
-            FA.run {
-              s.toList().k().traverse(FA) { (k, v) ->
-                (if (p(k)) f(v) else just(v)).map {
-                  k to it
-                }
-              }.map { it.toMap() }
+        object : Every<Map<K, V>, V> {
+          override fun <R> foldMap(M: Monoid<R>, source: Map<K, V>, map: (V) -> R): R = M.run {
+            source.entries.fold(empty()) { acc, (k, v) ->
+              if (p(k)) acc.combine(map(v)) else acc
             }
+          }
+
+          override fun modify(source: Map<K, V>, map: (focus: V) -> V): Map<K, V> =
+            source.mapValues { (k, v) -> if (p(k)) map(v) else v }
         }
       }
 
@@ -88,28 +65,30 @@ fun interface FilterIndex<S, I, A> {
     @JvmStatic
     fun <A> nonEmptyList(): FilterIndex<NonEmptyList<A>, Int, A> =
       FilterIndex { p ->
-        object : Traversal<NonEmptyList<A>, A> {
-          override fun <F> modifyF(
-            FA: Applicative<F>,
-            s: NonEmptyList<A>,
-            f: (A) -> Kind<F, A>
-          ): Kind<F, NonEmptyList<A>> =
-            s.all.mapIndexed { index, a -> a toT index }
-              .let(NonEmptyList.Companion::fromListUnsafe)
-              .traverse(FA) { (a, j) -> if (p(j)) f(a) else FA.just(a) }
+        object : Every<NonEmptyList<A>, A> {
+          override fun <R> foldMap(M: Monoid<R>, source: NonEmptyList<A>, map: (A) -> R): R = M.run {
+            source.foldIndexed(empty()) { index, acc, r ->
+              if (p(index)) acc.combine(map(r)) else acc
+            }
+          }
+
+          override fun modify(source: NonEmptyList<A>, map: (focus: A) -> A): NonEmptyList<A> =
+            NonEmptyList.fromListUnsafe(source.mapIndexed { index, a -> if (p(index)) map(a) else a })
         }
       }
 
     @JvmStatic
     fun <A> sequence(): FilterIndex<Sequence<A>, Int, A> =
       FilterIndex { p ->
-        object : Traversal<Sequence<A>, A> {
-          override fun <F> modifyF(FA: Applicative<F>, s: Sequence<A>, f: (A) -> Kind<F, A>): Kind<F, Sequence<A>> =
-            FA.run {
-              s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
-                if (p(j)) f(a) else just(a)
-              }
+        object : Every<Sequence<A>, A> {
+          override fun <R> foldMap(M: Monoid<R>, source: Sequence<A>, map: (A) -> R): R = M.run {
+            source.foldIndexed(empty()) { index, acc, a ->
+              if (p(index)) acc.combine(map(a)) else acc
             }
+          }
+
+          override fun modify(source: Sequence<A>, map: (focus: A) -> A): Sequence<A> =
+            source.mapIndexed { index, a -> if (p(index)) map(a) else a }
         }
       }
 
@@ -123,7 +102,7 @@ fun interface FilterIndex<S, I, A> {
     @JvmStatic
     fun string(): FilterIndex<String, Int, Char> =
       FilterIndex { p ->
-        Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
+        Iso.stringToList() compose list<Char>().filter(p)
       }
   }
 }

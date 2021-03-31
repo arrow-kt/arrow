@@ -82,8 +82,8 @@ Let's assume following domain, and compare two snippets one using `IO<Either<E, 
 
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 
 /* inline */ class Id(val id: Long)
 object PersistenceError
@@ -101,7 +101,7 @@ suspend fun User.process(): Either<PersistenceError, ProcessedUser> =
 
 ###### IO<Either<E, A>>
 
- ```kotlin:ank
+ ```kotlin
 import arrow.fx.*
 
 fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
@@ -127,8 +127,8 @@ import arrow.core.computations.either
 
 suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
   either {
-    val user = !fetchUser()
-    val processed = !user.process()
+    val user = fetchUser().bind()
+    val processed = user.process().bind()
     processed
   }
 ```
@@ -151,7 +151,7 @@ interface Persistence {
     suspend fun User.process(): Either<PersistenceError, ProcessedUser>
 
     suspend fun List<User>.process(): Either<PersistenceError, List<ProcessedUser>> =
-        either { map { !it.process() } }
+        either { map { it.process().bind() } }
 }
 ```
 
@@ -187,7 +187,7 @@ In contrast, when using `suspend`, the Kotlin compiler is aware of function comp
 
 Let's take our previous example from ergonomics:
  
-```kotlin:ank
+```kotlin
 import arrow.fx.IO
 
 fun number(): IO<Int> = IO.just(1)
