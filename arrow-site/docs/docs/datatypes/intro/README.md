@@ -45,7 +45,7 @@ so they are always required.
 
 - [`Eval`]({{ '/apidocs/arrow-core/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
-- `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
+- `TupleN` - a heterogeneous grouping of 4-9 values without creating a named class
 
 #### Data
 
@@ -82,4 +82,3 @@ For an overview on Arrow's Effect system see [Arrow Fx Coroutines](https://arrow
 - [`Sum`]({{ '/apidocs/arrow-ui-data/arrow.ui/-sum/' | relative_url }}) - a datatype that holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
 - [`Day`]({{ '/apidocs/arrow-ui-data/arrow.ui/-day/' | relative_url }}) - a datatype that holds two comonads which evolve independently.
-
