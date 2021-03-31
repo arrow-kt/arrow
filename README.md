@@ -68,12 +68,9 @@ Add the dependencies into the project's `build.gradle`:
 ##### Λrrow Core
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.12.0"
+def arrow_version = "0.13.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
@@ -82,7 +79,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.12.0"
+def arrow_version = "0.13.0"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
@@ -92,72 +89,12 @@ dependencies {
 ##### Λrrow Core + Λrrow Fx 
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.12.0"
+def arrow_version = "0.13.0"
 dependencies {
-    implementation "io.arrow-kt:arrow-fx:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
 ```
 
-##### Λrrow Core + Λrrow Optics + Λrrow Fx
-
-```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.12.0"
-dependencies {
-    implementation "io.arrow-kt:arrow-fx:$arrow_version"
-    implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-#### Additional Setup
-
-For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
-the setup below is also required:
-
-Add the dependencies into the project's `build.gradle`
-
-```groovy
-apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
-
-def arrow_version = "0.12.0"
-dependencies {
-    ...
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
-    ...
-}
-```
-
-`gradle/generated-kotlin-sources.gradle`
-```groovy
-apply plugin: 'idea'
-
-idea {
-    module {
-        sourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-```
 #### BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
@@ -166,7 +103,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
     implementation "io.arrow-kt:arrow-core"
-    implementation "io.arrow-kt:arrow-fx"
+    implementation "io.arrow-kt:arrow-fx-coroutines"
     ...
 ```
 
@@ -179,7 +116,7 @@ Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>0.12.0</arrow.version>
+    <arrow.version>0.13.0</arrow.version>
 </properties>
 ```
 
@@ -265,7 +202,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ## Next development version
 
-If you want to try the latest features, replace `0.12.0` with `0.13.0-SNAPSHOT` and add this repository:
+If you want to try the latest features, replace `0.13.0` with `1.0.0-SNAPSHOT` and add this repository:
 
 ```groovy
 allprojects {
