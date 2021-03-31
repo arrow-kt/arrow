@@ -1,6 +1,5 @@
 package arrow.benchmarks
 
-import arrow.fx.IO
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -20,17 +19,6 @@ open class AttemptNonRaised {
 
   @Param("10000")
   var size: Int = 0
-
-  private fun ioLoopHappy(size: Int, i: Int): IO<Int> =
-    if (i < size) {
-      IO { i + 1 }.attempt().flatMap {
-        it.fold(IO.Companion::raiseError) { n -> ioLoopHappy(size, n) }
-      }
-    } else IO.just(1)
-
-  @Benchmark
-  fun io(): Int =
-    ioLoopHappy(size, 0).unsafeRunSync()
 
   @Benchmark
   fun cats(): Any =

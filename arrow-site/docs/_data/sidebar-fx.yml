@@ -37,8 +37,5 @@ options:
       - title: Arrow Fx Coroutines
         url: /apidocs/arrow-fx-coroutines/
 
-      - title: Arrow Fx
-        url: /apidocs/arrow-fx/
-        
       - title: Arrow Fx STM
         url: /apidocs/arrow-fx-stm/

@@ -4,7 +4,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 sealed class SumType {
@@ -51,11 +50,7 @@ internal val userSetter: Setter<User, Token> = Setter { user, s ->
 }
 
 internal data class Token(val value: String) {
-  companion object {
-    fun eq() = object : Eq<Token> {
-      override fun Token.eqv(b: Token): Boolean = this == b
-    }
-  }
+  companion object
 }
 
 internal val genToken: Gen<Token> = Gen.string().map { Token(it) }

@@ -9,6 +9,8 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -23,17 +25,17 @@ class ResourceTest : ArrowFxSpec(
 
     "value resource is released with Complete" {
       checkAll(Arb.int()) { n ->
-        val p = Promise<ExitCase>()
+        val p = CompletableDeferred<ExitCase>()
         Resource({ n }, { _, ex -> p.complete(ex) })
           .use { Unit }
 
-        p.get() shouldBe ExitCase.Completed
+        p.await() shouldBe ExitCase.Completed
       }
     }
 
     "error resource finishes with error" {
       checkAll(Arb.throwable()) { e ->
-        val p = Promise<ExitCase>()
+        val p = CompletableDeferred<ExitCase>()
         val r = Resource<Int>({ throw e }, { _, ex -> p.complete(ex) })
 
         Either.catch {
@@ -44,20 +46,20 @@ class ResourceTest : ArrowFxSpec(
 
     "never use can be cancelled with ExitCase.Completed" {
       checkAll(Arb.int()) { n ->
-        val p = Promise<ExitCase>()
-        val start = Promise<Unit>()
+        val p = CompletableDeferred<ExitCase>()
+        val start = CompletableDeferred<Unit>()
         val r = Resource({ n }, { _, ex -> p.complete(ex) })
 
-        val f = ForkAndForget {
+        val f = async {
           r.use {
             start.complete(Unit)
             never<Int>()
           }
         }
 
-        start.get()
+        start.await()
         f.cancel()
-        p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
+        p.await().shouldBeInstanceOf<ExitCase.Cancelled>()
       }
     }
 

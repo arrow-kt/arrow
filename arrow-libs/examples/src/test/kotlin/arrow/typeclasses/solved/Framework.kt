@@ -2,100 +2,92 @@
 
 package arrow.typeclasses.solved
 
-import arrow.Kind
-import arrow.core.left
-import arrow.core.right
-import arrow.fx.IO
-import arrow.fx.typeclasses.Async
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
+import arrow.core.Either
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
 import arrow.typeclasses.NetworkModule
 import arrow.typeclasses.UserDao
 import arrow.typeclasses.UserDto
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 // Step 0 - extract interface
 
 interface NetworkOperations {
   val network: NetworkModule
 
-  fun Index.requestUser(): IO<UserDto> =
-      IO.effect { network.fetch(this, mapOf("1" to "2")) }
+  suspend fun Index.requestUser(): UserDto =
+    network.fetch(this, mapOf("1" to "2"))
 }
 
 interface DaoOperations {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): IO<UserDao> =
-      IO.effect { dao.query("SELECT * from Users where userId = $this") }
+  suspend fun Index.queryUser(): UserDao =
+    dao.query("SELECT * from Users where userId = $this")
 
-  fun Index.queryCompany(): IO<UserDao> =
-      IO.effect { dao.query("SELECT * from Companies where companyId = $this") }
+  suspend fun Index.queryCompany(): UserDao =
+    dao.query("SELECT * from Companies where companyId = $this")
 }
 
 // We should probably abstract the Mapper too
 
 // Step 1 - wrap
 
-interface NetworkOperationsUnsafe<F> : Applicative<F> {
+interface NetworkOperationsUnsafe {
   val network: NetworkModule
 
-  fun Index.requestUser(): Kind<F, UserDto> =
-    just(network.fetch(this, mapOf("1" to "2")))
+  fun Index.requestUser(): UserDto =
+    network.fetch(this, mapOf("1" to "2"))
 }
 
-interface DaoOperationsUnsafe<F> : Applicative<F> {
+interface DaoOperationsUnsafe {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): Kind<F, UserDao> =
-    just(dao.query("SELECT * from Users where userId = $this"))
+  fun Index.queryUser(): UserDao =
+    dao.query("SELECT * from Users where userId = $this")
 }
 
 // Okay, but those calls can throw exceptions 😱
 
-interface NetworkOperationsSync<F> : ApplicativeError<F, Throwable> {
+interface NetworkOperationsSync {
   val network: NetworkModule
 
-  fun Index.requestUser(): Kind<F, UserDto> =
-    try {
-      just(network.fetch(this, mapOf("1" to "2")))
-    } catch (t: Throwable) {
-      raiseError(t)
-    }
-  // catch { network.fetch(this, mapOf("1" to "2")) }
+  fun Index.requestUser(): Either<Throwable, UserDto> =
+    Either.catch { network.fetch(this, mapOf("1" to "2")) }
 }
 
-interface DaoOperationsSync<F> : ApplicativeError<F, Throwable> {
+interface DaoOperationsSync {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): Kind<F, UserDao> =
-    catch { dao.query("SELECT * from Users where userId = $this") }
+  fun Index.queryUser(): Either<Throwable, UserDao> =
+    Either.catch { dao.query("SELECT * from Users where userId = $this") }
 }
 
 // Let's see how these changes can also be applied to the Mapper
 
 // Step 2 - Make operations asynchronous
 
-interface NetworkOperationsAsync<F> : Async<F> {
+interface NetworkOperationsAsync {
   val network: NetworkModule
 
-  fun Index.requestUser(): Kind<F, UserDto> =
-    async { callback ->
+  suspend fun Index.requestUser(): UserDto =
+    suspendCoroutine { callback ->
       network.fetchAsync(this, mapOf("1" to "2"),
-        { err -> callback(err.left()) },
-        { value -> callback(value.right()) })
+        { err -> callback.resumeWithException(err) },
+        { value -> callback.resume(value) })
     }
 }
 
-interface DaoOperationsAsync<F> : Async<F> {
+interface DaoOperationsAsync {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): Kind<F, UserDao> =
-    async { callback ->
+  suspend fun Index.queryUser(): UserDao =
+    suspendCoroutine { callback ->
       dao.queryAsync("SELECT * from Users where userId = $this",
-        { err -> callback(err.left()) },
-        { value -> callback(value.right()) })
+        { err -> callback.resumeWithException(err) },
+        { value -> callback.resume(value) })
     }
 }
 

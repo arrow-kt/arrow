@@ -1,34 +1,9 @@
 package arrow.optics
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.identity
-import arrow.core.toT
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
-
-@Deprecated(KindDeprecation)
-class ForPLens private constructor() {
-  companion object
-}
-@Deprecated(KindDeprecation)
-typealias PLensOf<S, T, A, B> = arrow.Kind4<ForPLens, S, T, A, B>
-@Deprecated(KindDeprecation)
-typealias PLensPartialOf<S, T, A> = arrow.Kind3<ForPLens, S, T, A>
-@Deprecated(KindDeprecation)
-typealias PLensKindedJ<S, T, A, B> = arrow.HkJ4<ForPLens, S, T, A, B>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(KindDeprecation)
-inline fun <S, T, A, B> PLensOf<S, T, A, B>.fix(): PLens<S, T, A, B> =
-  this as PLens<S, T, A, B>
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
@@ -36,17 +11,12 @@ inline fun <S, T, A, B> PLensOf<S, T, A, B>.fix(): PLens<S, T, A, B> =
  */
 typealias Lens<S, A> = PLens<S, S, A, A>
 
-typealias ForLens = ForPLens
-typealias LensOf<S, A> = PLensOf<S, S, A, A>
-typealias LensPartialOf<S> = Kind<ForLens, S>
-typealias LensKindedJ<S, A> = PLensKindedJ<S, S, A, A>
-
 /**
  * A [Lens] (or Functional Reference) is an optic that can focus into a structure for
  * getting, setting or modifying the focus (target).
  *
  * A (polymorphic) [PLens] is useful when setting or modifying a value for a constructed type
- * i.e. PLens<Tuple2<Double, Int>, Tuple2<String, Int>, Double, String>
+ * i.e. PLens<Pair<Double, Int>, Pair<String, Int>, Double, String>
  *
  * A [PLens] can be seen as a pair of functions:
  * - `get: (S) -> A` meaning we can focus into an `S` and extract an `A`
@@ -57,14 +27,65 @@ typealias LensKindedJ<S, A> = PLensKindedJ<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
+interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
-  fun get(s: S): A
-  fun set(s: S, b: B): T
+  override fun get(source: S): A
+
+  override fun set(source: S, focus: B): T
+
+  override fun getOrModify(source: S): Either<T, A> =
+    Either.Right(get(source))
+
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+    map(get(source))
+
+  /**
+   * Join two [PLens] with the same focus in [A]
+   */
+  infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
+    { ss -> ss.fold(this::get, other::get) },
+    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
+  )
+
+  /**
+   * Pair two disjoint [PLens]
+   */
+  infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
+    PLens(
+      { (s, c) -> get(s) to other.get(c) },
+      { (s, s1), (b, b1) -> set(s, b) to other.set(s1, b1) }
+    )
+
+  /**
+   * Create a product of the [PLens] and a type [C]
+   */
+  override fun <C> first(): PLens<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> = PLens(
+    { (s, c) -> get(s) to c },
+    { (s, _), (b, c) -> set(s, b) to c }
+  )
+
+  /**
+   * Create a product of a type [C] and the [PLens]
+   */
+  override fun <C> second(): PLens<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> = PLens(
+    { (c, s) -> c to get(s) },
+    { (_, s), (c, b) -> c to set(s, b) }
+  )
+
+  /**
+   * Compose a [PLens] with another [PLens]
+   */
+  infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
+    { a -> other.get(get(a)) },
+    { s, c -> set(s, other.set(get(s), c)) }
+  )
+
+  operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
+    this compose other
 
   companion object {
 
-    fun <S> id() = PIso.id<S>().asLens()
+    fun <S> id() = PIso.id<S>()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
@@ -189,167 +210,4 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
     fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
       triplePThird()
   }
-
-  /**
-   * Modify the focus of a [PLens] using Functor function
-   */
-  fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
-    f(get(s)).map { b -> set(s, b) }
-  }
-
-  /**
-   * Lift a function [f]: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
-   */
-  fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = { s -> modifyF(FF, s, f) }
-
-  /**
-   * Join two [PLens] with the same focus in [A]
-   */
-  infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
-    { ss -> ss.fold(this::get, other::get) },
-    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
-  )
-
-  /**
-   * Pair two disjoint [PLens]
-   */
-  infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
-    PLens(
-      { (s, c) -> get(s) toT other.get(c) },
-      { (s, s1), (b, b1) -> set(s, b) toT other.set(s1, b1) }
-    )
-
-  /**
-   * Create a product of the [PLens] and a type [C]
-   */
-  fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
-    { (s, c) -> get(s) toT c },
-    { (s, _), (b, c) -> set(s, b) toT c }
-  )
-
-  /**
-   * Create a product of a type [C] and the [PLens]
-   */
-  fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
-    { (c, s) -> c toT get(s) },
-    { (_, s), (c, b) -> c toT set(s, b) }
-  )
-
-  /**
-   * Compose a [PLens] with another [PLens]
-   */
-  infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
-    { a -> l.get(get(a)) },
-    { s, c -> set(s, l.set(get(s), c)) }
-  )
-
-  /**
-   * Compose a [PLens] with a [POptional]
-   */
-  infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
-
-  /**
-   * Compose an [PLens] with a [PIso]
-   */
-  infix fun <C, D> compose(other: PIso<A, B, C, D>): PLens<S, T, C, D> = compose(other.asLens())
-
-  /**
-   * Compose an [PLens] with a [Getter]
-   */
-  infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
-
-  /**
-   * Compose an [PLens] with a [PSetter]
-   */
-  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
-
-  /**
-   * Compose an [PLens] with a [PPrism]
-   */
-  infix fun <C, D> compose(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
-
-  /**
-   * Compose an [PLens] with a [Fold]
-   */
-  infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
-
-  /**
-   * Compose an [PLens] with a [PTraversal]
-   */
-  infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
-
-  /**
-   * Plus operator overload to compose lenses
-   */
-  operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: PIso<A, B, C, D>): PLens<S, T, C, D> = compose(other)
-
-  operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
-
-  operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: PPrism<A, B, C, D>): POptional<S, T, C, D> = compose(other)
-
-  operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
-
-  operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
-
-  /**
-   * View [PLens] as a [Getter]
-   */
-  fun asGetter(): Getter<S, A> = Getter(this::get)
-
-  /**
-   * View a [PLens] as a [POptional]
-   */
-  fun asOptional(): POptional<S, T, A, B> = POptional(
-    { s -> Either.Right(get(s)) },
-    { s, b -> set(s, b) }
-  )
-
-  /**
-   * View a [PLens] as a [PSetter]
-   */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
-
-  /**
-   * View a [PLens] as a [Fold]
-   */
-  fun asFold(): Fold<S, A> = object : Fold<S, A> {
-    override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
-  }
-
-  /**
-   * View a [PLens] as a [PTraversal]
-   */
-  fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-    override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
-      f(get(s)).map { b -> this@PLens.set(s, b) }
-    }
-  }
-
-  /**
-   * Modify the focus of s [PLens] using s function `(A) -> B`
-   */
-  fun modify(s: S, f: (A) -> B): T = set(s, f(get(s)))
-
-  /**
-   * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
-   */
-  fun lift(f: (A) -> B): (S) -> T = { s -> modify(s, f) }
-
-  /**
-   * Find a focus that satisfies the predicate
-   */
-  fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { a ->
-    if (p(a)) Some(a) else None
-  }
-
-  /**
-   * Verify if the focus of a [PLens] satisfies the predicate
-   */
-  fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
 }

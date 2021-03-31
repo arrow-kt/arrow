@@ -30,6 +30,9 @@ options:
       - title: Traversal
         url: /optics/traversal/
 
+      - title: Every
+        url: /optics/every/
+
       - title: Cons
         url: /optics/cons/
 
@@ -44,9 +47,6 @@ options:
 
       - title: FilterIndex
         url: /optics/filterindex/
-
-      - title: Each
-        url: /optics/each/
 
   - title: Media
     url: https://media.arrow-kt.io/tags/optics/

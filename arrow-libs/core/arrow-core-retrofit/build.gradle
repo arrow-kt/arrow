@@ -11,7 +11,7 @@ apply from: "$ANIMALSNIFFER"
 
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compileOnly project(":arrow-core-data")
+    compileOnly project(":arrow-core")
     compileOnly "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

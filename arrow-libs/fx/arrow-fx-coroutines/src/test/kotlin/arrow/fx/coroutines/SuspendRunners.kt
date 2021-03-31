@@ -105,44 +105,6 @@ class SuspendRunners : ArrowFxSpec(
       }
     }
 
-    "should complete when running a pure value with startCoroutineCancellable" {
-      checkAll(Arb.int()) { i ->
-        val task = suspend { i }
-        task.startCoroutineCancellable(
-          CancellableContinuation(EmptyCoroutineContext) { res ->
-            res.getOrThrow() shouldBe i
-          }
-        )
-      }
-    }
-
-    "should return exceptions within main block with startCoroutineCancellable" {
-      checkAll(Arb.throwable()) { e ->
-        val task = suspend { throw e }
-        task.startCoroutineCancellable(
-          CancellableContinuation(EmptyCoroutineContext) { res ->
-            res.fold({ fail("Expected $e but found with $it") }, { it shouldBe e })
-          }
-        )
-      }
-    }
-
-    "should rethrow exceptions within run block with startCoroutineCancellable" {
-      checkAll(Arb.throwable()) { e ->
-        val task = suspend { throw e }
-        try {
-          task.startCoroutineCancellable(
-            CancellableContinuation(EmptyCoroutineContext) { res ->
-              res.fold({ fail("Expected $e but found with $it") }, { throw it })
-            }
-          )
-          fail("Should rethrow the exception")
-        } catch (t: Throwable) {
-          t shouldBe e
-        }
-      }
-    }
-
     "Effect-full stack-safe map" {
       val max = 10000
 

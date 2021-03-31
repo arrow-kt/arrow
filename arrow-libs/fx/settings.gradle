@@ -2,38 +2,27 @@
 
 rootProject.name = 'arrow-fx-libs'
 
-include 'arrow-fx'
 include 'arrow-fx-coroutines'
 include 'arrow-fx-coroutines-test'
-include 'arrow-fx-suspend-connection'
-include 'arrow-fx-coroutines-kotlinx-coroutines'
-include 'arrow-fx-reactor'
-include 'arrow-fx-rx2'
-include 'arrow-fx-kotlinx-coroutines'
 include 'arrow-benchmarks-fx:arrow-scala-benchmarks'
 include 'arrow-benchmarks-fx:arrow-kio-benchmarks'
 include 'arrow-benchmarks-fx'
-include 'arrow-fx-test'
 include 'arrow-fx-stm'
 
 // To allow the use of local projects from ../core:
 
 include 'arrow-core'
-include 'arrow-core-data'
 include 'arrow-core-test'
 include 'arrow-annotations'
 include 'arrow-continuations'
 include 'arrow-meta:arrow-meta-test-models'
 include 'arrow-meta'
-include 'arrow-syntax'
 include 'arrow-core-retrofit'
 
 project(":arrow-core").projectDir = file("../core/arrow-core")
-project(":arrow-core-data").projectDir = file("../core/arrow-core-data")
 project(":arrow-core-test").projectDir = file("../core/arrow-core-test")
 project(":arrow-annotations").projectDir = file("../core/arrow-annotations")
 project(":arrow-continuations").projectDir = file("../core/arrow-continuations")
 project(":arrow-meta:arrow-meta-test-models").projectDir = file("../core/arrow-meta/arrow-meta-test-models")
 project(":arrow-meta").projectDir = file("../core/arrow-meta")
-project(":arrow-syntax").projectDir = file("../core/arrow-syntax")
 project(":arrow-core-retrofit").projectDir = file("../core/arrow-core-retrofit")

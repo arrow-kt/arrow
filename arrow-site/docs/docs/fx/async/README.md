@@ -12,7 +12,7 @@ The resulting expressions enjoy the same syntax that most OOP and Java programme
 
 ## Parallelization & Concurrency
 
-Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence` and many more allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
+Arrow Fx comes with built-in versions of `parZip`, `parTraverse`, and `parSequence` and many more allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
 All parallel suspend operators in Arrow Fx behave in the following way.
 
  - When one of the parallel task fails, the others are also cancelled since a result cannot be determined. This will allow the other parallel operations to gracefully exit and close their resources before returning.
@@ -21,9 +21,9 @@ All parallel suspend operators in Arrow Fx behave in the following way.
 
 For more documentation on parallel operations see below.
 
-### `parMapN`/`parTupledN`
+### `parZip`
 
-`parMapN` allows *N#* effects to run in parallel on a given `CoroutineContext` suspending until all results completed, and then apply the user-provided transformation over the results.
+`parZip` allows *N#* effects to run in parallel on a given `CoroutineContext` suspending until all results completed, and then apply the user-provided transformation over the results.
 All input suspend functions are guaranteed to dispatch on the given CoroutineContext before they start running.
 It also wires their respective cancellation. That means that cancelling the resulting suspend fun will cancel both functions running in parallel inside.
 Additionally, the function does not return until both tasks are finished and their results combined by f: (A, B) -> C.
@@ -42,7 +42,7 @@ data class ThreadInfo(
 
 suspend fun main(): Unit {
   val (threadA: String, threadB: String) =
-    parMapN(::threadName, ::threadName, ::ThreadInfo)
+    parZip({ threadName() }, { threadName() }) { threadA, threadB -> ThreadInfo(threadA, threadB) }
 
   println(threadA)
   println(threadB)
@@ -108,14 +108,14 @@ The cancellation system is inherited from KotlinX Coroutines and works the same.
 See [KotlinX Coroutines documentation](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html)
 
 All operators found in Arrow Fx check for cancellation.
-In the small example of an infinite loop below `parMapN` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
+In the small example of an infinite loop below `parZip` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
 
 ```kotlin:ank
 import kotlinx.coroutines.Dispatchers
 
 tailrec suspend fun sleeper(): Unit {
   println("I am sleepy. I'm going to nap")
-  parMapN(Dispatchers.IO, { Thread.currentThread().name }, { Thread.currentThread().name }, ::Pair)  // <-- cancellation check-point
+  parZip(Dispatchers.IO, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b -> Pair(a, b) } // <-- cancellation check-point
   println("1 second nap.. Going to sleep some more")
   sleeper()
 }

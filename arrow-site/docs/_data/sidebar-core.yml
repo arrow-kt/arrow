@@ -1,6 +1,6 @@
 options:
   - title: Quick Start
-    url: /quickstart/
+    url: /core/
 
   - title: Tutorials
 
@@ -20,37 +20,34 @@ options:
     nested_options:
 
       - title: Either
-        url: /apidocs/arrow-core-data/arrow.core/-either/
+        url: /apidocs/arrow-core/arrow.core/-either/
 
       - title: Validated
-        url: /apidocs/arrow-core-data/arrow.core/-validated/
+        url: /apidocs/arrow-core/arrow.core/-validated/
 
       - title: Iterable
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-iterable/
+        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/
 
       - title: Option
-        url: /apidocs/arrow-core-data/arrow.core/-option/
+        url: /apidocs/arrow-core/arrow.core/-option/
 
       - title: List
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-list/
+        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-list/
 
       - title: NonEmptyList
         url: /arrow/core/nonemptylist/
 
       - title: Sequence
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.sequences.-sequence/
-
-      - title: Set
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-set/
+        url: /apidocs/arrow-core/arrow.core/kotlin.sequences.-sequence/
 
       - title: Map
-        url: /apidocs/arrow-core-data/arrow.core/kotlin.collections.-map/
+        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-map/
 
       - title: Ior
-        url: /apidocs/arrow-core-data/arrow.core/-ior/
+        url: /apidocs/arrow-core/arrow.core/-ior/
 
       - title: Eval
-        url: /apidocs/arrow-core-data/arrow.core/-eval/
+        url: /apidocs/arrow-core/arrow.core/-eval/
 
       - title: Semigroup
         url: /arrow/typeclasses/semigroup/
@@ -59,7 +56,7 @@ options:
         url: /arrow/typeclasses/monoid/
 
       - title: Semiring
-        url: /apidocs/arrow-core-data/arrow.typeclasses/-semiring/
+        url: /apidocs/arrow-core/arrow.typeclasses/-semiring/
 
   - title: Media
     url: https://media.arrow-kt.io/tags/core/

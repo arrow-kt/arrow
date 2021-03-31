@@ -15,19 +15,17 @@ If, for a structure `S`, the optionally focus `A` can be indexed by `I`, then `I
 We can use that `Optional` to safely operate on that focus `S` (i.e., operating on items in a `List` based on the index position).
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.optics.typeclasses.*
-import arrow.optics.extensions.listk.index.*
+import arrow.optics.typeclasses.Index
 
-val thirdListItemOptional = ListK.index<String>().index(3)
+val thirdListItemOptional = Index.list<String>().index(3)
 
-thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
+thirdListItemOptional.set(listOf("0", "1", "2", "3"), "newValue")
 ```
 ```kotlin:ank
-thirdListItemOptional.set(listOf("0", "1", "2").k(), "newValue")
+thirdListItemOptional.set(listOf("0", "1", "2"), "newValue")
 ```
 ```kotlin:ank
-thirdListItemOptional.setOption(listOf("0", "1", "2").k(), "newValue")
+thirdListItemOptional.setNullable(listOf("0", "1", "2"), "newValue")
 ```
 
 #### Creating your own `Index` instances

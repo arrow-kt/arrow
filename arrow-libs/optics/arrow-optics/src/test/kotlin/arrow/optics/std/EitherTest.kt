@@ -9,7 +9,6 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.validated
 import arrow.optics.Iso
 import arrow.optics.test.laws.IsoLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 
@@ -23,14 +22,14 @@ class EitherTest : UnitSpec() {
         when (this) {
           is Invalid -> {
             when (b) {
-              is Invalid -> Invalid((e + b.e))
+              is Invalid -> Invalid((value + b.value))
               is Valid -> b
             }
           }
           is Valid -> {
             when (b) {
               is Invalid -> b
-              is Valid -> arrow.core.Valid((a + b.a))
+              is Valid -> arrow.core.Valid((value + b.value))
             }
           }
         }
@@ -41,9 +40,6 @@ class EitherTest : UnitSpec() {
         aGen = Gen.either(Gen.string(), Gen.int()),
         bGen = Gen.validated(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
-        EQA = Eq.any(),
-        EQB = Eq.any(),
-        bMonoid = VAL_MONOID
       )
     )
   }

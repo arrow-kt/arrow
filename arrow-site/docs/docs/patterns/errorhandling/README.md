@@ -164,7 +164,7 @@ In the next example, we are going to use `Either` to deal with potentially throw
 
 ### Either
 
-When dealing with a known alternate path, we model return types as [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
+When dealing with a known alternate path, we model return types as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
 
@@ -193,8 +193,8 @@ Once we have an ADT defined to model our known errors, we can redefine our funct
 
 ```kotlin:ank
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Left
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 
 fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
 fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
@@ -206,6 +206,9 @@ Except for the types signatures, our program remains unchanged when we compute o
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
 ```kotlin:ank
+import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.computations.either
 
 suspend fun prepareEither(): Either<CookingException, Salad> =

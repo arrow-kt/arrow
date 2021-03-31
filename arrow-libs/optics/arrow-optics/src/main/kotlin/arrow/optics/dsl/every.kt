@@ -1,5 +1,6 @@
 package arrow.optics.dsl
 
+import arrow.optics.Every
 import arrow.optics.Fold
 import arrow.optics.Iso
 import arrow.optics.Lens
@@ -15,7 +16,7 @@ import arrow.optics.Traversal
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Traversal] with a focus in [A]
  */
-fun <T, S, A> Lens<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compose(TR)
+fun <T, S, A> Lens<T, S>.every(TR: Every<S, A>): Every<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with an [Iso] for a structure [S] to see all its foci [A]
@@ -24,7 +25,7 @@ fun <T, S, A> Lens<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.comp
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Traversal] with a focus in [A]
  */
-fun <T, S, A> Iso<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compose(TR)
+fun <T, S, A> Iso<T, S>.every(TR: Every<S, A>): Every<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
@@ -33,7 +34,7 @@ fun <T, S, A> Iso<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compo
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Traversal] with a focus in [A]
  */
-fun <T, S, A> Prism<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compose(TR)
+fun <T, S, A> Prism<T, S>.every(TR: Every<S, A>): Every<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with an [Optional] for a structure [S] to see all its foci [A]
@@ -42,7 +43,7 @@ fun <T, S, A> Prism<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.com
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Traversal] with a focus in [A]
  */
-fun <T, S, A> Optional<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compose(TR)
+fun <T, S, A> Optional<T, S>.every(TR: Every<S, A>): Every<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with a [Setter] for a structure [S] to see all its foci [A]
@@ -51,7 +52,7 @@ fun <T, S, A> Optional<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Setter] with a focus in [A]
  */
-fun <T, S, A> Setter<T, S>.every(TR: Traversal<S, A>): Setter<T, A> = this.compose(TR)
+fun <T, S, A> Setter<T, S>.every(TR: Every<S, A>): Setter<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with a [Traversal] for a structure [S] to see all its foci [A]
@@ -60,7 +61,7 @@ fun <T, S, A> Setter<T, S>.every(TR: Traversal<S, A>): Setter<T, A> = this.compo
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Traversal] with a focus in [A]
  */
-fun <T, S, A> Traversal<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this.compose(TR)
+fun <T, S, A> Traversal<T, S>.every(TR: Every<S, A>): Traversal<T, A> = this.compose(TR)
 
 /**
  * DSL to compose [Traversal] with a [Fold] for a structure [S] to see all its foci [A]
@@ -69,4 +70,4 @@ fun <T, S, A> Traversal<T, S>.every(TR: Traversal<S, A>): Traversal<T, A> = this
  * @param TR [Traversal] that can focus into a structure [S] to see all its foci [A]
  * @return [Fold] with a focus in [A]
  */
-fun <T, S, A> Fold<T, S>.every(TR: Traversal<S, A>): Fold<T, A> = this.compose(TR)
+fun <T, S, A> Fold<T, S>.every(TR: Every<S, A>): Fold<T, A> = this.compose(TR)

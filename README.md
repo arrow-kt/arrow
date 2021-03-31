@@ -22,7 +22,6 @@ Use the list below to learn more about Λrrow's main features.
 
 #### Curated external links
 
-- [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
 If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo. 
@@ -42,33 +41,24 @@ Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Setup
 
-### Next development version
-
-If you want to try the last features, replace `0.11.0` by `0.12.0-SNAPSHOT` in the following guideline.
-
 ### JDK
 
 Make sure to have the latest version of JDK 1.8 installed.
 
 ### Android
 
-Arrow supports Android out of the box starting on API 21 and up.
-
-We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
+Arrow supports Android starting on API 21 and up.
 
 ### Gradle
 
 #### Basic Setup
 
-In your project's root `build.gradle`, append these repositories to your list:
+In your project's root `build.gradle`, append this repository to your list:
 
 ```groovy
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" } // for SNAPSHOT builds
     }
 }
 ```
@@ -78,13 +68,9 @@ Add the dependencies into the project's `build.gradle`:
 ##### Λrrow Core
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.11.0"
+def arrow_version = "0.13.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
@@ -93,10 +79,9 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.11.0"
+def arrow_version = "0.13.0"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -104,74 +89,12 @@ dependencies {
 ##### Λrrow Core + Λrrow Fx 
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.11.0"
+def arrow_version = "0.13.0"
 dependencies {
-    implementation "io.arrow-kt:arrow-fx:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
 ```
 
-##### Λrrow Core + Λrrow Optics + Λrrow Fx
-
-```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "0.11.0"
-dependencies {
-    implementation "io.arrow-kt:arrow-fx:$arrow_version"
-    implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-#### Additional Setup
-
-For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
-the setup below is also required:
-
-Add the dependencies into the project's `build.gradle`
-
-```groovy
-apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
-
-def arrow_version = "0.11.0"
-dependencies {
-    ...
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
-    ...
-}
-```
-
-`gradle/generated-kotlin-sources.gradle`
-```groovy
-apply plugin: 'idea'
-
-idea {
-    module {
-        sourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-```
 #### BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
@@ -180,8 +103,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
     implementation "io.arrow-kt:arrow-core"
-    implementation "io.arrow-kt:arrow-fx"
-    implementation "io.arrow-kt:arrow-syntax"
+    implementation "io.arrow-kt:arrow-fx-coroutines"
     ...
 ```
 
@@ -194,7 +116,7 @@ Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>0.11.0</arrow.version>
+    <arrow.version>0.13.0</arrow.version>
 </properties>
 ```
 
@@ -205,16 +127,11 @@ Add the dependencies that you want to use:
     <artifactId>arrow-core</artifactId>
     <version>${arrow.version}</version>
 </dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-syntax</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
 ```
 
-#### Enabling kapt
+#### Enabling kapt for the Optics DSL
 
-Enable annotation processing using Kotlin plugin:
+For the Optics DSL, enable annotation processing using Kotlin plugin:
 ```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -281,6 +198,19 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
   <dependencies>
     ...
   </dependencies>
+```
+
+## Next development version
+
+If you want to try the latest features, replace `0.13.0` with `1.0.0-SNAPSHOT` and add this repository:
+
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    }
+}
 ```
 
 ## License

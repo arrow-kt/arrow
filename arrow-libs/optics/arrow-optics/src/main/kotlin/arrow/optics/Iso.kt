@@ -1,50 +1,23 @@
 package arrow.optics
 
-import arrow.Kind
-import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Right
+import arrow.core.Either.Right
 import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.Validated
 import arrow.core.Validated.Invalid
 import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
-import arrow.core.toT
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
-
-@Deprecated(KindDeprecation)
-class ForPIso private constructor() {
-  companion object
-}
-@Deprecated(KindDeprecation)
-typealias PIsoOf<S, T, A, B> = arrow.Kind4<ForPIso, S, T, A, B>
-@Deprecated(KindDeprecation)
-typealias PIsoPartialOf<S, T, A> = arrow.Kind3<ForPIso, S, T, A>
-@Deprecated(KindDeprecation)
-typealias PIsoKindedJ<S, T, A, B> = arrow.HkJ4<ForPIso, S, T, A, B>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated(KindDeprecation)
-inline fun <S, T, A, B> PIsoOf<S, T, A, B>.fix(): PIso<S, T, A, B> =
-  this as PIso<S, T, A, B>
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments
  * and restricts the [PIso] to monomorphic updates.
  */
 typealias Iso<S, A> = PIso<S, S, A, A>
-
-typealias ForIso = ForPIso
-typealias IsoOf<S, A> = PIsoOf<S, S, A, A>
-typealias IsoPartialOf<S> = Kind<ForIso, S>
-typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
 
 private val stringToList: Iso<String, List<Char>> =
   Iso(
@@ -66,17 +39,96 @@ private val stringToList: Iso<String, List<Char>> =
  * @param A the focus of a [PIso]
  * @param B the modified target of a [PIso]
  */
-interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
+interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   /**
    * Get the focus of a [PIso]
    */
-  fun get(s: S): A
+  override fun get(source: S): A
 
   /**
    * Get the modified focus of a [PIso]
    */
-  fun reverseGet(b: B): T
+  override fun reverseGet(focus: B): T
+
+  override fun getOrModify(source: S): Either<T, A> =
+    Either.Right(get(source))
+
+  override fun set(source: S, focus: B): T =
+    set(focus)
+
+  /**
+   * Modify polymorphically the focus of a [PIso] with a function
+   */
+  override fun modify(source: S, map: (focus: A) -> B): T =
+    reverseGet(map(get(source)))
+
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (A) -> R): R =
+    map(get(source))
+
+  /**
+   * Reverse a [PIso]: the source becomes the target and the target becomes the source
+   */
+  fun reverse(): PIso<B, A, T, S> =
+    PIso(this::reverseGet, this::get)
+
+  /**
+   * Set polymorphically the focus of a [PIso] with a value
+   */
+  fun set(b: B): T =
+    reverseGet(b)
+
+  /**
+   * Pair two disjoint [PIso]
+   */
+  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
+    PIso(
+      { (a, c) -> get(a) to other.get(c) },
+      { (b, d) -> reverseGet(b) to other.reverseGet(d) }
+    )
+
+  /**
+   * Create a pair of the [PIso] and a type [C]
+   */
+  override fun <C> first(): PIso<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> = Iso(
+    { (a, c) -> get(a) to c },
+    { (b, c) -> reverseGet(b) to c }
+  )
+
+  /**
+   * Create a pair of a type [C] and the [PIso]
+   */
+  override fun <C> second(): PIso<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> = PIso(
+    { (c, a) -> c to get(a) },
+    { (c, b) -> c to reverseGet(b) }
+  )
+
+  /**
+   * Create a sum of the [PIso] and a type [C]
+   */
+  override fun <C> left(): PIso<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PIso(
+    { it.bimap(this::get, ::identity) },
+    { it.bimap(this::reverseGet, ::identity) }
+  )
+
+  /**
+   * Create a sum of a type [C] and the [PIso]
+   */
+  override fun <C> right(): PIso<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PIso(
+    { it.bimap(::identity, this::get) },
+    { it.bimap(::identity, this::reverseGet) }
+  )
+
+  /**
+   * Compose a [PIso] with a [PIso]
+   */
+  infix fun <C, D> compose(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
+    other::get compose this::get,
+    this::reverseGet compose other::reverseGet
+  )
+
+  operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> =
+    this compose other
 
   companion object {
 
@@ -143,6 +195,20 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
       )
 
     /**
+     * [PIso] that defines the equality between the nullable platform type and [Option].
+     */
+    @JvmStatic
+    fun <A, B> nullableToPOption(): PIso<A?, B?, Option<A>, Option<B>> =
+      PIso(
+        get = Option.Companion::fromNullable,
+        reverseGet = { it.fold({ null }, ::identity) }
+      )
+
+    @JvmStatic
+    fun <A, B> nullableToOption(): PIso<A?, B?, Option<A>, Option<B>> =
+      nullableToPOption()
+
+    /**
      * [PIso] that defines the equality between [Option] and the nullable platform type.
      */
     @JvmStatic
@@ -199,216 +265,4 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
     fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
       validatedToPEither()
   }
-
-  /**
-   * Lift a [PIso] to a Functor level
-   */
-  fun <F> mapping(FF: Functor<F>): PIso<Kind<F, S>, Kind<F, T>, Kind<F, A>, Kind<F, B>> = FF.run {
-    PIso(
-      { fa -> fa.map(::get) },
-      { fb -> fb.map(::reverseGet) }
-    )
-  }
-
-  /**
-   * Modify polymorphically the target of a [PIso] with a Functor function
-   */
-  fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
-    f(get(s)).map(::reverseGet)
-  }
-
-  /**
-   * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
-   */
-  fun <F> liftF(FF: Functor<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FF.run {
-    { s -> f(get(s)).map(::reverseGet) }
-  }
-
-  /**
-   * Reverse a [PIso]: the source becomes the target and the target becomes the source
-   */
-  fun reverse(): PIso<B, A, T, S> = PIso(this::reverseGet, this::get)
-
-  /**
-   * Find if the focus satisfies the predicate
-   */
-  fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { aa ->
-    if (p(aa)) Some(aa) else None
-  }
-
-  /**
-   * Set polymorphically the focus of a [PIso] with a value
-   */
-  fun set(b: B): T = reverseGet(b)
-
-  /**
-   * Pair two disjoint [PIso]
-   */
-  infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
-    PIso(
-      { (a, c) -> get(a) toT other.get(c) },
-      { (b, d) -> reverseGet(b) toT other.reverseGet(d) }
-    )
-
-  /**
-   * Create a pair of the [PIso] and a type [C]
-   */
-  fun <C> first(): PIso<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = Iso(
-    { (a, c) -> get(a) toT c },
-    { (b, c) -> reverseGet(b) toT c }
-  )
-
-  /**
-   * Create a pair of a type [C] and the [PIso]
-   */
-  fun <C> second(): PIso<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PIso(
-    { (c, a) -> c toT get(a) },
-    { (c, b) -> c toT reverseGet(b) }
-  )
-
-  /**
-   * Create a sum of the [PIso] and a type [C]
-   */
-  fun <C> left(): PIso<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PIso(
-    { it.bimap(this::get, ::identity) },
-    { it.bimap(this::reverseGet, ::identity) }
-  )
-
-  /**
-   * Create a sum of a type [C] and the [PIso]
-   */
-  fun <C> right(): PIso<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PIso(
-    { it.bimap(::identity, this::get) },
-    { it.bimap(::identity, this::reverseGet) }
-  )
-
-  /**
-   * Compose a [PIso] with a [PIso]
-   */
-  infix fun <C, D> compose(other: PIso<A, B, C, D>): PIso<S, T, C, D> = PIso(
-    other::get compose this::get,
-    this::reverseGet compose other::reverseGet
-  )
-
-  /**
-   * Compose a [PIso] with a [PLens]
-   */
-  infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = asLens() compose other
-
-  /**
-   * Compose a [PIso] with a [PPrism]
-   */
-  infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = asPrism() compose other
-
-  /**
-   * Compose a [PIso] with a [Getter]
-   */
-  infix fun <C> compose(other: Getter<A, C>): Getter<S, C> = asGetter() compose other
-
-  /**
-   * Compose a [PIso] with a [PSetter]
-   */
-  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = asSetter() compose other
-
-  /**
-   * Compose a [PIso] with a [POptional]
-   */
-  infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = asOptional() compose other
-
-  /**
-   * Compose a [PIso] with a [Fold]
-   */
-  infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = asFold() compose other
-
-  /**
-   * Compose a [PIso] with a [PTraversal]
-   */
-  infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = asTraversal() compose other
-
-  /**
-   * Plus operator overload to compose lenses
-   */
-  operator fun <C, D> plus(other: PIso<A, B, C, D>): PIso<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
-
-  operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
-
-  operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
-
-  operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> = compose(other)
-
-  operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
-
-  operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> = compose(other)
-
-  /**
-   * View a [PIso] as a [PPrism]
-   */
-  fun asPrism(): PPrism<S, T, A, B> = PPrism(
-    { a -> Either.Right(get(a)) },
-    this::reverseGet
-  )
-
-  /**
-   * View a [PIso] as a [PLens]
-   */
-  fun asLens(): PLens<S, T, A, B> = PLens(this::get) { _, b -> set(b) }
-
-  /**
-   * View a [PIso] as a [Getter]
-   */
-  fun asGetter(): Getter<S, A> = Getter(this::get)
-
-  /**
-   * View a [PIso] as a [POptional]
-   */
-  fun asOptional(): POptional<S, T, A, B> = POptional(
-    { s -> Either.Right(get(s)) },
-    { _, b -> set(b) }
-  )
-
-  /**
-   * View a [PIso] as a [PSetter]
-   */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
-
-  /**
-   * View a [PIso] as a [Fold]
-   */
-  fun asFold(): Fold<S, A> = object : Fold<S, A> {
-    override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
-  }
-
-  /**
-   * View a [PIso] as a [PTraversal]
-   */
-  fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
-    override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
-      f(get(s)).map(this@PIso::reverseGet)
-    }
-  }
-
-  /**
-   * Check if the focus satisfies the predicate
-   */
-  fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
-
-  /**
-   * Modify polymorphically the focus of a [PIso] with a function
-   */
-  fun modify(s: S, f: (A) -> B): T = reverseGet(f(get(s)))
-
-  /**
-   * Modify polymorphically the focus of a [PIso] with a function
-   */
-  fun lift(f: (A) -> B): (S) -> T = { s -> reverseGet(f(get(s))) }
-
-  /**
-   * Lift a function [f] with a functor: `(A) -> Kind<F, B> to the context of `S`: `(S) -> Kind<F, T>`
-   */
-  fun <F> liftF(FF: Functor<F>, dummy: Unit = Unit, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
-    liftF(FF) { a -> f(a) }
 }

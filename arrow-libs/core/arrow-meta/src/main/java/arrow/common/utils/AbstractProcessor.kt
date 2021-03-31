@@ -2,7 +2,6 @@ package arrow.common.utils
 
 import arrow.common.messager.logE
 import arrow.common.messager.logW
-import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
@@ -92,13 +91,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
     else -> knownError("Unsupported @documented $kind")
   }
 
-  private fun processDocs(roundEnv: RoundEnvironment): Unit =
-    roundEnv
-      .getElementsAnnotatedWith(documented::class.java)
-      .filterIsInstance<TypeElement>().forEach {
-        processElementDoc(it)
-        it.enclosedElements.forEach(::processElementDoc)
-      }
+  private fun processDocs(roundEnv: RoundEnvironment): Unit = Unit
 
   final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {

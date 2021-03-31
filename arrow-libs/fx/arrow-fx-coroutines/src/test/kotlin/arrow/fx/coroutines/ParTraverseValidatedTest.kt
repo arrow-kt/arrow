@@ -2,7 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.invalidNel
 import arrow.core.sequenceValidated
@@ -14,36 +14,37 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseValidatedTest : ArrowFxSpec(
   spec = {
     "parTraverseValidated can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parTraverseValidated(NonEmptyList.semigroup()) {
+      (0 until 100).parTraverseValidated(Semigroup.nonEmptyList()) {
         ref.update { it + 1 }.validNel()
       }
       ref.get() shouldBe 100
     }
 
     "parTraverseValidated runs in parallel" {
-      val promiseA = Promise<Unit>()
-      val promiseB = Promise<Unit>()
-      val promiseC = Promise<Unit>()
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
       listOf(
         suspend {
-          promiseA.get()
+          promiseA.await()
           promiseC.complete(Unit).validNel()
         },
         suspend {
-          promiseB.get()
+          promiseB.await()
           promiseA.complete(Unit).validNel()
         },
         suspend {
           promiseB.complete(Unit)
-          promiseC.get().validNel()
+          promiseC.await().validNel()
         }
-      ).parTraverseValidated(NonEmptyList.semigroup()) { it() }
+      ).parTraverseValidated(Semigroup.nonEmptyList()) { it() }
     }
 
     "parTraverseValidated results in the correct left" {
@@ -52,7 +53,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
         Arb.int(min = 1, max = 9),
         Arb.string()
       ) { n, killOn, e ->
-        (0 until n).parTraverseValidated(NonEmptyList.semigroup()) { i ->
+        (0 until n).parTraverseValidated(Semigroup.nonEmptyList()) { i ->
           if (i == killOn) e.invalidNel() else Unit.validNel()
         } shouldBe e.invalidNel()
       }
@@ -60,7 +61,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
 
     "parTraverseValidated identity is identity" {
       checkAll(Arb.list(Arb.validatedNel(Arb.int(), Arb.int()))) { l ->
-        val res = l.parTraverseValidated(NonEmptyList.semigroup(), ::identity)
+        val res: Validated<NonEmptyList<Int>, List<Int>> = l.parTraverseValidated(Semigroup.nonEmptyList(), ::identity)
         res shouldBe l.sequenceValidated(Semigroup.nonEmptyList())
       }
     }
@@ -72,7 +73,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverseValidated(NonEmptyList.semigroup()) { i ->
+          (0 until n).parTraverseValidated(Semigroup.nonEmptyList()) { i ->
             if (i == killOn) throw e else Unit.validNel()
           }
         } should leftException(e)
@@ -81,14 +82,14 @@ class ParTraverseValidatedTest : ArrowFxSpec(
 
     "parTraverseValidated stack-safe" {
       val count = 20_000
-      val l = (0 until count).parTraverseValidated(NonEmptyList.semigroup()) { it.validNel() }
+      val l = (0 until count).parTraverseValidated(Semigroup.nonEmptyList()) { it.validNel() }
       l shouldBe (0 until count).toList().validNel()
     }
 
     "parTraverseValidated finishes on single thread " { // 100 is same default length as Arb.list
       checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
         single.use { ctx ->
-          (0 until i).parTraverseValidated(ctx, NonEmptyList.semigroup()) { Thread.currentThread().name.validNel() }
+          (0 until i).parTraverseValidated(ctx, Semigroup.nonEmptyList()) { Thread.currentThread().name.validNel() }
         } shouldBe (0 until i).map { "single" }.validNel()
       }
     }

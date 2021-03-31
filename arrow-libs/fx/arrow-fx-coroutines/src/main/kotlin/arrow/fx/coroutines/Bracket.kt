@@ -15,28 +15,6 @@ sealed class ExitCase {
 }
 
 /**
- * Runs [f] in an uncancellable manner.
- * If [f] gets cancelled, it will back-pressure the cancelling operation until finished.
- *
- * ```kotlin:ank:playground
- * import arrow.fx.coroutines.*
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   val n = timeOutOrNull(10.milliseconds) {
- *     uncancellable { sleep(100.milliseconds) }
- *   } // takes 100.milliseconds, and returns null
- *
- *   //sampleEnd
- *   println("n: $n")
- * }
- * ```
- */
-@Deprecated("Use withContext(NonCancellable) from KotlinX insteed", ReplaceWith("withContext(NonCancellable) { f() }", "kotlinx.coroutines.withContext"))
-suspend inline fun <A> uncancellable(crossinline f: suspend () -> A): A =
-  withContext(NonCancellable) { f() }
-
-/**
  * Registers an [onCancel] handler after [fa].
  * [onCancel] is guaranteed to be called in case of cancellation, otherwise it's ignored.
  *
@@ -260,7 +238,7 @@ suspend inline fun <A, B> bracketCase(
 @PublishedApi
 internal suspend inline fun runReleaseAndRethrow(original: Throwable, crossinline f: suspend () -> Unit): Nothing {
   try {
-    withContext(NonCancellable + SuspendConnection.uncancellable) {
+    withContext(NonCancellable) {
       f()
     }
   } catch (e: Throwable) {

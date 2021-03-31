@@ -1,8 +1,8 @@
 package generic
 
-import arrow.core.Left
-import arrow.core.Right
 import arrow.core.computations.either
+import arrow.core.Either.Right
+import arrow.core.Either.Left
 import io.kotlintest.fail
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
