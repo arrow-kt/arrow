@@ -413,9 +413,11 @@ fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>,
   }
 
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+  // Using foldRight here is very awkward since we have to somehow special-case the head of the Nel,
+  // but fold just works perfectly. In reality no one should really be relying on the order of execution of this traverse (hopefully)
+  tail.fold(f(head).map(::nonEmptyListOf)) { acc, a ->
     when (val res = f(a)) {
-      is Right -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
+      is Right -> acc.map { bs -> bs + nonEmptyListOf(res.value) }
       is Left -> res
     }
   }
@@ -427,10 +429,10 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+  tail.fold(f(head).map(::nonEmptyListOf)) { acc, a ->
     when (val res = f(a)) {
       is Validated.Valid -> when (acc) {
-        is Validated.Valid -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
+        is Validated.Valid -> acc.map { bs -> bs + nonEmptyListOf(res.value) }
         is Validated.Invalid -> acc
       }
       is Validated.Invalid -> when (acc) {
