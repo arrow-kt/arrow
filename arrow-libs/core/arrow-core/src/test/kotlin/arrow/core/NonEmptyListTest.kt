@@ -157,5 +157,21 @@ class NonEmptyListTest : UnitSpec() {
         result == expected
       }
     }
+
+    "traverseEither should correctly traverse nel" {
+      forAll(Gen.nonEmptyList(Gen.int())) { a ->
+        val result = (a.traverseEither { it.right() } as Either.Right<NonEmptyList<Int>>).value
+        val expected = a
+        result == expected
+      }
+    }
+
+    "traverseValidated should correctly traverse nel" {
+      forAll(Gen.nonEmptyList(Gen.int())) { a ->
+        val result = (a.traverseValidated<List<*>, Int, Int>(Semigroup.list()) { it.valid() } as Validated.Valid<NonEmptyList<Int>>).value
+        val expected = a
+        result == expected
+      }
+    }
   }
 }
