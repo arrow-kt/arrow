@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.collections.foldRight as _foldRight
 
 inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -281,7 +282,10 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
-  fold(initial) { acc, a -> operation(a, acc) }
+  when (this) {
+    is List -> _foldRight(initial, operation)
+    else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
+  }
 
 inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
   val acc = mutableListOf<B>()
