@@ -28,7 +28,7 @@ The implementation of `fold()` is a simple `when` that checks whether `this` is 
 
 All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int`, or absence is up to the functions passed by the user.
 
-Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/arrow-libs/core/arrow-core/src/main/kotlin/arrow/core/extensions/option.kt) and [other datatypes](https://github.com/arrow-kt/arrow-core/tree/master/arrow-core-data/src/main/kotlin/arrow/core) to discover their behavior!
+Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core/src/main/kotlin/arrow/core/extensions/option.kt) and [other datatypes](https://github.com/arrow-kt/arrow-core/tree/main/arrow-core-data/src/main/kotlin/arrow/core) to discover their behavior!
 
 ### Datatypes in Arrow
 

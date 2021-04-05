@@ -3,7 +3,7 @@
 set -e
 
 TAG_TIMESTAMP=$(git log $LATEST_PUBLISHED_VERSION --pretty="format:%ct" | head -1)
-hub pr list --limit 500 --base master -s merged --format='%mt#%au#[%i](%U) %t%n' > PR-list-all.txt
+hub pr list --limit 500 --base main -s merged --format='%mt#%au#[%i](%U) %t%n' > PR-list-all.txt
 while read line; do 
     pr_timestamp=$(echo $line | cut -d# -f1)
     if [ $pr_timestamp -gt $TAG_TIMESTAMP ]; then
