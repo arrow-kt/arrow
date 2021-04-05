@@ -3,6 +3,9 @@ package arrow.core
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  *
@@ -325,6 +328,7 @@ import arrow.typeclasses.Semigroup
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
  * Originally based on the Scala Koans.
  */
+@OptIn(ExperimentalContracts::class)
 sealed class Option<out A> {
 
   companion object {
@@ -337,13 +341,17 @@ sealed class Option<out A> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
-      try {
+    inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return try {
         Some(f())
       } catch (t: Throwable) {
         recover(t.nonFatalOrThrow())
         None
       }
+    }
 
     @JvmStatic
     fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
@@ -456,20 +464,44 @@ sealed class Option<out A> {
    */
   abstract fun isEmpty(): Boolean
 
-  fun isNotEmpty(): Boolean = !isEmpty()
+  fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some)
+      returns(false) implies (this@Option is None)
+    }
+    return !isEmpty()
+  }
 
   /**
    * alias for [isDefined]
    */
-  fun nonEmpty(): Boolean = isDefined()
+  fun nonEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some)
+      returns(false) implies (this@Option is None)
+    }
+    return isDefined()
+  }
 
   /**
    * Returns true if the option is an instance of [Some], false otherwise.
    * @note Used only for performance instead of fold.
    */
-  fun isDefined(): Boolean = !isEmpty()
+  fun isDefined(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some)
+      returns(false) implies (this@Option is None)
+    }
+    return !isEmpty()
+  }
 
-  fun orNull(): A? = fold({ null }, ::identity)
+  fun orNull(): A? {
+    contract {
+      returnsNotNull() implies (this@Option is Some)
+      returns(null) implies (this@Option is None)
+    }
+    return fold({ null }, ::identity)
+  }
 
   /**
    * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -529,8 +561,12 @@ sealed class Option<out A> {
    *
    * @param predicate the predicate to test
    */
-  inline fun all(predicate: (A) -> Boolean): Boolean =
-    fold({ true }, predicate)
+  inline fun all(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(false) implies (this@Option is Some)
+    }
+    return fold({ true }, predicate)
+  }
 
   @Deprecated(
     "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
@@ -594,7 +630,12 @@ sealed class Option<out A> {
    *
    * @param predicate the predicate to test
    */
-  inline fun exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
+  inline fun exists(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some)
+    }
+    return fold({ false }, predicate)
+  }
 
   /**
    * Returns the $option's value if this option is nonempty '''and''' the predicate
@@ -610,11 +651,15 @@ sealed class Option<out A> {
    * none.exists { it > 10 }      // Result: null
    * ```
    */
-  inline fun findOrNull(predicate: (A) -> Boolean): A? =
-    when (this) {
+  inline fun findOrNull(predicate: (A) -> Boolean): A? {
+    contract {
+      returnsNotNull() implies (this@Option is Some)
+    }
+    return when (this) {
       is Some -> if (predicate(value)) value else null
       is None -> null
     }
+  }
 
   inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     foldLeft(empty()) { b, a -> b.combine(f(a)) }

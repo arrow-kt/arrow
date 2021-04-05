@@ -4,6 +4,9 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -427,6 +430,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```
  */
+@OptIn(ExperimentalContracts::class)
 sealed class Validated<out E, out A> {
 
   companion object {
@@ -464,25 +468,37 @@ sealed class Validated<out E, out A> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
-      try {
+    inline fun <A> catch(f: () -> A): Validated<Throwable, A> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return try {
         f().valid()
       } catch (e: Throwable) {
         e.nonFatalOrThrow().invalid()
       }
+    }
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
-      catch(f).mapLeft(recover)
+    inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return catch(f).mapLeft(recover)
+    }
 
     @JvmStatic
-    inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
-      try {
+    inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return try {
         f().validNel()
       } catch (e: Throwable) {
         e.nonFatalOrThrow().invalidNel()
       }
+    }
 
     /**
      * Lifts a function `A -> B` to the [Validated] structure.
@@ -611,6 +627,7 @@ sealed class Validated<out E, out A> {
       is Invalid -> (fe(value))
     }
 
+  // TODO
   val isValid =
     fold({ false }, { true })
   val isInvalid =
@@ -619,21 +636,45 @@ sealed class Validated<out E, out A> {
   /**
    * Is this Valid and matching the given predicate
    */
-  inline fun exist(predicate: (A) -> Boolean): Boolean =
-    fold({ false }, predicate)
+  inline fun exist(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Validated is Valid)
+    }
+    return fold({ false }, predicate)
+  }
 
-  inline fun findOrNull(predicate: (A) -> Boolean): A? =
-    when (this) {
+  inline fun findOrNull(predicate: (A) -> Boolean): A? {
+    contract {
+      returnsNotNull() implies (this@Validated is Valid)
+    }
+    return when (this) {
       is Valid -> if (predicate(this.value)) this.value else null
       is Invalid -> null
     }
+  }
 
-  inline fun all(predicate: (A) -> Boolean): Boolean =
-    fold({ true }, predicate)
+  inline fun all(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(false) implies (this@Validated is Valid)
+    }
+    return fold({ true }, predicate)
+  }
 
-  fun isEmpty(): Boolean = isInvalid
+  fun isEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Validated is Invalid)
+      returns(false) implies (this@Validated is Valid)
+    }
+    return isInvalid
+  }
 
-  fun isNotEmpty(): Boolean = isValid
+  fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Validated is Valid)
+      returns(false) implies (this@Validated is Invalid)
+    }
+    return isValid
+  }
 
   /**
    * Converts the value to an Either<E, A>
@@ -1056,8 +1097,14 @@ inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
 /**
  * Return the Valid value, or null if Invalid
  */
-fun <E, A> Validated<E, A>.orNull(): A? =
-  getOrElse { null }
+@OptIn(ExperimentalContracts::class)
+fun <E, A> Validated<E, A>.orNull(): A? {
+  contract {
+    returns(null) implies (this@orNull is Validated.Invalid)
+    returnsNotNull() implies (this@orNull is Validated.Valid)
+  }
+  return getOrElse { null }
+}
 
 /**
  * Return the Valid value, or the result of f if Invalid

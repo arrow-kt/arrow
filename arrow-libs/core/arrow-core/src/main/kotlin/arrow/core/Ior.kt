@@ -5,6 +5,8 @@ import arrow.core.Ior.Left
 import arrow.core.Ior.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 
@@ -27,6 +29,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
+@OptIn(ExperimentalContracts::class)
 sealed class Ior<out A, out B> {
 
   /**
@@ -304,8 +307,13 @@ sealed class Ior<out A, out B> {
    * }
    * ```
    */
-  fun orNull(): B? =
-    fold({ null }, { it }, { _, b -> b })
+  fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Ior is Left)
+      returnsNotNull() implies (this@Ior !is Left)
+    }
+    return fold({ null }, { it }, { _, b -> b })
+  }
 
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]
@@ -328,8 +336,13 @@ sealed class Ior<out A, out B> {
    * }
    * ```
    */
-  fun leftOrNull(): A? =
-    fold({ it }, { null }, { a, _ -> a })
+  fun leftOrNull(): A? {
+    contract {
+      returns(null) implies (this@Ior is Right)
+      returnsNotNull() implies (this@Ior !is Right)
+    }
+    return fold({ it }, { null }, { a, _ -> a })
+  }
 
   /**
    * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]
@@ -458,8 +471,12 @@ sealed class Ior<out A, out B> {
       { a, b -> fa(b)?.let { Both(a, it) } }
     )
 
-  inline fun all(predicate: (B) -> Boolean): Boolean =
-    fold({ true }, predicate, { _, b -> predicate(b) })
+  inline fun all(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(false) implies (this@Ior !is Left)
+    }
+    return fold({ true }, predicate, { _, b -> predicate(b) })
+  }
 
   /**
    * Returns `false` if [Left] or returns the result of the application of
@@ -475,8 +492,12 @@ sealed class Ior<out A, out B> {
    * left.exists { it > 10 }      // Result: false
    * ```
    */
-  inline fun exists(predicate: (B) -> Boolean): Boolean =
-    fold({ false }, predicate, { _, b -> predicate(b) })
+  inline fun exists(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior !is Left)
+    }
+    return fold({ false }, predicate, { _, b -> predicate(b) })
+  }
 
   inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
@@ -485,9 +506,21 @@ sealed class Ior<out A, out B> {
       is Both -> if (predicate(this.rightValue)) this.rightValue else null
     }
 
-  fun isEmpty(): Boolean = isLeft
+  fun isEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Left)
+      returns(false) implies (this@Ior !is Left)
+    }
+    return isLeft
+  }
 
-  fun isNotEmpty(): Boolean = !isLeft
+  fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Ior !is Left)
+      returns(false) implies (this@Ior is Left)
+    }
+    return !isLeft
+  }
 
   inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(

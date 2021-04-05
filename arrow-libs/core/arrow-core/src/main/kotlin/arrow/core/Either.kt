@@ -5,6 +5,9 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  *
@@ -719,6 +722,7 @@ import arrow.typeclasses.Semigroup
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  *
  */
+@OptIn(ExperimentalContracts::class)
 sealed class Either<out A, out B> {
 
   /**
@@ -733,9 +737,21 @@ sealed class Either<out A, out B> {
    */
   internal abstract val isLeft: Boolean
 
-  fun isLeft(): Boolean = isLeft
+  fun isLeft(): Boolean {
+    contract {
+      returns(true) implies (this@Either is Either.Left)
+      returns(false) implies (this@Either is Either.Right)
+    }
+    return isLeft
+  }
 
-  fun isRight(): Boolean = isRight
+  fun isRight(): Boolean {
+    contract {
+      returns(true) implies (this@Either is Either.Right)
+      returns(false) implies (this@Either is Either.Left)
+    }
+    return isRight
+  }
 
   /**
    * Applies `ifLeft` if this is a [Left] or `ifRight` if this is a [Right].
@@ -770,7 +786,7 @@ sealed class Either<out A, out B> {
       is Left -> initial
     }
 
-  fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
+  inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
@@ -839,8 +855,12 @@ sealed class Either<out A, out B> {
    * left.exists { it > 10 }      // Result: false
    * ```
    */
-  inline fun exists(predicate: (B) -> Boolean): Boolean =
-    fold({ false }, predicate)
+  inline fun exists(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Either is Right)
+    }
+    return fold({ false }, predicate)
+  }
 
   /**
    * Returns the right value if it exists, otherwise null
@@ -860,7 +880,13 @@ sealed class Either<out A, out B> {
    * }
    * ```
    */
-  fun orNull(): B? = fold({ null }, { it })
+  fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Either is Left)
+      returnsNotNull() implies (this@Either is Right)
+    }
+    return fold({ null }, { it })
+  }
 
   fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) emptyList<B>().right()
@@ -893,12 +919,28 @@ sealed class Either<out A, out B> {
       is Left -> null
     }
 
-  inline fun all(predicate: (B) -> Boolean): Boolean =
-    fold({ true }, predicate)
+  inline fun all(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(false) implies (this@Either is Right)
+    }
+    return fold({ true }, predicate)
+  }
 
-  fun isEmpty(): Boolean = isLeft
+  fun isEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Either is Left)
+      returns(false) implies (this@Either is Right)
+    }
+    return isLeft
+  }
 
-  fun isNotEmpty(): Boolean = isRight
+  fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Either is Right)
+      returns(false) implies (this@Either is Left)
+    }
+    return isRight
+  }
 
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
@@ -978,26 +1020,38 @@ sealed class Either<out A, out B> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <R> catch(f: () -> R): Either<Throwable, R> =
-      try {
+    inline fun <R> catch(f: () -> R): Either<Throwable, R> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return try {
         f().right()
       } catch (t: Throwable) {
         t.nonFatalOrThrow().left()
       }
+    }
 
     @JvmStatic
     @JvmName("tryCatchAndFlatten")
-    inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
-      catch(f).fold({ it.left() }, { it })
+    inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return catch(f).fold({ it.left() }, { it })
+    }
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
-      try {
+    inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return try {
         f().right()
       } catch (t: Throwable) {
         fe(t.nonFatalOrThrow()).left()
       }
+    }
 
     /**
      * The resolve function can resolve any suspended function that yields an Either into one type of value.
@@ -1017,14 +1071,17 @@ sealed class Either<out A, out B> {
       error: (e: E) -> Either<Throwable, B>,
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>
-    ): B =
-      catch(f)
+    ): B {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      }
+      return catch(f)
         .fold(
           { t: Throwable -> throwable(t) },
           { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
-
+    }
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
      *  that can be applied over all [Either] values in the shape of Either<A, B>
@@ -1080,18 +1137,6 @@ fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  */
 inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
-
-/**
- * Returns the value from this [Either.Right] or null if this is a [Either.Left].
- *
- * Example:
- * ```
- * Right(12).orNull() // Result: 12
- * Left(12).orNull()  // Result: null
- * ```
- */
-fun <B> Either<*, B>.orNull(): B? =
-  getOrElse { null }
 
 /**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
@@ -1211,8 +1256,13 @@ inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
-fun <A, B> Either<A, B>.contains(elem: B): Boolean =
-  exists { it == elem }
+@OptIn(ExperimentalContracts::class)
+fun <A, B> Either<A, B>.contains(elem: B): Boolean {
+  contract {
+    returns(true) implies (this@contains is Right)
+  }
+  return exists { it == elem }
+}
 
 fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
   when (this) {
