@@ -7,7 +7,7 @@ buildscript {
         classpath "com.47deg:hood:$HOOD_VERSION"
     }
     ext {
-        JMH_RESULT_FOR_MASTER_BRANCH = "$rootDir/master-branch.json"
+        JMH_RESULT_FOR_MASTER_BRANCH = "$rootDir/main-branch.json"
         JMH_RESULT_FOR_PULL_REQUEST = "$rootDir/pull-request.json"
     }
 }

@@ -31,7 +31,7 @@ dokka {
             path = "src/main/kotlin"
 
             // URL showing where the source code can be accessed through the web browser
-            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
+            url = "https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/main/kotlin')}"
 
             // Suffix which is used to append the line number to the URL. Use #L for GitHub
             lineSuffix = "#L"

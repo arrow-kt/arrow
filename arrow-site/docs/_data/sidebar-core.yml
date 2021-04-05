@@ -65,4 +65,4 @@ options:
     url: /apidocs/arrow-core/
 
   - title: License
-    url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
+    url: https://github.com/arrow-kt/arrow/blob/main/LICENSE

@@ -3,7 +3,7 @@ name: "Publish libraries"
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - 'arrow-libs/**'
     - '.github/**'
