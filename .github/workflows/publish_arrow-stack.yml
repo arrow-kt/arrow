@@ -3,7 +3,7 @@ name: "Publish Arrow Stack (BOM file)"
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - 'arrow-libs/**'
     - 'arrow-stack/**'
