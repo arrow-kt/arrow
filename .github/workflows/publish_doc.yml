@@ -1,14 +1,13 @@
 name: "Publish documentation"
 
-# TODO:
-on: pull_request
-#  push:
-#    branches:
-#    - master
-#    paths:
-#    - 'arrow-libs/**'
-#    - 'arrow-site/**'
-#    - '.github/**'
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'arrow-libs/**'
+    - 'arrow-site/**'
+    - '.github/**'
 
 jobs:
   publish_doc:
@@ -74,36 +73,36 @@ jobs:
         SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
         bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
         tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
-    #- name: "Latest release: publish release directory (docs/<major.minor>)"
-    #  if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-    #  working-directory: arrow-site
-    #  run: |
-    #    SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-    #    echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
-    #    if [ "${SHORT_VERSION}" != "" ]; then
-    #      aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
-    #    else
-    #      exit 1
-    #    fi
-    #- name: "Next version: build (/docs/next)"
-    #  working-directory: arrow-site
-    #  run: |
-    #    bundle exec jekyll build -b docs/next -s build/site
-    #    tree _site > $BASEDIR/logs/content_docs-next.log
-    #- name: "Next version: publish (/docs/next)"
-    #  working-directory: arrow-site
-    #  run: |
-    #    echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
-    #    aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
-    #- name: "Site: publish sitemap.xml"
-    #  if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-    #  run: |
-    #    ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
-    #    aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
-    #- name: CloudFront cache invalidation
-    #  run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
-    #- name: List S3
-    #  run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
+    - name: "Latest release: publish release directory (docs/<major.minor>)"
+      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      working-directory: arrow-site
+      run: |
+        SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
+        echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
+        if [ "${SHORT_VERSION}" != "" ]; then
+          aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
+        else
+          exit 1
+        fi
+    - name: "Next version: build (/docs/next)"
+      working-directory: arrow-site
+      run: |
+        bundle exec jekyll build -b docs/next -s build/site
+        tree _site > $BASEDIR/logs/content_docs-next.log
+    - name: "Next version: publish (/docs/next)"
+      working-directory: arrow-site
+      run: |
+        echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
+        aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+    - name: "Site: publish sitemap.xml"
+      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      run: |
+        ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
+        aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
+    - name: CloudFront cache invalidation
+      run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+    - name: List S3
+      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
     - uses: actions/upload-artifact@v1
       with:
         name: logs
