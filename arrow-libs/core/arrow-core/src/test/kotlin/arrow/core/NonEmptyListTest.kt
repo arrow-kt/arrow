@@ -6,6 +6,7 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,6 +14,57 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Gen.nonEmptyList(Gen.int())))
+
+    "traverseEither stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverseEither { a ->
+        acc.add(a)
+        Either.Right(a)
+      }
+      res shouldBe Either.Right(NonEmptyList.fromListUnsafe(acc))
+      res shouldBe Either.Right(NonEmptyList.fromListUnsafe((0..20_000).toList()))
+    }
+
+    "traverseEither short-circuit" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseEither {
+          if (it % 2 == 0) {
+            acc.add(it)
+            Either.Right(it)
+          } else Either.Left(it)
+        }
+        acc == ints.takeWhile { it % 2 == 0 } &&
+          when (evens) {
+            is Either.Right -> evens.value == ints
+            is Either.Left -> evens.value == ints.first { it % 2 != 0 }
+          }
+      }
+    }
+
+    "traverseValidated stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseValidated(Semigroup.string()) {
+        acc.add(it)
+        Validated.Valid(it)
+      }
+      res shouldBe Validated.Valid(acc)
+      res shouldBe Validated.Valid((0..20_000).toList())
+    }
+
+    "traverseValidated acummulates" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        val res: ValidatedNel<Int, NonEmptyList<Int>> =
+          ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+
+        val expected: ValidatedNel<Int, NonEmptyList<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
+          .fold({ NonEmptyList.fromListUnsafe(ints.filter { it % 2 == 0 }).validNel() }, { it.invalid() })
+
+        res == expected
+      }
+    }
 
     "can align lists with different lengths" {
       forAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->

@@ -4,6 +4,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.sequence
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -17,10 +18,43 @@ class SequenceKTest : UnitSpec() {
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Gen.sequence(Gen.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "traverseEither is stacksafe over very long collections and short circuits properly" {
-      // This has to traverse 30k elements till it reaches None and terminates
-      generateSequence(0) { it + 1 }.map { if (it < 20_000) Either.Right(it) else Either.Left(Unit) }
-        .sequenceEither() shouldBe Either.Left(Unit)
+    "traverseEither stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = generateSequence(0) { it + 1 }.traverseEither { a ->
+        if (a > 20_000) {
+          Either.Left(Unit)
+        } else {
+          acc.add(a)
+          Either.Right(a)
+        }
+      }
+      acc shouldBe (0..20_000).toList()
+      res shouldBe Either.Left(Unit)
+    }
+
+    "traverseValidated stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).asSequence().traverseValidated(Semigroup.string()) {
+        acc.add(it)
+        Validated.Valid(it)
+      }.map { it.toList() }
+      res shouldBe Validated.Valid(acc)
+      res shouldBe Validated.Valid((0..20_000).toList())
+    }
+
+    "traverseValidated acummulates" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val ints = ints.asSequence()
+        val res: ValidatedNel<Int, Sequence<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          .sequenceValidated(Semigroup.nonEmptyList())
+
+        val expected: ValidatedNel<Int, Sequence<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 }.toList())
+          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+
+        res.map { it.toList() } == expected.map { it.toList() }
+      }
     }
 
     "zip3" {

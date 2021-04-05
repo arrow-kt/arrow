@@ -8,11 +8,62 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 
 class MapKTest : UnitSpec() {
 
   init {
     testLaws(MonoidLaws.laws(Monoid.map(Semigroup.int()), Gen.map(Gen.longSmall(), Gen.intSmall())))
+
+    "traverseEither is stacksafe" {
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).map { it to it }.toMap().traverseEither { v ->
+        acc.add(v)
+        Either.Right(v)
+      }
+      res shouldBe acc.map { it to it }.toMap().right()
+      res shouldBe (0..20_000).map { it to it }.toMap().right()
+    }
+
+    "traverseEither short-circuit" {
+      forAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseEither {
+          if (it % 2 == 0) {
+            acc.add(it)
+            Either.Right(it)
+          } else Either.Left(it)
+        }
+        acc == ints.values.takeWhile { it % 2 == 0 } &&
+          when (evens) {
+            is Either.Right -> evens.value == ints
+            is Either.Left -> evens.value == ints.values.first { it % 2 != 0 }
+          }
+      }
+    }
+
+    "traverseValidated is stacksafe" {
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).map { it to it }.toMap().traverseValidated(Semigroup.string()) { v ->
+        acc.add(v)
+        Validated.Valid(v)
+      }
+      res shouldBe acc.map { it to it }.toMap().valid()
+      res shouldBe (0..20_000).map { it to it }.toMap().valid()
+    }
+
+    "traverseValidated acummulates" {
+      forAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+        val res: ValidatedNel<Int, Map<Int, Int>> =
+          ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+
+        val expected: ValidatedNel<Int, Map<Int, Int>> =
+          NonEmptyList.fromList(ints.values.filterNot { it % 2 == 0 })
+            .fold({ ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() }, { it.invalid() })
+
+        res == expected
+      }
+    }
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
