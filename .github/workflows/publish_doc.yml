@@ -47,13 +47,17 @@ jobs:
     - name: "Validate documentation"
       working-directory: arrow-site
       run: ./gradlew runAnk
-    - name: "Latest release: build (landing page + docs/)"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+    - name: "Landing page: build"
       working-directory: arrow-site
       run: |
         bundle exec jekyll build -b docs -s build/site
         tree _site > $BASEDIR/logs/content_docs.log
-    - name: "Latest release: publish (landing page + docs/)"
+    - name: "Landing page: publish"
+      working-directory: arrow-site
+      run: |
+        echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
+        ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+    - name: "Latest release: publish (docs/)"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
       working-directory: arrow-site
       run: |
