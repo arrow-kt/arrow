@@ -643,35 +643,42 @@ fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
+@OptIn(ExperimentalStdlibApi::class)
 fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+  return buildList {
+    this@traverseEither.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> add(res.value)
+        is Left -> return@traverseEither res
+      }
     }
-  }
-  return acc.asSequence().right()
+  }.asSequence().right()
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Sequence<B>> = fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-  when (val res = f(a)) {
-    is Valid -> when (acc) {
-      is Valid -> acc.also { it.value.add(res.value) }
-      is Invalid -> acc
+): Validated<E, Sequence<B>> =
+  semigroup.run {
+    letWithBuildList<B, Validated<E, List<B>>> { list ->
+      fold(list.valid() as Validated<E, MutableList<B>>) { acc, a ->
+        when (val res = f(a)) {
+          is Valid -> when (acc) {
+            is Valid -> acc.also { it.value.add(res.value) }
+            is Invalid -> acc
+          }
+          is Invalid -> when (acc) {
+            is Valid -> res
+            is Invalid -> acc.value.combine(res.value).invalid()
+          }
+        }
+      }
     }
-    is Invalid -> when (acc) {
-      is Valid -> res
-      is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-    }
-  }
-}.map { it.asSequence() }
+  }.map { it.asSequence() }
 
 /**
  * splits an union into its component parts.

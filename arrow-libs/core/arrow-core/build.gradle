@@ -19,3 +19,9 @@ dependencies {
     testCompile project(":arrow-core-test")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+    }
+}

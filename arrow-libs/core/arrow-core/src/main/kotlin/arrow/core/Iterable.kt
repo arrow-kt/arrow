@@ -1,10 +1,15 @@
 @file:Suppress("unused", "FunctionName")
+
 package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.foldRight as _foldRight
 
 inline fun <B, C, D, E> Iterable<B>.zip(
@@ -17,9 +22,9 @@ inline fun <B, C, D, E> Iterable<B>.zip(
   val dd = d.iterator()
 
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault()
   )
   val list = ArrayList<E>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext()) {
@@ -39,10 +44,10 @@ inline fun <B, C, D, E, F> Iterable<B>.zip(
   val dd = d.iterator()
   val ee = e.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault()
   )
   val list = ArrayList<F>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext()) {
@@ -64,11 +69,11 @@ inline fun <B, C, D, E, F, G> Iterable<B>.zip(
   val ee = e.iterator()
   val ff = f.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault()
   )
   val list = ArrayList<G>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext()) {
@@ -92,12 +97,12 @@ inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
   val ff = f.iterator()
   val gg = g.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10),
-    g.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault(),
+    g.collectionSizeOrDefault()
   )
   val list = ArrayList<H>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext()) {
@@ -123,13 +128,13 @@ inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
   val gg = g.iterator()
   val hh = h.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10),
-    g.collectionSizeOrDefault(10),
-    h.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault(),
+    g.collectionSizeOrDefault(),
+    h.collectionSizeOrDefault()
   )
   val list = ArrayList<I>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext()) {
@@ -157,14 +162,14 @@ inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
   val hh = h.iterator()
   val ii = i.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10),
-    g.collectionSizeOrDefault(10),
-    h.collectionSizeOrDefault(10),
-    i.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault(),
+    g.collectionSizeOrDefault(),
+    h.collectionSizeOrDefault(),
+    i.collectionSizeOrDefault()
   )
   val list = ArrayList<J>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext()) {
@@ -194,15 +199,15 @@ inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   val ii = i.iterator()
   val jj = j.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10),
-    g.collectionSizeOrDefault(10),
-    h.collectionSizeOrDefault(10),
-    i.collectionSizeOrDefault(10),
-    j.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault(),
+    g.collectionSizeOrDefault(),
+    h.collectionSizeOrDefault(),
+    i.collectionSizeOrDefault(),
+    j.collectionSizeOrDefault()
   )
   val list = ArrayList<K>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext()) {
@@ -246,16 +251,16 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   val jj = j.iterator()
   val kk = k.iterator()
   val size = minOf(
-    collectionSizeOrDefault(10),
-    c.collectionSizeOrDefault(10),
-    d.collectionSizeOrDefault(10),
-    e.collectionSizeOrDefault(10),
-    f.collectionSizeOrDefault(10),
-    g.collectionSizeOrDefault(10),
-    h.collectionSizeOrDefault(10),
-    i.collectionSizeOrDefault(10),
-    j.collectionSizeOrDefault(10),
-    k.collectionSizeOrDefault(10)
+    collectionSizeOrDefault(),
+    c.collectionSizeOrDefault(),
+    d.collectionSizeOrDefault(),
+    e.collectionSizeOrDefault(),
+    f.collectionSizeOrDefault(),
+    g.collectionSizeOrDefault(),
+    h.collectionSizeOrDefault(),
+    i.collectionSizeOrDefault(),
+    j.collectionSizeOrDefault(),
+    k.collectionSizeOrDefault()
   )
   val list = ArrayList<L>(size)
   while (bb.hasNext() && cc.hasNext() && dd.hasNext() && ee.hasNext() && ff.hasNext() && gg.hasNext() && hh.hasNext() && ii.hasNext() && jj.hasNext() && kk.hasNext()) {
@@ -278,7 +283,7 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 }
 
 @PublishedApi
-internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
+internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int = 10): Int =
   if (this is Collection<*>) this.size else default
 
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
@@ -287,33 +292,37 @@ inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B)
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+  return buildList(collectionSizeOrDefault()) {
+    this@traverseEither.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> add(res.value)
+        is Left -> return@traverseEither res
+      }
     }
-  }
-  return acc.right()
+  }.right()
 }
 
 fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> = semigroup.run {
-  fold(Valid(mutableListOf<B>()) as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Validated.Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Validated.Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> acc.value.combine(res.value).invalid()
+  letWithBuildList<B, Validated<E, List<B>>>(collectionSizeOrDefault()) { list ->
+    fold(list.valid() as Validated<E, MutableList<B>>) { acc, a ->
+      when (val res = f(a)) {
+        is Valid -> when (acc) {
+          is Valid -> acc.also { it.value.add(res.value) }
+          is Invalid -> acc
+        }
+        is Invalid -> when (acc) {
+          is Valid -> res
+          is Invalid -> acc.value.combine(res.value).invalid()
+        }
       }
     }
   }
@@ -892,3 +901,27 @@ infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
 
 fun <T> Iterable<Option<T>>.filterOption(): List<T> =
   flatMap { it.fold(::emptyList, ::listOf) }
+
+@OptIn(ExperimentalContracts::class, ExperimentalTypeInference::class)
+@ExperimentalStdlibApi
+@PublishedApi
+internal inline fun <E, R> letWithBuildList(@BuilderInference builderAction: (MutableList<E>) -> R): R {
+  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+  val result: R
+  buildList {
+    result = builderAction(this)
+  }
+  return result
+}
+
+@OptIn(ExperimentalContracts::class, ExperimentalTypeInference::class)
+@ExperimentalStdlibApi
+@PublishedApi
+internal inline fun <E, R> letWithBuildList(capacity: Int, @BuilderInference builderAction: (MutableList<E>) -> R): R {
+  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+  val result: R
+  buildList(capacity) {
+    result = builderAction(this)
+  }
+  return result
+}

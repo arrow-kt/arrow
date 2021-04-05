@@ -3,6 +3,10 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 
 /**
@@ -120,7 +124,18 @@ inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
 ): Map<Key, I> {
   val destination = LinkedHashMap<Key, I>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh -> map(key, bb, cc, dd, ee, ff, gg, hh) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -138,7 +153,19 @@ inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
 ): Map<Key, J> {
   val destination = LinkedHashMap<Key, J>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii -> map(key, bb, cc, dd, ee, ff, gg, hh, ii) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh,
+        ii
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -157,7 +184,16 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
 ): Map<Key, K> {
   val destination = LinkedHashMap<Key, K>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key]) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -177,7 +213,17 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
 ): Map<Key, L> {
   val destination = LinkedHashMap<Key, L>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key],
+      k[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
       map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
     }?.let { l -> destination.put(key, l) }
   }
@@ -189,37 +235,42 @@ fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
-  val acc = mutableMapOf<K, B>()
-  forEach { (k, v) ->
-    when (val res = f(v)) {
-      is Right -> acc[k] = res.value
-      is Left -> return@traverseEither res
+  return buildMap<K, B>(size) {
+    this@traverseEither.forEach { (k, v) ->
+      when (val res = f(v)) {
+        is Right -> this[k] = res.value
+        is Left -> return@traverseEither res
+      }
     }
-  }
-  return acc.right()
+  }.right()
 }
 
 fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   traverseEither(::identity)
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> {
-  return foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
-    when (val res = f(v)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value[k] = res.value }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+): Validated<E, Map<K, B>> =
+  semigroup.run {
+    letWithBuildMap<K, B, Validated<E, Map<K, B>>>(size) { map ->
+      foldLeft(map.valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
+        when (val res = f(v)) {
+          is Valid -> when (acc) {
+            is Valid -> acc.also { it.value[k] = res.value }
+            is Invalid -> acc
+          }
+          is Invalid -> when (acc) {
+            is Valid -> res
+            is Invalid -> acc.value.combine(res.value).invalid()
+          }
+        }
       }
     }
   }
-}
 
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
@@ -427,3 +478,27 @@ internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
     null -> emptyList()
     else -> listOf(this)
   }
+
+@OptIn(ExperimentalContracts::class, ExperimentalTypeInference::class)
+@ExperimentalStdlibApi
+@PublishedApi
+internal inline fun <K, V, R> letWithBuildMap(@BuilderInference builderAction: (MutableMap<K, V>) -> R): R {
+  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+  val result: R
+  buildMap {
+    result = builderAction(this)
+  }
+  return result
+}
+
+@OptIn(ExperimentalContracts::class, ExperimentalTypeInference::class)
+@ExperimentalStdlibApi
+@PublishedApi
+internal inline fun <K, V, R> letWithBuildMap(capacity: Int, @BuilderInference builderAction: (MutableMap<K, V>) -> R): R {
+  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+  val result: R
+  buildMap(capacity) {
+    result = builderAction(this)
+  }
+  return result
+}

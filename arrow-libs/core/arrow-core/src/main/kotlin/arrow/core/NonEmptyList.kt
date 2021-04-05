@@ -412,34 +412,40 @@ fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>,
     }
   }
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
-    }
-  }
   // Safe due to traverse laws
-  return NonEmptyList.fromListUnsafe(acc).right()
+  return NonEmptyList.fromListUnsafe(buildList(size) {
+    this@traverseEither.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> add(res.value)
+        is Left -> return@traverseEither res
+      }
+    }
+  }).right()
 }
 
 fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
   traverseEither(::identity)
 
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+  semigroup.run {
+    letWithBuildList<B, Validated<E, List<B>>>(size) { list ->
+      fold(list.valid() as Validated<E, MutableList<B>>) { acc, a ->
+        when (val res = f(a)) {
+          is Valid -> when (acc) {
+            is Valid -> acc.also { it.value.add(res.value) }
+            is Invalid -> acc
+          }
+          is Invalid -> when (acc) {
+            is Valid -> res
+            is Invalid -> acc.value.combine(res.value).invalid()
+          }
+        }
       }
     }
   }.map { NonEmptyList.fromListUnsafe(it) }
