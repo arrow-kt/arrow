@@ -21,42 +21,32 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Set env
-      run: |
-        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: "Check versions"
-      id: versions
-      run: |
-        LATEST_PUBLISHED_RELEASE_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
-        RELEASE_VERSION=$(grep LATEST_VERSION $BASEDIR/gradle.properties | cut -d= -f2)
-        NEW_RELEASE_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_RELEASE_VERSION" == "$RELEASE_VERSION" ] && echo '0' || echo '1')
-        echo "::set-output name=latest-published-release-version::$LATEST_PUBLISHED_RELEASE_VERSION"
-        echo "::set-output name=release-version::$RELEASE_VERSION"
-        echo "::set-output name=new-release-version-exists::$NEW_RELEASE_VERSION_EXISTS"
+    - name: "Setup"
+      run: brew install grep
+    - name: "Set env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+    - name: "Show env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
     - name: "Update version when release"
-      if: steps.versions.outputs.new-release-version-exists == '1'
-      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i $BASEDIR/gradle.properties
+      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
     - name: "Publish"
       working-directory: arrow-libs
       run: |
         ./gradlew publish
         echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
     - name: "Create tag"
-      if: steps.versions.outputs.new-release-version-exists == '1'
+      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
       run: |
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow.git
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
-        git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
-        git push origin ${{ steps.versions.outputs.release-version }}
-    - name: "Create release notes"
-      if: steps.versions.outputs.new-release-version-exists == '1'
-      run: |
-        # TODO: enable after 0.12.0 release
-        export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-release-version }}
-        export RELEASE_VERSION=${{ steps.versions.outputs.release-version }}
-        #.github/scripts/create-release-notes.sh
+        git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION"
+        git push origin $RELEASE_VERSION
+    # TODO: enable after 0.12.0 release
+    # - name: "Create release notes"
+    #  if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+    #  run: ${GITHUB_WORKSPACE}/.github/scripts/create-release-notes.sh
