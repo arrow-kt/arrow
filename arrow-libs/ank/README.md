@@ -18,7 +18,7 @@ buildscript {
 
     repositories {
         // ...
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+        mavenCentral()
     }
     
     dependencies {

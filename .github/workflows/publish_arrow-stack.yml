@@ -26,21 +26,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Set env
-      run: |
-        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
-    - name: "Check versions"
-      id: versions
-      run: |
-        LATEST_PUBLISHED_RELEASE_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
-        RELEASE_VERSION=$(grep LATEST_VERSION $BASEDIR/gradle.properties | cut -d= -f2)
-        NEW_RELEASE_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_RELEASE_VERSION" == "$RELEASE_VERSION" ] && echo '0' || echo '1')
-        echo "::set-output name=release-version::$RELEASE_VERSION"
-        echo "::set-output name=new-release-version-exists::$NEW_RELEASE_VERSION_EXISTS"
+    - name: "Setup"
+      run: brew install grep
+    - name: "Set env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+    - name: "Show env"
+      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
     - name: "Update version when release"
-      if: steps.versions.outputs.new-release-version-exists == '1'
-      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i $BASEDIR/gradle.properties
+      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
     - name: "Publish"
       run: |
         ./gradlew publish
