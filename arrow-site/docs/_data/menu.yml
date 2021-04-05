@@ -2,11 +2,17 @@ nav:
     - title: Media
       url: https://media.arrow-kt.io
 
-    - title: Training
-      url: https://www.47deg.com/trainings/
-
     - title: Support
       url: https://www.47deg.com/services/
+
+    - title: Training
+      submenu:
+
+        - title: 47 Degrees
+          url: https://www.47deg.com/trainings/
+
+        - title: Instil
+          url: https://instil.co/courses/functional-programming-in-kotlin-with-arrow/
 
     - title: Github
       url: https://github.com/arrow-kt/arrow

@@ -89,6 +89,19 @@
             margin-right: ($base-point-grid * 5);
           }
 
+          .nav-submenu {
+            display: none;
+            position: absolute;
+
+            &-item {
+              padding-top: $base-point-grid;
+
+              &::before {
+                content: "-";
+              }
+            }
+          }
+
           .menu-links {
             padding-bottom: 4px;
             text-transform: uppercase;
@@ -103,6 +116,16 @@
               &:hover {
                 color: $white;
               }
+            }
+          }
+
+          .no-hover {
+            pointer-events: none;
+          }
+
+          &:hover {
+            .nav-submenu {
+              display: block;
             }
           }
         }
@@ -163,6 +186,20 @@
 
             &:not(:last-child) {
               margin-right: 0;
+            }
+
+            .nav-submenu {
+              position: relative;
+              display: block;
+
+              &-item {
+                padding-top: ($base-point-grid * 2);
+                padding-left: ($base-point-grid * 2);
+
+                &::before {
+                  content: "-";
+                }
+              }
             }
           }
 

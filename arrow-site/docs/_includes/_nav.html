@@ -14,7 +14,16 @@
           {% for item in site.data.menu.nav%}
           {% if item.title != 'Github' %}
           <li class="nav-menu-item">
-            <a class="menu-links" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+            <a class="menu-links {% if item.submenu %}no-hover{% endif %}" {% if item.url %}href="{{ item.url }}"{% endif %} title="{{ item.title }}">{{ item.title }}</a>
+            {% if item.submenu %}
+            <ul class="nav-submenu">
+              {% for submenu-item in item.submenu %}
+              <li class="nav-submenu-item">
+                <a class="menu-links" href="{{ submenu-item.url }}" title="{{ submenu-item.title }}">{{ submenu-item.title }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
           </li>
           {% endif %}
           {% endfor %}
