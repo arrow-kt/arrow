@@ -522,13 +522,17 @@ fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>,
     }
   }
 
-inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
+  val acc = mutableListOf<B>()
+  forEach { a ->
     when (val res = f(a)) {
-      is Right -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
-      is Left -> res
+      is Right -> acc.add(res.value)
+      is Left -> return@traverseEither res
     }
   }
+  // Safe due to traverse laws
+  return NonEmptyList.fromListUnsafe(acc).right()
+}
 
 fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
   traverseEither(::identity)
@@ -537,18 +541,18 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  foldRight(f(head).map(::nonEmptyListOf)) { a, acc ->
+  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
     when (val res = f(a)) {
-      is Validated.Valid -> when (acc) {
-        is Validated.Valid -> acc.map { bs -> nonEmptyListOf(res.value) + bs }
-        is Validated.Invalid -> acc
+      is Valid -> when (acc) {
+        is Valid -> acc.also { it.value.add(res.value) }
+        is Invalid -> acc
       }
-      is Validated.Invalid -> when (acc) {
-        is Validated.Valid -> res
-        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      is Invalid -> when (acc) {
+        is Valid -> res
+        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
       }
     }
-  }
+  }.map { NonEmptyList.fromListUnsafe(it) }
 
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   traverseValidated(semigroup, ::identity)

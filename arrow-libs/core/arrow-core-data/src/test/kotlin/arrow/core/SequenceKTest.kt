@@ -47,6 +47,7 @@ import arrow.core.test.laws.UnalignLaws
 import arrow.core.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -114,10 +115,43 @@ class SequenceKTest : UnitSpec() {
       )
     )
 
-    "traverseEither is stacksafe over very long collections and short circuits properly" {
-      // This has to traverse 30k elements till it reaches None and terminates
-      generateSequence(0) { it + 1 }.map { if (it < 20_000) Right(it) else Left(Unit) }
-        .sequenceEither() shouldBe Left(Unit)
+    "traverseEither stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = generateSequence(0) { it + 1 }.traverseEither { a ->
+        if (a > 20_000) {
+          Either.Left(Unit)
+        } else {
+          acc.add(a)
+          Either.Right(a)
+        }
+      }
+      acc shouldBe (0..20_000).toList()
+      res shouldBe Either.Left(Unit)
+    }
+
+    "traverseValidated stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).asSequence().traverseValidated(Semigroup.string()) {
+        acc.add(it)
+        Validated.Valid(it)
+      }.map { it.toList() }
+      res shouldBe Validated.Valid(acc)
+      res shouldBe Validated.Valid((0..20_000).toList())
+    }
+
+    "traverseValidated acummulates" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val ints = ints.asSequence()
+        val res: ValidatedNel<Int, Sequence<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          .sequenceValidated(Semigroup.nonEmptyList())
+
+        val expected: ValidatedNel<Int, Sequence<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 }.toList())
+          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+
+        res.map { it.toList() } == expected.map { it.toList() }
+      }
     }
 
     "zip3" {
@@ -129,7 +163,12 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c, d ->
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
         val expected = a.zip(b, ::Pair)
           .zip(c) { (a, b), c -> Triple(a, b, c) }
