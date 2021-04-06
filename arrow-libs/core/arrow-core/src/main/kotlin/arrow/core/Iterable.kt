@@ -287,13 +287,16 @@ inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B)
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
-inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  foldRight<A, Either<E, List<B>>>(emptyList<B>().right()) { a, acc ->
+inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
+  val acc = mutableListOf<B>()
+  forEach { a ->
     when (val res = f(a)) {
-      is Right -> acc.map { bs -> listOf(res.value) + bs }
-      is Left -> res
+      is Right -> acc.add(res.value)
+      is Left -> return@traverseEither res
     }
   }
+  return acc.right()
+}
 
 fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
@@ -302,15 +305,15 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> = semigroup.run {
-  foldRight<A, Validated<E, List<B>>>(emptyList<B>().valid()) { a, acc ->
+  fold(Valid(mutableListOf<B>()) as Validated<E, MutableList<B>>) { acc, a ->
     when (val res = f(a)) {
       is Validated.Valid -> when (acc) {
-        is Validated.Valid -> acc.map { bs -> listOf(res.value) + bs }
-        is Validated.Invalid -> acc
+        is Valid -> acc.also { it.value.add(res.value) }
+        is Invalid -> acc
       }
       is Validated.Invalid -> when (acc) {
-        is Validated.Valid -> res
-        is Validated.Invalid -> Invalid(res.value.combine(acc.value))
+        is Valid -> res
+        is Invalid -> acc.value.combine(res.value).invalid()
       }
     }
   }
