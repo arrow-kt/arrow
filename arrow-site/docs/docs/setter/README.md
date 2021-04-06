@@ -42,4 +42,4 @@ With a `PSetter<List<Int>, List<String>, Int, String>`, we can morph an `Int` va
 
 Arrow provides [`SetterLaws`][setter_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own setters.
 
-[setter_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/SetterLaws.kt
+[setter_laws_source]: https://github.com/arrow-kt/arrow/blob/main/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/SetterLaws.kt

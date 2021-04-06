@@ -9,27 +9,13 @@ MAIN_CONTENT=("CNAME"  "code"  "css"  "error.html"  "fonts"  "img"  "index.html"
 
 cd _site/
 for file in *; do
-
-    # Landscape and related
-    #
-    if [[ ${MAIN_CONTENT[*]} =~ "$file" ]]; then
+    if [[ ! ${MAIN_CONTENT[*]} =~ "$file" ]]; then
         if [ -f "$file" ]; then
-            echo "Copying main content: $file ..."
-            aws s3 cp $file s3://$S3_BUCKET/$file >> $BASEDIR/logs/aws_sync.log
+            echo "Copying $file ..."
+            aws s3 cp $file s3://$S3_BUCKET/docs/$file >> $BASEDIR/logs/aws_sync.log
             continue
         fi
-        echo "Sync main content: $file ..."
-        aws s3 sync $file s3://$S3_BUCKET/$file --delete >> $BASEDIR/logs/aws_sync.log
-        continue
+        echo "Sync $file ..."
+        aws s3 sync $file s3://$S3_BUCKET/docs/$file --delete >> $BASEDIR/logs/aws_sync.log
     fi
-
-    # /docs/
-    #
-    if [ -f "$file" ]; then
-        echo "Copying $file ..."
-        aws s3 cp $file s3://$S3_BUCKET/docs/$file >> $BASEDIR/logs/aws_sync.log
-        continue
-    fi
-    echo "Sync $file ..."
-    aws s3 sync $file s3://$S3_BUCKET/docs/$file --delete >> $BASEDIR/logs/aws_sync.log
 done
