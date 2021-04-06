@@ -123,4 +123,4 @@ With a `PTraversal<List<Int>, List<String>, Int, String>`, we can morph an `Int`
 
 Arrow provides [`TraversalLaws`][traversal_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own traversal.
 
-[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/TraversalLaws.kt
+[traversal_laws_source]: https://github.com/arrow-kt/arrow/blob/main/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/TraversalLaws.kt

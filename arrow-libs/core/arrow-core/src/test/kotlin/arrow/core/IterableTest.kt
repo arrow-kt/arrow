@@ -12,20 +12,42 @@ import kotlin.math.min
 class IterableTest : UnitSpec() {
   init {
     "traverseEither stack-safe" {
-      (0..20_000).map { Either.Right(it) }
-        .sequenceEither() shouldBe Either.Right((0..20_000).toList())
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseEither { a ->
+        acc.add(a)
+        Either.Right(a)
+      }
+      res shouldBe Either.Right(acc)
+      res shouldBe Either.Right((0..20_000).toList())
     }
 
     "traverseEither short-circuit" {
       forAll(Gen.list(Gen.int())) { ints ->
-        (ints.map { Either.Right(it) } + Either.Left(Unit))
-          .sequenceEither() == Either.Left(Unit)
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseEither {
+          if (it % 2 == 0) {
+            acc.add(it)
+            Either.Right(it)
+          } else Either.Left(it)
+        }
+        acc == ints.takeWhile { it % 2 == 0 } &&
+          when (evens) {
+            is Either.Right -> evens.value == ints
+            is Either.Left -> evens.value == ints.first { it % 2 != 0 }
+          }
       }
     }
 
     "traverseValidated stack-safe" {
-      (0..20_000).map { Validated.Valid(it) }
-        .sequenceValidated(Semigroup.string()) shouldBe Validated.Valid((0..20_000).toList())
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseValidated(Semigroup.string()) {
+        acc.add(it)
+        Validated.Valid(it)
+      }
+      res shouldBe Validated.Valid(acc)
+      res shouldBe Validated.Valid((0..20_000).toList())
     }
 
     "traverseValidated acummulates" {

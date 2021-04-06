@@ -16,8 +16,6 @@
 
 allprojects {
     repositories {
-        jcenter()  // TODO: Needed by Dokka for org.jetbrains.dokka.gradle.DokkaTask.tryResolveFatJar - update version to remove it!
         mavenCentral()
-        maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
 }
