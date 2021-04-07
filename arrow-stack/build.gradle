@@ -10,6 +10,7 @@ buildscript {
 plugins {
     id "maven-publish"
     id "java-platform"
+    id "signing"
 }
 
 dependencies {
@@ -67,10 +68,20 @@ publishing {
     repositories {
         maven {
             credentials {
-                username System.getenv('BINTRAY_USER')
-                password System.getenv('BINTRAY_API_KEY')
+                username System.getenv('SONATYPE_USER')
+                password System.getenv('SONATYPE_PWD')
             }
             url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
         }
+    }
+}
+
+if (project.hasProperty("signingKey") && project.hasProperty("signingPassword")) {
+    signing {
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+
+        sign publishing.publications.myPlatform
     }
 }

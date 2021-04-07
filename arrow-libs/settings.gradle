@@ -3,14 +3,14 @@
   This file includes the configuration of 'projectDir' beyond 'include' to
   allow to work with:
 
-    - All the      libraries when opening 'arrow-libs'
-    - CORE         libraries when opening 'arrow-libs/core'
-    - FX           libraries when opening 'arrow-libs/fx'
-    - OPTICS       libraries when opening 'arrow-libs/optics'
-    - ANK          libraries when opening 'arrow-libs/ank'
+    - All the libraries when opening 'arrow-libs'
+    - CORE    libraries when opening 'arrow-libs/core'
+    - FX      libraries when opening 'arrow-libs/fx'
+    - OPTICS  libraries when opening 'arrow-libs/optics'
+    - ANK     libraries when opening 'arrow-libs/ank'
 
-  This distribution is also useful to publish the artifacts from GitHub tasks (the number of
-  artifacts for publication into Bintray in a single task is limited).  
+  This distribution is also useful to publish the artifacts in case there is any limit about
+  the number of artifacts in a single task.
 
 */
 
