@@ -145,7 +145,7 @@ Both successful or failed build checks allow to download the tests report to rev
 
 #### What happens when merging a pull request
 
-When merging the pull request, a new SNAPSHOT library will be published into [OSS repository](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/).
+When merging the pull request, a new SNAPSHOT library will be published into [Sonatype OSSRH](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/).
 
 On the other hand, the documentation for the next version (SNAPSHOT) will be updated:
 

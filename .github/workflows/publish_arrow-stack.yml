@@ -14,8 +14,10 @@ jobs:
 
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
-      BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-      BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+      SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
+      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+      ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
 
     runs-on: macos-latest
     defaults:
