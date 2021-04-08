@@ -16,9 +16,15 @@ LATEST_VERSION=0.10.5
 
 When merging that pull request:
 
-* New RELEASE version will be published into Bintray for all the Arrow libraries.
+* New RELEASE version will be published for all the Arrow libraries into Sonatype staging repository.
 * A tag will be created with the RELEASE version.
 * Release notes will be created and associated to that tag.
 * The website will be updated with a new RELEASE version (`doc` and `doc/major.minor` directories)
 
-Then, it will be necessary to sync Bintray with Maven.
+Then, it will be necessary to close and release the Sonatype repository to sync with Maven Central:
+
+1. Login to https://oss.sonatype.org/ > `Staging repositories`
+3. Check the content and then: **Close** (it will check if the content meet the requirements)
+4. **Release** to sync with Maven Central (**Drop** and repeat if there are issues).
+
+NOTE: [This plugin](https://github.com/gradle-nexus/publish-plugin) provides tasks for closing and releasing the staging repositories. However, that plugin must be applied to the root project and it would be necessary to discard modules for publication. Let's keep this note here to give it a try later on.
