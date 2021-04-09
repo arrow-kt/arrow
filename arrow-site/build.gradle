@@ -20,10 +20,10 @@ apply from: "../arrow-libs/gradle/main.gradle"
 apply from: "../arrow-libs/gradle/subproject.gradle"
 
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
+    implementation "io.arrow-kt:arrow-optics:$VERSION_NAME"
+    implementation "io.arrow-kt:arrow-core:$VERSION_NAME"
+    implementation "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
+    implementation "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
 
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
