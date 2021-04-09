@@ -616,6 +616,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   ): B =
     fold({ fe(c, it) }, { fa(c, it) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <B> bifoldRight(
     c: Eval<B>,
     fe: (E, Eval<B>) -> Eval<B>,
@@ -758,6 +759,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     fold({ b }, { f(b, it) })
 
+  @Deprecated(FoldRightDeprecation)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     when (this) {
       is Valid -> Eval.defer { f(this.a, lb) }

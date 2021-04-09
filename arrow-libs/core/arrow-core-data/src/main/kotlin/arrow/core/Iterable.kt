@@ -281,6 +281,7 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
+@Deprecated("Iterable.foldRight is being deprecated because its functionality differs from other foldRight definitions within arrow. Use the stdlib foldRight instead", replaceWith = ReplaceWith("foldRight(initial) { acc, b -> operation(b, acc) }"))
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
   when (this) {
     is List -> _foldRight(initial, operation)
@@ -331,6 +332,7 @@ fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, Lis
 fun <A> Iterable<A>.void(): List<Unit> =
   map { Unit }
 
+@Deprecated(FoldRightDeprecation)
 fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun loop(fa_p: List<A>): Eval<B> = when {
     fa_p.isEmpty() -> lb
@@ -350,6 +352,7 @@ fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) ->
   return accumulator
 }
 
+@Deprecated(FoldRightDeprecation)
 inline fun <A, B> List<A>.reduceRightEvalOrNull(
   initial: (A) -> B,
   operation: (A, acc: Eval<B>) -> Eval<B>

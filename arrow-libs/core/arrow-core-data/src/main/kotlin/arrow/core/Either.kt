@@ -854,6 +854,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().let { either ->
       when (either) {
@@ -869,6 +870,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) })
 

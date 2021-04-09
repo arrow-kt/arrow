@@ -224,6 +224,7 @@ class NonEmptyList<out A>(
   inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     this.tail.fold(f(b, this.head), f)
 
+  @Deprecated(FoldRightDeprecation)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
 
