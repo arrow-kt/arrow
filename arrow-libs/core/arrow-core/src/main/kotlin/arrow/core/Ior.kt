@@ -151,6 +151,7 @@ sealed class Ior<out A, out B> {
   inline fun <C> foldLeft(c: C, f: (C, B) -> C): C =
     fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> foldRight(lc: Eval<C>, crossinline f: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ lc }, { Eval.defer { f(it, lc) } }, { _, b -> Eval.defer { f(b, lc) } })
 
@@ -161,6 +162,7 @@ sealed class Ior<out A, out B> {
   inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
 
