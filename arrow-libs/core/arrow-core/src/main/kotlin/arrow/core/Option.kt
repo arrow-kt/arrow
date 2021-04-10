@@ -626,6 +626,7 @@ sealed class Option<out A> {
       is None -> initial
     }
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <B> foldRight(initial: Eval<B>, crossinline operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
     when (this) {
       is Some -> Eval.defer { operation(value, initial) }
