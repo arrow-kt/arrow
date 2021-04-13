@@ -1,0 +1,21 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply from: "$SUB_PROJECT"
+apply from: "$TEST_COVERAGE"
+apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
+
+dependencies {
+    // TODO Change back to compileOnly when done
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+    compile project(":arrow-core")
+
+    testCompile "junit:junit:$JUNIT_VERSION"
+
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+}
