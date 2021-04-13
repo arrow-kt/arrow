@@ -12,11 +12,11 @@ import arrow.optics.get
 // The compiler could figure this out, if it knew that the Marker interfaces are final and thus
 //  have a fixed hierarchy...
 @JvmName("getFold")
-fun <K : FoldK, S, A, B> Optic_<K, S, A>.get(f: (A) -> B): Optic_<FoldK, S, B> =
+fun <K : FoldK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<FoldK, I, S, B> =
   this.compose(arrow.optics.Optic.get(f))
 @JvmName("getAffineFold")
-fun <K : AffineFoldK, S, A, B> Optic_<K, S, A>.get(f: (A) -> B): Optic_<AffineFoldK, S, B> =
+fun <K : AffineFoldK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<AffineFoldK, I, S, B> =
   this.compose(arrow.optics.Optic.get(f))
 @JvmName("getGetter")
-fun <K : GetterK, S, A, B> Optic_<K, S, A>.get(f: (A) -> B): Optic_<GetterK, S, B> =
+fun <K : GetterK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<GetterK, I, S, B> =
   this.compose(arrow.optics.Optic.get(f))

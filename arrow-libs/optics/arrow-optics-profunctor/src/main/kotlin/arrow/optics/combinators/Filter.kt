@@ -20,64 +20,64 @@ import arrow.optics.internal.Traversing
 import arrow.optics.internal.WanderF
 import arrow.optics.prism
 
-fun <S> Optic.Companion.filter(pred: (S) -> Boolean): Optic<PrismK, S, S, S, S> =
+fun <S> Optic.Companion.filter(pred: (S) -> Boolean): Optic<PrismK, Any?, S, S, S, S> =
   prism({ s -> if (pred(s)) Either.Right(s) else Either.Left(s) }, ::identity)
 
 @JvmName("filter_prism")
-fun <K : PrismK, S, A> Optic<K, S, S, A, A>.filter(
+fun <K : PrismK, I, S, A> Optic<K, I, S, S, A, A>.filter(
   pred: (A) -> Boolean
-): Optic<PrismK, S, S, A, A> = compose(Optic.filter(pred))
+): Optic<PrismK, I, S, S, A, A> = compose(Optic.filter(pred))
 
 @JvmName("filter_affineTraversal")
-fun <K : AffineTraversalK, S, A> Optic<K, S, S, A, A>.filter(
+fun <K : AffineTraversalK, I, S, A> Optic<K, I, S, S, A, A>.filter(
   pred: (A) -> Boolean
-): Optic<AffineTraversalK, S, S, A, A> = compose(Optic.filter(pred))
+): Optic<AffineTraversalK, I, S, S, A, A> = compose(Optic.filter(pred))
 
 @JvmName("filter_traversal")
-fun <K : TraversalK, S, A> Optic<K, S, S, A, A>.filter(
+fun <K : TraversalK, I, S, A> Optic<K, I, S, S, A, A>.filter(
   pred: (A) -> Boolean
-): Optic<TraversalK, S, S, A, A> = compose(Optic.filter(pred))
+): Optic<TraversalK, I, S, S, A, A> = compose(Optic.filter(pred))
 
 @JvmName("filter_affineFold")
-fun <K : AffineFoldK, S, A> Optic<K, S, S, A, A>.filter(
+fun <K : AffineFoldK, I, S, A> Optic<K, I, S, S, A, A>.filter(
   pred: (A) -> Boolean
-): Optic<AffineFoldK, S, S, A, A> = compose(Optic.filter(pred))
+): Optic<AffineFoldK, I, S, S, A, A> = compose(Optic.filter(pred))
 
 @JvmName("filter_fold")
-fun <K : FoldK, S, A> Optic<K, S, S, A, A>.filter(
+fun <K : FoldK, I, S, A> Optic<K, I, S, S, A, A>.filter(
   pred: (A) -> Boolean
-): Optic<FoldK, S, S, A, A> = compose(Optic.filter(pred))
+): Optic<FoldK, I, S, S, A, A> = compose(Optic.filter(pred))
 
-fun <K : FoldK, S> Optic.Companion.filteredBy(filter: Optic<K, S, S, Any?, Any?>): Optic<PrismK, S, S, S, S> =
+fun <K : FoldK, I, S> Optic.Companion.filteredBy(filter: Optic<K, I, S, S, Any?, Any?>): Optic<PrismK, Any?, S, S, S, S> =
   filter { s -> s.has(filter) }
 
 @JvmName("filteredBy_prism")
-fun <K1 : PrismK, K2 : FoldK, S, A> Optic<K1, S, S, A, A>.filteredBy(
-  filter: Optic<K2, A, A, Any?, Any?>
-): Optic<PrismK, S, S, A, A> =
+fun <K1 : PrismK, K2 : FoldK, I, J, S, A> Optic<K1, I, S, S, A, A>.filteredBy(
+  filter: Optic<K2, J, A, A, Any?, Any?>
+): Optic<PrismK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
 
 @JvmName("filteredBy_affineTraversal")
-fun <K1 : AffineTraversalK, K2 : FoldK, S, A> Optic<K1, S, S, A, A>.filteredBy(
-  filter: Optic<K2, A, A, Any?, Any?>
-): Optic<AffineTraversalK, S, S, A, A> =
+fun <K1 : AffineTraversalK, K2 : FoldK, I, J, S, A> Optic<K1, I, S, S, A, A>.filteredBy(
+  filter: Optic<K2, J, A, A, Any?, Any?>
+): Optic<AffineTraversalK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
 
 @JvmName("filteredBy_traversal")
-fun <K1 : TraversalK, K2 : FoldK, S, A> Optic<K1, S, S, A, A>.filteredBy(
-  filter: Optic<K2, A, A, Any?, Any?>
-): Optic<TraversalK, S, S, A, A> =
+fun <K1 : TraversalK, K2 : FoldK, I, J, S, A> Optic<K1, I, S, S, A, A>.filteredBy(
+  filter: Optic<K2, J, A, A, Any?, Any?>
+): Optic<TraversalK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
 
 @JvmName("filteredBy_affineFold")
-fun <K1 : AffineFoldK, K2 : FoldK, S, A> Optic<K1, S, S, A, A>.filteredBy(
-  filter: Optic<K2, A, A, Any?, Any?>
-): Optic<AffineFoldK, S, S, A, A> =
+fun <K1 : AffineFoldK, K2 : FoldK, I, J, S, A> Optic<K1, I, S, S, A, A>.filteredBy(
+  filter: Optic<K2, J, A, A, Any?, Any?>
+): Optic<AffineFoldK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
 
 @JvmName("filteredBy_fold")
-fun <K1 : FoldK, K2 : FoldK, S, A> Optic<K1, S, S, A, A>.filteredBy(
-  filter: Optic<K2, A, A, Any?, Any?>
-): Optic<FoldK, S, S, A, A> =
+fun <K1 : FoldK, K2 : FoldK, S, I, J, A> Optic<K1, I, S, S, A, A>.filteredBy(
+  filter: Optic<K2, J, A, A, Any?, Any?>
+): Optic<FoldK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
 

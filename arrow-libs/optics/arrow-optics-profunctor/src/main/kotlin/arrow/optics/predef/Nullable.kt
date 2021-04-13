@@ -18,23 +18,23 @@ fun <A, B> Optic.Companion.notNull(): PPrism<A?, B?, A, B> =
   }, { b -> b })
 
 @JvmName("notNull_prism")
-fun <K : PrismK, S, T, A, B> Optic<K, S, T, A?, B?>.notNull(): Optic<PrismK, S, T, A, B> =
+fun <K : PrismK, I, S, T, A, B> Optic<K, I, S, T, A?, B?>.notNull(): Optic<PrismK, I, S, T, A, B> =
   compose(Optic.notNull())
 
 @JvmName("notNull_affineTraversal")
-fun <K : AffineTraversalK, S, T, A, B> Optic<K, S, T, A?, B?>.notNull(): Optic<AffineTraversalK, S, T, A, B> =
+fun <K : AffineTraversalK, I, S, T, A, B> Optic<K, I, S, T, A?, B?>.notNull(): Optic<AffineTraversalK, I, S, T, A, B> =
   compose(Optic.notNull())
 
 @JvmName("notNull_traversal")
-fun <K : TraversalK, S, T, A, B> Optic<K, S, T, A?, B?>.notNull(): Optic<TraversalK, S, T, A, B> =
+fun <K : TraversalK, I, S, T, A, B> Optic<K, I, S, T, A?, B?>.notNull(): Optic<TraversalK, I, S, T, A, B> =
   compose(Optic.notNull())
 
 @JvmName("notNull_affineFold")
-fun <K : AffineFoldK, S, T, A, B> Optic<K, S, T, A?, B?>.notNull(): Optic<AffineFoldK, S, T, A, B> =
+fun <K : AffineFoldK, I, S, T, A, B> Optic<K, I, S, T, A?, B?>.notNull(): Optic<AffineFoldK, I, S, T, A, B> =
   compose(Optic.notNull())
 
 @JvmName("notNull_fold")
-fun <K : FoldK, S, T, A, B> Optic<K, S, T, A?, B?>.notNull(): Optic<FoldK, S, T, A, B> =
+fun <K : FoldK, I, S, T, A, B> Optic<K, I, S, T, A?, B?>.notNull(): Optic<FoldK, I, S, T, A, B> =
   compose(Optic.notNull())
 
 fun <A> Optic.Companion.isNull(): Prism<A?, Unit> =
@@ -43,21 +43,21 @@ fun <A> Optic.Companion.isNull(): Prism<A?, Unit> =
   }, { null })
 
 @JvmName("isNull_prism")
-fun <K : PrismK, S, A> Optic<K, S, S, A?, A?>.isNull(): Optic<PrismK, S, S, Unit, Unit> =
+fun <K : PrismK, I, S, A> Optic<K, I, S, S, A?, A?>.isNull(): Optic<PrismK, I, S, S, Unit, Unit> =
   compose(Optic.isNull<A>())
 
 @JvmName("isNull_affineTraversal")
-fun <K : AffineTraversalK, S, A> Optic<K, S, S, A?, A?>.isNull(): Optic<AffineTraversalK, S, S, Unit, Unit> =
+fun <K : AffineTraversalK, I, S, A> Optic<K, I, S, S, A?, A?>.isNull(): Optic<AffineTraversalK, I, S, S, Unit, Unit> =
   compose(Optic.isNull())
 
 @JvmName("isNull_traversal")
-fun <K : TraversalK, S, A> Optic<K, S, S, A?, A?>.isNull(): Optic<TraversalK, S, S, Unit, Unit> =
+fun <K : TraversalK, I, S, A> Optic<K, I, S, S, A?, A?>.isNull(): Optic<TraversalK, I, S, S, Unit, Unit> =
   compose(Optic.isNull())
 
 @JvmName("isNull_affineFold")
-fun <K : AffineFoldK, S, A> Optic<K, S, S, A?, A?>.isNull(): Optic<AffineFoldK, S, S, Unit, Unit> =
+fun <K : AffineFoldK, I, S, A> Optic<K, I, S, S, A?, A?>.isNull(): Optic<AffineFoldK, I, S, S, Unit, Unit> =
   compose(Optic.isNull())
 
 @JvmName("isNull_fold")
-fun <K : FoldK, S, A> Optic<K, S, S, A?, A?>.isNull(): Optic<FoldK, S, S, Unit, Unit> =
+fun <K : FoldK, I, S, A> Optic<K, I, S, S, A?, A?>.isNull(): Optic<FoldK, I, S, S, Unit, Unit> =
   compose(Optic.isNull())

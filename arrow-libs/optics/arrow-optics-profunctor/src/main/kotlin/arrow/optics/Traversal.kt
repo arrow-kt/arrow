@@ -1,6 +1,9 @@
 package arrow.optics
 
+import arrow.core.identity
 import arrow.optics.internal.Applicative
+import arrow.optics.internal.IxStar
+import arrow.optics.internal.IxWanderF
 import arrow.optics.internal.Kind
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
@@ -10,21 +13,43 @@ import arrow.optics.internal.WanderF
 import arrow.optics.internal.fix
 
 typealias Traversal<S, A> = PTraversal<S, S, A, A>
-typealias PTraversal<S, T, A, B> = Optic<TraversalK, S, T, A, B>
+typealias PTraversal<S, T, A, B> = Optic<TraversalK, Any?, S, T, A, B>
 
 fun <S, T, A, B> Optic.Companion.traversing(
   f: WanderF<S, T, A, B>
 ): PTraversal<S, T, A, B> =
   object : PTraversal<S, T, A, B> {
-    override fun <P> Profunctor<P>.transform(focus: Pro<P, A, B>): Pro<P, S, T> =
+    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, B>): Pro<P, (Any?) -> J, S, T> =
       (this as Traversing<P>).run {
-        focus.wander(f)
+        focus.wander(f).ixMap { it(Unit) }
       }
   }
 
-fun <K : TraversalK, S, T, A, B, F> S.traverseOf(
-  optic: Optic<K, S, T, A, B>,
+typealias IxTraversal<I, S, A> = PIxTraversal<I, S, S, A, A>
+typealias PIxTraversal<I, S, T, A, B> = Optic<TraversalK, I, S, T, A, B>
+
+fun <I, S, T, A, B> Optic.Companion.ixTraversing(
+  f: IxWanderF<I, S, T, A, B>
+): PIxTraversal<I, S, T, A, B> =
+  object : PIxTraversal<I, S, T, A, B> {
+    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, B>): Pro<P, (I) -> J, S, T> =
+      (this as Traversing<P>).run {
+        focus.iwander(f)
+      }
+  }
+
+fun <K : TraversalK, I, S, T, A, B, F> S.traverseOf(
+  optic: Optic<K, I, S, T, A, B>,
   AF: Applicative<F>,
   f: (A) -> Kind<F, B>
 ): Kind<F, T> =
-  Star.traversing(AF).run { optic.run { transform(Star(f)) } }.fix().f(this)
+  Star.traversing(AF).run { optic.run { transform(Star<F, I, A, B>(f)) } }
+    .fix().f(this)
+
+fun <K : TraversalK, I, S, T, A, B, F> S.ixTraverseOf(
+  optic: Optic<K, I, S, T, A, B>,
+  AF: Applicative<F>,
+  f: (I, A) -> Kind<F, B>
+): Kind<F, T> =
+  IxStar.traversing(AF).run { optic.run { transform(IxStar(f)) } }
+    .fix().f(::identity, this)

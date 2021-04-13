@@ -1,10 +1,20 @@
 import arrow.optics.Optic
+import arrow.optics.collectOf
 import arrow.optics.combinators.filter
-import arrow.optics.compose
+import arrow.optics.combinators.get
+import arrow.optics.combinators.ixPartsOf
+import arrow.optics.folding
+import arrow.optics.icompose
+import arrow.optics.ixCollectOf
+import arrow.optics.ixGet
+import arrow.optics.ixView
 import arrow.optics.modify
+import arrow.optics.predef.folded
 import arrow.optics.predef.notNull
 import arrow.optics.predef.pairFirst
+import arrow.optics.predef.traversed
 import arrow.optics.predef.traversedList
+import arrow.optics.predef.traversedString
 
 fun main() {
 
@@ -18,4 +28,19 @@ fun main() {
     (2 to "").modify(it) { it * 3 }
       .also(::println) // (6, "")
   }
+
+  val g = Optic.ixGet { i: Int -> 1 to i }.get { it * 2 }.let {
+    it.icompose(Optic.ixGet { it -> "Hello" to it })
+  }
+
+  100.ixView(g)
+    .also(::println)
+
+  val f = Optic.traversedList<String, String>()
+    .traversed()
+    .filter { it != 'W' && it != 'l' }
+    .ixPartsOf()
+
+  listOf("Hello", "World", "!").ixCollectOf(f)
+    .also(::println)
 }

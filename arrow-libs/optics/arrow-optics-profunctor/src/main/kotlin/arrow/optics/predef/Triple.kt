@@ -21,81 +21,81 @@ fun <A, B, C, D> Optic.Companion.tripleFirst(): PLens<Triple<A, C, D>, Triple<B,
   Optic.lens({ (a, _, _) -> a }, { (_, c, d), b -> Triple(b, c, d) })
 
 @JvmName("first_triple_lens")
-fun <K : LensK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<LensK, S, T, A, B> =
+fun <K : LensK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<LensK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 @JvmName("first_affine_traversal")
-fun <K : AffineTraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<AffineTraversalK, S, T, A, B> =
+fun <K : AffineTraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<AffineTraversalK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 @JvmName("first_triple_traversal")
-fun <K : TraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<TraversalK, S, T, A, B> =
+fun <K : TraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<TraversalK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 @JvmName("first_triple_getter")
-fun <K : GetterK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<GetterK, S, T, A, B> =
+fun <K : GetterK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<GetterK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 @JvmName("first_triple_affine_fold")
-fun <K : AffineFoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<AffineFoldK, S, T, A, B> =
+fun <K : AffineFoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<AffineFoldK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 @JvmName("first_triple_fold")
-fun <K : FoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<FoldK, S, T, A, B> =
+fun <K : FoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, C, D>, Triple<B, C, D>>.first(): Optic<FoldK, I, S, T, A, B> =
   compose(Optic.tripleFirst())
 
 fun <A, B, C, D> Optic.Companion.tripleSecond(): PLens<Triple<A, B, D>, Triple<A, C, D>, B, C> =
   Optic.lens({ (_, b, _) -> b }, { (a, _, d), c -> Triple(a, c, d) })
 
 @JvmName("second_triple_lens")
-fun <K : LensK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<LensK, S, T, B, C> =
+fun <K : LensK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<LensK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 @JvmName("second_affine_traversal")
-fun <K : AffineTraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<AffineTraversalK, S, T, B, C> =
+fun <K : AffineTraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<AffineTraversalK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 @JvmName("second_triple_traversal")
-fun <K : TraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<TraversalK, S, T, B, C> =
+fun <K : TraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<TraversalK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 @JvmName("second_triple_getter")
-fun <K : GetterK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<GetterK, S, T, B, C> =
+fun <K : GetterK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<GetterK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 @JvmName("second_triple_affine_fold")
-fun <K : AffineFoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<AffineFoldK, S, T, B, C> =
+fun <K : AffineFoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<AffineFoldK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 @JvmName("second_triple_fold")
-fun <K : FoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<FoldK, S, T, B, C> =
+fun <K : FoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, D>, Triple<A, C, D>>.second(): Optic<FoldK, I, S, T, B, C> =
   compose(Optic.tripleSecond())
 
 fun <A, B, C, D> Optic.Companion.tripleThird(): PLens<Triple<A, B, C>, Triple<A, B, D>, C, D> =
   Optic.lens({ (_, _, c) -> c }, { (a, b, _), d -> Triple(a, b, d) })
 
 @JvmName("third_triple_lens")
-fun <K : LensK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<LensK, S, T, C, D> =
+fun <K : LensK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<LensK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 @JvmName("third_affine_traversal")
-fun <K : AffineTraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<AffineTraversalK, S, T, C, D> =
+fun <K : AffineTraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<AffineTraversalK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 @JvmName("third_triple_traversal")
-fun <K : TraversalK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<TraversalK, S, T, C, D> =
+fun <K : TraversalK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<TraversalK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 @JvmName("third_triple_getter")
-fun <K : GetterK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<GetterK, S, T, C, D> =
+fun <K : GetterK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<GetterK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 @JvmName("third_triple_affine_fold")
-fun <K : AffineFoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<AffineFoldK, S, T, C, D> =
+fun <K : AffineFoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<AffineFoldK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 @JvmName("third_triple_fold")
-fun <K : FoldK, S, T, A, B, C, D> Optic<K, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<FoldK, S, T, C, D> =
+fun <K : FoldK, I, S, T, A, B, C, D> Optic<K, I, S, T, Triple<A, B, C>, Triple<A, B, D>>.third(): Optic<FoldK, I, S, T, C, D> =
   compose(Optic.tripleThird())
 
 fun <A, B> Optic.Companion.tripleEvery(): PTraversal<Triple<A, A, A>, Triple<B, B, B>, A, B> =
@@ -115,9 +115,9 @@ fun <A, B> Optic.Companion.tripleEvery(): PTraversal<Triple<A, A, A>, Triple<B, 
   })
 
 @JvmName("triple_every_traversal")
-fun <K : TraversalK, S, T, A, B> Optic<K, S, T, Triple<A, A, A>, Triple<B, B, B>>.every(): PTraversal<S, T, A, B> =
+fun <K : TraversalK, I, S, T, A, B> Optic<K, I, S, T, Triple<A, A, A>, Triple<B, B, B>>.every(): Optic<TraversalK, I, S, T, A, B> =
   compose(Optic.tripleEvery())
 
 @JvmName("triple_every_fold")
-fun <K : FoldK, S, T, A, B> Optic<K, S, T, Triple<A, A, A>, Triple<B, B, B>>.every(): Optic<FoldK, S, T, A, B> =
+fun <K : FoldK, I, S, T, A, B> Optic<K, I, S, T, Triple<A, A, A>, Triple<B, B, B>>.every(): Optic<FoldK, I, S, T, A, B> =
   compose(Optic.tripleEvery())

@@ -7,20 +7,20 @@ import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
 
 typealias Prism<S, A> = PPrism<S, S, A, A>
-typealias PPrism<S, T, A, B> = Optic<PrismK, S, T, A, B>
+typealias PPrism<S, T, A, B> = Optic<PrismK, Any?, S, T, A, B>
 
 fun <S, T, A ,B> Optic.Companion.prism(
   match: (S) -> Either<T, A>,
   re: (B) -> T
 ): PPrism<S, T, A, B> =
   object : PPrism<S, T, A, B> {
-    override fun <P> Profunctor<P>.transform(focus: Pro<P, A, B>): Pro<P, S, T> =
+    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, B>): Pro<P, (Any?) -> J, S, T> =
       (this as Choice<P>).run {
-        focus.right<A, B, T>().dimap({ s ->
+        focus.right<J, A, B, T>().dimap({ s: S ->
           match(s)
         }, { e ->
           e.fold(::identity) { b -> re(b) }
-        })
+        }).ixMap { it(Unit) }
       }
   }
 
