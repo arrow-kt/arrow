@@ -1,21 +1,32 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
 apply plugin: 'kotlinx-atomicfu'
 
-apply from: "$SUB_PROJECT"
+apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
-dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    api project(":arrow-continuations")
-    api project(":arrow-annotations")
+kotlin {
+    sourceSets {
+        jvmMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+                compileOnly "org.codehaus.mojo:animal-sniffer-annotations:1.19"
+                api project(":arrow-continuations")
+                api project(":arrow-annotations")
+            }
+        }
 
-    testCompile project(":arrow-core-test")
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+        jvmTest {
+            dependencies {
+                compileOnly project(":arrow-core-test")
+                runtimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+            }
+        }
+    }
 }
