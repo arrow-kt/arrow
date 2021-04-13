@@ -31,21 +31,3 @@ fun <K: AffineFoldK, I, S, A> Optic<K, I, S, S, A, A>.at(
   ind: I
 ): Getter<S, A?> =
   Optic.get { s -> s.viewOrNull(this@at.index(ind)) }
-
-// Unsafe if the index is not unique in th traversal
-@JvmName("at_traversal")
-fun <K: TraversalK, I, S, A> Optic<K, I, S, S, A, A>.at(
-  ind: I
-): IxLens<I, S, A?> =
-  Optic.ixLens({ s ->
-    ind to s.viewOrNull(this@at.uIndex(ind))
-  }, { s, a: A? ->
-    a?.let { s.set(this@at.uIndex(ind), it) } ?: s
-  })
-
-// Unsafe if the index is not unique in th traversal
-@JvmName("at_fold")
-fun <K: FoldK, I, S, A> Optic<K, I, S, S, A, A>.at(
-  ind: I
-): IxGetter<I, S, A?> =
-  Optic.ixGet { s -> ind to s.viewOrNull(this@at.uIndex(ind)) }

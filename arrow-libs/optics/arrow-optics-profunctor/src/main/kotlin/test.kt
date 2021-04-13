@@ -40,21 +40,17 @@ fun main() {
     .also(::println)
 
   val f = Optic.traversedList<String, String>()
-    .traversed()
-    .filter { it != 'W' && it != 'l' }
-    .reindexed { it * 2 }
-    .index(2)
+    .index(1)
     .also {
 
     }
 
   listOf("Hello", "World", "!")
-    .ixCollectOf(f)
+    .modify(f) { "" }
     .also(::println)
 
   val h = Optic.traversedMap<String, Int, Int>()
     .compose(Optic.id())
-    .at("Hello")
 
   mapOf("Hello" to 3, "World" to 5)
     .ixCollectOf(h)
