@@ -5,8 +5,8 @@ import arrow.typeclasses.Monoid
 
 internal class ForForget
 
-internal inline fun <R, I, A, B> Kind<Kind<Kind<Kind<ForForget, R>, I>, A>, B>.fix(): Forget<R, I, A, B> = this as Forget<R, I, A, B>
-internal class Forget<R, I, A, B>(internal val f: (A) -> R) : Kind<Kind<Kind<Kind<ForForget, R>, I>, A>, B> {
+internal inline fun <R, I, A, B> Pro<Kind<ForForget, R>, I, A, B>.fix(): Forget<R, I, A, B> = this as Forget<R, I, A, B>
+internal class Forget<out R, in I, in A, out B>(internal val f: (A) -> R) : Pro<Kind<ForForget, @kotlin.UnsafeVariance R>, I, A, B> {
   companion object {
     fun <R> strong(): ForgetStrong<R> = object : ForgetStrong<R> {}
     fun <R> traversing(MR: Monoid<R>) = object : ForgetTraversing<R> {

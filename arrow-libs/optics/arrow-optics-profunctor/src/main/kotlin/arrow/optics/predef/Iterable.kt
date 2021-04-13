@@ -21,5 +21,5 @@ fun <S: Iterable<A>, A> Optic.Companion.folded(): IxFold<Int, S, A> =
   })
 
 @JvmName("iterable_folded")
-fun <K : FoldK, I, S, IA: Iterable<A>, A> Optic_<K, I, S, IA>.folded(): Optic_<FoldK, I, S, A> =
-  compose(Optic.folded<IA, A>())
+fun <K : FoldK, I, S, T, IA: Iterable<A>, A, B> Optic<K, I, S, T, IA, B>.folded(): Optic<FoldK, I, S, Nothing, A, Nothing> =
+  compose(Optic.folded())

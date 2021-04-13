@@ -6,6 +6,12 @@ import arrow.optics.AffineFoldK
 import arrow.optics.AffineTraversal
 import arrow.optics.AffineTraversalK
 import arrow.optics.FoldK
+import arrow.optics.IxAffineFold
+import arrow.optics.IxAffineTraversal
+import arrow.optics.IxFold
+import arrow.optics.IxFoldF
+import arrow.optics.IxTraversal
+import arrow.optics.LensK
 import arrow.optics.Optic
 import arrow.optics.PrismK
 import arrow.optics.TraversalK
@@ -13,12 +19,20 @@ import arrow.optics.aTraversing
 import arrow.optics.compose
 import arrow.optics.has
 import arrow.optics.internal.Applicative
+import arrow.optics.internal.IxWanderF
 import arrow.optics.internal.Kind
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
 import arrow.optics.internal.Traversing
 import arrow.optics.internal.WanderF
+import arrow.optics.ixATraversing
+import arrow.optics.ixFolding
+import arrow.optics.ixTraverseOf
+import arrow.optics.ixTraverseOf_
+import arrow.optics.ixTraversing
 import arrow.optics.prism
+import arrow.optics.traverseOf_
+import arrow.optics.traversing
 
 fun <S> Optic.Companion.filter(pred: (S) -> Boolean): Optic<PrismK, Any?, S, S, S, S> =
   prism({ s -> if (pred(s)) Either.Right(s) else Either.Left(s) }, ::identity)
@@ -80,4 +94,3 @@ fun <K1 : FoldK, K2 : FoldK, S, I, J, A> Optic<K1, I, S, S, A, A>.filteredBy(
   filter: Optic<K2, J, A, A, Any?, Any?>
 ): Optic<FoldK, I, S, S, A, A> =
   compose(Optic.filteredBy(filter))
-

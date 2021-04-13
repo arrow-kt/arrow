@@ -106,12 +106,12 @@ fun <K1 : TraversalK, K2 : TraversalK, I, J, A, B, C, D, E, F> Optic.Companion.e
   })
 
 @JvmName("either_beside_fold")
-fun <K1 : FoldK, K2 : FoldK, I, J, A, B, C> Optic.Companion.eitherBeside(
-  l: Optic<K1, I, A, A, C, C>,
-  r: Optic<K2, J, B, B, C, C>
-): Fold<Either<A, B>, C> =
-  folding(object : FoldF<Either<A, B>, C> {
-    override fun <F> invoke(AF: Applicative<F>, s: Either<A, B>, f: (C) -> Kind<F, Unit>): Kind<F, Unit> =
+fun <K1 : FoldK, K2 : FoldK, I, J, A, B, C, D, E, F, G> Optic.Companion.eitherBeside(
+  l: Optic<K1, I, A, B, C, D>,
+  r: Optic<K2, J, E, F, C, G>
+): Fold<Either<A, E>, C> =
+  folding(object : FoldF<Either<A, E>, C> {
+    override fun <F> invoke(AF: Applicative<F>, s: Either<A, E>, f: (C) -> Kind<F, Unit>): Kind<F, Unit> =
       s.fold({ a ->
         a.traverseOf_(l, AF, f)
       }, { b ->
@@ -127,8 +127,8 @@ fun <K1 : TraversalK, K2 : TraversalK, K3: TraversalK, I, J, K, S, T, A, B, C, D
   compose(Optic.eitherBeside(l, r))
 
 @JvmName("either_beside_fold")
-fun <K1 : FoldK, K2 : FoldK, K3: FoldK, I, J, K, S, A, B, C> Optic<K1, I, S, S, Either<A, B>, Either<A, B>>.beside(
-  l: Optic<K2, J, A, A, C, C>,
-  r: Optic<K3, K, B, B, C, C>
-): Optic<FoldK, I, S, S, C, C> =
+fun <K1 : FoldK, K2 : FoldK, K3: FoldK, I, J, K, S, T, A, B, C, D, E, F, G> Optic<K1, I, S, T, Either<A, E>, Either<B, F>>.beside(
+  l: Optic<K2, J, A, B, C, D>,
+  r: Optic<K3, K, E, F, C, G>
+): Optic<FoldK, I, S, Nothing, C, Nothing> =
   compose(Optic.eitherBeside(l, r))

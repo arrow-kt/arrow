@@ -1,26 +1,29 @@
 import arrow.optics.Optic
-import arrow.optics.collectOf
+import arrow.optics.combinators.at
 import arrow.optics.combinators.filter
 import arrow.optics.combinators.get
-import arrow.optics.combinators.ixPartsOf
-import arrow.optics.folding
+import arrow.optics.combinators.id
+import arrow.optics.combinators.index
+import arrow.optics.compose
 import arrow.optics.icompose
 import arrow.optics.ixCollectOf
 import arrow.optics.ixGet
 import arrow.optics.ixView
 import arrow.optics.modify
-import arrow.optics.predef.folded
 import arrow.optics.predef.notNull
 import arrow.optics.predef.pairFirst
 import arrow.optics.predef.traversed
 import arrow.optics.predef.traversedList
-import arrow.optics.predef.traversedString
+import arrow.optics.predef.traversedMap
+import arrow.optics.reindexed
 
 fun main() {
 
   val xs = listOf(2, null, 3)
 
-  val o = Optic.traversedList<Int?, Int?>().notNull()
+  val o = Optic.traversedList<Int?, Int?>().notNull().also {
+
+  }
   xs.modify(o) { it * 3 }
     .also(::println) // [6, null, 9]
 
@@ -39,8 +42,21 @@ fun main() {
   val f = Optic.traversedList<String, String>()
     .traversed()
     .filter { it != 'W' && it != 'l' }
-    .ixPartsOf()
+    .reindexed { it * 2 }
+    .index(2)
+    .also {
 
-  listOf("Hello", "World", "!").ixCollectOf(f)
+    }
+
+  listOf("Hello", "World", "!")
+    .ixCollectOf(f)
+    .also(::println)
+
+  val h = Optic.traversedMap<String, Int, Int>()
+    .compose(Optic.id())
+    .at("Hello")
+
+  mapOf("Hello" to 3, "World" to 5)
+    .ixCollectOf(h)
     .also(::println)
 }

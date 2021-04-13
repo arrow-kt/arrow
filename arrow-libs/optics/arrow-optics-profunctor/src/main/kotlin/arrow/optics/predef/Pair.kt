@@ -110,12 +110,12 @@ fun <K1 : TraversalK, K2 : TraversalK, I, J, A, B, C, D, E, F> Optic.Companion.p
   })
 
 @JvmName("pair_beside_fold")
-fun <K1 : FoldK, K2 : FoldK, I, J, A, C, E> Optic.Companion.pairBeside(
-  l: Optic<K1, I, A, A, E, E>,
-  r: Optic<K2, J, C, C, E, E>
-): Fold<Pair<A, C>, E> =
-  folding(object : FoldF<Pair<A, C>, E> {
-    override fun <F> invoke(AF: Applicative<F>, s: Pair<A, C>, f: (E) -> Kind<F, Unit>): Kind<F, Unit> =
+fun <K1 : FoldK, K2 : FoldK, I, J, A, B, C, D, E, F, G> Optic.Companion.pairBeside(
+  l: Optic<K1, I, A, B, C, D>,
+  r: Optic<K2, J, E, F, C, G>
+): Fold<Pair<A, E>, C> =
+  folding(object : FoldF<Pair<A, E>, C> {
+    override fun <F> invoke(AF: Applicative<F>, s: Pair<A, E>, f: (C) -> Kind<F, Unit>): Kind<F, Unit> =
       AF.ap(
         AF.map(s.first.traverseOf_(l, AF, f)) { { } },
         s.second.traverseOf_(r, AF, f)
@@ -130,8 +130,8 @@ fun <K1 : TraversalK, K2 : TraversalK, K3 : TraversalK, I, J, K, S, T, A, B, C, 
   compose(Optic.pairBeside(l, r))
 
 @JvmName("pair_beside_fold")
-fun <K1 : FoldK, K2 : FoldK, K3 : FoldK, I, J, K, S, A, B, C> Optic<K1, I, S, S, Pair<A, B>, Pair<A, B>>.beside(
-  l: Optic<K2, J, A, A, C, C>,
-  r: Optic<K3, K, B, B, C, C>
-): Optic<FoldK, I, S, S, C, C> =
+fun <K1 : FoldK, K2 : FoldK, K3 : FoldK, I, J, K, S, T, A, B, C, D, E, F, G> Optic<K1, I, S, T, Pair<A, E>, Pair<B, F>>.beside(
+  l: Optic<K2, J, A, B, C, D>,
+  r: Optic<K3, K, E, F, C, G>
+): Optic<FoldK, I, S, Nothing, C, Nothing> =
   compose(Optic.pairBeside(l, r))

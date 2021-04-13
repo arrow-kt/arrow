@@ -2,21 +2,24 @@ package arrow.optics.combinators
 
 import arrow.optics.AffineFoldK
 import arrow.optics.FoldK
+import arrow.optics.Getter
 import arrow.optics.GetterK
+import arrow.optics.IxGetter
+import arrow.optics.Optic
 import arrow.optics.Optic_
 import arrow.optics.compose
 import arrow.optics.get
+import arrow.optics.ixGet
 
-// This is a bit ugly
-// The compiler can do this on its own if K is fixed, but not in polymorphic settings...
-// The compiler could figure this out, if it knew that the Marker interfaces are final and thus
-//  have a fixed hierarchy...
+fun <S> Optic.Companion.selfIndex(): IxGetter<S, S, S> =
+  ixGet { s -> s to s }
+
 @JvmName("getFold")
-fun <K : FoldK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<FoldK, I, S, B> =
-  this.compose(arrow.optics.Optic.get(f))
+fun <K : FoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<FoldK, I, S, Nothing, B, Nothing> =
+  this.compose(Optic.get(f))
 @JvmName("getAffineFold")
-fun <K : AffineFoldK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<AffineFoldK, I, S, B> =
-  this.compose(arrow.optics.Optic.get(f))
+fun <K : AffineFoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<AffineFoldK, I, S, Nothing, B, Nothing> =
+  this.compose(Optic.get(f))
 @JvmName("getGetter")
-fun <K : GetterK, I, S, A, B> Optic_<K, I, S, A>.get(f: (A) -> B): Optic_<GetterK, I, S, B> =
-  this.compose(arrow.optics.Optic.get(f))
+fun <K : GetterK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<GetterK, I, S, Nothing, B, Nothing> =
+  this.compose(Optic.get(f))

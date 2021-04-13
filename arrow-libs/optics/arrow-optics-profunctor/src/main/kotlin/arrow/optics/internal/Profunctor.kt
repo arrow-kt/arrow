@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.typeclasses.Monoid
 
 interface Kind<out F, out A>
-typealias Pro<P, I, A, B> = Kind<Kind<Kind<P, I>, A>, B>
+interface Pro<P, in I, in A, out B>
 
 // We are not using default impl anywhere because unlike haskell composition won't
 //  ever fuse and produce equally performant implementations, also its not that much
