@@ -1,9 +1,14 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.identity
 import arrow.optics.internal.Choice
+import arrow.optics.internal.Forget
+import arrow.optics.internal.IxForget
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
+import arrow.optics.internal.fix
+import arrow.typeclasses.Monoid
 
 typealias AffineFold<S, A> = Optic<AffineFoldK, Any?, S, Nothing, A, Nothing>
 
@@ -33,3 +38,22 @@ fun <I, S, A> Optic.Companion.ixAFolding(
       }.ixMap { f -> { i: I -> f(i) } }
   }
 
+fun <K : AffineFoldK, I, S, T, A, B> S.viewOrNull(optic: Optic<K, I, S, T, A, B>): A? =
+  Forget.traversing(Monoid.first<A>()).run {
+    optic.run {
+      transform(Forget<A?, I, A, B> { it })
+    }
+  }.fix().f(this)
+
+fun <K : AffineFoldK, I, S, T, A, B> S.ixViewOrNull(optic: Optic<K, I, S, T, A, B>): Pair<I, A>? =
+  IxForget.traversing(Monoid.first<Pair<I, A>>()).run {
+    optic.run {
+      transform(IxForget<Pair<I, A>?, I, A, B> { i, a -> i to a })
+    }
+  }.fix().f(::identity, this)
+
+fun <K : AffineFoldK, I, S, T, A, B> S.preview(optic: Optic<K, I, S, T, A, B>): A? =
+  viewOrNull(optic)
+
+fun <K : AffineFoldK, I, S, T, A, B> S.ixPreview(optic: Optic<K, I, S, T, A, B>): Pair<I, A>? =
+  ixViewOrNull(optic)

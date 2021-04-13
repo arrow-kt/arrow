@@ -59,22 +59,3 @@ fun <I, S, T, A, B> Optic.Companion.ixATraversing(
         })
       }
   }
-
-fun <K : AffineFoldK, I, S, T, A, B> S.viewOrNull(optic: Optic<K, I, S, T, A, B>): A? =
-  Forget.traversing(Monoid.first<A>()).run {
-    optic.run {
-      transform(Forget<A?, I, A, B> { it })
-    }
-  }.fix().f(this)
-
-fun <K : AffineFoldK, I, S, T, A, B> S.ixViewOrNull(optic: Optic<K, I, S, T, A, B>): Pair<I, A>? =
-  IxForget.traversing(Monoid.first<Pair<I, A>>()).run {
-    optic.run {
-      transform(IxForget<Pair<I, A>?, I, A, B> { i, a -> i to a })
-    }
-  }.fix().f(::identity, this)
-
-internal fun <A> Monoid.Companion.first() = object : Monoid<A?> {
-  override fun A?.combine(b: A?): A? = this ?: b
-  override fun empty(): A? = null
-}

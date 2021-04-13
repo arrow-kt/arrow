@@ -65,7 +65,7 @@ interface Applicative<F> : Functor<F> {
   override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = ap(pure(f), fa)
 }
 
-// Helpers
+// Helpers TODO Move
 internal class ForId
 
 internal fun <A> Kind<ForId, A>.fix(): Id<A> = this as Id<A>
@@ -104,3 +104,14 @@ internal interface ConstApplicative<R> : Applicative<Kind<ForConst, R>>, ConstFu
   override fun <A, B> map(fa: Kind<Kind<ForConst, R>, A>, f: (A) -> B): Kind<Kind<ForConst, R>, B> =
     fa as Const<R, B>
 }
+
+internal fun <F> Applicative<F>.backwards(): Applicative<F> =
+  object : Applicative<F> {
+    override fun <A, B> ap(ff: Kind<F, (A) -> B>, fa: Kind<F, A>): Kind<F, B> =
+      this@backwards.ap(
+        this@backwards.map(fa) { a: A -> { f: (A) -> B -> f(a) } },
+        ff
+      )
+
+    override fun <A> pure(a: A): Kind<F, A> = this@backwards.pure(a)
+  }

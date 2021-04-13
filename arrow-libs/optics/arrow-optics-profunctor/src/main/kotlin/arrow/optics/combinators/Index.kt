@@ -44,7 +44,7 @@ fun <K : AffineTraversalK, I, S, A> Optic<K, I, S, S, A, A>.ixFilter(
   (this as Optic<TraversalK, I, S, S, A, A>).ixFilter(filter) as IxAffineTraversal<I, S, A>
 
 @JvmName("ixFilter_fold")
-fun <K : FoldK, I, S, A> Optic<K, I, S, S, A, A>.ixFilter(
+fun <K : FoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.ixFilter(
   filter: (I, A) -> Boolean
 ): IxFold<I, S, A> =
   Optic.ixFolding(object : IxFoldF<I, S, A> {
@@ -56,11 +56,11 @@ fun <K : FoldK, I, S, A> Optic<K, I, S, S, A, A>.ixFilter(
   })
 
 @JvmName("ixFilter_affineFold")
-fun <K : AffineFoldK, I, S, A> Optic<K, I, S, S, A, A>.ixFilter(
+fun <K : AffineFoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.ixFilter(
   filter: (I, A) -> Boolean
 ): IxAffineFold<I, S, A> =
   // This is safe since we know that the filter will only ever be given one element
-  (this as Optic<FoldK, I, S, S, A, A>).ixFilter(filter) as IxAffineFold<I, S, A>
+  (this as Optic<FoldK, I, S, T, A, B>).ixFilter(filter) as IxAffineFold<I, S, A>
 
 
 @JvmName("index_traversal")

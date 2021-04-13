@@ -5,7 +5,7 @@ import arrow.optics.internal.Profunctor
 
 typealias Optic_<K, I, S, A> = Optic<K, I, S, S, A, A>
 
-interface Optic<out K, I, S, T, A, B> {
+interface Optic<out K, I, in S, out T, A, B> {
   fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, B>): Pro<P, (I) -> J, S, T>
 
   companion object
@@ -19,9 +19,12 @@ interface GetterK : AffineFoldK
 interface SetterK
 interface TraversalK : SetterK, FoldK
 interface AffineTraversalK : TraversalK, AffineFoldK
-interface PrismK : AffineTraversalK
+interface PrismK : AffineTraversalK, ReviewK
 interface LensK : AffineTraversalK, GetterK
-interface IsoK : LensK
+interface ReviewK
+interface ReversedLensK : ReviewK
+interface ReversedPrismK
+interface IsoK : LensK, ReversedLensK, ReversedPrismK
 
 // Type tetris! Although this isn't that bad ^-^
 fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.compose(

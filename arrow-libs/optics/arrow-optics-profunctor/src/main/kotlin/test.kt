@@ -1,10 +1,12 @@
+import arrow.core.Either
 import arrow.optics.Optic
-import arrow.optics.combinators.at
+import arrow.optics.combinators.backwards
 import arrow.optics.combinators.filter
 import arrow.optics.combinators.get
 import arrow.optics.combinators.id
-import arrow.optics.combinators.index
+import arrow.optics.combinators.only
 import arrow.optics.compose
+import arrow.optics.get
 import arrow.optics.ixCollectOf
 import arrow.optics.ixCompose
 import arrow.optics.ixGet
@@ -12,10 +14,10 @@ import arrow.optics.ixView
 import arrow.optics.modify
 import arrow.optics.predef.notNull
 import arrow.optics.predef.pairFirst
-import arrow.optics.predef.traversed
 import arrow.optics.predef.traversedList
 import arrow.optics.predef.traversedMap
-import arrow.optics.reindexed
+import arrow.optics.review
+import arrow.optics.un
 
 fun main() {
 
@@ -40,19 +42,24 @@ fun main() {
     .also(::println)
 
   val f = Optic.traversedList<String, String>()
-    .index(1)
+    .backwards()
     .also {
 
     }
 
   listOf("Hello", "World", "!")
-    .modify(f) { "" }
+    .ixCollectOf(f)
     .also(::println)
 
   val h = Optic.traversedMap<String, Int, Int>()
     .compose(Optic.id())
+    .backwards()
 
   mapOf("Hello" to 3, "World" to 5)
     .ixCollectOf(h)
     .also(::println)
+
+  "20".review(Optic.get<String, Either<String, Int>> { Either.Left(it) }.un())
+    .also(::println)
 }
+
