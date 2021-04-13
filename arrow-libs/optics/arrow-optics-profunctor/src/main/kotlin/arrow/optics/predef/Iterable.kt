@@ -6,7 +6,6 @@ import arrow.optics.IxFoldF
 import arrow.optics.Optic
 import arrow.optics.Optic_
 import arrow.optics.compose
-import arrow.optics.icomposeLeft
 import arrow.optics.internal.Applicative
 import arrow.optics.internal.Kind
 import arrow.optics.ixFolding
@@ -21,5 +20,5 @@ fun <S: Iterable<A>, A> Optic.Companion.folded(): IxFold<Int, S, A> =
   })
 
 @JvmName("iterable_folded")
-fun <K : FoldK, I, S, T, IA: Iterable<A>, A, B> Optic<K, I, S, T, IA, B>.folded(): Optic<FoldK, I, S, Nothing, A, Nothing> =
+fun <K : FoldK, I, S, T, IA: Iterable<A>, A, B> Optic<K, I, S, T, IA, B>.folded(): Optic<FoldK, I, S, T, A, Nothing> =
   compose(Optic.folded())

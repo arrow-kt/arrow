@@ -4,8 +4,8 @@ import arrow.core.Either
 
 internal class ForStar
 
-internal inline fun <F, I, A, B> Kind<Kind<Kind<Kind<ForStar, F>, I>, A>, B>.fix(): Star<F, I, A, B> = this as Star<F, I, A, B>
-internal class Star<F, I, A, B>(internal val f: (A) -> Kind<F, B>) : Kind<Kind<Kind<Kind<ForStar, F>, I>, A>, B> {
+internal inline fun <F, I, A, B> Pro<Kind<ForStar, F>, I, A, B>.fix(): Star<F, I, A, B> = this as Star<F, I, A, B>
+internal class Star<F, I, A, B>(internal val f: (A) -> Kind<F, B>) : Pro<Kind<ForStar, F>, I, A, B> {
   companion object {
     fun <F> traversing(AF: Applicative<F>) = object : StarTraversing<F> {
       override fun AF(): Applicative<F> = AF

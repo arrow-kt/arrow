@@ -4,8 +4,8 @@ import arrow.core.Either
 
 internal class ForIxStar
 
-internal inline fun <F, I, A, B> Kind<Kind<Kind<Kind<ForIxStar, F>, I>, A>, B>.fix(): IxStar<F, I, A, B> = this as IxStar<F, I, A, B>
-internal class IxStar<F, I, A, B>(internal val f: (I, A) -> Kind<F, B>) : Kind<Kind<Kind<Kind<ForIxStar, F>, I>, A>, B> {
+internal inline fun <F, I, A, B> Pro<Kind<ForIxStar, F>, I, A, B>.fix(): IxStar<F, I, A, B> = this as IxStar<F, I, A, B>
+internal class IxStar<F, I, A, B>(internal val f: (I, A) -> Kind<F, B>) : Pro<Kind<ForIxStar, F>, I, A, B> {
   companion object {
     fun <F> traversing(AF: Applicative<F>) = object : IxStarTraversing<F> {
       override fun AF(): Applicative<F> = AF

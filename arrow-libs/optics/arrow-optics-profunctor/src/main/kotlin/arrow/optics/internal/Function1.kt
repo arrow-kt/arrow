@@ -4,8 +4,8 @@ import arrow.core.Either
 
 internal class ForFunction1
 
-internal inline fun <I, A, B> Kind<Kind<Kind<ForFunction1, I>, A>, B>.fix(): Function1<I, A, B> = this as Function1<I, A, B>
-internal class Function1<I, A, B>(internal val f: (A) -> B) : Kind<Kind<Kind<ForFunction1, I>, A>, B> {
+internal inline fun <I, A, B> Pro<ForFunction1, I, A, B>.fix(): Function1<I, A, B> = this as Function1<I, A, B>
+internal class Function1<in I, in A, out B>(internal val f: (A) -> B) : Pro<ForFunction1, I, A, B> {
   companion object {
     fun mapping() = object : Function1Mapping {}
   }

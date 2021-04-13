@@ -4,9 +4,9 @@ import arrow.core.Either
 
 internal class ForIxFunction1
 
-internal inline fun <I, A, B> Kind<Kind<Kind<ForIxFunction1, I>, A>, B>.fix(): IxFunction1<I, A, B> =
+internal inline fun <I, A, B> Pro<ForIxFunction1, I, A, B>.fix(): IxFunction1<I, A, B> =
   this as IxFunction1<I, A, B>
-internal class IxFunction1<I, A, B>(val f: (I, A) -> B) : Kind<Kind<Kind<ForIxFunction1, I>, A>, B> {
+internal class IxFunction1<I, A, B>(val f: (I, A) -> B) : Pro<ForIxFunction1, I, A, B> {
   companion object {
     fun mapping() = object : IxFunction1Mapping {}
   }

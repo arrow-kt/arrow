@@ -15,11 +15,11 @@ fun <S> Optic.Companion.selfIndex(): IxGetter<S, S, S> =
   ixGet { s -> s to s }
 
 @JvmName("getFold")
-fun <K : FoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<FoldK, I, S, Nothing, B, Nothing> =
+fun <K : FoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<FoldK, I, S, T, B, Nothing> =
   this.compose(Optic.get(f))
 @JvmName("getAffineFold")
-fun <K : AffineFoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<AffineFoldK, I, S, Nothing, B, Nothing> =
+fun <K : AffineFoldK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<AffineFoldK, I, S, T, B, Nothing> =
   this.compose(Optic.get(f))
 @JvmName("getGetter")
-fun <K : GetterK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<GetterK, I, S, Nothing, B, Nothing> =
+fun <K : GetterK, I, S, T, A, B, C> Optic<K, I, S, T, A, C>.get(f: (A) -> B): Optic<GetterK, I, S, T, B, Nothing> =
   this.compose(Optic.get(f))

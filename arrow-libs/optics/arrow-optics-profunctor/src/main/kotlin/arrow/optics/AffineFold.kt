@@ -5,31 +5,31 @@ import arrow.optics.internal.Choice
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
 
-typealias AffineFold<S, A> = Optic_<AffineFoldK, Any?, S, A>
+typealias AffineFold<S, A> = Optic<AffineFoldK, Any?, S, Nothing, A, Nothing>
 
 fun <S, A> Optic.Companion.aFolding(
   f: (S) -> A?
 ): AffineFold<S, A> =
   object : AffineFold<S, A> {
-    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, A>): Pro<P, (Any?) -> J, S, S> =
+    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, Nothing>): Pro<P, (Any?) -> J, S, Nothing> =
       (this as Choice<P>).run {
-        focus.left<J, A, A, Any?>().lMap { s: S ->
+        focus.left<J, A, Nothing, Any?>().lMap { s: S ->
           f(s)?.let { Either.Left(it) } ?: Either.Right(Unit)
-        } as Pro<P, J, S, S> // Safe because AffineFoldK guarantees use of Forget
+        } as Pro<P, J, S, Nothing> // Safe because AffineFoldK guarantees use of Forget
       }.ixMap { it(Unit) }
   }
 
-typealias IxAffineFold<I, S, A> = Optic_<AffineFoldK, I, S, A>
+typealias IxAffineFold<I, S, A> = Optic<AffineFoldK, I, S, Nothing, A, Nothing>
 
 fun <I, S, A> Optic.Companion.ixAFolding(
   f: (S) -> Pair<I, A>?
 ): IxAffineFold<I, S, A> =
   object : IxAffineFold<I, S, A> {
-    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, A>): Pro<P, (I) -> J, S, S> =
+    override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, A, Nothing>): Pro<P, (I) -> J, S, Nothing> =
       (this as Choice<P>).run {
-        focus.left<J, A, A, Any?>().lMap { s: S ->
-          f(s)?.let { Either.Left(it) } ?: Either.Right(Unit)
-        } as Pro<P, J, S, S> // Safe because AffineFoldK guarantees use of Forget
+        focus.left<J, A, Nothing, Any?>().lMap { s: S ->
+          f(s)?.let { Either.Left(it.second) } ?: Either.Right(Unit)
+        } as Pro<P, (I) -> J, S, Nothing> // Safe because AffineFoldK guarantees use of Forget
       }.ixMap { f -> { i: I -> f(i) } }
   }
 

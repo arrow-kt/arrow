@@ -24,42 +24,41 @@ interface LensK : AffineTraversalK, GetterK
 interface IsoK : LensK
 
 // Type tetris! Although this isn't that bad ^-^
-fun <LK1, LK2, I, I2, S, T1, T2 : T1, A1 : A2, A2, B1, B2 : B1, C, D> Optic<LK1, I, S, T1, A1, B1>.compose(
-  other: Optic<LK2, I2, A2, B2, C, D>
-): Optic<LK1, I, S, T2, C, D> where LK2 : LK1 = object : Optic<LK1, I, S, T2, C, D> {
-  override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, C, D>): Pro<P, (I) -> J, S, T2> {
-    // Both casts are safe because of variance but the Pro type does not allow variance :/
+fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.compose(
+  other: Optic<K2, I2, A2, B2, C, D>
+): Optic<K1, I1, S, T, C, D> = object : Optic<K1, I1, S, T, C, D> {
+  override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, C, D>): Pro<P, (I1) -> J, S, T> {
     val pab = other.run { transform(focus) }.ixMap<J, (I2) -> J, A2, B2> { j -> { j } }
-      as Pro<P, J, A1, B1>
-    return this@compose.run { transform(pab) as Pro<P, (I) -> J, S, T2> }
+    return this@compose.run { transform(pab) }
   }
 }
 
-fun <LK1, LK2, I, J, Z, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<LK1, I, S, T, A1, B1>.icompose(
-  other: Optic<LK2, J, A2, B2, C, D>,
-  f: (I, J) -> Z
-): Optic<LK1, Z, S, T, C, D> where LK2 : LK1 = object : Optic<LK1, Z, S, T, C, D> {
-  override fun <P, K> Profunctor<P>.transform(focus: Pro<P, K, C, D>): Pro<P, (Z) -> K, S, T> {
+fun <K1, K2 : K1, I1, I2, I3, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.ixCompose(
+  other: Optic<K2, I2, A2, B2, C, D>,
+  f: (I1, I2) -> I3
+): Optic<K1, I3, S, T, C, D> = object : Optic<K1, I3, S, T, C, D> {
+  override fun <P, J> Profunctor<P>.transform(focus: Pro<P, J, C, D>): Pro<P, (I3) -> J, S, T> {
     val pab = other.run { transform(focus) }
-    return this@icompose.run { transform(pab).ixMap { zk -> { i -> { j -> zk(f(i, j)) } } } }
+    return this@ixCompose.run { transform(pab) }
+      .ixMap { i3j -> { i1: I1 -> { i2: I2 -> i3j(f(i1, i2)) } } }
   }
 }
 
-fun <LK1, LK2, I, J, S, T, A, B, C, D> Optic<LK1, I, S, T, A, B>.icompose(
-  other: Optic<LK2, J, A, B, C, D>
-): Optic<LK1, Pair<I, J>, S, T, C, D> where LK2 : LK1 =
-  icompose(other) { i, j -> i to j }
+fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.ixCompose(
+  other: Optic<K2, I2, A2, B2, C, D>
+): Optic<K1, Pair<I1, I2>, S, T, C, D> =
+  ixCompose(other) { i1, i2 -> i1 to i2 }
 
-// Included for symmetry
-fun <LK1, LK2, I, J, S, T, A, B, C, D> Optic<LK1, I, S, T, A, B>.icomposeLeft(
-  other: Optic<LK2, J, A, B, C, D>
-): Optic<LK1, I, S, T, C, D> where LK2 : LK1 =
+// Included for symmetry, but this is just compose
+fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.ixComposeLeft(
+  other: Optic<K2, I2, A2, B2, C, D>
+): Optic<K1, I1, S, T, C, D> =
   compose(other)
 
-fun <LK1, LK2, I, J, S, T, A, B, C, D> Optic<LK1, I, S, T, A, B>.icomposeRight(
-  other: Optic<LK2, J, A, B, C, D>
-): Optic<LK1, J, S, T, C, D> where LK2 : LK1 =
-  icompose(other) { _, j -> j }
+fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.ixComposeRight(
+  other: Optic<K2, I2, A2, B2, C, D>
+): Optic<K1, I2, S, T, C, D> =
+  ixCompose(other) { _, i2 -> i2 }
 
 fun <K, I, J, S, T, A, B> Optic<K, I, S, T, A, B>.reindexed(
   f: (I) -> J

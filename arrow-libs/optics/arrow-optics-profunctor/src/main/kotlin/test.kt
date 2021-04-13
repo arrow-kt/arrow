@@ -5,8 +5,8 @@ import arrow.optics.combinators.get
 import arrow.optics.combinators.id
 import arrow.optics.combinators.index
 import arrow.optics.compose
-import arrow.optics.icompose
 import arrow.optics.ixCollectOf
+import arrow.optics.ixCompose
 import arrow.optics.ixGet
 import arrow.optics.ixView
 import arrow.optics.modify
@@ -33,7 +33,7 @@ fun main() {
   }
 
   val g = Optic.ixGet { i: Int -> 1 to i }.get { it * 2 }.let {
-    it.icompose(Optic.ixGet { it -> "Hello" to it })
+    it.ixCompose(Optic.ixGet { it -> "Hello" to it })
   }
 
   100.ixView(g)

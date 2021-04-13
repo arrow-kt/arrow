@@ -5,8 +5,8 @@ import arrow.typeclasses.Monoid
 
 internal class ForIxForget
 
-internal inline fun <R, I, A, B> Kind<Kind<Kind<Kind<ForIxForget, R>, I>, A>, B>.fix(): IxForget<R, I, A, B> = this as IxForget<R, I, A, B>
-internal class IxForget<R, I, A, B>(internal val f: (I, A) -> R) : Kind<Kind<Kind<Kind<ForIxForget, R>, I>, A>, B> {
+internal inline fun <R, I, A, B> Pro<Kind<ForIxForget, R>, I, A, B>.fix(): IxForget<R, I, A, B> = this as IxForget<R, I, A, B>
+internal class IxForget<out R, in I, in A, out B>(internal val f: (I, A) -> R) : Pro<Kind<ForIxForget, @kotlin.UnsafeVariance R>, I, A, B> {
   companion object {
     fun <R> strong(): IxForgetStrong<R> = object : IxForgetStrong<R> {}
     fun <R> traversing(MR: Monoid<R>) = object : IxForgetTraversing<R> {

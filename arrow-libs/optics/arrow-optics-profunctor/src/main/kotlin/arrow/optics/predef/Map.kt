@@ -31,5 +31,5 @@ fun <K : TraversalK, I, S, T, Key, A, B> Optic<K, I, S, T, Map<Key, A>, Map<Key,
   compose(Optic.traversedMap())
 
 @JvmName("map_fold")
-fun <K : FoldK, I, S, Key, A> Optic<K, I, S, S, Map<Key, A>, Map<Key, A>>.traversed(): IxFold<I, S, A> =
+fun <K : FoldK, I, S, Key, A> Optic<K, I, S, S, Map<Key, A>, Map<Key, A>>.traversed(): Optic<FoldK, I, S, S, A, Nothing> =
   compose(Optic.traversedMap())

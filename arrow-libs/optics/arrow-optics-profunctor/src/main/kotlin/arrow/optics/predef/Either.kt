@@ -130,5 +130,5 @@ fun <K1 : TraversalK, K2 : TraversalK, K3: TraversalK, I, J, K, S, T, A, B, C, D
 fun <K1 : FoldK, K2 : FoldK, K3: FoldK, I, J, K, S, T, A, B, C, D, E, F, G> Optic<K1, I, S, T, Either<A, E>, Either<B, F>>.beside(
   l: Optic<K2, J, A, B, C, D>,
   r: Optic<K3, K, E, F, C, G>
-): Optic<FoldK, I, S, Nothing, C, Nothing> =
+): Optic<FoldK, I, S, T, C, Nothing> =
   compose(Optic.eitherBeside(l, r))
