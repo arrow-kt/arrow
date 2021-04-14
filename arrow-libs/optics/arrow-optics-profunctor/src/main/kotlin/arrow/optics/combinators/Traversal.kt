@@ -1,32 +1,43 @@
 package arrow.optics.combinators
 
+import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.unalign
 import arrow.optics.FoldK
+import arrow.optics.IxAffineTraversal
 import arrow.optics.IxFoldF
 import arrow.optics.IxLens
 import arrow.optics.IxTraversal
 import arrow.optics.Lens
 import arrow.optics.Optic
+import arrow.optics.PIxAffineTraversal
 import arrow.optics.PIxLens
 import arrow.optics.PIxTraversal
 import arrow.optics.PLens
 import arrow.optics.TraversalK
 import arrow.optics.collectOf
+import arrow.optics.firstOrNull
 import arrow.optics.internal.Applicative
 import arrow.optics.internal.IxWanderF
 import arrow.optics.internal.Kind
+import arrow.optics.internal.Pro
+import arrow.optics.internal.Profunctor
 import arrow.optics.internal.backwards
+import arrow.optics.ixATraversing
 import arrow.optics.ixCollectOf
+import arrow.optics.ixFirstOrNull
 import arrow.optics.ixFolding
 import arrow.optics.ixLens
 import arrow.optics.ixTraverseOf
 import arrow.optics.ixTraverseOf_
 import arrow.optics.ixTraversing
+import arrow.optics.ixView
 import arrow.optics.lens
 import arrow.optics.modify
+import arrow.optics.set
 import arrow.optics.traverseOf
 import arrow.optics.traversing
+import arrow.optics.view
 
 fun <K : TraversalK, I, S, A> Optic<K, I, S, S, A, A>.partsOf(): Lens<S, List<A>> =
   Optic.lens({ s ->
@@ -142,8 +153,31 @@ fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.ixDropWhile(filter: (I, 
     }
   })
 
+// This is hacked together using unsafePartsOf in an index preserving way
+// TODO If we use lazy applicatives instead we can just use Applicative.backwards instead, but for now this is needed
 fun <K : TraversalK, I, S, T, A, B> Optic<K, I, S, T, A, B>.backwards(): PIxTraversal<I, S, T, A, B> =
   Optic.ixTraversing(object : IxWanderF<I, S, T, A, B> {
-    override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> =
-      source.ixTraverseOf(this@backwards, AF.backwards(), f)
+    override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> {
+      val thisP = this@backwards.unsafeIxPartsOf()
+      val (ix, parts) = source.ixView(thisP).let { (a, b) -> a to b.toMutableList() }
+      val buf = mutableListOf<B>()
+      val fUnit = parts.asReversed().foldIndexed(AF.pure(Unit)) { i, acc, a ->
+        AF.ap(
+          AF.map(acc) { { b -> buf += b } },
+          f(ix[ix.size - i - 1], a)
+        )
+      }
+      return AF.map(fUnit) { source.modify(thisP) { buf } }
+    }
+  })
+
+fun <K : TraversalK, I, S, A> Optic<K, I, S, S, A, A>.singular(): IxAffineTraversal<I, S, A> =
+  take(1) as IxAffineTraversal<I, S, A>
+
+// Unsafe because it throws if the traversal is empty and modifies all elements if it has more than one
+fun <K : TraversalK, I, S, T, A, B> Optic<K, I, S, T, A, B>.unsafeSingular(): PIxLens<I, S, T, A, B> =
+  Optic.ixLens({ s ->
+    s.ixFirstOrNull(this@unsafeSingular) ?: throw IllegalStateException("unsafeSingular: No element")
+  }, { s, b ->
+    s.set(this@unsafeSingular, b)
   })

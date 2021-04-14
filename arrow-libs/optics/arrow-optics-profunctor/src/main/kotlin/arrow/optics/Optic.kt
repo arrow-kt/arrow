@@ -24,7 +24,7 @@ interface LensK : AffineTraversalK, GetterK
 interface ReviewK
 interface ReversedLensK : ReviewK
 interface ReversedPrismK : GetterK
-interface IsoK : LensK, ReversedLensK, ReversedPrismK
+interface IsoK : LensK, PrismK, ReversedLensK, ReversedPrismK
 
 // Type tetris! Although this isn't that bad ^-^
 fun <K1, K2 : K1, I1, I2, S, T, A1 : A2, A2, B1, B2 : B1, C, D> Optic<K1, I1, S, T, A1, B1>.compose(
