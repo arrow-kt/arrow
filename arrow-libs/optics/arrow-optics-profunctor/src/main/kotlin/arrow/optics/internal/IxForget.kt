@@ -76,3 +76,11 @@ internal interface IxForgetTraversing<R> : Traversing<Kind<ForIxForget, R>>, IxF
       ).fix().v
     }
 }
+
+internal interface IxForgetCoChoice<R> : CoChoice<Kind<ForIxForget, R>>, IxForgetProfunctor<R> {
+  override fun <I, A, B, C> Pro<Kind<ForIxForget, R>, I, Either<A, C>, Either<B, C>>.unLeft(): Pro<Kind<ForIxForget, R>, I, A, B> =
+    IxForget { i, a -> fix().f(i, Either.Left(a)) }
+
+  override fun <I, A, B, C> Pro<Kind<ForIxForget, R>, I, Either<C, A>, Either<C, B>>.unRight(): Pro<Kind<ForIxForget, R>, I, A, B> =
+    IxForget { i, a -> fix().f(i, Either.Right(a)) }
+}

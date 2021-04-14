@@ -192,7 +192,6 @@ internal fun <A, C: Comparable<C>> Monoid.Companion.maxBy(f: (A) -> C) = object 
   }
   override fun empty(): A? = null
 }
-
 internal fun <A, C: Comparable<C>> Monoid.Companion.minBy(f: (A) -> C) = object : Monoid<A?> {
   override fun A?.combine(b: A?): A? = when {
     this == null -> b

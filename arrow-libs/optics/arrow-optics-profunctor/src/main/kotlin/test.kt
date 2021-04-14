@@ -5,6 +5,7 @@ import arrow.optics.combinators.filter
 import arrow.optics.combinators.get
 import arrow.optics.combinators.id
 import arrow.optics.combinators.only
+import arrow.optics.combinators.re
 import arrow.optics.compose
 import arrow.optics.get
 import arrow.optics.ixCollectOf
@@ -12,12 +13,13 @@ import arrow.optics.ixCompose
 import arrow.optics.ixGet
 import arrow.optics.ixView
 import arrow.optics.modify
+import arrow.optics.predef.eitherLeft
 import arrow.optics.predef.notNull
 import arrow.optics.predef.pairFirst
 import arrow.optics.predef.traversedList
 import arrow.optics.predef.traversedMap
 import arrow.optics.review
-import arrow.optics.un
+import arrow.optics.view
 
 fun main() {
 
@@ -59,7 +61,17 @@ fun main() {
     .ixCollectOf(h)
     .also(::println)
 
-  "20".review(Optic.get<String, Either<String, Int>> { Either.Left(it) }.un())
+  "20".review(Optic.get<String, Either<String, Int>> { Either.Left(it) }.re())
+    .also(::println)
+
+  val x = Optic.eitherLeft<Int, String, Double>().re().re()
+  val y = Optic.pairFirst<Int, String, Double>().re().re()
+
+  "Hello".review(x)
+    .also(::println)
+
+  (100 to 1.0).view(y)
     .also(::println)
 }
+
 

@@ -23,7 +23,7 @@ interface PrismK : AffineTraversalK, ReviewK
 interface LensK : AffineTraversalK, GetterK
 interface ReviewK
 interface ReversedLensK : ReviewK
-interface ReversedPrismK
+interface ReversedPrismK : GetterK
 interface IsoK : LensK, ReversedLensK, ReversedPrismK
 
 // Type tetris! Although this isn't that bad ^-^

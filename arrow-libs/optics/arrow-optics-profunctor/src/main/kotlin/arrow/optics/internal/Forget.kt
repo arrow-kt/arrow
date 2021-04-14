@@ -8,8 +8,8 @@ internal class ForForget
 internal inline fun <R, I, A, B> Pro<Kind<ForForget, R>, I, A, B>.fix(): Forget<R, I, A, B> = this as Forget<R, I, A, B>
 internal class Forget<out R, in I, in A, out B>(internal val f: (A) -> R) : Pro<Kind<ForForget, @kotlin.UnsafeVariance R>, I, A, B> {
   companion object {
-    fun <R> strong(): ForgetStrong<R> = object : ForgetStrong<R> {}
-    fun <R> traversing(MR: Monoid<R>) = object : ForgetTraversing<R> {
+    fun <R> strong(): ForgetStrong<R> = object : ForgetStrong<R>, ForgetCoChoice<R> {}
+    fun <R> traversing(MR: Monoid<R>): ForgetTraversing<R> = object : ForgetTraversing<R> {
       override fun MR(): Monoid<R> = MR
     }
   }
@@ -76,5 +76,12 @@ internal interface ForgetTraversing<R> : Traversing<Kind<ForForget, R>>, ForgetS
         }, s, { _, a -> Const(this.fix().f(a)) }
       ).fix().v
     }
+}
 
+internal interface ForgetCoChoice<R> : CoChoice<Kind<ForForget, R>>, ForgetProfunctor<R> {
+  override fun <I, A, B, C> Pro<Kind<ForForget, R>, I, Either<A, C>, Either<B, C>>.unLeft(): Pro<Kind<ForForget, R>, I, A, B> =
+    Forget { a -> fix().f(Either.Left(a)) }
+
+  override fun <I, A, B, C> Pro<Kind<ForForget, R>, I, Either<C, A>, Either<C, B>>.unRight(): Pro<Kind<ForForget, R>, I, A, B> =
+    Forget { a -> fix().f(Either.Right(a)) }
 }

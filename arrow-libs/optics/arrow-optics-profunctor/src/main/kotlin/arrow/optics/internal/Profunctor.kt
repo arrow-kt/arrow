@@ -29,9 +29,19 @@ interface IxLinearF<I, S, T, A, B> {
   operator fun <F> invoke(FF: Functor<F>, s: S, f: (I, A) -> Kind<F, B>): Kind<F, T>
 }
 
+interface CoStrong<P> : Profunctor<P> {
+  fun <I, A, B, C> Pro<P, I, Pair<A, C>, Pair<B, C>>.unFirst(): Pro<P, I, A, B>
+  fun <I, A, B, C> Pro<P, I, Pair<C, A>, Pair<C, B>>.unSecond(): Pro<P, I, A, B>
+}
+
 interface Choice<P> : Profunctor<P> {
   fun <I, A, B, C> Pro<P, I, A, B>.left(): Pro<P, I, Either<A, C>, Either<B, C>>
   fun <I, A, B, C> Pro<P, I, A, B>.right(): Pro<P, I, Either<C, A>, Either<C, B>>
+}
+
+interface CoChoice<P> : Profunctor<P> {
+  fun <I, A, B, C> Pro<P, I, Either<A, C>, Either<B, C>>.unLeft(): Pro<P, I, A, B>
+  fun <I, A, B, C> Pro<P, I, Either<C, A>, Either<C, B>>.unRight(): Pro<P, I, A, B>
 }
 
 interface Traversing<P> : Strong<P>, Choice<P> {

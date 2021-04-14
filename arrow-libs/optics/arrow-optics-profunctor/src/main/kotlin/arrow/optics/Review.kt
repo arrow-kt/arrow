@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.optics.combinators.re
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
 import arrow.optics.internal.Tagged
@@ -14,12 +15,6 @@ fun <B, T> Optic.Companion.unGet(f: (B) -> T): Review<B, T> =
       // Safe because ReviewK ensures Tagged or similar is used
       focus.rMap(f) as Pro<P, (Any?) -> J, Nothing, T>
   }
-
-fun <K : ReviewK, I, S, T, A, B> Optic<K, I, S, T, A, B>.re(): Getter<B, T> =
-  Optic.get { it.review(this@re) }
-
-fun <K : GetterK, I, S, T, A, B> Optic<K, I, S, T, A, B>.un(): Review<S, A> =
-  Optic.unGet { s -> s.view(this@un) }
 
 fun <K : ReviewK, I, S, T, A, B> B.review(optic: Optic<K, I, S, T, A, B>): T =
   Tagged.choice().run { optic.run { transform(Tagged<I, A, B>(this@review)) } }
