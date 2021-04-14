@@ -1,5 +1,7 @@
 package arrow.optics.predef
 
+import arrow.core.Eval
+import arrow.core.iterateRight
 import arrow.optics.FoldK
 import arrow.optics.IxFold
 import arrow.optics.IxTraversal
@@ -22,6 +24,13 @@ fun <K, A, B> Optic.Companion.traversedMap(): PIxTraversal<K, Map<K, A>, Map<K, 
           f(k, a)
         )
       }
+      return AF.map(funit) { buf }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: Map<K, A>, f: (K, A) -> Kind<F, B>): Kind<F, Map<K, B>> {
+      val buf = mutableMapOf<K, B>()
+      val funit = source.iterator().iterateRight(Eval.now(AF.pure(Unit))) { (k, a), acc ->
+        AF.apLazy(AF.map(f(k, a)) { b -> { buf[k] = b } }, acc)
+      }.value()
       return AF.map(funit) { buf }
     }
   })

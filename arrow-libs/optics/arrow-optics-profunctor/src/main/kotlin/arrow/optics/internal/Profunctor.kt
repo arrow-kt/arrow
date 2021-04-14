@@ -1,6 +1,7 @@
 package arrow.optics.internal
 
 import arrow.core.Either
+import arrow.core.Eval
 import arrow.typeclasses.Monoid
 
 interface Kind<out F, out A>
@@ -52,10 +53,12 @@ interface Traversing<P> : Strong<P>, Choice<P> {
 // Traverse in disguise
 interface WanderF<S, T, A, B> {
   operator fun <F> invoke(AF: Applicative<F>, source: S, f: (A) -> Kind<F, B>): Kind<F, T>
+  fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (A) -> Kind<F, B>): Kind<F, T> = invoke(AF, source, f)
 }
 
 interface IxWanderF<I, S, T, A, B> {
   operator fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T>
+  fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> = invoke(AF, source, f)
 }
 
 interface Mapping<P> : Traversing<P> {
@@ -71,6 +74,8 @@ interface Functor<F> {
 interface Applicative<F> : Functor<F> {
   fun <A> pure(a: A): Kind<F, A>
   fun <A, B> ap(ff: Kind<F, (A) -> B>, fa: Kind<F, A>): Kind<F, B>
+  fun <A, B> apLazy(ff: Kind<F, (A) -> B>, fa: Eval<Kind<F, A>>): Eval<Kind<F, B>> =
+    fa.map { fa -> ap(ff, fa) }
 
   override fun <A, B> map(fa: Kind<F, A>, f: (A) -> B): Kind<F, B> = ap(pure(f), fa)
 }
@@ -110,6 +115,12 @@ internal interface ConstApplicative<R> : Applicative<Kind<ForConst, R>>, ConstFu
     fa: Kind<Kind<ForConst, R>, A>
   ): Kind<Kind<ForConst, R>, B> =
     Const(MR().run { ff.fix().v.combine(fa.fix().v) })
+
+  override fun <A, B> apLazy(
+    ff: Kind<Kind<ForConst, R>, (A) -> B>,
+    fa: Eval<Kind<Kind<ForConst, R>, A>>
+  ): Eval<Kind<Kind<ForConst, R>, B>> =
+    MR().run { ff.fix().v.combineLazy(fa.map { it.fix().v }).map { Const(it) } }
 
   override fun <A, B> map(fa: Kind<Kind<ForConst, R>, A>, f: (A) -> B): Kind<Kind<ForConst, R>, B> =
     fa as Const<R, B>

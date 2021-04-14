@@ -53,3 +53,20 @@ fun <K : TraversalK, I, S, T, A, B, F> S.ixTraverseOf(
 ): Kind<F, T> =
   IxStar.traversing(AF).run { optic.run { transform(IxStar(f)) } }
     .fix().f(::identity, this)
+
+fun <K : TraversalK, I, S, T, A, B, F> S.traverseLazyOf(
+  optic: Optic<K, I, S, T, A, B>,
+  AF: Applicative<F>,
+  f: (A) -> Kind<F, B>
+): Kind<F, T> =
+  Star.traversingLazy(AF).run { optic.run { transform(Star<F, I, A, B>(f)) } }
+    .fix().f(this)
+
+fun <K : TraversalK, I, S, T, A, B, F> S.ixTraverseLazyOf(
+  optic: Optic<K, I, S, T, A, B>,
+  AF: Applicative<F>,
+  f: (I, A) -> Kind<F, B>
+): Kind<F, T> =
+  IxStar.traversingLazy(AF).run { optic.run { transform(IxStar(f)) } }
+    .fix().f(::identity, this)
+

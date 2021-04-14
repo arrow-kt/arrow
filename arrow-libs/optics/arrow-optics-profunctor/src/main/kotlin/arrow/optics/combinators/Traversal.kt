@@ -28,6 +28,7 @@ import arrow.optics.ixCollectOf
 import arrow.optics.ixFirstOrNull
 import arrow.optics.ixFolding
 import arrow.optics.ixLens
+import arrow.optics.ixTraverseLazyOf
 import arrow.optics.ixTraverseOf
 import arrow.optics.ixTraverseOf_
 import arrow.optics.ixTraversing
@@ -96,6 +97,13 @@ fun <K : TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.take(n: Int): PIxTraver
         else AF.pure(a)
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var counter = 0
+      return source.ixTraverseLazyOf(this@take, AF) { i, a ->
+        if (counter++ < n) f(i, a)
+        else AF.pure(a)
+      }
+    }
   })
 
 fun <K : TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.drop(n: Int): PIxTraversal<I, S, T, A, A> =
@@ -103,6 +111,13 @@ fun <K : TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.drop(n: Int): PIxTraver
     override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
       var counter = 0
       return source.ixTraverseOf(this@drop, AF) { i, a ->
+        if (counter++ < n) AF.pure(a)
+        else f(i, a)
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var counter = 0
+      return source.ixTraverseLazyOf(this@drop, AF) { i, a ->
         if (counter++ < n) AF.pure(a)
         else f(i, a)
       }
@@ -118,6 +133,13 @@ fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.takeWhile(filter: (A) ->
         else AF.pure(a).also { tripped = true }
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var tripped = false
+      return source.ixTraverseLazyOf(this@takeWhile, AF) { i, a ->
+        if (!tripped && filter(a)) f(i, a)
+        else AF.pure(a).also { tripped = true }
+      }
+    }
   })
 
 fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.dropWhile(filter: (A) -> Boolean): PIxTraversal<I, S, T, A, A> =
@@ -125,6 +147,13 @@ fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.dropWhile(filter: (A) ->
     override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
       var tripped = false
       return source.ixTraverseOf(this@dropWhile, AF) { i, a ->
+        if (!tripped && filter(a)) AF.pure(a).also { tripped = true }
+        else f(i, a)
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var tripped = false
+      return source.ixTraverseLazyOf(this@dropWhile, AF) { i, a ->
         if (!tripped && filter(a)) AF.pure(a).also { tripped = true }
         else f(i, a)
       }
@@ -140,6 +169,13 @@ fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.ixTakeWhile(filter: (I, 
         else AF.pure(a).also { tripped = true }
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var tripped = false
+      return source.ixTraverseLazyOf(this@ixTakeWhile, AF) { i, a ->
+        if (!tripped && filter(i, a)) f(i, a)
+        else AF.pure(a).also { tripped = true }
+      }
+    }
   })
 
 fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.ixDropWhile(filter: (I, A) -> Boolean): PIxTraversal<I, S, T, A, A> =
@@ -147,6 +183,13 @@ fun <K: TraversalK, I, S, T, A> Optic<K, I, S, T, A, A>.ixDropWhile(filter: (I, 
     override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
       var tripped = false
       return source.ixTraverseOf(this@ixDropWhile, AF) { i, a ->
+        if (!tripped && filter(i, a)) AF.pure(a).also { tripped = true }
+        else f(i, a)
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, T> {
+      var tripped = false
+      return source.ixTraverseLazyOf(this@ixDropWhile, AF) { i, a ->
         if (!tripped && filter(i, a)) AF.pure(a).also { tripped = true }
         else f(i, a)
       }

@@ -19,6 +19,8 @@ import arrow.optics.internal.Kind
 import arrow.optics.internal.Pro
 import arrow.optics.internal.Profunctor
 import arrow.optics.ixFolding
+import arrow.optics.ixTraverseLazyOf
+import arrow.optics.ixTraverseLazyOf_
 import arrow.optics.ixTraverseOf
 import arrow.optics.ixTraverseOf_
 import arrow.optics.ixTraversing
@@ -31,6 +33,11 @@ fun <K : TraversalK, I, S, A> Optic<K, I, S, S, A, A>.ixFilter(
   Optic.ixTraversing(object : IxWanderF<I, S, S, A, A> {
     override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, S> =
       source.ixTraverseOf(this@ixFilter, AF) { i, a ->
+        if (filter(i, a)) f(i, a)
+        else AF.pure(a)
+      }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, A>): Kind<F, S> =
+      source.ixTraverseLazyOf(this@ixFilter, AF) { i, a ->
         if (filter(i, a)) f(i, a)
         else AF.pure(a)
       }
@@ -50,6 +57,11 @@ fun <K : FoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.ixFilter(
   Optic.ixFolding(object : IxFoldF<I, S, A> {
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> =
       s.ixTraverseOf_(this@ixFilter, AF) { i, a ->
+        if (filter(i, a)) f(i, a)
+        else AF.pure(Unit)
+      }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> =
+      s.ixTraverseLazyOf_(this@ixFilter, AF) { i, a ->
         if (filter(i, a)) f(i, a)
         else AF.pure(Unit)
       }
@@ -96,6 +108,10 @@ fun <K : TraversalK, I, S, T, A, B> Optic<K, I, S, T, A, B>.withIndex(): PIxTrav
       source.ixTraverseOf(this@withIndex, AF) { i, a ->
         AF.map(f(i, i to a)) { (_, b) -> b }
       }
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, Pair<I, A>) -> Kind<F, Pair<I, B>>): Kind<F, T> =
+      source.ixTraverseLazyOf(this@withIndex, AF) { i, a ->
+        AF.map(f(i, i to a)) { (_, b) -> b }
+      }
   })
 
 @JvmName("withIndex_fold")
@@ -103,6 +119,10 @@ fun <K : FoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.withIndex(): IxFold<I, S,
   Optic.ixFolding(object : IxFoldF<I, S, Pair<I, A>> {
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, Pair<I, A>) -> Kind<F, Unit>): Kind<F, Unit> =
       s.ixTraverseOf_(this@withIndex, AF) { i, a ->
+        f(i, i to a)
+      }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, Pair<I, A>) -> Kind<F, Unit>): Kind<F, Unit> =
+      s.ixTraverseLazyOf_(this@withIndex, AF) { i, a ->
         f(i, i to a)
       }
   })

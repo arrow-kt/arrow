@@ -10,6 +10,9 @@ internal class Star<F, I, A, B>(internal val f: (A) -> Kind<F, B>) : Pro<Kind<Fo
     fun <F> traversing(AF: Applicative<F>) = object : StarTraversing<F> {
       override fun AF(): Applicative<F> = AF
     }
+    fun <F> traversingLazy(AF: Applicative<F>) = object : StarTraversingLazy<F> {
+      override fun AF(): Applicative<F> = AF
+    }
   }
 }
 
@@ -67,4 +70,12 @@ internal interface StarTraversing<F> : Traversing<Kind<ForStar, F>>, StarChoice<
 
   override fun <I, J, S, T, A, B> Pro<Kind<ForStar, F>, J, A, B>.iwander(f: IxWanderF<I, S, T, A, B>): Pro<Kind<ForStar, F>, (I) -> J, S, T> =
     Star { s -> f.invoke(AF(), s) { _, a -> this.fix().f(a) } }
+}
+
+internal interface StarTraversingLazy<F> : Traversing<Kind<ForStar, F>>, StarChoice<F>, StarStrong<F> {
+  override fun <I, S, T, A, B> Pro<Kind<ForStar, F>, I, A, B>.wander(f: WanderF<S, T, A, B>): Pro<Kind<ForStar, F>, I, S, T> =
+    Star { s -> f.invokeLazy(AF(), s, this.fix().f) }
+
+  override fun <I, J, S, T, A, B> Pro<Kind<ForStar, F>, J, A, B>.iwander(f: IxWanderF<I, S, T, A, B>): Pro<Kind<ForStar, F>, (I) -> J, S, T> =
+    Star { s -> f.invokeLazy(AF(), s) { _, a -> this.fix().f(a) } }
 }

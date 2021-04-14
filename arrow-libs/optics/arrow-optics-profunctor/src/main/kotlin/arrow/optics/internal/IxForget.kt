@@ -5,11 +5,17 @@ import arrow.typeclasses.Monoid
 
 internal class ForIxForget
 
-internal inline fun <R, I, A, B> Pro<Kind<ForIxForget, R>, I, A, B>.fix(): IxForget<R, I, A, B> = this as IxForget<R, I, A, B>
-internal class IxForget<out R, in I, in A, out B>(internal val f: (I, A) -> R) : Pro<Kind<ForIxForget, @kotlin.UnsafeVariance R>, I, A, B> {
+internal inline fun <R, I, A, B> Pro<Kind<ForIxForget, R>, I, A, B>.fix(): IxForget<R, I, A, B> =
+  this as IxForget<R, I, A, B>
+
+internal class IxForget<out R, in I, in A, out B>(internal val f: (I, A) -> R) :
+  Pro<Kind<ForIxForget, @kotlin.UnsafeVariance R>, I, A, B> {
   companion object {
     fun <R> strong(): IxForgetStrong<R> = object : IxForgetStrong<R> {}
     fun <R> traversing(MR: Monoid<R>) = object : IxForgetTraversing<R> {
+      override fun MR(): Monoid<R> = MR
+    }
+    fun <R> traversingLazy(MR: Monoid<R>) = object : IxForgetTraversingLazy<R> {
       override fun MR(): Monoid<R> = MR
     }
   }
@@ -51,7 +57,7 @@ internal interface IxForgetChoice<R> : Choice<Kind<ForIxForget, R>>, IxForgetPro
   fun MR(): Monoid<R>
 
   override fun <I, A, B, C> Pro<Kind<ForIxForget, R>, I, A, B>.left(): Pro<Kind<ForIxForget, R>, I, Either<A, C>, Either<B, C>> =
-    IxForget { i ,e -> e.fold({ a -> this.fix().f(i, a) }, { MR().empty() }) }
+    IxForget { i, e -> e.fold({ a -> this.fix().f(i, a) }, { MR().empty() }) }
 
   override fun <I, A, B, C> Pro<Kind<ForIxForget, R>, I, A, B>.right(): Pro<Kind<ForIxForget, R>, I, Either<C, A>, Either<C, B>> =
     IxForget { i, e -> e.fold({ MR().empty() }, { a -> this.fix().f(i, a) }) }
@@ -72,6 +78,26 @@ internal interface IxForgetTraversing<R> : Traversing<Kind<ForIxForget, R>>, IxF
       f.invoke(
         object : ConstApplicative<R> {
           override fun MR(): Monoid<R> = this@IxForgetTraversing.MR()
+        }, s, { i, a -> Const(this.fix().f(ij(i), a)) }
+      ).fix().v
+    }
+}
+
+internal interface IxForgetTraversingLazy<R> : Traversing<Kind<ForIxForget, R>>, IxForgetStrong<R>, IxForgetChoice<R> {
+  override fun <I, S, T, A, B> Pro<Kind<ForIxForget, R>, I, A, B>.wander(f: WanderF<S, T, A, B>): Pro<Kind<ForIxForget, R>, I, S, T> =
+    IxForget { i, s ->
+      f.invokeLazy(
+        object : ConstApplicative<R> {
+          override fun MR(): Monoid<R> = this@IxForgetTraversingLazy.MR()
+        }, s, { a -> Const(this.fix().f(i, a)) }
+      ).fix().v
+    }
+
+  override fun <I, J, S, T, A, B> Pro<Kind<ForIxForget, R>, J, A, B>.iwander(f: IxWanderF<I, S, T, A, B>): Pro<Kind<ForIxForget, R>, (I) -> J, S, T> =
+    IxForget { ij, s ->
+      f.invokeLazy(
+        object : ConstApplicative<R> {
+          override fun MR(): Monoid<R> = this@IxForgetTraversingLazy.MR()
         }, s, { i, a -> Const(this.fix().f(ij(i), a)) }
       ).fix().v
     }

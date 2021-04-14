@@ -12,6 +12,9 @@ internal class Forget<out R, in I, in A, out B>(internal val f: (A) -> R) : Pro<
     fun <R> traversing(MR: Monoid<R>): ForgetTraversing<R> = object : ForgetTraversing<R> {
       override fun MR(): Monoid<R> = MR
     }
+    fun <R> traversingLazy(MR: Monoid<R>): ForgetLazyTraversing<R> = object : ForgetLazyTraversing<R> {
+      override fun MR(): Monoid<R> = MR
+    }
   }
 }
 
@@ -73,6 +76,26 @@ internal interface ForgetTraversing<R> : Traversing<Kind<ForForget, R>>, ForgetS
       f.invoke(
         object : ConstApplicative<R> {
           override fun MR(): Monoid<R> = this@ForgetTraversing.MR()
+        }, s, { _, a -> Const(this.fix().f(a)) }
+      ).fix().v
+    }
+}
+
+internal interface ForgetLazyTraversing<R> : Traversing<Kind<ForForget, R>>, ForgetStrong<R>, ForgetChoice<R> {
+  override fun <I, S, T, A, B> Pro<Kind<ForForget, R>, I, A, B>.wander(f: WanderF<S, T, A, B>): Pro<Kind<ForForget, R>, I, S, T> =
+    Forget { s ->
+      f.invokeLazy(
+        object : ConstApplicative<R> {
+          override fun MR(): Monoid<R> = this@ForgetLazyTraversing.MR()
+        }, s, { a -> Const(this.fix().f(a)) }
+      ).fix().v
+    }
+
+  override fun <I, J, S, T, A, B> Pro<Kind<ForForget, R>, J, A, B>.iwander(f: IxWanderF<I, S, T, A, B>): Pro<Kind<ForForget, R>, (I) -> J, S, T> =
+    Forget { s ->
+      f.invokeLazy(
+        object : ConstApplicative<R> {
+          override fun MR(): Monoid<R> = this@ForgetLazyTraversing.MR()
         }, s, { _, a -> Const(this.fix().f(a)) }
       ).fix().v
     }

@@ -1,28 +1,22 @@
 package arrow.optics.combinators
 
-import arrow.core.Either
 import arrow.optics.FoldK
 import arrow.optics.IxAffineFold
 import arrow.optics.IxFold
 import arrow.optics.IxFoldF
 import arrow.optics.IxGetter
 import arrow.optics.Optic
-import arrow.optics.TraversalK
-import arrow.optics.firstOrNull
 import arrow.optics.internal.Applicative
 import arrow.optics.internal.Kind
-import arrow.optics.internal.backwards
 import arrow.optics.ixAFolding
-import arrow.optics.ixATraversing
 import arrow.optics.ixCollectOf
 import arrow.optics.ixFirstOrNull
 import arrow.optics.ixFolding
 import arrow.optics.ixGet
-import arrow.optics.ixLens
+import arrow.optics.ixTraverseLazyOf_
 import arrow.optics.ixTraverseOf_
-import arrow.optics.set
 
-fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.take(n: Int): IxFold<I, S, A> =
+fun <K: FoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.take(n: Int): IxFold<I, S, A> =
   Optic.ixFolding(object : IxFoldF<I, S, A> {
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
       var counter = 0
@@ -31,13 +25,27 @@ fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.take(n: Int): IxFold<I, S, A>
         else AF.pure(Unit)
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var counter = 0
+      return s.ixTraverseLazyOf_(this@take, AF) { i, a ->
+        if (counter++ < n) f(i, a)
+        else AF.pure(Unit)
+      }
+    }
   })
 
-fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.drop(n: Int): IxFold<I, S, A> =
+fun <K: FoldK, I, S, T, A, B> Optic<K, I, S, T, A, B>.drop(n: Int): IxFold<I, S, A> =
   Optic.ixFolding(object : IxFoldF<I, S, A> {
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
       var counter = 0
       return s.ixTraverseOf_(this@drop, AF) { i, a ->
+        if (counter++ < n) AF.pure(Unit)
+        else f(i, a)
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var counter = 0
+      return s.ixTraverseLazyOf_(this@drop, AF) { i, a ->
         if (counter++ < n) AF.pure(Unit)
         else f(i, a)
       }
@@ -53,6 +61,13 @@ fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.takeWhile(filter: (A) -> Bool
         else AF.pure(Unit).also { tripped = true }
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var tripped = false
+      return s.ixTraverseLazyOf_(this@takeWhile, AF) { i, a ->
+        if (!tripped && filter(a)) f(i, a)
+        else AF.pure(Unit).also { tripped = true }
+      }
+    }
   })
 
 fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.dropWhile(filter: (A) -> Boolean): IxFold<I, S, A> =
@@ -60,6 +75,13 @@ fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.dropWhile(filter: (A) -> Bool
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
       var tripped = false
       return s.ixTraverseOf_(this@dropWhile, AF) { i, a ->
+        if (!tripped && filter(a)) AF.pure(Unit)
+        else f(i, a).also { tripped = true }
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var tripped = false
+      return s.ixTraverseLazyOf_(this@dropWhile, AF) { i, a ->
         if (!tripped && filter(a)) AF.pure(Unit)
         else f(i, a).also { tripped = true }
       }
@@ -75,6 +97,13 @@ fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.ixTakeWhile(filter: (I, A) ->
         else AF.pure(Unit).also { tripped = true }
       }
     }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var tripped = false
+      return s.ixTraverseLazyOf_(this@ixTakeWhile, AF) { i, a ->
+        if (!tripped && filter(i, a)) f(i, a)
+        else AF.pure(Unit).also { tripped = true }
+      }
+    }
   })
 
 fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.ixDropWhile(filter: (I, A) -> Boolean): IxFold<I, S, A> =
@@ -82,6 +111,13 @@ fun <K: FoldK, I, S, T, A> Optic<K, I, S, T, A, A>.ixDropWhile(filter: (I, A) ->
     override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
       var tripped = false
       return s.ixTraverseOf_(this@ixDropWhile, AF) { i, a ->
+        if (!tripped && filter(i, a)) AF.pure(Unit)
+        else f(i, a).also { tripped = true }
+      }
+    }
+    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
+      var tripped = false
+      return s.ixTraverseLazyOf_(this@ixDropWhile, AF) { i, a ->
         if (!tripped && filter(i, a)) AF.pure(Unit)
         else f(i, a).also { tripped = true }
       }
