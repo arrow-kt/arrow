@@ -1,8 +1,8 @@
 package arrow.optics.predef
 
 import arrow.core.Eval
-import arrow.core.foldRight
 import arrow.core.iterateRight
+import arrow.optics.IxFold
 import arrow.optics.Optic
 import arrow.optics.PIxTraversal
 import arrow.optics.TraversalK
@@ -11,6 +11,8 @@ import arrow.optics.internal.Applicative
 import arrow.optics.internal.IxWanderF
 import arrow.optics.internal.Kind
 import arrow.optics.ixTraversing
+
+fun <A> Optic.Companion.foldedList(): IxFold<Int, List<A>, A> = foldedIterable()
 
 fun <A, B> Optic.Companion.traversedList(): PIxTraversal<Int, List<A>, List<B>, A, B> =
   ixTraversing(object : IxWanderF<Int, List<A>, List<B>, A, B> {

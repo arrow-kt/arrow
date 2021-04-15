@@ -1,5 +1,6 @@
 import arrow.core.Either
 import arrow.optics.Optic
+import arrow.optics.collectOf
 import arrow.optics.combinators.backwards
 import arrow.optics.combinators.default
 import arrow.optics.combinators.drop
@@ -10,26 +11,26 @@ import arrow.optics.combinators.re
 import arrow.optics.combinators.singular
 import arrow.optics.combinators.take
 import arrow.optics.compose
-import arrow.optics.first
 import arrow.optics.firstOrNull
 import arrow.optics.get
-import arrow.optics.internal.Forget
-import arrow.optics.internal.fix
 import arrow.optics.ixCollectOf
 import arrow.optics.ixCompose
 import arrow.optics.ixGet
 import arrow.optics.ixView
 import arrow.optics.modify
 import arrow.optics.predef.eitherLeft
-import arrow.optics.predef.folded
+import arrow.optics.predef.foldedIterable
+import arrow.optics.predef.foldedList
 import arrow.optics.predef.notNull
 import arrow.optics.predef.pairFirst
 import arrow.optics.predef.traversedList
 import arrow.optics.predef.traversedMap
 import arrow.optics.review
 import arrow.optics.set
+import arrow.optics.typeclasses.Plated
+import arrow.optics.typeclasses.cosmos
+import arrow.optics.typeclasses.deep
 import arrow.optics.view
-import arrow.typeclasses.Monoid
 
 fun main() {
 
@@ -87,11 +88,22 @@ fun main() {
   (null to 1.0).set(y, 100)
     .also(::println) // (null, 1.0)
 
-  val test = Optic.folded<List<Int>, Int>()
+  val test = Optic.foldedIterable<List<Int>, Int>()
     .take(5)
     .drop(1)
 
   listOf(100, 200, 300)
     .firstOrNull(test)
     .also(::println)
+
+  val plate = Plated.list<Int>()
+
+  (0..10000).toList()
+    .collectOf(plate.deep(Optic.filter { it.size == 2 }))
+    .also(::println) // [[9999, 10000]]
+
+  (0..3).toList()
+    .collectOf(plate.cosmos())
+    .also(::println) // [[0,1,2,3], [1,2,3], [2,3], [3], []]
 }
+

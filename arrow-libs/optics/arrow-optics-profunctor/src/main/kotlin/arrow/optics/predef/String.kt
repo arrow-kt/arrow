@@ -12,10 +12,10 @@ import arrow.optics.iso
 import arrow.optics.ixComposeRight
 
 fun Optic.Companion.foldedString(): IxFold<Int, String, Char> =
-  Optic.get { str: String -> str.asIterable() }.ixComposeRight(folded())
+  Optic.get { str: String -> str.asIterable() }.ixComposeRight(foldedIterable())
 
 @JvmName("string_folded")
-fun <K : FoldK, I, S, T, B> Optic<K, I, S, T, String, B>.folded(): Optic<FoldK, I, S, T, Char, Nothing> =
+fun <K : FoldK, I, S, T, B> Optic<K, I, S, T, String, B>.foldedIterable(): Optic<FoldK, I, S, T, Char, Nothing> =
   compose(Optic.foldedString())
 
 @JvmName("string_traversed")

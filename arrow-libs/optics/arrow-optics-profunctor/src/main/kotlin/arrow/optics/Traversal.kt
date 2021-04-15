@@ -70,3 +70,14 @@ fun <K : TraversalK, I, S, T, A, B, F> S.ixTraverseLazyOf(
   IxStar.traversingLazy(AF).run { optic.run { transform(IxStar(f)) } }
     .fix().f(::identity, this)
 
+fun <K : TraversalK, I, S, T, A, B> S.modifyOrNull(optic: Optic<K, I, S, T, A, B>, f: (A) -> B): T? {
+  var tripped = false
+  val res = this.modify(optic) { a -> f(a).also { tripped = true } }
+  return if (tripped) res else null
+}
+
+fun <K : TraversalK, I, S, T, A, B> S.ixModifyOrNull(optic: Optic<K, I, S, T, A, B>, f: (I, A) -> B): T? {
+  var tripped = false
+  val res = this.ixModify(optic) { i, a -> f(i, a).also { tripped = true } }
+  return if (tripped) res else null
+}
