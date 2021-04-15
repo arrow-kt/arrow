@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 afterEvaluate {
     publishing {
@@ -59,11 +60,22 @@ afterEvaluate {
         repositories {
             maven {
                 credentials {
-                    username "$System.env.BINTRAY_USER"
-                    password "$System.env.BINTRAY_API_KEY"
+                    username "$System.env.SONATYPE_USER"
+                    password "$System.env.SONATYPE_PWD"
                 }
                 url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
             }
+        }
+    }
+
+    // Guide: https://docs.gradle.org/current/userguide/signing_plugin.html
+    if (project.hasProperty("signingKey") && project.hasProperty("signingPassword")) {
+        signing {
+            def signingKey = findProperty("signingKey")
+            def signingPassword = findProperty("signingPassword")
+            useInMemoryPgpKeys(signingKey, signingPassword)
+
+            sign publishing.publications.mavenJava
         }
     }
 }
