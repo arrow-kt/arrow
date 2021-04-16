@@ -1,21 +1,32 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$SUB_PROJECT"
+apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
-dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compileOnly project(":arrow-core")
-    compileOnly "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testImplementation project(":arrow-core-test")
-    testImplementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
-    testImplementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
+kotlin {
+    sourceSets {
+        jvmMain {
+          dependencies {
+            compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+            compileOnly project(":arrow-core")
+            compileOnly "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+          }
+        }
+
+        jvmTest {
+            dependencies {
+              compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+              runtimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+              implementation project(":arrow-core-test")
+              implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+              implementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
+            }
+        }
+    }
 }
