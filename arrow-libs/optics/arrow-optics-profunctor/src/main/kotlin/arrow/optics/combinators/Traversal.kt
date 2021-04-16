@@ -268,7 +268,7 @@ fun <K1 : TraversalK, K2 : TraversalK, I, J, S, T, A, B> Optic<K1, I, S, T, A, B
 //  - this can be solved by making the argument to failing lazy
 // - recursive on traversal: for every s visited by this we get additional of stack depth ==> stackoverflow
 //  - this is solved here by manually implementing the combinator in a flat (and rather ugly) way
-@OptIn(ExperimentalStdlibApi::class)
+@ExperimentalStdlibApi
 @JvmName("deepOf_traversal")
 fun <K1 : TraversalK, K2 : TraversalK, I, S, T, A, B> Optic<K1, Any?, S, T, S, T>.deepOf(
   next: Optic<K2, I, S, T, A, B>
@@ -282,6 +282,7 @@ fun <K1 : TraversalK, K2 : TraversalK, I, S, T, A, B> Optic<K1, Any?, S, T, S, T
           val newFt = s.ixTraverseOf(next, AF) { i, a -> f(i, a).also { tripped = true } }
 
           if (!tripped) {
+            // Note if tripped = false after this we newFt should always be pure(t) and thus can be thrown away safely
             AF.map(callRecursive(s.collectOf(this@deepOf))) {
               val ts = it.toMutableList()
               s.modify(this@deepOf) { ts.removeFirst() }

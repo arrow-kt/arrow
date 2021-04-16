@@ -34,6 +34,7 @@ fun interface Plated<A> {
   }
 }
 
+@ExperimentalStdlibApi
 @JvmName("deep_traversal")
 fun <K : TraversalK, I, S, A, B> Plated<S>.deep(next: Optic<K, I, S, S, A, B>): PIxTraversal<I, S, S, A, B> =
   plate().deepOf(next)

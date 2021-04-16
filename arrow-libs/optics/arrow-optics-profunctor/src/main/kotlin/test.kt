@@ -50,6 +50,7 @@ import arrow.optics.typeclasses.cosmos
 import arrow.optics.typeclasses.deep
 import arrow.optics.view
 
+@ExperimentalStdlibApi
 fun main() {
 
   val xs = listOf(2, null, 3)
@@ -148,8 +149,7 @@ fun main() {
   t.modify(
     Plated.tree<Int>()
       .deep(Tree.leaf())
-      .partsOf()
-  ) { it.reversed() }
+  ) { it * 3 }
     .also(::println)
 }
 
