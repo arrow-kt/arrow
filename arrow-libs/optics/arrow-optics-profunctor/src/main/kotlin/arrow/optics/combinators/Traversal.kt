@@ -263,15 +263,60 @@ fun <K1 : TraversalK, K2 : TraversalK, I, J, S, T, A, B> Optic<K1, I, S, T, A, B
     }
   })
 
-/*
 // This is technically just compose(next.failing(this.deepOf(next))) however that has two problems in kotlin:
 // - recursive on call to deepOf: this.deepOf(next) is evaluated before any traversing takes place ==> stackoverflow
 //  - this can be solved by making the argument to failing lazy
 // - recursive on traversal: for every s visited by this we get additional of stack depth ==> stackoverflow
 //  - this is solved here by manually implementing the combinator in a flat (and rather ugly) way
+@OptIn(ExperimentalStdlibApi::class)
 @JvmName("deepOf_traversal")
 fun <K1 : TraversalK, K2 : TraversalK, I, S, T, A, B> Optic<K1, Any?, S, T, S, T>.deepOf(
   next: Optic<K2, I, S, T, A, B>
-): PIxTraversal<I, S, T, A, B> = TODO()
-> This was very broken, only the fold version works for now
- */
+): PIxTraversal<I, S, T, A, B> =
+  Optic.ixTraversing(object : IxWanderF<I, S, T, A, B> {
+    override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> {
+      val f = DeepRecursiveFunction<List<S>, Kind<F, List<T>>> { xs ->
+        val fts = mutableListOf<Kind<F, T>>()
+        for (s in xs) {
+          var tripped = false
+          val newFt = s.ixTraverseOf(next, AF) { i, a -> f(i, a).also { tripped = true } }
+
+          if (!tripped) {
+            AF.map(callRecursive(s.collectOf(this@deepOf))) {
+              val ts = it.toMutableList()
+              s.modify(this@deepOf) { ts.removeFirst() }
+            }.let { fts.add(it) }
+          } else fts.add(newFt)
+        }
+        val buf = mutableListOf<T>()
+        val fUnit = fts.fold(AF.pure(Unit)) { acc, ft ->
+          AF.ap(AF.map(acc) { { t -> buf.add(t) } }, ft)
+        }
+        AF.map(fUnit) { buf }
+      }
+      return AF.map(f.invoke(listOf(source))) { it.first() }
+    }
+
+    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> {
+      val f = DeepRecursiveFunction<List<S>, Kind<F, List<T>>> { xs ->
+        val fts = mutableListOf<Kind<F, T>>()
+        for (s in xs) {
+          var tripped = false
+          val newFt = s.ixTraverseLazyOf(next, AF) { i, a -> f(i, a).also { tripped = true } }
+
+          if (!tripped) {
+            AF.map(callRecursive(s.collectOf(this@deepOf))) {
+              val ts = it.toMutableList()
+              s.modify(this@deepOf) { ts.removeFirst() }
+            }.let { fts.add(it) }
+          } else fts.add(newFt)
+        }
+        val buf = mutableListOf<T>()
+        val fUnit = fts.fold(AF.pure(Unit)) { acc, ft ->
+          AF.ap(AF.map(acc) { { t -> buf.add(t) } }, ft)
+        }
+        AF.map(fUnit) { buf }
+      }
+      return AF.map(f.invoke(listOf(source))) { it.first() }
+    }
+  })
