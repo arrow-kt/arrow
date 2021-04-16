@@ -1,14 +1,20 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$SUB_PROJECT"
+apply from: "$SUB_PROJECT_MPP"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
-dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    api "io.kindedj:kindedj:$KINDEDJ_VERSION"
+kotlin {
+    sourceSets {
+        jvmMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+                api "io.kindedj:kindedj:$KINDEDJ_VERSION"
+            }
+        }
+    }
 }
