@@ -34,10 +34,11 @@ fun interface Plated<A> {
   }
 }
 
+/* The traversal impl is broken...
 @JvmName("deep_traversal")
 fun <K : TraversalK, I, S, A, B> Plated<S>.deep(next: Optic<K, I, S, S, A, B>): PIxTraversal<I, S, S, A, B> =
   plate().deepOf(next)
-
+ */
 @JvmName("deep_fold")
 fun <K : FoldK, I, S, A, B> Plated<S>.deep(next: Optic<K, I, S, S, A, B>): IxFold<I, S, A> =
   plate().deepOf(next)

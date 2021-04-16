@@ -263,28 +263,7 @@ fun <K1 : TraversalK, K2 : TraversalK, I, J, S, T, A, B> Optic<K1, I, S, T, A, B
     }
   })
 
-@JvmName("failing_fold")
-fun <K1 : FoldK, K2 : FoldK, I, J, S, T, A, B> Optic<K1, I, S, T, A, B>.failing(
-  other: Optic<K2, J, S, T, A, B>
-): Optic<FoldK, Either<I, J>, S, Nothing, A, Nothing> =
-  Optic.ixFolding(object : IxFoldF<Either<I, J>, S, A> {
-    override fun <F> invoke(AF: Applicative<F>, s: S, f: (Either<I, J>, A) -> Kind<F, Unit>): Kind<F, Unit> {
-      var tripped = false
-      val res = s.ixTraverseOf_(this@failing, AF) { i, a -> f(Either.Left(i), a).also { tripped = true } }
-
-      return if (tripped) res
-      else s.ixTraverseOf_(other, AF) { j, a -> f(Either.Right(j), a) }
-    }
-
-    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (Either<I, J>, A) -> Kind<F, Unit>): Kind<F, Unit> {
-      var tripped = false
-      val res = s.ixTraverseLazyOf_(this@failing, AF) { i, a -> f(Either.Left(i), a).also { tripped = true } }
-
-      return if (tripped) res
-      else s.ixTraverseLazyOf_(other, AF) { j, a -> f(Either.Right(j), a) }
-    }
-  })
-
+/*
 // This is technically just compose(next.failing(this.deepOf(next))) however that has two problems in kotlin:
 // - recursive on call to deepOf: this.deepOf(next) is evaluated before any traversing takes place ==> stackoverflow
 //  - this can be solved by making the argument to failing lazy
@@ -293,66 +272,6 @@ fun <K1 : FoldK, K2 : FoldK, I, J, S, T, A, B> Optic<K1, I, S, T, A, B>.failing(
 @JvmName("deepOf_traversal")
 fun <K1 : TraversalK, K2 : TraversalK, I, S, T, A, B> Optic<K1, Any?, S, T, S, T>.deepOf(
   next: Optic<K2, I, S, T, A, B>
-): PIxTraversal<I, S, T, A, B> =
-  Optic.ixTraversing(object : IxWanderF<I, S, T, A, B> {
-    override fun <F> invoke(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> {
-      var tripped = false
-      val nextS = mutableListOf(source)
-      var ft: Kind<F, T>? = null
-      while (nextS.isNotEmpty()) {
-        val head = nextS.removeFirst()
-        ft = head.ixTraverseOf(next, AF) { i, a -> f(i, a).also { tripped = true } }
-
-        if (tripped) break
-        else nextS.addAll(head.collectOf(this@deepOf))
-      }
-      return ft!!
-    }
-    override fun <F> invokeLazy(AF: Applicative<F>, source: S, f: (I, A) -> Kind<F, B>): Kind<F, T> {
-      var tripped = false
-      val nextS = mutableListOf(source)
-      var ft: Kind<F, T>? = null
-      while (nextS.isNotEmpty()) {
-        val head = nextS.removeFirst()
-        ft = head.ixTraverseLazyOf(next, AF) { i, a -> f(i, a).also { tripped = true } }
-
-        if (tripped) break
-        else nextS.addAll(head.collectOf(this@deepOf))
-      }
-      return ft!!
-    }
-  })
-
-@JvmName("deepOf_fold")
-fun <K1 : FoldK, K2 : FoldK, I, S, T, A, B> Optic<K1, Any?, S, T, S, T>.deepOf(
-  next: Optic<K2, I, S, T, A, B>
-): IxFold<I, S, A> =
-  Optic.ixFolding(object : IxFoldF<I, S, A> {
-    override fun <F> invoke(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
-      var tripped = false
-      val nextS = mutableListOf(s)
-      var ft: Kind<F, Unit>? = null
-      while (nextS.isNotEmpty()) {
-        val head = nextS.removeFirst()
-        ft = head.ixTraverseOf_(next, AF) { i, a -> f(i, a).also { tripped = true } }
-
-        if (tripped) break
-        else nextS.addAll(head.collectOf(this@deepOf))
-      }
-      return ft!!
-    }
-    override fun <F> invokeLazy(AF: Applicative<F>, s: S, f: (I, A) -> Kind<F, Unit>): Kind<F, Unit> {
-      var tripped = false
-      val nextS = mutableListOf(s)
-      var ft: Kind<F, Unit>? = null
-      while (nextS.isNotEmpty()) {
-        val head = nextS.removeFirst()
-        ft = head.ixTraverseLazyOf_(next, AF) { i, a -> f(i, a).also { tripped = true } }
-
-        if (tripped) break
-        else nextS.addAll(head.collectOf(this@deepOf))
-      }
-      return ft!!
-    }
-  })
-
+): PIxTraversal<I, S, T, A, B> = TODO()
+> This was very broken, only the fold version works for now
+ */
