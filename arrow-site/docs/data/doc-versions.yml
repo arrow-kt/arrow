@@ -1,0 +1,26 @@
+docVersions:
+
+    - title: "v0.10.5"
+      url: https://arrow-kt.io/docs/0.10/
+      previous: https://arrow-kt.io/docs/0.9/
+
+    - title: "v0.11.0"
+      url: https://arrow-kt.io/docs/0.11/
+      previous: https://arrow-kt.io/docs/0.10/
+
+    - title: "v0.12.0"
+      url: https://arrow-kt.io/docs/0.12/
+      previous: https://arrow-kt.io/docs/0.11/
+
+    - title: "v0.13.1"
+      url: https://arrow-kt.io/
+      previous: https://arrow-kt.io/docs/0.12/
+
+    - title: "v1.0.0-SNAPSHOT"
+      url: https://arrow-kt.io/docs/next/
+      previous: https://arrow-kt.io/
+
+# Literals
+previous: PREVIOUS
+stable: STABLE
+next: NEXT

@@ -1,0 +1,30 @@
+// Quickstart
+// -----------------------------------------------
+// -----------------------------------------------
+
+.site-quickstart {
+  .quickstart-content {
+    margin: 200px auto 0 auto;
+    max-width: 940px;
+    text-align: center;
+
+    h1 {
+      font-size: 4rem;
+      line-height: 1.6;
+    }
+
+    .quickstart-cta {
+      padding: 12px 40px;
+      display: inline-block;
+      margin-top: 40px;
+      font-size: 1.429rem;
+      text-transform: uppercase;
+      border: 2px solid $brand-primary;
+
+      &:hover {
+        text-decoration: none;
+        background: #fff;
+      }
+    }
+  }
+}
