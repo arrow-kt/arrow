@@ -1,3 +1,8 @@
-quickstartTitle: "Λrrow is a library for Typed Functional Programming in Kotlin."
+quickstartTitles:
+  - title: Functional companion to Kotlin's Standard Library
+  - title: Functional Effects Framework companion to KotlinX Coroutines.
+  - title: Deep access and transformations over immutable data
+  - title: Metaprogramming library for Kotlin compiler plugins
+
 quickstartCtaName: "Quickstart"
-quickstartCtaUrl: #
+quickstartCtaUrl: /core/
