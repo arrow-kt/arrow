@@ -48,3 +48,11 @@ configurations.all {
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
+
+tasks.jvmTest{
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat 'full'
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
