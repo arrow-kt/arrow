@@ -3,7 +3,12 @@ nav:
       url: https://media.arrow-kt.io
 
     - title: Training
-      url: https://www.47deg.com/trainings/
+      icon: <i class="far fa-angle-down"></i>
+      externals:
+        - company: 47 Degrees
+          url: https://www.47deg.com/
+        - company: Instil
+          url: https://instil.com/
 
     - title: Support
       url: https://www.47deg.com/services/

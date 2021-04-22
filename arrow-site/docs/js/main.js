@@ -80,7 +80,7 @@ window.addEventListener("resize", mobileViewControl);
 // Init call
 function loadEvent() {
   mobileViewControl();
-  
+
   document.addEventListener("scroll", scrollFunction);
 
   function baseAnimation() {
@@ -143,6 +143,25 @@ function loadEvent() {
     }
   });
 
+}
+
+
+function myFunction() {
+  document.getElementById("dropdown").classList.toggle("show");
+}
+
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropdown-btn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }
 
 // Attach the functions to each event they are interested in

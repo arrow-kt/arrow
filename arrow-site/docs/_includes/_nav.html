@@ -13,9 +13,22 @@
         <ul>
           {% for item in site.data.menu.nav%}
           {% if item.title != 'Github' %}
+          {% if item.title != "Training" %}
           <li class="nav-menu-item">
-            <a class="menu-links" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+            <a class="menu-links" href="" title="{{ item.title }}">{{ item.title }}</a>
           </li>
+          {% else %}
+          <li class="nav-menu-item">
+            <span onclick="myFunction()" class="menu-links dropdown-btn" title="{{ item.title }}">{{ item.title }}{{ item.icon }}</span>
+            <div id="dropdown" class="dropdown-content">
+              <ul>
+                {% for external in item.externals %}
+                <li><a href="{{ external.url }}">{{ external.company }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </li>
+          {% endif %}
           {% endif %}
           {% endfor %}
           <div class="nav-stars">

@@ -2,6 +2,10 @@
 // -----------------------------------------------
 // -----------------------------------------------
 
+.listado {
+  background: #765;
+}
+
 #site-nav {
   position: fixed;
   padding: ($base-point-grid * 5) 0;
@@ -81,10 +85,11 @@
       transition: all $base-duration $base-timing;
       font-weight: bold;
 
-      ul {
+      > ul {
         display: flex;
 
         .nav-menu-item {
+          position: relative;
           &:not(:last-child) {
             margin-right: ($base-point-grid * 5);
           }
@@ -94,9 +99,25 @@
             text-transform: uppercase;
             font-size: ($base-point-grid * 2);
 
+            i {
+              margin-left: 8px;
+            }
+
+            &:after {
+              display: block;
+              content: '';
+              border-bottom: 2px solid $brand-primary;
+              transform: scaleX(0);
+              transition: transform 0.3s ease-in-out;
+              margin-top: 0;
+            }
+
             &:hover {
               text-decoration: none;
-              border-bottom: 2px solid $brand-primary;
+
+              &:after {
+                transform: scaleX(1);
+              }
             }
 
             &.hover-mode {
@@ -119,22 +140,59 @@
     }
 
     .nav-icon-close {
-        display: none;
-        padding: 6px;
-        left: 85%;
-        top: 32px;
+      display: none;
+      padding: 6px;
+      left: 85%;
+      top: 32px;
 
-        img {
-            display: block;
-            transition: transform .3s ease;
+      img {
+        display: block;
+        transition: transform 0.3s ease;
 
-            &:hover {
-              transform: rotate(180deg);
-            }
+        &:hover {
+          transform: rotate(180deg);
         }
+      }
     }
   }
 }
+
+.dropdown-btn {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.dropdown-content {
+  padding: 16px;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  overflow: auto;
+  border: 2px solid $brand-primary;
+  background: $background-color;
+  z-index: 1;
+  transition: all 0.35s ease-out;
+  visibility: hidden;
+  opacity: 0;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    li {
+      a {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &.show {
+    top: 40px;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 // Responsive
 // -----------------------------------------------
 @include bp(medium) {
@@ -170,6 +228,7 @@
             margin-top: ($base-point-grid * 4);
           }
         }
+
         &.top-scroll {
           padding-top: $base-point-grid;
         }
