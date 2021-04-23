@@ -854,6 +854,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().let { either ->
       when (either) {
@@ -869,6 +870,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) })
 
@@ -1022,6 +1024,10 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     companion object {
       @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Left(a)", "arrow.core.Either"))
       operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
+
+      @PublishedApi
+      internal val leftUnit: Either<Unit, Nothing> =
+        Left(Unit)
     }
   }
 
@@ -1039,8 +1045,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     override fun toString(): String = "Either.Right($b)"
 
     companion object {
+
       @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Either.Right(b)", "arrow.core.Either"))
       operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
+
+      @PublishedApi
+      internal val unit: Either<Nothing, Unit> = Right(Unit)
     }
   }
 
@@ -1074,13 +1084,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       ReplaceWith("Either.Right(right)", "arrow.core.Either")
     )
     fun <R> right(right: R): Either<Nothing, R> = Right(right)
-
-    @PublishedApi
-    internal val leftUnit: Either<Unit, Nothing> =
-      left(Unit)
-
-    @PublishedApi
-    internal val unit: Either<Nothing, Unit> = right(Unit)
 
     @JvmStatic
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
@@ -1525,13 +1528,13 @@ inline fun <A, B, C, D, E> Either<A, B>.zip(
   zip(
     c,
     d,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit
   ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
 inline fun <A, B, C, D, E, F> Either<A, B>.zip(
@@ -1544,12 +1547,12 @@ inline fun <A, B, C, D, E, F> Either<A, B>.zip(
     c,
     d,
     e,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit
   ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
 inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
@@ -1564,11 +1567,11 @@ inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
     d,
     e,
     f,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit,
-    Either.unit
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit,
+    Right.unit
   ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
 inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
@@ -1579,7 +1582,7 @@ inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H
 ): Either<A, H> =
-  zip(c, d, e, f, g, Either.unit, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, _, _, _, _ ->
+  zip(c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ ->
     map(
       b,
       c,
@@ -1599,7 +1602,7 @@ inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I
 ): Either<A, I> =
-  zip(c, d, e, f, g, h, Either.unit, Either.unit, Either.unit) { b, c, d, e, f, g, h, _, _, _ ->
+  zip(c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ ->
     map(
       b,
       c,
@@ -1621,7 +1624,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   i: Either<A, I>,
   map: (B, C, D, E, F, G, H, I) -> J
 ): Either<A, J> =
-  zip(c, d, e, f, g, h, i, Either.unit, Either.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  zip(c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
 
 inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1634,7 +1637,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   j: Either<A, J>,
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Either<A, K> =
-  zip(c, d, e, f, g, h, i, j, Either.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  zip(c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   c: Either<A, C>,

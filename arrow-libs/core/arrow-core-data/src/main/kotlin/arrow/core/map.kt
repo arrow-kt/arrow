@@ -195,13 +195,16 @@ fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
-  foldRight(emptyMap<K, B>().right()) { (k, a), acc: Either<E, Map<K, B>> ->
-    when (val res = f(a)) {
-      is Right -> acc.map { bs: Map<K, B> -> mapOf(k to res.value) + bs }
-      is Left -> res
+inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
+  val acc = mutableMapOf<K, B>()
+  forEach { (k, v) ->
+    when (val res = f(v)) {
+      is Right -> acc[k] = res.value
+      is Left -> return@traverseEither res
     }
   }
+  return acc.right()
+}
 
 fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   traverseEither(::identity)
@@ -209,19 +212,20 @@ fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
 inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> =
-  foldRight<K, A, Validated<E, Map<K, B>>>(emptyMap<K, B>().valid()) { (k, a), acc ->
-    when (val res = f(a)) {
-      is Validated.Valid -> when (acc) {
-        is Validated.Valid -> acc.map { bs -> mapOf(k to res.value) + bs }
-        is Validated.Invalid -> acc
+): Validated<E, Map<K, B>> {
+  return foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
+    when (val res = f(v)) {
+      is Valid -> when (acc) {
+        is Valid -> acc.also { it.value[k] = res.value }
+        is Invalid -> acc
       }
-      is Validated.Invalid -> when (acc) {
-        is Validated.Valid -> res
-        is Validated.Invalid -> Invalid(semigroup.run { res.value.combine(acc.value) })
+      is Invalid -> when (acc) {
+        is Valid -> res
+        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
       }
     }
   }
+}
 
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
@@ -415,6 +419,7 @@ fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(S
 fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
 
+@Deprecated("Map<K, A>.foldRight is being deprecated because its functionality differs from other definitions of foldRight within arrow.")
 inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
   this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
 

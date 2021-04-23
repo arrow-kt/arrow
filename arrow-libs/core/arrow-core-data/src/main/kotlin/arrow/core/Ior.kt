@@ -195,10 +195,6 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     @JvmStatic
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
       { it.bimap(fa, fb) }
-
-    @PublishedApi
-    internal val unit: Ior<Nothing, Unit> =
-      Right(Unit)
   }
 
   /**
@@ -228,6 +224,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
   inline fun <C> foldLeft(c: C, f: (C, B) -> C): C =
     fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> foldRight(lc: Eval<C>, crossinline f: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ lc }, { Eval.defer { f(it, lc) } }, { _, b -> Eval.defer { f(b, lc) } })
 
@@ -246,6 +243,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
   inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
 
+  @Deprecated(FoldRightDeprecation)
   inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
 
@@ -500,6 +498,10 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     companion object {
       @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Right(a)", "arrow.core.Right"))
       operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
+
+      @PublishedApi
+      internal val unit: Ior<Nothing, Unit> =
+        Right(Unit)
     }
   }
 
@@ -816,7 +818,7 @@ inline fun <A, B, C, D> Ior<A, B>.zip(
   c: Ior<A, C>,
   map: (B, C) -> D
 ): Ior<A, D> =
-  zip(SA, c, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+  zip(SA, c, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
 inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -824,7 +826,7 @@ inline fun <A, B, C, D, E> Ior<A, B>.zip(
   d: Ior<A, D>,
   map: (B, C, D) -> E
 ): Ior<A, E> =
-  zip(SA, c, d, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  zip(SA, c, d, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
 inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -833,7 +835,7 @@ inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   e: Ior<A, E>,
   map: (B, C, D, E) -> F
 ): Ior<A, F> =
-  zip(SA, c, d, e, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  zip(SA, c, d, e, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
 inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -843,7 +845,7 @@ inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   f: Ior<A, F>,
   map: (B, C, D, E, F) -> G
 ): Ior<A, G> =
-  zip(SA, c, d, e, f, Ior.unit, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  zip(SA, c, d, e, f, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
 inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -854,7 +856,7 @@ inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   g: Ior<A, G>,
   map: (B, C, D, E, F, G) -> H
 ): Ior<A, H> =
-  zip(SA, c, d, e, f, g, Ior.unit, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  zip(SA, c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
 
 inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -866,7 +868,7 @@ inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   h: Ior<A, H>,
   map: (B, C, D, E, F, G, H) -> I
 ): Ior<A, I> =
-  zip(SA, c, d, e, f, g, h, Ior.unit, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  zip(SA, c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
 
 inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -879,7 +881,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   i: Ior<A, I>,
   map: (B, C, D, E, F, G, H, I) -> J
 ): Ior<A, J> =
-  zip(SA, c, d, e, f, g, h, i, Ior.unit, Ior.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  zip(SA, c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
 
 inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -893,7 +895,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   j: Ior<A, J>,
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Ior<A, K> =
-  zip(SA, c, d, e, f, g, h, i, j, Ior.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  zip(SA, c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   SA: Semigroup<A>,
