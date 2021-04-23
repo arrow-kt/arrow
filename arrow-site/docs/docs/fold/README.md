@@ -7,7 +7,7 @@ permalink: /optics/fold/
 ## Fold
 
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
-It is a generalization of `[`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce)`, and implements all operators that can be derived from it.
+It is a generalization of [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce), and implements all operators that can be derived from it.
 
 A structure `S` that has a focus `A` to which we can apply a function `(A) -> R` with `Monoid<R>` to `S` and get `R`.
 For example, `S == List<Int>` to which we apply `(Int) -> String` with `Monoid<String>` and we get `R == String`
