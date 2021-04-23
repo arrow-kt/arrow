@@ -2,10 +2,6 @@
 // -----------------------------------------------
 // -----------------------------------------------
 
-.listado {
-  background: #765;
-}
-
 #site-nav {
   position: fixed;
   padding: ($base-point-grid * 5) 0;
@@ -164,24 +160,37 @@
 }
 
 .dropdown-content {
-  padding: 16px;
+  padding: 16px 0;
   position: absolute;
   top: 32px;
   left: 0;
   overflow: auto;
-  border: 2px solid $brand-primary;
-  background: $background-color;
   z-index: 1;
   transition: all 0.35s ease-out;
   visibility: hidden;
   opacity: 0;
+  background: rgba(#fff, 0.95);
+  box-shadow: 0px 0px 6px rgba($box-text-color, 0.3);
+  border-radius: 2px;
+  min-width: 148px;
 
   ul {
     display: flex;
     flex-direction: column;
     li {
       a {
+        display: block;
+        padding: 2px 16px;
         white-space: nowrap;
+        color: $box-text-color;
+        text-transform: uppercase;
+        transition: all 0.4s ease-out;
+        &:hover {
+          color: $box-text-color;
+          text-decoration: none;
+          background: rgba($box-text-color, 0.07);
+          border-radius: 2px;
+        }
       }
     }
   }
