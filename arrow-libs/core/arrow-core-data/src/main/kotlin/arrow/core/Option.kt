@@ -422,9 +422,6 @@ sealed class Option<out A> : OptionOf<A> {
     @JvmStatic
     fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
-
-    @PublishedApi
-    internal val unit: Option<Unit> = Some(Unit)
   }
 
   fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
@@ -434,14 +431,34 @@ sealed class Option<out A> : OptionOf<A> {
     b: Option<B>,
     map: (A, B) -> C
   ): Option<C> =
-    zip(b, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+    zip(
+      b,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
   inline fun <B, C, D> zip(
     b: Option<B>,
     c: Option<C>,
     map: (A, B, C) -> D
   ): Option<D> =
-    zip(b, c, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+    zip(
+      b,
+      c,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
   inline fun <B, C, D, E> zip(
     b: Option<B>,
@@ -449,7 +466,17 @@ sealed class Option<out A> : OptionOf<A> {
     d: Option<D>,
     map: (A, B, C, D) -> E
   ): Option<E> =
-    zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+    zip(
+      b,
+      c,
+      d,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
 
   inline fun <B, C, D, E, F> zip(
     b: Option<B>,
@@ -458,7 +485,15 @@ sealed class Option<out A> : OptionOf<A> {
     e: Option<E>,
     map: (A, B, C, D, E) -> F
   ): Option<F> =
-    zip(b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e) }
+    zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+      map(
+        a,
+        b,
+        c,
+        d,
+        e
+      )
+    }
 
   inline fun <B, C, D, E, F, G> zip(
     b: Option<B>,
@@ -468,7 +503,16 @@ sealed class Option<out A> : OptionOf<A> {
     f: Option<F>,
     map: (A, B, C, D, E, F) -> G
   ): Option<G> =
-    zip(b, c, d, e, f, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e, f) }
+    zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+      map(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f
+      )
+    }
 
   inline fun <B, C, D, E, F, G, H, I> zip(
     b: Option<B>,
@@ -479,7 +523,7 @@ sealed class Option<out A> : OptionOf<A> {
     g: Option<G>,
     map: (A, B, C, D, E, F, G) -> H
   ): Option<H> =
-    zip(b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+    zip(b, c, d, e, f, g, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
 
   inline fun <B, C, D, E, F, G, H, I> zip(
     b: Option<B>,
@@ -491,7 +535,7 @@ sealed class Option<out A> : OptionOf<A> {
     h: Option<H>,
     map: (A, B, C, D, E, F, G, H) -> I
   ): Option<I> =
-    zip(b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+    zip(b, c, d, e, f, g, h, Some.unit, Some.unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
 
   inline fun <B, C, D, E, F, G, H, I, J> zip(
     b: Option<B>,
@@ -504,7 +548,7 @@ sealed class Option<out A> : OptionOf<A> {
     i: Option<I>,
     map: (A, B, C, D, E, F, G, H, I) -> J
   ): Option<J> =
-    zip(b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+    zip(b, c, d, e, f, g, h, i, Some.unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
 
   inline fun <B, C, D, E, F, G, H, I, J, K> zip(
     b: Option<B>,
@@ -841,6 +885,11 @@ data class Some<out T>(
   override fun isEmpty() = false
 
   override fun toString(): String = "Option.Some($t)"
+
+  companion object {
+    @PublishedApi
+    internal val unit: Option<Unit> = Some(Unit)
+  }
 }
 
 /**

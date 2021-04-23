@@ -33,6 +33,7 @@ import arrow.core.test.laws.TraverseLaws
 import arrow.core.test.laws.UnalignLaws
 import arrow.core.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

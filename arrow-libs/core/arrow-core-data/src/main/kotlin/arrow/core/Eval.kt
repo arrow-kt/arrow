@@ -385,6 +385,11 @@ sealed class Eval<out A> : EvalOf<A> {
 
     override fun toString(): String =
       "Eval.Now($value)"
+
+    companion object {
+      @PublishedApi
+      internal val unit: Eval<Unit> = Now(kotlin.Unit)
+    }
   }
 
   /**
@@ -496,7 +501,7 @@ fun <A, B, C, D> Eval<A>.zip(
   c: Eval<C>,
   map: (A, B, C) -> D
 ): Eval<D> =
-  zip(b, c, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
+  zip(b, c, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
 
 fun <A, B, C, D, E> Eval<A>.zip(
   b: Eval<B>,
@@ -504,7 +509,7 @@ fun <A, B, C, D, E> Eval<A>.zip(
   d: Eval<D>,
   map: (A, B, C, D) -> E
 ): Eval<E> =
-  zip(b, c, d, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
+  zip(b, c, d, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
 
 fun <A, B, C, D, E, F> Eval<A>.zip(
   b: Eval<B>,
@@ -513,7 +518,7 @@ fun <A, B, C, D, E, F> Eval<A>.zip(
   e: Eval<E>,
   map: (A, B, C, D, E) -> F
 ): Eval<F> =
-  zip(b, c, d, e, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
+  zip(b, c, d, e, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
 
 fun <A, B, C, D, E, F, G> Eval<A>.zip(
   b: Eval<B>,
@@ -523,7 +528,7 @@ fun <A, B, C, D, E, F, G> Eval<A>.zip(
   f: Eval<F>,
   map: (A, B, C, D, E, F) -> G
 ): Eval<G> =
-  zip(b, c, d, e, f, Eval.Unit, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
+  zip(b, c, d, e, f, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
 
 fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
   b: Eval<B>,
@@ -534,7 +539,7 @@ fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
   g: Eval<G>,
   map: (A, B, C, D, E, F, G) -> H
 ): Eval<H> =
-  zip(b, c, d, e, f, g, Eval.Unit, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
+  zip(b, c, d, e, f, g, Eval.Now.unit, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
 
 fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
   b: Eval<B>,
@@ -546,7 +551,7 @@ fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
   h: Eval<H>,
   map: (A, B, C, D, E, F, G, H) -> I
 ): Eval<I> =
-  zip(b, c, d, e, f, g, h, Eval.Unit, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
+  zip(b, c, d, e, f, g, h, Eval.Now.unit, Eval.Now.unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
 
 fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
   b: Eval<B>,
@@ -559,7 +564,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
   i: Eval<I>,
   map: (A, B, C, D, E, F, G, H, I) -> J
 ): Eval<J> =
-  zip(b, c, d, e, f, g, h, i, Eval.Unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+  zip(b, c, d, e, f, g, h, i, Eval.Now.unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
 
 fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
   b: Eval<B>,
