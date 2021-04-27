@@ -22,6 +22,15 @@ jobs:
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: Build
-      working-directory: arrow-libs
+    - name: "Build Core libraries"
+      working-directory: arrow-libs/core
+      run: ./gradlew build
+    - name: "Build Fx libraries"
+      working-directory: arrow-libs/fx
+      run: ./gradlew build
+    - name: "Build Optics libraries"
+      working-directory: arrow-libs/optics
+      run: ./gradlew build
+    - name: "Build Ank library and plugin"
+      working-directory: arrow-libs/ank
       run: ./gradlew build
