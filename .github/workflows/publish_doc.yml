@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+    - release/**
     paths:
     - 'arrow-libs/**'
     - 'arrow-site/**'
@@ -48,17 +49,19 @@ jobs:
       working-directory: arrow-site
       run: ./gradlew runAnk
     - name: "Landing page: build"
+      if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         bundle exec jekyll build -b docs -s build/site
         tree _site > $BASEDIR/logs/content_docs.log
     - name: "Landing page: publish"
+      if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
         ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
     - name: "Latest release: publish (docs/)"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
@@ -85,17 +88,19 @@ jobs:
           exit 1
         fi
     - name: "Next version: build (/docs/next)"
+      if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         bundle exec jekyll build -b docs/next -s build/site
         tree _site > $BASEDIR/logs/content_docs-next.log
     - name: "Next version: publish (/docs/next)"
+      if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
         aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
     - name: "Site: publish sitemap.xml"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       run: |
         ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
         aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
