@@ -10,10 +10,9 @@ apply from: "$ANIMALSNIFFER"
 
 kotlin {
     sourceSets {
-        jvmMain {
+        commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-                api "io.kindedj:kindedj:$KINDEDJ_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
     }
