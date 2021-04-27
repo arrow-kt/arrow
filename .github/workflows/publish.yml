@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+    - release/**
     paths:
     - 'arrow-libs/**'
     - '.github/**'
@@ -32,9 +33,6 @@ jobs:
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: "Update version when release"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
     - name: "Publish"
       working-directory: arrow-libs
       run: |
@@ -49,6 +47,6 @@ jobs:
         git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION"
         git push origin $RELEASE_VERSION
     # TODO: enable after 0.12.0 release
-    # - name: "Create release notes"
-    #  if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+    #- name: "Create release notes"
+    #  if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
     #  run: ${GITHUB_WORKSPACE}/.github/scripts/create-release-notes.sh
