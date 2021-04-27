@@ -33,10 +33,19 @@ jobs:
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: "Publish"
-      working-directory: arrow-libs
+    - name: "Publish Core libraries"
+      working-directory: arrow-libs/core
+      run: ./gradlew publish
+    - name: "Publish Fx libraries"
+      working-directory: arrow-libs/fx
+      run: ./gradlew clean publish
+    - name: "Publish Optics libraries"
+      working-directory: arrow-libs/optics
+      run: ./gradlew clean publish
+    - name: "Publish Ank library and plugin"
+      working-directory: arrow-libs/ank
       run: |
-        ./gradlew publish
+        ./gradlew clean publish
         echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
     - name: "Create tag"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
