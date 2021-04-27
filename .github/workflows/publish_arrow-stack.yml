@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+    - release/**
     paths:
     - 'arrow-libs/**'
     - 'arrow-stack/**'
@@ -34,9 +35,6 @@ jobs:
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: "Update version when release"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-      run: perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
     - name: "Publish"
       run: |
         ./gradlew publish
