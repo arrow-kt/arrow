@@ -22,6 +22,7 @@ fi
 
 if [ $NEW_RELEASE_VERSION_EXISTS == '1' ]; then
     perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
+    perl -pe "s/^org.gradle.parallel=.*/org.gradle.parallel=false/g" -i $BASEDIR/gradle.properties
 fi
 
 echo "LATEST_PUBLISHED_VERSION=$LATEST_PUBLISHED_VERSION" >> $GITHUB_ENV
