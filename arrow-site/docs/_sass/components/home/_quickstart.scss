@@ -48,6 +48,18 @@
     }
   }
 }
+
+
+// Responsive
+@include bp(medium) {
+  .site-quickstart {
+    .quickstart-content {
+      h1 {
+        font-size: 2.9rem;
+      }
+    }
+  }
+}
 // @keyframes animate {
 //   0.0% {
 //     opacity: 0;

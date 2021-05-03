@@ -33,5 +33,6 @@
 @import "components/docs/navigation";
 @import "components/common/dropdown";
 @import "components/common/button";
+@import "components/docs/quickstart-doc";
 
 @include dropdown($dropdown-config...);

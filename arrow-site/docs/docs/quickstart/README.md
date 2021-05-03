@@ -11,11 +11,15 @@ permalink: /core/
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-grey.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
 [![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=blue&style=flat)](https://twitter.com/arrow_kt)
 
+{: .heading-h1}
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
+{: .quickstart-intro}
 Arrow complements the Kotlin standard library and KotlinX Coroutines libraries with functional patterns that favor composition, effect control, and immutability.
 
 Arrow is composed of 4 main modular libraries:
+
+{: .quickstart-inro-libraries}
 
 * [**Core**]({{ '/core/' | relative_url }}): Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).

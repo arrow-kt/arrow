@@ -1,0 +1,31 @@
+// Quickstart docs
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content {
+  .heading-h1 {
+    font-family: $header-font-family;
+    font-size: 3rem;
+    font-weight: $font-semibold;
+    line-height: $heading-line-height;
+  }
+
+  .quickstart-intro {
+    padding: 1rem 2rem;
+    margin: 2rem 0 3rem 0;
+    font-family: $header-font-family;
+    font-size: 1.75rem;
+    font-weight: $font-regular;
+    background: rgba($core-background, 0.08);
+  }
+
+  .quickstart-inro-libraries {
+    display: grid;
+    gap: 2rem;
+      grid-template-columns: repeat(2, 1fr);
+
+    li {
+      background: #fff;
+    }
+  }
+}
