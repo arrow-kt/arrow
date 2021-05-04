@@ -1,9 +1,13 @@
 <div class="site-quickstart">
   <div class="wrapper">
     <div class="quickstart-content">
-      {% for quickstart in site.data.quickstart.quickstartTitles %}
-      <h1>{{quickstart.title}}</h1>
-      {% endfor %}
+    
+      <div class="container py-5">
+  <div class="output" id="output">
+    <h1 class="cursor"></h1>
+    <p></p>
+  </div>
+</div>
       <a class="quickstart-cta" href="{{site.data.quickstart.quickstartCtaUrl}}">{{site.data.quickstart.quickstartCtaName}}</a>
     </div>
   </div>

@@ -7,7 +7,7 @@
     font-family: $doc-font-family;
     position: relative;
     padding: ($base-point-grid * 4);
-  
+
     font-size: 1rem;
     //border-right: 1px solid rgba($core-background, 0.15);
 
@@ -29,22 +29,22 @@
     }
 
     h1 {
-        font-size: 3.5rem;
+        font-size: 3rem;
 
     }
 
     h2 {
-      padding-bottom: 1rem;
-        font-size: 3rem;
+        padding-bottom: 1rem;
+        font-size: 2.5rem;
         border-bottom: 1px solid rgba($core-background, 0.15);
     }
 
     h3 {
-        font-size: 2.25rem;
+        font-size: 2rem;
     }
 
     h4 {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
     }
 
     h5 {
