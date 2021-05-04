@@ -19,12 +19,9 @@ ul {
 
     .CodeMirror,
     .hljs {
-        font-size: 15px;
+        font-size: 1rem;
         font-family: $code-font-family;
-
-        pre {
-            line-height: 1.8;
-        }
+        line-height: 1.9;
 
     }
 
@@ -35,16 +32,23 @@ ul {
         pre {
 
         &.highlight {
-            border: 1px solid $code-border-color;
             margin-bottom: $code-margin;
+
+            border: none;
+
 
             .hljs {
                 padding: $code-padding;
+                border: 1px solid rgba($core-background, 0.15);
             }
         }
     }
 
     .executable-fragment {
+    border: 1px solid rgba($core-background, 0.15);
+    .js-code-output-executor {
+      border: none;
+    }
       .console-close,
       .run-button {
         width: 24px;

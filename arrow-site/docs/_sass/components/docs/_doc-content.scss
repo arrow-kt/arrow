@@ -3,11 +3,15 @@
 // -----------------------------------------------
 
 .doc-content {
+    max-width: 1172px;
     font-family: $doc-font-family;
     position: relative;
     padding: ($base-point-grid * 4);
-    font-size: 1.125rem;
-    background: rgba($core-background, 0.09);
+  
+    font-size: 1rem;
+    //border-right: 1px solid rgba($core-background, 0.15);
+
+
 
     h1,
     h2,
@@ -25,24 +29,32 @@
     }
 
     h1 {
-        font-size: 2.25rem;
+        font-size: 3.5rem;
+
     }
 
     h2 {
-        font-size: 1.9rem;
+      padding-bottom: 1rem;
+        font-size: 3rem;
+        border-bottom: 1px solid rgba($core-background, 0.15);
     }
 
     h3 {
-        font-size: 1.675rem;
+        font-size: 2.25rem;
     }
 
     h4 {
-        font-size: 1.425rem;
+        font-size: 1.75rem;
     }
 
-    h5 {}
+    h5 {
+        font-size: 1.25rem;
+    }
 
-    h6 {}
+    h6 {
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
 
     p {
         margin-bottom: ($base-point-grid * 2);

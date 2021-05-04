@@ -40,13 +40,13 @@ $font-regular: 400;
 $font-medium: 500;
 $font-semibold: 600;
 $font-bold: 700;
-$base-font-size: 14px;
-$base-line-height: 1.6;
-$heading-line-height: 1.4;
-$base-docs-font-size: 16px;
+$base-font-size: 16px;
+$base-line-height: 1.7;
+$heading-line-height: 1.3;
+$base-docs-font-size: 1rem;
 // Sizes
 // -----------------------------------------------
-$base-point-grid: 8px;
+$base-point-grid: 0.5rem;
 $sidebar-cat-button: 164px;
 $sidebar-doc-version-button: 200px;
 $height-home-code-block: 400px;
@@ -88,6 +88,7 @@ $gutter-margin: ($base-point-grid * 4);
 $border-color: rgba($gray-primary, 0.1);
 $doc-header-border: rgba($brand-secondary, 0.8);
 $sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
+
 // Code
 // -----------------------------------------------
 $code-border-color: rgba($gray-primary, 0.2);
@@ -99,6 +100,7 @@ $sidebar-width: 325px;
 // Box Shadow
 $box-shadow-item: rgba($brand-primary, 0.10) 0 0 20px;
 $box-shadow-button: rgba(0,0,0,0.3) 0 2px 8px 0;
+$base-box-shadow: 0 4px 10px rgba($core-background, 0.06);
 // Docsearch dropdown
 $dropdown-config: (
   main-color: $brand-tertiary,

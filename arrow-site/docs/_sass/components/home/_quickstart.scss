@@ -13,24 +13,6 @@
       font-size: 4.2rem;
       line-height: 1.4;
       overflow: hidden;
-      /* Gives that scrolling effect as the typing happens */
-      //position: absolute;
-      //animation: yourAnimation 24s ease-out infinite normal none;
-      // &:nth-child(1) {
-      //   animation-delay: 0;
-      // }
-      //
-      // &:nth-child(2) {
-      //   animation-delay: 6s;
-      // }
-      //
-      // &:nth-child(3) {
-      //   animation-delay: 12s;
-      // }
-      //
-      // &:nth-child(4) {
-      //   animation-delay: 18s;
-      // }
     }
 
     .quickstart-cta {
@@ -60,25 +42,3 @@
     }
   }
 }
-// @keyframes animate {
-//   0.0% {
-//     opacity: 0;
-//   }
-//
-//   2.5% {
-//     opacity: 1;
-//   }
-//
-//   25% {
-//     opacity: 1;
-//     margin-left: 0;
-//   }
-//
-//   27.5% {
-//     opacity: 0;
-//   }
-//
-//   35.5% {
-//     margin-left: 200px;
-//   }
-// }

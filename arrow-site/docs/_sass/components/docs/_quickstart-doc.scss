@@ -4,28 +4,124 @@
 
 .doc-content {
   .heading-h1 {
+    margin-top: 3rem;
     font-family: $header-font-family;
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: $font-semibold;
     line-height: $heading-line-height;
   }
 
   .quickstart-intro {
     padding: 1rem 2rem;
-    margin: 2rem 0 3rem 0;
+    margin: 3rem 0;
     font-family: $header-font-family;
-    font-size: 1.75rem;
+    font-size: 1.7rem;
     font-weight: $font-regular;
-    background: rgba($core-background, 0.08);
+    background: rgba($core-background, 0.07);
   }
 
-  .quickstart-inro-libraries {
+  .quickstart-intro-modular {
+    margin-bottom: 2.5rem;
+    font-family: $header-font-family;
+    font-size: 1.7rem;
+
+    strong {
+      //background: rgba($core-background, 0.07);
+      font-weight: $font-semibold;
+    }
+  }
+
+  .quickstart-intro-libraries {
     display: grid;
     gap: 2rem;
-      grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    list-style: none;
+    padding: 0;
 
     li {
-      background: #fff;
+      position: relative;
+      padding: 2rem;
+      list-style: none;
+      background: $white;
+      //border: 1px solid rgba($core-background, 0.14);
+      box-shadow: 0 2px 16px 0 rgba($core-background, 0.06);
+      &:nth-child(1) {
+
+      }
+
+      &:nth-child(2) {
+
+
+        a {
+          color: $fx-color;
+        }
+      }
+
+      &:nth-child(3) {
+
+
+        a {
+          color: $optics-color;
+        }
+      }
+
+      &:nth-child(4) {
+
+        a {
+          color: $meta-color;
+        }
+      }
+
+      img {
+        width: 48px;
+        height: auto;
+        position: absolute;
+      }
+
+      h2 {
+        border: none;
+        padding: 0;
+        margin: 0.5rem 0 2rem 5rem;
+        font-size: 1.8rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+    }
+  }
+
+  .quickstart-setup-heading {
+    font-size: 3rem;
+  }
+
+  .quickstart-setup-requirements {
+    margin-top: 2rem;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0;
+    li {
+      list-style: none;
+      padding: 0;
+      h3 {
+        @extend .quickstart-setup-h3;
+      }
+    }
+  }
+
+  .quickstart-setup-h3 {
+    padding: 0 1rem;
+    background: $core-color;
+    display: inline-block;
+    color: $white;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+}
+// Responsive
+@include bp(large) {
+  .doc-content {
+    .quickstart-intro-libraries {
+      grid-template-columns: 1fr;
     }
   }
 }
