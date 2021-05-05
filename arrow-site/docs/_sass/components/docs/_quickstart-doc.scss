@@ -45,30 +45,67 @@
       background: $white;
       //border: 1px solid rgba($core-background, 0.14);
       box-shadow: 0 2px 16px 0 rgba($core-background, 0.06);
-      &:nth-child(1) {
+      p {
+        margin-bottom: 0;
+         a {
+           &:last-child {
+             display: flex;
+             align-items: center;
+             margin-top: 1.5rem;
+             font-family: $header-font-family;
+             font-size: 1.125rem;
+             font-weight: 600;
+             i {
+               margin-left: 0.5rem;
+               padding-top: 0.25rem;
+             }
 
+           }
+           &:hover {
+             text-decoration: none;
+           }
+         }
+      }
+      &:nth-child(1) {
+        p {
+           a {
+             &:last-child {
+
+             }
+           }
+        }
       }
 
       &:nth-child(2) {
-
-
         a {
           color: $fx-color;
+        }
+        p {
+           a {
+             &:last-child {}
+           }
         }
       }
 
       &:nth-child(3) {
-
-
         a {
           color: $optics-color;
+        }
+        p {
+           a {
+             &:last-child {}
+           }
         }
       }
 
       &:nth-child(4) {
-
         a {
           color: $meta-color;
+        }
+        p {
+           a {
+             &:last-child {}
+           }
         }
       }
 
@@ -91,31 +128,27 @@
 
   .quickstart-setup-heading {
     font-size: 3rem;
-  }
 
-  .quickstart-setup-requirements {
-    margin-top: 2rem;
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 0;
-    li {
-      list-style: none;
-      padding: 0;
-      h3 {
-        @extend .quickstart-setup-h3;
-      }
-    }
   }
 
   .quickstart-setup-h3 {
-    padding: 0 1rem;
-    background: $core-color;
-    display: inline-block;
-    color: $white;
-    font-size: 1.5rem;
-    text-transform: uppercase;
+    .fal {
+      margin-right: 0.7rem;
+      color: $core-color;
+    }
   }
+
+
+
+
+  // .quickstart-setup-h3 {
+  //   padding: 0 1rem;
+  //   background: $core-color;
+  //   display: inline-block;
+  //   color: $white;
+  //   font-size: 1.5rem;
+  //   text-transform: uppercase;
+  // }
 }
 // Responsive
 @include bp(large) {

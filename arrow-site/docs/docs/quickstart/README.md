@@ -24,24 +24,28 @@ Arrow is composed of **4 main modular libraries**:
 {: .quickstart-intro-libraries}
 
 * ![#](/img/core/arrow-core-brand-sidebar.svg)
-## [**Core**]({{ '/core/' | relative_url }})
+## Core
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
+[Learn More <i class="far fa-long-arrow-right"></i>]({{ ‘/core/’ | relative_url }})
 
 * ![#](/img/fx/arrow-fx-brand-sidebar.svg)
-## [**Fx**]({{ '/fx/' | relative_url }})
+## Fx
 Arrow Fx is a full-featured, high-performance, asynchronous framework that brings functional operators to Kotlin's `suspend` functions.
 By leveraging the power of KotlinX Coroutines and the compiler support for CPS transformations, Arrow Fx results in optimal async programs with increased throughput and decreased allocations.
+[Learn More <i class="far fa-long-arrow-right"></i>]({{ ‘/fx/’ | relative_url }})
 
 * ![#](/img/optics/arrow-optics-brand-sidebar.svg)
-## [**Optics**]({{ '/optics/dsl/' | relative_url }})
+## Optics
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 Optics also offers all the base types such as [Lens]({{ '/optics/lens/' | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
+[Learn More <i class="far fa-long-arrow-right"></i>]({{ ‘/optics/dsl/’ | relative_url }})
 
 * ![#](/img/meta/arrow-meta-brand-sidebar.svg)
-## [**Meta**](https://meta.arrow-kt.io)
+## Meta
 Arrow Meta is a general purpose library for meta-programming in Kotlin to build compiler plugins.
 Some type system features proposed by Arrow such as union types, product types, proof derivation, and others are built with Arrow Meta and serve as examples of what could be incorporated in the Kotlin compiler.
+[Learn More <i class="far fa-long-arrow-right"></i>](https://meta.arrow-kt.io)
 
 
 {: .quickstart-setup-heading}
@@ -50,14 +54,16 @@ Some type system features proposed by Arrow such as union types, product types, 
 
 {: .quickstart-setup-requirements}
 
-* ### JDK
+{: .quickstart-setup-h3}
+### <i class="fal fa-angle-right"></i>JDK
 Make sure to have the latest version of JDK 1.8 installed.
 
-* ### Android
+{: .quickstart-setup-h3}
+### <i class="fal fa-angle-right"></i>Android
 Arrow supports Android starting on API 21 and up.
 
 {: .quickstart-setup-h3}
-### Gradle
+### <i class="fal fa-angle-right"></i>Gradle
 
 #### Basic Setup
 
@@ -116,7 +122,7 @@ implementation "io.arrow-kt:arrow-fx-coroutines"
 ```
 
 {: .quickstart-setup-h3}
-### Maven
+### <i class="fal fa-angle-right"></i>Maven
 
 #### Basic Setup
 
