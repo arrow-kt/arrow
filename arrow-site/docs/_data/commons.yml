@@ -1,6 +1,6 @@
 name: "Arrow"
 title: "Λrrow"
-description: "Functional companion to Kotlmos dsodks"
+description: "Functional companion to Kotlin's Standard Library"
 keywords: "functional-programming, kotlin-library, monads, monad-transformers, functional-data-structure, kotlin, fp-types, adt, effects handlers, continuations, coroutines, for-comprehension, category-theory"
 google_analytics: "UA-18433785-18"
 github_repository: "https://github.com/arrow-kt/arrow"
