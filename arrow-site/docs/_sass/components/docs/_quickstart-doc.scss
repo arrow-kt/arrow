@@ -49,12 +49,17 @@
         margin-bottom: 0;
          a {
            &:last-child {
+             padding: 0.5rem 0;
+             text-align: center;
              display: flex;
+             justify-content: center;
              align-items: center;
              margin-top: 1.5rem;
              font-family: $header-font-family;
              font-size: 1.125rem;
+             width: 160px;
              font-weight: 600;
+             color: $white;
              i {
                margin-left: 0.5rem;
                padding-top: 0.25rem;
@@ -64,47 +69,58 @@
            &:hover {
              text-decoration: none;
            }
+           transition-property: background-color;
+           transition: $base-duration $base-timing;
          }
       }
       &:nth-child(1) {
         p {
            a {
              &:last-child {
-
+               background: $core-color;
+               &:hover {
+                 background: darken($core-color, 15%);
+               }
              }
            }
         }
       }
 
       &:nth-child(2) {
-        a {
-          color: $fx-color;
-        }
         p {
            a {
-             &:last-child {}
+             &:last-child {
+               background: $fx-color;
+               &:hover {
+                 background: darken($fx-color, 15%);
+               }
+             }
            }
         }
       }
 
       &:nth-child(3) {
-        a {
-          color: $optics-color;
-        }
         p {
            a {
-             &:last-child {}
+             &:last-child {
+               background: $optics-color;
+               &:hover {
+                 background: darken($optics-color, 15%);
+               }
+             }
            }
         }
       }
 
       &:nth-child(4) {
-        a {
-          color: $meta-color;
-        }
         p {
            a {
-             &:last-child {}
+             &:last-child {
+               background: $meta-color;
+                &:hover {
+                  background: darken($meta-color, 15%);
+                }
+             }
            }
         }
       }
