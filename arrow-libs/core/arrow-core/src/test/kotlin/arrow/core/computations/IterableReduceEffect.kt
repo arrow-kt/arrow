@@ -3,7 +3,7 @@ package arrow.core.computations
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 
-class IterableReduceEffect: UnitSpec() {
+class IterableReduceEffect : UnitSpec() {
 
   init {
     "empty - expect 2" {
@@ -71,5 +71,4 @@ class IterableReduceEffect: UnitSpec() {
       result shouldBe null
     }
   }
-
 }
