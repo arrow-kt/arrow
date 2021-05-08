@@ -4,9 +4,14 @@ import arrow.continuations.Effect
 import arrow.continuations.generic.DelimitedScope
 
 /**
- * Allows to iterate over the [Iterable]<A> receiver and reduce to a nullable result.
+ * Allows to iterate over the [Iterable]<A> receiver and operate on any number of values in order.
  *
- * Can be used to convert a number of items in an [Iterable]<A> skipping any non requested
+ * With some special features:
+ * - Not all items need to be consumed.
+ * - If we try to get a value after there are no more items then results in a `null` value.
+ * - At any point we can cancel the iteration resulting in a `null` value.
+ *
+ * Can be used to apply operations to an arbitrary number of items in an [Iterable]<A>:
  * ```kotlin
  * val result: String? = listOf(1, 2, 3).partialReduceOrNull {
  *    val a = next() // gets 1
@@ -16,7 +21,7 @@ import arrow.continuations.generic.DelimitedScope
  * result shouldBe "1 2"
  * ```
  *
- * It's possible to also skip a value in the iteration:
+ * It's possible to also skip a value:
  * ```kotlin
  * val result: String? = listOf(1, 2, 3).partialReduceOrNull {
  *    val a = next() // gets 1
@@ -27,7 +32,7 @@ import arrow.continuations.generic.DelimitedScope
  * result shouldBe "1 3"
  * ```
  *
- * If you need to skip more than one item:
+ * If we need to skip more than one item:
  * ```kotlin
  * val result: String? = listOf(1, 2, 3, 4).partialReduceOrNull {
  *    val a = next() // gets 1
@@ -38,7 +43,7 @@ import arrow.continuations.generic.DelimitedScope
  * result shouldBe "1 4"
  * ```
  *
- * You can use `cancel()` to end the iteration if a given condition is met:
+ * We can use `cancel()` to end the iteration if a given condition is met:
  * ```kotlin
  * val result: String? = listOf(1, 2, 3, 4).partialReduceOrNull {
  *    val a = next() // gets 1
@@ -73,7 +78,7 @@ class IterableEffect<A, R>(
   }
 
   /**
-   * Drops [n] items form the current iteration.
+   * Drops [n] items from the current iteration.
    */
   suspend fun drop(n: Int) = repeat(n) { dropNext() }
 
