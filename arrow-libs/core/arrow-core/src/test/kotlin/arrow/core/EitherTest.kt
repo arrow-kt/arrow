@@ -17,6 +17,7 @@ import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
+import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -37,6 +38,18 @@ class EitherTest : UnitSpec() {
         it.bind()
       }
     )
+
+    "isLeft should return true if Left and false if Right" {
+      forAll { a: Int ->
+        Left(a).isLeft() && !Right(a).isLeft()
+      }
+    }
+
+    "isRight should return false if Left and true if Right" {
+      forAll { a: Int ->
+        !Left(a).isRight() && Right(a).isRight()
+      }
+    }
 
     "fromNullable should lift value as a Right if it is not null" {
       forAll { a: Int ->
@@ -82,7 +95,7 @@ class EitherTest : UnitSpec() {
 
     "orNull should return value" {
       forAll { a: Int ->
-        Either.Right(a).orNull() == a
+        Right(a).orNull() == a
       }
     }
 
