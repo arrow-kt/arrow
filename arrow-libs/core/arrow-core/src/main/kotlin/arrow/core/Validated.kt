@@ -907,7 +907,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
     accumulatedError =
       if (ff is Validated.Invalid) emptyCombine(accumulatedError, ff.value) else accumulatedError
     accumulatedError =
-      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.value)else accumulatedError
+      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.value) else accumulatedError
     accumulatedError =
       if (h is Validated.Invalid) emptyCombine(accumulatedError, h.value) else accumulatedError
     accumulatedError =
@@ -1060,7 +1060,7 @@ fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
 fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
 
-fun <E, A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
+fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
   traverseOption(::identity)
 
 operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
@@ -1080,6 +1080,9 @@ inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
  */
 fun <E, A> Validated<E, A>.orNull(): A? =
   getOrElse { null }
+
+fun <E, A> Validated<E, A>.orNone(): Option<A> =
+  fold({ None }, { Some(it) })
 
 /**
  * Return the Valid value, or the result of f if Invalid

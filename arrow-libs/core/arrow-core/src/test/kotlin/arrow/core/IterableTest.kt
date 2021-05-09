@@ -40,6 +40,12 @@ class IterableTest : UnitSpec() {
       }
     }
 
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { it.right() }.sequenceEither() == ints.traverseEither { it.right() }
+      }
+    }
+
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -71,6 +77,12 @@ class IterableTest : UnitSpec() {
       }
     }
 
+    "sequenceOption should be consistent with traverseOption" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { Some(it) }.sequenceOption() == ints.traverseOption { Some(it) }
+      }
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -91,6 +103,13 @@ class IterableTest : UnitSpec() {
           .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
 
         res == expected
+      }
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { it.valid() as Validated<String, Int> }.sequenceValidated(Semigroup.string()) ==
+          ints.traverseValidated(Semigroup.string()) { it.valid() as Validated<String, Int> }
       }
     }
 

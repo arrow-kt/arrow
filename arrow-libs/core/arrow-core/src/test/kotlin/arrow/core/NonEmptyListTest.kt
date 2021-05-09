@@ -43,6 +43,13 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequenceEither() ==
+          ints.traverseEither { Either.conditionally(it % 2 == 0, { it }, { it }) }
+      }
+    }
+
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -74,6 +81,13 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
+    "sequenceOption should be consistent with traverseOption" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        ints.map { (it % 2 == 0).maybe { it } }.sequenceOption() ==
+          ints.traverseOption { (it % 2 == 0).maybe { it } }
+      }
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -94,6 +108,13 @@ class NonEmptyListTest : UnitSpec() {
           .fold({ NonEmptyList.fromListUnsafe(ints.filter { it % 2 == 0 }).validNel() }, { it.invalid() })
 
         res == expected
+      }
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        ints.map { if (it % 2 == 0) it.valid() else it.invalid() }.sequenceValidated(Semigroup.int()) ==
+          ints.traverseValidated(Semigroup.int()) { if (it % 2 == 0) it.valid() else it.invalid() }
       }
     }
 

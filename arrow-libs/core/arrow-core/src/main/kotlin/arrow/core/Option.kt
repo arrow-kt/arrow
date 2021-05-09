@@ -736,7 +736,6 @@ sealed class Option<out A> {
   fun void(): Option<Unit> =
     map { Unit }
 
-
   fun <L> pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
 
   fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }

@@ -190,5 +190,44 @@ class OptionTest : UnitSpec() {
       some.toMap() shouldBe mapOf("key" to "value")
       none.toMap() shouldBe emptyMap()
     }
+
+    "traverse should yield list of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverse { listOf(it) } shouldBe listOf(Some("value"))
+      none.traverse { listOf(it) } shouldBe emptyList()
+    }
+
+    "sequence should be consistent with traverse" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { listOf(it) }.sequence() == option.traverse { listOf(it) }
+      }
+    }
+
+    "traverseEither should yield either of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverseEither { it.right() } shouldBe some.right()
+      none.traverseEither { it.right() } shouldBe none.right()
+    }
+
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { it.right() }.sequenceEither() == option.traverseEither { it.right() }
+      }
+    }
+
+    "traverseValidated should yield validated of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverseValidated { it.valid() } shouldBe some.valid()
+      none.traverseValidated { it.valid() } shouldBe none.valid()
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { it.valid() }.sequenceValidated() == option.traverseValidated { it.valid() }
+      }
+    }
   }
 }

@@ -617,6 +617,9 @@ fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequ
 fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   traverseEither(::identity)
 
+fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
+  traverseOption(::identity)
+
 fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
@@ -658,6 +661,9 @@ fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequ
   }
   return acc.asSequence().right()
 }
+
+fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
+  traverseEither { f(it).toEither { Unit } }.orNone()
 
 fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,

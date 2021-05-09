@@ -33,6 +33,19 @@ class SequenceKTest : UnitSpec() {
       res shouldBe Either.Left(Unit)
     }
 
+    "traverseOption stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = generateSequence(0) { it + 1 }.traverseOption { a ->
+        (a <= 20_000).maybe {
+          acc.add(a)
+          a
+        }
+      }
+      acc shouldBe (0..20_000).toList()
+      res shouldBe None
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
