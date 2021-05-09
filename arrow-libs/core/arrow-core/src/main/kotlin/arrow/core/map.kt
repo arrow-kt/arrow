@@ -224,6 +224,12 @@ inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
+inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
+  traverseEither { f(it).toEither { Unit } }.orNone()
+
+fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
+  traverseOption { it }
+
 fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
 
@@ -237,6 +243,8 @@ fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
   }
   return destination
 }
+
+fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
 
 /**
  * Returns a Map containing all elements that are instances of specified type parameter R.
@@ -404,6 +412,8 @@ fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  */
 fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
+
+fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
 fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
   if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }

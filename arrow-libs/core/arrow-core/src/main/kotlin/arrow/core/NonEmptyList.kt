@@ -447,3 +447,9 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   traverseValidated(semigroup, ::identity)
+
+inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  traverseEither { f(it).toEither { Unit } }.orNone()
+
+fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
+  traverseOption { it }

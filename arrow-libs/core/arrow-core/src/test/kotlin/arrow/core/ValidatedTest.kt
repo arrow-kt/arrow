@@ -298,5 +298,21 @@ class ValidatedTest : UnitSpec() {
 
       invalid.combine(Monoid.string(), Monoid.string(), invalid) shouldBe (Invalid("NopeNope"))
     }
+
+    "traverse should yield list when validated is valid" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverse { listOf(it) } shouldBe listOf(Valid("Who"))
+      invalid.traverse { listOf(it) } shouldBe emptyList()
+    }
+
+    "traverseOption should yield option when validated is valid" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverseOption { Some(it) } shouldBe Some(Valid("Who"))
+      invalid.traverseOption { Some(it) } shouldBe None
+    }
   }
 }

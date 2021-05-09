@@ -43,6 +43,37 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
+    "traverseOption is stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverseOption { a ->
+        acc.add(a)
+        Some(a)
+      }
+      res shouldBe Some(NonEmptyList.fromListUnsafe(acc))
+      res shouldBe Some(NonEmptyList.fromListUnsafe((0..20_000).toList()))
+    }
+
+    "traverseOption short-circuits" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseOption {
+          (it % 2 == 0).maybe {
+            acc.add(it)
+            it
+          }
+        }
+        acc == ints.takeWhile { it % 2 == 0 } && evens.all { it == ints }
+      }
+    }
+
+    "sequenceOption yields some when all entries in the list are some" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        evens.all { it == ints }
+      }
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()

@@ -30,10 +30,20 @@ class EitherTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN),
-      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::invoke) {
+      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
+        Gen.int().map(::Right),
+        GEN.map { it },
+        Either<String, Int>::equals,
+        either::invoke
+      ) {
         it.bind()
       },
-      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::eager) {
+      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(
+        Gen.int().map(::Right),
+        GEN.map { it },
+        Either<String, Int>::equals,
+        either::eager
+      ) {
         it.bind()
       }
     )
@@ -83,6 +93,18 @@ class EitherTest : UnitSpec() {
     "orNull should return value" {
       forAll { a: Int ->
         Either.Right(a).orNull() == a
+      }
+    }
+
+    "orNone should return Some(value)" {
+      forAll { a: Int ->
+        Either.Right(a).orNone() == Some(a)
+      }
+    }
+
+    "orNone should return None when left" {
+      forAll { a: String ->
+        Left(a).orNone() == None
       }
     }
 
@@ -306,6 +328,22 @@ class EitherTest : UnitSpec() {
         }
         true
       }
+    }
+
+    "traverse should return list if either is right" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
+      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
+    }
+
+    "traverseOption should return option if either is right" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverseOption { Some(it) } shouldBe Some(Right(1))
+      left.traverseOption { Some(it) } shouldBe None
     }
   }
 }

@@ -329,6 +329,12 @@ fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>):
 fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
+inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
+  traverseEither { f(it).toEither { Unit } }.orNone()
+
+fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
+  this.traverseOption { it }
+
 fun <A> Iterable<A>.void(): List<Unit> =
   map { Unit }
 
@@ -895,3 +901,5 @@ infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
 
 fun <T> Iterable<Option<T>>.filterOption(): List<T> =
   flatMap { it.fold(::emptyList, ::listOf) }
+
+fun <T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()

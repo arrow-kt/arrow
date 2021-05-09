@@ -357,14 +357,34 @@ sealed class Option<out A> {
     b: Option<B>,
     map: (A, B) -> C
   ): Option<C> =
-    zip(b, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+    zip(
+      b,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 
   inline fun <B, C, D> zip(
     b: Option<B>,
     c: Option<C>,
     map: (A, B, C) -> D
   ): Option<D> =
-    zip(b, c, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+    zip(
+      b,
+      c,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
   inline fun <B, C, D, E> zip(
     b: Option<B>,
@@ -372,7 +392,17 @@ sealed class Option<out A> {
     d: Option<D>,
     map: (A, B, C, D) -> E
   ): Option<E> =
-    zip(b, c, d, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+    zip(
+      b,
+      c,
+      d,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit,
+      Some.unit
+    ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
 
   inline fun <B, C, D, E, F> zip(
     b: Option<B>,
@@ -381,7 +411,15 @@ sealed class Option<out A> {
     e: Option<E>,
     map: (A, B, C, D, E) -> F
   ): Option<F> =
-    zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e) }
+    zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+      map(
+        a,
+        b,
+        c,
+        d,
+        e
+      )
+    }
 
   inline fun <B, C, D, E, F, G> zip(
     b: Option<B>,
@@ -391,7 +429,16 @@ sealed class Option<out A> {
     f: Option<F>,
     map: (A, B, C, D, E, F) -> G
   ): Option<G> =
-    zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e, f) }
+    zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+      map(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f
+      )
+    }
 
   inline fun <B, C, D, E, F, G, H, I> zip(
     b: Option<B>,
@@ -689,6 +736,11 @@ sealed class Option<out A> {
   fun void(): Option<Unit> =
     map { Unit }
 
+
+  fun <L> pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
+
+  fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
+
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
   } else {
@@ -917,6 +969,8 @@ inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Opti
  */
 fun <B, A : B> Option<A>.widen(): Option<B> =
   this
+
+fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
 fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
   when (this) {
