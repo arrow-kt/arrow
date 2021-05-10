@@ -1,10 +1,10 @@
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.computations.EitherEffect
 import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
-import arrow.core.Either.Right
-import arrow.core.Either.Left
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.any
 import arrow.core.test.generators.either
@@ -254,6 +254,40 @@ class EitherTest : UnitSpec() {
 
         right.bimap({ it + 2 }, { it + 1 }) == Right(a + 1) &&
           left.bimap({ it + 2 }, { it + 1 }) == Left(b + 2)
+      }
+    }
+
+    "replicate should return Right(empty list) when n <= 0" {
+      forAll(
+        Gen.oneOf(Gen.negativeIntegers(), Gen.constant(0)),
+        Gen.int()
+      ) { n: Int, a: Int ->
+        val expected: Either<Int, List<Int>> = Right(emptyList())
+
+        Right(a).replicate(n) == expected &&
+          Left(a).replicate(n) == expected
+      }
+    }
+
+    "replicate should return Right(list of repeated value size n) when Right and n is positive" {
+      forAll(
+        Gen.intSmall().filter { it > 0 },
+        Gen.int()
+      ) { n: Int, a: Int ->
+        Right(a).replicate(n) == Right(List(n) { a }) &&
+          Left(a).replicate(n) == Left(a)
+      }
+    }
+
+    "traverse should return list of Right when Right and empty list when Left" {
+      forAll(
+        Gen.int(),
+        Gen.int(),
+        Gen.int()
+      ) { a: Int, b: Int, c: Int ->
+        Right(a).traverse { emptyList<Int>() } == emptyList<Int>() &&
+          Right(a).traverse { listOf(b, c) } == listOf(Right(b), Right(c)) &&
+          Left(a).traverse { listOf(b, c) } == emptyList<Int>()
       }
     }
 
