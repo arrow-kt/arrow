@@ -4,7 +4,7 @@ import arrow.continuations.Effect
 import arrow.continuations.generic.DelimitedScope
 
 /**
- * Allows to iterate over the [Iterable]<A> receiver and operate on any number of values in order.
+ * Allows to iterate over the [Iterable]<A> receiver and operate on an arbitrary number of items.
  *
  * With some special features:
  * - Not all items need to be consumed.
@@ -12,8 +12,8 @@ import arrow.continuations.generic.DelimitedScope
  * - At any point we can cancel the iteration resulting in a `null` value.
  *
  * Can be used to apply operations to an arbitrary number of items in an [Iterable]<A>:
- * ```kotlin
- * val result: String? = listOf(1, 2, 3).partialReduceOrNull {
+ * ```kotlin:ank
+ * val result: String? = listOf(1, 2, 3).iterateOrNull {
  *    val a = next() // gets 1
  *    val b = next() // gets 2
  *    "$a $b"
@@ -22,8 +22,8 @@ import arrow.continuations.generic.DelimitedScope
  * ```
  *
  * It's possible to also skip a value:
- * ```kotlin
- * val result: String? = listOf(1, 2, 3).partialReduceOrNull {
+ * ```kotlin:ank
+ * val result: String? = listOf(1, 2, 3).iterateOrNull {
  *    val a = next() // gets 1
  *    dropNext() // drop 2
  *    val b = next() //gets 3
@@ -32,9 +32,9 @@ import arrow.continuations.generic.DelimitedScope
  * result shouldBe "1 3"
  * ```
  *
- * If we need to skip more than one item:
- * ```kotlin
- * val result: String? = listOf(1, 2, 3, 4).partialReduceOrNull {
+ * If we need to skip more than one:
+ * ```kotlin:ank
+ * val result: String? = listOf(1, 2, 3, 4).iterateOrNull {
  *    val a = next() // gets 1
  *    drop(2) // drops 2 and 3
  *    val b = next() // gets 4
@@ -44,8 +44,8 @@ import arrow.continuations.generic.DelimitedScope
  * ```
  *
  * We can use `cancel()` to end the iteration if a given condition is met:
- * ```kotlin
- * val result: String? = listOf(1, 2, 3, 4).partialReduceOrNull {
+ * ```kotlin:ank
+ * val result: String? = listOf(1, 2, 3, 4).iterateOrNull {
  *    val a = next() // gets 1
  *    if(a == 1) {
  *      cancel() // ends iteration
