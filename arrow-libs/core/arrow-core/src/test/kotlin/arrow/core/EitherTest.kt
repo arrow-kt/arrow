@@ -18,6 +18,7 @@ import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.PropertyContext
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
@@ -51,40 +52,45 @@ class EitherTest : UnitSpec() {
     }
 
     "fold should apply first op if Left and second op if Right" {
-      forAll { a: Int, b: Int, c: Int ->
-        Left(a).fold({ b }, { c }) == b &&
-          Right(a).fold({ b }, { c }) == c
+      forAllSmallInt { a: Int, b: Int ->
+        val right: Either<Int, Int> = Right(a)
+        val left: Either<Int, Int> = Left(b)
+
+        right.fold({ it + 2 }, { it + 1 }) == a + 1 &&
+          left.fold({ it + 2 }, { it + 1 }) == b + 2
       }
     }
 
     "foldLeft should return initial if Left and apply op if Right" {
-      forAll { a: Int, b: Int ->
-        Right(a).foldLeft(b, Int::plus) == b + a &&
-          Left(a).foldLeft(b, Int::plus) == b
+      forAllSmallInt { a: Int, b: Int, c: Int ->
+        Right(a).foldLeft(c, Int::plus) == c + a &&
+          Left(b).foldLeft(c, Int::plus) == c
       }
     }
 
-    "foldMap should return inner type empty if Left and apply op if Right" {
-      forAll { a: String, b: String ->
-        Right(a).foldMap(Monoid.string()) { "$it,$b" } == "$a,$b" &&
-          Left(a).foldMap(Monoid.string()) { b } == Monoid.string().empty()
+    "foldMap should return the empty of the inner type if Left and apply op if Right" {
+      forAllSmallInt { a: Int, b: Int ->
+        val left: Either<Int, Int> = Left(b)
+
+        Right(a).foldMap(Monoid.int()) { it + 1 } == a + 1 &&
+          left.foldMap(Monoid.int()) { it + 1 } == Monoid.int().empty()
       }
     }
 
     "bifoldLeft should apply first op if Left and apply second op if Right" {
-      forAll { a: Int, b: Int ->
-        Right(a).bifoldLeft(b, Int::plus, Int::times) == b * a &&
-          Left(a).bifoldLeft(b, Int::plus, Int::times) == b + a
+      forAllSmallInt { a: Int, b: Int, c: Int ->
+        Right(a).bifoldLeft(c, Int::plus, Int::times) == a * c &&
+          Left(b).bifoldLeft(c, Int::plus, Int::times) == b + c
       }
     }
 
     "bifoldMap should apply first op if Left and apply second op if Right" {
-      forAll { a: String, b: String, c: String ->
-        val right: Either<String, String> = Right(a)
-        val left: Either<String, String> = Left(a)
+      forAllSmallInt { a: Int, b: Int ->
+        val right: Either<Int, Int> = Right(a)
+        val left: Either<Int, Int> = Left(b)
 
-        right.bifoldMap(Monoid.string(), { "$it,$b" }, { "$it,$c" }) == "$a,$c" &&
-          left.bifoldMap(Monoid.string(), { "$it,$b" }, { "$it,$c" }) == "$a,$b"
+        right.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) == a + 1 &&
+          left.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) == b + 2
       }
     }
 
@@ -142,7 +148,7 @@ class EitherTest : UnitSpec() {
     }
 
     "filterOrElse should filter values" {
-      forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
+      forAllSmallInt { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
         Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a) &&
@@ -153,7 +159,7 @@ class EitherTest : UnitSpec() {
     }
 
     "filterOrOther should filter values" {
-      forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
+      forAllSmallInt { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
         Right(a).filterOrOther({ it > a - 1 }, { b + a }) == Right(a) &&
@@ -168,6 +174,17 @@ class EitherTest : UnitSpec() {
         Right(a).leftIfNull { b } == Right(a) &&
           Right(null).leftIfNull { b } == Left(b) &&
           Left(a).leftIfNull { b } == Left(a)
+      }
+    }
+
+    "exists should apply predicate to Right only" {
+      forAllSmallInt { a: Int ->
+        val left: Either<Int, Int> = Left(a)
+
+        Right(a).exists { it > a - 1 } &&
+          !Right(a).exists { it > a + 1 } &&
+          !left.exists { it > a - 1 } &&
+          !left.exists { it > a + 1 }
       }
     }
 
@@ -202,7 +219,7 @@ class EitherTest : UnitSpec() {
     }
 
     "contains should check value" {
-      forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
+      forAllSmallInt { a: Int, b: Int ->
         val rightContains = Right(a).contains(a)
         // We need to check that a != b or this test will result in a false negative
         val rightDoesntContains = if (a != b) !Right(a).contains(b) else true
@@ -212,11 +229,41 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "mapLeft should alter left instance only" {
-      forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
+    "map should alter right instance only" {
+      forAllSmallInt { a: Int, b: Int ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
+
+        right.map { it + 1 } == Right(a + 1) && left.map { it + 1 } == left
+      }
+    }
+
+    "mapLeft should alter left instance only" {
+      forAllSmallInt { a: Int, b: Int ->
+        val right: Either<Int, Int> = Right(a)
+        val left: Either<Int, Int> = Left(b)
+
         right.mapLeft { it + 1 } == right && left.mapLeft { it + 1 } == Left(b + 1)
+      }
+    }
+
+    "bimap should alter left or right instance accordingly" {
+      forAllSmallInt { a: Int, b: Int ->
+        val right: Either<Int, Int> = Right(a)
+        val left: Either<Int, Int> = Left(b)
+
+        right.bimap({ it + 2 }, { it + 1 }) == Right(a + 1) &&
+          left.bimap({ it + 2 }, { it + 1 }) == Left(b + 2)
+      }
+    }
+
+    "flatMap should map right instance only" {
+      forAllSmallInt { a: Int, b: Int ->
+        val right: Either<Int, Int> = Right(a)
+        val left: Either<Int, Int> = Left(b)
+
+        right.flatMap { Right(it + 1) } == Right(a + 1) &&
+          left.flatMap { Right(it + 1) } == left
       }
     }
 
@@ -373,3 +420,12 @@ private suspend fun <A> throwException(
   a: A
 ): Either<Throwable, Any> =
   throw RuntimeException("An Exception is thrown while handling the result of the supplied function.")
+
+private fun forAllSmallInt(fn: PropertyContext.(a: Int) -> Boolean) =
+  forAll(Gen.intSmall(), fn)
+
+private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int) -> Boolean) =
+  forAll(Gen.intSmall(), Gen.intSmall(), fn)
+
+private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int, c: Int) -> Boolean) =
+  forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), fn)
