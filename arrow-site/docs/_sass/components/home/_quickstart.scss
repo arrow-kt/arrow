@@ -31,7 +31,10 @@
   }
 }
 
-/* Cursor Styling */
+.container {
+  min-height: 192px;
+}
+
 .output {
   text-align:center;
   font-family: 'Source Code Pro', monospace;
@@ -43,17 +46,17 @@
 .cursor::after {
   content:'';
   display:inline-block;
-  margin-left: 6px;
+  margin-left: 3px;
   margin-top: 4px;
   background-color: $brand-primary;
   animation-name:blink;
-  animation-duration: 0.6s;
+  animation-duration: 0.9s;
   animation-iteration-count: infinite;
 }
 
 h1.cursor::after {
-  height:48px;
-  width: 4px;
+  height: 6px;
+  width: 40px;
 }
 
 @keyframes blink {
