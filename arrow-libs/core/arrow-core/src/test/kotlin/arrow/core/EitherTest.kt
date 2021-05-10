@@ -17,7 +17,6 @@ import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -51,6 +50,44 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "fold should apply first op if Left and second op if Right" {
+      forAll { a: Int, b: Int, c: Int ->
+        Left(a).fold({ b }, { c }) == b &&
+          Right(a).fold({ b }, { c }) == c
+      }
+    }
+
+    "foldLeft should return initial if Left and apply op if Right" {
+      forAll { a: Int, b: Int ->
+        Right(a).foldLeft(b, Int::plus) == b + a &&
+          Left(a).foldLeft(b, Int::plus) == b
+      }
+    }
+
+    "foldMap should return inner type empty if Left and apply op if Right" {
+      forAll { a: String, b: String ->
+        Right(a).foldMap(Monoid.string()) { "$it,$b" } == "$a,$b" &&
+          Left(a).foldMap(Monoid.string()) { b } == Monoid.string().empty()
+      }
+    }
+
+    "bifoldLeft should apply first op if Left and apply second op if Right" {
+      forAll { a: Int, b: Int ->
+        Right(a).bifoldLeft(b, Int::plus, Int::times) == b * a &&
+          Left(a).bifoldLeft(b, Int::plus, Int::times) == b + a
+      }
+    }
+
+    "bifoldMap should apply first op if Left and apply second op if Right" {
+      forAll { a: String, b: String, c: String ->
+        val right: Either<String, String> = Right(a)
+        val left: Either<String, String> = Left(a)
+
+        right.bifoldMap(Monoid.string(), { "$it,$b" }, { "$it,$c" }) == "$a,$c" &&
+          left.bifoldMap(Monoid.string(), { "$it,$b" }, { "$it,$c" }) == "$a,$b"
+      }
+    }
+
     "fromNullable should lift value as a Right if it is not null" {
       forAll { a: Int ->
         Either.fromNullable(a) == Right(a)
@@ -62,9 +99,7 @@ class EitherTest : UnitSpec() {
     }
 
     "empty should return a Right of the empty of the inner type" {
-      forAll { _: String ->
-        Right(Monoid.string().empty()) == Monoid.either(Monoid.string(), Monoid.string()).empty()
-      }
+      Right(Monoid.string().empty()) shouldBe Monoid.either(Monoid.string(), Monoid.string()).empty()
     }
 
     "combine two rights should return a right of the combine of the inners" {
