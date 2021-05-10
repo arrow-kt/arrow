@@ -194,8 +194,10 @@ class EitherTest : UnitSpec() {
 
     "orNull should convert" {
       forAll { a: Int ->
+        val left: Either<Int, Int> = Left(a)
+
         Right(a).orNull() == a &&
-          Left(a).orNull() == null
+          left.orNull() == null
       }
     }
 
