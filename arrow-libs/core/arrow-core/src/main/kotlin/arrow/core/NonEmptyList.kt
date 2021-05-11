@@ -448,8 +448,17 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   traverseValidated(semigroup, ::identity)
 
-inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  traverseEither { f(it).toEither { Unit } }.orNone()
+inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> {
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    when (val res = f(a)) {
+      is Some -> acc.add(res.value)
+      is None -> return@traverseOption res
+    }
+  }
+  // Safe due to traverse laws
+  return NonEmptyList.fromListUnsafe(acc).some()
+}
 
 fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
   traverseOption { it }

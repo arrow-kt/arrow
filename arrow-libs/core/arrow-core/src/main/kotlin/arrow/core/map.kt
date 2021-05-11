@@ -224,8 +224,16 @@ inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
-inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
-  traverseEither { f(it).toEither { Unit } }.orNone()
+inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> {
+  val acc = mutableMapOf<K, B>()
+  forEach { (k, v) ->
+    when (val res = f(v)) {
+      is Some -> acc[k] = res.value
+      is None -> return@traverseOption res
+    }
+  }
+  return acc.some()
+}
 
 fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
   traverseOption { it }

@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
+import arrow.core.test.generators.option
 import arrow.core.test.generators.sequence
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
@@ -79,7 +80,12 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c, d ->
+      forAll(
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int()),
+        Gen.sequence(Gen.int())
+      ) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
         val expected = a.zip(b, ::Pair)
           .zip(c) { (a, b), c -> Triple(a, b, c) }
@@ -287,6 +293,12 @@ class SequenceKTest : UnitSpec() {
             .asSequence()
 
         result.toList() == expected.toList()
+      }
+    }
+
+    "filterOption should filter None" {
+      forAll(Gen.list(Gen.option(Gen.int()))) { ints ->
+        ints.asSequence().filterOption().toList() == ints.filterOption()
       }
     }
   }

@@ -329,8 +329,16 @@ fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>):
 fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
-inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  traverseEither { f(it).toEither { Unit } }.orNone()
+inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>>  {
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    when (val res = f(a)) {
+      is Some -> acc.add(res.value)
+      is None -> return@traverseOption res
+    }
+  }
+  return acc.some()
+}
 
 fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   this.traverseOption { it }
