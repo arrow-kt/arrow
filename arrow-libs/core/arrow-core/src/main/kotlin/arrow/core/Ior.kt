@@ -516,7 +516,11 @@ sealed class Ior<out A, out B> {
     )
 
   inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Ior<A, C>> =
-    traverseEither { fa(it).toEither { Unit } }.orNone()
+    fold(
+      { a -> Some(Left(a)) },
+      { b -> fa(b).map { Right(it) } },
+      { a, b -> fa(b).map { Both(a, it) } }
+    )
 
   inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
     fold(
