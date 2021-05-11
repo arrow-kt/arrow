@@ -432,10 +432,11 @@ sealed class Ior<out A, out B> {
     fa: (A) -> Option<C>,
     fb: (B) -> Option<D>
   ): Option<Ior<C, D>> =
-    bitraverseEither(
-      { fa(it).toEither { Unit } },
-      { fb(it).toEither { Unit } }
-    ).orNone()
+    fold(
+      { fa(it).map { Left(it) } },
+      { fb(it).map { Right(it) } },
+      { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
+    )
 
   inline fun <AA, C, D> bitraverseValidated(
     SA: Semigroup<AA>,
