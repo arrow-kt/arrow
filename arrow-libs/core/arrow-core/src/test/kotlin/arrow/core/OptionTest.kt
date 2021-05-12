@@ -22,10 +22,20 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Gen.option(Gen.int())),
-      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Option<String>::equals, option::invoke) {
+      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
+        Gen.string().map(Option.Companion::invoke),
+        Gen.option(Gen.string()),
+        Option<String>::equals,
+        option::invoke
+      ) {
         it.bind()
       },
-      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Option<String>::equals, option::eager) {
+      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(
+        Gen.string().map(Option.Companion::invoke),
+        Gen.option(Gen.string()),
+        Option<String>::equals,
+        option::eager
+      ) {
         it.bind()
       }
     )
@@ -76,7 +86,7 @@ class OptionTest : UnitSpec() {
       forAll { a: Int ->
         val op: Option<Int> = a.some()
         some.zip(op) { a, b -> a + b } == Some("kotlin$a") &&
-        none.zip(op) { a, b -> a + b } == None &&
+          none.zip(op) { a, b -> a + b } == None &&
           some.zip(op) == Some(Pair("kotlin", a))
       }
     }
@@ -158,6 +168,66 @@ class OptionTest : UnitSpec() {
       1.leftIor().leftOrNull() shouldBe 1
       2.rightIor().leftOrNull() shouldBe null
       (1 to 2).bothIor().leftOrNull() shouldBe 1
+    }
+
+    "pairLeft" {
+      val some: Option<Int> = Some(2)
+      val none: Option<Int> = None
+      some.pairLeft("key") shouldBe Some("key" to 2)
+      none.pairLeft("key") shouldBe None
+    }
+
+    "pairRight" {
+      val some: Option<Int> = Some(2)
+      val none: Option<Int> = None
+      some.pairRight("right") shouldBe Some(2 to "right")
+      none.pairRight("right") shouldBe None
+    }
+
+    "Option<Pair<L, R>>.toMap()" {
+      val some: Option<Pair<String, String>> = Some("key" to "value")
+      val none: Option<Pair<String, String>> = None
+      some.toMap() shouldBe mapOf("key" to "value")
+      none.toMap() shouldBe emptyMap()
+    }
+
+    "traverse should yield list of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverse { listOf(it) } shouldBe listOf(Some("value"))
+      none.traverse { listOf(it) } shouldBe emptyList()
+    }
+
+    "sequence should be consistent with traverse" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { listOf(it) }.sequence() == option.traverse { listOf(it) }
+      }
+    }
+
+    "traverseEither should yield either of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverseEither { it.right() } shouldBe some.right()
+      none.traverseEither { it.right() } shouldBe none.right()
+    }
+
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { it.right() }.sequenceEither() == option.traverseEither { it.right() }
+      }
+    }
+
+    "traverseValidated should yield validated of option" {
+      val some: Option<String> = Some("value")
+      val none: Option<String> = None
+      some.traverseValidated { it.valid() } shouldBe some.valid()
+      none.traverseValidated { it.valid() } shouldBe none.valid()
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.option(Gen.int())) { option ->
+        option.map { it.valid() }.sequenceValidated() == option.traverseValidated { it.valid() }
+      }
     }
   }
 }

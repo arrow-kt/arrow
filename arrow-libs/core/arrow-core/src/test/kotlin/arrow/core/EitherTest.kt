@@ -30,10 +30,20 @@ class EitherTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN),
-      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::invoke) {
+      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
+        Gen.int().map(::Right),
+        GEN.map { it },
+        Either<String, Int>::equals,
+        either::invoke
+      ) {
         it.bind()
       },
-      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Either<String, Int>::equals, either::eager) {
+      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(
+        Gen.int().map(::Right),
+        GEN.map { it },
+        Either<String, Int>::equals,
+        either::eager
+      ) {
         it.bind()
       }
     )
@@ -83,6 +93,18 @@ class EitherTest : UnitSpec() {
     "orNull should return value" {
       forAll { a: Int ->
         Either.Right(a).orNull() == a
+      }
+    }
+
+    "orNone should return Some(value)" {
+      forAll { a: Int ->
+        Either.Right(a).orNone() == Some(a)
+      }
+    }
+
+    "orNone should return None when left" {
+      forAll { a: String ->
+        Left(a).orNone() == None
       }
     }
 
@@ -305,6 +327,93 @@ class EitherTest : UnitSpec() {
           }
         }
         true
+      }
+    }
+
+    "traverse should return list if either is right" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
+      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
+    }
+
+    "sequence should be consistent with traverse" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.map { listOf(it) }.sequence() == either.traverse { listOf(it) }
+      }
+    }
+
+    "traverseOption should return option if either is right" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverseOption { Some(it) } shouldBe Some(Right(1))
+      left.traverseOption { Some(it) } shouldBe None
+    }
+
+    "sequenceOption should be consistent with traverseOption" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.map { Some(it) }.sequenceOption() == either.traverseOption { Some(it) }
+      }
+    }
+
+    "traverseValidated should return validated of either" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverseValidated { it.valid() } shouldBe Valid(Right(1))
+      left.traverseValidated { it.valid() } shouldBe Valid(Left("foo"))
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.map { it.valid() }.sequenceValidated() == either.traverseValidated { it.valid() }
+      }
+    }
+
+    "bitraverse should wrap either in a list" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.bitraverse({ listOf(it, "bar", "baz") }, { listOf(it, 2, 3) }) shouldBe listOf(Right(1), Right(2), Right(3))
+      left.bitraverse({ listOf(it, "bar", "baz") }, { listOf(it, 2, 3) }) shouldBe
+        listOf(Left("foo"), Left("bar"), Left("baz"))
+    }
+
+    "bisequence should be consistent with bitraverse" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.bimap({ listOf(it) }, { listOf(it) }).bisequence() == either.bitraverse({ listOf(it) }, { listOf(it) })
+      }
+    }
+
+    "bitraverseOption should wrap either in an option" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.bitraverseOption({ Some(it) }, { Some(it.toString()) }) shouldBe Some(Right("1"))
+      left.bitraverseOption({ Some(it) }, { Some(it.toString()) }) shouldBe Some(Left("foo"))
+    }
+
+    "bisequenceOption should be consistent with bitraverseOption" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
+          either.bitraverseOption({ Some(it) }, { Some(it) })
+      }
+    }
+
+    "bitraverseValidated should return validated of either" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Valid(Right(1))
+      left.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Invalid("foo")
+    }
+
+    "bisequenceValidated should be consistent with bitraverseValidated" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() ==
+          either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
     }
   }

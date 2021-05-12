@@ -3,6 +3,7 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.longSmall
+import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -39,6 +40,37 @@ class MapKTest : UnitSpec() {
             is Either.Right -> evens.value == ints
             is Either.Left -> evens.value == ints.values.first { it % 2 != 0 }
           }
+      }
+    }
+
+    "traverseOption is stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).map { it to it }.toMap().traverseOption { a ->
+        acc.add(a)
+        Some(a)
+      }
+      res shouldBe Some(acc.map { it to it }.toMap())
+      res shouldBe Some((0..20_000).map { it to it }.toMap())
+    }
+
+    "traverseOption short-circuits" {
+      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseOption {
+          (it % 2 == 0).maybe {
+            acc.add(it)
+            it
+          }
+        }
+        acc == ints.takeWhile { it % 2 == 0 } && evens.all { it == ints }
+      }
+    }
+
+    "sequenceOption yields some when all entries in the list are some" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        evens.all { it == ints }
       }
     }
 

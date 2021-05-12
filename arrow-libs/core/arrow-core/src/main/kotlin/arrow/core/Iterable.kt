@@ -1,4 +1,5 @@
 @file:Suppress("unused", "FunctionName")
+
 package arrow.core
 
 import arrow.core.Either.Left
@@ -281,7 +282,10 @@ inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated("Iterable.foldRight is being deprecated because its functionality differs from other foldRight definitions within arrow. Use the stdlib foldRight instead", replaceWith = ReplaceWith("foldRight(initial) { acc, b -> operation(b, acc) }"))
+@Deprecated(
+  "Iterable.foldRight is being deprecated because its functionality differs from other foldRight definitions within arrow. Use the stdlib foldRight instead",
+  replaceWith = ReplaceWith("foldRight(initial) { acc, b -> operation(b, acc) }")
+)
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
   when (this) {
     is List -> _foldRight(initial, operation)
@@ -328,6 +332,20 @@ fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>):
 
 fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
+
+inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    when (val res = f(a)) {
+      is Some -> acc.add(res.value)
+      is None -> return@traverseOption res
+    }
+  }
+  return acc.some()
+}
+
+fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
+  this.traverseOption { it }
 
 fun <A> Iterable<A>.void(): List<Unit> =
   map { Unit }
@@ -895,3 +913,5 @@ infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
 
 fun <T> Iterable<Option<T>>.filterOption(): List<T> =
   flatMap { it.fold(::emptyList, ::listOf) }
+
+fun <T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()

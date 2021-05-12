@@ -558,6 +558,12 @@ sealed class Validated<out E, out A> {
       is Invalid -> this.right()
     }
 
+  inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
+    when (this) {
+      is Valid -> fa(this.value).map { Valid(it) }
+      is Invalid -> None
+    }
+
   inline fun <B> bifoldLeft(
     c: B,
     fe: (B, E) -> B,
@@ -585,6 +591,12 @@ sealed class Validated<out E, out A> {
     fa: (A) -> Either<EE, C>
   ): Either<EE, Validated<B, C>> =
     fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
+
+  inline fun <B, C> bitraverseOption(
+    fe: (E) -> Option<B>,
+    fa: (A) -> Option<C>
+  ): Option<Validated<B, C>> =
+    fold({ fe(it).map(::Invalid) }, { fa(it).map(::Valid) })
 
   inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -895,7 +907,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
     accumulatedError =
       if (ff is Validated.Invalid) emptyCombine(accumulatedError, ff.value) else accumulatedError
     accumulatedError =
-      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.value)else accumulatedError
+      if (g is Validated.Invalid) emptyCombine(accumulatedError, g.value) else accumulatedError
     accumulatedError =
       if (h is Validated.Invalid) emptyCombine(accumulatedError, h.value) else accumulatedError
     accumulatedError =
@@ -1032,6 +1044,9 @@ fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A
 fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
   bitraverseEither(::identity, ::identity)
 
+fun <A, B> Validated<Option<A>, Option<B>>.bisequenceOption(): Option<Validated<A, B>> =
+  bitraverseOption(::identity, ::identity)
+
 fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
@@ -1044,6 +1059,9 @@ fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
 
 fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
+
+fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
+  traverseOption(::identity)
 
 operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
@@ -1062,6 +1080,9 @@ inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
  */
 fun <E, A> Validated<E, A>.orNull(): A? =
   getOrElse { null }
+
+fun <E, A> Validated<E, A>.orNone(): Option<A> =
+  fold({ None }, { Some(it) })
 
 /**
  * Return the Valid value, or the result of f if Invalid

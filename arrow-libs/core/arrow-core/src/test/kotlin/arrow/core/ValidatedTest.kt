@@ -64,6 +64,12 @@ class ValidatedTest : UnitSpec() {
       invalid.orNull() shouldBe null
     }
 
+    "orNone should return value if is Valid or None otherwise" {
+      Valid(13).orNone() shouldBe Some(13)
+      val invalid: Validated<Int, Int> = Invalid(13)
+      invalid.orNone() shouldBe None
+    }
+
     "valueOr should return value if is Valid or the the result of f otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
       Invalid(13).valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
@@ -161,8 +167,15 @@ class ValidatedTest : UnitSpec() {
         val all = listOf(a, b, c, d, e, f, g, h, i, j)
         val isValid = all.all(Validated<Long?, Int?>::isValid)
         val expected: Validated<Long?, Int?> =
-          if (isValid) Valid(all.fold<Validated<Long?, Int?>, Int?>(0) { acc, validated -> Nullable.zip(acc, validated.orNull()) { a, b -> a + b } })
-          else Invalid(all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup))
+          if (isValid) Valid(all.fold<Validated<Long?, Int?>, Int?>(0) { acc, validated ->
+            Nullable.zip(
+              acc,
+              validated.orNull()
+            ) { a, b -> a + b }
+          })
+          else Invalid(
+            all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup)
+          )
 
         res == expected
       }
@@ -297,6 +310,120 @@ class ValidatedTest : UnitSpec() {
       val invalid: Validated<String, String> = Invalid("Nope")
 
       invalid.combine(Monoid.string(), Monoid.string(), invalid) shouldBe (Invalid("NopeNope"))
+    }
+
+    "traverse should yield list when validated is valid" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverse { listOf(it) } shouldBe listOf(Valid("Who"))
+      invalid.traverse { listOf(it) } shouldBe emptyList()
+    }
+
+    "sequence should yield consistent result with traverse" {
+      forAll { a: String, b: String ->
+        val valid = Valid(a)
+        val invalid = Invalid(b)
+
+        valid.traverse { listOf(it) } == valid.map { listOf(it) }.sequence() &&
+          invalid.traverse { listOf(it) } == invalid.map { listOf(it) }.sequence()
+      }
+    }
+
+    "traverseOption should yield option when validated is valid" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverseOption { Some(it) } shouldBe Some(Valid("Who"))
+      invalid.traverseOption { Some(it) } shouldBe None
+    }
+
+    "sequenceOption should yield consistent result with traverseOption" {
+      forAll { a: String, b: String ->
+        val valid = Valid(a)
+        val invalid = Invalid(b)
+
+        valid.traverseOption { Some(it) } == valid.map { Some(it) }.sequenceOption() &&
+          invalid.traverseOption { Some(it) } == invalid.map { Some(it) }.sequenceOption()
+      }
+    }
+
+    "traverseEither should wrap validated in either" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverseEither { it.right() } shouldBe Valid("Who").right()
+      invalid.traverseEither { it.right() } shouldBe Invalid("Nope").right()
+    }
+
+    "sequenceEither should yield consistent result with traverseEither" {
+      forAll { a: String, b: String ->
+        val valid = Valid(a)
+        val invalid = Invalid(b)
+
+        valid.traverseEither { Right(it) } == valid.map { Right(it) }.sequenceEither() &&
+          invalid.traverseEither { Right(it) } == invalid.map { Right(it) }.sequenceEither()
+      }
+    }
+
+    "bitraverse should wrap valid or invalid in a list" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.bitraverse({ listOf(it) }, { listOf(it) }) shouldBe listOf(Valid("Who"))
+      invalid.bitraverse({ listOf(it) }, { listOf(it) }) shouldBe listOf(Invalid("Nope"))
+    }
+
+    "bisequence should yield consistent result with bitraverse" {
+      forAll { a: String, b: String ->
+        val valid: Validated<String, String> = Valid(a)
+        val invalid: Validated<String, String> = Invalid(b)
+
+        valid.bimap({ listOf(it) }, { listOf(it) }).bisequence() == valid.bitraverse({ listOf(it) }, { listOf(it) }) &&
+          invalid.bimap({ listOf(it) }, { listOf(it) }).bisequence() == invalid.bitraverse(
+          { listOf(it) },
+          { listOf(it) })
+      }
+    }
+
+    "bitraverseOption should wrap valid or invalid in an option" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.bitraverseOption({ Some(it) }, { Some(it) }) shouldBe Some(Valid("Who"))
+      invalid.bitraverseOption({ Some(it) }, { Some(it) }) shouldBe Some(Invalid("Nope"))
+    }
+
+    "bisequenceOption should yield consistent result with bitraverseOption" {
+      forAll { a: String, b: String ->
+        val valid: Validated<String, String> = Valid(a)
+        val invalid: Validated<String, String> = Invalid(b)
+
+        valid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
+          valid.bitraverseOption({ Some(it) }, { Some(it) }) &&
+          invalid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
+          invalid.bitraverseOption({ Some(it) }, { Some(it) })
+      }
+    }
+
+    "bitraverseEither should wrap valid or invalid in an either" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.bitraverseEither({ it.left() }, { it.right() }) shouldBe Valid("Who").right()
+      invalid.bitraverseEither({ it.left() }, { it.right() }) shouldBe "Nope".left()
+    }
+
+    "bisequenceEither should yield consistent result with bitraverseEither" {
+      forAll { a: String, b: String ->
+        val valid: Validated<String, String> = Valid(a)
+        val invalid: Validated<String, String> = Invalid(b)
+
+        valid.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
+          valid.bitraverseEither({ it.left() }, { it.right() }) &&
+          invalid.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
+          invalid.bitraverseEither({ it.left() }, { it.right() })
+      }
     }
   }
 }

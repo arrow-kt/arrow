@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
+import arrow.core.test.generators.option
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Semigroup
 import io.kotlintest.properties.Gen
@@ -39,6 +40,49 @@ class IterableTest : UnitSpec() {
       }
     }
 
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { it.right() }.sequenceEither() == ints.traverseEither { it.right() }
+      }
+    }
+
+    "traverseOption is stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseOption { a ->
+        acc.add(a)
+        Some(a)
+      }
+      res shouldBe Some(acc)
+      res shouldBe Some((0..20_000).toList())
+    }
+
+    "traverseOption short-circuits" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseOption {
+          (it % 2 == 0).maybe {
+            acc.add(it)
+            it
+          }
+        }
+        acc == ints.takeWhile { it % 2 == 0 } && evens.all { it == ints }
+      }
+    }
+
+    "sequenceOption yields some when all entries in the list are some" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        evens.all { it == ints }
+      }
+    }
+
+    "sequenceOption should be consistent with traverseOption" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { Some(it) }.sequenceOption() == ints.traverseOption { Some(it) }
+      }
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -59,6 +103,13 @@ class IterableTest : UnitSpec() {
           .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
 
         res == expected
+      }
+    }
+
+    "sequenceValidated should be consistent with traverseValidated" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        ints.map { it.valid() as Validated<String, Int> }.sequenceValidated(Semigroup.string()) ==
+          ints.traverseValidated(Semigroup.string()) { it.valid() as Validated<String, Int> }
       }
     }
 
@@ -301,6 +352,18 @@ class IterableTest : UnitSpec() {
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
         a.padZip(b) == left.zip(right) { l, r -> l to r }
+      }
+    }
+
+    "filterOption" {
+      forAll(Gen.list(Gen.option(Gen.int()))) { listOfOption ->
+        listOfOption.filterOption() == listOfOption.mapNotNull { it.orNull() }
+      }
+    }
+
+    "flattenOption" {
+      forAll(Gen.list(Gen.option(Gen.int()))) { listOfOption ->
+        listOfOption.flattenOption() == listOfOption.mapNotNull { it.orNull() }
       }
     }
   }

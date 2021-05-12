@@ -200,5 +200,119 @@ class IorTest : UnitSpec() {
         }
       }
     }
+
+    "traverse should wrap ior in a list" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.traverse { listOf(it) } == listOf(Ior.Left(a)) &&
+          iorR.traverse { listOf(it) } == listOf(Ior.Right(b)) &&
+          iorBoth.traverse { listOf(it) } == listOf(Ior.Both(a, b))
+      }
+    }
+
+    "sequence should be consistent with traverse" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.map { listOf(it) }.sequence() == ior.traverse { listOf(it) }
+      }
+    }
+
+    "traverseOption should wrap ior in an Option" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.traverseOption { Some(it) } == Some(Ior.Left(a)) &&
+          iorR.traverseOption { Some(it) } == Some(Ior.Right(b)) &&
+          iorBoth.traverseOption { Some(it) } == Some(Ior.Both(a, b))
+      }
+    }
+
+    "sequenceOption should be consistent with traverseOption" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.map { Some(it) }.sequenceOption() == ior.traverseOption { Some(it) }
+      }
+    }
+
+    "traverseEither should wrap ior in an Option" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.traverseEither { it.right() } == Either.Right(Ior.Left(a)) &&
+          iorR.traverseEither { it.right() } == Either.Right(Ior.Right(b)) &&
+          iorBoth.traverseEither { it.right() } == Either.Right(Ior.Both(a, b))
+      }
+    }
+
+    "sequenceEither should be consistent with traverseEither" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.map { it.right() }.sequenceEither() == ior.traverseEither { it.right() }
+      }
+    }
+
+    "bitraverse should wrap ior in a list" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        println(iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }))
+
+        iorL.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) == listOf(Ior.Left(a), Ior.Left(2), Ior.Left(3)) &&
+          iorR.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) == listOf(Ior.Right(b)) &&
+          iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it, 4, 5) }) ==
+          listOf(Ior.Both(a, b), Ior.Both(2, 4), Ior.Both(3, 5))
+      }
+    }
+
+    "bisequence should be consistent with bitraverse" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.bimap({ listOf(it) }, { listOf(it) }).bisequence() ==
+          ior.bitraverse({ listOf(it) }, { listOf(it) })
+      }
+    }
+
+    "bitraverseOption should wrap ior in an Option" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.bitraverseOption({ None }, { Some(it) }) == None &&
+          iorR.bitraverseOption({ None }, { Some(it) }) == Some(Ior.Right(b)) &&
+          iorBoth.bitraverseOption({ None }, { Some(it) }) == None
+      }
+    }
+
+    "bisequenceOption should be consistent with bitraverseOption" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.bimap({ None }, { Some(it) }).bisequenceOption() ==
+          ior.bitraverseOption({ None }, { Some(it) })
+      }
+    }
+
+    "bitraverseEither should wrap ior in an Either" {
+      forAll { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.bitraverseEither({ it.left() }, { it.right() }) == Either.Left(a) &&
+          iorR.bitraverseEither({ it.left() }, { it.right() }) == Either.Right(Ior.Right(b)) &&
+          iorBoth.bitraverseEither({ it.left() }, { it.right() }) == Either.Left(a)
+      }
+    }
+
+    "bisequenceEither should be consistent with bitraverseEither" {
+      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+        ior.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
+          ior.bitraverseEither({ it.left() }, { it.right() })
+      }
+    }
   }
 }
