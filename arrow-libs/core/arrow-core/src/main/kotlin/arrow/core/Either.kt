@@ -864,6 +864,8 @@ sealed class Either<out A, out B> {
    */
   fun orNull(): B? = fold({ null }, { it })
 
+  fun orNone(): Option<B> = fold({ None }, { Some(it) })
+
   fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) emptyList<B>().right()
     else when (this) {
@@ -874,6 +876,9 @@ sealed class Either<out A, out B> {
   inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
     fold({ emptyList() }, { fa(it).map { Right(it) } })
 
+  inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
+    fold({ None }, { right -> fa(right).map { Right(it) } })
+
   inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
       is Right -> fa(this.value).map { Right(it) }
@@ -882,6 +887,9 @@ sealed class Either<out A, out B> {
 
   inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
+
+  inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
+    fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
 
   inline fun <AA, C, D> bitraverseValidated(
     fe: (A) -> Validated<AA, C>,
@@ -915,7 +923,7 @@ sealed class Either<out A, out B> {
       @PublishedApi
       internal val leftUnit: Either<Unit, Nothing> =
         Left(Unit)
-   }
+    }
   }
 
   /**
@@ -1504,11 +1512,17 @@ inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B)
 fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   traverse(::identity)
 
+fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
+  traverseOption(::identity)
+
 fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
   traverseValidated(::identity)
 
 fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)
+
+fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either<A, B>> =
+  bitraverseOption(::identity, ::identity)
 
 fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)

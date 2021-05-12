@@ -617,6 +617,9 @@ fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequ
 fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   traverseEither(::identity)
 
+fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
+  traverseOption(::identity)
+
 fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
@@ -657,6 +660,20 @@ fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequ
     }
   }
   return acc.asSequence().right()
+}
+
+fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> {
+  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
+  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
+  //  forcing too much of the sequence to be evaluated.
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    when (val res = f(a)) {
+      is Some -> acc.add(res.value)
+      is None -> return@traverseOption res
+    }
+  }
+  return Some(acc.asSequence())
 }
 
 fun <E, A, B> Sequence<A>.traverseValidated(
@@ -809,3 +826,5 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  */
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
+
+fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> = this.mapNotNull { it.orNull() }
