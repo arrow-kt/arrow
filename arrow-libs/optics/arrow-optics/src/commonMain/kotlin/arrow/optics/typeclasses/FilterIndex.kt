@@ -5,6 +5,7 @@ import arrow.core.Predicate
 import arrow.optics.Every
 import arrow.optics.Iso
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * [FilterIndex] provides a [Every] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.

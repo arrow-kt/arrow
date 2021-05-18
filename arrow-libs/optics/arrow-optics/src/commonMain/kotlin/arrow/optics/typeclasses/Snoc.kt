@@ -8,6 +8,7 @@ import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.Prism
+import kotlin.jvm.JvmStatic
 
 typealias Conj<S, A> = Snoc<S, A>
 

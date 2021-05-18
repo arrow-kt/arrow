@@ -12,6 +12,7 @@ import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments

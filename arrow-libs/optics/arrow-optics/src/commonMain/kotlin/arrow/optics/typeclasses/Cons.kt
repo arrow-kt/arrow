@@ -7,6 +7,7 @@ import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.PPrism
 import arrow.optics.Prism
+import kotlin.jvm.JvmStatic
 
 /**
  * [Cons] provides a [Prism] between [S] and its first element [A] and tail [S].

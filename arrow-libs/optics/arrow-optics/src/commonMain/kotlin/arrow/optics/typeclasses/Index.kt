@@ -11,6 +11,7 @@ import arrow.optics.POptional
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
+import kotlin.jvm.JvmStatic
 
 /**
  * [Index] provides an [Optional] for a structure [S] to focus in an optional [A] at a given index [I].

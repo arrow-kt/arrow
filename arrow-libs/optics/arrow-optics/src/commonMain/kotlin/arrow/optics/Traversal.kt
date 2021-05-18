@@ -10,6 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import kotlin.jvm.JvmStatic
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

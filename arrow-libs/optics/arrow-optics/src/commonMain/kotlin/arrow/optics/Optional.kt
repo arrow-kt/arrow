@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments

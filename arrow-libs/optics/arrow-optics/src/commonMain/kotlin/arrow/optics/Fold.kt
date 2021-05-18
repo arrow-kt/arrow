@@ -12,6 +12,7 @@ import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.

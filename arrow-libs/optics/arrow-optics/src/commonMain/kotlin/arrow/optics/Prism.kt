@@ -8,6 +8,7 @@ import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments

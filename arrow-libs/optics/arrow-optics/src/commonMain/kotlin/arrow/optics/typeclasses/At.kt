@@ -11,6 +11,7 @@ import arrow.optics.PLens
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
+import kotlin.jvm.JvmStatic
 
 /**
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].

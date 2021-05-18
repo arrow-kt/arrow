@@ -13,6 +13,7 @@ import arrow.core.Tuple9
 import arrow.core.foldLeft
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 typealias Every<S, A> = PEvery<S, S, A, A>
 

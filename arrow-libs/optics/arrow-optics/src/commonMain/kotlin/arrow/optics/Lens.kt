@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmStatic
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
