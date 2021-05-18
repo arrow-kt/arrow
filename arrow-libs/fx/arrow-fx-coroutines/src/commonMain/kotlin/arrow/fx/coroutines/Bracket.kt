@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext

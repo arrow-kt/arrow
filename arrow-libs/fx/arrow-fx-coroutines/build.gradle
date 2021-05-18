@@ -12,10 +12,18 @@ apply from: "$PUBLICATION_MPP"
 
 kotlin {
     sourceSets {
-        jvmMain {
+        commonMain {
             dependencies {
                 api project(":arrow-core")
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+                compileOnly "org.codehaus.mojo:animal-sniffer-annotations:1.19"
             }
         }
 

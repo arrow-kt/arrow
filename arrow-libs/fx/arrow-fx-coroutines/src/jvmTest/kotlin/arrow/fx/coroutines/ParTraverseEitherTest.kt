@@ -4,8 +4,11 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import arrow.core.sequenceEither
+import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
@@ -87,9 +90,14 @@ class ParTraverseEitherTest : ArrowFxSpec(
 
     "parTraverseEither finishes on single thread " { // 100 is same default length as Arb.list
       checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        single.use { ctx ->
+        val res = single.use { ctx ->
           (0 until i).parTraverseEither(ctx) { Thread.currentThread().name.right() }
-        } shouldBe (0 until i).map { "single" }.right()
+        }
+        assertSoftly {
+          res.orNull()?.forEach {
+            it shouldStartWith "single"
+          } ?: fail("Expected Right but found $res")
+        }
       }
     }
   }

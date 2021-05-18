@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

@@ -4,11 +4,13 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.identity
 import arrow.core.left
+import arrow.core.nonFatalOrThrow
 import arrow.core.right
 import arrow.fx.coroutines.Schedule.ScheduleImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
+import kotlin.jvm.JvmName
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow

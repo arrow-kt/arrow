@@ -69,7 +69,7 @@ private constructor(
         markOrResetFailures(attempt)
       }
       is Open -> {
-        val now = System.currentTimeMillis()
+        val now = timeInMillis()
         if (now >= curr.expiresAt) {
           // The Open state has expired, so we are letting just one
           // task to execute, while transitioning into HalfOpen
@@ -122,7 +122,7 @@ private constructor(
               else throw result.value
             } else {
               // N.B. this could be canceled, however we don't care
-              val now = System.currentTimeMillis()
+              val now = timeInMillis()
               // We've gone over the permitted failures threshold,
               // so we need to open the circuit breaker
               val update = Open(now, resetTimeout, CompletableDeferred())
@@ -180,7 +180,7 @@ private constructor(
             val nextTimeout: Double =
               if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
               else value
-            val ts = System.currentTimeMillis()
+            val ts = timeInMillis()
             state.value = Open(ts, nextTimeout, awaitClose)
             onOpen.invoke()
           }
@@ -326,7 +326,11 @@ private constructor(
         "Closed(failures=$failures)"
     }
 
-    class Open internal constructor(val startedAt: Long, val resetTimeoutNanos: Double, internal val awaitClose: CompletableDeferred<Unit>) : State() {
+    class Open internal constructor(
+      val startedAt: Long,
+      val resetTimeoutNanos: Double,
+      internal val awaitClose: CompletableDeferred<Unit>
+    ) : State() {
 
       /** [State] of the [CircuitBreaker] in which the circuit
        * breaker rejects all tasks with an [ExecutionRejected].
@@ -345,7 +349,11 @@ private constructor(
        *        exponential backoff factor for the next transition from
        *        `HalfOpen` to `Open`, in case the reset attempt fails
        */
-      constructor(startedAt: Long, resetTimeoutNanos: Double) : this(startedAt, resetTimeoutNanos, CompletableDeferred())
+      constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
+        startedAt,
+        resetTimeoutNanos,
+        CompletableDeferred()
+      )
 
       /** The timestamp in milliseconds since the epoch, specifying
        * when the `Open` state is to transition to [HalfOpen].
@@ -372,7 +380,10 @@ private constructor(
       }
     }
 
-    class HalfOpen internal constructor(val resetTimeoutNanos: Double, internal val awaitClose: CompletableDeferred<Unit>) : State() {
+    class HalfOpen internal constructor(
+      val resetTimeoutNanos: Double,
+      internal val awaitClose: CompletableDeferred<Unit>
+    ) : State() {
 
       /** [State] of the [CircuitBreaker] in which the circuit
        * breaker has already allowed a task to go through, as a reset

@@ -2,7 +2,7 @@ package arrow.fx.coroutines
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
-import kotlinx.coroutines.runBlocking
+import kotlin.jvm.JvmName
 
 internal const val ArrowExceptionMessage =
   "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
@@ -10,9 +10,6 @@ internal const val ArrowExceptionMessage =
 internal class ArrowInternalException(override val message: String = ArrowExceptionMessage) : RuntimeException(message)
 
 object Platform {
-
-  internal fun <A> unsafeRunSync(f: suspend () -> A): A =
-    runBlocking { f() }
 
   fun composeErrors(first: Throwable, res: Result<Any?>): Throwable {
     res.fold({ first }, { e -> first.addSuppressed(e) })
@@ -154,9 +151,3 @@ class AtomicIntW(a: Int) {
 
   override fun toString(): String = value.toString()
 }
-
-fun Throwable.nonFatalOrThrow(): Throwable =
-  when (this) {
-    is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError -> throw this
-    else -> this
-  }
