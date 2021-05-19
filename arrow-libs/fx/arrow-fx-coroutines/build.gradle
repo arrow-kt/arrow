@@ -8,7 +8,7 @@ apply plugin: 'kotlinx-atomicfu'
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
-apply from: "$PUBLICATION"
+apply from: "$PUBLICATION_MPP"
 
 kotlin {
     sourceSets {
