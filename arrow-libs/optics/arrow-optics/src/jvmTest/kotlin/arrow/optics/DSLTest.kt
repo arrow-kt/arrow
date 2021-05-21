@@ -4,7 +4,7 @@ import arrow.core.None
 import arrow.core.test.UnitSpec
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Index
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String) {

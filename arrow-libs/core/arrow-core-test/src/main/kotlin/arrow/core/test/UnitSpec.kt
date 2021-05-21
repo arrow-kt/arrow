@@ -3,95 +3,102 @@ package arrow.core.test
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.test.laws.Law
-import io.kotlintest.TestCase
-import io.kotlintest.TestType
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.PropertyContext
-import io.kotlintest.properties.assertAll
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.AbstractStringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.test.createTestName
+import io.kotest.property.Arb
+import io.kotest.property.PropertyContext
+import io.kotest.property.arbitrary.bind
+import io.kotest.property.checkAll
 
 /**
  * Base class for unit tests
  */
-abstract class UnitSpec : AbstractStringSpec() {
+abstract class UnitSpec : StringSpec() {
 
-  private val lawTestCases = mutableListOf<TestCase>()
-
-  fun testLaws(vararg laws: List<Law>): List<TestCase> = laws
+  fun testLaws(vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
-    .map { law: Law ->
-      val lawTestCase = createTestCase(law.name, law.test, defaultTestCaseConfig, TestType.Test)
-      lawTestCases.add(lawTestCase)
-      lawTestCase
+    .forEach { law: Law ->
+      registration().addTest(createTestName(law.name), xdisabled = false, law.test)
     }
 
-  override fun testCases(): List<TestCase> = super.testCases() + lawTestCases
-
-  fun <A, B, C, D, E, F, G> forAll(
-    gena: Gen<A>,
-    genb: Gen<B>,
-    genc: Gen<C>,
-    gend: Gen<D>,
-    gene: Gen<E>,
-    genf: Gen<F>,
-    geng: Gen<G>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> Boolean
-  ) {
-    assertAll(gena, genb, genc, gend, gene, Gen.bind(genf, geng, ::Pair)) { a, b, c, d, e, (f, g) ->
-      fn(a, b, c, d, e, f, g) shouldBe true
+  fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
+    .flatMap { list: List<Law> -> list.asIterable() }
+    .distinctBy { law: Law -> law.name }
+    .forEach { law: Law ->
+      registration().addTest(createTestName(prefix, law.name, true), xdisabled = false, law.test)
     }
-  }
 
-  fun <A, B, C, D, E, F, G, H> forAll(
-    gena: Gen<A>,
-    genb: Gen<B>,
-    genc: Gen<C>,
-    gend: Gen<D>,
-    gene: Gen<E>,
-    genf: Gen<F>,
-    geng: Gen<G>,
-    genh: Gen<H>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> Boolean
+  suspend fun <A, B, C, D, E, F, G> checkAll(
+    gena: Arb<A>,
+    genb: Arb<B>,
+    genc: Arb<C>,
+    gend: Arb<D>,
+    gene: Arb<E>,
+    genf: Arb<F>,
+    geng: Arb<G>,
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> Unit
   ) {
-    assertAll(gena, genb, genc, gend, gene, Gen.bind(genf, geng, genh, ::Triple)) { a, b, c, d, e, (f, g, h) ->
-      fn(a, b, c, d, e, f, g, h) shouldBe true
+    checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, ::Pair)) { a, b, c, d, e, (f, g) ->
+      fn(a, b, c, d, e, f, g)
     }
   }
 
-  fun <A, B, C, D, E, F, G, H, I> forAll(
-    gena: Gen<A>,
-    genb: Gen<B>,
-    genc: Gen<C>,
-    gend: Gen<D>,
-    gene: Gen<E>,
-    genf: Gen<F>,
-    geng: Gen<G>,
-    genh: Gen<H>,
-    geni: Gen<I>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) -> Boolean
+  suspend fun <A, B, C, D, E, F, G, H> checkAll(
+    gena: Arb<A>,
+    genb: Arb<B>,
+    genc: Arb<C>,
+    gend: Arb<D>,
+    gene: Arb<E>,
+    genf: Arb<F>,
+    geng: Arb<G>,
+    genh: Arb<H>,
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> Unit
   ) {
-    assertAll(gena, genb, genc, gend, gene, Gen.bind(genf, geng, genh, geni, ::Tuple4)) { a, b, c, d, e, (f, g, h, i) ->
-      fn(a, b, c, d, e, f, g, h, i) shouldBe true
+    checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, genh, ::Triple)) { a, b, c, d, e, (f, g, h) ->
+      fn(a, b, c, d, e, f, g, h)
     }
   }
 
-  fun <A, B, C, D, E, F, G, H, I, J> forAll(
-    gena: Gen<A>,
-    genb: Gen<B>,
-    genc: Gen<C>,
-    gend: Gen<D>,
-    gene: Gen<E>,
-    genf: Gen<F>,
-    geng: Gen<G>,
-    genh: Gen<H>,
-    geni: Gen<I>,
-    genj: Gen<J>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J) -> Boolean
+  suspend fun <A, B, C, D, E, F, G, H, I> checkAll(
+    gena: Arb<A>,
+    genb: Arb<B>,
+    genc: Arb<C>,
+    gend: Arb<D>,
+    gene: Arb<E>,
+    genf: Arb<F>,
+    geng: Arb<G>,
+    genh: Arb<H>,
+    geni: Arb<I>,
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) -> Unit
   ) {
-    assertAll(gena, genb, genc, gend, gene, Gen.bind(genf, geng, genh, geni, genj, ::Tuple5)) { a, b, c, d, e, (f, g, h, i, j) ->
-      fn(a, b, c, d, e, f, g, h, i, j) shouldBe true
+    checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, genh, geni, ::Tuple4)) { a, b, c, d, e, (f, g, h, i) ->
+      fn(a, b, c, d, e, f, g, h, i)
+    }
+  }
+
+  suspend fun <A, B, C, D, E, F, G, H, I, J> checkAll(
+    gena: Arb<A>,
+    genb: Arb<B>,
+    genc: Arb<C>,
+    gend: Arb<D>,
+    gene: Arb<E>,
+    genf: Arb<F>,
+    geng: Arb<G>,
+    genh: Arb<H>,
+    geni: Arb<I>,
+    genj: Arb<J>,
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J) -> Unit
+  ) {
+    checkAll(
+      gena,
+      genb,
+      genc,
+      gend,
+      gene,
+      Arb.bind(genf, geng, genh, geni, genj, ::Tuple5)
+    ) { a, b, c, d, e, (f, g, h, i, j) ->
+      fn(a, b, c, d, e, f, g, h, i, j)
     }
   }
 }

@@ -1,31 +1,28 @@
 package arrow.core
 
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 class MemoizationTest : FreeSpec() {
 
   init {
     "Memoize races" {
-      forAll<Int> {
-        runBlocking {
-          fun sum(): Int =
-            Random.nextInt(Int.MAX_VALUE)
+      checkAll<Int> {
+        fun sum(): Int =
+          Random.nextInt(Int.MAX_VALUE)
 
-          val memoized = ::sum.memoize()
+        val memoized = ::sum.memoize()
 
-          val (first, second) = listOf(
-            async { memoized() },
-            async { memoized() }
-          ).awaitAll()
+        val (first, second) = listOf(
+          async { memoized() },
+          async { memoized() }
+        ).awaitAll()
 
-          first == second
-        }
+        first shouldBe second
       }
     }
 

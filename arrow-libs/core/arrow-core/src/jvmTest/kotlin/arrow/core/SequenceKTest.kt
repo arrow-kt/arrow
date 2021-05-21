@@ -6,10 +6,14 @@ import arrow.core.test.generators.sequence
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import io.kotlintest.matchers.sequences.shouldBeEmpty
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.matchers.sequences.shouldBeEmpty
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.string
 import kotlin.math.max
 import kotlin.math.min
 
@@ -17,7 +21,7 @@ class SequenceKTest : UnitSpec() {
 
   init {
 
-    testLaws(MonoidLaws.laws(Monoid.sequence(), Gen.sequence(Gen.int())) { s1, s2 -> s1.toList() == s2.toList() })
+    testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "traverseEither stack-safe" {
       // also verifies result order and execution order (l to r)
@@ -59,49 +63,48 @@ class SequenceKTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      forAll(Gen.list(Gen.int())) { ints ->
-        val ints = ints.asSequence()
+      checkAll(Arb.sequence(Arb.int())) { ints ->
         val res: ValidatedNel<Int, Sequence<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequenceValidated(Semigroup.nonEmptyList())
 
         val expected: ValidatedNel<Int, Sequence<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 }.toList())
           .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
 
-        res.map { it.toList() } == expected.map { it.toList() }
+        res.map { it.toList() } shouldBe expected.map { it.toList() }
       }
     }
 
     "zip3" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c ->
+      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
         val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip4" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
         val expected = a.zip(b, ::Pair)
           .zip(c) { (a, b), c -> Triple(a, b, c) }
           .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip5" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e ->
         val result = a.zip(b, c, d, e, ::Tuple5)
         val expected = a.zip(b, ::Pair)
@@ -109,18 +112,18 @@ class SequenceKTest : UnitSpec() {
           .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
           .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip6" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e, f ->
         val result = a.zip(b, c, d, e, f, ::Tuple6)
         val expected = a.zip(b, ::Pair)
@@ -129,19 +132,19 @@ class SequenceKTest : UnitSpec() {
           .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
           .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip7" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e, f, g ->
         val result = a.zip(b, c, d, e, f, g, ::Tuple7)
         val expected = a.zip(b, ::Pair)
@@ -151,20 +154,20 @@ class SequenceKTest : UnitSpec() {
           .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
           .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip8" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e, f, g, h ->
         val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
         val expected = a.zip(b, ::Pair)
@@ -175,21 +178,21 @@ class SequenceKTest : UnitSpec() {
           .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
           .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip9" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e, f, g, h, i ->
         val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
         val expected = a.zip(b, ::Pair)
@@ -201,22 +204,22 @@ class SequenceKTest : UnitSpec() {
           .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
           .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "zip10" {
-      forAll(
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int()),
-        Gen.sequence(Gen.int())
+      checkAll(
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int()),
+        Arb.sequence(Arb.int())
       ) { a, b, c, d, e, f, g, h, i, j ->
         val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
         val expected = a.zip(b, ::Pair)
@@ -229,29 +232,29 @@ class SequenceKTest : UnitSpec() {
           .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
           .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "can align sequences" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
-        a.align(b).toList().size == max(a.toList().size, b.toList().size)
+      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+        a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
 
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
-        a.align(b).take(min(a.toList().size, b.toList().size)).all {
-          it.isBoth
+      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+        a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
+          it.isBoth shouldBe true
         }
       }
 
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
-        a.align(b).drop(min(ls.size, rs.size)).all {
+        a.align(b).drop(min(ls.size, rs.size)).forEach {
           if (ls.size < rs.size) {
-            it.isRight
+            it.isRight shouldBe true
           } else {
-            it.isLeft
+            it.isLeft shouldBe true
           }
         }
       }
@@ -267,15 +270,15 @@ class SequenceKTest : UnitSpec() {
 
       val seq2 = generateSequence(0) { it + 1 }
 
-      forAll(10, Gen.positiveIntegers().filter { it < 10_000 }) { idx: Int ->
+      checkAll(10, Arb.positiveInts(max = 10_000)) { idx: Int ->
         val element = seq1.align(seq2).drop(idx).first()
 
-        element == Ior.Both("A", idx)
+        element shouldBe Ior.Both("A", idx)
       }
     }
 
     "mapNotNull" {
-      forAll(Gen.sequence(Gen.int())) { a ->
+      checkAll(Arb.sequence(Arb.int())) { a ->
         val result = a.mapNotNull {
           when (it % 2 == 0) {
             true -> it.toString()
@@ -292,13 +295,13 @@ class SequenceKTest : UnitSpec() {
             }
             .asSequence()
 
-        result.toList() == expected.toList()
+        result.toList() shouldBe expected.toList()
       }
     }
 
     "filterOption should filter None" {
-      forAll(Gen.list(Gen.option(Gen.int()))) { ints ->
-        ints.asSequence().filterOption().toList() == ints.filterOption()
+      checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
+        ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
     }
   }

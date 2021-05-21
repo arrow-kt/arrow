@@ -3,12 +3,13 @@
 package arrow.core
 
 import arrow.core.test.generators.intSmall
-import io.kotlintest.matchers.collections.shouldContainAll
-import io.kotlintest.matchers.types.shouldBeNull
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.arbitrary.of
 
 class NullableTest : StringSpec({
   "map1 short circuits if any arg is null" {
@@ -16,103 +17,104 @@ class NullableTest : StringSpec({
   }
 
   "map1 performs action when arg is not null" {
-    forAll(Gen.intSmall()) { a ->
-      Nullable.zip(a) { it + 1 } == a + 1
+    checkAll(Arb.intSmall()) { a ->
+      Nullable.zip(a) { it + 1 } shouldBe a + 1
     }
   }
 
   "map2 only performs action when all arguments are not null" {
-    forAll(combGen("a", null, 2)) { (a: String?, b: String?) ->
+    checkAll(combArb("a", null, 2)) { (a: String?, b: String?) ->
       if (listOf(a, b).all { it != null }) {
         Nullable.zip(a, b, { a, b -> a + b }).let {
-          it == a!! + b!!
+          it shouldBe a!! + b!!
         }
       } else {
-        Nullable.zip(a, b, { _, _ -> Unit }) == null
+        Nullable.zip(a, b, { _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map3 only performs action when all arguments are not null" {
-    forAll(combGen("a", null, 3)) { (a: String?, b: String?, c: String?) ->
+    checkAll(combArb("a", null, 3)) { (a: String?, b: String?, c: String?) ->
       if (listOf(a, b, c).all { it != null }) {
         Nullable.zip(a, b, c, { a, b, c -> a + b + c }).let {
-          it == a!! + b!! + c!!
+          it shouldBe a!! + b!! + c!!
         }
       } else {
-        Nullable.zip(a, b, c, { _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, { _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map4 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 4)) { (a: Int?, b: Int?, c: Int?, d: Int?) ->
+    checkAll(combArb(1, null, 4)) { (a: Int?, b: Int?, c: Int?, d: Int?) ->
       if (listOf(a, b, c, d).all { it != null }) {
         Nullable.zip(a, b, c, d, { a, b, c, d -> a + b + c + d }).let {
-          it == a!! + b!! + c!! + d!!
+          it shouldBe a!! + b!! + c!! + d!!
         }
       } else {
-        Nullable.zip(a, b, c, d, { _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, { _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map5 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 5)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?) ->
+    checkAll(combArb(1, null, 5)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?) ->
       if (listOf(a, b, c, d, e).all { it != null }) {
         Nullable.zip(a, b, c, d, e, { a, b, c, d, e -> a + b + c + d + e }).let {
-          it == a!! + b!! + c!! + d!! + e!!
+          it shouldBe a!! + b!! + c!! + d!! + e!!
         }
       } else {
-        Nullable.zip(a, b, c, d, e, { _, _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, e, { _, _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map6 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 6)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?) ->
+    checkAll(combArb(1, null, 6)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?) ->
       if (listOf(a, b, c, d, e, f).all { it != null }) {
         Nullable.zip(a, b, c, d, e, f, { a, b, c, d, e, f -> a + b + c + d + e + f }).let {
-          it == a!! + b!! + c!! + d!! + e!! + f!!
+          it shouldBe a!! + b!! + c!! + d!! + e!! + f!!
         }
       } else {
-        Nullable.zip(a, b, c, d, e, f, { _, _, _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, e, f, { _, _, _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map7 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 7)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?) ->
+    checkAll(combArb(1, null, 7)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?) ->
       if (listOf(a, b, c, d, e, f, g).all { it != null }) {
         Nullable.zip(a, b, c, d, e, f, g, { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }).let {
-          it == a!! + b!! + c!! + d!! + e!! + f!! + g!!
+          it shouldBe a!! + b!! + c!! + d!! + e!! + f!! + g!!
         }
       } else {
-        Nullable.zip(a, b, c, d, e, f, g, { _, _, _, _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, e, f, g, { _, _, _, _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map8 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 8)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?, h: Int?) ->
+    checkAll(combArb(1, null, 8)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?, h: Int?) ->
       if (listOf(a, b, c, d, e, f, g, h).all { it != null }) {
         Nullable.zip(a, b, c, d, e, f, g, h, { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }).let {
-          it == a!! + b!! + c!! + d!! + e!! + f!! + g!! + h!!
+          it shouldBe a!! + b!! + c!! + d!! + e!! + f!! + g!! + h!!
         }
       } else {
-        Nullable.zip(a, b, c, d, e, f, g, h, { _, _, _, _, _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, e, f, g, h, { _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
 
   "map9 only performs action when all arguments are not null" {
-    forAll(combGen(1, null, 9)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?, h: Int?, i: Int?) ->
+    checkAll(combArb(1, null, 9)) { (a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?, h: Int?, i: Int?) ->
       if (listOf(a, b, c, d, e, f, g, h, i).all { it != null }) {
-        Nullable.zip(a, b, c, d, e, f, g, h, i, { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i }).let {
-          it == a!! + b!! + c!! + d!! + e!! + f!! + g!! + h!! + i!!
-        }
+        Nullable.zip(a, b, c, d, e, f, g, h, i, { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i })
+          .let {
+            it shouldBe a!! + b!! + c!! + d!! + e!! + f!! + g!! + h!! + i!!
+          }
       } else {
-        Nullable.zip(a, b, c, d, e, f, g, h, i, { _, _, _, _, _, _, _, _, _ -> Unit }) == null
+        Nullable.zip(a, b, c, d, e, f, g, h, i, { _, _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
       }
     }
   }
@@ -132,13 +134,10 @@ private fun <A> generateAllPathsForNForks(choice1: A, choice2: A, n: Int): List<
     acc.forkPaths(choice1, choice2)
   }
 
-private fun <A> combGen(choice1: A, choice2: A, n: Int) = object : Gen<List<A>> {
-  override fun constants(): Iterable<List<A>> = emptyList()
+private fun <A> combArb(choice1: A, choice2: A, n: Int): Arb<List<A>> =
+  Arb.of(generateAllPathsForNForks(choice1, choice2, n))
 
-  override fun random(): Sequence<List<A>> = generateAllPathsForNForks(choice1, choice2, n).asSequence()
-}
-
-class GenerateAllPathsForNForksTest : StringSpec({
+class ArberateAllPathsForNForksTest : StringSpec({
   "for 0 forks" {
     generateAllPathsForNForks("a", "b", 0) shouldContainAll emptyList()
   }

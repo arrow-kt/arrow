@@ -8,35 +8,56 @@ import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.OptionalLaws
-import io.kotlintest.properties.Gen
+import arrow.optics.test.laws.SetterLaws
+import arrow.optics.test.laws.TraversalLaws
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 
 class ListTest : UnitSpec() {
 
   init {
 
     testLaws(
+      "Optional list head - ",
       OptionalLaws.laws(
         optional = Optional.listHead(),
-        aGen = Gen.list(Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
+      ),
+      TraversalLaws.laws(
+        traversal = Optional.listHead<Int>(),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
+      ),
+      SetterLaws.laws(
+        setter = Optional.listHead<Int>(),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
+      "Optional list tail - ",
       OptionalLaws.laws(
         optional = Optional.listTail(),
-        aGen = Gen.list(Gen.int()),
-        bGen = Gen.list(Gen.int()),
-        funcGen = Gen.functionAToB(Gen.list(Gen.int())),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.list(Arb.int()),
+        funcGen = Arb.functionAToB(Arb.list(Arb.int())),
       )
     )
 
-    testLaws(IsoLaws.laws(
-      iso = Iso.listToOptionNel(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
-      funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
-    ))
+    testLaws(
+      "Iso list to Option Nel - ",
+      IsoLaws.laws(
+        iso = Iso.listToOptionNel(),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.option(Arb.nonEmptyList(Arb.int())),
+        funcGen = Arb.functionAToB(Arb.option(Arb.nonEmptyList(Arb.int()))),
+      )
+    )
   }
 }

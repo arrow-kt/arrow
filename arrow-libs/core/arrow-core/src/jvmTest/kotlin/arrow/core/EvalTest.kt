@@ -6,20 +6,25 @@ import arrow.core.computations.eval
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.FxLaws
-import io.kotlintest.fail
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.assertions.fail
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Sample
+import io.kotest.property.arbitrary.arbitrary
+import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
 
 class EvalTest : UnitSpec() {
 
   init {
 
     testLaws(
-      FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
+      FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
         it.bind()
       },
-      FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Gen.int().map(Eval.Companion::now), Gen.int().map(Eval.Companion::now), Eval<Int>::equals, eval::eager) {
+      FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::eager) {
         it.bind()
       }
     )
@@ -131,10 +136,9 @@ class EvalTest : UnitSpec() {
     }
 
     "stack safety stress test" {
-      forAll(DeepEval.gen) { d: DeepEval ->
+      checkAll(DeepEval.gen) { d: DeepEval ->
         try {
           d.eval.value()
-          true
         } catch (e: StackOverflowError) {
           fail("stack overflowed with eval-depth ${DeepEval.maxDepth}")
         }
@@ -150,11 +154,11 @@ class EvalTest : UnitSpec() {
       class Defer : O()
 
       companion object {
-        val gen = Gen.oneOf<O>(
-          Gen.create { O.Map { it + 1 } },
-          Gen.create { O.FlatMap { Eval.Now(it) } },
-          Gen.create { O.Memoize() },
-          Gen.create { O.Defer() }
+        val gen = Arb.choice(
+          arbitrary { O.Map { it + 1 } },
+          arbitrary { O.FlatMap { Eval.Now(it) } },
+          arbitrary { O.Memoize() },
+          arbitrary { O.Defer() }
         )
       }
     }
@@ -182,9 +186,9 @@ class EvalTest : UnitSpec() {
         step(0, leaf, mutableListOf())
       }
 
-      val gen = Gen.create {
+      val gen = arbitrary { rs ->
         val leaf = { Eval.Now(0) }
-        val eval = build(leaf, O.gen.random().take(maxDepth).toList())
+        val eval = build(leaf, O.gen.samples().map(Sample<O>::value).take(maxDepth).toList())
         DeepEval(eval)
       }
     }

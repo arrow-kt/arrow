@@ -10,7 +10,9 @@ import arrow.core.test.generators.validated
 import arrow.optics.Iso
 import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
 
 class EitherTest : UnitSpec() {
 
@@ -37,9 +39,9 @@ class EitherTest : UnitSpec() {
     testLaws(
       IsoLaws.laws(
         iso = Iso.eitherToValidated(),
-        aGen = Gen.either(Gen.string(), Gen.int()),
-        bGen = Gen.validated(Gen.string(), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
+        aGen = Arb.either(Arb.string(), Arb.int()),
+        bGen = Arb.validated(Arb.string(), Arb.int()),
+        funcGen = Arb.functionAToB(Arb.validated(Arb.string(), Arb.int())),
       )
     )
   }

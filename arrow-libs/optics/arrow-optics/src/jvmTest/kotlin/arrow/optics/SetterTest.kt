@@ -6,28 +6,33 @@ import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.SetterLaws
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 class SetterTest : UnitSpec() {
 
   init {
 
     testLaws(
+      "Setter identity - ",
       SetterLaws.laws(
         setter = Setter.id(),
-        aGen = Gen.int(),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.int(),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
+      "Setter token - ",
       SetterLaws.laws(
         setter = tokenSetter,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
@@ -38,15 +43,15 @@ class SetterTest : UnitSpec() {
       val token = Token(oldValue)
       val user = User(token)
 
-      forAll { value: String ->
-        joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value ==
+      checkAll { value: String ->
+        joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value shouldBe
           joinedSetter.set(user.right(), value).getOrElse { User(Token("Wrong value")) }.token.value
       }
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      forAll(genToken, Gen.string()) { token, value ->
-        tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
+      checkAll(genToken, Arb.string()) { token, value ->
+        tokenSetter.modify(token) { value } shouldBe tokenSetter.lift { value }(token)
       }
     }
   }

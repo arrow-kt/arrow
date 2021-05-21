@@ -8,38 +8,52 @@ import arrow.optics.Iso
 import arrow.optics.Prism
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.orNull
 
 class OptionTest : UnitSpec() {
 
   init {
 
-    testLaws(PrismLaws.laws(
-      prism = Prism.some(),
-      aGen = Gen.option(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-    ))
+    testLaws(
+      "Prism some - ",
+      PrismLaws.laws(
+        prism = Prism.some(),
+        aGen = Arb.option(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
+      )
+    )
 
-    testLaws(PrismLaws.laws(
-      prism = Prism.none(),
-      aGen = Gen.option(Gen.int()),
-      bGen = Gen.create { Unit },
-      funcGen = Gen.functionAToB(Gen.create { Unit }),
-    ))
+    testLaws(
+      "Prism none - ",
+      PrismLaws.laws(
+        prism = Prism.none(),
+        aGen = Arb.option(Arb.int()),
+        bGen = Arb.constant(Unit),
+        funcGen = Arb.functionAToB(Arb.constant(Unit)),
+      )
+    )
 
-    testLaws(IsoLaws.laws(
-      iso = Iso.optionToNullable<Int>().reverse(),
-      aGen = Gen.int().orNull(),
-      bGen = Gen.option(Gen.int()),
-      funcGen = Gen.functionAToB(Gen.option(Gen.int()))
-    ))
+    testLaws(
+      "Iso option to nullable - ",
+      IsoLaws.laws(
+        iso = Iso.optionToNullable<Int>().reverse(),
+        aGen = Arb.int().orNull(),
+        bGen = Arb.option(Arb.int()),
+        funcGen = Arb.functionAToB(Arb.option(Arb.int()))
+      )
+    )
 
-    testLaws(IsoLaws.laws(
-      iso = Iso.optionToEither(),
-      aGen = Gen.option(Gen.int()),
-      bGen = Gen.either(Gen.create { Unit }, Gen.int()),
-      funcGen = Gen.functionAToB(Gen.either(Gen.create { Unit }, Gen.int())),
+    testLaws(
+      "Iso option to either - ",
+      IsoLaws.laws(
+        iso = Iso.optionToEither(),
+        aGen = Arb.option(Arb.int()),
+        bGen = Arb.either(Arb.constant(Unit), Arb.int()),
+        funcGen = Arb.functionAToB(Arb.either(Arb.constant(Unit), Arb.int())),
       )
     )
   }

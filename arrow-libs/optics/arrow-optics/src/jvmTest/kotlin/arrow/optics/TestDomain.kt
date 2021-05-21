@@ -4,19 +4,24 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
 
 sealed class SumType {
   data class A(val string: String) : SumType()
   data class B(val int: Int) : SumType()
 }
 
-val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
+val genSumTypeA: Arb<SumType.A> = Arb.string().map { SumType.A(it) }
 
-val genSum: Gen<SumType> =
-  Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
+val genSum: Arb<SumType> =
+  Arb.choice(Arb.string().map { SumType.A(it) }, Arb.int().map { SumType.B(it) })
 
-val sumPrism: Prism<SumType, String> = Prism<SumType, String>(
+val sumPrism: Prism<SumType, String> = Prism(
   { Option.fromNullable((it as? SumType.A)?.string) },
   SumType::A
 )
@@ -53,15 +58,15 @@ internal data class Token(val value: String) {
   companion object
 }
 
-internal val genToken: Gen<Token> = Gen.string().map { Token(it) }
+internal val genToken: Arb<Token> = Arb.string().map { Token(it) }
 
 internal data class User(val token: Token)
 
-internal val genUser: Gen<User> = genToken.map { User(it) }
+internal val genUser: Arb<User> = genToken.map { User(it) }
 
 internal data class IncompleteUser(val token: Token?)
 
-internal val genIncompleteUser: Gen<IncompleteUser> = Gen.constant(IncompleteUser(null))
+internal val genIncompleteUser: Arb<IncompleteUser> = Arb.constant(IncompleteUser(null))
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 

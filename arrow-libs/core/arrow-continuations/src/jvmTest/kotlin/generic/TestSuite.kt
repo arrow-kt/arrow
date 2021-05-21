@@ -6,7 +6,7 @@ import arrow.continuations.generic.RestrictedScope
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.test.UnitSpec
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 
 abstract class ContTestSuite : UnitSpec() {
   abstract suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A

@@ -2,7 +2,7 @@ package arrow.core.computations
 
 import arrow.core.Some
 import arrow.core.test.UnitSpec
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 
 class NullableTest : UnitSpec() {
 

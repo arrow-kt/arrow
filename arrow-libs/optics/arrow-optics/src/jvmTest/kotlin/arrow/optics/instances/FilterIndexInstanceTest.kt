@@ -5,52 +5,66 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.generators.sequence
-import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.char
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
 
 class FilterIndexInstanceTest : UnitSpec() {
 
   init {
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.list<String>().filter { true },
-      aGen = Gen.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+    testLaws(
+      "FilterIndex list - ",
+      TraversalLaws.laws(
+        traversal = FilterIndex.list<String>().filter { true },
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
+      "FilterIndex sequence - ",
       TraversalLaws.laws(
         traversal = FilterIndex.sequence<String>().filter { true },
-        aGen = Gen.sequence(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Arb.sequence(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ) { a, b -> a.toList() == b.toList() }
     )
 
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.nonEmptyList<String>().filter { true },
-      aGen = Gen.nonEmptyList(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = Gen.functionAToB(Gen.string()),
-    ))
-
     testLaws(
+      "FilterIndex Nel - ",
       TraversalLaws.laws(
-        traversal = FilterIndex.map<Char, Int>().filter { true },
-        aGen = Gen.map(Gen.char(), Gen.intSmall()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        traversal = FilterIndex.nonEmptyList<String>().filter { true },
+        aGen = Arb.nonEmptyList(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
-    testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.string().filter { true },
-      aGen = Gen.string(),
-      bGen = Gen.char(),
-      funcGen = Gen.functionAToB(Gen.char()),
-    ))
+    testLaws(
+      "FilterIndex map - ",
+      TraversalLaws.laws(
+        traversal = FilterIndex.map<Char, Int>().filter { true },
+        aGen = Arb.map(Arb.char(), Arb.intSmall()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
+      )
+    )
+
+    testLaws(
+      "FilterIndex string - ",
+      TraversalLaws.laws(
+        traversal = FilterIndex.string().filter { true },
+        aGen = Arb.string(),
+        bGen = Arb.char(),
+        funcGen = Arb.functionAToB(Arb.char()),
+      )
+    )
   }
 }

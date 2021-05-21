@@ -25,7 +25,6 @@ kotlin {
         jvmTest {
             dependencies {
                 runtimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-                compileOnly "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
                 implementation project(":arrow-core-test")
             }
         }

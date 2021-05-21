@@ -2,8 +2,11 @@ package arrow.optics
 
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.checkAll
 
 class EveryTest : UnitSpec() {
   init {
@@ -11,50 +14,50 @@ class EveryTest : UnitSpec() {
     with(Every.list<Int>()) {
 
       "asFold should behave as valid Fold: size" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          size(ints) == ints.size
+        checkAll(Arb.list(Arb.int())) { ints ->
+          size(ints) shouldBe ints.size
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          isNotEmpty(ints) == ints.isNotEmpty()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          isNotEmpty(ints) shouldBe ints.isNotEmpty()
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          isEmpty(ints) == ints.isEmpty()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          isEmpty(ints) shouldBe ints.isEmpty()
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          getAll(ints) == ints
+        checkAll(Arb.list(Arb.int())) { ints ->
+          getAll(ints) shouldBe ints
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          combineAll(Monoid.int(), ints) == ints.sum()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          combineAll(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          fold(Monoid.int(), ints) == ints.sum()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: headOption" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          firstOrNull(ints) == ints.firstOrNull()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          firstOrNull(ints) shouldBe ints.firstOrNull()
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          lastOrNull(ints) == ints.lastOrNull()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          lastOrNull(ints) shouldBe ints.lastOrNull()
         }
       }
     }
@@ -62,32 +65,32 @@ class EveryTest : UnitSpec() {
     with(Every.list<Int>()) {
 
       "Getting all targets of a traversal" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          getAll(ints) == ints
+        checkAll(Arb.list(Arb.int())) { ints ->
+          getAll(ints) shouldBe ints
         }
       }
 
       "Folding all the values of a traversal" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          fold(Monoid.int(), ints) == ints.sum()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "Combining all the values of a traversal" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          combineAll(Monoid.int(), ints) == ints.sum()
+        checkAll(Arb.list(Arb.int())) { ints ->
+          combineAll(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "Finding an number larger than 10" {
-        forAll(Gen.list(Gen.choose(-100, 100))) { ints ->
-          findOrNull(ints) { it > 10 } == ints.firstOrNull { it > 10 }
+        checkAll(Arb.list(Arb.int(-100..100))) { ints ->
+          findOrNull(ints) { it > 10 } shouldBe ints.firstOrNull { it > 10 }
         }
       }
 
       "Get the length from a traversal" {
-        forAll(Gen.list(Gen.int())) { ints ->
-          size(ints) == ints.size
+        checkAll(Arb.list(Arb.int())) { ints ->
+          size(ints) shouldBe ints.size
         }
       }
     }

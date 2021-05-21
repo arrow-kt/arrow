@@ -2,11 +2,12 @@ package arrow.core.test.laws
 
 import arrow.continuations.Effect
 import arrow.core.test.generators.throwable
-import io.kotlintest.fail
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bind
+import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -20,36 +21,54 @@ private typealias SuspendFxBlock<Eff, F, A> = suspend (suspend Eff.() -> A) -> F
 object FxLaws {
 
   fun <Eff : Effect<*>, F, A> suspended(
-    pureGen: Gen<F>,
-    G: Gen<F>,
+    pureArb: Arb<F>,
+    G: Arb<F>,
     eq: (F, F) -> Boolean,
     fxSuspend: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
     Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, eq, fxSuspend, invoke) },
     Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, eq, fxSuspend, invoke) },
-    Law("suspended fx can bind immediate exceptions") { suspendedCanBindImmediateExceptions(pureGen, fxSuspend, invoke) },
-    Law("suspended fx can bind suspended exceptions") { suspendedCanBindSuspendedExceptions(pureGen, fxSuspend, invoke) }
+    Law("suspended fx can bind immediate exceptions") {
+      suspendedCanBindImmediateExceptions(
+        pureArb,
+        fxSuspend,
+        invoke
+      )
+    },
+    Law("suspended fx can bind suspended exceptions") {
+      suspendedCanBindSuspendedExceptions(
+        pureArb,
+        fxSuspend,
+        invoke
+      )
+    }
   )
 
   fun <Eff : Effect<*>, F, A> eager(
-    pureGen: Gen<F>,
-    G: Gen<F>,
+    pureArb: Arb<F>,
+    G: Arb<F>,
     eq: (F, F) -> Boolean,
     fxEager: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ): List<Law> = listOf(
     Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, eq, fxEager, invoke) },
-    Law("non-suspended fx can bind immediate exceptions") { nonSuspendedCanBindImmediateException(pureGen, fxEager, invoke) }
+    Law("non-suspended fx can bind immediate exceptions") {
+      nonSuspendedCanBindImmediateException(
+        pureArb,
+        fxEager,
+        invoke
+      )
+    }
   )
 
   private suspend fun <Eff : Effect<*>, F, A> nonSuspendedCanBindImmediateValues(
-    G: Gen<F>,
+    G: Arb<F>,
     eq: (F, F) -> Boolean,
     fxBlock: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    forAll(G) { f: F ->
+    checkAll(G) { f: F ->
       fxBlock {
         val res = invoke(f)
         res
@@ -57,12 +76,12 @@ object FxLaws {
     }
   }
 
-  private fun <Eff : Effect<*>, F, A> nonSuspendedCanBindImmediateException(
-    G: Gen<F>,
+  private suspend fun <Eff : Effect<*>, F, A> nonSuspendedCanBindImmediateException(
+    G: Arb<F>,
     fxBlock: EagerFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    forAll(G, Gen.throwable()) { f, exception ->
+    checkAll(G, Arb.throwable()) { f, exception ->
       shouldThrow<Throwable> {
         fxBlock {
           val res = invoke(f)
@@ -76,74 +95,74 @@ object FxLaws {
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindImmediateValues(
-    G: Gen<F>,
+    G: Arb<F>,
     eq: (F, F) -> Boolean,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    G.random()
+    G.samples()
       .take(1001)
       .forEach { f ->
         fxBlock {
-          val res = invoke(f)
+          val res = invoke(f.value)
           res
-        }.equalUnderTheLaw(f, eq)
+        }.equalUnderTheLaw(f.value, eq)
       }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindSuspendedValues(
-    G: Gen<F>,
+    G: Arb<F>,
     eq: (F, F) -> Boolean,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    G.random()
+    G.samples()
       .take(10)
       .forEach { f ->
         fxBlock {
-          val res = invoke(f.suspend())
+          val res = invoke(f.value.suspend())
           res
-        }.equalUnderTheLaw(f, eq)
+        }.equalUnderTheLaw(f.value, eq)
       }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindImmediateExceptions(
-    G: Gen<F>,
+    G: Arb<F>,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    Gen.bind(G, Gen.throwable(), ::Pair)
-      .random()
+    Arb.bind(G, Arb.throwable(), ::Pair)
+      .samples()
       .take(1001)
-      .forEach { (f, exception) ->
+      .forEach { (f, _) ->
         shouldThrow<Throwable> {
           fxBlock {
-            val res = invoke(f)
-            throw exception
+            val res = invoke(f.first)
+            throw f.second
             res
           }
-          fail("It should never reach here. fx should've thrown $exception")
-        } shouldBe exception
+          fail("It should never reach here. fx should've thrown ${f.second}")
+        } shouldBe f.second
       }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindSuspendedExceptions(
-    G: Gen<F>,
+    G: Arb<F>,
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    Gen.bind(G, Gen.throwable(), ::Pair)
-      .random()
+    Arb.bind(G, Arb.throwable(), ::Pair)
+      .samples()
       .take(10)
-      .forEach { (f, exception) ->
+      .forEach { (f, _) ->
         shouldThrow<Throwable> {
           fxBlock {
-            val res = invoke(f)
-            exception.suspend()
+            val res = invoke(f.first)
+            f.second.suspend()
             res
           }
-          fail("It should never reach here. fx should've thrown $exception")
-        } shouldBe exception
+          fail("It should never reach here. fx should've thrown ${f.second}")
+        } shouldBe f.second
       }
   }
 }

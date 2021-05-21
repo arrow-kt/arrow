@@ -5,27 +5,31 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
 import arrow.optics.Lens
 import arrow.optics.test.laws.LensLaws
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.string
 
 class NonEmptyListTest : UnitSpec() {
 
   init {
 
     testLaws(
+      "Lens Nel head - ",
       LensLaws.laws(
         lens = Lens.nonEmptyListHead(),
-        aGen = Gen.nonEmptyList(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Arb.nonEmptyList(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
+      "Lens Nel tail - ",
       LensLaws.laws(
         lens = Lens.nonEmptyListTail(),
-        aGen = Gen.nonEmptyList(Gen.string()),
-        bGen = Gen.list(Gen.string()),
-        funcGen = Gen.functionAToB(Gen.list(Gen.string())),
+        aGen = Arb.nonEmptyList(Arb.string()),
+        bGen = Arb.list(Arb.string()),
+        funcGen = Arb.functionAToB(Arb.list(Arb.string())),
       )
     )
   }

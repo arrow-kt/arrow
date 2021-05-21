@@ -8,10 +8,13 @@ import arrow.core.test.generators.option
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.kotest.property.checkAll
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
 
 class OptionTest : UnitSpec() {
 
@@ -21,18 +24,18 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonoidLaws.laws(Monoid.option(Monoid.int()), Gen.option(Gen.int())),
+      MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
       FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
-        Gen.string().map(Option.Companion::invoke),
-        Gen.option(Gen.string()),
+        Arb.string().map(Option.Companion::invoke),
+        Arb.option(Arb.string()),
         Option<String>::equals,
         option::invoke
       ) {
         it.bind()
       },
       FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(
-        Gen.string().map(Option.Companion::invoke),
-        Gen.option(Gen.string()),
+        Arb.string().map(Option.Companion::invoke),
+        Arb.option(Arb.string()),
         Option<String>::equals,
         option::eager
       ) {
@@ -55,10 +58,10 @@ class OptionTest : UnitSpec() {
     }
 
     "fromNullable should work for both null and non-null values of nullable types" {
-      forAll { a: Int? ->
+      checkAll { a: Int? ->
         // This seems to be generating only non-null values, so it is complemented by the next test
         val o: Option<Int> = Option.fromNullable(a)
-        if (a == null) o == None else o == Some(a)
+        if (a == null) o shouldBe None else o shouldBe Some(a)
       }
     }
 
@@ -83,11 +86,11 @@ class OptionTest : UnitSpec() {
     }
 
     "zip" {
-      forAll { a: Int ->
+      checkAll { a: Int ->
         val op: Option<Int> = a.some()
-        some.zip(op) { a, b -> a + b } == Some("kotlin$a") &&
-          none.zip(op) { a, b -> a + b } == None &&
-          some.zip(op) == Some(Pair("kotlin", a))
+        some.zip(op) { a, b -> a + b } shouldBe Some("kotlin$a")
+        none.zip(op) { a, b -> a + b } shouldBe None
+        some.zip(op) shouldBe Some(Pair("kotlin", a))
       }
     }
 
@@ -199,8 +202,8 @@ class OptionTest : UnitSpec() {
     }
 
     "sequence should be consistent with traverse" {
-      forAll(Gen.option(Gen.int())) { option ->
-        option.map { listOf(it) }.sequence() == option.traverse { listOf(it) }
+      checkAll(Arb.option(Arb.int())) { option ->
+        option.map { listOf(it) }.sequence() shouldBe option.traverse { listOf(it) }
       }
     }
 
@@ -212,8 +215,8 @@ class OptionTest : UnitSpec() {
     }
 
     "sequenceEither should be consistent with traverseEither" {
-      forAll(Gen.option(Gen.int())) { option ->
-        option.map { it.right() }.sequenceEither() == option.traverseEither { it.right() }
+      checkAll(Arb.option(Arb.int())) { option ->
+        option.map { it.right() }.sequenceEither() shouldBe option.traverseEither { it.right() }
       }
     }
 
@@ -225,8 +228,8 @@ class OptionTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      forAll(Gen.option(Gen.int())) { option ->
-        option.map { it.valid() }.sequenceValidated() == option.traverseValidated { it.valid() }
+      checkAll(Arb.option(Arb.int())) { option ->
+        option.map { it.valid() }.sequenceValidated() shouldBe option.traverseValidated { it.valid() }
       }
     }
   }
