@@ -6,7 +6,7 @@ import arrow.core.Either.Left
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
