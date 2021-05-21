@@ -6,6 +6,8 @@ import arrow.optics.Optional
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
 import io.kotest.property.Arb
+import io.kotest.property.PropertyContext
+import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
 object OptionalLaws {
@@ -36,9 +38,13 @@ object OptionalLaws {
     funcGen: Arb<(B) -> B>,
     eqa: (A, A) -> Boolean = { a, b -> a == b },
     eqb: (B?, B?) -> Boolean = { a, b -> a == b }
-  ): List<Law> = laws(Gen.constant(optional), aGen, bGen, funcGen, eqa, eqb)
+  ): List<Law> = laws(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
 
-  fun <A, B> getOptionSet(optionalGen: Arb<Optional<A, B>>, aGen: Arb<A>, eq: (A, A) -> Boolean): Unit =
+  suspend fun <A, B> getOptionSet(
+    optionalGen: Arb<Optional<A, B>>,
+    aGen: Arb<A>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
     checkAll(optionalGen, aGen) { optional, a ->
       optional.run {
         getOrModify(a).fold(::identity) { set(a, it) }
@@ -46,12 +52,12 @@ object OptionalLaws {
       }
     }
 
-  fun <A, B> setGetOption(
+  suspend fun <A, B> setGetOption(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
     eq: (B?, B?) -> Boolean
-  ): Unit =
+  ): PropertyContext =
     checkAll(optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         getOrNull(set(a, b))
@@ -59,7 +65,12 @@ object OptionalLaws {
       }
     }
 
-  fun <A, B> setIdempotent(optionalGen: Arb<Optional<A, B>>, aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): Unit =
+  suspend fun <A, B> setIdempotent(
+    optionalGen: Arb<Optional<A, B>>,
+    aGen: Arb<A>,
+    bGen: Arb<B>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
     checkAll(optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         set(set(a, b), b)
@@ -67,7 +78,11 @@ object OptionalLaws {
       }
     }
 
-  fun <A, B> modifyIdentity(optionalGen: Arb<Optional<A, B>>, aGen: Arb<A>, eq: (A, A) -> Boolean): Unit =
+  suspend fun <A, B> modifyIdentity(
+    optionalGen: Arb<Optional<A, B>>,
+    aGen: Arb<A>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
     checkAll(optionalGen, aGen) { optional, a ->
       optional.run {
         modify(a, ::identity)
@@ -75,7 +90,12 @@ object OptionalLaws {
       }
     }
 
-  fun <A, B> composeModify(optionalGen: Arb<Optional<A, B>>, aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): Unit =
+  suspend fun <A, B> composeModify(
+    optionalGen: Arb<Optional<A, B>>,
+    aGen: Arb<A>,
+    funcGen: Arb<(B) -> B>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
     checkAll(optionalGen, aGen, funcGen, funcGen) { optional, a, f, g ->
       optional.run {
         modify(modify(a, f), g)
@@ -83,7 +103,12 @@ object OptionalLaws {
       }
     }
 
-  fun <A, B> consistentSetModify(optionalGen: Arb<Optional<A, B>>, aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): Unit =
+  suspend fun <A, B> consistentSetModify(
+    optionalGen: Arb<Optional<A, B>>,
+    aGen: Arb<A>,
+    bGen: Arb<B>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
     checkAll(optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         set(a, b)
