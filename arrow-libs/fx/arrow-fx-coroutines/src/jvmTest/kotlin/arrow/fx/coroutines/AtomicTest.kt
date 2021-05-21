@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.runBlocking
 
 class AtomicTest : ArrowFxSpec(
   spec = {
@@ -66,7 +67,7 @@ class AtomicTest : ArrowFxSpec(
       checkAll(Arb.int()) { x ->
         val ref = Atomic(x)
         ref.tryUpdate {
-          Platform.unsafeRunSync { ref.update(Int::inc) }
+          runBlocking { ref.update(Int::inc) }
           it + 1
         } shouldBe false
       }

@@ -5,6 +5,7 @@ import arrow.core.identity
 import arrow.core.merge
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
@@ -26,15 +27,15 @@ class RaceNTest : ArrowFxSpec(
       checkAll(Arb.int(1..2)) { choose ->
         single.zip(racer).use { (single, raceCtx) ->
           withContext(single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             val racedOn = when (choose) {
               1 -> raceN(raceCtx, { threadName() }, { never<Nothing>() }).swap().orNull()
               else -> raceN(raceCtx, { never<Nothing>() }, { threadName() }).orNull()
             }
 
-            racedOn shouldBe racerName
-            threadName() shouldBe singleThreadName
+            racedOn shouldStartWith racerName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -47,7 +48,7 @@ class RaceNTest : ArrowFxSpec(
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
         single.zip(racer).use { (single, raceCtx) ->
           withContext(single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             Either.catch {
               when (choose) {
@@ -56,7 +57,7 @@ class RaceNTest : ArrowFxSpec(
               }
             } should leftException(e)
 
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -77,7 +78,7 @@ class RaceNTest : ArrowFxSpec(
     "first racer out of 2 always wins on a single thread" {
       single.use { ctx ->
         raceN(ctx, threadName, threadName)
-      } shouldBe Either.Left("single")
+      }.swap().orNull() shouldStartWith "single"
     }
 
     "Cancelling race 2 cancels all participants" {
@@ -139,7 +140,7 @@ class RaceNTest : ArrowFxSpec(
       checkAll(Arb.int(1..3)) { choose ->
         single.zip(racer).use { (single, raceCtx) ->
           withContext(single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             val racedOn = when (choose) {
               1 ->
@@ -153,8 +154,8 @@ class RaceNTest : ArrowFxSpec(
                   .fold({ null }, { null }, ::identity)
             }
 
-            racedOn shouldBe racerName
-            threadName() shouldBe singleThreadName
+            racedOn shouldStartWith racerName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -167,7 +168,7 @@ class RaceNTest : ArrowFxSpec(
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
         single.zip(racer).use { (single, raceCtx) ->
           withContext(single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             Either.catch {
               when (choose) {
@@ -183,7 +184,7 @@ class RaceNTest : ArrowFxSpec(
               }
             } should leftException(e)
 
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -208,9 +209,9 @@ class RaceNTest : ArrowFxSpec(
     }
 
     "first racer out of 3 always wins on a single thread" {
-      single.use { ctx ->
+      (single.use { ctx ->
         raceN(ctx, threadName, threadName, threadName)
-      } shouldBe Race3.First("single")
+      } as? Race3.First)?.winner shouldStartWith "single"
     }
 
     "Cancelling race 3 cancels all participants" {

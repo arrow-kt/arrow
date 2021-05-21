@@ -7,6 +7,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -18,7 +19,7 @@ class SuspendRunners : ArrowFxSpec(
       var run = false
       val fa = suspend { run = true }
       run shouldBe false
-      Platform.unsafeRunSync(fa)
+      runBlocking { fa() }
       run shouldBe true
     }
 
@@ -26,8 +27,8 @@ class SuspendRunners : ArrowFxSpec(
       val sideEffect = SideEffect()
       val fa = suspend { sideEffect.increment(); 1 }
 
-      Platform.unsafeRunSync(fa)
-      Platform.unsafeRunSync(fa)
+      runBlocking { fa() }
+      runBlocking { fa() }
 
       sideEffect.counter shouldBe 2
     }
@@ -36,7 +37,7 @@ class SuspendRunners : ArrowFxSpec(
       checkAll(Arb.throwable()) { e ->
         val task = suspend { throw e }
         shouldThrow<Throwable> {
-          Platform.unsafeRunSync { task.invoke() }
+          runBlocking { task.invoke() }
         } shouldBe e
       }
     }
@@ -44,20 +45,20 @@ class SuspendRunners : ArrowFxSpec(
     "should yield immediate successful invoke value" {
       checkAll(Arb.int()) { i ->
         val task = suspend { i }
-        val run = Platform.unsafeRunSync { task.invoke() }
+        val run = runBlocking { task.invoke() }
         run shouldBe i
       }
     }
 
     "should return a null value from unsafeRunSync" {
-      val run = Platform.unsafeRunSync { suspend { null }() }
+      val run = runBlocking { suspend { null }() }
       run shouldBe null
     }
 
     "suspend with unsafeRunSync" {
       checkAll(Arb.int().map { suspend { it } }) { i ->
         val map = suspend { i() + 1 }
-        Platform.unsafeRunSync(map) shouldBe (i.invoke() + 1)
+        runBlocking { map() } shouldBe (i.invoke() + 1)
       }
     }
 
@@ -113,7 +114,7 @@ class SuspendRunners : ArrowFxSpec(
       suspend fun fa(): Int =
         (0 until (max * 10000)).fold(0) { acc, _ -> addOne(acc) }
 
-      Platform.unsafeRunSync { fa() } shouldBe (max * 10000)
+      runBlocking { fa() } shouldBe (max * 10000)
     }
   }
 )

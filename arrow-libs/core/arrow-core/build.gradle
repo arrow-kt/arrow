@@ -9,16 +9,20 @@ apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
-apply from: "$ANIMALSNIFFER"
+apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
     sourceSets {
+        commonMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                api project(":arrow-continuations")
+                api project(":arrow-annotations")
+            }
+        }
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-                compileOnly "org.codehaus.mojo:animal-sniffer-annotations:1.19"
-                api project(":arrow-continuations")
-                api project(":arrow-annotations")
             }
         }
 

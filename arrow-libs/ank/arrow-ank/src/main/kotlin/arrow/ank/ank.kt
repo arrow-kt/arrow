@@ -2,10 +2,7 @@ package arrow.ank
 
 import arrow.core.Validated
 import arrow.core.ValidatedNel
-import arrow.core.invalidNel
 import arrow.core.sequenceValidated
-import arrow.core.validNel
-import arrow.fx.coroutines.nonFatalOrThrow
 import java.nio.file.Path
 import kotlin.math.ln
 import kotlin.math.pow
@@ -20,13 +17,6 @@ fun Long.humanBytes(): String {
   val pre = ("KMGTPE")[exp - 1] + "i"
   return String.format("%.1f %sB", this / unit.toDouble().pow(exp.toDouble()), pre)
 }
-
-suspend fun <A> Validated.Companion.catchNel(f: suspend () -> A): ValidatedNel<Throwable, A> =
-  try {
-    f().validNel()
-  } catch (e: Throwable) {
-    e.nonFatalOrThrow().invalidNel()
-  }
 
 suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Unit = with(ankOps) {
   printConsole(colored(ANSI_PURPLE, AnkHeader))
