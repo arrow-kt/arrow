@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+{% assign cat_id = "quickstart" %}
+{% assign cat_id_cap = cat_id | capitalize %}
+{% include _head-docs.html %}
+
+<body id="doc-body">
+  <div id="wrapper">
+    {% include _sidebar-wrapper.html %}
+    <div class="doc-content-core">
+      {% include _doc-wrapper.html %}
+    </div>
+  </div>
+  {% include _github-modal.html %}
+  {% include _slack-link.html %}
+  {% include _js-bottom-docs.html %}
+</body>
+
+</html>

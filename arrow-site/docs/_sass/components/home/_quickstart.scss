@@ -83,4 +83,9 @@ h1.cursor::after {
       }
     }
   }
+
+  h1.cursor::after {
+    height: 4px;
+    width: 32px;
+  }
 }

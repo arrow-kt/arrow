@@ -1,0 +1,22 @@
+options:
+  - title: Introduction
+    url: /introduction/
+
+  - title: Media
+    url: https://media.arrow-kt.io/tags/core/
+
+  - title: Training
+
+    nested_options:
+
+      - title: 47 Degrees
+        url: https://www.47deg.com/
+
+      - title: Instill
+        url: https://instil.co/
+
+  - title: Code of conduct
+    url: /codeofconduct/
+
+  - title: License
+    url: https://github.com/arrow-kt/arrow/blob/main/LICENSE

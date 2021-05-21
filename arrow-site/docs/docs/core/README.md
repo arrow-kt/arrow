@@ -1,7 +1,7 @@
 ---
-layout: quickstart
-title: Quick Start
-permalink: /quickstart/
+layout: docs-core
+title: Core
+permalink: /core/
 ---
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
