@@ -1,13 +1,14 @@
 package arrow.core.test.laws
 
 import arrow.typeclasses.Semiring
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.PropertyContext
 
 object SemiringLaws {
 
-  fun <F> laws(SG: Semiring<F>, GEN: Gen<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
+  fun <F> laws(SG: Semiring<F>, GEN: Arb<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
     listOf(
       Law("Semiring: Additive commutativity") { SG.semiringAdditiveCommutativity(GEN, eq) },
       Law("Semiring: Additive left identity") { SG.semiringAdditiveLeftIdentity(GEN, eq) },
@@ -34,117 +35,117 @@ object SemiringLaws {
     )
 
   // a + b = b + a
-  fun <F> Semiring<F>.semiringAdditiveCommutativity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN) { a, b ->
+  suspend fun <F> Semiring<F>.semiringAdditiveCommutativity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN) { a, b ->
       a.combine(b).equalUnderTheLaw(b.combine(a), eq)
     }
 
   // 0 + a = a
-  fun <F> Semiring<F>.semiringAdditiveLeftIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringAdditiveLeftIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       (zero().combine(A)).equalUnderTheLaw(A, eq)
     }
 
   // a + 0 = a
-  fun <F> Semiring<F>.semiringAdditiveRightIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringAdditiveRightIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       A.combine(zero()).equalUnderTheLaw(A, eq)
     }
 
   // a + (b + c) = (a + b) + c
-  fun <F> Semiring<F>.semiringAdditiveAssociativity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN, GEN) { A, B, C ->
+  suspend fun <F> Semiring<F>.semiringAdditiveAssociativity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN, GEN) { A, B, C ->
       A.combine(B.combine(C)).equalUnderTheLaw((A.combine(B)).combine(C), eq)
     }
 
   // a · b = b · a
-  fun <F> Semiring<F>.semiringMultiplicativeCommutativity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN) { a, b ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeCommutativity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN) { a, b ->
       a.combineMultiplicate(b).equalUnderTheLaw(b.combineMultiplicate(a), eq)
     }
 
   // 1 · a = a
-  fun <F> Semiring<F>.semiringMultiplicativeLeftIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeLeftIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       (one().combineMultiplicate(A)).equalUnderTheLaw(A, eq)
     }
 
   // a · 1 = a
-  fun <F> Semiring<F>.semiringMultiplicativeRightIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeRightIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       A.combineMultiplicate(one()).equalUnderTheLaw(A, eq)
     }
 
   // a · (b · c) = (a · b) · c
-  fun <F> Semiring<F>.semiringMultiplicativeAssociativity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN, GEN) { A, B, C ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeAssociativity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN, GEN) { A, B, C ->
       A.combineMultiplicate(B.combineMultiplicate(C)).equalUnderTheLaw((B.combineMultiplicate(A)).combineMultiplicate(C), eq)
     }
 
   // (a + b) · c = a · c + b · c
-  fun <F> Semiring<F>.semiringRightDistributivity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN, GEN) { A, B, C ->
+  suspend fun <F> Semiring<F>.semiringRightDistributivity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN, GEN) { A, B, C ->
       (A.combine(B)).combineMultiplicate(C).equalUnderTheLaw((A.combineMultiplicate(C)).combine(B.combineMultiplicate(C)), eq)
     }
 
   // a · (b + c) = a · b + a · c
-  fun <F> Semiring<F>.semiringLeftDistributivity(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN, GEN, GEN) { A, B, C ->
+  suspend fun <F> Semiring<F>.semiringLeftDistributivity(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN, GEN, GEN) { A, B, C ->
       A.combineMultiplicate(B.combine(C)).equalUnderTheLaw((A.combineMultiplicate(B)).combine(A.combineMultiplicate(C)), eq)
     }
 
   // 0 · a = 0
-  fun <F> Semiring<F>.semiringMultiplicativeLeftAbsorption(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeLeftAbsorption(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       (zero().combineMultiplicate(A)).equalUnderTheLaw(zero(), eq)
     }
 
   // a · 0 = 0
-  fun <F> Semiring<F>.semiringMultiplicativeRightAbsorption(GEN: Gen<F>, eq: (F, F) -> Boolean) =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.semiringMultiplicativeRightAbsorption(GEN: Arb<F>, eq: (F, F) -> Boolean) =
+    checkAll(GEN) { A ->
       A.combineMultiplicate(zero()).equalUnderTheLaw(zero(), eq)
     }
 
-  fun <F> Semiring<F>.timesIsDerived(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN, GEN) { A, B ->
+  suspend fun <F> Semiring<F>.timesIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN, GEN) { A, B ->
       A.times(B).equalUnderTheLaw(A.combineMultiplicate(B), eq)
     }
 
-  fun <F> Semiring<F>.plusIsDerived(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN, GEN) { A, B ->
+  suspend fun <F> Semiring<F>.plusIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN, GEN) { A, B ->
       A.plus(B).equalUnderTheLaw(A.combine(B), eq)
     }
 
-  fun <F> Semiring<F>.maybeCombineAdditionIsDerived(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN, GEN) { A, B ->
+  suspend fun <F> Semiring<F>.maybeCombineAdditionIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN, GEN) { A, B ->
       A.maybeCombineAddition(B).equalUnderTheLaw(A.combine(B), eq)
     }
 
-  fun <F> Semiring<F>.maybeCombineAdditionLeftNull(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.maybeCombineAdditionLeftNull(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { A ->
       null.maybeCombineAddition(A).equalUnderTheLaw(zero(), eq)
     }
 
-  fun <F> Semiring<F>.maybeCombineAdditionRightNull(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.maybeCombineAdditionRightNull(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { A ->
       A.maybeCombineAddition(null).equalUnderTheLaw(A, eq)
     }
 
   fun <F> Semiring<F>.maybeCombineAdditionBothNull(eq: (F, F) -> Boolean): Unit =
     null.maybeCombineAddition(null).equalUnderTheLaw(zero(), eq) shouldBe true
 
-  fun <F> Semiring<F>.maybeCombineMultiplicateIsDerived(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN, GEN) { A, B ->
+  suspend fun <F> Semiring<F>.maybeCombineMultiplicateIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN, GEN) { A, B ->
       A.maybeCombineMultiplicate(B).equalUnderTheLaw(A.combineMultiplicate(B), eq)
     }
 
-  fun <F> Semiring<F>.maybeCombineMultiplicateLeftNull(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.maybeCombineMultiplicateLeftNull(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { A ->
       null.maybeCombineMultiplicate(A).equalUnderTheLaw(one(), eq)
     }
 
-  fun <F> Semiring<F>.maybeCombineMultiplicateRightNull(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { A ->
+  suspend fun <F> Semiring<F>.maybeCombineMultiplicateRightNull(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { A ->
       A.maybeCombineMultiplicate(null).equalUnderTheLaw(A, eq)
     }
 

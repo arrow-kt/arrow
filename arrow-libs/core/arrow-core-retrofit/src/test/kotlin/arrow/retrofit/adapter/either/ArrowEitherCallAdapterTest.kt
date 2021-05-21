@@ -6,9 +6,7 @@ import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import arrow.retrofit.adapter.retrofit.SuspedApiClientTest
-import io.kotlintest.Spec
-import io.kotlintest.shouldBe
-import kotlinx.coroutines.runBlocking
+import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
@@ -28,22 +26,15 @@ class ArrowEitherCallAdapterTest : UnitSpec() {
       .create(SuspedApiClientTest::class.java)
   }
 
-  override fun beforeSpec(spec: Spec) {
-    super.beforeSpec(spec)
-    server.start()
-  }
-
-  override fun afterSpec(spec: Spec) {
-    server.shutdown()
-    super.afterSpec(spec)
-  }
-
   init {
+
+    beforeSpec { server.start() }
+    afterSpec { server.shutdown() }
 
     "should return ResponseMock for 200 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
-      val body = runBlocking { service.getEither() }
+      val body = service.getEither()
 
       body shouldBe ResponseMock("Arrow rocks").right()
     }
@@ -51,7 +42,7 @@ class ArrowEitherCallAdapterTest : UnitSpec() {
     "should return ErrorMock for 400 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"errorCode":666}""").setResponseCode(400))
 
-      val body = runBlocking { service.getEither() }
+      val body = service.getEither()
 
       body shouldBe ErrorMock(666).left()
     }
@@ -59,7 +50,7 @@ class ArrowEitherCallAdapterTest : UnitSpec() {
     "should throw for 200 with invalid JSON" {
       server.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
-      val body = kotlin.runCatching { service.getEither() }
+      val body = runCatching { service.getEither() }
 
       body.isFailure shouldBe true
     }
@@ -67,7 +58,7 @@ class ArrowEitherCallAdapterTest : UnitSpec() {
     "should throw for 400 and invalid JSON" {
       server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
-      val body = kotlin.runCatching { service.getEither() }
+      val body = runCatching { service.getEither() }
 
       body.isFailure shouldBe true
     }

@@ -1,13 +1,15 @@
 package arrow.core.test.laws
 
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.property.PropertyContext
+import io.kotest.property.arbitrary.list
 
 object MonoidLaws {
 
-  fun <F> laws(M: Monoid<F>, GEN: Gen<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
+  fun <F> laws(M: Monoid<F>, GEN: Arb<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
     SemigroupLaws.laws(M, GEN, eq) +
       listOf(
         Law("Monoid Laws: Left identity") { M.monoidLeftIdentity(GEN, eq) },
@@ -16,18 +18,18 @@ object MonoidLaws {
         Law("Monoid Laws: combineAll of empty list is empty") { M.combineAllOfEmptyIsEmpty(eq) }
       )
 
-  fun <F> Monoid<F>.monoidLeftIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { a ->
+  suspend fun <F> Monoid<F>.monoidLeftIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { a ->
       (empty().combine(a)).equalUnderTheLaw(a, eq)
     }
 
-  fun <F> Monoid<F>.monoidRightIdentity(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(GEN) { a ->
+  suspend fun <F> Monoid<F>.monoidRightIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(GEN) { a ->
       a.combine(empty()).equalUnderTheLaw(a, eq)
     }
 
-  fun <F> Monoid<F>.combineAllIsDerived(GEN: Gen<F>, eq: (F, F) -> Boolean): Unit =
-    forAll(5, Gen.list(GEN)) { list ->
+  suspend fun <F> Monoid<F>.combineAllIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+    checkAll(5, Arb.list(GEN)) { list ->
       list.combineAll().equalUnderTheLaw(if (list.isEmpty()) empty() else list.reduce { acc, f -> acc.combine(f) }, eq)
     }
 
