@@ -17,26 +17,26 @@ class ListTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optional = Optional.listHead(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       OptionalLaws.laws(
         optional = Optional.listTail(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Arb.list(Gen.int()),
-        funcGen = Gen.functionAToB(Arb.list(Gen.int())),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.list(Arb.int()),
+        funcGen = Arb.functionAToB(Arb.list(Arb.int())),
       )
     )
 
     testLaws(IsoLaws.laws(
       iso = Iso.listToOptionNel(),
-      aGen = Arb.list(Gen.int()),
-      bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
-      funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
+      aGen = Arb.list(Arb.int()),
+      bGen = Gen.option(Gen.nonEmptyList(Arb.int())),
+      funcGen = Arb.functionAToB(Gen.option(Gen.nonEmptyList(Arb.int()))),
     ))
   }
 }

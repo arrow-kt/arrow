@@ -14,7 +14,7 @@ class SetterTest : UnitSpec() {
 
   init {
     "update_ f should be as modify f within State and returning Unit" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { generatedToken, f ->
         tokenSetter.update_(f).run(generatedToken) ==
           State { token: Token ->
             tokenSetter.modify(token, f) toT Unit
@@ -23,7 +23,7 @@ class SetterTest : UnitSpec() {
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
-      checkAll(genToken, Gen.string()) { generatedToken, string ->
+      checkAll(genToken, Arb.string()) { generatedToken, string ->
         tokenSetter.assign_(string).run(generatedToken) ==
           State { token: Token ->
             tokenSetter.set(token, string) toT Unit

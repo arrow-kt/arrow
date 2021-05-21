@@ -11,10 +11,10 @@ class IndexInstanceTest : UnitSpec() {
   init {
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { Index.list<String>().index(it) },
-        aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string())
+        optionalGen = Arb.int().map { Index.list<String>().index(it) },
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
       )
     )
   }

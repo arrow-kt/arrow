@@ -17,9 +17,9 @@ class SequenceInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.sequence(),
-        aGen = Gen.sequence(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.sequence(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
         eq = { a, b -> a.toList() == b.toList() }
       )
     )
@@ -27,19 +27,19 @@ class SequenceInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.sequence<String>().filter { true },
-        aGen = Gen.sequence(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.sequence(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
         eq = { a, b -> a.toList() == b.toList() }
       )
     )
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { Index.sequence<String>().index(it) },
-        aGen = Gen.sequence(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        optionalGen = Arb.int().map { Index.sequence<String>().index(it) },
+        aGen = Gen.sequence(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
         eqa = { a, b -> a.toList() == b.toList() }
       )
     )

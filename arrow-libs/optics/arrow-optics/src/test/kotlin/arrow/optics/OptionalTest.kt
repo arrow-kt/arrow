@@ -20,51 +20,51 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead(),
-      aGen = Arb.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
+      aGen = Arb.list(Arb.int()),
+      bGen = Arb.int(),
+      funcGen = Arb.functionAToB(Arb.int()),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.id(),
-      aGen = Gen.int(),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
+      aGen = Arb.int(),
+      bGen = Arb.int(),
+      funcGen = Arb.functionAToB(Arb.int()),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().first(),
-      aGen = Gen.pair(Arb.list(Gen.int()), Gen.bool()),
-      bGen = Gen.pair(Gen.int(), Gen.bool()),
-      funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
+      aGen = Gen.pair(Arb.list(Arb.int()), Gen.bool()),
+      bGen = Gen.pair(Arb.int(), Gen.bool()),
+      funcGen = Arb.functionAToB(Gen.pair(Arb.int(), Gen.bool())),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().first(),
-      aGen = Gen.pair(Arb.list(Gen.int()), Gen.bool()),
-      bGen = Gen.pair(Gen.int(), Gen.bool()),
-      funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.bool())),
+      aGen = Gen.pair(Arb.list(Arb.int()), Gen.bool()),
+      bGen = Gen.pair(Arb.int(), Gen.bool()),
+      funcGen = Arb.functionAToB(Gen.pair(Arb.int(), Gen.bool())),
     ))
 
     testLaws(OptionalLaws.laws(
       optional = Optional.listHead<Int>().second(),
-      aGen = Gen.pair(Gen.bool(), Arb.list(Gen.int())),
-      bGen = Gen.pair(Gen.bool(), Gen.int()),
-      funcGen = Gen.functionAToB(Gen.pair(Gen.bool(), Gen.int())),
+      aGen = Gen.pair(Gen.bool(), Arb.list(Arb.int())),
+      bGen = Gen.pair(Gen.bool(), Arb.int()),
+      funcGen = Arb.functionAToB(Gen.pair(Gen.bool(), Arb.int())),
     ))
 
     testLaws(TraversalLaws.laws(
       traversal = Optional.listHead<Int>(),
-      aGen = Arb.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
+      aGen = Arb.list(Arb.int()),
+      bGen = Arb.int(),
+      funcGen = Arb.functionAToB(Arb.int()),
     ))
 
     testLaws(SetterLaws.laws(
       setter = Optional.listHead<Int>(),
-      aGen = Arb.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
+      aGen = Arb.list(Arb.int()),
+      bGen = Arb.int(),
+      funcGen = Arb.functionAToB(Arb.int()),
     ))
 
     "asSetter should set absent optional" {
@@ -141,38 +141,38 @@ class OptionalTest : UnitSpec() {
     }
 
     "Checking if there is no target" {
-      checkAll(Arb.list(Gen.int())) { list ->
+      checkAll(Arb.list(Arb.int())) { list ->
         Optional.listHead<Int>().isNotEmpty(list) == list.isNotEmpty()
       }
     }
 
     "Lift should be consistent with modify" {
-      checkAll(Arb.list(Gen.int())) { list ->
+      checkAll(Arb.list(Arb.int())) { list ->
         val f = { i: Int -> i + 5 }
         Optional.listHead<Int>().lift(f)(list) == Optional.listHead<Int>().modify(list, f)
       }
     }
 
     "Checking if a target exists" {
-      checkAll(Arb.list(Gen.int())) { list ->
+      checkAll(Arb.list(Arb.int())) { list ->
         Optional.listHead<Int>().isEmpty(list) == list.isEmpty()
       }
     }
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
-      checkAll(Arb.list(Gen.int()), Gen.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int()), Gen.bool()) { list, predicate ->
         Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true } ?: false == (predicate && list.isNotEmpty())
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      checkAll(Arb.list(Gen.int()), Gen.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int()), Gen.bool()) { list, predicate ->
         Optional.listHead<Int>().exists(list) { predicate } == (predicate && list.isNotEmpty())
       }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      checkAll(Arb.list(Gen.int()), Gen.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int()), Gen.bool()) { list, predicate ->
         Optional.listHead<Int>().all(list) { predicate } == if (list.isEmpty()) true else predicate
       }
     }
@@ -180,7 +180,7 @@ class OptionalTest : UnitSpec() {
     "Joining two optionals together with same target should yield same result" {
       val joinedOptional = Optional.listHead<Int>().choice(defaultHead)
 
-      checkAll(Gen.int()) { int ->
+      checkAll(Arb.int()) { int ->
         joinedOptional.getOrNull(Left(listOf(int))) == joinedOptional.getOrNull(Right(int))
       }
     }

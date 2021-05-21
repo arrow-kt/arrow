@@ -13,7 +13,7 @@ class StringTest : UnitSpec() {
     testLaws(
       IsoLaws.laws(
         iso = Iso.stringToList(),
-        aGen = Gen.string(),
+        aGen = Arb.string(),
         bGen = Arb.list(Gen.char()),
         funcGen = Arb.list(Gen.char()).map { list -> { chars: List<Char> -> list + chars } },
       )

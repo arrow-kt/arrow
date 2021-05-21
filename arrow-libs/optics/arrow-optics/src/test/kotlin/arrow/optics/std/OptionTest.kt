@@ -16,30 +16,30 @@ class OptionTest : UnitSpec() {
 
     testLaws(PrismLaws.laws(
       prism = Prism.some(),
-      aGen = Gen.option(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
+      aGen = Gen.option(Arb.int()),
+      bGen = Arb.int(),
+      funcGen = Arb.functionAToB(Arb.int()),
     ))
 
     testLaws(PrismLaws.laws(
       prism = Prism.none(),
-      aGen = Gen.option(Gen.int()),
+      aGen = Gen.option(Arb.int()),
       bGen = Gen.create { Unit },
-      funcGen = Gen.functionAToB(Gen.create { Unit }),
+      funcGen = Arb.functionAToB(Gen.create { Unit }),
     ))
 
     testLaws(IsoLaws.laws(
       iso = Iso.optionToNullable<Int>().reverse(),
-      aGen = Gen.int().orNull(),
-      bGen = Gen.option(Gen.int()),
-      funcGen = Gen.functionAToB(Gen.option(Gen.int()))
+      aGen = Arb.int().orNull(),
+      bGen = Gen.option(Arb.int()),
+      funcGen = Arb.functionAToB(Gen.option(Arb.int()))
     ))
 
     testLaws(IsoLaws.laws(
       iso = Iso.optionToEither(),
-      aGen = Gen.option(Gen.int()),
-      bGen = Gen.either(Gen.create { Unit }, Gen.int()),
-      funcGen = Gen.functionAToB(Gen.either(Gen.create { Unit }, Gen.int())),
+      aGen = Gen.option(Arb.int()),
+      bGen = Gen.either(Gen.create { Unit }, Arb.int()),
+      funcGen = Arb.functionAToB(Gen.either(Gen.create { Unit }, Arb.int())),
       )
     )
   }

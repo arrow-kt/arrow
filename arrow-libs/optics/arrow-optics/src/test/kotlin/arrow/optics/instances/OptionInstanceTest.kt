@@ -14,9 +14,9 @@ class OptionInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.option(),
-        aGen = Gen.option(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.option(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
   }

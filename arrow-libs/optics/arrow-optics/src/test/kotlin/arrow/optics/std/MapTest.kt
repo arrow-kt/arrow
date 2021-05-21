@@ -11,9 +11,9 @@ class MapTest : UnitSpec() {
   init {
     testLaws(IsoLaws.laws(
       iso = Iso.mapToSet(),
-      aGen = Gen.map(Gen.string(), Gen.create { Unit }),
-      bGen = Gen.set(Gen.string()),
-      funcGen = Gen.functionAToB(Gen.set(Gen.string())),
+      aGen = Gen.map(Arb.string(), Gen.create { Unit }),
+      bGen = Gen.set(Arb.string()),
+      funcGen = Arb.functionAToB(Gen.set(Arb.string())),
     ))
   }
 }

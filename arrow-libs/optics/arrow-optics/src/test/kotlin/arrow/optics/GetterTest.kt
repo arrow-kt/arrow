@@ -113,14 +113,14 @@ class GetterTest : UnitSpec() {
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenGetter.first<Int>()
-      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Arb.int()) { token: Token, int: Int ->
         first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val first = tokenGetter.second<Int>()
-      checkAll(Gen.int(), genToken) { int: Int, token: Token ->
+      checkAll(Arb.int(), genToken) { int: Int, token: Token ->
         first.get(int to token) == int to token.value
       }
     }

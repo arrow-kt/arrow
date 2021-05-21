@@ -12,10 +12,10 @@ sealed class SumType {
   data class B(val int: Int) : SumType()
 }
 
-val genSumTypeA: Arb<SumType.A> = Gen.string().map { SumType.A(it) }
+val genSumTypeA: Arb<SumType.A> = Arb.string().map { SumType.A(it) }
 
 val genSum: Arb<SumType> =
-  Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
+  Gen.oneOf<SumType>(Arb.string().map { SumType.A(it) }, Arb.int().map { SumType.B(it) })
 
 val sumPrism: Prism<SumType, String> = Prism<SumType, String>(
   { Option.fromNullable((it as? SumType.A)?.string) },
@@ -58,7 +58,7 @@ internal data class Token(val value: String) {
   }
 }
 
-internal val genToken: Arb<Token> = Gen.string().map { Token(it) }
+internal val genToken: Arb<Token> = Arb.string().map { Token(it) }
 
 internal data class User(val token: Token)
 

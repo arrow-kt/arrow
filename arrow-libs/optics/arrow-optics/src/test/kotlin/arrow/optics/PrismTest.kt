@@ -18,74 +18,74 @@ class PrismTest : UnitSpec() {
       PrismLaws.laws(
         prism = sumPrism,
         aGen = genSum,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ),
 
       SetterLaws.laws(
         setter = sumPrism,
         aGen = genSum,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ),
 
       TraversalLaws.laws(
         traversal = sumPrism,
         aGen = genSum,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ),
 
       OptionalLaws.laws(
         optional = sumPrism,
         aGen = genSum,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.first(),
-        aGen = Gen.pair(genSum, Gen.int()),
-        bGen = Gen.pair(Gen.string(), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.int())),
+        aGen = Gen.pair(genSum, Arb.int()),
+        bGen = Gen.pair(Arb.string(), Arb.int()),
+        funcGen = Arb.functionAToB(Gen.pair(Arb.string(), Arb.int())),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.second(),
-        aGen = Gen.pair(Gen.int(), genSum),
-        bGen = Gen.pair(Gen.int(), Gen.string()),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.string())),
+        aGen = Gen.pair(Arb.int(), genSum),
+        bGen = Gen.pair(Arb.int(), Arb.string()),
+        funcGen = Arb.functionAToB(Gen.pair(Arb.int(), Arb.string())),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.right(),
-        aGen = Gen.either(Gen.int(), genSum),
-        bGen = Gen.either(Gen.int(), Gen.string()),
-        funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.string())),
+        aGen = Gen.either(Arb.int(), genSum),
+        bGen = Gen.either(Arb.int(), Arb.string()),
+        funcGen = Arb.functionAToB(Gen.either(Arb.int(), Arb.string())),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.left(),
-        aGen = Gen.either(genSum, Gen.int()),
-        bGen = Gen.either(Gen.string(), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),
+        aGen = Gen.either(genSum, Arb.int()),
+        bGen = Gen.either(Arb.string(), Arb.int()),
+        funcGen = Arb.functionAToB(Gen.either(Arb.string(), Arb.int())),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Prism.id(),
-        aGen = Gen.either(Gen.int(), Gen.int()),
-        bGen = Gen.either(Gen.int(), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.int())),
+        aGen = Gen.either(Arb.int(), Arb.int()),
+        bGen = Gen.either(Arb.int(), Arb.int()),
+        funcGen = Arb.functionAToB(Gen.either(Arb.int(), Arb.int())),
       )
     )
 
@@ -168,7 +168,7 @@ class PrismTest : UnitSpec() {
     }
 
     "Setting a target on a prism should set the correct target" {
-      checkAll(genSumTypeA, Gen.string()) { a, string ->
+      checkAll(genSumTypeA, Arb.string()) { a, string ->
         (sumPrism.setNullable(a, string)!!) == a.copy(string = string)
       }
     }

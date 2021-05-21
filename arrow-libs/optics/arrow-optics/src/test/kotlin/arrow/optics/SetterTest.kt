@@ -16,9 +16,9 @@ class SetterTest : UnitSpec() {
     testLaws(
       SetterLaws.laws(
         setter = Setter.id(),
-        aGen = Gen.int(),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.int(),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -26,8 +26,8 @@ class SetterTest : UnitSpec() {
       SetterLaws.laws(
         setter = tokenSetter,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
@@ -45,7 +45,7 @@ class SetterTest : UnitSpec() {
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      checkAll(genToken, Gen.string()) { token, value ->
+      checkAll(genToken, Arb.string()) { token, value ->
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
       }
     }

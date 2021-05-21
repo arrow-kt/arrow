@@ -39,7 +39,7 @@ class LensTest : UnitSpec() {
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { token, f ->
         tokenLens.asks(f).runId(token) == f(token.value)
       }
     }
@@ -60,13 +60,13 @@ class LensTest : UnitSpec() {
     }
 
     "Extracts with f should be same as extract and map" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { generatedToken, f ->
         tokenLens.extractMap(f).run(generatedToken) == tokenLens.extract().map(f).run(generatedToken)
       }
     }
 
     "update f should be same modify f within State and returning new state" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { generatedToken, f ->
         tokenLens.update(f).run(generatedToken) ==
           State { token: Token ->
             tokenLens.modify(token, f)
@@ -76,7 +76,7 @@ class LensTest : UnitSpec() {
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { generatedToken, f ->
         tokenLens.updateOld(f).run(generatedToken) ==
           State { token: Token ->
             tokenLens.modify(token, f) toT tokenLens.get(token)
@@ -85,7 +85,7 @@ class LensTest : UnitSpec() {
     }
 
     "update_ f should be as modify f within State and returning Unit" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { generatedToken, f ->
         tokenLens.update_(f).run(generatedToken) ==
           State { token: Token ->
             tokenLens.modify(token, f) toT Unit
@@ -94,7 +94,7 @@ class LensTest : UnitSpec() {
     }
 
     "assign a should be same set a within State and returning new value" {
-      checkAll(genToken, Gen.string()) { generatedToken, string ->
+      checkAll(genToken, Arb.string()) { generatedToken, string ->
         tokenLens.assign(string).run(generatedToken) ==
           State { token: Token ->
             tokenLens.set(token, string)
@@ -104,7 +104,7 @@ class LensTest : UnitSpec() {
     }
 
     "assignOld f should be same as modify f within State and returning old state" {
-      checkAll(genToken, Gen.string()) { generatedToken, string ->
+      checkAll(genToken, Arb.string()) { generatedToken, string ->
         tokenLens.assignOld(string).run(generatedToken) ==
           State { token: Token ->
             tokenLens.set(token, string) toT tokenLens.get(token)
@@ -113,7 +113,7 @@ class LensTest : UnitSpec() {
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
-      checkAll(genToken, Gen.string()) { generatedToken, string ->
+      checkAll(genToken, Arb.string()) { generatedToken, string ->
         tokenLens.assign_(string).run(generatedToken) ==
           State { token: Token ->
             tokenLens.set(token, string) toT Unit

@@ -10,6 +10,9 @@ import io.kotest.assertions.fail
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.orNull
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
@@ -127,24 +130,24 @@ class ValidatedTest : UnitSpec() {
     }
 
     "zip identity" {
-      checkAll(Gen.validated(Gen.long().orNull(), Gen.int().orNull())) { validated ->
+      checkAll(Arb.validated(Arb.long().orNull(), Arb.int().orNull())) { validated ->
         val res = validated.zip(nullableLongSemigroup, Valid(Unit)) { a, _ -> a }
-        res == validated
+        res shouldBe validated
       }
     }
 
     "zip is derived from flatMap" {
       checkAll(
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
-        Gen.validated(Gen.long().orNull(), Gen.int().orNull())
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
+        Arb.validated(Arb.long().orNull(), Arb.int().orNull())
       ) { a, b, c, d, e, f, g, h, i, j ->
         val res = a.zip(
           nullableLongSemigroup,
@@ -177,7 +180,7 @@ class ValidatedTest : UnitSpec() {
             all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup)
           )
 
-        res == expected
+        res shouldBe expected
       }
     }
 
@@ -321,12 +324,12 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequence should yield consistent result with traverse" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
-        valid.traverse { listOf(it) } == valid.map { listOf(it) }.sequence() &&
-          invalid.traverse { listOf(it) } == invalid.map { listOf(it) }.sequence()
+        valid.traverse { listOf(it) } shouldBe valid.map { listOf(it) }.sequence()
+        invalid.traverse { listOf(it) } shouldBe invalid.map { listOf(it) }.sequence()
       }
     }
 
@@ -339,12 +342,12 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequenceOption should yield consistent result with traverseOption" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
-        valid.traverseOption { Some(it) } == valid.map { Some(it) }.sequenceOption() &&
-          invalid.traverseOption { Some(it) } == invalid.map { Some(it) }.sequenceOption()
+        valid.traverseOption { Some(it) } shouldBe valid.map { Some(it) }.sequenceOption()
+          invalid.traverseOption { Some(it) } shouldBe invalid.map { Some(it) }.sequenceOption()
       }
     }
 
@@ -357,12 +360,12 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequenceEither should yield consistent result with traverseEither" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
-        valid.traverseEither { Right(it) } == valid.map { Right(it) }.sequenceEither() &&
-          invalid.traverseEither { Right(it) } == invalid.map { Right(it) }.sequenceEither()
+        valid.traverseEither { Right(it) } shouldBe valid.map { Right(it) }.sequenceEither()
+          invalid.traverseEither { Right(it) } shouldBe invalid.map { Right(it) }.sequenceEither()
       }
     }
 
@@ -375,12 +378,14 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequence should yield consistent result with bitraverse" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
-        valid.bimap({ listOf(it) }, { listOf(it) }).bisequence() == valid.bitraverse({ listOf(it) }, { listOf(it) }) &&
-          invalid.bimap({ listOf(it) }, { listOf(it) }).bisequence() == invalid.bitraverse(
+        valid.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe valid.bitraverse(
+          { listOf(it) },
+          { listOf(it) })
+        invalid.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe invalid.bitraverse(
           { listOf(it) },
           { listOf(it) })
       }
@@ -395,13 +400,13 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequenceOption should yield consistent result with bitraverseOption" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
-        valid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
-          valid.bitraverseOption({ Some(it) }, { Some(it) }) &&
-          invalid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
+        valid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
+          valid.bitraverseOption({ Some(it) }, { Some(it) })
+        invalid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
           invalid.bitraverseOption({ Some(it) }, { Some(it) })
       }
     }
@@ -415,13 +420,13 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequenceEither should yield consistent result with bitraverseEither" {
-      forAll { a: String, b: String ->
+      checkAll { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
-        valid.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
-          valid.bitraverseEither({ it.left() }, { it.right() }) &&
-          invalid.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
+        valid.bimap({ it.left() }, { it.right() }).bisequenceEither() shouldBe
+          valid.bitraverseEither({ it.left() }, { it.right() })
+        invalid.bimap({ it.left() }, { it.right() }).bisequenceEither() shouldBe
           invalid.bitraverseEither({ it.left() }, { it.right() })
       }
     }

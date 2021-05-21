@@ -21,9 +21,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.map(),
-        aGen = Gen.map(Gen.int(), Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.map(Arb.int(), Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
@@ -31,26 +31,26 @@ class MapInstanceTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = FilterIndex.map<Char, Int>().filter { true },
         aGen = Gen.map(Gen.char(), Gen.intSmall()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.string().map { Index.map<String, Int>().index(it) },
-        aGen = Gen.map(Gen.string(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        optionalGen = Arb.string().map { Index.map<String, Int>().index(it) },
+        aGen = Gen.map(Arb.string(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.string().map { At.map<String, Int>().at(it) },
-        aGen = Gen.map(Gen.string(), Gen.int()),
-        bGen = Gen.option(Gen.int()),
-        funcGen = Gen.functionAToB(Gen.option(Gen.int())),
+        lensGen = Arb.string().map { At.map<String, Int>().at(it) },
+        aGen = Gen.map(Arb.string(), Arb.int()),
+        bGen = Gen.option(Arb.int()),
+        funcGen = Arb.functionAToB(Gen.option(Arb.int())),
       )
     )
   }

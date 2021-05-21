@@ -33,7 +33,7 @@ class GetterTest : UnitSpec() {
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { token, f ->
         tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
@@ -54,7 +54,7 @@ class GetterTest : UnitSpec() {
     }
 
     "extractMap with f should be same as extract and map" {
-      checkAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
+      checkAll(genToken, Arb.functionAToB<String, String>(Arb.string())) { token, f ->
         tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
       }
     }

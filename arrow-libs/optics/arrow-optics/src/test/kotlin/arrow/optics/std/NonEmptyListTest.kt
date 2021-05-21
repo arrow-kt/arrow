@@ -14,18 +14,18 @@ class NonEmptyListTest : UnitSpec() {
     testLaws(
       LensLaws.laws(
         lens = Lens.nonEmptyListHead(),
-        aGen = Gen.nonEmptyList(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.nonEmptyList(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.nonEmptyListTail(),
-        aGen = Gen.nonEmptyList(Gen.string()),
-        bGen = Arb.list(Gen.string()),
-        funcGen = Gen.functionAToB(Arb.list(Gen.string())),
+        aGen = Gen.nonEmptyList(Arb.string()),
+        bGen = Arb.list(Arb.string()),
+        funcGen = Arb.functionAToB(Arb.list(Arb.string())),
       )
     )
   }

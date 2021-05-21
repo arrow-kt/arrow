@@ -15,42 +15,42 @@ class FilterIndexInstanceTest : UnitSpec() {
   init {
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.list<String>().filter { true },
-      aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+      aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.sequence<String>().filter { true },
-        aGen = Gen.sequence(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.sequence(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ) { a, b -> a.toList() == b.toList() }
     )
 
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.nonEmptyList<String>().filter { true },
-      aGen = Gen.nonEmptyList(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = Gen.functionAToB(Gen.string()),
+      aGen = Gen.nonEmptyList(Arb.string()),
+      bGen = Arb.string(),
+      funcGen = Arb.functionAToB(Arb.string()),
     ))
 
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.map<Char, Int>().filter { true },
         aGen = Gen.map(Gen.char(), Gen.intSmall()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.string().filter { true },
-      aGen = Gen.string(),
+      aGen = Arb.string(),
       bGen = Gen.char(),
-      funcGen = Gen.functionAToB(Gen.char()),
+      funcGen = Arb.functionAToB(Gen.char()),
     ))
   }
 }

@@ -12,10 +12,10 @@ class SetInstanceTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.string().map { At.set<String>().at(it) },
-        aGen = Gen.set(Gen.string()),
+        lensGen = Arb.string().map { At.set<String>().at(it) },
+        aGen = Gen.set(Arb.string()),
         bGen = Gen.bool(),
-        funcGen = Gen.functionAToB(Gen.bool()),
+        funcGen = Arb.functionAToB(Gen.bool()),
       )
     )
   }

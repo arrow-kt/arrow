@@ -10,11 +10,17 @@ import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
+import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
 
 class MapKTest : UnitSpec() {
 
   init {
-    testLaws(MonoidLaws.laws(Monoid.map(Semigroup.int()), Gen.map(Gen.longSmall(), Gen.intSmall())))
+    testLaws(MonoidLaws.laws(Monoid.map(Semigroup.int()), Arb.map(Arb.longSmall(), Arb.intSmall())))
 
     "traverseEither is stacksafe" {
       val acc = mutableListOf<Int>()
@@ -27,7 +33,7 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseEither short-circuit" {
-      checkAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseEither {
           if (it % 2 == 0) {
@@ -35,11 +41,11 @@ class MapKTest : UnitSpec() {
             Either.Right(it)
           } else Either.Left(it)
         }
-        acc == ints.values.takeWhile { it % 2 == 0 } &&
-          when (evens) {
-            is Either.Right -> evens.value == ints
-            is Either.Left -> evens.value == ints.values.first { it % 2 != 0 }
-          }
+        acc shouldBe ints.values.takeWhile { it % 2 == 0 }
+        when (evens) {
+          is Either.Right -> evens.value shouldBe ints
+          is Either.Left -> evens.value shouldBe ints.values.first { it % 2 != 0 }
+        }
       }
     }
 
@@ -55,7 +61,7 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseOption short-circuits" {
-      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseOption {
           (it % 2 == 0).maybe {
@@ -63,14 +69,15 @@ class MapKTest : UnitSpec() {
             it
           }
         }
-        acc == ints.takeWhile { it % 2 == 0 } && evens.all { it == ints }
+        acc shouldBe ints.takeWhile { it % 2 == 0 }
+        evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
     "sequenceOption yields some when all entries in the list are some" {
-      checkAll(Arb.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Arb.int())) { ints ->
         val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
-        evens.all { it == ints }
+        evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
@@ -85,68 +92,70 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      checkAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val res: ValidatedNel<Int, Map<Int, Int>> =
           ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, Map<Int, Int>> =
           NonEmptyList.fromList(ints.values.filterNot { it % 2 == 0 })
-            .fold({ ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() }, { it.invalid() })
+            .fold(
+              { ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() },
+              { it.invalid() })
 
-        res == expected
+        res shouldBe expected
       }
     }
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
-      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
         val aligned = a.align(b)
-        aligned.size == (a.keys + b.keys).size
+        aligned.size shouldBe (a.keys + b.keys).size
       }
 
       // aligned map contains Both for all entries existing in a and b
-      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
         val aligned = a.align(b)
-        a.keys.intersect(b.keys).all {
-          aligned[it]?.isBoth ?: false
+        a.keys.intersect(b.keys).forEach {
+          aligned[it]?.isBoth shouldBe true
         }
       }
 
       // aligned map contains Left for all entries existing only in a
-      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
         val aligned = a.align(b)
-        (a.keys - b.keys).all { key ->
-          aligned[key]?.let { it.isLeft } ?: false
+        (a.keys - b.keys).forEach { key ->
+          aligned[key]?.isLeft shouldBe true
         }
       }
 
       // aligned map contains Right for all entries existing only in b
-      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
         val aligned = a.align(b)
-        (b.keys - a.keys).all { key ->
-          aligned[key]?.isRight ?: false
+        (b.keys - a.keys).forEach { key ->
+          aligned[key]?.isRight shouldBe true
         }
       }
     }
 
     "zip2" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip3" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result = a.zip(b, b) { _, aa, bb, cc -> Triple(aa, bb, cc) }
 
@@ -154,14 +163,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Triple(v, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip4" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
       ) { a, b ->
         val result = a.zip(b, b, b) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
 
@@ -169,14 +178,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple4(v, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip5" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
       ) { a, b ->
         val result = a.zip(b, b, b, b) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
 
@@ -184,14 +193,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple5(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip6" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
       ) { a, b ->
         val result = a.zip(b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
 
@@ -199,14 +208,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple6(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip7" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result = a.zip(b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
 
@@ -214,14 +223,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple7(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip8" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result =
           a.zip(b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
@@ -230,14 +239,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple8(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip9" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result = a.zip(b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
           Tuple9(
@@ -257,14 +266,14 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "zip10" {
       checkAll(
-        Gen.map(Gen.intSmall(), Gen.intSmall()),
-        Gen.map(Gen.intSmall(), Gen.intSmall())
+        Arb.map(Arb.intSmall(), Arb.intSmall()),
+        Arb.map(Arb.intSmall(), Arb.intSmall())
       ) { a, b ->
         val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
           Tuple10(
@@ -285,20 +294,20 @@ class MapKTest : UnitSpec() {
           .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
-        result == expected
+        result shouldBe expected
       }
     }
 
     "flatMap" {
       checkAll(
-        Gen.map(Gen.string(), Gen.intSmall()),
-        Gen.map(Gen.string(), Gen.string())
+        Arb.map(Arb.string(), Arb.intSmall()),
+        Arb.map(Arb.string(), Arb.string())
       ) { a, b ->
         val result: Map<String, String> = a.flatMap { b }
         val expected: Map<String, String> = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, b[k]!!) }
+          .map { (k, _) -> Pair(k, b[k]!!) }
           .toMap()
-        result == expected
+        result shouldBe expected
       }
     }
   }

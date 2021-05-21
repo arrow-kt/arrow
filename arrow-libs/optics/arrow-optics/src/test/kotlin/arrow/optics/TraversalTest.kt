@@ -13,16 +13,16 @@ class TraversalTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       ),
 
       SetterLaws.laws(
         setter = Traversal.list(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -31,7 +31,7 @@ class TraversalTest : UnitSpec() {
         traversal = Traversal({ it.first }, { it.second }, { a, b, _ -> a to b }),
         aGen = Gen.pair(Gen.float(), Gen.float()),
         bGen = Gen.float(),
-        funcGen = Gen.functionAToB(Gen.float()),
+        funcGen = Arb.functionAToB(Gen.float()),
       )
     )
   }

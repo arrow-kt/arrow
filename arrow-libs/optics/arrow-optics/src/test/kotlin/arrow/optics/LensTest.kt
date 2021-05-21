@@ -19,38 +19,38 @@ class LensTest : UnitSpec() {
       LensLaws.laws(
         lens = tokenLens,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string())
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
       ),
 
       TraversalLaws.laws(
         traversal = tokenLens,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ),
 
       OptionalLaws.laws(
         optional = tokenLens,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       ),
 
       SetterLaws.laws(
         setter = tokenLens,
         aGen = genToken,
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.id(),
-        aGen = Gen.int(),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Arb.int(),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -109,19 +109,19 @@ class LensTest : UnitSpec() {
     }
 
     "asGetter should behave as valid Getter: find" {
-      checkAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      checkAll(genToken, Arb.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.findOrNull(token, p) == tokenGetter.findOrNull(token, p)
       }
     }
 
     "asGetter should behave as valid Getter: exist" {
-      checkAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      checkAll(genToken, Arb.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.any(token, p) == tokenGetter.any(token, p)
       }
     }
 
     "Lifting a function should yield the same result as not yielding" {
-      checkAll(genToken, Gen.string()) { token, value ->
+      checkAll(genToken, Arb.string()) { token, value ->
         tokenLens.set(token, value) == tokenLens.lift { value }(token)
       }
     }
@@ -158,14 +158,14 @@ class LensTest : UnitSpec() {
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenLens.first<Int>()
-      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Arb.int()) { token: Token, int: Int ->
         first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val second = tokenLens.second<Int>()
-      checkAll(Gen.int(), genToken) { int: Int, token: Token ->
+      checkAll(Arb.int(), genToken) { int: Int, token: Token ->
         second.get(int to token) == int to token.value
       }
     }

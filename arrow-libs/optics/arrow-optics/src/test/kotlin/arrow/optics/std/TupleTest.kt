@@ -22,108 +22,108 @@ class TupleTest : UnitSpec() {
     testLaws(
       LensLaws.laws(
         lens = Lens.pairFirst(),
-        aGen = Gen.pair(Gen.int(), Gen.string()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.pair(Arb.int(), Arb.string()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.pairSecond(),
-        aGen = Gen.pair(Gen.int(), Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.pair(Arb.int(), Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.tripleFirst(),
-        aGen = Gen.triple(Gen.int(), Gen.string(), Gen.string()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.triple(Arb.int(), Arb.string(), Arb.string()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.tripleSecond(),
-        aGen = Gen.triple(Gen.int(), Gen.string(), Gen.int()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.triple(Arb.int(), Arb.string(), Arb.int()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       LensLaws.laws(
         lens = Lens.tripleThird(),
-        aGen = Gen.triple(Gen.int(), Gen.int(), Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Gen.triple(Arb.int(), Arb.int(), Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.pair(),
-        aGen = Gen.pair(Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.pair(Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.triple(),
-        aGen = Gen.triple(Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.triple(Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.tuple4(),
-        aGen = Gen.tuple4(Gen.int(), Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.tuple4(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.tuple5(),
-        aGen = Gen.tuple5(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.tuple5(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.tuple6(),
-        aGen = Gen.tuple6(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.tuple6(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.tuple7(),
-        aGen = Gen.tuple7(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.tuple7(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.tuple8(),
-        aGen = Gen.tuple8(Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int(), Gen.int()),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        aGen = Gen.tuple8(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -131,18 +131,18 @@ class TupleTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = Traversal.tuple9(),
         aGen = Gen.tuple9(
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int()
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int()
         ),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -150,19 +150,19 @@ class TupleTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = Traversal.tuple10(),
         aGen = Gen.tuple10(
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int(),
-          Gen.int()
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int(),
+          Arb.int()
         ),
-        bGen = Gen.int(),
-        funcGen = Gen.functionAToB(Gen.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
   }

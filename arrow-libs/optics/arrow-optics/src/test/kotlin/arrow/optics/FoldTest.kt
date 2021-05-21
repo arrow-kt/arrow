@@ -12,7 +12,7 @@ class FoldTest : UnitSpec() {
     "Fold select a list that contains one" {
       val select = Fold.select<List<Int>> { it.contains(1) }
 
-      checkAll(Arb.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Arb.int())) { ints ->
         select.run { getAll(ints) }.firstOrNull() ==
           ints.let { if (it.contains(1)) it else null }
       }
@@ -21,32 +21,32 @@ class FoldTest : UnitSpec() {
     with(Fold.list<Int>()) {
 
       "Folding a list of ints" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           fold(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "Folding a list should yield same result as combineAll" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           combineAll(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "Folding and mapping a list of strings" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           Fold.list<String>()
             .foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) == ints.sum()
         }
       }
 
       "Get all targets" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           getAll(ints) == ints
         }
       }
 
       "Get the size of the fold" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           size(ints) == ints.size
         }
       }
@@ -58,25 +58,25 @@ class FoldTest : UnitSpec() {
       }
 
       "Checking existence of a target" {
-        checkAll(Arb.list(Gen.int()), Gen.bool()) { ints, predicate ->
+        checkAll(Arb.list(Arb.int()), Gen.bool()) { ints, predicate ->
           exists(ints) { predicate } == (predicate && ints.isNotEmpty())
         }
       }
 
       "Check if all targets match the predicate" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           all(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
         }
       }
 
       "Check if there is no target" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           isEmpty(ints) == ints.isEmpty()
         }
       }
 
       "Check if there is a target" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           isNotEmpty(ints) == ints.isNotEmpty()
         }
       }

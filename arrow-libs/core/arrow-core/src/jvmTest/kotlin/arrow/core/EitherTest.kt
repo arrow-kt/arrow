@@ -18,30 +18,35 @@ import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.property.Arb
-Arb.list(
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
-import kotlinx.coroutines.runBlocking
+import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.negativeInts
+import io.kotest.property.arbitrary.string
 
 class EitherTest : UnitSpec() {
 
-  val GEN = Gen.either(Gen.string(), Gen.int())
+  private val ARB = Arb.either(Arb.string(), Arb.int())
 
   init {
     testLaws(
-      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), GEN),
+      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
       FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
-        Gen.int().map(::Right),
-        GEN.map { it },
+        Arb.int().map(::Right),
+        ARB.map { it },
         Either<String, Int>::equals,
         either::invoke
       ) {
         it.bind()
       },
       FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(
-        Gen.int().map(::Right),
-        GEN.map { it },
+        Arb.int().map(::Right),
+        ARB.map { it },
         Either<String, Int>::equals,
         either::eager
       ) {
@@ -50,63 +55,63 @@ class EitherTest : UnitSpec() {
     )
 
     "isLeft should return true if Left and false if Right" {
-      forAll { a: Int ->
+      checkAll { a: Int ->
         Left(a).isLeft() && !Right(a).isLeft()
       }
     }
 
     "isRight should return false if Left and true if Right" {
-      forAll { a: Int ->
+      checkAll { a: Int ->
         !Left(a).isRight() && Right(a).isRight()
       }
     }
 
     "fold should apply first op if Left and second op if Right" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.fold({ it + 2 }, { it + 1 }) == a + 1 &&
-          left.fold({ it + 2 }, { it + 1 }) == b + 2
+        right.fold({ it + 2 }, { it + 1 }) shouldBe a + 1
+        left.fold({ it + 2 }, { it + 1 }) shouldBe b + 2
       }
     }
 
     "foldLeft should return initial if Left and apply op if Right" {
-      forAllSmallInt { a: Int, b: Int, c: Int ->
-        Right(a).foldLeft(c, Int::plus) == c + a &&
-          Left(b).foldLeft(c, Int::plus) == c
+      checkAll<Int, Int, Int>(Arb.intSmall(), Arb.intSmall(), Arb.intSmall()) { a, b, c ->
+        Right(a).foldLeft(c, Int::plus) shouldBe c + a
+        Left(b).foldLeft(c, Int::plus) shouldBe c
       }
     }
 
     "foldMap should return the empty of the inner type if Left and apply op if Right" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val left: Either<Int, Int> = Left(b)
 
-        Right(a).foldMap(Monoid.int()) { it + 1 } == a + 1 &&
-          left.foldMap(Monoid.int()) { it + 1 } == Monoid.int().empty()
+        Right(a).foldMap(Monoid.int()) { it + 1 } shouldBe a + 1
+        left.foldMap(Monoid.int()) { it + 1 } shouldBe Monoid.int().empty()
       }
     }
 
     "bifoldLeft should apply first op if Left and apply second op if Right" {
-      forAllSmallInt { a: Int, b: Int, c: Int ->
-        Right(a).bifoldLeft(c, Int::plus, Int::times) == a * c &&
-          Left(b).bifoldLeft(c, Int::plus, Int::times) == b + c
+      checkAll(Arb.intSmall(), Arb.intSmall(), Arb.intSmall()) { a, b, c ->
+        Right(a).bifoldLeft(c, Int::plus, Int::times) shouldBe a * c
+        Left(b).bifoldLeft(c, Int::plus, Int::times) shouldBe b + c
       }
     }
 
     "bifoldMap should apply first op if Left and apply second op if Right" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) == a + 1 &&
-          left.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) == b + 2
+        right.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) shouldBe a + 1
+        left.bifoldMap(Monoid.int(), { it + 2 }, { it + 1 }) shouldBe b + 2
       }
     }
 
     "fromNullable should lift value as a Right if it is not null" {
-      forAll { a: Int ->
-        Either.fromNullable(a) == Right(a)
+      checkAll { a: Int ->
+        Either.fromNullable(a) shouldBe Right(a)
       }
     }
 
@@ -119,345 +124,329 @@ class EitherTest : UnitSpec() {
     }
 
     "combine two rights should return a right of the combine of the inners" {
-      forAll { a: String, b: String ->
-        Monoid.string().run { Right(a.combine(b)) } == Right(a).combine(Monoid.string(), Monoid.string(), Right(b))
+      checkAll { a: String, b: String ->
+        Monoid.string().run { Right(a.combine(b)) } shouldBe Right(a).combine(
+          Monoid.string(),
+          Monoid.string(),
+          Right(b)
+        )
       }
     }
 
     "combine two lefts should return a left of the combine of the inners" {
-      forAll { a: String, b: String ->
-        Monoid.string().run { Left(a.combine(b)) } == Left(a).combine(Monoid.string(), Monoid.string(), Left(b))
+      checkAll { a: String, b: String ->
+        Monoid.string().run { Left(a.combine(b)) } shouldBe Left(a).combine(Monoid.string(), Monoid.string(), Left(b))
       }
     }
 
     "combine a right and a left should return left" {
-      forAll { a: String, b: String ->
-        Left(a) == Left(a).combine(Monoid.string(), Monoid.string(), Right(b)) &&
-          Left(a) == Right(b).combine(Monoid.string(), Monoid.string(), Left(a))
+      checkAll { a: String, b: String ->
+        Left(a) shouldBe Left(a).combine(Monoid.string(), Monoid.string(), Right(b))
+        Left(a) shouldBe Right(b).combine(Monoid.string(), Monoid.string(), Left(a))
       }
     }
 
     "getOrElse should return value" {
-      forAll { a: Int, b: Int ->
-        Right(a).getOrElse { b } == a &&
-          Left(a).getOrElse { b } == b
+      checkAll { a: Int, b: Int ->
+        Right(a).getOrElse { b } shouldBe a
+        Left(a).getOrElse { b } shouldBe b
       }
     }
 
     "orNull should return value" {
-      forAll { a: Int ->
-        Right(a).orNull() == a
+      checkAll { a: Int ->
+        Right(a).orNull() shouldBe a
       }
     }
 
     "orNone should return Some(value)" {
-      forAll { a: Int ->
-        Either.Right(a).orNone() == Some(a)
+      checkAll { a: Int ->
+        Right(a).orNone() shouldBe Some(a)
       }
     }
 
     "orNone should return None when left" {
-      forAll { a: String ->
-        Left(a).orNone() == None
+      checkAll { a: String ->
+        Left(a).orNone() shouldBe None
       }
     }
 
     "getOrHandle should return value" {
-      forAll { a: Int, b: Int ->
-        Right(a).getOrHandle { b } == a &&
-          Left(a).getOrHandle { it + b } == a + b
+      checkAll { a: Int, b: Int ->
+        Right(a).getOrHandle { b } shouldBe a
+        Left(a).getOrHandle { it + b } shouldBe a + b
       }
     }
 
     "filterOrElse should filter values" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a) &&
-          Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b) &&
-          left.filterOrElse({ it > a - 1 }, { b }) == Left(a) &&
-          left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
+        Right(a).filterOrElse({ it > a - 1 }, { b }) shouldBe Right(a)
+        Right(a).filterOrElse({ it > a + 1 }, { b }) shouldBe Left(b)
+        left.filterOrElse({ it > a - 1 }, { b }) shouldBe Left(a)
+        left.filterOrElse({ it > a + 1 }, { b }) shouldBe Left(a)
       }
     }
 
     "filterOrOther should filter values" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).filterOrOther({ it > a - 1 }, { b + a }) == Right(a) &&
-          Right(a).filterOrOther({ it > a + 1 }, { b + a }) == Left(b + a) &&
-          left.filterOrOther({ it > a - 1 }, { b + a }) == Left(a) &&
-          left.filterOrOther({ it > a + 1 }, { b + a }) == Left(a)
+        Right(a).filterOrOther({ it > a - 1 }, { b + a }) shouldBe Right(a)
+        Right(a).filterOrOther({ it > a + 1 }, { b + a }) shouldBe Left(b + a)
+        left.filterOrOther({ it > a - 1 }, { b + a }) shouldBe Left(a)
+        left.filterOrOther({ it > a + 1 }, { b + a }) shouldBe Left(a)
       }
     }
 
     "leftIfNull should return Left if Right value is null of if Either is Left" {
-      forAll { a: Int, b: Int ->
-        Right(a).leftIfNull { b } == Right(a) &&
-          Right(null).leftIfNull { b } == Left(b) &&
-          Left(a).leftIfNull { b } == Left(a)
+      checkAll { a: Int, b: Int ->
+        Right(a).leftIfNull { b } shouldBe Right(a)
+        Right(null).leftIfNull { b } shouldBe Left(b)
+        Left(a).leftIfNull { b } shouldBe Left(a)
       }
     }
 
     "exists should apply predicate to Right only" {
-      forAllSmallInt { a: Int ->
+      checkAll(Arb.intSmall()) { a ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).exists { it > a - 1 } &&
-          !Right(a).exists { it > a + 1 } &&
-          !left.exists { it > a - 1 } &&
-          !left.exists { it > a + 1 }
+        Right(a).exists { it > a - 1 } shouldBe true
+        !Right(a).exists { it > a + 1 } shouldBe true
+        !left.exists { it > a - 1 } shouldBe true
+        !left.exists { it > a + 1 } shouldBe true
       }
     }
 
     "rightIfNotNull should return Left if value is null or Right of value when not null" {
-      forAll { a: Int, b: Int ->
-        null.rightIfNotNull { b } == Left(b) &&
-          a.rightIfNotNull { b } == Right(a)
+      checkAll { a: Int, b: Int ->
+        null.rightIfNotNull { b } shouldBe Left(b)
+        a.rightIfNotNull { b } shouldBe Right(a)
       }
     }
 
     "rightIfNull should return Left if value is not null or Right of value when null" {
-      forAll { a: Int, b: Int ->
-        a.rightIfNull { b } == Left(b) &&
-          null.rightIfNull { b } == Right(null)
+      checkAll { a: Int, b: Int ->
+        a.rightIfNull { b } shouldBe Left(b)
+        null.rightIfNull { b } shouldBe Right(null)
       }
     }
 
     "swap should interchange values" {
-      forAll { a: Int ->
-        Left(a).swap() == Right(a) &&
-          Right(a).swap() == Left(a)
+      checkAll { a: Int ->
+        Left(a).swap() shouldBe Right(a)
+        Right(a).swap() shouldBe Left(a)
       }
     }
 
     "orNull should convert" {
-      forAll { a: Int ->
+      checkAll { a: Int ->
         val left: Either<Int, Int> = Left(a)
 
-        Right(a).orNull() == a &&
-          left.orNull() == null
+        Right(a).orNull() shouldBe a
+        left.orNull() shouldBe null
       }
     }
 
     "contains should check value" {
-      forAllSmallInt { a: Int, b: Int ->
-        val rightContains = Right(a).contains(a)
+      // We need to check that a != b or this test will result in a false negative
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
+        Right(a).contains(a) shouldBe true
         // We need to check that a != b or this test will result in a false negative
-        val rightDoesntContains = if (a != b) !Right(a).contains(b) else true
-        val leftNeverContains = !Left(a).contains(a)
-
-        rightContains && rightDoesntContains && leftNeverContains
+        Right(a).contains(b) shouldBe (a == b)
+        !Left(a).contains(a) shouldBe false
       }
     }
 
     "map should alter right instance only" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.map { it + 1 } == Right(a + 1) && left.map { it + 1 } == left
+        right.map { it + 1 } shouldBe Right(a + 1)
+        left.map { it + 1 } shouldBe left
       }
     }
 
     "mapLeft should alter left instance only" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.mapLeft { it + 1 } == right && left.mapLeft { it + 1 } == Left(b + 1)
+        right.mapLeft { it + 1 } shouldBe right
+        left.mapLeft { it + 1 } shouldBe Left(b + 1)
       }
     }
 
     "bimap should alter left or right instance accordingly" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.bimap({ it + 2 }, { it + 1 }) == Right(a + 1) &&
-          left.bimap({ it + 2 }, { it + 1 }) == Left(b + 2)
+        right.bimap({ it + 2 }, { it + 1 }) shouldBe Right(a + 1)
+        left.bimap({ it + 2 }, { it + 1 }) shouldBe Left(b + 2)
       }
     }
 
     "replicate should return Right(empty list) when n <= 0" {
       checkAll(
-        Gen.oneOf(Gen.negativeIntegers(), Gen.constant(0)),
-        Gen.int()
+        Arb.choice(Arb.negativeInts(), Arb.constant(0)),
+        Arb.int()
       ) { n: Int, a: Int ->
         val expected: Either<Int, List<Int>> = Right(emptyList())
 
-        Right(a).replicate(n) == expected &&
-          Left(a).replicate(n) == expected
+        Right(a).replicate(n) shouldBe expected
+        Left(a).replicate(n) shouldBe expected
       }
     }
 
     "replicate should return Right(list of repeated value size n) when Right and n is positive" {
       checkAll(
-        Gen.intSmall().filter { it > 0 },
-        Gen.int()
+        Arb.intSmall().filter { it > 0 },
+        Arb.int()
       ) { n: Int, a: Int ->
-        Right(a).replicate(n) == Right(List(n) { a }) &&
-          Left(a).replicate(n) == Left(a)
+        Right(a).replicate(n) shouldBe Right(List(n) { a })
+        Left(a).replicate(n) shouldBe Left(a)
       }
     }
 
     "traverse should return list of Right when Right and empty list when Left" {
       checkAll(
-        Gen.int(),
-        Gen.int(),
-        Gen.int()
+        Arb.int(),
+        Arb.int(),
+        Arb.int()
       ) { a: Int, b: Int, c: Int ->
-        Right(a).traverse { emptyList<Int>() } == emptyList<Int>() &&
-          Right(a).traverse { listOf(b, c) } == listOf(Right(b), Right(c)) &&
-          Left(a).traverse { listOf(b, c) } == emptyList<Int>()
+        Right(a).traverse { emptyList<Int>() } shouldBe emptyList<Int>()
+        Right(a).traverse { listOf(b, c) } shouldBe listOf(Right(b), Right(c))
+        Left(a).traverse { listOf(b, c) } shouldBe emptyList<Int>()
       }
     }
 
     "flatMap should map right instance only" {
-      forAllSmallInt { a: Int, b: Int ->
+      checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
 
-        right.flatMap { Right(it + 1) } == Right(a + 1) &&
-          left.flatMap { Right(it + 1) } == left
+        right.flatMap { Right(it + 1) } shouldBe Right(a + 1)
+        left.flatMap { Right(it + 1) } shouldBe left
       }
     }
 
     "conditionally should create right instance only if test is true" {
-      forAll { t: Boolean, i: Int, s: String ->
+      checkAll { t: Boolean, i: Int, s: String ->
         val expected = if (t) Right(i) else Left(s)
-        Either.conditionally(t, { s }, { i }) == expected
+        Either.conditionally(t, { s }, { i }) shouldBe expected
       }
     }
 
     "handleErrorWith should handle left instance otherwise return Right" {
-      forAll { a: Int, b: String ->
-        Left(a).handleErrorWith { Right(b) } == Right(b) &&
-          Right(a).handleErrorWith { Right(b) } == Right(a) &&
-          Left(a).handleErrorWith { Left(b) } == Left(b)
+      checkAll { a: Int, b: String ->
+        Left(a).handleErrorWith { Right(b) } shouldBe Right(b)
+        Right(a).handleErrorWith { Right(b) } shouldBe Right(a)
+        Left(a).handleErrorWith { Left(b) } shouldBe Left(b)
       }
     }
 
     "catch should return Right(result) when f does not throw" {
-      suspend fun loadFromNetwork(): Int = 1
-      Either.catch { loadFromNetwork() } shouldBe Right(1)
+      Either.catch { 1 } shouldBe Right(1)
     }
 
     "catch should return Left(result) when f throws" {
       val exception = Exception("Boom!")
-      suspend fun loadFromNetwork(): Int = throw exception
-      Either.catch { loadFromNetwork() } shouldBe Left(exception)
+      Either.catch { throw exception } shouldBe Left(exception)
     }
 
     "catchAndFlatten should return Right(result) when f does not throw" {
-      suspend fun loadFromNetwork(): Either<Throwable, Int> = Right(1)
-      Either.catchAndFlatten { loadFromNetwork() } shouldBe Right(1)
+      Either.catchAndFlatten { Right(1) } shouldBe Right(1)
     }
 
     "catchAndFlatten should return Left(result) when f throws" {
       val exception = Exception("Boom!")
-      suspend fun loadFromNetwork(): Either<Throwable, Int> = throw exception
-      Either.catchAndFlatten { loadFromNetwork() } shouldBe Left(exception)
+      Either.catchAndFlatten<Int> { throw exception } shouldBe Left(exception)
     }
 
     "resolve should yield a result when deterministic functions are used as handlers" {
       checkAll(
-        Gen.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
-        Gen.any()
+        Arb.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
+        Arb.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-
-        runBlocking {
-          val result =
-            Either.resolve(
-              f = { f() },
-              success = { a -> handleWithPureFunction(a, returnObject) },
-              error = { e -> handleWithPureFunction(e, returnObject) },
-              throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = { handleWithPureFunction(it) }
-            )
-          result == returnObject
-        }
+        val result =
+          Either.resolve(
+            f = { f() },
+            success = { a -> handleWithPureFunction(a, returnObject) },
+            error = { e -> handleWithPureFunction(e, returnObject) },
+            throwable = { t -> handleWithPureFunction(t, returnObject) },
+            unrecoverableState = { handleWithPureFunction(it) }
+          )
+        result shouldBe returnObject
       }
     }
 
     "resolve should throw a Throwable when a fatal Throwable is thrown" {
       checkAll(
-        Gen.suspendFunThatThrowsFatalThrowable(),
-        Gen.any()
+        Arb.suspendFunThatThrowsFatalThrowable(),
+        Arb.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-
-        runBlocking {
-          shouldThrow<Throwable> {
-            Either.resolve(
-              f = { f() },
-              success = { a -> handleWithPureFunction(a, returnObject) },
-              error = { e -> handleWithPureFunction(e, returnObject) },
-              throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = { handleWithPureFunction(it) }
-            )
-          }
+        shouldThrow<Throwable> {
+          Either.resolve(
+            f = { f() },
+            success = { a -> handleWithPureFunction(a, returnObject) },
+            error = { e -> handleWithPureFunction(e, returnObject) },
+            throwable = { t -> handleWithPureFunction(t, returnObject) },
+            unrecoverableState = { handleWithPureFunction(it) }
+          )
         }
-        true
       }
     }
 
     "resolve should yield a result when an exception is thrown in the success supplied function" {
       checkAll(
-        Gen.suspendFunThatReturnsAnyRight(),
-        Gen.any()
+        Arb.suspendFunThatReturnsAnyRight(),
+        Arb.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-
-        runBlocking {
-          val result =
-            Either.resolve(
-              f = { f() },
-              success = { throwException(it) },
-              error = { e -> handleWithPureFunction(e, returnObject) },
-              throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = { handleWithPureFunction(it) }
-            )
-          result == returnObject
-        }
+        val result =
+          Either.resolve(
+            f = { f() },
+            success = { throwException(it) },
+            error = { e -> handleWithPureFunction(e, returnObject) },
+            throwable = { t -> handleWithPureFunction(t, returnObject) },
+            unrecoverableState = { handleWithPureFunction(it) }
+          )
+        result shouldBe returnObject
       }
     }
 
     "resolve should yield a result when an exception is thrown in the error supplied function" {
       checkAll(
-        Gen.suspendFunThatReturnsAnyLeft(),
-        Gen.any()
+        Arb.suspendFunThatReturnsAnyLeft(),
+        Arb.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-
-        runBlocking {
-          val result =
-            Either.resolve(
-              f = { f() },
-              success = { a -> handleWithPureFunction(a, returnObject) },
-              error = { throwException(it) },
-              throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = { handleWithPureFunction(it) }
-            )
-          result == returnObject
-        }
+        val result =
+          Either.resolve(
+            f = { f() },
+            success = { a -> handleWithPureFunction(a, returnObject) },
+            error = { throwException(it) },
+            throwable = { t -> handleWithPureFunction(t, returnObject) },
+            unrecoverableState = { handleWithPureFunction(it) }
+          )
+        result shouldBe returnObject
       }
     }
 
     "resolve should throw a Throwable when any exception is thrown in the throwable supplied function" {
       checkAll(
-        Gen.suspendFunThatThrows()
+        Arb.suspendFunThatThrows()
       ) { f: suspend () -> Either<Any, Any> ->
-
-        runBlocking {
-          shouldThrow<Throwable> {
-            Either.resolve(
-              f = { f() },
-              success = { throwException(it) },
-              error = { throwException(it) },
-              throwable = { throwException(it) },
-              unrecoverableState = { handleWithPureFunction(it) }
-            )
-          }
+        shouldThrow<Throwable> {
+          Either.resolve(
+            f = { f() },
+            success = { throwException(it) },
+            error = { throwException(it) },
+            throwable = { throwException(it) },
+            unrecoverableState = { handleWithPureFunction(it) }
+          )
         }
-        true
       }
     }
 
@@ -470,8 +459,8 @@ class EitherTest : UnitSpec() {
     }
 
     "sequence should be consistent with traverse" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.map { listOf(it) }.sequence() == either.traverse { listOf(it) }
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.map { listOf(it) }.sequence() shouldBe either.traverse { listOf(it) }
       }
     }
 
@@ -484,8 +473,8 @@ class EitherTest : UnitSpec() {
     }
 
     "sequenceOption should be consistent with traverseOption" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.map { Some(it) }.sequenceOption() == either.traverseOption { Some(it) }
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.map { Some(it) }.sequenceOption() shouldBe either.traverseOption { Some(it) }
       }
     }
 
@@ -498,8 +487,8 @@ class EitherTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.map { it.valid() }.sequenceValidated() == either.traverseValidated { it.valid() }
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.map { it.valid() }.sequenceValidated() shouldBe either.traverseValidated { it.valid() }
       }
     }
 
@@ -513,8 +502,10 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequence should be consistent with bitraverse" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.bimap({ listOf(it) }, { listOf(it) }).bisequence() == either.bitraverse({ listOf(it) }, { listOf(it) })
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe either.bitraverse(
+          { listOf(it) },
+          { listOf(it) })
       }
     }
 
@@ -527,8 +518,8 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequenceOption should be consistent with bitraverseOption" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
           either.bitraverseOption({ Some(it) }, { Some(it) })
       }
     }
@@ -542,8 +533,8 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequenceValidated should be consistent with bitraverseValidated" {
-      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
-        either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() ==
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() shouldBe
           either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
     }
@@ -563,12 +554,3 @@ private suspend fun <A> throwException(
   a: A
 ): Either<Throwable, Any> =
   throw RuntimeException("An Exception is thrown while handling the result of the supplied function.")
-
-private fun forAllSmallInt(fn: PropertyContext.(a: Int) -> Boolean) =
-  checkAll(Gen.intSmall(), fn)
-
-private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int) -> Boolean) =
-  checkAll(Gen.intSmall(), Gen.intSmall(), fn)
-
-private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int, c: Int) -> Boolean) =
-  checkAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), fn)

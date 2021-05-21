@@ -20,45 +20,45 @@ class StringInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.string(),
-        aGen = Gen.string(),
+        aGen = Arb.string(),
         bGen = Gen.char(),
-        funcGen = Gen.functionAToB(Gen.char()),
+        funcGen = Arb.functionAToB(Gen.char()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.string().filter { true },
-        aGen = Gen.string(),
+        aGen = Arb.string(),
         bGen = Gen.char(),
-        funcGen = Gen.functionAToB(Gen.char()),
+        funcGen = Arb.functionAToB(Gen.char()),
       )
     )
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { Index.string().index(it) },
-        aGen = Gen.string(),
+        optionalGen = Arb.int().map { Index.string().index(it) },
+        aGen = Arb.string(),
         bGen = Gen.char(),
-        funcGen = Gen.functionAToB(Gen.char()),
+        funcGen = Arb.functionAToB(Gen.char()),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Cons.string().cons(),
-        aGen = Gen.string(),
-        bGen = Gen.pair(Gen.char(), Gen.string()),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.char(), Gen.string())),
+        aGen = Arb.string(),
+        bGen = Gen.pair(Gen.char(), Arb.string()),
+        funcGen = Arb.functionAToB(Gen.pair(Gen.char(), Arb.string())),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Snoc.string().snoc(),
-        aGen = Gen.string(),
-        bGen = Gen.pair(Gen.string(), Gen.char()),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.string(), Gen.char())),
+        aGen = Arb.string(),
+        bGen = Gen.pair(Arb.string(), Gen.char()),
+        funcGen = Arb.functionAToB(Gen.pair(Arb.string(), Gen.char())),
       )
     )
   }

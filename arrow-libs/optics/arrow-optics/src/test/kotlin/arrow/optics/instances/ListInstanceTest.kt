@@ -19,54 +19,54 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.list<String>().filter { true },
-        aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { Index.list<String>().index(it) },
-        aGen = Arb.list(Gen.string()),
-        bGen = Gen.string(),
-        funcGen = Gen.functionAToB(Gen.string()),
+        optionalGen = Arb.int().map { Index.list<String>().index(it) },
+        aGen = Arb.list(Arb.string()),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Cons.list<Int>().cons(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Gen.pair(Gen.int(), Arb.list(Gen.int())),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Arb.list(Gen.int()))),
+        aGen = Arb.list(Arb.int()),
+        bGen = Gen.pair(Arb.int(), Arb.list(Arb.int())),
+        funcGen = Arb.functionAToB(Gen.pair(Arb.int(), Arb.list(Arb.int()))),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Snoc.list<Int>().snoc(),
-        aGen = Arb.list(Gen.int()),
-        bGen = Gen.pair(Arb.list(Gen.int()), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.pair(Arb.list(Gen.int()), Gen.int())),
+        aGen = Arb.list(Arb.int()),
+        bGen = Gen.pair(Arb.list(Arb.int()), Arb.int()),
+        funcGen = Arb.functionAToB(Gen.pair(Arb.list(Arb.int()), Arb.int())),
       )
     )
   }

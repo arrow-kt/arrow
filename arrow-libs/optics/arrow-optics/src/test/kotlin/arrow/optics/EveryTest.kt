@@ -11,49 +11,49 @@ class EveryTest : UnitSpec() {
     with(Every.list<Int>()) {
 
       "asFold should behave as valid Fold: size" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           size(ints) == ints.size
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           isNotEmpty(ints) == ints.isNotEmpty()
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           isEmpty(ints) == ints.isEmpty()
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           getAll(ints) == ints
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           combineAll(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           fold(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: headOption" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           firstOrNull(ints) == ints.firstOrNull()
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           lastOrNull(ints) == ints.lastOrNull()
         }
       }
@@ -62,19 +62,19 @@ class EveryTest : UnitSpec() {
     with(Every.list<Int>()) {
 
       "Getting all targets of a traversal" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           getAll(ints) == ints
         }
       }
 
       "Folding all the values of a traversal" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           fold(Monoid.int(), ints) == ints.sum()
         }
       }
 
       "Combining all the values of a traversal" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           combineAll(Monoid.int(), ints) == ints.sum()
         }
       }
@@ -86,7 +86,7 @@ class EveryTest : UnitSpec() {
       }
 
       "Get the length from a traversal" {
-        checkAll(Arb.list(Gen.int())) { ints ->
+        checkAll(Arb.list(Arb.int())) { ints ->
           size(ints) == ints.size
         }
       }

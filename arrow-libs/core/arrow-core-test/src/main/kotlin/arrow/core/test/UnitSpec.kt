@@ -31,10 +31,10 @@ abstract class UnitSpec : StringSpec() {
     gene: Arb<E>,
     genf: Arb<F>,
     geng: Arb<G>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> Boolean
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> Unit
   ) {
     checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, ::Pair)) { a, b, c, d, e, (f, g) ->
-      fn(a, b, c, d, e, f, g) shouldBe true
+      fn(a, b, c, d, e, f, g)
     }
   }
 
@@ -47,10 +47,10 @@ abstract class UnitSpec : StringSpec() {
     genf: Arb<F>,
     geng: Arb<G>,
     genh: Arb<H>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> Boolean
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> Unit
   ) {
     checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, genh, ::Triple)) { a, b, c, d, e, (f, g, h) ->
-      fn(a, b, c, d, e, f, g, h) shouldBe true
+      fn(a, b, c, d, e, f, g, h)
     }
   }
 
@@ -64,10 +64,10 @@ abstract class UnitSpec : StringSpec() {
     geng: Arb<G>,
     genh: Arb<H>,
     geni: Arb<I>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) -> Boolean
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) -> Unit
   ) {
     checkAll(gena, genb, genc, gend, gene, Arb.bind(genf, geng, genh, geni, ::Tuple4)) { a, b, c, d, e, (f, g, h, i) ->
-      fn(a, b, c, d, e, f, g, h, i) shouldBe true
+      fn(a, b, c, d, e, f, g, h, i)
     }
   }
 
@@ -82,7 +82,7 @@ abstract class UnitSpec : StringSpec() {
     genh: Arb<H>,
     geni: Arb<I>,
     genj: Arb<J>,
-    fn: PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J) -> Boolean
+    fn: suspend PropertyContext.(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J) -> Unit
   ) {
     checkAll(
       gena,
@@ -92,7 +92,7 @@ abstract class UnitSpec : StringSpec() {
       gene,
       Arb.bind(genf, geng, genh, geni, genj, ::Tuple5)
     ) { a, b, c, d, e, (f, g, h, i, j) ->
-      fn(a, b, c, d, e, f, g, h, i, j) shouldBe true
+      fn(a, b, c, d, e, f, g, h, i, j)
     }
   }
 }
