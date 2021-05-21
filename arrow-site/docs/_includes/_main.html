@@ -3,8 +3,8 @@
     <div id="main-flex" class="main-flex">
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
+      {% if item.id != "quickstart" %}
       <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url | relative_url }}">
-
         <div id="{{ item.id }}-header" class="item-header">
           <div id="icon-{{ item.id }}-content" class="icon-content">
             <img id="{{ item.id }}-dark" class="cat-icon-dark" src="{{ item.icon }}.svg" alt="{{ item.title }}">
@@ -15,6 +15,7 @@
           <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
       </a>
+      {% endif %}
       {% endfor %}
     </div>
   </div>

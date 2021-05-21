@@ -1,4 +1,10 @@
 content:
+    - title: QuickStart
+      description: Λrrow is a library for Typed Functional Programming in Kotlin.
+      icon: img/home/arrow-core-lines
+      url: /quickstart/
+      id: quickstart
+
     - title: Core
       description: Functional companion to Kotlin's Standard Library
       icon: img/home/arrow-core-lines
@@ -22,4 +28,3 @@ content:
       icon: img/home/arrow-meta-lines
       url: https://meta.arrow-kt.io/
       id: meta
-
