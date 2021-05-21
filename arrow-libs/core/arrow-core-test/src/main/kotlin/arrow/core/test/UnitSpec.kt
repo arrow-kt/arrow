@@ -6,7 +6,6 @@ import arrow.core.test.laws.Law
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.createTestName
 import io.kotest.property.Arb
-import io.kotest.matchers.shouldBe
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.checkAll
@@ -21,6 +20,13 @@ abstract class UnitSpec : StringSpec() {
     .distinctBy { law: Law -> law.name }
     .forEach { law: Law ->
       registration().addTest(createTestName(law.name), xdisabled = false, law.test)
+    }
+
+  fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
+    .flatMap { list: List<Law> -> list.asIterable() }
+    .distinctBy { law: Law -> law.name }
+    .forEach { law: Law ->
+      registration().addTest(createTestName(prefix, law.name, true), xdisabled = false, law.test)
     }
 
   suspend fun <A, B, C, D, E, F, G> checkAll(

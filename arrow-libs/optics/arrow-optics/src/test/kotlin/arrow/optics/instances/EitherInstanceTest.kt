@@ -6,6 +6,8 @@ import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
 import arrow.optics.test.laws.TraversalLaws
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
 
 class EitherInstanceTest : UnitSpec() {
 
@@ -14,7 +16,7 @@ class EitherInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.either(),
-        aGen = Gen.either(Arb.string(), Arb.int()),
+        aGen = Arb.either(Arb.string(), Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       )

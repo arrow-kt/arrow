@@ -2,7 +2,11 @@ package arrow.optics
 
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
+import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.checkAll
 
 class FoldTest : UnitSpec() {
@@ -13,7 +17,7 @@ class FoldTest : UnitSpec() {
       val select = Fold.select<List<Int>> { it.contains(1) }
 
       checkAll(Arb.list(Arb.int())) { ints ->
-        select.run { getAll(ints) }.firstOrNull() ==
+        select.run { getAll(ints) }.firstOrNull() shouldBe
           ints.let { if (it.contains(1)) it else null }
       }
     }
@@ -22,62 +26,62 @@ class FoldTest : UnitSpec() {
 
       "Folding a list of ints" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) == ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "Folding a list should yield same result as combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) == ints.sum()
+          combineAll(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
       "Folding and mapping a list of strings" {
         checkAll(Arb.list(Arb.int())) { ints ->
           Fold.list<String>()
-            .foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) == ints.sum()
+            .foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) shouldBe ints.sum()
         }
       }
 
       "Get all targets" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          getAll(ints) == ints
+          getAll(ints) shouldBe ints
         }
       }
 
       "Get the size of the fold" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          size(ints) == ints.size
+          size(ints) shouldBe ints.size
         }
       }
 
       "Find the first element matching the predicate" {
-        checkAll(Arb.list(Gen.choose(-100, 100))) { ints ->
-          findOrNull(ints) { it > 10 } == ints.firstOrNull { it > 10 }
+        checkAll(Arb.list(Arb.int(-100..100))) { ints ->
+          findOrNull(ints) { it > 10 } shouldBe ints.firstOrNull { it > 10 }
         }
       }
 
       "Checking existence of a target" {
-        checkAll(Arb.list(Arb.int()), Gen.bool()) { ints, predicate ->
-          exists(ints) { predicate } == (predicate && ints.isNotEmpty())
+        checkAll(Arb.list(Arb.int()), Arb.bool()) { ints, predicate ->
+          exists(ints) { predicate } shouldBe (predicate && ints.isNotEmpty())
         }
       }
 
       "Check if all targets match the predicate" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          all(ints) { it % 2 == 0 } == ints.all { it % 2 == 0 }
+          all(ints) { it % 2 == 0 } shouldBe ints.all { it % 2 == 0 }
         }
       }
 
       "Check if there is no target" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          isEmpty(ints) == ints.isEmpty()
+          isEmpty(ints) shouldBe ints.isEmpty()
         }
       }
 
       "Check if there is a target" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          isNotEmpty(ints) == ints.isNotEmpty()
+          isNotEmpty(ints) shouldBe ints.isNotEmpty()
         }
       }
     }

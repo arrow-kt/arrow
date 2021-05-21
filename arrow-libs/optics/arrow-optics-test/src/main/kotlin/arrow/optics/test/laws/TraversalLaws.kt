@@ -8,6 +8,7 @@ import arrow.core.test.laws.equalUnderTheLaw
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
+import kotlin.math.max
 
 object TraversalLaws {
 
@@ -24,18 +25,27 @@ object TraversalLaws {
   )
 
   suspend fun <A, B> Traversal<A, B>.setIdempotent(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen, bGen) { a, b ->
+    checkAll(max(aGen.minIterations(), bGen.minIterations()), aGen, bGen) { a, b ->
       set(set(a, b), b)
         .equalUnderTheLaw(set(a, b), eq)
     }
 
   suspend fun <A, B> Traversal<A, B>.modifyIdentity(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen) { a ->
+    checkAll(aGen.minIterations(), aGen) { a ->
       modify(a, ::identity).equalUnderTheLaw(a, eq)
     }
 
-  suspend fun <A, B> Traversal<A, B>.composeModify(aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen, funcGen, funcGen) { a, f, g ->
+  suspend fun <A, B> Traversal<A, B>.composeModify(
+    aGen: Arb<A>,
+    funcGen: Arb<(B) -> B>,
+    eq: (A, A) -> Boolean
+  ): PropertyContext =
+    checkAll(
+      max(max(aGen.minIterations(), funcGen.minIterations()), funcGen.minIterations()),
+      aGen,
+      funcGen,
+      funcGen
+    ) { a, f, g ->
       modify(modify(a, f), g)
         .equalUnderTheLaw(modify(a, g compose f), eq)
     }

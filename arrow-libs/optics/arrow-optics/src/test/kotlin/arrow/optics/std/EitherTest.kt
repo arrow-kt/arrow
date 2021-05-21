@@ -11,6 +11,8 @@ import arrow.optics.Iso
 import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Monoid
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
 
 class EitherTest : UnitSpec() {
 
@@ -37,9 +39,9 @@ class EitherTest : UnitSpec() {
     testLaws(
       IsoLaws.laws(
         iso = Iso.eitherToValidated(),
-        aGen = Gen.either(Arb.string(), Arb.int()),
-        bGen = Gen.validated(Arb.string(), Arb.int()),
-        funcGen = Arb.functionAToB(Gen.validated(Arb.string(), Arb.int())),
+        aGen = Arb.either(Arb.string(), Arb.int()),
+        bGen = Arb.validated(Arb.string(), Arb.int()),
+        funcGen = Arb.functionAToB(Arb.validated(Arb.string(), Arb.int())),
       )
     )
   }

@@ -14,7 +14,7 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.handleError
 import arrow.core.handleErrorWith
-import io.kotest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 /*** Arrow.io documentation as runnable code ***/

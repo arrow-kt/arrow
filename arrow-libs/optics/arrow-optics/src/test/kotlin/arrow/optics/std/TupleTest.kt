@@ -14,155 +14,174 @@ import arrow.optics.Traversal
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.triple
 
 class TupleTest : UnitSpec() {
 
   init {
 
     testLaws(
+      "Lens pair first - ",
       LensLaws.laws(
         lens = Lens.pairFirst(),
-        aGen = Gen.pair(Arb.int(), Arb.string()),
+        aGen = Arb.pair(Arb.int(), Arb.string()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
+      "Lens pair second - ",
       LensLaws.laws(
         lens = Lens.pairSecond(),
-        aGen = Gen.pair(Arb.int(), Arb.string()),
+        aGen = Arb.pair(Arb.int(), Arb.string()),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
+      "Lens triple first - ",
       LensLaws.laws(
         lens = Lens.tripleFirst(),
-        aGen = Gen.triple(Arb.int(), Arb.string(), Arb.string()),
+        aGen = Arb.triple(Arb.int(), Arb.string(), Arb.string()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
+      "Lens triple second - ",
       LensLaws.laws(
         lens = Lens.tripleSecond(),
-        aGen = Gen.triple(Arb.int(), Arb.string(), Arb.int()),
+        aGen = Arb.triple(Arb.int(), Arb.string(), Arb.int()),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
+      "Lens triple third - ",
       LensLaws.laws(
         lens = Lens.tripleThird(),
-        aGen = Gen.triple(Arb.int(), Arb.int(), Arb.string()),
+        aGen = Arb.triple(Arb.int(), Arb.int(), Arb.string()),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 
     testLaws(
+      "Traversal pair - ",
       TraversalLaws.laws(
         traversal = Traversal.pair(),
-        aGen = Gen.pair(Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.pair(Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal triple - ",
       TraversalLaws.laws(
         traversal = Traversal.triple(),
-        aGen = Gen.triple(Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.triple(Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple4 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple4(),
-        aGen = Gen.tuple4(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.tuple4(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple5 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple5(),
-        aGen = Gen.tuple5(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.tuple5(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple6 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple6(),
-        aGen = Gen.tuple6(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.tuple6(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple7 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple7(),
-        aGen = Gen.tuple7(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.tuple7(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple8 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple8(),
-        aGen = Gen.tuple8(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        aGen = Arb.tuple8(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
 
     testLaws(
+      "Traversal tuple9 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple9(),
-        aGen = Gen.tuple9(
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int()
+        aGen = Arb.tuple9(
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool()
         ),
-        bGen = Arb.int(),
+        bGen = Arb.bool(),
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
+      "Traversal tuple10 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple10(),
-        aGen = Gen.tuple10(
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int(),
-          Arb.int()
+        aGen = Arb.tuple10(
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool(),
+          Arb.bool()
         ),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
+        bGen = Arb.bool(),
+        funcGen = Arb.functionAToB(Arb.bool()),
       )
     )
   }

@@ -89,7 +89,7 @@ fun Arb.Companion.longSmall(): Arb<Long> =
   Arb.long((Long.MIN_VALUE / 100000L)..(Long.MAX_VALUE / 100000L))
 
 fun <A, B, C, D> Arb.Companion.tuple4(arbA: Arb<A>, arbB: Arb<B>, arbC: Arb<C>, arbD: Arb<D>): Arb<Tuple4<A, B, C, D>> =
-  Arb.bind(arbA, arbB, arbC, arbD) { a: A, b: B, c: C, d: D -> Tuple4(a, b, c, d) }
+  Arb.bind(arbA, arbB, arbC, arbD, ::Tuple4)
 
 fun <A, B, C, D, E> Arb.Companion.tuple5(
   arbA: Arb<A>,
@@ -98,7 +98,7 @@ fun <A, B, C, D, E> Arb.Companion.tuple5(
   arbD: Arb<D>,
   arbE: Arb<E>
 ): Arb<Tuple5<A, B, C, D, E>> =
-  Arb.bind(arbA, arbB, arbC, arbD, arbE) { a: A, b: B, c: C, d: D, e: E -> Tuple5(a, b, c, d, e) }
+  Arb.bind(arbA, arbB, arbC, arbD, arbE, ::Tuple5)
 
 fun <A, B, C, D, E, F> Arb.Companion.tuple6(
   arbA: Arb<A>,
@@ -108,7 +108,7 @@ fun <A, B, C, D, E, F> Arb.Companion.tuple6(
   arbE: Arb<E>,
   arbF: Arb<F>
 ): Arb<Tuple6<A, B, C, D, E, F>> =
-  Arb.bind(arbA, arbB, arbC, arbD, arbE, arbF) { a: A, b: B, c: C, d: D, e: E, f: F -> Tuple6(a, b, c, d, e, f) }
+  Arb.bind(arbA, arbB, arbC, arbD, arbE, arbF, ::Tuple6)
 
 fun <A, B, C, D, E, F, G> Arb.Companion.tuple7(
   arbA: Arb<A>,
@@ -119,17 +119,7 @@ fun <A, B, C, D, E, F, G> Arb.Companion.tuple7(
   arbF: Arb<F>,
   arbG: Arb<G>
 ): Arb<Tuple7<A, B, C, D, E, F, G>> =
-  Arb.bind(arbA, arbB, arbC, arbD, arbE, arbF, arbG) { a: A, b: B, c: C, d: D, e: E, f: F, g: G ->
-    Tuple7(
-      a,
-      b,
-      c,
-      d,
-      e,
-      f,
-      g
-    )
-  }
+  Arb.bind(arbA, arbB, arbC, arbD, arbE, arbF, arbG, ::Tuple7)
 
 fun <A, B, C, D, E, F, G, H> Arb.Companion.tuple8(
   arbA: Arb<A>,
@@ -144,17 +134,8 @@ fun <A, B, C, D, E, F, G, H> Arb.Companion.tuple8(
   Arb.bind(
     Arb.tuple7(arbA, arbB, arbC, arbD, arbE, arbF, arbG),
     arbH
-  ) { tuple: Tuple7<A, B, C, D, E, F, G>, h: H ->
-    Tuple8(
-      tuple.first,
-      tuple.second,
-      tuple.third,
-      tuple.fourth,
-      tuple.fifth,
-      tuple.sixth,
-      tuple.seventh,
-      h
-    )
+  ) { (a, b, c, d, e, f, g), h ->
+    Tuple8(a, b, c, d, e, f, g, h)
   }
 
 fun <A, B, C, D, E, F, G, H, I> Arb.Companion.tuple9(
@@ -171,18 +152,8 @@ fun <A, B, C, D, E, F, G, H, I> Arb.Companion.tuple9(
   Arb.bind(
     Arb.tuple8(arbA, arbB, arbC, arbD, arbE, arbF, arbG, arbH),
     arbI
-  ) { tuple: Tuple8<A, B, C, D, E, F, G, H>, i: I ->
-    Tuple9(
-      tuple.first,
-      tuple.second,
-      tuple.third,
-      tuple.fourth,
-      tuple.fifth,
-      tuple.sixth,
-      tuple.seventh,
-      tuple.eighth,
-      i
-    )
+  ) { (a, b, c, d, e, f, g, h), i ->
+    Tuple9(a, b, c, d, e, f, g, h, i)
   }
 
 fun <A, B, C, D, E, F, G, H, I, J> Arb.Companion.tuple10(
@@ -200,19 +171,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Arb.Companion.tuple10(
   Arb.bind(
     Arb.tuple9(arbA, arbB, arbC, arbD, arbE, arbF, arbG, arbH, arbI),
     arbJ
-  ) { tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j: J ->
-    Tuple10(
-      tuple.first,
-      tuple.second,
-      tuple.third,
-      tuple.fourth,
-      tuple.fifth,
-      tuple.sixth,
-      tuple.seventh,
-      tuple.eighth,
-      tuple.ninth,
-      j
-    )
+  ) { (a, b, c, d, e, f, g, h, i), j ->
+    Tuple10(a, b, c, d, e, f, g, h, i, j)
   }
 
 fun Arb.Companion.nonZeroInt(): Arb<Int> = Arb.int().filter { it != 0 }
