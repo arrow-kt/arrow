@@ -16,8 +16,11 @@ import arrow.fx.coroutines.singleThreadName
 import arrow.fx.coroutines.suspend
 import arrow.fx.coroutines.threadName
 import arrow.fx.coroutines.throwable
+import arrow.fx.coroutines.fromExecutor
+import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
@@ -38,17 +41,17 @@ class ParMap4Test : ArrowFxSpec(
       checkAll {
         single.zip(mapCtx).use { (_single, _mapCtx) ->
           withContext(_single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             val (s1, s2, s3, s4) = parZip(
               _mapCtx, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }
             ) { a, b, c, d -> Tuple4(a, b, c, d) }
 
-            s1 shouldBe mapCtxName
-            s2 shouldBe mapCtxName
-            s3 shouldBe mapCtxName
-            s4 shouldBe mapCtxName
-            threadName() shouldBe singleThreadName
+            s1 shouldStartWith mapCtxName
+            s2 shouldStartWith mapCtxName
+            s3 shouldStartWith mapCtxName
+            s4 shouldStartWith mapCtxName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -61,7 +64,7 @@ class ParMap4Test : ArrowFxSpec(
       checkAll(Arb.int(1..4), Arb.throwable()) { choose, e ->
         single.zip(mapCtx).use { (_single, _mapCtx) ->
           withContext(_single) {
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
 
             Either.catch {
               when (choose) {
@@ -96,7 +99,7 @@ class ParMap4Test : ArrowFxSpec(
               }
             } should leftException(e)
 
-            threadName() shouldBe singleThreadName
+            threadName() shouldStartWith singleThreadName
           }
         }
       }
@@ -138,9 +141,12 @@ class ParMap4Test : ArrowFxSpec(
 
     "parMapN 4 finishes on single thread" {
       checkAll(Arb.string()) {
-        single.use { ctx ->
-          parZip(ctx, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b, c, d -> Tuple4(a, b, c, d) }
-        } shouldBe Tuple4("single", "single", "single", "single")
+        val res = single.use { ctx ->
+          parZip(ctx, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b, c, d -> listOf(a, b, c, d) }
+        }
+        assertSoftly {
+          res.forEach { it shouldStartWith "single" }
+        }
       }
     }
 

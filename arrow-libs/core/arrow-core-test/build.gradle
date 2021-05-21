@@ -8,6 +8,7 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
     api project(":arrow-core")
     api project(":arrow-continuations")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"

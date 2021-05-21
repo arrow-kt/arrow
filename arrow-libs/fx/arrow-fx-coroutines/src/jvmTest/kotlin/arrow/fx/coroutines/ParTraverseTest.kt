@@ -1,8 +1,10 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
@@ -71,11 +73,14 @@ class ParTraverseTest : ArrowFxSpec(
       l shouldBe (0 until count).toList()
     }
 
-    "parTraverse finishes on single thread " { // 100 is same default length as Arb.list
+    "parTraverse runs on provided context " { // 100 is same default length as Arb.list
       checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        single.use { ctx ->
+        val res = single.use { ctx ->
           (0 until i).parTraverse(ctx) { Thread.currentThread().name }
-        } shouldBe (0 until i).map { "single" }
+        }
+        assertSoftly {
+          res.forEach { it shouldStartWith "single" }
+        }
       }
     }
 
@@ -87,13 +92,16 @@ class ParTraverseTest : ArrowFxSpec(
       ref.get() shouldBe 100
     }
 
-    "parTraverseN finishes on single thread" {
+    "parTraverseN runs on provided thread" {
       checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        single.use { ctx ->
+        val res = single.use { ctx ->
           (0 until i).parTraverseN(ctx, 3) {
             Thread.currentThread().name
           }
-        } shouldBe (0 until i).map { "single" }
+        }
+        assertSoftly {
+          res.forEach { it shouldStartWith "single" }
+        }
       }
     }
 
