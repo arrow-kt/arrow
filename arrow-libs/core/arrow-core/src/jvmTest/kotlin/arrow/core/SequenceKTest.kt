@@ -7,9 +7,9 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotlintest.matchers.sequences.shouldBeEmpty
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -59,7 +59,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val ints = ints.asSequence()
         val res: ValidatedNel<Int, Sequence<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequenceValidated(Semigroup.nonEmptyList())
@@ -72,7 +72,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip3" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c ->
+      checkAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.int()), Gen.sequence(Gen.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
         val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
         result.toList() == expected.toList()
@@ -80,7 +80,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -96,7 +96,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip5" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -114,7 +114,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip6" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -134,7 +134,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip7" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -156,7 +156,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip8" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -180,7 +180,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip9" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -206,7 +206,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "zip10" {
-      forAll(
+      checkAll(
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
         Gen.sequence(Gen.int()),
@@ -234,17 +234,17 @@ class SequenceKTest : UnitSpec() {
     }
 
     "can align sequences" {
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
+      checkAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
         a.align(b).toList().size == max(a.toList().size, b.toList().size)
       }
 
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
+      checkAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).all {
           it.isBoth
         }
       }
 
-      forAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
+      checkAll(Gen.sequence(Gen.int()), Gen.sequence(Gen.string())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).all {
@@ -267,7 +267,7 @@ class SequenceKTest : UnitSpec() {
 
       val seq2 = generateSequence(0) { it + 1 }
 
-      forAll(10, Gen.positiveIntegers().filter { it < 10_000 }) { idx: Int ->
+      checkAll(10, Gen.positiveIntegers().filter { it < 10_000 }) { idx: Int ->
         val element = seq1.align(seq2).drop(idx).first()
 
         element == Ior.Both("A", idx)
@@ -275,7 +275,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "mapNotNull" {
-      forAll(Gen.sequence(Gen.int())) { a ->
+      checkAll(Gen.sequence(Gen.int())) { a ->
         val result = a.mapNotNull {
           when (it % 2 == 0) {
             true -> it.toString()
@@ -297,7 +297,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     "filterOption should filter None" {
-      forAll(Gen.list(Gen.option(Gen.int()))) { ints ->
+      checkAll(Arb.list(Gen.option(Gen.int()))) { ints ->
         ints.asSequence().filterOption().toList() == ints.filterOption()
       }
     }

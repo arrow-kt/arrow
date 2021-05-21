@@ -5,9 +5,9 @@ import arrow.core.test.generators.ior
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotlintest.forAll
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 
 class IorTest : UnitSpec() {
 
@@ -25,14 +25,14 @@ class IorTest : UnitSpec() {
     }
 
     "zip identity" {
-      forAll(Gen.ior(Gen.long().orNull(), Gen.int().orNull())) { ior ->
+      checkAll(Gen.ior(Gen.long().orNull(), Gen.int().orNull())) { ior ->
         val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
         res == ior
       }
     }
 
     "zip is derived from flatMap" {
-      forAll(
+      checkAll(
         Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
         Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
         Gen.ior(Gen.long().orNull(), Gen.int().orNull()),
@@ -183,7 +183,7 @@ class IorTest : UnitSpec() {
     "combine cases for Semigroup" {
       fun case(a: Ior<String, Int>, b: Ior<String, Int>, result: Ior<String, Int>) = listOf(a, b, result)
       Semigroup.ior(Semigroup.string(), Semigroup.int()).run {
-        forAll(
+        checkAll(
           listOf(
             case("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
             case(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
@@ -214,7 +214,7 @@ class IorTest : UnitSpec() {
     }
 
     "sequence should be consistent with traverse" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.map { listOf(it) }.sequence() == ior.traverse { listOf(it) }
       }
     }
@@ -232,7 +232,7 @@ class IorTest : UnitSpec() {
     }
 
     "sequenceOption should be consistent with traverseOption" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.map { Some(it) }.sequenceOption() == ior.traverseOption { Some(it) }
       }
     }
@@ -250,7 +250,7 @@ class IorTest : UnitSpec() {
     }
 
     "sequenceEither should be consistent with traverseEither" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.map { it.right() }.sequenceEither() == ior.traverseEither { it.right() }
       }
     }
@@ -271,7 +271,7 @@ class IorTest : UnitSpec() {
     }
 
     "bisequence should be consistent with bitraverse" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.bimap({ listOf(it) }, { listOf(it) }).bisequence() ==
           ior.bitraverse({ listOf(it) }, { listOf(it) })
       }
@@ -290,7 +290,7 @@ class IorTest : UnitSpec() {
     }
 
     "bisequenceOption should be consistent with bitraverseOption" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.bimap({ None }, { Some(it) }).bisequenceOption() ==
           ior.bitraverseOption({ None }, { Some(it) })
       }
@@ -309,7 +309,7 @@ class IorTest : UnitSpec() {
     }
 
     "bisequenceEither should be consistent with bitraverseEither" {
-      forAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
+      checkAll(Gen.ior(Gen.int(), Gen.string())) { ior ->
         ior.bimap({ it.left() }, { it.right() }).bisequenceEither() ==
           ior.bitraverseEither({ it.left() }, { it.right() })
       }

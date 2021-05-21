@@ -4,8 +4,8 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class GetterTest : UnitSpec() {
 
@@ -18,49 +18,49 @@ class GetterTest : UnitSpec() {
     with(tokenGetter) {
 
       "asFold should behave as valid Fold: size" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           size(token) == 1
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           isNotEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           !isEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           getAll(token) == listOf(token.value)
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           combineAll(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           fold(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: headOption" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           firstOrNull(token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           lastOrNull(token) == token.value
         }
       }
@@ -106,21 +106,21 @@ class GetterTest : UnitSpec() {
 
     "Pairing two disjoint getters should yield a pair of their results" {
       val splitGetter: Getter<Pair<Token, User>, Pair<String, Token>> = tokenGetter.split(userGetter)
-      forAll(genToken, genUser) { token: Token, user: User ->
+      checkAll(genToken, genUser) { token: Token, user: User ->
         splitGetter.get(token to user) == token.value to user.token
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenGetter.first<Int>()
-      forAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
         first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val first = tokenGetter.second<Int>()
-      forAll(Gen.int(), genToken) { int: Int, token: Token ->
+      checkAll(Gen.int(), genToken) { int: Int, token: Token ->
         first.get(int to token) == int to token.value
       }
     }

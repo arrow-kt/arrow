@@ -10,7 +10,7 @@ import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class ListInstanceTest : UnitSpec() {
 
@@ -19,7 +19,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Gen.list(Gen.string()),
+        aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -28,7 +28,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = Traversal.list(),
-        aGen = Gen.list(Gen.string()),
+        aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -37,7 +37,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = FilterIndex.list<String>().filter { true },
-        aGen = Gen.list(Gen.string()),
+        aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -46,7 +46,7 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.int().map { Index.list<String>().index(it) },
-        aGen = Gen.list(Gen.string()),
+        aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )
@@ -55,18 +55,18 @@ class ListInstanceTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = Cons.list<Int>().cons(),
-        aGen = Gen.list(Gen.int()),
-        bGen = Gen.pair(Gen.int(), Gen.list(Gen.int())),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Gen.list(Gen.int()))),
+        aGen = Arb.list(Gen.int()),
+        bGen = Gen.pair(Gen.int(), Arb.list(Gen.int())),
+        funcGen = Gen.functionAToB(Gen.pair(Gen.int(), Arb.list(Gen.int()))),
       )
     )
 
     testLaws(
       PrismLaws.laws(
         prism = Snoc.list<Int>().snoc(),
-        aGen = Gen.list(Gen.int()),
-        bGen = Gen.pair(Gen.list(Gen.int()), Gen.int()),
-        funcGen = Gen.functionAToB(Gen.pair(Gen.list(Gen.int()), Gen.int())),
+        aGen = Arb.list(Gen.int()),
+        bGen = Gen.pair(Arb.list(Gen.int()), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.pair(Arb.list(Gen.int()), Gen.int())),
       )
     )
   }

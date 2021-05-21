@@ -1,9 +1,9 @@
 package arrow.core
 
 import arrow.core.test.generators.functionAToB
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 class AndThenTests : FreeSpec() {
@@ -13,7 +13,7 @@ class AndThenTests : FreeSpec() {
 
     "AndThen0" - {
       "compose a chain of functions with andThen should be same with AndThen" {
-        forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
+        checkAll(Gen.int(), Arb.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
           val result = fs.fold({ i }) { acc, f ->
             { f(acc()) }
           }.invoke()
@@ -27,7 +27,7 @@ class AndThenTests : FreeSpec() {
       }
 
       "compose a chain of function with compose should be same with AndThen" {
-        forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
+        checkAll(Gen.int(), Arb.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
           val result = fs.fold({ x: Int -> x }) { acc, f ->
             { x: Int -> acc(f(x)) }
           }.invoke(i)
@@ -59,7 +59,7 @@ class AndThenTests : FreeSpec() {
 
     "AndThen1" - {
       "compose a chain of functions with andThen should be same with AndThen" {
-        forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
+        checkAll(Gen.int(), Arb.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
           val result = fs.fold({ x: Int -> x }) { acc, f ->
             { x: Int -> f(acc(x)) }
           }.invoke(i)
@@ -73,7 +73,7 @@ class AndThenTests : FreeSpec() {
       }
 
       "compose a chain of function with compose should be same with AndThen" {
-        forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
+        checkAll(Gen.int(), Arb.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
           val result = fs.fold({ x: Int -> x }) { acc, f ->
             { x: Int -> acc(f(x)) }
           }.invoke(i)
@@ -111,7 +111,7 @@ class AndThenTests : FreeSpec() {
 
     "AndThen2" - {
       "compose a chain of functions with andThen should be same with AndThen" {
-        forAll(Gen.int(), Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, j, fs ->
+        checkAll(Gen.int(), Gen.int(), Arb.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, j, fs ->
           val result = fs.fold({ x: Int, y: Int -> x + y }) { acc, f ->
             { x: Int, y: Int -> f(acc(x, y)) }
           }.invoke(i, j)

@@ -4,9 +4,9 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -27,7 +27,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "traverseEither short-circuit" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseEither {
           if (it % 2 == 0) {
@@ -44,7 +44,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "sequenceEither should be consistent with traverseEither" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequenceEither() ==
           ints.traverseEither { Either.conditionally(it % 2 == 0, { it }, { it }) }
       }
@@ -62,7 +62,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "traverseOption short-circuits" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseOption {
           (it % 2 == 0).maybe {
@@ -75,14 +75,14 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "sequenceOption yields some when all entries in the list are some" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
         evens.all { it == ints }
       }
     }
 
     "sequenceOption should be consistent with traverseOption" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         ints.map { (it % 2 == 0).maybe { it } }.sequenceOption() ==
           ints.traverseOption { (it % 2 == 0).maybe { it } }
       }
@@ -100,7 +100,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         val res: ValidatedNel<Int, NonEmptyList<Int>> =
           ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
@@ -112,18 +112,18 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         ints.map { if (it % 2 == 0) it.valid() else it.invalid() }.sequenceValidated(Semigroup.int()) ==
           ints.traverseValidated(Semigroup.int()) { if (it % 2 == 0) it.valid() else it.invalid() }
       }
     }
 
     "can align lists with different lengths" {
-      forAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->
+      checkAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->
         a.align(b).size == max(a.size, b.size)
       }
 
-      forAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->
+      checkAll(Gen.nonEmptyList(Gen.bool()), Gen.nonEmptyList(Gen.bool())) { a, b ->
         a.align(b).all.take(min(a.size, b.size)).all {
           it.isBoth
         }
@@ -131,7 +131,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip2" {
-      forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
+      checkAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
         val result = a.zip(b)
         val expected = a.all.zip(b.all).let(NonEmptyList.Companion::fromListUnsafe)
         result == expected
@@ -139,7 +139,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip3" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int())
@@ -151,7 +151,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -164,7 +164,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip5" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -178,7 +178,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip6" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -193,7 +193,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip7" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -209,7 +209,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip8" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -226,7 +226,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip9" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
@@ -244,7 +244,7 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "zip10" {
-      forAll(
+      checkAll(
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),
         Gen.nonEmptyList(Gen.int()),

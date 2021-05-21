@@ -4,9 +4,9 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Semigroup
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -24,7 +24,7 @@ class IterableTest : UnitSpec() {
     }
 
     "traverseEither short-circuit" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseEither {
           if (it % 2 == 0) {
@@ -41,7 +41,7 @@ class IterableTest : UnitSpec() {
     }
 
     "sequenceEither should be consistent with traverseEither" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         ints.map { it.right() }.sequenceEither() == ints.traverseEither { it.right() }
       }
     }
@@ -58,7 +58,7 @@ class IterableTest : UnitSpec() {
     }
 
     "traverseOption short-circuits" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseOption {
           (it % 2 == 0).maybe {
@@ -71,14 +71,14 @@ class IterableTest : UnitSpec() {
     }
 
     "sequenceOption yields some when all entries in the list are some" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
         evens.all { it == ints }
       }
     }
 
     "sequenceOption should be consistent with traverseOption" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         ints.map { Some(it) }.sequenceOption() == ints.traverseOption { Some(it) }
       }
     }
@@ -95,7 +95,7 @@ class IterableTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequenceValidated()
 
@@ -107,14 +107,14 @@ class IterableTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         ints.map { it.valid() as Validated<String, Int> }.sequenceValidated(Semigroup.string()) ==
           ints.traverseValidated(Semigroup.string()) { it.valid() as Validated<String, Int> }
       }
     }
 
     "zip3" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b, c ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
         val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
         result == expected
@@ -122,7 +122,7 @@ class IterableTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int()), Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b, c, d ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int()), Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
         val expected = a.zip(b, ::Pair)
           .zip(c) { (a, b), c -> Triple(a, b, c) }
@@ -133,12 +133,12 @@ class IterableTest : UnitSpec() {
     }
 
     "zip5" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e ->
         val result = a.zip(b, c, d, e, ::Tuple5)
         val expected = a.zip(b, ::Pair)
@@ -151,13 +151,13 @@ class IterableTest : UnitSpec() {
     }
 
     "zip6" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e, f ->
         val result = a.zip(b, c, d, e, f, ::Tuple6)
         val expected = a.zip(b, ::Pair)
@@ -171,14 +171,14 @@ class IterableTest : UnitSpec() {
     }
 
     "zip7" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e, f, g ->
         val result = a.zip(b, c, d, e, f, g, ::Tuple7)
         val expected = a.zip(b, ::Pair)
@@ -193,15 +193,15 @@ class IterableTest : UnitSpec() {
     }
 
     "zip8" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e, f, g, h ->
         val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
         val expected = a.zip(b, ::Pair)
@@ -217,16 +217,16 @@ class IterableTest : UnitSpec() {
     }
 
     "zip9" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e, f, g, h, i ->
         val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
         val expected = a.zip(b, ::Pair)
@@ -243,17 +243,17 @@ class IterableTest : UnitSpec() {
     }
 
     "zip10" {
-      forAll(
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int()),
-        Gen.list(Gen.int())
+      checkAll(
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int()),
+        Arb.list(Gen.int())
       ) { a, b, c, d, e, f, g, h, i, j ->
         val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
         val expected = a.zip(b, ::Pair)
@@ -271,17 +271,17 @@ class IterableTest : UnitSpec() {
     }
 
     "can align lists with different lengths" {
-      forAll(Gen.list(Gen.bool()), Gen.list(Gen.bool())) { a, b ->
+      checkAll(Arb.list(Gen.bool()), Arb.list(Gen.bool())) { a, b ->
         a.align(b).size == max(a.size, b.size)
       }
 
-      forAll(Gen.list(Gen.bool()), Gen.list(Gen.bool())) { a, b ->
+      checkAll(Arb.list(Gen.bool()), Arb.list(Gen.bool())) { a, b ->
         a.align(b).take(min(a.size, b.size)).all {
           it.isBoth
         }
       }
 
-      forAll(Gen.list(Gen.bool()), Gen.list(Gen.bool())) { a, b ->
+      checkAll(Arb.list(Gen.bool()), Arb.list(Gen.bool())) { a, b ->
         a.align(b).drop(min(a.size, b.size)).all {
           if (a.size < b.size) {
             it.isRight
@@ -293,7 +293,7 @@ class IterableTest : UnitSpec() {
     }
 
     "leftPadZip (with map)" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
@@ -304,7 +304,7 @@ class IterableTest : UnitSpec() {
     }
 
     "leftPadZip (without map)" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
@@ -315,7 +315,7 @@ class IterableTest : UnitSpec() {
     }
 
     "rightPadZip (without map)" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
@@ -327,7 +327,7 @@ class IterableTest : UnitSpec() {
     }
 
     "rightPadZip (with map)" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
@@ -339,7 +339,7 @@ class IterableTest : UnitSpec() {
     }
 
     "padZip" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
         a.padZip(b) { l, r -> Ior.fromNullables(l, r) } == left.zip(right) { l, r -> Ior.fromNullables(l, r) }
@@ -347,7 +347,7 @@ class IterableTest : UnitSpec() {
     }
 
     "padZipWithNull" {
-      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { a, b ->
+      checkAll(Arb.list(Gen.int()), Arb.list(Gen.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
@@ -356,13 +356,13 @@ class IterableTest : UnitSpec() {
     }
 
     "filterOption" {
-      forAll(Gen.list(Gen.option(Gen.int()))) { listOfOption ->
+      checkAll(Arb.list(Gen.option(Gen.int()))) { listOfOption ->
         listOfOption.filterOption() == listOfOption.mapNotNull { it.orNull() }
       }
     }
 
     "flattenOption" {
-      forAll(Gen.list(Gen.option(Gen.int()))) { listOfOption ->
+      checkAll(Arb.list(Gen.option(Gen.int()))) { listOfOption ->
         listOfOption.flattenOption() == listOfOption.mapNotNull { it.orNull() }
       }
     }

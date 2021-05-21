@@ -11,7 +11,7 @@ import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class StringInstanceTest : UnitSpec() {
 

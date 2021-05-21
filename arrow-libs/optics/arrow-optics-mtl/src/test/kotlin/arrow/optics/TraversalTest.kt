@@ -20,8 +20,8 @@ import arrow.optics.mtl.toState
 import arrow.optics.mtl.update
 import arrow.optics.mtl.updateOld
 import arrow.optics.mtl.update_
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class TraversalTest : UnitSpec() {
 
@@ -31,7 +31,7 @@ class TraversalTest : UnitSpec() {
 
     with(listKTraverse) {
       "Extract should extract the focus from the state" {
-        forAll(Gen.listK(Gen.int())) { ints ->
+        checkAll(Gen.listK(Gen.int())) { ints ->
           extract().run(ints) ==
             State { iis: ListK<Int> ->
               iis toT getAll(iis)
@@ -40,19 +40,19 @@ class TraversalTest : UnitSpec() {
       }
 
       "toState should be an alias to extract" {
-        forAll(Gen.listK(Gen.int())) { ints ->
+        checkAll(Gen.listK(Gen.int())) { ints ->
           toState().run(ints) == extract().run(ints)
         }
       }
 
       "Extracts with f should be same as extract and map" {
-        forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, String>(Gen.string())) { ints, f ->
+        checkAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, String>(Gen.string())) { ints, f ->
           extractMap(f).run(ints) == extract().map { it.map(f) }.run(ints)
         }
       }
 
       "update f should be same modify f within State and returning new state" {
-        forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
+        checkAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
           update(f).run(ints) ==
             State<ListK<Int>, ListK<Int>> { iis: ListK<Int> ->
               modify(iis, f)
@@ -62,7 +62,7 @@ class TraversalTest : UnitSpec() {
       }
 
       "updateOld f should be same as modify f within State and returning old state" {
-        forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
+        checkAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
           updateOld(f).run(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT getAll(iis)
@@ -71,7 +71,7 @@ class TraversalTest : UnitSpec() {
       }
 
       "update_ f should be as modify f within State and returning Unit" {
-        forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
+        checkAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
           update_(f).run(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT Unit
@@ -80,7 +80,7 @@ class TraversalTest : UnitSpec() {
       }
 
       "assign a should be same set a within State and returning new value" {
-        forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
+        checkAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
           assign(i).run(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i)
@@ -90,7 +90,7 @@ class TraversalTest : UnitSpec() {
       }
 
       "assignOld f should be same as modify f within State and returning old state" {
-        forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
+        checkAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
           assignOld(i).run(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i).fix() toT getAll(iis)
@@ -99,7 +99,7 @@ class TraversalTest : UnitSpec() {
       }
 
       "assign_ f should be as modify f within State and returning Unit" {
-        forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
+        checkAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
           assign_(i).run(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i).fix() toT Unit

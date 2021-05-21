@@ -13,7 +13,7 @@ import arrow.optics.Lens
 import arrow.optics.Traversal
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class TupleTest : UnitSpec() {
 

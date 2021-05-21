@@ -8,7 +8,7 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class NonEmptyListInstanceTest : UnitSpec() {
 

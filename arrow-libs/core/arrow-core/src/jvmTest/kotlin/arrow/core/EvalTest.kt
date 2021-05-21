@@ -6,10 +6,10 @@ import arrow.core.computations.eval
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.FxLaws
-import io.kotlintest.fail
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.assertions.fail
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 
 class EvalTest : UnitSpec() {
 
@@ -131,7 +131,7 @@ class EvalTest : UnitSpec() {
     }
 
     "stack safety stress test" {
-      forAll(DeepEval.gen) { d: DeepEval ->
+      checkAll(DeepEval.gen) { d: DeepEval ->
         try {
           d.eval.value()
           true

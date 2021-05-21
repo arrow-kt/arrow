@@ -6,10 +6,10 @@ import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.core.test.generators.validated
-import io.kotlintest.fail
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.assertions.fail
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
@@ -127,14 +127,14 @@ class ValidatedTest : UnitSpec() {
     }
 
     "zip identity" {
-      forAll(Gen.validated(Gen.long().orNull(), Gen.int().orNull())) { validated ->
+      checkAll(Gen.validated(Gen.long().orNull(), Gen.int().orNull())) { validated ->
         val res = validated.zip(nullableLongSemigroup, Valid(Unit)) { a, _ -> a }
         res == validated
       }
     }
 
     "zip is derived from flatMap" {
-      forAll(
+      checkAll(
         Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
         Gen.validated(Gen.long().orNull(), Gen.int().orNull()),
         Gen.validated(Gen.long().orNull(), Gen.int().orNull()),

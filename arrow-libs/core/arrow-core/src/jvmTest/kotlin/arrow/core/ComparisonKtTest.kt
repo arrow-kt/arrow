@@ -2,9 +2,9 @@ package arrow.core
 
 import arrow.core.test.generators.byte
 import arrow.core.test.generators.short
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
 
 data class Person(val age: Int, val name: String) : Comparable<Person> {
@@ -18,13 +18,13 @@ data class Person(val age: Int, val name: String) : Comparable<Person> {
     comparator.compare(this, other)
 }
 
-fun Gen.Companion.person(): Gen<Person> =
+fun Gen.Companion.person(): Arb<Person> =
   bind(int(), string(), ::Person)
 
 class ComparisonKtTest : StringSpec() {
   init {
     "Generic - sort2" {
-      forAll(Gen.person(), Gen.person()) { a, b ->
+      checkAll(Gen.person(), Gen.person()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -36,7 +36,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Generic - sort3" {
-      forAll(Gen.person(), Gen.person(), Gen.person()) { a, b, c ->
+      checkAll(Gen.person(), Gen.person(), Gen.person()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -49,7 +49,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Generic - sortAll" {
-      forAll(Gen.person(), Gen.list(Gen.person())) { a, aas ->
+      checkAll(Gen.person(), Arb.list(Gen.person())) { a, aas ->
         val res = sort(a, *aas.toTypedArray())
         val expected = listOf(a, *aas.toTypedArray()).sorted()
 
@@ -58,7 +58,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Generic - comparator - sort2" {
-      forAll(Gen.person(), Gen.person()) { a, b ->
+      checkAll(Gen.person(), Gen.person()) { a, b ->
         val (first, second) = sort(a, b, Person.comparator)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -70,7 +70,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Generic - comparator - sort3" {
-      forAll(Gen.person(), Gen.person(), Gen.person()) { a, b, c ->
+      checkAll(Gen.person(), Gen.person(), Gen.person()) { a, b, c ->
         val (first, second, third) = sort(a, b, c, Person.comparator)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -83,7 +83,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Byte - sort2" {
-      forAll(Gen.byte(), Gen.byte()) { a, b ->
+      checkAll(Gen.byte(), Gen.byte()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -95,7 +95,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Byte - sort3" {
-      forAll(Gen.byte(), Gen.byte(), Gen.byte()) { a, b, c ->
+      checkAll(Gen.byte(), Gen.byte(), Gen.byte()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -108,7 +108,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Byte - sortAll" {
-      forAll(Gen.byte(), Gen.byte(), Gen.byte(), Gen.byte()) { a, b, c, d ->
+      checkAll(Gen.byte(), Gen.byte(), Gen.byte(), Gen.byte()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 
@@ -117,7 +117,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Short - sort2" {
-      forAll(Gen.short(), Gen.short()) { a, b ->
+      checkAll(Gen.short(), Gen.short()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -129,7 +129,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Short - sort3" {
-      forAll(Gen.short(), Gen.short(), Gen.short()) { a, b, c ->
+      checkAll(Gen.short(), Gen.short(), Gen.short()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -142,7 +142,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Short - sortAll" {
-      forAll(Gen.short(), Gen.short(), Gen.short(), Gen.short()) { a, b, c, d ->
+      checkAll(Gen.short(), Gen.short(), Gen.short(), Gen.short()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 
@@ -151,7 +151,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Int - sort2" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
+      checkAll(Gen.int(), Gen.int()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -160,7 +160,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Int - sort3" {
-      forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
+      checkAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -173,7 +173,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Int - sortAll" {
-      forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
+      checkAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 
@@ -182,7 +182,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Long - sort2" {
-      forAll(Gen.long(), Gen.long()) { a, b ->
+      checkAll(Gen.long(), Gen.long()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -194,7 +194,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Long - sort3" {
-      forAll(Gen.long(), Gen.long(), Gen.long()) { a, b, c ->
+      checkAll(Gen.long(), Gen.long(), Gen.long()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -207,7 +207,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Long - sortAll" {
-      forAll(Gen.long(), Gen.long(), Gen.long(), Gen.long()) { a, b, c, d ->
+      checkAll(Gen.long(), Gen.long(), Gen.long(), Gen.long()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 
@@ -216,7 +216,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Float - sort2" {
-      forAll(Gen.float(), Gen.float()) { a, b ->
+      checkAll(Gen.float(), Gen.float()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -225,7 +225,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Float - sort3" {
-      forAll(Gen.float(), Gen.float(), Gen.float()) { a, b, c ->
+      checkAll(Gen.float(), Gen.float(), Gen.float()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -238,7 +238,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Float - sortAll" {
-      forAll(Gen.float(), Gen.float(), Gen.float(), Gen.float()) { a, b, c, d ->
+      checkAll(Gen.float(), Gen.float(), Gen.float(), Gen.float()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 
@@ -247,7 +247,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Double - sort2" {
-      forAll(Gen.double(), Gen.double()) { a, b ->
+      checkAll(Gen.double(), Gen.double()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
@@ -256,7 +256,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Double - sort3" {
-      forAll(Gen.double(), Gen.double(), Gen.double()) { a, b, c ->
+      checkAll(Gen.double(), Gen.double(), Gen.double()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
@@ -265,7 +265,7 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Double - sortAll" {
-      forAll(Gen.double(), Gen.double(), Gen.double(), Gen.double()) { a, b, c, d ->
+      checkAll(Gen.double(), Gen.double(), Gen.double(), Gen.double()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
 

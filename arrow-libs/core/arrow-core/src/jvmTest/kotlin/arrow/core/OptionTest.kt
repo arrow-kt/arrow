@@ -8,9 +8,9 @@ import arrow.core.test.generators.option
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import io.kotlintest.shouldNotBe
 
 class OptionTest : UnitSpec() {
@@ -199,7 +199,7 @@ class OptionTest : UnitSpec() {
     }
 
     "sequence should be consistent with traverse" {
-      forAll(Gen.option(Gen.int())) { option ->
+      checkAll(Gen.option(Gen.int())) { option ->
         option.map { listOf(it) }.sequence() == option.traverse { listOf(it) }
       }
     }
@@ -212,7 +212,7 @@ class OptionTest : UnitSpec() {
     }
 
     "sequenceEither should be consistent with traverseEither" {
-      forAll(Gen.option(Gen.int())) { option ->
+      checkAll(Gen.option(Gen.int())) { option ->
         option.map { it.right() }.sequenceEither() == option.traverseEither { it.right() }
       }
     }
@@ -225,7 +225,7 @@ class OptionTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      forAll(Gen.option(Gen.int())) { option ->
+      checkAll(Gen.option(Gen.int())) { option ->
         option.map { it.valid() }.sequenceValidated() == option.traverseValidated { it.valid() }
       }
     }

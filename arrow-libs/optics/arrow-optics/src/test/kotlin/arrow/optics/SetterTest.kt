@@ -6,8 +6,8 @@ import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.SetterLaws
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class SetterTest : UnitSpec() {
 
@@ -45,7 +45,7 @@ class SetterTest : UnitSpec() {
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      forAll(genToken, Gen.string()) { token, value ->
+      checkAll(genToken, Gen.string()) { token, value ->
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
       }
     }

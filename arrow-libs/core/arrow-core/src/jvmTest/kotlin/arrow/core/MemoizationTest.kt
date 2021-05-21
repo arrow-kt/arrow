@@ -1,7 +1,7 @@
 package arrow.core
 
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

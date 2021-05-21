@@ -17,8 +17,8 @@ import arrow.optics.mtl.toState
 import arrow.optics.mtl.update
 import arrow.optics.mtl.updateOld
 import arrow.optics.mtl.update_
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class OptionalTest : UnitSpec() {
 
@@ -27,7 +27,7 @@ class OptionalTest : UnitSpec() {
     val successInt = Option.some<Int>().asOptional()
 
     "Extract should extract the focus from the state" {
-      forAll(Gen.option(Gen.int())) { tryInt ->
+      checkAll(Gen.option(Gen.int())) { tryInt ->
         successInt.extract().run(tryInt) ==
           State { x: Option<Int> ->
             x toT successInt.getOption(x)
@@ -36,19 +36,19 @@ class OptionalTest : UnitSpec() {
     }
 
     "toState should be an alias to extract" {
-      forAll(Gen.option(Gen.int())) { x ->
+      checkAll(Gen.option(Gen.int())) { x ->
         successInt.toState().run(x) == successInt.extract().run(x)
       }
     }
 
     "extractMap with f should be same as extract and map" {
-      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      checkAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.extractMap(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
       }
     }
 
     "update f should be same modify f within State and returning new state" {
-      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      checkAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.update(f).run(x) ==
           State { xx: Option<Int> ->
             successInt.modify(xx, f)
@@ -58,7 +58,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
-      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      checkAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.updateOld(f).run(x) ==
           State { xx: Option<Int> ->
             successInt.modify(xx, f) toT successInt.getOption(xx)
@@ -67,7 +67,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "update_ f should be as modify f within State and returning Unit" {
-      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      checkAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.update_(f).run(x) ==
           State { xx: Option<Int> ->
             successInt.modify(xx, f) toT Unit
@@ -76,7 +76,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "assign a should be same set a within State and returning new value" {
-      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
+      checkAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assign(i).run(x) ==
           State { xx: Option<Int> ->
             successInt.set(xx, i)
@@ -86,7 +86,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "assignOld f should be same as modify f within State and returning old state" {
-      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
+      checkAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assignOld(i).run(x) ==
           State { xx: Option<Int> ->
             successInt.set(xx, i) toT successInt.getOption(xx)
@@ -95,7 +95,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
-      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
+      checkAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assign_(i).run(x) ==
           State { xx: Option<Int> ->
             successInt.set(xx, i) toT Unit

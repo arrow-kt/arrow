@@ -1,6 +1,6 @@
 package arrow.optics.test.generators
 
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
-fun Gen.Companion.char(): Gen<Char> =
+fun Gen.Companion.char(): Arb<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())

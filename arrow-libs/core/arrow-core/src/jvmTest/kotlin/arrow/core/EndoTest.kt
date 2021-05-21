@@ -4,7 +4,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.endo
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class EndoTest : UnitSpec() {
   init {

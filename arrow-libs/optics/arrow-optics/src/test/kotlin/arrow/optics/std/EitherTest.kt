@@ -10,7 +10,7 @@ import arrow.core.test.generators.validated
 import arrow.optics.Iso
 import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class EitherTest : UnitSpec() {
 

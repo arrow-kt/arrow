@@ -8,7 +8,7 @@ import arrow.optics.Iso
 import arrow.optics.Prism
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class OptionTest : UnitSpec() {
 

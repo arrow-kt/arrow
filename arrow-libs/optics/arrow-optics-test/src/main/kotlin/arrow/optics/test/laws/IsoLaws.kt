@@ -5,16 +5,16 @@ import arrow.core.identity
 import arrow.optics.Iso
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 object IsoLaws {
 
   fun <A, B> laws(
     iso: Iso<A, B>,
-    aGen: Gen<A>,
-    bGen: Gen<B>,
-    funcGen: Gen<(B) -> B>,
+    aGen: Arb<A>,
+    bGen: Arb<B>,
+    funcGen: Arb<(B) -> B>,
     eqa: (A, A) -> Boolean = { a, b -> a == b },
     eqb: (B, B) -> Boolean = { a, b -> a == b }
   ): List<Law> =
@@ -26,28 +26,28 @@ object IsoLaws {
       Law("Iso Law: consitent set with modify") { iso.consistentSetModify(aGen, bGen, eqa) }
     )
 
-  fun <A, B> Iso<A, B>.roundTripOneWay(aGen: Gen<A>, eq: (A, A) -> Boolean): Unit =
-    forAll(aGen) { a ->
+  fun <A, B> Iso<A, B>.roundTripOneWay(aGen: Arb<A>, eq: (A, A) -> Boolean): Unit =
+    checkAll(aGen) { a ->
       reverseGet(get(a)).equalUnderTheLaw(a, eq)
     }
 
-  fun <A, B> Iso<A, B>.roundTripOtherWay(bGen: Gen<B>, eq: (B, B) -> Boolean): Unit =
-    forAll(bGen) { b ->
+  fun <A, B> Iso<A, B>.roundTripOtherWay(bGen: Arb<B>, eq: (B, B) -> Boolean): Unit =
+    checkAll(bGen) { b ->
       get(reverseGet(b)).equalUnderTheLaw(b, eq)
     }
 
-  fun <A, B> Iso<A, B>.modifyIdentity(aGen: Gen<A>, eq: (A, A) -> Boolean): Unit =
-    forAll(aGen) { a ->
+  fun <A, B> Iso<A, B>.modifyIdentity(aGen: Arb<A>, eq: (A, A) -> Boolean): Unit =
+    checkAll(aGen) { a ->
       modify(a, ::identity).equalUnderTheLaw(a, eq)
     }
 
-  fun <A, B> Iso<A, B>.composeModify(aGen: Gen<A>, funcGen: Gen<(B) -> B>, eq: (A, A) -> Boolean): Unit =
-    forAll(aGen, funcGen, funcGen) { a, f, g ->
+  fun <A, B> Iso<A, B>.composeModify(aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): Unit =
+    checkAll(aGen, funcGen, funcGen) { a, f, g ->
       modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
     }
 
-  fun <A, B> Iso<A, B>.consistentSetModify(aGen: Gen<A>, bGen: Gen<B>, eq: (A, A) -> Boolean): Unit =
-    forAll(aGen, bGen) { a, b ->
+  fun <A, B> Iso<A, B>.consistentSetModify(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): Unit =
+    checkAll(aGen, bGen) { a, b ->
       set(b).equalUnderTheLaw(modify(a) { b }, eq)
     }
 }

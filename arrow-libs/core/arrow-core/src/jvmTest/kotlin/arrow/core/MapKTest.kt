@@ -7,9 +7,9 @@ import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
 
 class MapKTest : UnitSpec() {
 
@@ -27,7 +27,7 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseEither short-circuit" {
-      forAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+      checkAll(Gen.map(Gen.int(), Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseEither {
           if (it % 2 == 0) {
@@ -55,7 +55,7 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseOption short-circuits" {
-      forAll(Gen.nonEmptyList(Gen.int())) { ints ->
+      checkAll(Gen.nonEmptyList(Gen.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverseOption {
           (it % 2 == 0).maybe {
@@ -68,7 +68,7 @@ class MapKTest : UnitSpec() {
     }
 
     "sequenceOption yields some when all entries in the list are some" {
-      forAll(Gen.list(Gen.int())) { ints ->
+      checkAll(Arb.list(Gen.int())) { ints ->
         val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
         evens.all { it == ints }
       }
@@ -85,7 +85,7 @@ class MapKTest : UnitSpec() {
     }
 
     "traverseValidated acummulates" {
-      forAll(Gen.map(Gen.int(), Gen.int())) { ints ->
+      checkAll(Gen.map(Gen.int(), Gen.int())) { ints ->
         val res: ValidatedNel<Int, Map<Int, Int>> =
           ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
@@ -99,13 +99,13 @@ class MapKTest : UnitSpec() {
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
-      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         aligned.size == (a.keys + b.keys).size
       }
 
       // aligned map contains Both for all entries existing in a and b
-      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).all {
           aligned[it]?.isBoth ?: false
@@ -113,7 +113,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Left for all entries existing only in a
-      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         (a.keys - b.keys).all { key ->
           aligned[key]?.let { it.isLeft } ?: false
@@ -121,7 +121,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Right for all entries existing only in b
-      forAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
+      checkAll(Gen.map(Gen.long(), Gen.bool()), Gen.map(Gen.long(), Gen.bool())) { a, b ->
         val aligned = a.align(b)
         (b.keys - a.keys).all { key ->
           aligned[key]?.isRight ?: false
@@ -130,7 +130,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip2" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -144,7 +144,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip3" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -159,7 +159,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip4" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall()),
       ) { a, b ->
@@ -174,7 +174,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip5" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall()),
       ) { a, b ->
@@ -189,7 +189,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip6" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall()),
       ) { a, b ->
@@ -204,7 +204,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip7" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -219,7 +219,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip8" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -235,7 +235,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip9" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -262,7 +262,7 @@ class MapKTest : UnitSpec() {
     }
 
     "zip10" {
-      forAll(
+      checkAll(
         Gen.map(Gen.intSmall(), Gen.intSmall()),
         Gen.map(Gen.intSmall(), Gen.intSmall())
       ) { a, b ->
@@ -290,7 +290,7 @@ class MapKTest : UnitSpec() {
     }
 
     "flatMap" {
-      forAll(
+      checkAll(
         Gen.map(Gen.string(), Gen.intSmall()),
         Gen.map(Gen.string(), Gen.string())
       ) { a, b ->

@@ -4,7 +4,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.typeclasses.Index
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class IndexInstanceTest : UnitSpec() {
 
@@ -12,7 +12,7 @@ class IndexInstanceTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.int().map { Index.list<String>().index(it) },
-        aGen = Gen.list(Gen.string()),
+        aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string())
       )

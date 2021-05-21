@@ -5,16 +5,16 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import arrow.typeclasses.Eq
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 sealed class SumType {
   data class A(val string: String) : SumType()
   data class B(val int: Int) : SumType()
 }
 
-val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
+val genSumTypeA: Arb<SumType.A> = Gen.string().map { SumType.A(it) }
 
-val genSum: Gen<SumType> =
+val genSum: Arb<SumType> =
   Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
 
 val sumPrism: Prism<SumType, String> = Prism<SumType, String>(
@@ -58,15 +58,15 @@ internal data class Token(val value: String) {
   }
 }
 
-internal val genToken: Gen<Token> = Gen.string().map { Token(it) }
+internal val genToken: Arb<Token> = Gen.string().map { Token(it) }
 
 internal data class User(val token: Token)
 
-internal val genUser: Gen<User> = genToken.map { User(it) }
+internal val genUser: Arb<User> = genToken.map { User(it) }
 
 internal data class IncompleteUser(val token: Token?)
 
-internal val genIncompleteUser: Gen<IncompleteUser> = Gen.constant(IncompleteUser(null))
+internal val genIncompleteUser: Arb<IncompleteUser> = Gen.constant(IncompleteUser(null))
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 

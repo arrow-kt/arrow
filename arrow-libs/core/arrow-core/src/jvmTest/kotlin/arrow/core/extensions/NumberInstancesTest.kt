@@ -13,12 +13,12 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.SemiringLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semiring
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class NumberInstancesTest : UnitSpec() {
 
-  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, GEN: Gen<F>) {
+  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, GEN: Arb<F>) {
     testLaws(SemiringLaws.laws(SG, GEN))
     testLaws(MonoidLaws.laws(M, GEN))
   }
@@ -43,7 +43,7 @@ class NumberInstancesTest : UnitSpec() {
     }
 
     "should semigroup with the instance passed - float" {
-      forAll(Gen.numericFloats()) { value: Float ->
+      checkAll(Gen.numericFloats()) { value: Float ->
         val seen = Monoid.float().run { value.combine(value) }
         val expected = value + value
 
@@ -52,7 +52,7 @@ class NumberInstancesTest : UnitSpec() {
     }
 
     "should semigroup with the instance passed - double" {
-      forAll(Gen.numericDoubles()) { value: Double ->
+      checkAll(Gen.numericDoubles()) { value: Double ->
         val seen = Monoid.double().run { value.combine(value) }
         val expected = value + value
 
@@ -70,7 +70,7 @@ class NumberInstancesTest : UnitSpec() {
     }
 
     "should semigroup with the instance passed - short" {
-      forAll(Gen.short()) { value: Short ->
+      checkAll(Gen.short()) { value: Short ->
         val seen = Monoid.short().run { value.combine(value) }
         val expected = (value + value).toShort()
 
@@ -79,7 +79,7 @@ class NumberInstancesTest : UnitSpec() {
     }
 
     "should semigroup with the instance passed - byte" {
-      forAll(Gen.byte()) { value: Byte ->
+      checkAll(Gen.byte()) { value: Byte ->
         val seen = Monoid.byte().run { value.combine(value) }
         val expected = (value + value).toByte()
 

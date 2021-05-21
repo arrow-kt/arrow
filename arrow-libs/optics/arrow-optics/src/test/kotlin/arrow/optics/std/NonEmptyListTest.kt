@@ -5,7 +5,7 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
 import arrow.optics.Lens
 import arrow.optics.test.laws.LensLaws
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class NonEmptyListTest : UnitSpec() {
 
@@ -24,8 +24,8 @@ class NonEmptyListTest : UnitSpec() {
       LensLaws.laws(
         lens = Lens.nonEmptyListTail(),
         aGen = Gen.nonEmptyList(Gen.string()),
-        bGen = Gen.list(Gen.string()),
-        funcGen = Gen.functionAToB(Gen.list(Gen.string())),
+        bGen = Arb.list(Gen.string()),
+        funcGen = Gen.functionAToB(Arb.list(Gen.string())),
       )
     )
   }

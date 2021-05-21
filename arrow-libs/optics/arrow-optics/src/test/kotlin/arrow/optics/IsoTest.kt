@@ -10,8 +10,8 @@ import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
+import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class IsoTest : UnitSpec() {
 
@@ -69,49 +69,49 @@ class IsoTest : UnitSpec() {
     with(tokenIso) {
 
       "asFold should behave as valid Fold: size" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           size(token) == 1
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           isNotEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           !isEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           getAll(token) == listOf(token.value)
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           combineAll(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           fold(Monoid.string(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: headOption" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           firstOrNull(token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           lastOrNull(token) == token.value
         }
       }
@@ -120,47 +120,47 @@ class IsoTest : UnitSpec() {
     with(tokenIso) {
 
       "asGetter should behave as valid Getter: get" {
-        forAll(genToken) { token ->
+        checkAll(genToken) { token ->
           get(token) == tokenGetter.get(token)
         }
       }
 
       "asGetter should behave as valid Getter: find" {
-        forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
+        checkAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
           findOrNull(token, p) == tokenGetter.findOrNull(token, p)
         }
       }
 
       "asGetter should behave as valid Getter: exist" {
-        forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
+        checkAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
           any(token, p) == tokenGetter.any(token, p)
         }
       }
     }
 
     "Lifting a function should yield the same result as not yielding" {
-      forAll(genToken, Gen.string()) { token, value ->
+      checkAll(genToken, Gen.string()) { token, value ->
         tokenIso.modify(token) { value } == tokenIso.lift { value }(token)
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenIso.first<Int>()
-      forAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
         first.get(token to int) == token.value to int
       }
     }
 
     "Creating a second pair with a type should result in the value to target" {
       val second = tokenIso.second<Int>()
-      forAll(Gen.int(), genToken) { int: Int, token: Token ->
+      checkAll(Gen.int(), genToken) { int: Int, token: Token ->
         second.get(int to token) == int to token.value
       }
     }
 
     "Creating a left with a type should result in a sum target to value" {
       val left = tokenIso.left<Int>()
-      forAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(token)) == Either.Left(token.value) &&
           left.get(Either.Right(int)) == Either.Right(int)
       }
@@ -168,7 +168,7 @@ class IsoTest : UnitSpec() {
 
     "Creating a right with a type should result in a sum value to target" {
       val left = tokenIso.right<Int>()
-      forAll(genToken, Gen.int()) { token: Token, int: Int ->
+      checkAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(int)) == Either.Left(int) &&
           left.get(Either.Right(token)) == Either.Right(token.value)
       }

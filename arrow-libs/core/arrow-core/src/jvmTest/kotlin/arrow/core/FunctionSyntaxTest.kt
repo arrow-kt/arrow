@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 
 class FunctionSyntaxTest : UnitSpec() {
 

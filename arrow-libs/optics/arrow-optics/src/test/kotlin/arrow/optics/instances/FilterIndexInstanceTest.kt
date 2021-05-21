@@ -8,14 +8,14 @@ import arrow.core.test.generators.sequence
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.typeclasses.FilterIndex
-import io.kotlintest.properties.Gen
+import io.kotest.property.Arb
 
 class FilterIndexInstanceTest : UnitSpec() {
 
   init {
     testLaws(TraversalLaws.laws(
       traversal = FilterIndex.list<String>().filter { true },
-      aGen = Gen.list(Gen.string()),
+      aGen = Arb.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
       )

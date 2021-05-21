@@ -17,11 +17,11 @@ import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.PropertyContext
-import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
+import io.kotest.property.Arb
+Arb.list(
+import io.kotest.property.checkAll
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.throwables.shouldThrow
 import kotlinx.coroutines.runBlocking
 
 class EitherTest : UnitSpec() {
@@ -280,7 +280,7 @@ class EitherTest : UnitSpec() {
     }
 
     "replicate should return Right(empty list) when n <= 0" {
-      forAll(
+      checkAll(
         Gen.oneOf(Gen.negativeIntegers(), Gen.constant(0)),
         Gen.int()
       ) { n: Int, a: Int ->
@@ -292,7 +292,7 @@ class EitherTest : UnitSpec() {
     }
 
     "replicate should return Right(list of repeated value size n) when Right and n is positive" {
-      forAll(
+      checkAll(
         Gen.intSmall().filter { it > 0 },
         Gen.int()
       ) { n: Int, a: Int ->
@@ -302,7 +302,7 @@ class EitherTest : UnitSpec() {
     }
 
     "traverse should return list of Right when Right and empty list when Left" {
-      forAll(
+      checkAll(
         Gen.int(),
         Gen.int(),
         Gen.int()
@@ -361,7 +361,7 @@ class EitherTest : UnitSpec() {
     }
 
     "resolve should yield a result when deterministic functions are used as handlers" {
-      forAll(
+      checkAll(
         Gen.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
@@ -381,7 +381,7 @@ class EitherTest : UnitSpec() {
     }
 
     "resolve should throw a Throwable when a fatal Throwable is thrown" {
-      forAll(
+      checkAll(
         Gen.suspendFunThatThrowsFatalThrowable(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
@@ -402,7 +402,7 @@ class EitherTest : UnitSpec() {
     }
 
     "resolve should yield a result when an exception is thrown in the success supplied function" {
-      forAll(
+      checkAll(
         Gen.suspendFunThatReturnsAnyRight(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
@@ -422,7 +422,7 @@ class EitherTest : UnitSpec() {
     }
 
     "resolve should yield a result when an exception is thrown in the error supplied function" {
-      forAll(
+      checkAll(
         Gen.suspendFunThatReturnsAnyLeft(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
@@ -442,7 +442,7 @@ class EitherTest : UnitSpec() {
     }
 
     "resolve should throw a Throwable when any exception is thrown in the throwable supplied function" {
-      forAll(
+      checkAll(
         Gen.suspendFunThatThrows()
       ) { f: suspend () -> Either<Any, Any> ->
 
@@ -470,7 +470,7 @@ class EitherTest : UnitSpec() {
     }
 
     "sequence should be consistent with traverse" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.map { listOf(it) }.sequence() == either.traverse { listOf(it) }
       }
     }
@@ -484,7 +484,7 @@ class EitherTest : UnitSpec() {
     }
 
     "sequenceOption should be consistent with traverseOption" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.map { Some(it) }.sequenceOption() == either.traverseOption { Some(it) }
       }
     }
@@ -498,7 +498,7 @@ class EitherTest : UnitSpec() {
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.map { it.valid() }.sequenceValidated() == either.traverseValidated { it.valid() }
       }
     }
@@ -513,7 +513,7 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequence should be consistent with bitraverse" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.bimap({ listOf(it) }, { listOf(it) }).bisequence() == either.bitraverse({ listOf(it) }, { listOf(it) })
       }
     }
@@ -527,7 +527,7 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequenceOption should be consistent with bitraverseOption" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() ==
           either.bitraverseOption({ Some(it) }, { Some(it) })
       }
@@ -542,7 +542,7 @@ class EitherTest : UnitSpec() {
     }
 
     "bisequenceValidated should be consistent with bitraverseValidated" {
-      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+      checkAll(Gen.either(Gen.string(), Gen.int())) { either ->
         either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() ==
           either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
@@ -565,10 +565,10 @@ private suspend fun <A> throwException(
   throw RuntimeException("An Exception is thrown while handling the result of the supplied function.")
 
 private fun forAllSmallInt(fn: PropertyContext.(a: Int) -> Boolean) =
-  forAll(Gen.intSmall(), fn)
+  checkAll(Gen.intSmall(), fn)
 
 private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int) -> Boolean) =
-  forAll(Gen.intSmall(), Gen.intSmall(), fn)
+  checkAll(Gen.intSmall(), Gen.intSmall(), fn)
 
 private fun forAllSmallInt(fn: PropertyContext.(a: Int, b: Int, c: Int) -> Boolean) =
-  forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), fn)
+  checkAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), fn)

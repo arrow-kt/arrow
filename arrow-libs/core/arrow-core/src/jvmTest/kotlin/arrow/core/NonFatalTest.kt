@@ -1,8 +1,8 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrowAny
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.throwables.shouldThrowAny
 
 class NonFatalTest : UnitSpec() {
   init {
