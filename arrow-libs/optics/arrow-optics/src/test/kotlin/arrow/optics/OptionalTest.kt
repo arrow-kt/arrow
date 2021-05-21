@@ -9,6 +9,7 @@ import arrow.core.test.generators.functionAToB
 import arrow.core.toOption
 import arrow.optics.test.laws.OptionalLaws
 import arrow.typeclasses.Monoid
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
@@ -16,7 +17,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.checkAll
-import io.kotlintest.matchers.types.shouldNotBeNull
 
 class OptionalTest : UnitSpec() {
 
