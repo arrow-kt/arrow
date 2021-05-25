@@ -14,8 +14,8 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.handleError
 import arrow.core.handleErrorWith
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.shouldBe
 
 /*** Arrow.io documentation as runnable code ***/
 class DataTypeExamples : FreeSpec() {

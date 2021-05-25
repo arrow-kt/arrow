@@ -8,9 +8,11 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
     api project(":arrow-core")
     api project(":arrow-continuations")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    api "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    api "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION" // for kotest framework
+    api "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION" // for kotest core jvm assertions
+    api "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
 }
