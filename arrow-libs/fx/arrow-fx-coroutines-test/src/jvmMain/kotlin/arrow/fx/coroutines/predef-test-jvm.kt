@@ -15,28 +15,3 @@ class NamedThreadFactory(private val mkName: (Int) -> String) : ThreadFactory {
     Thread(r, mkName(count.value))
       .apply { isDaemon = true }
 }
-
-// /**
-//  * Catches `System.err` output, for testing purposes.
-//  */
-// fun catchSystemErr(thunk: () -> Unit): String {
-//   val outStream = ByteArrayOutputStream()
-//   catchSystemErrInto(outStream, thunk)
-//   return String(outStream.toByteArray(), StandardCharsets.UTF_8)
-// }
-//
-// /**
-//  * Catches `System.err` output into `outStream`, for testing purposes.
-//  */
-// @Synchronized
-// fun <A> catchSystemErrInto(outStream: OutputStream, thunk: () -> A): A {
-//   val oldErr = System.err
-//   val fakeErr = PrintStream(outStream)
-//   System.setErr(fakeErr)
-//   return try {
-//     thunk()
-//   } finally {
-//     System.setErr(oldErr)
-//     fakeErr.close()
-//   }
-// }
