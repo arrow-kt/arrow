@@ -288,7 +288,7 @@ class ComparisonKtTest : StringSpec() {
  * Equality for Float to check sorting order.
  * So we need `NaN == NaN` to be true.
  */
-private fun Float.eqv(other: Float): Boolean =
+fun Float.eqv(other: Float): Boolean =
   if (isNaN() && other.isNaN()) true else {
     this shouldBe other
     true
@@ -298,7 +298,7 @@ private fun Float.eqv(other: Float): Boolean =
  * Equality for Double to check sorting order.
  * So we need `NaN == NaN` to be true.
  */
-private fun Double.eqv(other: Double): Boolean =
+fun Double.eqv(other: Double): Boolean =
   if (isNaN() && other.isNaN()) true else {
     this shouldBe other
     true

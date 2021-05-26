@@ -26,25 +26,19 @@ import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.double
-import io.kotest.property.arbitrary.file
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.localDate
-import io.kotest.property.arbitrary.localDateTime
-import io.kotest.property.arbitrary.localTime
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.numericDoubles
 import io.kotest.property.arbitrary.numericFloats
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.period
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arbitrary.uuid
 import kotlin.math.abs
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
@@ -64,9 +58,6 @@ fun <A> Arb.Companion.functionToA(arb: Arb<A>): Arb<() -> A> =
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
-
-fun Arb.Companion.fatalThrowable(): Arb<Throwable> =
-  Arb.of(listOf(ThreadDeath(), StackOverflowError(), OutOfMemoryError(), InterruptedException()))
 
 fun Arb.Companion.doubleSmall(): Arb<Double> =
   Arb.numericDoubles(from = 0.0, to = 100.0)
@@ -243,9 +234,6 @@ fun Arb.Companion.suspendFunThatReturnsAnyLeft(): Arb<suspend () -> Either<Any, 
 fun Arb.Companion.suspendFunThatThrows(): Arb<suspend () -> Either<Any, Any>> =
   throwable().map { suspend { throw it } } as Arb<suspend () -> Either<Any, Any>>
 
-fun Arb.Companion.suspendFunThatThrowsFatalThrowable(): Arb<suspend () -> Either<Any, Any>> =
-  fatalThrowable().map { suspend { throw it } } as Arb<suspend () -> Either<Any, Any>>
-
 fun Arb.Companion.any(): Arb<Any> =
   choice(
     Arb.string() as Arb<Any>,
@@ -254,13 +242,6 @@ fun Arb.Companion.any(): Arb<Any> =
     Arb.float() as Arb<Any>,
     Arb.double() as Arb<Any>,
     Arb.bool() as Arb<Any>,
-    Arb.uuid() as Arb<Any>,
-    Arb.file() as Arb<Any>,
-    Arb.localDate() as Arb<Any>,
-    Arb.localTime() as Arb<Any>,
-    Arb.localDateTime() as Arb<Any>,
-    Arb.period() as Arb<Any>,
     Arb.throwable() as Arb<Any>,
-    Arb.fatalThrowable() as Arb<Any>,
     Arb.unit() as Arb<Any>
   )

@@ -1,18 +1,27 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$SUB_PROJECT"
+apply from: "$SUB_PROJECT_MPP"
 apply from: "$PUBLICATION"
-apply from: "$ANIMALSNIFFER"
+apply from: "$ANIMALSNIFFER_MPP"
 
-dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
-    api project(":arrow-core")
-    api project(":arrow-continuations")
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    api "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION" // for kotest framework
-    api "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION" // for kotest core jvm assertions
-    api "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                api project(":arrow-core")
+                api project(":arrow-continuations")
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-api:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
+            }
+        }
+        jvmMain {
+
+        }
+    }
 }

@@ -13,7 +13,6 @@ import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
 import arrow.core.test.generators.suspendFunThatReturnsAnyRight
 import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
-import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
@@ -250,12 +249,11 @@ class EitherTest : UnitSpec() {
     }
 
     "contains should check value" {
-      // We need to check that a != b or this test will result in a false negative
       checkAll(Arb.intSmall(), Arb.intSmall()) { a, b ->
-        Right(a).contains(a) shouldBe true
-        // We need to check that a != b or this test will result in a false negative
-        Right(a).contains(b) shouldBe (a == b)
-        !Left(a).contains(a) shouldBe false
+        require(Right(a).contains(a)) { "Expected ${Right(a)}.contains($a) to be true, but it was false." }
+        if (a != b) require(!Right(a).contains(b)) { "Expected ${Right(a)}.contains($b) to be false, but it was true." }
+        else require(Right(a).contains(b)) { "Expected ${Right(a)}.contains($b) to be true, but it was false." }
+        require(!Left(a).contains(a)) { "Expected ${Left(a)}.contains($a) to be false, but it was true." }
       }
     }
 
@@ -380,23 +378,6 @@ class EitherTest : UnitSpec() {
             unrecoverableState = { handleWithPureFunction(it) }
           )
         result shouldBe returnObject
-      }
-    }
-
-    "resolve should throw a Throwable when a fatal Throwable is thrown" {
-      checkAll(
-        Arb.suspendFunThatThrowsFatalThrowable(),
-        Arb.any()
-      ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-        shouldThrow<Throwable> {
-          Either.resolve(
-            f = { f() },
-            success = { a -> handleWithPureFunction(a, returnObject) },
-            error = { e -> handleWithPureFunction(e, returnObject) },
-            throwable = { t -> handleWithPureFunction(t, returnObject) },
-            unrecoverableState = { handleWithPureFunction(it) }
-          )
-        }
       }
     }
 
