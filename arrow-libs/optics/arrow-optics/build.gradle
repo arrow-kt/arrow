@@ -36,11 +36,6 @@ kotlin {
     }
 }
 
-test {
-    useJUnitPlatform()
-}
-
-
 dependencies {
     kaptTest project(":arrow-meta")
     testCompile project(":arrow-optics-test")

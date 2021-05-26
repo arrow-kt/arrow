@@ -38,7 +38,3 @@ kotlin {
         }
     }
 }
-
-test {
-    useJUnitPlatform()
-}
