@@ -4,14 +4,14 @@ plugins {
 }
 
 apply from: "$SUB_PROJECT_MPP"
-apply from: "$PUBLICATION"
+apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 api project(":arrow-core")
                 api project(":arrow-continuations")
                 api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
@@ -21,7 +21,7 @@ kotlin {
             }
         }
         jvmMain {
-
+               compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
         }
     }
 }
