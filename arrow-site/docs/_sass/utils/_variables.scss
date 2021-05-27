@@ -1,6 +1,7 @@
 // Variables
 // -----------------------------------------------
 // -----------------------------------------------
+ @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
 // Colors
 // -----------------------------------------------
 $brand-primary: var(--color-primary);
@@ -38,6 +39,7 @@ $base-font-family: 'Iosevka Web';
 $header-font-family: $base-font-family;
 $code-font-family: $base-font-family;
 $doc-font-family: 'Open Sans', sans-serif;
+$heading-font-family: 'Montserrat', sans-serif;
 $base-font-color: $brand-primary;
 $header-font-color: $brand-primary;
 $font-regular: 400;
@@ -51,7 +53,7 @@ $base-docs-font-size: 1rem;
 // Sizes
 // -----------------------------------------------
 $base-point-grid: 0.5rem;
-$sidebar-cat-button: 164px;
+$sidebar-cat-button: 192px;
 $sidebar-doc-version-button: 200px;
 $height-home-code-block: 400px;
 $width-home-code-block: 580px;

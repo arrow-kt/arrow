@@ -69,6 +69,7 @@
             background: $fx-background;
 
             > a {
+                font-family: $heading-font-family;
                 transition: background $base-duration $base-timing;
 
                 &:hover {
@@ -92,7 +93,6 @@
 
                 a {
                     color: $white;
-                    padding-left: 10px;
 
                     &:hover {
                         @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));

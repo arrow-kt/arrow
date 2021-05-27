@@ -1,10 +1,9 @@
 .quickstart {
-    background: $quickstart-background;
+  background: $quickstart-background;
 
   .sidebar-menu {
     .sidebar-menu-item {
       &.active {
-
         & > button {
           border-left: 4px solid $quickstart-color;
         }
@@ -24,81 +23,82 @@
 }
 
 #cat-quickstart-dropdown {
-    min-width: $sidebar-cat-button;
+  min-width: $sidebar-cat-button;
 
-    .sidebar-nav {
-        .sidebar-nav-item {
-            > a {
-                transition: background $base-duration $base-timing;
-                &:hover {
-                    background: $quickstart-hover;
-                    box-shadow: $sidebar-cat-dropdow;
-                }
-            }
+  .sidebar-nav {
+    .sidebar-nav-item {
+      > a {
+        transition: background $base-duration $base-timing;
 
-            &.active {
-                > a {
-                    background: $quickstart-hover;
-                    box-shadow: $sidebar-cat-dropdow;
-                }
-            }
-
-            ul {
-                width: 100%;
-                z-index: 1;
-                box-shadow: $sidebar-cat-dropdow;
-                background: $quickstart-hover;
-
-                a {
-                    color: $white;
-                    transition: all $base-duration $base-timing;
-
-                    &:hover {
-                        background: rgba($white, 0.05);
-                        color: rgba($white, 0.8);
-                    }
-                }
-            }
+        &:hover {
+          background: $quickstart-hover;
+          box-shadow: $sidebar-cat-dropdow;
         }
+      }
+
+      &.active {
+        > a {
+          background: $quickstart-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      ul {
+        width: 100%;
+        z-index: 1;
+        box-shadow: $sidebar-cat-dropdow;
+        background: $quickstart-hover;
+
+        a {
+          color: $white;
+          transition: all $base-duration $base-timing;
+
+          &:hover {
+            background: rgba($white, 0.05);
+            color: rgba($white, 0.8);
+          }
+        }
+      }
     }
+  }
 }
 
-#doc-core-version-button {
-    .sidebar-doc-versions {
-        .sidebar-nav-item {
-            background: $quickstart-background;
+#doc-quickstart-version-button {
+  .sidebar-doc-versions {
+    .sidebar-nav-item {
+      background: $quickstart-background;
 
-            > a {
-                transition: background $base-duration $base-timing;
+      > a {
+        font-family: $heading-font-family;
+        transition: background $base-duration $base-timing;
 
-                &:hover {
-                    background: $quickstart-hover;
-                    box-shadow: $sidebar-cat-dropdow;
-                }
-            }
-
-            &.active {
-                > a {
-                    background: $quickstart-hover;
-                    box-shadow: $sidebar-cat-dropdow;
-                }
-            }
-
-            ul {
-                width: 100%;
-                z-index: 1;
-                box-shadow: $sidebar-cat-dropdow;
-                background: $quickstart-hover;
-
-                a {
-                    color: $white;
-                    padding-left: 10px;
-
-                    &:hover {
-                        @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
-                    }
-                }
-            }
+        &:hover {
+          background: $quickstart-hover;
+          box-shadow: $sidebar-cat-dropdow;
         }
+      }
+
+      &.active {
+        > a {
+          background: $quickstart-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      ul {
+        width: 100%;
+        z-index: 1;
+        box-shadow: $sidebar-cat-dropdow;
+        background: $quickstart-hover;
+
+        a {
+          color: $white;
+
+          &:hover {
+            @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+          }
+        }
+      }
     }
+  }
 }
