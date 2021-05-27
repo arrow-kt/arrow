@@ -21,7 +21,9 @@ kotlin {
             }
         }
         jvmMain {
-               compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+            }
         }
     }
 }
