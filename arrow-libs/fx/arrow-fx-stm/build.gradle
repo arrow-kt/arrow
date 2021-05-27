@@ -26,13 +26,14 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
             }
         }
-
-        jvmTest {
+        commonTest {
             dependencies {
                 implementation project(":arrow-fx-coroutines-test")
-                implementation "io.kotest:kotest-runner-junit5:$KOTEST_VERSION" // for kotest framework
-                implementation "io.kotest:kotest-assertions-core:$KOTEST_VERSION" // for kotest core jvm assertions
-                implementation "io.kotest:kotest-property:$KOTEST_VERSION" // for kotest property test
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }
     }

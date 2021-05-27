@@ -3,6 +3,12 @@ package arrow.typeclasses
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
+const val FloatInstanceDeprecation: String =
+  "Float instances for Semigroup/Monoid & Semiring are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
+
+const val DoubleInstanceDeprecation: String =
+  "Double instances for Semigroup/Monoid & Semiring are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
+
 /**
  * The [Semiring] type class for a given type `A` combines both a commutative additive [Monoid] and a multiplicative [Monoid].
  *  It requires the multiplicative [Monoid] to distribute over the additive one. The operations of the multiplicative [Monoid] have been renamed to
@@ -123,6 +129,7 @@ interface Semiring<A> {
   companion object {
     @JvmStatic
     @JvmName("Float")
+    @Deprecated(FloatInstanceDeprecation)
     fun float(): Semiring<Float> = FloatSemiring
 
     @JvmStatic
@@ -139,6 +146,7 @@ interface Semiring<A> {
 
     @JvmStatic
     @JvmName("Double")
+    @Deprecated(DoubleInstanceDeprecation)
     fun double(): Semiring<Double> = DoubleSemiring
 
     @JvmStatic
