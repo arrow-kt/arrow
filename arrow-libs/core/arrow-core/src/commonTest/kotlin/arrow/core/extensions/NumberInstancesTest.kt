@@ -37,10 +37,6 @@ class NumberInstancesTest : UnitSpec() {
     testAllLaws(Semiring.int(), Monoid.int(), Arb.intSmall())
     testAllLaws(Semiring.long(), Monoid.long(), Arb.longSmall())
     MonoidLaws.laws(Monoid.float(), Arb.floatSmall(), Float::eqv)
-    // TODO Semiring laws failing with == or Float::eqv
-    // testAllLaws(Semiring.float(), Monoid.float(), Arb.floatSmall(), Float::eqv)
-    // TODO Semiring/Monoid laws failing with == or Double::eqv
-    // testAllLaws(Semiring.double(), Monoid.double(), Arb.doubleSmall(), Double::eqv)
 
     /** Semigroup specific instance check */
 
