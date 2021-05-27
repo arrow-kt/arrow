@@ -18,6 +18,10 @@ dependencies {
     testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
 }
 
+test {
+    useJUnitPlatform()
+}
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
