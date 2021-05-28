@@ -35,5 +35,15 @@ kotlin {
                 runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+            }
+        }
     }
 }
