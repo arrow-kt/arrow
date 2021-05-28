@@ -17,9 +17,11 @@ import io.kotest.property.arbitrary.string
 
 data class Person(val age: Int, val name: String) : Comparable<Person> {
   companion object {
-    val comparator: Comparator<Person> =
-      Comparator.comparingInt(Person::age)
-        .thenComparing(Person::name)
+    val comparator: Comparator<Person> = Comparator { a, b ->
+      val res = a.age.compareTo(b.age)
+      if (res != 0) res
+      else a.name.compareTo(b.name)
+    }
   }
 
   override fun compareTo(other: Person): Int =
@@ -260,7 +262,10 @@ class ComparisonKtTest : StringSpec() {
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
-        first.eqv(aa) && second.eqv(bb)
+        assertSoftly {
+          first shouldBe aa
+          second shouldBe bb
+        }
       }
     }
 
@@ -269,7 +274,11 @@ class ComparisonKtTest : StringSpec() {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        first.eqv(aa) && second.eqv(bb) && third.eqv(cc)
+        assertSoftly {
+          first shouldBe aa
+          second shouldBe bb
+          third shouldBe cc
+        }
       }
     }
 

@@ -28,11 +28,11 @@ kotlin {
         commonTest {
             dependencies {
                 implementation project(":arrow-fx-coroutines-test")
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
             }
         }
         jvmTest {
             dependencies {
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
                 implementation "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }

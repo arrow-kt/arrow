@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.computations.EitherEffect
 import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
 import arrow.core.test.UnitSpec
@@ -22,7 +21,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
@@ -35,14 +33,14 @@ class EitherTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
-      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
-        Arb.int().map(::Right),
-        ARB.map { it },
-        Either<String, Int>::equals,
-        either::invoke
-      ) {
-        it.bind()
-      },
+//      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
+//        Arb.int().map(::Right),
+//        ARB.map { it },
+//        Either<String, Int>::equals,
+//        either::invoke
+//      ) {
+//        it.bind()
+//      },
       FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(
         Arb.int().map(::Right),
         ARB.map { it },
@@ -299,15 +297,15 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "replicate should return Right(list of repeated value size n) when Right and n is positive" {
-      checkAll(
-        Arb.intSmall().filter { it > 0 },
-        Arb.int()
-      ) { n: Int, a: Int ->
-        Right(a).replicate(n) shouldBe Right(List(n) { a })
-        Left(a).replicate(n) shouldBe Left(a)
-      }
-    }
+//    "replicate should return Right(list of repeated value size n) when Right and n is positive" {
+//      checkAll(
+//        Arb.intSmall().filter { it > 0 },
+//        Arb.int()
+//      ) { n: Int, a: Int ->
+//        Right(a).replicate(n) shouldBe Right(List(n) { a })
+//        Left(a).replicate(n) shouldBe Left(a)
+//      }
+//    }
 
     "traverse should return list of Right when Right and empty list when Left" {
       checkAll(
