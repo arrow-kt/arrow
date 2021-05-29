@@ -57,7 +57,7 @@ fun main() {
   }
 
   100.ixView(g)
-    .also(::println)
+    .also(::println) // "((1, Hello), 200)"
 
   val f = Optic.traversedList<String, String>()
     .backwards()
@@ -65,7 +65,7 @@ fun main() {
 
   listOf("Hello", "World", "!")
     .ixCollectOf(f)
-    .also(::println)
+    .also(::println) // [(2, !), (1, World), (0, Hello)]
 
   val h = Optic.traversedMap<String, Int, Int>()
     .compose(Optic.id())
@@ -73,15 +73,15 @@ fun main() {
 
   mapOf("Hello" to 3, "World" to 5)
     .ixCollectOf(h.singular())
-    .also(::println)
+    .also(::println) // [(World, 5)]
 
   "20".review(Optic.get<String, Either<String, Int>> { Either.Left(it) }.re())
-    .also(::println)
+    .also(::println) // Either.Left(20)
 
   val x = Optic.eitherLeft<Int, String, Double>().re().re()
 
   "Hello".review(x)
-    .also(::println)
+    .also(::println) // Either.Left(Hello)
 
   val y = Optic.pairFirst<Int?, Int?, Double>().re().re() // re().re() = id()
     .compose(Optic.default(100))
@@ -97,7 +97,7 @@ fun main() {
 
   listOf(100, 200, 300)
     .firstOrNull(test)
-    .also(::println)
+    .also(::println) // 200
 
   val plate = Plated.list<Int>()
 
@@ -125,16 +125,16 @@ fun main() {
   )
 
   t.collectOf(Plated.tree<Int>().plate())
-    .also(::println)
+    .also(::println) // [1, 200, Branches [3, 25, 20], 500]
 
   t.collectOf(Plated.tree<Int>().deep(Tree.leaf()))
-    .also(::println)
+    .also(::println) // [1, 200, 3, 25, 20, 500]
 
   t.modify(
     Plated.tree<Int>()
       .deep(Tree.leaf())
   ) { it * 3 }
-    .also(::println)
+    .also(::println) // Branches [3, 600, Branches [9, 75, 60], 1500]
 }
 
 sealed class Tree<A> {
