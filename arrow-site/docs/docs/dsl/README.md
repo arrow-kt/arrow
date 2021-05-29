@@ -22,7 +22,7 @@ package com.example.domain
 The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class.
 
 ```kotlin:ank
-import arrow.optics.combinators.*
+import arrow.optics.dls.*
 import com.example.domain.*
 import arrow.optics.Optional
 
