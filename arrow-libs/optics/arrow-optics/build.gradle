@@ -1,26 +1,42 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$SUB_PROJECT"
+apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
-apply from: "$PUBLICATION"
-apply from: "$ANIMALSNIFFER"
+apply from: "$PUBLICATION_MPP"
+apply from: "$ANIMALSNIFFER_MPP"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":arrow-core")
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation project(":arrow-optics-test")
+            }
+        }
+        jvmMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+            }
+        }
+        jvmTest {
+            dependencies {
+                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+            }
+        }
+    }
+}
 
 dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compile project(":arrow-core")
-
-    kapt project(":arrow-meta")
     kaptTest project(":arrow-meta")
-
-    testCompile "junit:junit:$JUNIT_VERSION"
-
-    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
-
     testCompile project(":arrow-optics-test")
 }

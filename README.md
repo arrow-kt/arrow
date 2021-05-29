@@ -1,7 +1,7 @@
 <a href="https://arrow-kt.io" title="Arrow website"><img src="img/logo/arrow-dark.svg" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Latest snapshot](https://img.shields.io/maven-metadata/v?label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.sonatype.org%2Fservice%2Flocal%2Frepositories%2Fsnapshots%2Fcontent%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/)
+[![Latest snapshot](https://img.shields.io/badge/dynamic/xml?color=orange&label=latest%20snapshot&prefix=v&query=%2F%2Fmetadata%2Fversioning%2Flatest&url=https%3A%2F%2Foss.sonatype.org%2Fservice%2Flocal%2Frepositories%2Fsnapshots%2Fcontent%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/)
 [![Kotlin version](https://img.shields.io/badge/Kotlin-1.4-blue)](https://kotlinlang.org/docs/reference/whatsnew14.html)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -68,7 +68,7 @@ Add the dependencies into the project's `build.gradle`:
 ##### Λrrow Core
 
 ```groovy
-def arrow_version = "0.13.1"
+def arrow_version = "0.13.2"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
@@ -79,7 +79,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.13.1"
+def arrow_version = "0.13.2"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
@@ -89,7 +89,7 @@ dependencies {
 ##### Λrrow Core + Λrrow Fx 
 
 ```groovy
-def arrow_version = "0.13.1"
+def arrow_version = "0.13.2"
 dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
@@ -116,7 +116,7 @@ Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>0.13.1</arrow.version>
+    <arrow.version>0.13.2</arrow.version>
 </properties>
 ```
 
@@ -202,7 +202,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ## Next development version
 
-If you want to try the latest features, replace `0.13.1` with `1.0.0-SNAPSHOT` and add this repository:
+If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this repository:
 
 ```groovy
 allprojects {

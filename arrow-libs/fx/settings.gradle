@@ -4,9 +4,9 @@ rootProject.name = 'arrow-fx-libs'
 
 include 'arrow-fx-coroutines'
 include 'arrow-fx-coroutines-test'
-include 'arrow-benchmarks-fx:arrow-scala-benchmarks'
-include 'arrow-benchmarks-fx:arrow-kio-benchmarks'
-include 'arrow-benchmarks-fx'
+// include 'arrow-benchmarks-fx:arrow-scala-benchmarks'
+// include 'arrow-benchmarks-fx:arrow-kio-benchmarks'
+// include 'arrow-benchmarks-fx'
 include 'arrow-fx-stm'
 
 // To allow the use of local projects from ../core:
