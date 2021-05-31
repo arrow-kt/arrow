@@ -20,7 +20,13 @@ import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.property.arbitrary.*
+import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.negativeInts
+import io.kotest.property.arbitrary.string
 
 class EitherTest : UnitSpec() {
 
