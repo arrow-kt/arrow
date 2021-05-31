@@ -8,6 +8,10 @@ apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
+    js(IR) {
+        browser()
+        nodejs()
+    }
     sourceSets {
         commonMain {
             dependencies {

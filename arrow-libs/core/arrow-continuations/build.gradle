@@ -11,6 +11,10 @@ apply from: "$ANIMALSNIFFER_MPP"
 apply plugin: 'kotlinx-atomicfu'
 
 kotlin {
+    js(IR) {
+        browser()
+        nodejs()
+    }
     sourceSets {
         commonMain {
             dependencies {
