@@ -263,8 +263,6 @@ class IorTest : UnitSpec() {
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
 
-        println(iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }))
-
         iorL.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Left(a), Ior.Left(2), Ior.Left(3))
         iorR.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Right(b))
         iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it, 4, 5) }) shouldBe

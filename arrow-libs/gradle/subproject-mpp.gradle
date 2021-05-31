@@ -29,10 +29,6 @@ kotlin {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
-    js(IR) {
-        browser()
-        nodejs()
-    }
 }
 
 ktlint {
