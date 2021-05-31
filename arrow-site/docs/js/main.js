@@ -164,5 +164,7 @@ window.onclick = function(event) {
   }
 }
 
+
+
 // Attach the functions to each event they are interested in
 window.addEventListener("load", loadEvent);

@@ -2,7 +2,6 @@
 // -----------------------------------------------
 // -----------------------------------------------
 
-
 .card-quickstart {
   padding: 3rem 3.5rem;
   background: #fff;
@@ -129,7 +128,7 @@
 
       .jdk-item {
         padding-right: 4.5rem;
-        border-right: 1px solid rgba(#273244, 0.14);
+        border-right: 1px solid rgba($dark-color-doc, 0.14);
       }
 
       .android-item {
@@ -143,14 +142,61 @@
 
         p {
           margin-bottom: 0;
+
           &:first-child {
             margin-right: 2rem;
           }
         }
       }
     }
+
+    .setup-graddle-maven {
+      margin-top: 2.5rem;
+      background: #fff;
+      box-shadow: $base-box-shadow;
+
+      .tab {
+        overflow: hidden;
+        p {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          button:first-child {
+            border-right: 1px solid #DCDEE1;
+          }
+        }
+      }
+
+      .tab button {
+        background-color: inherit;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 1.75rem 1rem;
+        font-size: 1.25rem;
+        font-family: $heading-font-family;
+        font-weight: $font-bold;
+        transition: 0.3s;
+      }
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: rgba($dark-color-doc, 0.03);
+      }
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: rgba($dark-color-doc, 0.01);
+        box-shadow: 0 1px #DCDEE1;
+
+
+      }
+      /* Style the tab content */
+      .tabcontent {
+        display: none;
+        padding: 2.5rem;
+      }
+    }
   }
 }
+
 @include bp(large) {
   .quickstart-doc {
     .modular-libraries {

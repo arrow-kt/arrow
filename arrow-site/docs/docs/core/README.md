@@ -108,11 +108,10 @@ implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
 implementation "io.arrow-kt:arrow-core"
 implementation "io.arrow-kt:arrow-fx-coroutines"
-...
+
 ```
 
-{: .quickstart-setup-h3}
-### <i class="fal fa-angle-right"></i>Maven
+### >Maven
 
 #### Basic Setup
 
