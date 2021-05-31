@@ -44,6 +44,7 @@ interface Semigroup<A> {
 
     @JvmStatic
     @JvmName("Double")
+    @Deprecated(DoubleInstanceDeprecation)
     fun double(): Semigroup<Double> = Monoid.double()
 
     @JvmStatic
@@ -60,6 +61,7 @@ interface Semigroup<A> {
 
     @JvmStatic
     @JvmName("Float")
+    @Deprecated(FloatInstanceDeprecation)
     fun float(): Semigroup<Float> = Monoid.float()
 
     @JvmStatic
