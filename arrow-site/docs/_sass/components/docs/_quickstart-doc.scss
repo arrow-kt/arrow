@@ -2,30 +2,181 @@
 // -----------------------------------------------
 // -----------------------------------------------
 
+
+.card-quickstart {
+  padding: 3rem 3.5rem;
+  background: #fff;
+  box-shadow: $base-box-shadow;
+}
+
 .quickstart-wrapper {
   background: url("../img/quickstart-pattern.svg") repeat-y;
 }
 
 .quickstart-doc {
   .modular-libraries {
+    margin-bottom: 7.75rem;
+
     .modular-libraries-header {
       text-align: center;
+
       h1 {
         margin: 2rem 0;
         font-size: 3.5rem;
       }
+
       p {
         font-size: 1.5rem;
       }
     }
+
     .libraries-list {
       margin-top: 4.5rem;
       display: grid;
       grid-template-columns: 1fr;
       grid-gap: 2.5rem;
-      .libraries-item {
-        padding: 3rem 3.5rem;
-        background: #fff;
+
+      .library-item {
+        display: flex;
+        @extend .card-quickstart;
+
+        .library-item-content {
+          margin-right: 2rem;
+
+          h3 {
+            font-size: 1.5rem;
+          }
+
+          p {
+            &:nth-child(3) {
+              margin: 0;
+            }
+          }
+
+          .library-cta {
+            padding: 0.75rem 1.5rem;
+            font-family: $heading-font-family;
+            font-size: 0.9375rem;
+            color: #fff;
+            display: inline-block;
+            transition: background-color 300ms $base-timing;
+
+            &:hover {
+              text-decoration: none;
+            }
+
+            &.core {
+              background: $core-color;
+
+              &:hover {
+                background: darken($core-color, 10%);
+              }
+            }
+
+            &.fx {
+              background: $fx-color;
+
+              &:hover {
+                background: darken($fx-color, 10%);
+              }
+            }
+
+            &.optics {
+              background: $optics-color;
+
+              &:hover {
+                background: darken($optics-color, 10%);
+              }
+            }
+
+            &.meta {
+              background: $meta-color;
+
+              &:hover {
+                background: darken($meta-color, 10%);
+              }
+            }
+          }
+        }
+
+        .library-item-brand {
+          p {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .setup {
+    h2 {
+      padding-bottom: 0;
+      border-bottom: none;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .setup-subtitle {
+      margin-bottom: 4rem;
+      text-align: center;
+      font-size: 1.25rem;
+    }
+
+    .setup-jdk-android {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      @extend .card-quickstart;
+
+      .jdk-item {
+        padding-right: 4.5rem;
+        border-right: 1px solid rgba(#273244, 0.14);
+      }
+
+      .android-item {
+        margin-left: 4.5rem;
+      }
+
+      .android-item,
+      .jdk-item {
+        display: flex;
+        align-items: center;
+
+        p {
+          margin-bottom: 0;
+          &:first-child {
+            margin-right: 2rem;
+          }
+        }
+      }
+    }
+  }
+}
+@include bp(large) {
+  .quickstart-doc {
+    .modular-libraries {
+      .libraries-list {
+        .library-item {
+          flex-direction: column-reverse;
+
+          .library-item-content {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+
+    .setup {
+      .setup-jdk-android {
+        grid-template-columns: 1fr;
+
+        .jdk-item {
+          padding-right: 0;
+          border-right: none;
+        }
+
+        .android-item {
+          margin-left: 0;
+        }
       }
     }
   }
