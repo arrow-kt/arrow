@@ -18,7 +18,16 @@
         .cm-s-arrow span.cm-keyword {
             color: $meta-color;
         }
-        
+
+        // Codemirror
+        .cm-s-arrow.CodeMirror {
+          background: $meta-background;
+        }
+
+        .cm-s-arrow .CodeMirror-gutters {
+          background-color: $meta-background;
+        }
+
                 .hljs-variable,
         .hljs-template-variable,
         .hljs-tag,

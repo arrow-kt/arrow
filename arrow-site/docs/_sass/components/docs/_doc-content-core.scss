@@ -3,52 +3,57 @@
 // -----------------------------------------------
 
 .doc-content-core {
-    .doc-content {
-        a {
-            color: $core-color;
-        }
-
-        p,
-        ul {
-            code {
-                background: rgba($core-background, 0.08);
-            }
-
-            a {
-                code {
-                    text-decoration: underline;
-                }
-            }
-        }
-
-        .cm-s-arrow span.cm-keyword {
-            color: $core-color;
-        }
-
-
-
-
-        .hljs-variable,
-        .hljs-template-variable,
-        .hljs-tag,
-        .hljs-name,
-        .hljs-selector-id,
-        .hljs-selector-class,
-        .hljs-regexp,
-        .hljs-deletion {
-            color: $core-color;
-        }
-
-        .button-video {
-            background: $white;
-            border: 2px solid $core-color;
-            transition: background $base-duration;
-
-            &:hover {
-                background: $core-color;
-                color: $white;
-            }
-        }
+  .doc-content {
+    a {
+      color: $core-color;
     }
 
+    p,
+    ul {
+      code {
+        background: rgba($core-background, 0.08);
+      }
+
+      a {
+        code {
+          text-decoration: underline;
+        }
+      }
+    }
+    // Codemirror
+    .cm-s-arrow.CodeMirror {
+      background: $core-background;
+    }
+
+    .cm-s-arrow .CodeMirror-gutters {
+      background-color: $core-background;
+    }
+
+
+    .cm-s-arrow span.cm-keyword {
+      color: $core-color;
+    }
+
+    .hljs-deletion,
+    .hljs-name,
+    .hljs-regexp,
+    .hljs-selector-class,
+    .hljs-selector-id,
+    .hljs-tag,
+    .hljs-template-variable,
+    .hljs-variable {
+      color: $core-color;
+    }
+
+    .button-video {
+      background: $white;
+      border: 2px solid $core-color;
+      transition: background $base-duration;
+
+      &:hover {
+        background: $core-color;
+        color: $white;
+      }
+    }
+  }
 }

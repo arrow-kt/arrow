@@ -8,7 +8,7 @@
 @import "utils/mixins/general-mixins";
 
 // Vendors
-@import "vendors/highlight/color-brewer";
+@import "vendors/highlight/atom-one-dark";
 
 // Base
 @import "base/reset";
@@ -17,6 +17,7 @@
 @import "base/fonts";
 
 // Components
+@import "components/docs/playground-theme";
 @import "components/docs/code";
 @import "components/docs/doc-body";
 @import "components/docs/doc-content-core";

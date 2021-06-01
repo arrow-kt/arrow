@@ -19,8 +19,17 @@
         .cm-s-arrow span.cm-keyword {
             color: $optics-color;
         }
-        
-        
+
+        // Codemirror
+        .cm-s-arrow.CodeMirror {
+          background: $optics-background;
+        }
+
+        .cm-s-arrow .CodeMirror-gutters {
+          background-color: $optics-background;
+        }
+
+
                 .hljs-variable,
         .hljs-template-variable,
         .hljs-tag,
