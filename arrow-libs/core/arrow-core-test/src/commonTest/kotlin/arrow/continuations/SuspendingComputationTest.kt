@@ -3,8 +3,8 @@ package arrow.continuations
 import arrow.core.computations.either
 import arrow.core.Either.Right
 import arrow.core.Either.Left
-import arrow.core.Some
-import arrow.core.computations.option
+import arrow.core.Eval
+import arrow.core.computations.eval
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
@@ -73,7 +73,7 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit immediately from nested blocks" {
     either<String, Int> {
-      val x = option {
+      val x = eval {
         Left("test").bind()
         5L
       }
@@ -85,7 +85,7 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit suspended from nested blocks" {
     either<String, Int> {
-      val x = option {
+      val x = eval {
         Left("test").suspend().bind()
         5L
       }
@@ -97,8 +97,8 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit immediately after suspending from nested blocks" {
     either<String, Int> {
-      val x = option {
-        Some(1L).suspend().bind()
+      val x = eval {
+        Eval.Now(1L).suspend().bind()
         Left("test").suspend().bind()
         5L
       }
@@ -110,8 +110,8 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit suspended after suspending from nested blocks" {
     either<String, Int> {
-      val x = option {
-        Some(1L).suspend().bind()
+      val x = eval {
+        Eval.Now(1L).suspend().bind()
         Left("test").suspend().bind()
         5L
       }

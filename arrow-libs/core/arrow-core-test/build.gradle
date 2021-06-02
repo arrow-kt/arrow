@@ -37,7 +37,7 @@ kotlin {
         jvmTest {
             dependencies {
                 runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-                compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+                implementation project(":arrow-core-retrofit")
                 implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
                 implementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
             }
