@@ -3,144 +3,164 @@
 // -----------------------------------------------
 
 .doc-content {
-   padding: 3rem 3.5rem;
-   margin: 2.5rem;
-   background: #fff;
-   box-shadow: $base-box-shadow;
-    max-width: 1072px;
-    font-family: $doc-font-family;
-    position: relative;
-    box-sizing: content-box;
-    color: rgba($dark-color-doc, 0.9);
+  padding: 3rem 3.5rem;
+  margin: 2.5rem;
+  background: #fff;
+  box-shadow: $base-box-shadow;
+  max-width: 1072px;
+  font-family: $doc-font-family;
+  position: relative;
+  box-sizing: content-box;
+  color: rgba($dark-color-doc, 0.9);
+  font-size: 1rem;
+  //border-right: 1px solid rgba($core-background, 0.15);
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 1.5rem;
+    margin-top: 3rem;
+    font-family: $heading-font-family;
+    font-weight: $font-bold;
+    color: $header-font-color;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    padding-bottom: 1rem;
+    font-size: 2rem;
+    border-bottom: 1px solid rgba($core-background, 0.15);
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
     font-size: 1rem;
-    //border-right: 1px solid rgba($core-background, 0.15);
+    text-transform: uppercase;
+  }
 
+  p {
+    margin-bottom: ($base-point-grid * 2);
+  }
 
+  a {
+    border-bottom: 1px solid rgba($dark-color-doc, 0.3);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-bottom: 1.5rem;
-        margin-top: 3rem;
-        font-family: $heading-font-family;
-        font-weight: $font-bold;
-        color: $header-font-color;
+    &:hover {
+      border-bottom: 1px solid rgba($dark-color-doc, 0.6);
+    }
+  }
 
-        &:first-child {
-            margin-top: 0;
-        }
+  .browser {
+    margin-top: ($base-point-grid * 3);
+  }
+
+  ol,
+  ul {
+    padding-left: 1.1rem;
+  }
+
+  ul {
+    list-style: none;
+
+    li {
+      margin-bottom: 0.25rem;
+      &::before {
+        content: "\2022";
+        /* Add content: \2022 is the CSS Code/unicode for a bullet */
+        color: $dark-color-doc;
+        /* Change the color */
+        font-weight: bold;
+        /* If you want it to be bold */
+        display: inline-block;
+        /* Needed to add space between the bullet and the text */
+        width: 1em;
+        /* Also needed for space (tweak if needed) */
+        margin-left: -1em;
+        /* Also needed for space (tweak if needed) */
+      }
+    }
+  }
+
+  ol {
+    li {
+      list-style-type: decimal;
+    }
+  }
+
+  strong {
+    font-weight: $font-bold;
+  }
+
+  del {
+    text-decoration: line-through;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    width: 100%;
+    background: rgba($dark-color-doc, 0.26);
+  }
+
+  table {
+    width: 100%;
+
+    thead {
+      text-align: left;
+      font-weight: bold;
     }
 
-    h1 {
-        font-size: 2.5rem;
-
+    td,
+    th {
+      padding: $base-point-grid;
+      border: 1px solid rgba($dark-color-doc, 0.16);
+      border-left: 0;
+      border-right: 0;
     }
+  }
 
-    h2 {
-        padding-bottom: 1rem;
-        font-size: 2rem;
-        border-bottom: 1px solid rgba($core-background, 0.15);
-    }
+  .header-link {
+    float: left;
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-left: -24px;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity $base-duration $base-timing;
+  }
 
-    h3 {
-        font-size: 1.75rem;
-    }
-
-    h4 {
-        font-size: 1.5rem;
-    }
-
-    h5 {
-        font-size: 1.25rem;
-    }
-
-    h6 {
-      font-size: 1rem;
-      text-transform: uppercase;
-    }
-
-    p {
-        margin-bottom: ($base-point-grid * 2);
-    }
-
-    .browser {
-        margin-top: ($base-point-grid * 3);
-    }
-
-    ul, ol {
-        padding-left: ($base-point-grid * 3);
-    }
-
-    ul {
-
-        li {
-            list-style: circle;
-        }
-    }
-
-    ol {
-        li {
-            list-style-type: decimal;
-        }
-    }
-
-    strong {
-        font-weight: $font-bold;
-    }
-
-    del {
-        text-decoration: line-through;
-    }
-
-    em {
-        font-style: italic;
-    }
-
-    hr {
-        border: none;
-        height: 1px;
-        width: 100%;
-        background: rgba($brand-secondary, 0.9);
-    }
-
-    table {
-        width: 100%;
-        thead {
-            text-align: left;
-            font-weight: bold;
-        }
-
-        th, td {
-            padding: $base-point-grid;
-            border: 1px solid rgba($brand-secondary, 0.9);
-        }
-
-        tr:nth-child(2n) {
-            background: $background-color;
-        }
-    }
-
+  h1:hover,
+  h2:hover,
+  h3:hover,
+  h4:hover,
+  h5:hover,
+  h6:hover {
     .header-link {
-        float: left;
-        font-size: 1.4rem;
-        line-height: 1;
-        margin-left: -24px;
-        margin-top: 10px;
-        opacity: 0;
-        transition: opacity $base-duration $base-timing;
+      opacity: 1;
     }
-
-    h1:hover,
-    h2:hover,
-    h3:hover,
-    h4:hover,
-    h5:hover,
-    h6:hover {
-        .header-link {
-            opacity: 1;
-        }
-    }
+  }
 }
