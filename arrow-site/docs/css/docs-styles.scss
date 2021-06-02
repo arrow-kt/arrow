@@ -8,7 +8,7 @@
 @import "utils/mixins/general-mixins";
 
 // Vendors
-@import "vendors/highlight/atom-one-dark";
+@import "vendors/highlight/dracula";
 
 // Base
 @import "base/reset";
@@ -18,6 +18,7 @@
 
 // Components
 @import "components/docs/playground-theme";
+@import "components/docs/highlight";
 @import "components/docs/code";
 @import "components/docs/doc-body";
 @import "components/docs/doc-content-core";

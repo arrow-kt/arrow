@@ -3,12 +3,15 @@
 // -----------------------------------------------
 
 .doc-content {
+   padding: 3rem 3.5rem;
+   margin: 2.5rem;
+   background: #fff;
+   box-shadow: $base-box-shadow;
     max-width: 1072px;
     font-family: $doc-font-family;
     position: relative;
-    padding: 2.5rem;
     box-sizing: content-box;
-    color: rgba(#273244, 0.9);
+    color: rgba($dark-color-doc, 0.9);
     font-size: 1rem;
     //border-right: 1px solid rgba($core-background, 0.15);
 
@@ -20,8 +23,8 @@
     h4,
     h5,
     h6 {
-        margin-bottom: ($base-point-grid * 2);
-        margin-top: ($base-point-grid * 4);
+        margin-bottom: 1.5rem;
+        margin-top: 3rem;
         font-family: $heading-font-family;
         font-weight: $font-bold;
         color: $header-font-color;
@@ -32,18 +35,18 @@
     }
 
     h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
 
     }
 
     h2 {
         padding-bottom: 1rem;
-        font-size: 2.5rem;
+        font-size: 2rem;
         border-bottom: 1px solid rgba($core-background, 0.15);
     }
 
     h3 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     h4 {

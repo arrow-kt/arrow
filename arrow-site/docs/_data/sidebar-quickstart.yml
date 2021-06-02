@@ -1,6 +1,9 @@
 options:
   - title: Introduction
-    url: /introduction/
+    url: /quickstart/#rrow-is-a-library-for-typed-functional-programming-in-kotlin
+
+  - title: Setup
+    url: /quickstart/#setup
 
   - title: Media
     url: https://media.arrow-kt.io/tags/core/

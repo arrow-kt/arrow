@@ -62,7 +62,7 @@
       }
 
       a {
-        font-size: 1rem;
+        font-size: 0.875rem;
         padding: $base-point-grid ($base-point-grid * 2);
         @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
 

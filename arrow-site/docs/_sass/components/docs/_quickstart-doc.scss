@@ -10,6 +10,12 @@
 
 .quickstart-wrapper {
   background: url("../img/quickstart-pattern.svg") repeat-y;
+
+  .doc-content {
+    margin: 0;
+    background: none;
+    box-shadow: none;
+  }
 }
 
 .quickstart-doc {

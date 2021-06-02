@@ -22,9 +22,10 @@ Arrow is composed of 4 main modular libraries
 <div href="#" class="library-item" markdown="1">
 <div class="library-item-content" markdown="1">
 ### Core
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
+Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
 
-<a href="#" class="library-cta core">Read more</a>
+<a href="{{ "/core/" | relative_url }}" class="library-cta core" markdown="1">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
 ![Core](/img/quickstart/modular-libraries-core.svg "Arrow Core")
@@ -36,9 +37,10 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 <div href="#" class="library-item" markdown="1">
 <div class="library-item-content" markdown="1">
 ### Fx
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Arrow Fx is a full-featured, high-performance, asynchronous framework that brings functional operators to Kotlin's `suspend` functions.
+By leveraging the power of KotlinX Coroutines and the compiler support for CPS transformations, Arrow Fx results in optimal async programs with increased throughput and decreased allocations.
 
-<a href="#" class="library-cta fx">Read more</a>
+<a href="{{ "/fx/" | relative_url }}" class="library-cta fx">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
 ![Core](/img/quickstart/modular-libraries-fx.svg "Arrow Core")
@@ -47,10 +49,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 <!--- Module library Optics
 -------------------------------------
 -->
-<div href="#" class="library-item" markdown="1">
+<div href="{{ "/optics/dsl/" | relative_url }}" class="library-item" markdown="1">
 <div class="library-item-content" markdown="1">
 ### Optics
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
+Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
 
 <a href="#" class="library-cta optics">Read more</a>
 </div>
@@ -61,10 +64,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 <!--- Module library Meta start
 -------------------------------------
 -->
-<div href="#" class="library-item" markdown="1">
+<div href="https://meta.arrow-kt.io" class="library-item" markdown="1">
 <div class="library-item-content" markdown="1">
 ### Meta
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Arrow Meta is a general purpose library for meta-programming in Kotlin to build compiler plugins.
+Some type system features proposed by Arrow such as union types, product types, proof derivation, and others are built with Arrow Meta and serve as examples of what could be incorporated in the Kotlin compiler.
 
 <a href="#" class="library-cta meta">Read more</a>
 </div>
