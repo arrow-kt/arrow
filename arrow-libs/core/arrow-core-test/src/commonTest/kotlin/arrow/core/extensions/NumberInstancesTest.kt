@@ -11,6 +11,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.SemiringLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semiring
+import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.byte
@@ -39,6 +40,10 @@ class NumberInstancesTest : UnitSpec() {
     MonoidLaws.laws(Monoid.float(), Arb.floatSmall(), Float::eqv)
 
     /** Semigroup specific instance check */
+
+    "This test in  numbers should fail" {
+      fail("This fail was expected, the js tests are running!")
+    }
 
     "should semigroup with the instance passed - int" {
       checkAll { value: Int ->

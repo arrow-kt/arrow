@@ -24,19 +24,9 @@ kotlin {
                 api project(":arrow-annotations")
             }
         }
-        commonTest {
-            dependencies {
-                implementation project(":arrow-core-test")
-            }
-        }
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-            }
-        }
-        jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }
         jsMain {
@@ -44,10 +34,6 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
-        jsTest {
-            dependencies {
-                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-            }
-        }
+
     }
 }

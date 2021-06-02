@@ -24,9 +24,32 @@ kotlin {
                 api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
+        commonTest {
+            dependencies {
+                implementation project(":arrow-core-test")
+            }
+        }
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+            }
+        }
+        jvmTest {
+            dependencies {
+                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+                implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+                implementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
+            }
+        }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
             }
         }
     }
