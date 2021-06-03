@@ -252,6 +252,9 @@
         .jdk-item {
           padding-right: 0;
           border-right: none;
+          border-bottom: 1px solid rgba($dark-color-doc, 0.14);
+          padding-bottom: 2rem;
+          margin-bottom: 2rem;
         }
 
         .android-item {

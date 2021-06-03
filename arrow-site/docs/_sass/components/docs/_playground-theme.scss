@@ -51,3 +51,7 @@
   background-color: #494D4E !important;
   color: #9C9E9E !important;
 }
+
+@include bp(large) {
+  .cm-s-arrow.CodeMirror {  padding: 0.4rem;}
+}

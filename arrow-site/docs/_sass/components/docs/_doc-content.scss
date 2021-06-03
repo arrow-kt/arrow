@@ -130,6 +130,7 @@
     display: block;
     overflow-x: auto;
     white-space: nowrap;
+    font-size: 16px;
 
     thead {
       text-align: left;
@@ -137,7 +138,6 @@
     }
 
     tbody {
-      display: table;
       width: 100%;
     }
 
