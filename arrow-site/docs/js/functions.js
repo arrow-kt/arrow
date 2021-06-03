@@ -117,7 +117,7 @@ function activateParent(element, activeClass = 'active') {
   activate(elemParent, activeClass);
 }
 
-function openCity(evt, cityName) {
+function openSetup(evt, setupName) {
   // Declare all variables
   var i, tabcontent, tablinks;
 
@@ -134,9 +134,9 @@ function openCity(evt, cityName) {
   }
 
   // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(cityName).style.display = "block";
+  document.getElementById(setupName).style.display = "block";
   evt.currentTarget.className += " active";
 }
 
 // Get the element with id="defaultOpen" and click on it
-document.getElementById("Maven").click();
+document.getElementById("defaultOpen").click();

@@ -3,13 +3,14 @@
 // -----------------------------------------------
 
 p,
-ul {
+ul,
+table {
     code {
         font-family: $code-doc-font-famil;
         padding: 0 0.3rem;
         margin: 0;
         font-size: 16px;
-        border-radius: 3px;
+        border-radius: 2px;
         color: rgba($dark-color-doc, 0.9);
         background: rgba($quickstart-background, 0.1);
     }

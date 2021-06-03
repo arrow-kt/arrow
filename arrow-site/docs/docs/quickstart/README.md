@@ -107,12 +107,12 @@ Arrow supports Android starting on API 21 and up.
 <div class="setup-graddle-maven" markdown="1">
 <!-- Tab links -->
 <div class="tab" markdown="1">
-  <button class="tablinks" onclick="openCity(event, 'London')" id="Maven" markdown="1">Maven</button>
-  <button class="tablinks" onclick="openCity(event, 'Paris')" markdown="1">Graddle</button>
+  <button class="tablinks" onclick="openSetup(event, 'Gradle')" id="defaultOpen" markdown="1">Gradle</button>
+  <button class="tablinks" onclick="openSetup(event, 'Maven')" markdown="1">Maven</button>
 </div>
 
 <!-- Tab content -->
-<div id="London" class="tabcontent" markdown="1">
+<div id="Gradle" class="tabcontent" markdown="1">
 
 #### Basic Setup
 
@@ -169,7 +169,7 @@ dependencies {
 
 </div>
 
-<div id="Paris" class="tabcontent" markdown="1">
+<div id="Maven" class="tabcontent" markdown="1">
 
 #### Basic Setup
 

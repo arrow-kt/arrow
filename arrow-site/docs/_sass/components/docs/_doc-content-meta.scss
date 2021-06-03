@@ -9,9 +9,11 @@
         }
 
         p,
-        ul {
+        ul,
+        table {
             code {
                 background: rgba($meta-background, 0.08);
+                font-family: $code-doc-font-famil;
             }
         }
 
