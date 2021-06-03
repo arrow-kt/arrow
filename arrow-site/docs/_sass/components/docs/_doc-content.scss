@@ -69,7 +69,7 @@
       border-bottom: 1px solid rgba($dark-color-doc, 0.6);
     }
 
-    img {
+    &:not( > img) {
       border-bottom: none;
     }
   }
@@ -89,6 +89,7 @@
 
     li {
       margin-bottom: 0.55rem;
+
       &::before {
         content: "\2022";
         color: $dark-color-doc;
@@ -167,5 +168,11 @@
     .header-link {
       opacity: 1;
     }
+  }
+}
+@include bp(large) {
+  .doc-content {
+    padding: 1.5rem 1rem;
+    margin: 1rem;
   }
 }

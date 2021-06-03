@@ -3,10 +3,13 @@
 // -----------------------------------------------
 
 .card-quickstart {
-  padding: 3rem 3.5rem;
+  padding: 3rem;
   background: #fff;
   box-shadow: $base-box-shadow;
 }
+
+
+
 
 .quickstart-wrapper {
   background: url("../img/quickstart-pattern.svg") repeat-y;
@@ -17,6 +20,11 @@
     box-shadow: none;
     max-width: 1072px;
   }
+}
+
+.quick-snap {
+  display: flex;
+  justify-content: center;
 }
 
 .quickstart-doc {
@@ -207,11 +215,28 @@
 }
 
 @include bp(large) {
+  .card-quickstart {
+    padding: 1.5rem 1rem;
+  }
+
   .quickstart-doc {
     .modular-libraries {
+      .modular-libraries-header {
+        text-align: center;
+
+        h1 {
+          margin: 2rem 0;
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1.5rem;
+        }
+      }
       .libraries-list {
         .library-item {
           flex-direction: column-reverse;
+          text-align: center;
 
           .library-item-content {
             margin-right: 0;
@@ -233,6 +258,12 @@
           margin-left: 0;
         }
       }
+      .setup-graddle-maven {
+        .tabcontent {
+          padding: 1rem;
+        }
+      }
+
     }
   }
 }
