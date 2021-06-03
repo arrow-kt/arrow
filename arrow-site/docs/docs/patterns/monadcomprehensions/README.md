@@ -76,11 +76,6 @@ private val deans = mapOf(
   UniversityId("UCA") to Dean(Name("James"))
 )
 
-/* in memory db of deans */
-private val deans = mapOf(
-  UniversityId("UCA") to Dean(Name("James"))
-)
-
 /* gets a student by name */
 suspend fun student(name: Name): Either<NotFound, Student> =
   students[name]?.let(::Right) ?: Left(NotFound)
