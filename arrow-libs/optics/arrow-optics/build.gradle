@@ -18,6 +18,11 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
             }
         }
+        commonTest {
+            dependencies {
+                implementation project(":arrow-optics-test")
+            }
+        }
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
@@ -25,8 +30,7 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                compileOnly project(":arrow-optics-test")
-                runtimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }
     }
