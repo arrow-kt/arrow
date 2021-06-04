@@ -80,7 +80,7 @@ Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relati
 Arrow Meta is a general purpose library for meta-programming in Kotlin to build compiler plugins.
 Some type system features proposed by Arrow such as union types, product types, proof derivation, and others are built with Arrow Meta and serve as examples of what could be incorporated in the Kotlin compiler.
 
-<a href="#" class="library-cta meta">Read more</a>
+<a href="https://meta.arrow-kt.io" class="library-cta meta">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
 ![Core](/img/quickstart/modular-libraries-meta.svg "Arrow Core")
