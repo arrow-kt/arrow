@@ -159,9 +159,7 @@
   }
 
   table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+    width: 100%;
     font-size: 16px;
 
     thead {
@@ -213,5 +211,12 @@
   .doc-content {
     padding: 1.5rem 1rem;
     margin: 1rem;
+
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
   }
 }
