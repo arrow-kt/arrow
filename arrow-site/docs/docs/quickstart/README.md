@@ -65,7 +65,7 @@ By leveraging the power of KotlinX Coroutines and the compiler support for CPS t
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.
 
-<a href="#" class="library-cta optics">Read more</a>
+<a href="{{ "/optics/dsl/" | relative_url }}" class="library-cta fx">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
 ![Core](/img/quickstart/modular-libraries-optics.svg "Arrow Core")
