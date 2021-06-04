@@ -18,8 +18,5 @@ options:
       - title: Instill
         url: https://instil.co/
 
-  - title: Code of conduct
-    url: /codeofconduct/
-
   - title: License
     url: https://github.com/arrow-kt/arrow/blob/main/LICENSE
