@@ -119,6 +119,38 @@
     font-style: italic;
   }
 
+  blockquote {
+    position: relative;
+    padding: 1rem;
+    background: rgba($blocquote-info, 0.2);
+    margin-bottom: 1rem;
+
+
+    &::before {
+      position: absolute;
+      font-size: 1.375rem;
+      top: 13px;
+      content: "";
+      color: rgba($blocquote-info, 0.9);
+      font-family: 'Font Awesome 5 Pro';
+    }
+
+
+    &.blockquote-alert {
+      background: rgba($blocquote-alert, 0.2);
+      &::before {
+        content: "";
+        color: rgba($blocquote-alert, 0.9);
+      }
+    }
+
+    p {
+      padding-left: 1rem;
+      margin-bottom: 0;
+      padding-left: 2.4rem;
+    }
+  }
+
   hr {
     border: none;
     height: 1px;
