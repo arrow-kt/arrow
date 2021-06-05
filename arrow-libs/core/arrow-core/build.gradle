@@ -12,7 +12,7 @@ apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
-    js(IR) {
+    js(BOTH) {
         browser()
         nodejs()
     }
