@@ -139,13 +139,13 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Compose a [POptional] with a [POptional]
    */
-  infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
+  infix fun <C, D> compose(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
     POptional(
       { source -> getOrModify(source).flatMap { a -> other.getOrModify(a).bimap({ b -> set(source, b) }, ::identity) } },
       { source, d -> modify(source) { a -> other.set(a, d) } }
     )
 
-  operator fun <C, D> plus(other: POptional<A, B, C, D>): POptional<S, T, C, D> =
+  operator fun <C, D> plus(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
     this compose other
 
   companion object {

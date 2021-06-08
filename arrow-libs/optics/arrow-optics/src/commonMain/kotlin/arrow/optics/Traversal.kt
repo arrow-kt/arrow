@@ -44,10 +44,10 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
   /**
    * Compose a [PTraversal] with a [PTraversal]
    */
-  infix fun <C, D> compose(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> =
+  infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     PTraversal { s, f -> this@PTraversal.modify(s) { b -> other.modify(b, f) } }
 
-  operator fun <C, D> plus(other: PTraversal<A, B, C, D>): PTraversal<S, T, C, D> =
+  operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
 
   companion object {
