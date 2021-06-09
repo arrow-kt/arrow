@@ -14,10 +14,10 @@ var textArray = [
 ];
 
 // Speed (in milliseconds) of typing.
-var speedForward = 60, //Typing Speed
+var speedForward = 40, //Typing Speed
     speedWait = 9000, // Wait between typing and backspacing
     speedBetweenLines = 1000, //Wait between first and second lines
-    speedBackspace = 60; //Backspace Speed
+    speedBackspace = 40; //Backspace Speed
 
 //Run the loop
 typeWriter("output", textArray);

@@ -14,8 +14,21 @@
     line-height: ($base-point-grid * 3);
 
     .footer-dev {
+      display: flex;
       width: $column-4;
       transition: color $base-duration $base-timing;
+
+      .footer-47 {
+        position: relative;
+        margin-right: 1.25rem;
+        #footer-47-dark {
+          position: absolute;
+          opacity: 1;
+        }
+        #footer-47-white {
+          opacity: 0;
+        }
+      }
 
       .site-name {
         text-transform: uppercase;
