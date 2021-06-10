@@ -174,9 +174,10 @@
         overflow: hidden;
         p {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          button:first-child {
+          grid-template-columns: repeat(3, 1fr);
+          button:nth-child(2) {
             border-right: 1px solid #DCDEE1;
+            border-left: 1px solid #DCDEE1;
           }
         }
       }

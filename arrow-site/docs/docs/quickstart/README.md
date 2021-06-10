@@ -117,12 +117,13 @@ Arrow supports Android starting on API 21 and up.
 <div class="setup-graddle-maven" markdown="1">
 <!-- Tab links -->
 <div class="tab" markdown="1">
-  <button class="tablinks" onclick="openSetup(event, 'Gradle')" id="defaultOpen" markdown="1">Gradle</button>
+  <button class="tablinks" onclick="openSetup(event, 'Gradle-kotlin')" id="defaultOpen" markdown="1">Gradle Kotlin</button>
+  <button class="tablinks" onclick="openSetup(event, 'Gradle-Groovy')" markdown="1">Gradle Groovy</button>
   <button class="tablinks" onclick="openSetup(event, 'Maven')" markdown="1">Maven</button>
 </div>
 
 <!-- Tab content -->
-<div id="Gradle" class="tabcontent" markdown="1">
+<div id="Gradle-kotlin" class="tabcontent" markdown="1">
 
 #### Basic Setup
 
@@ -176,6 +177,14 @@ dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
 ```
+
+</div>
+
+<div id="Gradle-Groovy" class="tabcontent" markdown="1">
+
+#### Basic Setup
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 </div>
 
