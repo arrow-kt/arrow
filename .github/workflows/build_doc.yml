@@ -22,14 +22,6 @@ jobs:
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: "Create APIdoc"
+    - name: "Create API doc and validate documentation"
       working-directory: arrow-libs
-      run: ./gradlew dokka
-    - name: "Validate documentation"
-      working-directory: arrow-site
-      run: ./gradlew runAnk
-    - name: "Build site"
-      working-directory: arrow-site
-      run: |
-         bundle install --gemfile Gemfile --path vendor/bundle
-         bundle exec jekyll build -s build/site
+      run: ./gradlew buildDoc
