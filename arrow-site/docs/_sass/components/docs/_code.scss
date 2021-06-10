@@ -12,7 +12,7 @@ table {
         font-size: 16px;
         border-radius: 2px;
         color: rgba($dark-color-doc, 0.9);
-        background: rgba($quickstart-background, 0.1);
+        background: rgba($quickstart-background, 0.08);
     }
 }
 
@@ -28,7 +28,7 @@ table {
     }
 
     .hljs {
-      background: $quickstart-background;
+      background: rgba($quickstart-background, 0.06);
     }
 
     .cm-s-arrow span.cm-keyword {

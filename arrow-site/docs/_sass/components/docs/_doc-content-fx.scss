@@ -16,17 +16,15 @@
         }
 
         .cm-s-arrow span.cm-keyword {
-            color: $fx-color;
+            //color: $fx-color;
         }
 
         // Codemirror
         .cm-s-arrow.CodeMirror {
-          background: $fx-background;
+          background: rgba($fx-background, 0.06);
         }
 
-        .cm-s-arrow .CodeMirror-gutters {
-          background-color: $fx-background;
-        }
+
 
                 .hljs-variable,
         .hljs-template-variable,
@@ -36,7 +34,7 @@
         .hljs-selector-class,
         .hljs-regexp,
         .hljs-deletion {
-            color: $fx-color;
+            //color: $fx-color;
         }
 
         .button-video {

@@ -22,16 +22,14 @@
     }
     // Codemirror
     .cm-s-arrow.CodeMirror {
-      background: $core-background;
+      background: rgba($core-background, 0.06);
     }
 
-    .cm-s-arrow .CodeMirror-gutters {
-      background-color: $core-background;
-    }
+
 
 
     .cm-s-arrow span.cm-keyword {
-      color: $core-color;
+      //color: $core-color;
     }
 
     .hljs-deletion,
@@ -42,7 +40,7 @@
     .hljs-tag,
     .hljs-template-variable,
     .hljs-variable {
-      color: $core-color;
+      //color: $core-color;
     }
 
     .button-video {
