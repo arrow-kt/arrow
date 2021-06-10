@@ -76,12 +76,12 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
   /**
    * Compose a [PLens] with another [PLens]
    */
-  infix fun <C, D> compose(other: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
+  infix fun <C, D> compose(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> = Lens(
     { a -> other.get(get(a)) },
     { s, c -> set(s, other.set(get(s), c)) }
   )
 
-  operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> =
+  operator fun <C, D> plus(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> =
     this compose other
 
   companion object {
