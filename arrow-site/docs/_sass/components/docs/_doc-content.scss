@@ -206,6 +206,29 @@
       opacity: 1;
     }
   }
+  .content-edit-page {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -20px;
+    a {
+      border: 1px solid rgba($dark-color-doc, 0.2);
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      span {
+        font-size: 0.813rem;
+      }
+
+      i {
+        font-size: 1.125rem;
+        margin-right: 0.25rem;
+      }
+      &:hover {
+        background: rgba($dark-color-doc, 0.08);
+      }
+    }
+  }
 }
 @include bp(large) {
   .doc-content {
@@ -217,6 +240,10 @@
       overflow-x: auto;
       white-space: nowrap;
     }
+
+      .content-edit-page {
+        display: none;
+      }
 
   }
 }
