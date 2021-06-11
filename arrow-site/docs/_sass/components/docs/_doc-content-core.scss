@@ -25,7 +25,13 @@
       background: rgba($core-background, 0.06);
     }
 
+    .cm-s-arrow .CodeMirror-gutters {
+      background-color: rgba($core-background, 0.08);
+    }
 
+    .CodeMirror-linebackground.unmodifiable-line {
+      background-color: rgba($core-background, 0.06);
+    }
 
 
     .cm-s-arrow span.cm-keyword {
@@ -44,7 +50,7 @@
     }
 
     .button-video {
-      background: $white;
+      background: $core-color;
       border: 2px solid $core-color;
       transition: background $base-duration;
 
