@@ -25,9 +25,11 @@
     </ul>
   </div>
   <div class="doc-content">
+    {% unless page.path contains 'apidocs' %}
     <div class="content-edit-page">
-      <a href="#"><i class="fab fa-github"></i> <span>Edit Page</span></a>
+      <a href="https://github.com/arrow-kt/arrow/edit/main/arrow-site/docs/{{ page.path }}"><i class="fab fa-github"></i> <span>Edit Page</span></a>
     </div>
+    {% endunless %}
     {% if page.video %}
     {% include _media-wrapper.html id=page.video %}
     {% endif %}
