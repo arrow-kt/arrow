@@ -4,7 +4,6 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "../$DOC_CREATION"
 apply from: "../$SUB_PROJECT"
 
 dependencies {

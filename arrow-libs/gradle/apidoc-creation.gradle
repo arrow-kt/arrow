@@ -19,21 +19,103 @@ apply plugin: "org.jetbrains.dokka"
 //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
 dokka {
     outputFormat = 'jekyll'
-    outputDirectory = "${rootDir}/../arrow-site/docs/apidocs"
+    outputDirectory = "${projectDir}/../../../arrow-site/docs/apidocs"
     configuration {
         includes = ['README.md']
         reportUndocumented = false
-        // Specifies the location of the project source code on the Web.
-        // If provided, Dokka generates "source" links for each declaration.
-        // Repeat for multiple mappings
         sourceLink {
-            // Source directory
-            path = "src/main/kotlin"
-
-            // URL showing where the source code can be accessed through the web browser
-            url = "https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/main/kotlin')}"
-
-            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            path = "core/arrow-continuations/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-continuations/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-continuations/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-continuations/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-annotations/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-annotations/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-core-test/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core-test/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-core-test/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core-test/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-core-retrofit/src/main/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core-retrofit/src/main/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-core/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "core/arrow-core/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/core/arrow-core/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "optics/arrow-optics-mtl/src/main/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/optics/arrow-optics-mtl/src/main/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "optics/arrow-optics-test/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/optics/arrow-optics-test/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "optics/arrow-optics/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/optics/arrow-optics/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-coroutines-test/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-coroutines-test/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-coroutines-test/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-coroutines-test/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-coroutines/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-coroutines/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-coroutines/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-stm/src/commonMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-stm/src/commonMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "fx/arrow-fx-stm/src/jvmMain/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/fx/arrow-fx-stm/src/jvmMain/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "ank/arrow-ank-gradle/src/main/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/ank/arrow-ank-gradle/src/main/kotlin"
+            lineSuffix = "#L"
+        }
+        sourceLink {
+            path = "ank/arrow-ank/src/main/kotlin"
+            url = "https://github.com/arrow-kt/arrow/blob/main/arrow-libs/ank/arrow-ank/src/main/kotlin"
             lineSuffix = "#L"
         }
     }
