@@ -117,13 +117,88 @@ Arrow supports Android starting on API 21 and up.
 <div class="setup-graddle-maven" markdown="1">
 <!-- Tab links -->
 <div class="tab" markdown="1">
-  <button class="tablinks" onclick="openSetup(event, 'Gradle-kotlin')" id="defaultOpen" markdown="1">Gradle Kotlin</button>
-  <button class="tablinks" onclick="openSetup(event, 'Gradle-Groovy')" markdown="1">Gradle Groovy</button>
+  <button class="tablinks" onclick="openSetup(event, 'Gradle-kotlin')" id="defaultOpen" markdown="1">Gradle Kotlin DSL</button>
+  <button class="tablinks" onclick="openSetup(event, 'Gradle-Groovy')" markdown="1">Gradle Groovy DSL</button>
   <button class="tablinks" onclick="openSetup(event, 'Maven')" markdown="1">Maven</button>
 </div>
 
 <!-- Tab content -->
 <div id="Gradle-kotlin" class="tabcontent" markdown="1">
+
+#### Basic Setup
+
+In your project's root `build.gradle.kts`, append this repository to your list:
+
+```kotlin
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+```
+
+Add the dependencies into the project's `build.gradle.kts`:
+
+##### Arrow Core
+
+```kotlin
+dependencies {
+    implementation("io.arrow-kt:arrow-core:0.13.2")
+}
+```
+
+##### Arrow Core + Arrow Optics
+
+```kotlin
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+    implementation("io.arrow-kt:arrow-optics:0.13.2")
+    kapt("io.arrow-kt:arrow-meta:0.13.2")
+}
+```
+
+##### Arrow Core + Arrow Fx
+
+```kotlin
+dependencies {
+    implementation("io.arrow-kt:arrow-fx-coroutines:0.13.2")
+}
+```
+
+#### BOM file
+
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
+```kotlin
+dependencies {
+    implementation(platform("io.arrow-kt:arrow-stack:0.13.2"))
+
+    implementation("io.arrow-kt:arrow-core")
+    implementation("io.arrow-kt:arrow-fx-coroutines")
+    ...
+}
+```
+
+#### Next development version
+
+If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
+
+```kotlin
+allprojects {
+    repositories {
+        ...
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    }
+
+    // To use latest artifacts
+    configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
+}
+```
+
+</div>
+
+<div id="Gradle-Groovy" class="tabcontent" markdown="1">
 
 #### Basic Setup
 
@@ -171,20 +246,34 @@ dependencies {
 
 #### BOM file
 
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
 ```groovy
 def arrow_version = "0.13.2"
 dependencies {
-    implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
+    implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
+
+    implementation "io.arrow-kt:arrow-core"
+    implementation "io.arrow-kt:arrow-fx-coroutines"
+    ...
 }
 ```
 
-</div>
+#### Next development version
 
-<div id="Gradle-Groovy" class="tabcontent" markdown="1">
+If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
 
-#### Basic Setup
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    // To use latest artifacts
+    configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' }
+}
+```
 
 </div>
 
@@ -194,7 +283,8 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
-```
+
+```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
     <arrow.version>0.13.2</arrow.version>
@@ -202,7 +292,8 @@ Add to your pom.xml file the following properties:
 ```
 
 Add the dependencies that you want to use:
-```
+
+```xml
 <dependency>
   <groupId>io.arrow-kt</groupId>
   <artifactId>arrow-core</artifactId>
@@ -213,7 +304,8 @@ Add the dependencies that you want to use:
 #### Enabling kapt for the Optics DSL
 
 For the Optics DSL, enable annotation processing using Kotlin plugin:
-```
+
+```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
@@ -264,7 +356,7 @@ For the Optics DSL, enable annotation processing using Kotlin plugin:
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
-```
+```xml
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -279,6 +371,19 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
   <dependencies>
     ...
   </dependencies>
+```
+
+#### Next development version
+
+If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
+
+```xml
+<repository>
+  <snapshotss>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    <updatePolicy>always</updatePolicy>
+  </snapshots>
+</repository>
 ```
 
 </div>
