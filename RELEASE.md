@@ -5,7 +5,7 @@
 * [No broken links in the website](CONTRIBUTING.md#how-to-test-links)
 * Dependencies in `arrow-stack/build.gradle`:
   * The new modules are considered
-  * The old modules doesn't appear
+  * The old modules don't appear
 
 ## 1. Create a pull request
 
