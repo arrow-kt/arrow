@@ -47,23 +47,38 @@ jobs:
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
 
-    - name: "Create API doc and validate documentation"
+    - name: "Create API doc"
       working-directory: arrow-libs
-      run: ./gradlew buildDoc
+      run: ./gradlew dokka
+
+    - name: "Validate documentation"
+      working-directory: arrow-site
+      run: ./gradlew runAnk
 
     - name: "Landing page: build"
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
-        bundle exec jekyll build -b docs -s build/site
-        tree _site > $BASEDIR/logs/content_docs.log
+        bundle exec jekyll build -s build/site
+        tree _site > $BASEDIR/logs/content.log
 
     - name: "Landing page: publish"
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
         ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+
+    - name: "Remove index for versions"
+      working-directory: arrow-site
+      run: rm -f build/site/index.md
+
+    - name: "Latest release: build (docs/)"
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+      working-directory: arrow-site
+      run: |
+        bundle exec jekyll build -b docs -s build/site
+        tree _site > $BASEDIR/logs/content_docs.log
 
     - name: "Latest release: publish (docs/)"
       if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
@@ -71,10 +86,6 @@ jobs:
       run: |
         echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
         ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
-
-    - name: "Remove index for versions"
-      working-directory: arrow-site
-      run: rm -f build/site/index.md
 
     - name: "Latest release: build release directory (docs/<major.minor>)"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
