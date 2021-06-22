@@ -29,7 +29,7 @@ jobs:
       if: ${{ always() }}
       run: |
         mkdir test-reports
-        for report in `ls -d arrow-libs/**/**/build/reports/tests/test`; do
+        for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
           module=$(echo $report | cut -d/ -f3)
           cp -r $report test-reports/$module
         done
