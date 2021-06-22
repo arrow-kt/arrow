@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Reason: The root directory also has docs/, docs/next/ and docs/<major.minor>. 
+
 set -e
 
 MAIN_CONTENT=("CNAME"  "code"  "css"  "error.html"  "fonts"  "img"  "index.html"  "js"  "redirects.json")
