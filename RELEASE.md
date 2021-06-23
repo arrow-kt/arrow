@@ -41,7 +41,12 @@ NOTE: [This plugin](https://github.com/gradle-nexus/publish-plugin) provides tas
 
 ## How to fix a released version
 
-When fixing `<major.minor.patch>` version:
+Context:
+
+* Latest release has a bug and `main` branch already has other additional features.
+* A released version has a bug and it's not the latest release.
+
+How to fix a `<major.minor.patch>` version in some of those contexts:
 
 1. Create `release/<major.minor.(patch + 1)>` branch from tag `<major.minor.patch>`.
 2. Apply the fix into the new branch:
@@ -49,9 +54,9 @@ When fixing `<major.minor.patch>` version:
    * Directly for existing changes (cherry-pick).
 3. Check that new `<major.minor.(patch + 1)-SNAPSHOT>` artifacts are deployed into [Sonatype OSSRH](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/) with the fixes.
 4. Try the new `<major.minor.(patch + 1)-SNAPSHOT>` version.
-5. Create a pull request into `main` branch if the new changes must be applied to the new versions as well.
-6. Create a pull request into `release/<major.minor.(patch + 1)>` branch:
-    * Change `LATEST_VERSION` in `arrow-libs/gradle.properties`.
+5. Create a pull request into `main` branch if the fix must be applied to the new versions as well.
+6. Create a pull request into `release/<major.minor.(patch + 1)>` branch to release the fix:
+    * Change just `LATEST_VERSION` in `arrow-libs/gradle.properties`.
     * Update the version in `README.md`.
     * Update the version in [the QuickStart section of the website](arrow-site/docs/docs/quickstart/README.md).
     * Update [the sidebar](arrow-site/docs/_data/doc-versions.yml).
