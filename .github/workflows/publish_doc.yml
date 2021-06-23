@@ -59,7 +59,7 @@ jobs:
       if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
-        bundle exec jekyll build -s build/site
+        bundle exec jekyll build -b docs -s build/site
         tree _site > $BASEDIR/logs/content.log
 
     - name: "Landing page: publish"
