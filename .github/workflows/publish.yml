@@ -19,7 +19,6 @@ jobs:
       SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
       ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
-      GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
     runs-on: macos-latest
 

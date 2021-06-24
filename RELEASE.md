@@ -39,6 +39,17 @@ Then, close and release the Sonatype repository to sync with Maven Central:
 
 NOTE: [This plugin](https://github.com/gradle-nexus/publish-plugin) provides tasks for closing and releasing the staging repositories. However, that plugin must be applied to the root project and it would be necessary to discard modules for publication. Let's keep this note here to give it a try later on.
 
+### About signing artifacts with GPG/PGP
+
+One of the requirements for artifacts available in Central Maven is being signed with GPG/PGP.
+
+These secrets are involved to meet that requirement:
+
+* `ORG_GRADLE_PROJECT_SIGNINGKEY`: private key from [Generating a Key Pair](https://central.sonatype.org/publish/requirements/gpg/#generating-a-key-pair)
+* `ORG_GRADLE_PROJECT_SIGNINGPASSWORD`: passphrase from [Generating a Key Pair](https://central.sonatype.org/publish/requirements/gpg/#generating-a-key-pair)
+
+To verify artifacts during **Close** task, the public key must be distributed to a key server: [Distributing Your Public Key](https://central.sonatype.org/publish/requirements/gpg/#distributing-your-public-key).
+
 ## How to fix a released version
 
 Context:
