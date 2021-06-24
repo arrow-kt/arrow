@@ -47,6 +47,12 @@ jobs:
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
 
+    - name: "Assemble"
+      working-directory: arrow-libs
+      run: |
+        echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
+        ./gradlew assemble
+
     - name: "Create API doc"
       working-directory: arrow-libs
       run: ./gradlew dokka
