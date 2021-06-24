@@ -59,6 +59,15 @@ cd arrow-libs
 ./gradlew buildDoc
 ```
 
+That Gradle task is equivalent to run Dokka and Ank:
+
+```bash
+cd arrow-libs
+./gradlew dokka
+cd ../arrow-site
+./gradlew runAnk
+```
+
 ### Doc snippets policies
 
 Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please,
@@ -83,6 +92,17 @@ Also note that you can make your Ank snippets **editable and runnable in the act
 ```sh
 cd arrow-site
 ./gradlew buildSite
+```
+
+That Gradle task is equivalent to run Dokka, Ank and Jekyll build:
+
+```bash
+cd arrow-libs
+./gradlew dokka
+cd ../arrow-site
+./gradlew runAnk
+bundle install --gemfile Gemfile --path vendor/bundle
+bundle exec jekyll serve -s build/site
 ```
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
