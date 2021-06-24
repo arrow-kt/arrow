@@ -129,7 +129,7 @@ Arrow supports Android starting on API 21 and up.
 
 In your project's root `build.gradle.kts`, append this repository to your list:
 
-```kotlin
+```
 allprojects {
     repositories {
         mavenCentral()
@@ -141,7 +141,7 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ##### Arrow Core
 
-```kotlin
+```
 dependencies {
     implementation("io.arrow-kt:arrow-core:0.13.2")
 }
@@ -149,7 +149,7 @@ dependencies {
 
 ##### Arrow Core + Arrow Optics
 
-```kotlin
+```
 apply plugin: 'kotlin-kapt'
 
 dependencies {
@@ -160,7 +160,7 @@ dependencies {
 
 ##### Arrow Core + Arrow Fx
 
-```kotlin
+```
 dependencies {
     implementation("io.arrow-kt:arrow-fx-coroutines:0.13.2")
 }
@@ -170,7 +170,7 @@ dependencies {
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
-```kotlin
+```
 dependencies {
     implementation(platform("io.arrow-kt:arrow-stack:0.13.2"))
 
@@ -184,7 +184,7 @@ dependencies {
 
 If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
 
-```kotlin
+```
 allprojects {
     repositories {
         ...
