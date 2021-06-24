@@ -5,17 +5,19 @@ set -ex
 echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
 echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
 
+NEW_RELEASE_VERSION_EXISTS=0
 if [ "$GITHUB_REF" == "refs/heads/main" ]; then
     LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | ggrep -oP '<latest>\K[^<]*')
     if [ "$LATEST_PUBLISHED_VERSION" == "" ]; then exit 1; fi
     RELEASE_VERSION=$(grep LATEST_VERSION $BASEDIR/gradle.properties | cut -d= -f2)
-    NEW_RELEASE_VERSION_EXISTS=$(expr "$LATEST_PUBLISHED_VERSION" != "$RELEASE_VERSION")
+    if [ "$LATEST_PUBLISHED_VERSION" != "$RELEASE_VERSION" ]; then NEW_RELEASE_VERSION_EXISTS=1; fi
 else
     echo "Into release branch ..."
     BRANCH_VERSION=$(echo $GITHUB_REF | cut -d/ -f4)
     RELEASE_VERSION=$(grep LATEST_VERSION $BASEDIR/gradle.properties | cut -d= -f2)
-    NEW_RELEASE_VERSION_EXISTS=$(expr "$BRANCH_VERSION" == "$RELEASE_VERSION")
-    if [ $NEW_RELEASE_VERSION_EXISTS == 0 ]; then
+    if [ "$BRANCH_VERSION" == "$RELEASE_VERSION" ]; then
+        NEW_RELEASE_VERSION_EXISTS=1
+    else
         perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=$BRANCH_VERSION-SNAPSHOT/g" -i $BASEDIR/gradle.properties
     fi
 fi
