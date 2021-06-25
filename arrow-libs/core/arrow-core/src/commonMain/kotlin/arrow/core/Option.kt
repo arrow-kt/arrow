@@ -812,19 +812,92 @@ fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
     acc.combine(MA, a)
   }
 
-fun <T> Iterable<T>.firstOrNone(): Option<T> = this.firstOrNull().toOption()
+fun <T> Iterable<T>.firstOrNone(): Option<T> {
+  when (this) {
+    is List -> {
+      return if (isEmpty()) None else Some(this[0])
+    }
+    else -> {
+      val iterator = iterator()
+      if (!iterator.hasNext())
+        return None
+      return Some(iterator.next())
+    }
+  }
+}
 
-inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
+inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
+  for (element in this) if (predicate(element)) return Some(element)
+  return None
+}
 
-fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
+fun <T> Iterable<T>.singleOrNone(): Option<T> {
+  when (this) {
+    is List -> return if (size == 1) Some(this[0]) else None
+    else -> {
+      val iterator = iterator()
+      if (!iterator.hasNext())
+        return None
+      val single = iterator.next()
+      if (iterator.hasNext())
+        return None
+      return Some(single)
+    }
+  }
+}
 
-inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
+inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
+  var single: Option<T> = None
+  var found = false
+  for (element in this) {
+    if (predicate(element)) {
+      if (found) return None
+      single = Some(element)
+      found = true
+    }
+  }
+  if (!found) return None
+  return single
+}
 
-fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
+fun <T> Iterable<T>.lastOrNone(): Option<T> {
+  when (this) {
+    is List -> return if (isEmpty()) None else Some(this[size - 1])
+    else -> {
+      val iterator = iterator()
+      if (!iterator.hasNext())
+        return None
+      var last = iterator.next()
+      while (iterator.hasNext())
+        last = iterator.next()
+      return Some(last)
+    }
+  }
+}
 
-fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.lastOrNull(predicate).toOption()
+fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
+  var found = false
+  val list = mutableListOf<T>()
+  for (element in this) {
+    if (predicate(element)) {
+      if (found) list[0] = element else list.add(element)
+      found = true
+    }
+  }
+  return if (found) Some(list[0]) else None
+}
 
-fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
+fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> {
+  if (this is List) return if (index in 0..lastIndex) Some(get(index)) else None
+  if (index < 0) return None
+  val iterator = iterator()
+  var count = 0
+  while (iterator.hasNext()) {
+    val element = iterator.next()
+    if (index == count++) return Some(element)
+  }
+  return None
+}
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
