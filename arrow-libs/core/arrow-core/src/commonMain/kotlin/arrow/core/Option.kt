@@ -847,17 +847,17 @@ fun <T> Iterable<T>.singleOrNone(): Option<T> {
 }
 
 inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
-  var single: Option<T> = None
+  val list = mutableListOf<T>()
   var found = false
   for (element in this) {
     if (predicate(element)) {
       if (found) return None
-      single = Some(element)
+      list.add(element)
       found = true
     }
   }
   if (!found) return None
-  return single
+  return Some(list[0])
 }
 
 fun <T> Iterable<T>.lastOrNone(): Option<T> {
