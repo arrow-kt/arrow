@@ -339,12 +339,11 @@ public sealed class Option<out A> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
+    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> =
       try {
         Some(f())
       } catch (t: Throwable) {
         recover(t.nonFatalOrThrow())
-        None
       }
 
     @JvmStatic
