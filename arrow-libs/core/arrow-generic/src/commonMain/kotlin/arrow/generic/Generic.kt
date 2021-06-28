@@ -234,7 +234,7 @@ public sealed interface Generic<A> {
     ): Generic<A> {
       val genericEncoder = GenericEncoder(serializersModule)
       ser.serialize(genericEncoder, value)
-      return genericEncoder.result(ser.descriptor.serialName) as Generic<A>
+      return genericEncoder.result(ser) as Generic<A>
     }
 
     public fun <A : kotlin.Enum<A>> enum(

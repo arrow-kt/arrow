@@ -1,6 +1,9 @@
 package arrow.generic
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SealedClassSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -121,7 +124,7 @@ class GenericEncoder(
     // todo
     val encoder = GenericEncoder(serializersModule)
     serializer.serialize(encoder, value)
-    genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
+    genericProperties[propertyName] = encoder.result(serializer)
     println("encodeSerializableValue: $serializer, $value")
   }
 
@@ -135,7 +138,7 @@ class GenericEncoder(
       // todo
       val encoder = GenericEncoder(serializersModule)
       serializer.serialize(encoder, value)
-      genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
+      genericProperties[propertyName] = encoder.result(serializer)
     } else {
       // todo
     }
@@ -155,14 +158,14 @@ class GenericEncoder(
     println("endStructure: $descriptor")
   }
 
-  fun result(serialName: String): Generic<*> =
+  fun result(serializer: SerializationStrategy<*>): Generic<*> =
     genericValue ?: when (descriptor?.kind) {
       StructureKind.CLASS -> Generic.Product<Any?>(
-        Generic.ObjectInfo(serialName),
+        Generic.ObjectInfo(serializer.descriptor.serialName),
         genericProperties.toList()
       )
       StructureKind.OBJECT -> Generic.Product<Any?>(
-        Generic.ObjectInfo(serialName),
+        Generic.ObjectInfo(serializer.descriptor.serialName),
         genericProperties.toList()
       )
       PolymorphicKind.OPEN -> genericProperties["value"] ?: throw RuntimeException()
@@ -173,11 +176,9 @@ class GenericEncoder(
 
       PolymorphicKind.SEALED ->
         Generic.Product<Any?>(
-          Generic.ObjectInfo(serialName),
+          Generic.ObjectInfo(serializer.descriptor.serialName),
           genericProperties.toList()
         )
-        //TODO("Gets called for subtype value, figure out how to access parent descriptor ??")
-
       null -> TODO()
       else -> TODO("Internal error: primitives & enum should be handeled.")
     }
