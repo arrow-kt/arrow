@@ -161,15 +161,22 @@ class GenericEncoder(
         Generic.ObjectInfo(serialName),
         genericProperties.toList()
       )
-
-      StructureKind.OBJECT -> TODO()
+      StructureKind.OBJECT -> Generic.Product<Any?>(
+        Generic.ObjectInfo(serialName),
+        genericProperties.toList()
+      )
       PolymorphicKind.OPEN -> genericProperties["value"] ?: throw RuntimeException()
       SerialKind.CONTEXTUAL -> TODO()
 
       StructureKind.LIST -> TODO()
       StructureKind.MAP -> TODO()
 
-      PolymorphicKind.SEALED -> TODO("Gets called for subtype value, figure out how to access parent descriptor ??")
+      PolymorphicKind.SEALED ->
+        Generic.Product<Any?>(
+          Generic.ObjectInfo(serialName),
+          genericProperties.toList()
+        )
+        //TODO("Gets called for subtype value, figure out how to access parent descriptor ??")
 
       null -> TODO()
       else -> TODO("Internal error: primitives & enum should be handeled.")

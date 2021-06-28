@@ -20,7 +20,7 @@ fun main() {
   println(c)
 
   val tree: Branch<String> =
-    Branch(Leaf("1"), Branch(Leaf("2"), Leaf("3")))
+    Branch(Leaf("1"), Branch(Leaf("2"), Edge))
 
   val generic = Generic.encode(tree, serializersModule = SerializersModule {
     polymorphic(Any::class, Int::class, Int.serializer())
@@ -48,3 +48,6 @@ data class Branch<A>(val left: Tree<A>, val right: Tree<A>) : Tree<A>()
 
 @Serializable
 data class Leaf<A>(val value: A) : Tree<A>()
+
+@Serializable
+object Edge : Tree<String>()
