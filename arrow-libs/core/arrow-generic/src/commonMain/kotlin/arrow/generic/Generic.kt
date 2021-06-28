@@ -6,6 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
@@ -16,22 +17,24 @@ import kotlinx.serialization.serializer
 
 @ExperimentalSerializationApi
 class GenericEncoder<A>(
-  val genericValue: A,
-  val kSerializer: KSerializer<A>,
-  override val serializersModule: SerializersModule = EmptySerializersModule,
+  var genericValue: A,
+//  val kSerializer: KSerializer<Any?>,
+  override val serializersModule: SerializersModule,
 ) : AbstractEncoder() {
 
-  var genericName: String? = kSerializer.descriptor.serialName
-  var genericProperties: MutableMap<String, Generic<*>> = mutableMapOf()
+  val genericProperties: MutableMap<String, Generic<*>> = mutableMapOf()
 
   private var value: Any? = null
   private var index: Int = -1
   private var serializer: SerializationStrategy<*>? = null
   private var descriptor: SerialDescriptor? = null
+  private var propertyDescriptor: SerialDescriptor? = null
+//  private val genericName: String?
+//    get() = descriptor?.elementNames?.toList()[index] ?:
 
   private var state: State = State.Init
 
-  var generic: Generic<A>? = null
+  var generic: Generic<Any?>? = null
 
   private enum class State {
     Init,
@@ -46,6 +49,13 @@ class GenericEncoder<A>(
 
   override fun encodeValue(value: Any) {
     println("encodeValue: $value")
+    when (state) {
+      State.Init -> {
+        genericValue = value as A
+      }
+      else -> genericProperties[descriptor?.elementNames?.toList()?.get(index)!!] =
+        Generic(propertyDescriptor?.serialName ?: value::class.qualifiedName!!, value, emptyMap())
+    }
   }
 
   override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
@@ -67,15 +77,31 @@ class GenericEncoder<A>(
 
   override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
     state = State.EncodeSerializableValue
+    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
     this.serializer = serializer
     this.value = value
+    this.propertyDescriptor = serializer.descriptor
+    //todo
+    val encoder = GenericEncoder(value, serializersModule)
+    serializer.serialize(encoder, value)
+    genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
     println("encodeSerializableValue: $serializer, $value")
   }
 
   override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
     state = State.EncodeNullableSerializableValue
+    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
     this.serializer = serializer
     this.value = value
+    this.propertyDescriptor = serializer.descriptor
+    if (value != null) {
+      //todo
+      val encoder = GenericEncoder(value, serializersModule)
+      serializer.serialize(encoder, value)
+      genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
+    } else {
+      //todo
+    }
     println("encodeNullableSerializableValue: $serializer, $value")
   }
 
@@ -83,7 +109,7 @@ class GenericEncoder<A>(
     state = State.BeginStructure
     this.descriptor = descriptor
     println("beginStructure: $descriptor")
-    return this
+    return this //GenericEncoder(serializersModule)
   }
 
   override fun endStructure(descriptor: SerialDescriptor) {
@@ -92,25 +118,27 @@ class GenericEncoder<A>(
     println("endStructure: $descriptor")
   }
 
-  fun result(): Generic<A> = object : Generic<A> {
-    override val name: String = genericName ?: throw IllegalStateException("Expected a generic name")
-    override val value: A = genericValue ?: throw IllegalStateException("Expected a generic value")
-    override val properties: Map<String, Generic<*>> = genericProperties
-  }
-
+  fun result(serialName: String): Generic<Any?> = Generic<Any?>(
+    name = serialName,
+    value = genericValue ?: throw IllegalStateException("Expected a generic value"),
+    properties = genericProperties
+  )
 }
 
-interface Generic<A> {
-  val name: String
-  val value: A
-  val properties: Map<String, Generic<*>>
-}
+data class Generic<A>(
+  val name: String,
+  val value: A,
+  val properties: Map<String, Generic<*>>,
+)
 
-inline fun <reified A> A.generic(): Generic<A> {
-  val ser = serializer<A>()
-  val genericEncoder = GenericEncoder<A>(this, ser)
+
+inline fun <reified A> A.generic(
+  ser: KSerializer<A> = serializer<A>(),
+  serializersModule: SerializersModule = EmptySerializersModule
+): Generic<A> {
+  val genericEncoder = GenericEncoder<A>(this, serializersModule)
   ser.serialize(genericEncoder, this)
-  return genericEncoder.result()
+  return genericEncoder.result(ser.descriptor.serialName) as Generic<A>
 }
 
 @Serializable
