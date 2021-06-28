@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 api project(":arrow-continuations")
                 api project(":arrow-annotations")
             }

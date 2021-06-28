@@ -42,12 +42,9 @@ jobs:
         mkdir $BASEDIR/logs
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
-    - name: "Create APIdoc"
+    - name: "Create API doc and validate documentation"
       working-directory: arrow-libs
-      run: ./gradlew dokka
-    - name: "Validate documentation"
-      working-directory: arrow-site
-      run: ./gradlew runAnk
+      run: ./gradlew buildDoc
     - name: "Landing page: build"
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site

@@ -16,6 +16,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+            }
+        }
+        jvmMain {
+            dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
             }
         }

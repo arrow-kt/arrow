@@ -16,7 +16,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":arrow-core")
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
             }
         }
