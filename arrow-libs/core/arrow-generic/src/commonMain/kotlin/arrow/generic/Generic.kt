@@ -53,6 +53,8 @@ class GenericEncoder<A>(
     println("encodeElement: $descriptor, $index")
     this.descriptor = descriptor
     this.index = index
+//    this.genericName = descriptor.serialName
+//    genericProperties[descriptor.elementNames.toList()[index]] = result(descriptor.serialName)
     return true
   }
 

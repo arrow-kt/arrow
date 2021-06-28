@@ -2,8 +2,12 @@ package arrow.generic
 
 
 fun main() {
-  val generic = Person("X", 98, Person2("Y", 99)).generic()
-  //val generic = 1.generic()
-  println("$generic")
+  val a = Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null)).generic()
+  val b = 1.generic()
+  val c = Pair(1, "Hello, World!").generic()
+
+  println(a)
+  println(b)
+  println(c)
 }
 
