@@ -91,11 +91,13 @@ class GenericEncoder(
   }
 
   override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
-    encodeValue(Generic.Enum<Any?>(
-      Generic.ObjectInfo(enumDescriptor.serialName),
-      enumDescriptor.elementNames.mapIndexed { ord, name -> Generic.EnumValue(name, ord) },
-      index
-    ))
+    encodeValue(
+      Generic.Enum<Any?>(
+        Generic.ObjectInfo(enumDescriptor.serialName),
+        enumDescriptor.elementNames.mapIndexed { ord, name -> Generic.EnumValue(name, ord) },
+        index
+      )
+    )
   }
 
   override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
@@ -175,9 +177,9 @@ class GenericEncoder(
       StructureKind.MAP -> TODO()
 
       PolymorphicKind.SEALED ->
-        Generic.Product<Any?>(
+        Generic.Coproduct<Any?>(
           Generic.ObjectInfo(serializer.descriptor.serialName),
-          genericProperties.toList()
+          genericProperties.toList().map { it.second }
         )
       null -> TODO()
       else -> TODO("Internal error: primitives & enum should be handeled.")
