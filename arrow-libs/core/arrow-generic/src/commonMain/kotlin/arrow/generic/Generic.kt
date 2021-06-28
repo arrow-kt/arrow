@@ -1,149 +1,257 @@
 package arrow.generic
 
-
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.elementNames
-import kotlinx.serialization.encoding.AbstractEncoder
-import kotlinx.serialization.encoding.CompositeEncoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.internal.TaggedEncoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-@ExperimentalSerializationApi
-class GenericEncoder<A>(
-  var genericValue: A,
-//  val kSerializer: KSerializer<Any?>,
-  override val serializersModule: SerializersModule,
-) : AbstractEncoder() {
+public sealed interface Generic<A> {
 
-  val genericProperties: MutableMap<String, Generic<*>> = mutableMapOf()
+  /**
+   * Returns an optional version of this schema, with `isOptional` set to true.
+   */
+  public fun asNullable(): Generic<A?> = Nullable(this)
 
-  private var value: Any? = null
-  private var index: Int = -1
-  private var serializer: SerializationStrategy<*>? = null
-  private var descriptor: SerialDescriptor? = null
-  private var propertyDescriptor: SerialDescriptor? = null
-//  private val genericName: String?
-//    get() = descriptor?.elementNames?.toList()[index] ?:
+  /**
+   * Returns an array version of this schema, with the schema type wrapped in [SchemaType.List].
+   * Sets `isOptional` to true as the collection might be empty.
+   */
+  public fun asArray(): Generic<Array<A>> = List(this)
 
-  private var state: State = State.Init
+  /** Returns a collection version of this schema, with the schema type wrapped in [SchemaType.List].
+   * Sets `isOptional` to true as the collection might be empty.
+   */
+  public fun asList(): Generic<kotlin.collections.List<A>> = List(this)
 
-  var generic: Generic<Any?>? = null
+  /**
+   * Nullable & Collections are considered nullable. Collections because they can be empty.
+   **/
+  public fun isOptional(): kotlin.Boolean =
+    this is Nullable || this is List
 
-  private enum class State {
-    Init,
-    BeginStructure,
-    EndStructure,
-    EncodeValue,
-    EncodeElement,
-    EncodeInline,
-    EncodeSerializableValue,
-    EncodeNullableSerializableValue
+  public fun isNotOptional(): kotlin.Boolean = !isOptional()
+
+  public inline class String(val value: kotlin.String) : Generic<kotlin.String>
+
+  public inline class Char(val value: kotlin.Char) : Generic<kotlin.Char>
+
+  public sealed interface Number<A : kotlin.Number> : Generic<A> {
+    val value: A
+
+    public inline class Byte(override val value: kotlin.Byte) : Number<kotlin.Byte>
+
+//    public inline class UByte(val value: kotlin.UByte) : Number<kotlin.UByte>
+
+    public inline class Short(override val value: kotlin.Short) : Number<kotlin.Short>
+
+//    public inline class UShort(val value: kotlin.UShort) : Number<kotlin.UShort>
+
+    public inline class Int(override val value: kotlin.Int) : Number<kotlin.Int>
+
+//    public inline class UInt(val value: kotlin.UInt) : Number<kotlin.UInt>
+
+    public inline class Long(override val value: kotlin.Long) : Number<kotlin.Long>
+
+//    public inline class ULong(val value: kotlin.ULong) : Number<kotlin.ULong>
+
+    public inline class Float(override val value: kotlin.Float) : Number<kotlin.Float>
+
+    public inline class Double(override val value: kotlin.Double) : Number<kotlin.Double>
   }
 
-  override fun encodeValue(value: Any) {
-    println("encodeValue: $value")
-    when (state) {
-      State.Init -> {
-        genericValue = value as A
-      }
-      else -> genericProperties[descriptor?.elementNames?.toList()?.get(index)!!] =
-        Generic(propertyDescriptor?.serialName ?: value::class.qualifiedName!!, value, emptyMap())
+  public inline class Boolean(val value: kotlin.Boolean) : Generic<kotlin.Boolean>
+
+  public data class List<A>(
+    val element: Generic<*>,
+  ) : Generic<A> {
+    override fun toString(): kotlin.String = "[$element]"
+  }
+
+  public data class Nullable<A>(
+    val element: Generic<*>,
+  ) : Generic<A> {
+    override fun toString(): kotlin.String = "$element?"
+  }
+
+  public sealed interface Object<A> : Generic<A> {
+    public val objectInfo: ObjectInfo
+  }
+
+  public data class Either<A>(
+    val left: Generic<*>,
+    val right: Generic<*>,
+  ) : Object<A> {
+    override val objectInfo: ObjectInfo =
+      ObjectInfo("arrow.core.Either", listOf(left.toString(), right.toString()))
+
+    override fun toString(): kotlin.String = "either<$left, $right>"
+  }
+
+  /**
+   * Represents an key-value set or Map<K, V>.
+   * A Map contains N-fields of the same type [valueGeneric] which are held by a corresponding key [keyGeneric].
+   *
+   * Map<Int, DateTime> =>
+   *   Schema2.Map(
+   *     Schema2.ObjectInfo("Map", listOf("Int", "DateTime")),
+   *     Schema.int,
+   *     Schema.dateTime
+   *   )
+   */
+  public data class Map<A>(
+    override val objectInfo: ObjectInfo,
+    val keyGeneric: Generic<*>,
+    val valueGeneric: Generic<*>,
+  ) : Object<A> {
+    override fun toString(): kotlin.String = "$keyGeneric->$valueGeneric"
+  }
+
+  /**
+   * Represents an open-product or Map<String, V>.
+   * An open product contains N-fields, which are held by [String] keys.
+   *
+   * Map<String, Int> =>
+   *   Schema2.OpenProduct(
+   *     Schema2.ObjectInfo("Map", listOf("String", "Int")),
+   *     Schema.int
+   *   )
+   */
+  public data class OpenProduct<A>(
+    override val objectInfo: ObjectInfo,
+    val valueGeneric: Generic<*>,
+  ) : Object<A> {
+    override fun toString(): kotlin.String = "String->$valueGeneric"
+  }
+
+  /**
+   * Represents a product type.
+   * A product type has [ObjectInfo] & a fixed set of [fields]
+   *
+   * public data class Person(val name: String, val age: Int)
+   *
+   * Person =>
+   *   Schema2.Product(
+   *     ObjectInfo("Person"),
+   *     listOf(
+   *       Pair(FieldName("name"), Schema.string),
+   *       Pair(FieldName("age"), Schema.int)
+   *     )
+   *   )
+   */
+  public data class Product<A>(
+    override val objectInfo: ObjectInfo,
+    val fields: kotlin.collections.List<Pair<kotlin.String, Generic<*>>>,
+  ) : Object<A> {
+    public fun required(): kotlin.collections.List<kotlin.String> =
+      fields.mapNotNull { (f, s) -> if (!s.isOptional()) f else null }
+
+    override fun toString(): kotlin.String =
+      "${objectInfo.fullName}(${fields.joinToString(",") { (f, s) -> "$f=$s" }})"
+
+    public companion object {
+      public val Empty = Product<Unit>(ObjectInfo.unit, emptyList())
+      operator fun invoke(objectInfo: ObjectInfo, vararg fields: Pair<kotlin.String, Generic<*>>): Generic.Product<*> =
+        Generic.Product<Any?>(objectInfo, fields.toList())
     }
   }
 
-  override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
-    state = State.EncodeElement
-    println("encodeElement: $descriptor, $index")
-    this.descriptor = descriptor
-    this.index = index
-//    this.genericName = descriptor.serialName
-//    genericProperties[descriptor.elementNames.toList()[index]] = result(descriptor.serialName)
-    return true
+  /**
+   * Represents a value in an enum class
+   * A product of [kotlin.Enum.name] and [kotlin.Enum.ordinal]
+   */
+  public data class EnumValue(val name: kotlin.String, val ordinal: Int)
+
+  /**
+   * Represents an Enum
+   * Has [ObjectInfo], and list of its values.
+   *
+   * enum class Test { A, B, C; }
+   *
+   * Test =>
+   *   Schema2.Enum(
+   *     Schema2.ObjectInfo("Test"),
+   *     listOf(
+   *       Schema2.EnumValue("A", 0),
+   *       Schema2.EnumValue("B", 1),
+   *       Schema2.EnumValue("C", 2)
+   *     )
+   *   )
+   */
+  public data class Enum<A>(
+    override val objectInfo: ObjectInfo,
+    val values: kotlin.collections.List<EnumValue>,
+    val index: Int
+  ) : Object<A> {
+    override fun toString(): kotlin.String =
+      "${objectInfo.fullName}[${values.joinToString(separator = " | ")}]"
   }
 
-  override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
-    state = State.EncodeInline
-    println("encodeInline: $inlineDescriptor")
-    this.descriptor = descriptor
-    return super.encodeInline(inlineDescriptor)
+  /**
+   * Represents a sum or coproduct type.
+   * Has [ObjectInfo], and NonEmptyList of subtypes schemas.
+   * These subtype schemas contain all details about the subtypes, since they'll all have Schema2 is Schema2.Object.
+   *
+   * Either<A, B> =>
+   *   Schema2.Coproduct(
+   *     Schema2.ObjectInfo("Either", listOf("A", "B")),
+   *     listOf(
+   *       Schema2.Product("Either.Left", listOf("value", schemeA)),
+   *       Schema2.Product("Either.Right", listOf("value", schemeA)),
+   *     )
+   *   )
+   */
+  public data class Coproduct<A>(
+    override val objectInfo: ObjectInfo,
+//    val schemas: arrow.core.NonEmptyList<Schema<*>>,
+    val generics: kotlin.collections.List<Generic<*>>,
+  ) : Object<A> {
+    override fun toString(): kotlin.String =
+      "${objectInfo.fullName}[${generics.joinToString(separator = " | ")}]"
   }
 
-  override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-    state = State.EncodeSerializableValue
-    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
-    this.serializer = serializer
-    this.value = value
-    this.propertyDescriptor = serializer.descriptor
-    //todo
-    val encoder = GenericEncoder(value, serializersModule)
-    serializer.serialize(encoder, value)
-    genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
-    println("encodeSerializableValue: $serializer, $value")
-  }
-
-  override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
-    state = State.EncodeNullableSerializableValue
-    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
-    this.serializer = serializer
-    this.value = value
-    this.propertyDescriptor = serializer.descriptor
-    if (value != null) {
-      //todo
-      val encoder = GenericEncoder(value, serializersModule)
-      serializer.serialize(encoder, value)
-      genericProperties[propertyName] = encoder.result(serializer.descriptor.serialName)
-    } else {
-      //todo
+  /**
+   * ObjectInfo contains the fullName of an object, and the type-param names.
+   *
+   * Either<A, B> => ObjectInfo("Either", listOf("A", "B"))
+   */
+  public data class ObjectInfo(
+    val fullName: kotlin.String,
+    val typeParameterShortNames: kotlin.collections.List<kotlin.String> = emptyList()
+  ) {
+    public companion object {
+      public val unit: ObjectInfo = ObjectInfo(fullName = "Unit")
     }
-    println("encodeNullableSerializableValue: $serializer, $value")
   }
 
-  override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
-    state = State.BeginStructure
-    this.descriptor = descriptor
-    println("beginStructure: $descriptor")
-    return this //GenericEncoder(serializersModule)
-  }
+  public companion object {
 
-  override fun endStructure(descriptor: SerialDescriptor) {
-    state = State.EndStructure
-    this.descriptor = descriptor
-    println("endStructure: $descriptor")
-  }
+    @ExperimentalSerializationApi
+    public inline fun <reified A> encode(
+      value: A,
+      ser: KSerializer<A> = serializer(),
+      serializersModule: SerializersModule = EmptySerializersModule
+    ): Generic<A> {
+      val genericEncoder = GenericEncoder(serializersModule)
+      ser.serialize(genericEncoder, value)
+      return genericEncoder.result(ser.descriptor.serialName) as Generic<A>
+    }
 
-  fun result(serialName: String): Generic<Any?> = Generic<Any?>(
-    name = serialName,
-    value = genericValue ?: throw IllegalStateException("Expected a generic value"),
-    properties = genericProperties
-  )
+    public fun <A : kotlin.Enum<A>> enum(
+      name: kotlin.String,
+      enumValues: Array<out A>,
+      index: Int
+    ): Generic<A> = Enum(
+      Generic.ObjectInfo(name),
+      enumValues.map { EnumValue(it.name, it.ordinal) },
+      index
+    )
+
+    public inline fun <reified A : kotlin.Enum<A>> enum(value: kotlin.Enum<A>): Generic<A> =
+      enum(
+        requireNotNull(A::class.qualifiedName) { "Qualified name on KClass should never be null." },
+        enumValues(),
+        enumValues<A>().indexOfFirst { it == value }
+      )
+  }
 }
-
-data class Generic<A>(
-  val name: String,
-  val value: A,
-  val properties: Map<String, Generic<*>>,
-)
-
-
-inline fun <reified A> A.generic(
-  ser: KSerializer<A> = serializer<A>(),
-  serializersModule: SerializersModule = EmptySerializersModule
-): Generic<A> {
-  val genericEncoder = GenericEncoder<A>(this, serializersModule)
-  ser.serialize(genericEncoder, this)
-  return genericEncoder.result(ser.descriptor.serialName) as Generic<A>
-}
-
-@Serializable
-data class Person(val name: String, val age: Int, val p: Person2? = null)
-
-@Serializable
-data class Person2(val name: String, val age: Int, val p: Person2? = null)
-

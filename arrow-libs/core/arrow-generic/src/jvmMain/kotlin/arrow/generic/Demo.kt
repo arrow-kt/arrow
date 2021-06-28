@@ -4,10 +4,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 
+@Serializable
+data class Person(val name: String, val age: Int, val p: Person2? = null)
+
+@Serializable
+data class Person2(val name: String, val age: Int, val p: Person2? = null)
+
 fun main() {
-  val a = Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null)).generic()
-  val b = 1.generic()
-  val c = Pair(1, "Hello, World!").generic()
+  val a = Generic.encode(Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null)))
+  val b = Generic.encode(1)
+  val c = Generic.encode(Pair(1, "Hello, World!"))
 
   println(a)
   println(b)
@@ -16,7 +22,7 @@ fun main() {
   val tree: Branch<String> =
     Branch(Leaf("1"), Branch(Leaf("2"), Leaf("3")))
 
-  val generic = tree.generic(serializersModule = SerializersModule {
+  val generic = Generic.encode(tree, serializersModule = SerializersModule {
     polymorphic(Any::class, Int::class, Int.serializer())
     polymorphic(Any::class, String::class, String.serializer())
     polymorphic(Any::class, Char::class, Char.serializer())
@@ -31,7 +37,7 @@ fun main() {
     polymorphic(Any::class, ULong::class, ULong.serializer())
   })
 
-  println(tree)
+  println(generic)
 }
 
 @Serializable
