@@ -130,17 +130,20 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
   }
 
   override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
-    state = State.EncodeNullableSerializableValue
-    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
     this.serializer = serializer
     this.value = value
-    // this.propertyDescriptor = serializer.descriptor
-    if (value != null) {
-      val encoder = GenericEncoder(serializersModule)
+    val encoder = GenericEncoder(serializersModule)
+    val res = if (value != null) {
       serializer.serialize(encoder, value)
-      genericProperties[propertyName] = encoder.result(serializer)
+      encoder.result(serializer)
+    } else Generic.Null
+
+    if (state == State.EncodeInline) {
+      genericValue = res
     } else {
-      // Encode nulls ?
+      state = State.EncodeSerializableValue
+      val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
+      genericProperties[propertyName] = res
     }
 //    println("encodeNullableSerializableValue: $serializer, $value")
   }
@@ -170,7 +173,8 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       )
 
       // Probably similar to SEALED. Extracting the values.
-      PolymorphicKind.OPEN -> genericProperties["value"] ?: throw RuntimeException()
+      PolymorphicKind.OPEN -> genericProperties["value"]
+        ?: throw RuntimeException("Internal error: no value found for $value in $genericProperties.")
 
       SerialKind.CONTEXTUAL -> TODO()
       StructureKind.LIST -> TODO()
@@ -179,7 +183,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       PolymorphicKind.SEALED ->
         Generic.Coproduct<Any?>(
           Generic.ObjectInfo(serializer.descriptor.serialName),
-          Generic.ObjectInfo(this.serializer?.descriptor?.serialName!!),
+          Generic.ObjectInfo(requireNotNull(this.serializer?.descriptor?.serialName) { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" }),
           // genericProperties contains `value` and `type`
           // Where `type` is a label of the case representing the sum
           // And `value` is the actual instance, we want to extract the fields of the actual instance.
@@ -189,7 +193,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
             .elementDescriptors
             .last() // Take the last one. The others are filled with optional generic params
             .elementNames
-            .indexOf(this.serializer?.descriptor?.serialName!!)
+            .indexOf(requireNotNull(this.serializer?.descriptor?.serialName) { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" })
         )
       null -> throw RuntimeException("Internal error: descriptor is null when requesting result from $this.")
       else -> throw RuntimeException("Internal error: primitives & enum should be handled.")

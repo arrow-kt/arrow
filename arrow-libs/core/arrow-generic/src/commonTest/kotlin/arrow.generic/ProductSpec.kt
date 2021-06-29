@@ -89,7 +89,7 @@ fun person(name: String, age: Int, p: Person2? = null): Generic<Person> =
     listOfNotNull(
       "name" to Generic.String(name),
       "age" to Generic.Number.Int(age),
-      if (p == null) null else "p" to person2(p.name, p.age, p.p)
+      "p" to if (p == null) Generic.Null else person2(p.name, p.age, p.p)
     )
   )
 
@@ -98,7 +98,6 @@ fun person2(name: String, age: Int, p: Person2? = null): Generic<Person2> =
     listOfNotNull(
       "name" to Generic.String(name),
       "age" to Generic.Number.Int(age),
-      if (p == null) null
-      else "p" to person2(p.name, p.age, p.p)
+      "p" to if (p == null) Generic.Null else person2(p.name, p.age, p.p)
     )
   )

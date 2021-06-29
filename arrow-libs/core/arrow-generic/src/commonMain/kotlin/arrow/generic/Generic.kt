@@ -6,18 +6,12 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-public sealed interface Generic<A> {
+public sealed interface Generic<out A> {
 
   /**
    * Returns an optional version of this schema, with `isOptional` set to true.
    */
   public fun asNullable(): Generic<A?> = Nullable(this)
-
-  /**
-   * Returns an array version of this schema, with the schema type wrapped in [SchemaType.List].
-   * Sets `isOptional` to true as the collection might be empty.
-   */
-  public fun asArray(): Generic<Array<A>> = List(this)
 
   /** Returns a collection version of this schema, with the schema type wrapped in [SchemaType.List].
    * Sets `isOptional` to true as the collection might be empty.
@@ -31,6 +25,10 @@ public sealed interface Generic<A> {
     this is Nullable || this is List
 
   public fun isNotOptional(): kotlin.Boolean = !isOptional()
+
+  public object Null : Generic<kotlin.Nothing> {
+    override fun toString(): kotlin.String = "Generic.Null"
+  }
 
   public inline class String(val value: kotlin.String) : Generic<kotlin.String>
 
@@ -240,3 +238,10 @@ public sealed interface Generic<A> {
       )
   }
 }
+
+
+/**
+ * Returns an array version of this schema, with the schema type wrapped in [SchemaType.List].
+ * Sets `isOptional` to true as the collection might be empty.
+ */
+public fun <A> Generic<A>.asArray(): Generic<Array<A>> = Generic.List(this)
