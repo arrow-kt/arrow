@@ -45,10 +45,19 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
    * This is called from all encodeX methods, which exists for primitives and enums
    */
   private fun encodeValue(generic: Generic<*>): Unit =
-    if (state == State.Init || state == State.EncodeInline) {
-      genericValue = generic
-    } else {
-      genericProperties[descriptor?.elementNames?.toList()?.get(index)!!] = generic
+    when (state) {
+      State.Init -> {
+        genericValue = generic
+      }
+      State.EncodeInline -> {
+        genericValue = Generic.Inline<Any?>(
+          Generic.ObjectInfo(descriptor!!.serialName),
+          generic
+        )
+      }
+      else -> {
+        genericProperties[descriptor?.elementNames?.toList()?.get(index)!!] = generic
+      }
     }
 
   override fun encodeString(value: String) {
@@ -87,6 +96,10 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
     encodeValue(Generic.Number.Double(value))
   }
 
+  override fun encodeNull() {
+    encodeValue(Generic.Null)
+  }
+
   override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
     encodeValue(
       Generic.Enum<Any?>(
@@ -119,12 +132,21 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
     val encoder = GenericEncoder(serializersModule)
     serializer.serialize(encoder, value)
 
-    if (state == State.EncodeInline) {
-      genericValue = encoder.result(serializer)
-    } else {
-      state = State.EncodeSerializableValue
-      val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
-      genericProperties[propertyName] = encoder.result(serializer)
+    when (state) {
+      State.Init -> {
+        genericValue = encoder.result(serializer)
+      }
+      State.EncodeInline -> {
+        genericValue = Generic.Inline<Any?>(
+          Generic.ObjectInfo(descriptor!!.serialName),
+          encoder.result(serializer)
+        )
+      }
+      else -> {
+        state = State.EncodeSerializableValue
+        val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
+        genericProperties[propertyName] = encoder.result(serializer)
+      }
     }
 //    println("encodeSerializableValue: $serializer, $value")
   }
@@ -138,7 +160,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       encoder.result(serializer)
     } else Generic.Null
 
-    if (state == State.EncodeInline) {
+    if (state == State.Init || state == State.EncodeInline) {
       genericValue = res
     } else {
       state = State.EncodeSerializableValue

@@ -10,6 +10,7 @@ import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -31,7 +32,7 @@ inline fun <reified A> StringSpec.testPrimitive(
   noinline expected: (A) -> Generic<A>
 ): Unit =
   "${A::class.qualifiedName!!}" {
-    checkAll(arb) { a ->
-      Generic.encode(a) shouldBe expected(a)
+    checkAll(arb.orNull()) { a ->
+      Generic.encode(a) shouldBe if (a == null) Generic.Null else expected(a)
     }
   }

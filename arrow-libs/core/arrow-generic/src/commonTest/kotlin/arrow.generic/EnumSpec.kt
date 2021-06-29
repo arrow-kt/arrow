@@ -3,6 +3,7 @@ package arrow.generic
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 import kotlinx.serialization.Serializable
 
@@ -27,10 +28,10 @@ class EnumSpec : StringSpec({
     checkAll(Arb.of(Planet.values())) { planet ->
       val res = Generic.encode(planet)
       val expected = Generic.Enum<Any?>(
-        Generic.ObjectInfo(Planet::class.qualifiedName!!),
-        Planet.values().map { Generic.EnumValue(it.name, it.ordinal) },
-        planet.ordinal
-      )
+          Generic.ObjectInfo(Planet::class.qualifiedName!!),
+          Planet.values().map { Generic.EnumValue(it.name, it.ordinal) },
+          planet.ordinal
+        )
 
       res shouldBe expected
     }

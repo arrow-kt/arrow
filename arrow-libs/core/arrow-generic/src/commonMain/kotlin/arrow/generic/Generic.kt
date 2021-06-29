@@ -51,6 +51,11 @@ public sealed interface Generic<out A> {
 //    public inline class ULong(val value: kotlin.ULong) : Number<kotlin.ULong>
   }
 
+  public data class Inline<A>(
+    val objectInfo: ObjectInfo,
+    val element: Generic<*>
+    ): Generic<A>
+
   public inline class Boolean(val value: kotlin.Boolean) : Generic<kotlin.Boolean>
 
   public data class List<A>(
@@ -59,7 +64,7 @@ public sealed interface Generic<out A> {
     override fun toString(): kotlin.String = "[$element]"
   }
 
-  public data class Nullable<A>(
+  public inline class Nullable<A>(
     val element: Generic<*>,
   ) : Generic<A> {
     override fun toString(): kotlin.String = "$element?"

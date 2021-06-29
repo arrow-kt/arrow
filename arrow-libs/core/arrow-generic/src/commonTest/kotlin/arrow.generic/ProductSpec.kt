@@ -10,6 +10,7 @@ import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -72,8 +73,8 @@ inline fun <reified A> StringSpec.testIdProduct(
   noinline expected: (A) -> Generic<A>
 ): Unit =
   "Id - ${A::class.qualifiedName!!}" {
-    checkAll(arb) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe expected(a).id()
+    checkAll(arb.map(::Id)) { id ->
+      Generic.encode(id, serializersModule = serializersModule) shouldBe expected(id.value).id()
     }
   }
 

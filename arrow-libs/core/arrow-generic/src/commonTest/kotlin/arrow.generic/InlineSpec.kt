@@ -1,5 +1,7 @@
 package arrow.generic
 
+import arrow.generic.Generic.*
+import arrow.generic.Generic.Number.*
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -12,9 +14,19 @@ import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.Boolean
+import kotlin.Byte
+import kotlin.Char
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.Short
+import kotlin.String
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
@@ -53,24 +65,24 @@ inline class ITree(val value: Tree<String>)
 inline class IPerson(val value: Person)
 
 class InlineSpec : StringSpec({
-  testInline(Arb.bool().map(::IBoolean)) { Generic.Boolean(it.value) }
-  testInline(Arb.string().map(::IString)) { Generic.String(it.value) }
-  testInline(Arb.char().map(::IChar)) { Generic.Char(it.value) }
-  testInline(Arb.byte().map(::IByte)) { Generic.Number.Byte(it.value) }
-  testInline(Arb.short().map(::IShort)) { Generic.Number.Short(it.value) }
-  testInline(Arb.int().map(::IInt)) { Generic.Number.Int(it.value) }
-  testInline(Arb.long().map(::ILong)) { Generic.Number.Long(it.value) }
-  testInline(Arb.float().map(::IFloat)) { Generic.Number.Float(it.value) }
-  testInline(Arb.double().map(::IDouble)) { Generic.Number.Double(it.value) }
+  testInline(Arb.bool().map(::IBoolean)) { Inline<IBoolean>(ObjectInfo(IBoolean::class.qualifiedName!!), Boolean(it.value)) }
+  testInline(Arb.string().map(::IString)) { Inline<IString>(ObjectInfo(IString::class.qualifiedName!!), String(it.value)) }
+  testInline(Arb.char().map(::IChar)) { Inline<IChar>(ObjectInfo(IChar::class.qualifiedName!!), Char(it.value)) }
+  testInline(Arb.byte().map(::IByte)) { Inline<IByte>(ObjectInfo(IByte::class.qualifiedName!!), Byte(it.value)) }
+  testInline(Arb.short().map(::IShort)) { Inline<IShort>(ObjectInfo(IShort::class.qualifiedName!!), Short(it.value)) }
+  testInline(Arb.int().map(::IInt)) { Inline<IInt>(ObjectInfo(IInt::class.qualifiedName!!), Int(it.value)) }
+  testInline(Arb.long().map(::ILong)) { Inline<ILong>(ObjectInfo(ILong::class.qualifiedName!!), Long(it.value)) }
+  testInline(Arb.float().map(::IFloat)) { Inline<IFloat>(ObjectInfo(IFloat::class.qualifiedName!!), Float(it.value)) }
+  testInline(Arb.double().map(::IDouble)) { Inline<IDouble>(ObjectInfo(IDouble::class.qualifiedName!!), Double(it.value)) }
 
   testInline(Arb.bind(Arb.string(), Arb.int(), ::Person).map(::IPerson)) {
     val (name, age, p) = it.value
-    person(name, age, p)
+    Inline<IPerson>(ObjectInfo(IPerson::class.qualifiedName!!), person(name, age, p))
   }
 
   testInline(Arb.bind(Arb.string(), Arb.string(), Arb.string()) { a, b, c ->
     ITree(Branch(Leaf(a), Branch(Leaf(b), Leaf(c))))
-  }, serializersModule) { tree(it.value) }
+  }, serializersModule) { Inline<ITree>(ObjectInfo(ITree::class.qualifiedName!!), tree(it.value)) }
 })
 
 inline fun <reified A> StringSpec.testInline(
