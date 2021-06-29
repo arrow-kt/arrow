@@ -139,15 +139,33 @@ public sealed interface Generic<A> {
     public fun required(): kotlin.collections.List<kotlin.String> =
       fields.mapNotNull { (f, s) -> if (!s.isOptional()) f else null }
 
-    override fun toString(): kotlin.String =
-      "${objectInfo.fullName}(${fields.joinToString(",") { (f, s) -> "$f=$s" }})"
-
     public companion object {
       public val Empty = Product<Unit>(ObjectInfo.unit, emptyList())
       operator fun invoke(objectInfo: ObjectInfo, vararg fields: Pair<kotlin.String, Generic<*>>): Generic.Product<*> =
         Generic.Product<Any?>(objectInfo, fields.toList())
     }
   }
+
+  /**
+   * Represents a sum or coproduct type.
+   * Has [ObjectInfo], and NonEmptyList of subtypes schemas.
+   * These subtype schemas contain all details about the subtypes, since they'll all have Schema2 is Schema2.Object.
+   *
+   * Either<A, B> =>
+   *   Schema2.Coproduct(
+   *     Schema2.ObjectInfo("Either", listOf("A", "B")),
+   *     listOf(
+   *       Schema2.Product("Either.Left", listOf("value", schemeA)),
+   *       Schema2.Product("Either.Right", listOf("value", schemeA)),
+   *     )
+   *   )
+   */
+  public data class Coproduct<A>(
+    override val objectInfo: ObjectInfo,
+    val productInfo: ObjectInfo,
+    val fields: kotlin.collections.List<Pair<kotlin.String, Generic<*>>>,
+    val index: Int
+  ) : Object<A>
 
   /**
    * Represents a value in an enum class
@@ -175,33 +193,7 @@ public sealed interface Generic<A> {
     override val objectInfo: ObjectInfo,
     val values: kotlin.collections.List<EnumValue>,
     val index: Int
-  ) : Object<A> {
-    override fun toString(): kotlin.String =
-      "${objectInfo.fullName}[${values.joinToString(separator = " | ")}]"
-  }
-
-  /**
-   * Represents a sum or coproduct type.
-   * Has [ObjectInfo], and NonEmptyList of subtypes schemas.
-   * These subtype schemas contain all details about the subtypes, since they'll all have Schema2 is Schema2.Object.
-   *
-   * Either<A, B> =>
-   *   Schema2.Coproduct(
-   *     Schema2.ObjectInfo("Either", listOf("A", "B")),
-   *     listOf(
-   *       Schema2.Product("Either.Left", listOf("value", schemeA)),
-   *       Schema2.Product("Either.Right", listOf("value", schemeA)),
-   *     )
-   *   )
-   */
-  public data class Coproduct<A>(
-    override val objectInfo: ObjectInfo,
-//    val schemas: arrow.core.NonEmptyList<Schema<*>>,
-    val generics: kotlin.collections.List<Generic<*>>,
-  ) : Object<A> {
-    override fun toString(): kotlin.String =
-      "${objectInfo.fullName}[${generics.joinToString(separator = " | ")}]"
-  }
+  ) : Object<A>
 
   /**
    * ObjectInfo contains the fullName of an object, and the type-param names.

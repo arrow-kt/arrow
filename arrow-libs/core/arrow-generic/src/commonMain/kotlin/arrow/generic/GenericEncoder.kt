@@ -1,11 +1,13 @@
 package arrow.generic
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.SerialKind
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
@@ -99,7 +101,7 @@ class GenericEncoder(
 
   override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
     state = State.EncodeElement
-    println("encodeElement: $descriptor, $index")
+//    println("encodeElement: $descriptor, $index")
     this.descriptor = descriptor
     this.index = index
 //    this.genericName = descriptor.serialName
@@ -109,11 +111,12 @@ class GenericEncoder(
 
   override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
     state = State.EncodeInline
-    println("encodeInline: $inlineDescriptor")
+//    println("encodeInline: $inlineDescriptor")
     this.descriptor = descriptor
     return super.encodeInline(inlineDescriptor)
   }
 
+  @InternalSerializationApi
   override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
     state = State.EncodeSerializableValue
     val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
@@ -122,6 +125,14 @@ class GenericEncoder(
     // this.propertyDescriptor = serializer.descriptor
     // todo
     val encoder = GenericEncoder(serializersModule)
+
+    val elementDescriptors = serializer
+      .descriptor
+      .elementDescriptors
+      .lastOrNull()
+      ?.elementNames
+      ?.toList() ?: emptyList()
+
     serializer.serialize(encoder, value)
     genericProperties[propertyName] = encoder.result(serializer)
     println("encodeSerializableValue: $serializer, $value")
@@ -141,32 +152,34 @@ class GenericEncoder(
     } else {
       // todo
     }
-    println("encodeNullableSerializableValue: $serializer, $value")
+//    println("encodeNullableSerializableValue: $serializer, $value")
   }
 
   override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
     state = State.BeginStructure
     this.descriptor = descriptor
-    println("beginStructure: $descriptor")
+//    println("beginStructure: $descriptor")
     return this
   }
 
   override fun endStructure(descriptor: SerialDescriptor) {
     state = State.EndStructure
     this.descriptor = descriptor
-    println("endStructure: $descriptor")
+//    println("endStructure: $descriptor")
   }
 
   fun result(serializer: SerializationStrategy<*>): Generic<*> =
     genericValue ?: when (descriptor?.kind) {
-      StructureKind.CLASS -> Generic.Product<Any?>(
+      StructureKind.CLASS -> Generic.Product(
         Generic.ObjectInfo(serializer.descriptor.serialName),
         genericProperties.toList()
       )
-      StructureKind.OBJECT -> Generic.Product<Any?>(
+      StructureKind.OBJECT -> Generic.Product(
         Generic.ObjectInfo(serializer.descriptor.serialName),
         genericProperties.toList()
       )
+
+      // Probably similar to SEALED. Extracting the values.
       PolymorphicKind.OPEN -> genericProperties["value"] ?: throw RuntimeException()
       SerialKind.CONTEXTUAL -> TODO()
 
@@ -176,7 +189,17 @@ class GenericEncoder(
       PolymorphicKind.SEALED ->
         Generic.Coproduct<Any?>(
           Generic.ObjectInfo(serializer.descriptor.serialName),
-          genericProperties.toList().map { it.second }
+          Generic.ObjectInfo(this.serializer?.descriptor?.serialName!!),
+          // genericProperties contains `value` and `type`
+          // Where `type` is a label of the case representing the sum
+          // And `value` is the actual instance, we want to extract the fields of the actual instance.
+          (genericProperties["value"] as Generic.Product).fields,
+          serializer
+            .descriptor
+            .elementDescriptors
+            .last()
+            .elementNames
+            .indexOf(this.serializer?.descriptor?.serialName!!)
         )
       null -> TODO()
       else -> TODO("Internal error: primitives & enum should be handeled.")

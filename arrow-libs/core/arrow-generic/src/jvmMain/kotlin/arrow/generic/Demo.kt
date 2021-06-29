@@ -38,6 +38,8 @@ fun main() {
   })
 
   println(generic)
+
+  println(Generic.encode(Edge))
 }
 
 @Serializable

@@ -11,29 +11,35 @@ import kotlinx.serialization.Serializable
 sealed class Tree<A>
 
 @Serializable
-data class Branch<A>(val left: Tree<A>, val right: Tree<A>) : Tree<A>()
+data class Leaf<A>(val value: A) : Tree<A>()
 
 @Serializable
-data class Leaf<A>(val value: A) : Tree<A>()
+data class Branch<A>(val left: Tree<A>, val right: Tree<A>) : Tree<A>()
 
 class SumSpec : StringSpec({
 
   "Tree" {
     checkAll(Arb.string(), Arb.string(), Arb.string()) { a, b, c ->
-      val tree: Branch<String> =
+      val tree: Tree<String> =
         Branch(Leaf(a), Branch(Leaf(b), Leaf(c)))
 
-      Generic.encode(tree, serializersModule = serializersModule) shouldBe Generic.Coproduct(
-        Generic.ObjectInfo(Tree::class.qualifiedName!!),
-        listOf(
-          Generic.Product<Leaf<String>>(Generic.ObjectInfo(Leaf::class.qualifiedName!!), listOf("value" to Generic.String(a))),
-          Generic.Product(
-            Generic.ObjectInfo(Branch::class.qualifiedName!!),
-            "left" to Generic.Product<Leaf<String>>(Generic.ObjectInfo(Leaf::class.qualifiedName!!), listOf("value" to Generic.String(b))),
-            "left" to Generic.Product<Leaf<String>>(Generic.ObjectInfo(Leaf::class.qualifiedName!!), listOf("value" to Generic.String(c))),
-          )
-        )
-      )
+      Generic.encode(tree, serializersModule = serializersModule) shouldBe branch(leaf(a), branch(leaf(b), leaf(c)))
     }
   }
 })
+
+fun leaf(value: String): Generic<Tree<String>> =
+  Generic.Coproduct(
+    Generic.ObjectInfo(Tree::class.qualifiedName!!),
+    Generic.ObjectInfo(Leaf::class.qualifiedName!!),
+    listOf("value" to Generic.String(value)),
+    0
+  )
+
+fun branch(left: Generic<Tree<String>>, right: Generic<Tree<String>>): Generic<Tree<String>> =
+  Generic.Coproduct(
+    Generic.ObjectInfo(Tree::class.qualifiedName!!),
+    Generic.ObjectInfo(Branch::class.qualifiedName!!),
+    listOf("left" to left, "right" to right),
+    1
+  )
