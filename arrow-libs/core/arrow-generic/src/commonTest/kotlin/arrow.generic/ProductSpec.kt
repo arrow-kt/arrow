@@ -68,6 +68,20 @@ class ProductSpec : StringSpec({
     res shouldBe expected
   }
 
+  "Serializable Person, without Module Config" {
+    val res = Generic.encode(Id(Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null))))
+    val expected = Generic.Product(
+      Generic.ObjectInfo(Person::class.qualifiedName!!),
+      "name" to Generic.String("X"),
+      "age" to Generic.Number.Int(98),
+      "p" to Generic.Product(Generic.ObjectInfo(Person2::class.qualifiedName!!),
+        "name" to Generic.String("Y"),
+        "age" to Generic.Number.Int(99)
+      )
+    ).id()
+    res shouldBe expected
+  }
+
   testIdProduct(Arb.bool()) { Generic.Boolean(it) }
   testIdProduct(Arb.string()) { Generic.String(it) }
   testIdProduct(Arb.char()) { Generic.Char(it) }

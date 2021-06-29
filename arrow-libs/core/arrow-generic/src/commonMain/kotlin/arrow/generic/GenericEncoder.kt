@@ -47,7 +47,7 @@ class GenericEncoder(
   }
 
   fun encodeValue(generic: Generic<*>): Unit =
-    if (state == State.Init) {
+    if (state == State.Init || state == State.EncodeInline) {
       genericValue = generic
     } else {
       genericProperties[descriptor?.elementNames?.toList()?.get(index)!!] = generic
@@ -112,7 +112,7 @@ class GenericEncoder(
   override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
     state = State.EncodeInline
 //    println("encodeInline: $inlineDescriptor")
-    this.descriptor = descriptor
+    this.descriptor = inlineDescriptor
     return super.encodeInline(inlineDescriptor)
   }
 
@@ -135,7 +135,7 @@ class GenericEncoder(
 
     serializer.serialize(encoder, value)
     genericProperties[propertyName] = encoder.result(serializer)
-    println("encodeSerializableValue: $serializer, $value")
+//    println("encodeSerializableValue: $serializer, $value")
   }
 
   override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
