@@ -26,6 +26,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
   private var index: Int = -1
   private var serializer: SerializationStrategy<*>? = null
   private var descriptor: SerialDescriptor? = null
+  private var debug: Boolean = false
 
   private var state: State = State.Init
 
@@ -110,9 +111,12 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
     )
   }
 
+  private fun println(message: Any?): Unit =
+    if (debug) kotlin.io.println(message) else Unit
+
   override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
     state = State.EncodeElement
-//    println("encodeElement: $descriptor, $index")
+    println("encodeElement: $descriptor, $index")
     this.descriptor = descriptor
     this.index = index
     return true
@@ -120,7 +124,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
 
   override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder {
     state = State.EncodeInline
-//    println("encodeInline: $inlineDescriptor")
+    println("encodeInline: $inlineDescriptor")
     this.descriptor = inlineDescriptor
     return super.encodeInline(inlineDescriptor)
   }
@@ -144,11 +148,11 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       }
       else -> {
         state = State.EncodeSerializableValue
-        val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
+        val propertyName: String = descriptor?.elementNames?.toList()?.getOrNull(index) ?: index.toString()
         genericProperties[propertyName] = encoder.result(serializer)
       }
     }
-//    println("encodeSerializableValue: $serializer, $value")
+    println("encodeSerializableValue: $serializer, $value")
   }
 
   override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
@@ -164,23 +168,23 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       genericValue = res
     } else {
       state = State.EncodeSerializableValue
-      val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
+      val propertyName: String = descriptor?.elementNames?.toList()?.getOrNull(index) ?: index.toString()
       genericProperties[propertyName] = res
     }
-//    println("encodeNullableSerializableValue: $serializer, $value")
+    println("encodeNullableSerializableValue: $serializer, $value")
   }
 
   override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
     state = State.BeginStructure
     this.descriptor = descriptor
-//    println("beginStructure: $descriptor")
+    println("beginStructure: $descriptor")
     return this
   }
 
   override fun endStructure(descriptor: SerialDescriptor) {
     state = State.EndStructure
     this.descriptor = descriptor
-//    println("endStructure: $descriptor")
+    println("endStructure: $descriptor")
   }
 
   fun result(serializer: SerializationStrategy<*>): Generic<*> =
@@ -199,7 +203,10 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
         ?: throw RuntimeException("Internal error: no value found for $value in $genericProperties.")
 
       SerialKind.CONTEXTUAL -> TODO()
-      StructureKind.LIST -> TODO()
+      StructureKind.LIST -> Generic.Product(
+        Generic.Info(serializer.descriptor.serialName),
+        genericProperties.toList()
+      )
       StructureKind.MAP -> TODO()
 
       PolymorphicKind.SEALED ->

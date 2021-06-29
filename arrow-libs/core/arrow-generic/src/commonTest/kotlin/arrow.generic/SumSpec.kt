@@ -30,19 +30,22 @@ class SumSpec : StringSpec({
 
 fun tree(value: Tree<String>): Generic<Tree<String>> =
   when (value) {
-    is Leaf -> leaf(value.value)
+    is Leaf -> leaf(Generic.String(value.value))
     is Branch -> branch(tree(value.left), tree(value.right))
   }
 
 fun leaf(value: String): Generic<Tree<String>> =
+  leaf(Generic.String(value))
+
+inline fun <reified A> leaf(value: Generic<A>): Generic<Tree<A>> =
   Generic.Coproduct(
     Generic.Info(Tree::class.qualifiedName!!),
     Generic.Info(Leaf::class.qualifiedName!!),
-    listOf("value" to Generic.String(value)),
+    listOf("value" to value),
     0
   )
 
-fun branch(left: Generic<Tree<String>>, right: Generic<Tree<String>>): Generic<Tree<String>> =
+inline fun <reified A> branch(left: Generic<Tree<A>>, right: Generic<Tree<A>>): Generic<Tree<A>> =
   Generic.Coproduct(
     Generic.Info(Tree::class.qualifiedName!!),
     Generic.Info(Branch::class.qualifiedName!!),
