@@ -62,10 +62,12 @@ class InlineSpec : StringSpec({
   testInline(Arb.long().map(::ILong)) { Generic.Number.Long(it.value) }
   testInline(Arb.float().map(::IFloat)) { Generic.Number.Float(it.value) }
   testInline(Arb.double().map(::IDouble)) { Generic.Number.Double(it.value) }
+
   testInline(Arb.bind(Arb.string(), Arb.int(), ::Person).map(::IPerson)) {
     val (name, age, p) = it.value
     person(name, age, p)
   }
+
   testInline(Arb.bind(Arb.string(), Arb.string(), Arb.string()) { a, b, c ->
     ITree(Branch(Leaf(a), Branch(Leaf(b), Leaf(c))))
   }, serializersModule) { tree(it.value) }

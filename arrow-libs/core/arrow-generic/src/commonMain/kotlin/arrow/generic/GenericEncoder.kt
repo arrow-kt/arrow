@@ -15,12 +15,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
 @ExperimentalSerializationApi
-class GenericEncoder(
-//  val kSerializer: KSerializer<Any?>,
-  override val serializersModule: SerializersModule,
-) : AbstractEncoder() {
+class GenericEncoder(override val serializersModule: SerializersModule) : AbstractEncoder() {
 
-  val genericProperties: MutableMap<String, Generic<*>> = mutableMapOf()
+  private val genericProperties: MutableMap<String, Generic<*>> = mutableMapOf()
 
   // When this is set, it means that one of the primitive `encodeX` methods was called
   private var genericValue: Generic<*>? = null
@@ -29,9 +26,6 @@ class GenericEncoder(
   private var index: Int = -1
   private var serializer: SerializationStrategy<*>? = null
   private var descriptor: SerialDescriptor? = null
-//  private var propertyDescriptor: SerialDescriptor? = null
-//  private val genericName: String?
-//    get() = descriptor?.elementNames?.toList()[index] ?:
 
   private var state: State = State.Init
 
@@ -46,7 +40,11 @@ class GenericEncoder(
     EncodeNullableSerializableValue
   }
 
-  fun encodeValue(generic: Generic<*>): Unit =
+  /**
+   * Our own custom encodeValue method
+   * This is called from all encodeX methods, which exists for primitives and enums
+   */
+  private fun encodeValue(generic: Generic<*>): Unit =
     if (state == State.Init || state == State.EncodeInline) {
       genericValue = generic
     } else {
@@ -104,8 +102,6 @@ class GenericEncoder(
 //    println("encodeElement: $descriptor, $index")
     this.descriptor = descriptor
     this.index = index
-//    this.genericName = descriptor.serialName
-//    genericProperties[descriptor.elementNames.toList()[index]] = result(descriptor.serialName)
     return true
   }
 
@@ -118,22 +114,16 @@ class GenericEncoder(
 
   @InternalSerializationApi
   override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+    this.serializer = serializer
+    this.value = value
+    val encoder = GenericEncoder(serializersModule)
+    serializer.serialize(encoder, value)
+
     if (state == State.EncodeInline) {
-      this.serializer = serializer
-      this.value = value
-      val encoder = GenericEncoder(serializersModule)
-      serializer.serialize(encoder, value)
       genericValue = encoder.result(serializer)
     } else {
       state = State.EncodeSerializableValue
       val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
-      this.serializer = serializer
-      this.value = value
-      // this.propertyDescriptor = serializer.descriptor
-      // todo
-      val encoder = GenericEncoder(serializersModule)
-
-      serializer.serialize(encoder, value)
       genericProperties[propertyName] = encoder.result(serializer)
     }
 //    println("encodeSerializableValue: $serializer, $value")
@@ -146,12 +136,11 @@ class GenericEncoder(
     this.value = value
     // this.propertyDescriptor = serializer.descriptor
     if (value != null) {
-      // todo
       val encoder = GenericEncoder(serializersModule)
       serializer.serialize(encoder, value)
       genericProperties[propertyName] = encoder.result(serializer)
     } else {
-      // todo
+      // Encode nulls ?
     }
 //    println("encodeNullableSerializableValue: $serializer, $value")
   }
@@ -182,8 +171,8 @@ class GenericEncoder(
 
       // Probably similar to SEALED. Extracting the values.
       PolymorphicKind.OPEN -> genericProperties["value"] ?: throw RuntimeException()
-      SerialKind.CONTEXTUAL -> TODO()
 
+      SerialKind.CONTEXTUAL -> TODO()
       StructureKind.LIST -> TODO()
       StructureKind.MAP -> TODO()
 
@@ -198,11 +187,11 @@ class GenericEncoder(
           serializer
             .descriptor
             .elementDescriptors
-            .last()
+            .last() // Take the last one. The others are filled with optional generic params
             .elementNames
             .indexOf(this.serializer?.descriptor?.serialName!!)
         )
-      null -> TODO()
-      else -> TODO("Internal error: primitives & enum should be handeled.")
+      null -> throw RuntimeException("Internal error: descriptor is null when requesting result from $this.")
+      else -> throw RuntimeException("Internal error: primitives & enum should be handled.")
     }
 }
