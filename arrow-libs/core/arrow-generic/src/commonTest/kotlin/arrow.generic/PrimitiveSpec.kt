@@ -15,58 +15,23 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
 class PrimitiveSpec : StringSpec({
-
-  "String" {
-    checkAll(Arb.string()) { a ->
-      Generic.encode(a) shouldBe Generic.String(a)
-    }
-  }
-
-  "Char" {
-    checkAll(Arb.char()) { a ->
-      Generic.encode(a) shouldBe Generic.Char(a)
-    }
-  }
-
-  "Byte" {
-    checkAll(Arb.byte()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Byte(a)
-    }
-  }
-
-  "Short" {
-    checkAll(Arb.short()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Short(a)
-    }
-  }
-
-  "Int" {
-    checkAll(Arb.int()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Int(a)
-    }
-  }
-
-  "Long" {
-    checkAll(Arb.long()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Long(a)
-    }
-  }
-
-  "Float" {
-    checkAll(Arb.float()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Float(a)
-    }
-  }
-
-  "Double" {
-    checkAll(Arb.double()) { a ->
-      Generic.encode(a) shouldBe Generic.Number.Double(a)
-    }
-  }
-
-  "Boolean" {
-    checkAll(Arb.bool()) { a ->
-      Generic.encode(a) shouldBe Generic.Boolean(a)
-    }
-  }
+  testPrimitive(Arb.bool()) { Generic.Boolean(it) }
+  testPrimitive(Arb.string()) { Generic.String(it) }
+  testPrimitive(Arb.char()) { Generic.Char(it) }
+  testPrimitive(Arb.byte()) { Generic.Number.Byte(it) }
+  testPrimitive(Arb.short()) { Generic.Number.Short(it) }
+  testPrimitive(Arb.int()) { Generic.Number.Int(it) }
+  testPrimitive(Arb.long()) { Generic.Number.Long(it) }
+  testPrimitive(Arb.float()) { Generic.Number.Float(it) }
+  testPrimitive(Arb.double()) { Generic.Number.Double(it) }
 })
+
+inline fun <reified A> StringSpec.testPrimitive(
+  arb: Arb<A>,
+  noinline expected: (A) -> Generic<A>
+): Unit =
+  "${A::class.qualifiedName!!}" {
+    checkAll(arb) { a ->
+      Generic.encode(a) shouldBe expected(a)
+    }
+  }

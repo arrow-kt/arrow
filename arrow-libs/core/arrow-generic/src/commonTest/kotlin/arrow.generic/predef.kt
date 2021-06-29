@@ -1,7 +1,12 @@
 package arrow.generic
 
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.element
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
+
+fun <T> Arb.Companion.of(collection: Array<T>): Arb<T> =
+  element(collection.toList())
 
 val serializersModule = SerializersModule {
   polymorphic(Any::class, Int::class, Int.serializer())

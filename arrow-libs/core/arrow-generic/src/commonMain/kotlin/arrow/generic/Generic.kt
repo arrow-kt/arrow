@@ -40,24 +40,17 @@ public sealed interface Generic<A> {
     val value: A
 
     public inline class Byte(override val value: kotlin.Byte) : Number<kotlin.Byte>
-
-//    public inline class UByte(val value: kotlin.UByte) : Number<kotlin.UByte>
-
     public inline class Short(override val value: kotlin.Short) : Number<kotlin.Short>
-
-//    public inline class UShort(val value: kotlin.UShort) : Number<kotlin.UShort>
-
     public inline class Int(override val value: kotlin.Int) : Number<kotlin.Int>
-
-//    public inline class UInt(val value: kotlin.UInt) : Number<kotlin.UInt>
-
     public inline class Long(override val value: kotlin.Long) : Number<kotlin.Long>
-
-//    public inline class ULong(val value: kotlin.ULong) : Number<kotlin.ULong>
-
     public inline class Float(override val value: kotlin.Float) : Number<kotlin.Float>
-
     public inline class Double(override val value: kotlin.Double) : Number<kotlin.Double>
+
+// These are not considered Number yet
+//    public inline class UByte(val value: kotlin.UByte) : Number<kotlin.UByte>
+//    public inline class UShort(val value: kotlin.UShort) : Number<kotlin.UShort>
+//    public inline class UInt(val value: kotlin.UInt) : Number<kotlin.UInt>
+//    public inline class ULong(val value: kotlin.ULong) : Number<kotlin.ULong>
   }
 
   public inline class Boolean(val value: kotlin.Boolean) : Generic<kotlin.Boolean>

@@ -1,9 +1,6 @@
 package arrow.generic
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SealedClassSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor

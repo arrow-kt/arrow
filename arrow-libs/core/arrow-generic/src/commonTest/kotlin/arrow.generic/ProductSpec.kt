@@ -68,63 +68,29 @@ class ProductSpec : StringSpec({
     res shouldBe expected
   }
 
-  fun <A> Generic<A>.id(): Generic.Product<Id<A>> =
-    Generic.Product(
-      Generic.ObjectInfo(Id::class.qualifiedName!!),
-      listOf("value" to this@id)
-    )
-
-  "Generic - String" {
-    checkAll(Arb.string()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.String(a).id()
-    }
-  }
-
-  "Generic - Char" {
-    checkAll(Arb.char()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Char(a).id()
-    }
-  }
-
-  "Generic - Byte" {
-    checkAll(Arb.byte()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Byte(a).id()
-    }
-  }
-
-  "Generic - Short" {
-    checkAll(Arb.short()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Short(a).id()
-    }
-  }
-
-  "Generic - Int" {
-    checkAll(Arb.int()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Int(a).id()
-    }
-  }
-
-  "Generic - Long" {
-    checkAll(Arb.long()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Long(a).id()
-    }
-  }
-
-  "Generic - Float" {
-    checkAll(Arb.float()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Float(a).id()
-    }
-  }
-
-  "Generic - Double" {
-    checkAll(Arb.double()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Number.Double(a).id()
-    }
-  }
-
-  "Generic - Boolean" {
-    checkAll(Arb.bool()) { a ->
-      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe Generic.Boolean(a).id()
-    }
-  }
+  testIdProduct(Arb.bool()) { Generic.Boolean(it) }
+  testIdProduct(Arb.string()) { Generic.String(it) }
+  testIdProduct(Arb.char()) { Generic.Char(it) }
+  testIdProduct(Arb.byte()) { Generic.Number.Byte(it) }
+  testIdProduct(Arb.short()) { Generic.Number.Short(it) }
+  testIdProduct(Arb.int()) { Generic.Number.Int(it) }
+  testIdProduct(Arb.long()) { Generic.Number.Long(it) }
+  testIdProduct(Arb.float()) { Generic.Number.Float(it) }
+  testIdProduct(Arb.double()) { Generic.Number.Double(it) }
 })
+
+fun <A> Generic<A>.id(): Generic.Product<Id<A>> =
+  Generic.Product(
+    Generic.ObjectInfo(Id::class.qualifiedName!!),
+    listOf("value" to this@id)
+  )
+
+inline fun <reified A> StringSpec.testIdProduct(
+  arb: Arb<A>,
+  noinline expected: (A) -> Generic<A>
+): Unit =
+  "Id - ${A::class.qualifiedName!!}" {
+    checkAll(arb) { a ->
+      Generic.encode(Id(a), serializersModule = serializersModule) shouldBe expected(a).id()
+    }
+  }
