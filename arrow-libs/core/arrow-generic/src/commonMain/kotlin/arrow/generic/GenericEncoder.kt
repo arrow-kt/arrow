@@ -51,7 +51,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       }
       State.EncodeInline -> {
         genericValue = Generic.Inline<Any?>(
-          Generic.ObjectInfo(descriptor!!.serialName),
+          Generic.Info(descriptor!!.serialName),
           generic
         )
       }
@@ -103,7 +103,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
   override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
     encodeValue(
       Generic.Enum<Any?>(
-        Generic.ObjectInfo(enumDescriptor.serialName),
+        Generic.Info(enumDescriptor.serialName),
         enumDescriptor.elementNames.mapIndexed { ord, name -> Generic.EnumValue(name, ord) },
         index
       )
@@ -138,7 +138,7 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       }
       State.EncodeInline -> {
         genericValue = Generic.Inline<Any?>(
-          Generic.ObjectInfo(descriptor!!.serialName),
+          Generic.Info(descriptor!!.serialName),
           encoder.result(serializer)
         )
       }
@@ -186,11 +186,11 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
   fun result(serializer: SerializationStrategy<*>): Generic<*> =
     genericValue ?: when (descriptor?.kind) {
       StructureKind.CLASS -> Generic.Product(
-        Generic.ObjectInfo(serializer.descriptor.serialName),
+        Generic.Info(serializer.descriptor.serialName),
         genericProperties.toList()
       )
       StructureKind.OBJECT -> Generic.Product(
-        Generic.ObjectInfo(serializer.descriptor.serialName),
+        Generic.Info(serializer.descriptor.serialName),
         genericProperties.toList()
       )
 
@@ -204,8 +204,8 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
 
       PolymorphicKind.SEALED ->
         Generic.Coproduct<Any?>(
-          Generic.ObjectInfo(serializer.descriptor.serialName),
-          Generic.ObjectInfo(requireNotNull(this.serializer?.descriptor?.serialName) { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" }),
+          Generic.Info(serializer.descriptor.serialName),
+          Generic.Info(requireNotNull(this.serializer?.descriptor?.serialName) { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" }),
           // genericProperties contains `value` and `type`
           // Where `type` is a label of the case representing the sum
           // And `value` is the actual instance, we want to extract the fields of the actual instance.

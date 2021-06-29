@@ -36,16 +36,16 @@ fun tree(value: Tree<String>): Generic<Tree<String>> =
 
 fun leaf(value: String): Generic<Tree<String>> =
   Generic.Coproduct(
-    Generic.ObjectInfo(Tree::class.qualifiedName!!),
-    Generic.ObjectInfo(Leaf::class.qualifiedName!!),
+    Generic.Info(Tree::class.qualifiedName!!),
+    Generic.Info(Leaf::class.qualifiedName!!),
     listOf("value" to Generic.String(value)),
     0
   )
 
 fun branch(left: Generic<Tree<String>>, right: Generic<Tree<String>>): Generic<Tree<String>> =
   Generic.Coproduct(
-    Generic.ObjectInfo(Tree::class.qualifiedName!!),
-    Generic.ObjectInfo(Branch::class.qualifiedName!!),
+    Generic.Info(Tree::class.qualifiedName!!),
+    Generic.Info(Branch::class.qualifiedName!!),
     listOf("left" to left, "right" to right),
     1
   )

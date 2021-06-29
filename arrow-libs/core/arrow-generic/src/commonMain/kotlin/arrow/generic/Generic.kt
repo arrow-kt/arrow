@@ -8,25 +8,7 @@ import kotlinx.serialization.serializer
 
 public sealed interface Generic<out A> {
 
-  /**
-   * Returns an optional version of this schema, with `isOptional` set to true.
-   */
-  public fun asNullable(): Generic<A?> = Nullable(this)
-
-  /** Returns a collection version of this schema, with the schema type wrapped in [SchemaType.List].
-   * Sets `isOptional` to true as the collection might be empty.
-   */
-  public fun asList(): Generic<kotlin.collections.List<A>> = List(this)
-
-  /**
-   * Nullable & Collections are considered nullable. Collections because they can be empty.
-   **/
-  public fun isOptional(): kotlin.Boolean =
-    this is Nullable || this is List
-
-  public fun isNotOptional(): kotlin.Boolean = !isOptional()
-
-  public object Null : Generic<kotlin.Nothing> {
+  public object Null : Generic<Nothing> {
     override fun toString(): kotlin.String = "Generic.Null"
   }
 
@@ -52,77 +34,19 @@ public sealed interface Generic<out A> {
   }
 
   public data class Inline<A>(
-    val objectInfo: ObjectInfo,
+    override val info: Info,
     val element: Generic<*>
-    ): Generic<A>
+  ) : Object<A>
 
   public inline class Boolean(val value: kotlin.Boolean) : Generic<kotlin.Boolean>
 
-  public data class List<A>(
-    val element: Generic<*>,
-  ) : Generic<A> {
-    override fun toString(): kotlin.String = "[$element]"
-  }
-
-  public inline class Nullable<A>(
-    val element: Generic<*>,
-  ) : Generic<A> {
-    override fun toString(): kotlin.String = "$element?"
-  }
-
   public sealed interface Object<A> : Generic<A> {
-    public val objectInfo: ObjectInfo
-  }
-
-  public data class Either<A>(
-    val left: Generic<*>,
-    val right: Generic<*>,
-  ) : Object<A> {
-    override val objectInfo: ObjectInfo =
-      ObjectInfo("arrow.core.Either", listOf(left.toString(), right.toString()))
-
-    override fun toString(): kotlin.String = "either<$left, $right>"
-  }
-
-  /**
-   * Represents an key-value set or Map<K, V>.
-   * A Map contains N-fields of the same type [valueGeneric] which are held by a corresponding key [keyGeneric].
-   *
-   * Map<Int, DateTime> =>
-   *   Schema2.Map(
-   *     Schema2.ObjectInfo("Map", listOf("Int", "DateTime")),
-   *     Schema.int,
-   *     Schema.dateTime
-   *   )
-   */
-  public data class Map<A>(
-    override val objectInfo: ObjectInfo,
-    val keyGeneric: Generic<*>,
-    val valueGeneric: Generic<*>,
-  ) : Object<A> {
-    override fun toString(): kotlin.String = "$keyGeneric->$valueGeneric"
-  }
-
-  /**
-   * Represents an open-product or Map<String, V>.
-   * An open product contains N-fields, which are held by [String] keys.
-   *
-   * Map<String, Int> =>
-   *   Schema2.OpenProduct(
-   *     Schema2.ObjectInfo("Map", listOf("String", "Int")),
-   *     Schema.int
-   *   )
-   */
-  public data class OpenProduct<A>(
-    override val objectInfo: ObjectInfo,
-    val valueGeneric: Generic<*>,
-  ) : Object<A> {
-    override fun toString(): kotlin.String = "String->$valueGeneric"
+    public val info: Info
   }
 
   /**
    * Represents a product type.
-   * A product type has [ObjectInfo] & a fixed set of [fields]
+   * A product type has [Info] & a fixed set of [fields]
    *
    * public data class Person(val name: String, val age: Int)
    *
@@ -136,22 +60,22 @@ public sealed interface Generic<out A> {
    *   )
    */
   public data class Product<A>(
-    override val objectInfo: ObjectInfo,
-    val fields: kotlin.collections.List<Pair<kotlin.String, Generic<*>>>,
+    override val info: Info,
+    val fields: List<Pair<kotlin.String, Generic<*>>>,
   ) : Object<A> {
-    public fun required(): kotlin.collections.List<kotlin.String> =
-      fields.mapNotNull { (f, s) -> if (!s.isOptional()) f else null }
+//    public fun required(): List<kotlin.String> =
+//      fields.mapNotNull { (f, s) -> if (!s.isOptional()) f else null }
 
     public companion object {
-      public val Empty = Product<Unit>(ObjectInfo.unit, emptyList())
-      operator fun invoke(objectInfo: ObjectInfo, vararg fields: Pair<kotlin.String, Generic<*>>): Generic.Product<*> =
-        Generic.Product<Any?>(objectInfo, fields.toList())
+      public val Empty = Product<Unit>(Info.unit, emptyList())
+      operator fun invoke(info: Info, vararg fields: Pair<kotlin.String, Generic<*>>): Generic.Product<*> =
+        Generic.Product<Any?>(info, fields.toList())
     }
   }
 
   /**
    * Represents a sum or coproduct type.
-   * Has [ObjectInfo], and NonEmptyList of subtypes schemas.
+   * Has [Info], and NonEmptyList of subtypes schemas.
    * These subtype schemas contain all details about the subtypes, since they'll all have Schema2 is Schema2.Object.
    *
    * Either<A, B> =>
@@ -164,9 +88,9 @@ public sealed interface Generic<out A> {
    *   )
    */
   public data class Coproduct<A>(
-    override val objectInfo: ObjectInfo,
-    val productInfo: ObjectInfo,
-    val fields: kotlin.collections.List<Pair<kotlin.String, Generic<*>>>,
+    override val info: Info,
+    val productInfo: Info,
+    val fields: List<Pair<kotlin.String, Generic<*>>>,
     val index: Int
   ) : Object<A>
 
@@ -178,7 +102,7 @@ public sealed interface Generic<out A> {
 
   /**
    * Represents an Enum
-   * Has [ObjectInfo], and list of its values.
+   * Has [Info], and list of its values.
    *
    * enum class Test { A, B, C; }
    *
@@ -193,8 +117,8 @@ public sealed interface Generic<out A> {
    *   )
    */
   public data class Enum<A>(
-    override val objectInfo: ObjectInfo,
-    val values: kotlin.collections.List<EnumValue>,
+    override val info: Info,
+    val values: List<EnumValue>,
     val index: Int
   ) : Object<A>
 
@@ -203,12 +127,12 @@ public sealed interface Generic<out A> {
    *
    * Either<A, B> => ObjectInfo("Either", listOf("A", "B"))
    */
-  public data class ObjectInfo(
+  public data class Info(
     val fullName: kotlin.String,
-    val typeParameterShortNames: kotlin.collections.List<kotlin.String> = emptyList()
+    val typeParameterShortNames: List<kotlin.String> = emptyList()
   ) {
     public companion object {
-      public val unit: ObjectInfo = ObjectInfo(fullName = "Unit")
+      public val unit: Info = Info(fullName = "Unit")
     }
   }
 
@@ -230,7 +154,7 @@ public sealed interface Generic<out A> {
       enumValues: Array<out A>,
       index: Int
     ): Generic<A> = Enum(
-      Generic.ObjectInfo(name),
+      Info(name),
       enumValues.map { EnumValue(it.name, it.ordinal) },
       index
     )
@@ -243,10 +167,3 @@ public sealed interface Generic<out A> {
       )
   }
 }
-
-
-/**
- * Returns an array version of this schema, with the schema type wrapped in [SchemaType.List].
- * Sets `isOptional` to true as the collection might be empty.
- */
-public fun <A> Generic<A>.asArray(): Generic<Array<A>> = Generic.List(this)

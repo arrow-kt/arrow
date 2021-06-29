@@ -64,7 +64,7 @@ class ProductSpec : StringSpec({
 
 fun <A> Generic<A>.id(): Generic.Product<Id<A>> =
   Generic.Product(
-    Generic.ObjectInfo(Id::class.qualifiedName!!),
+    Generic.Info(Id::class.qualifiedName!!),
     listOf("value" to this@id)
   )
 
@@ -80,13 +80,13 @@ inline fun <reified A> StringSpec.testIdProduct(
 
 fun <A, B> pair(first: Generic<A>, second: Generic<B>): Generic<Pair<A, B>> =
   Generic.Product(
-    Generic.ObjectInfo("kotlin.Pair"),
+    Generic.Info("kotlin.Pair"),
     listOf("first" to first, "second" to second)
   )
 
 fun person(name: String, age: Int, p: Person2? = null): Generic<Person> =
   Generic.Product(
-    Generic.ObjectInfo(Person::class.qualifiedName!!),
+    Generic.Info(Person::class.qualifiedName!!),
     listOfNotNull(
       "name" to Generic.String(name),
       "age" to Generic.Number.Int(age),
@@ -95,7 +95,7 @@ fun person(name: String, age: Int, p: Person2? = null): Generic<Person> =
   )
 
 fun person2(name: String, age: Int, p: Person2? = null): Generic<Person2> =
-  Generic.Product(Generic.ObjectInfo(Person2::class.qualifiedName!!),
+  Generic.Product(Generic.Info(Person2::class.qualifiedName!!),
     listOfNotNull(
       "name" to Generic.String(name),
       "age" to Generic.Number.Int(age),
