@@ -118,23 +118,24 @@ class GenericEncoder(
 
   @InternalSerializationApi
   override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-    state = State.EncodeSerializableValue
-    val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
-    this.serializer = serializer
-    this.value = value
-    // this.propertyDescriptor = serializer.descriptor
-    // todo
-    val encoder = GenericEncoder(serializersModule)
+    if (state == State.EncodeInline) {
+      this.serializer = serializer
+      this.value = value
+      val encoder = GenericEncoder(serializersModule)
+      serializer.serialize(encoder, value)
+      genericValue = encoder.result(serializer)
+    } else {
+      state = State.EncodeSerializableValue
+      val propertyName: String = descriptor?.elementNames?.toList()?.get(index)!!
+      this.serializer = serializer
+      this.value = value
+      // this.propertyDescriptor = serializer.descriptor
+      // todo
+      val encoder = GenericEncoder(serializersModule)
 
-    val elementDescriptors = serializer
-      .descriptor
-      .elementDescriptors
-      .lastOrNull()
-      ?.elementNames
-      ?.toList() ?: emptyList()
-
-    serializer.serialize(encoder, value)
-    genericProperties[propertyName] = encoder.result(serializer)
+      serializer.serialize(encoder, value)
+      genericProperties[propertyName] = encoder.result(serializer)
+    }
 //    println("encodeSerializableValue: $serializer, $value")
   }
 

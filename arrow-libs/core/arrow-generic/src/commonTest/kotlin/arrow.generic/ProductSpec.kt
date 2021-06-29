@@ -28,57 +28,25 @@ class ProductSpec : StringSpec({
 
   "Pair" {
     checkAll(Arb.int(), Arb.string()) { a, b ->
-      Generic.encode(Pair(a, b)) shouldBe
-        Generic.Product(
-          Generic.ObjectInfo("kotlin.Pair"),
-          listOf(
-            "first" to Generic.Number.Int(a),
-            "second" to Generic.String(b)
-          )
-        )
+      Generic.encode(Pair(a, b)) shouldBe pair(Generic.Number.Int(a), Generic.String(b))
     }
   }
 
   "Nested Pair" {
     checkAll(Arb.int(), Arb.string(), Arb.float()) { a, b, c ->
-      Generic.encode(Pair(a, Pair(b, c))) shouldBe
-        Generic.Product(
-          Generic.ObjectInfo("kotlin.Pair"),
-          "first" to Generic.Number.Int(a),
-          "second" to Generic.Product(
-            Generic.ObjectInfo("kotlin.Pair"),
-            "first" to Generic.String(b),
-            "second" to Generic.Number.Float(c)
-          )
-        )
+      Generic.encode(Pair(a, Pair(b, c))) shouldBe pair(Generic.Number.Int(a), pair(Generic.String(b), Generic.Number.Float(c)))
     }
   }
 
   "Person" {
     val res = Generic.encode(Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null)))
-    val expected = Generic.Product(
-      Generic.ObjectInfo(Person::class.qualifiedName!!),
-      "name" to Generic.String("X"),
-      "age" to Generic.Number.Int(98),
-      "p" to Generic.Product(Generic.ObjectInfo(Person2::class.qualifiedName!!),
-        "name" to Generic.String("Y"),
-        "age" to Generic.Number.Int(99)
-      )
-    )
+    val expected = person("X", 98, Person2("Y", 99))
     res shouldBe expected
   }
 
   "Serializable Person, without Module Config" {
     val res = Generic.encode(Id(Person(name = "X", age = 98, p = Person2(name = "Y", age = 99, p = null))))
-    val expected = Generic.Product(
-      Generic.ObjectInfo(Person::class.qualifiedName!!),
-      "name" to Generic.String("X"),
-      "age" to Generic.Number.Int(98),
-      "p" to Generic.Product(Generic.ObjectInfo(Person2::class.qualifiedName!!),
-        "name" to Generic.String("Y"),
-        "age" to Generic.Number.Int(99)
-      )
-    ).id()
+    val expected = person("X", 98, Person2("Y", 99)).id()
     res shouldBe expected
   }
 
@@ -108,3 +76,29 @@ inline fun <reified A> StringSpec.testIdProduct(
       Generic.encode(Id(a), serializersModule = serializersModule) shouldBe expected(a).id()
     }
   }
+
+fun <A, B> pair(first: Generic<A>, second: Generic<B>): Generic<Pair<A, B>> =
+  Generic.Product(
+    Generic.ObjectInfo("kotlin.Pair"),
+    listOf("first" to first, "second" to second)
+  )
+
+fun person(name: String, age: Int, p: Person2? = null): Generic<Person> =
+  Generic.Product(
+    Generic.ObjectInfo(Person::class.qualifiedName!!),
+    listOfNotNull(
+      "name" to Generic.String(name),
+      "age" to Generic.Number.Int(age),
+      if (p == null) null else "p" to person2(p.name, p.age, p.p)
+    )
+  )
+
+fun person2(name: String, age: Int, p: Person2? = null): Generic<Person2> =
+  Generic.Product(Generic.ObjectInfo(Person2::class.qualifiedName!!),
+    listOfNotNull(
+      "name" to Generic.String(name),
+      "age" to Generic.Number.Int(age),
+      if (p == null) null
+      else "p" to person2(p.name, p.age, p.p)
+    )
+  )
