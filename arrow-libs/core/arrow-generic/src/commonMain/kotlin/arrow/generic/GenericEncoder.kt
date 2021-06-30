@@ -207,12 +207,13 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
         Generic.Info(serializer.descriptor.serialName),
         genericProperties.toList()
       )
-      StructureKind.MAP -> TODO()
+      StructureKind.MAP -> Generic.Product(Generic.Info(serializer.descriptor.serialName), mapGeneric())
 
       PolymorphicKind.SEALED ->
         Generic.Coproduct<Any?>(
           Generic.Info(serializer.descriptor.serialName),
-          Generic.Info(requireNotNull(this.serializer?.descriptor?.serialName) { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" }),
+          Generic.Info(requireNotNull(this.serializer?.descriptor?.serialName)
+          { "Internal error: this.serializer?.descriptor?.serialName was null ${this.serializer}" }),
           // genericProperties contains `value` and `type`
           // Where `type` is a label of the case representing the sum
           // And `value` is the actual instance, we want to extract the fields of the actual instance.
@@ -227,4 +228,28 @@ class GenericEncoder(override val serializersModule: SerializersModule) : Abstra
       null -> throw RuntimeException("Internal error: descriptor is null when requesting result from $this.")
       else -> throw RuntimeException("Internal error: primitives & enum should be handled.")
     }
+
+  private fun mapGeneric(): List<Pair<String, Generic<*>>> {
+    var index = 0
+    var key: Generic<*>? = null
+    val buffer = ArrayList<Pair<String, Generic<*>>>(genericProperties.size / 2)
+
+    genericProperties.forEach { (_, generic) ->
+      if (key == null) {
+        key = generic
+      } else {
+        value = generic
+        buffer.add(
+          Pair("${index++}", Generic.Product(
+            Generic.Info(Pair::class.qualifiedName!!),
+            "first" to key!!,
+            "second" to generic
+          ))
+        )
+        key = null
+      }
+    }
+
+    return buffer
+  }
 }

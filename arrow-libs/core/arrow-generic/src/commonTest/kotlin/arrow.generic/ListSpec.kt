@@ -8,6 +8,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.serializer
 
 class ListSpec : StringSpec({
@@ -29,13 +31,17 @@ class ListSpec : StringSpec({
     }
   }
 
-  // TODO Caused by SerializationException: Class 'ArrayList' is not registered for polymorphic serialization in the scope of 'Any'.
   "list inside sum-type".config(enabled = false) {
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b, c ->
       val tree: Tree<List<Int>> =
         Branch(Leaf(a), Branch(Leaf(b), Leaf(c)))
 
-      Generic.encode(tree) shouldBe branch(leaf(list(a)), branch(leaf(list(b)), leaf(list(c))))
+      Generic.encode(
+        tree,
+//         TODO Caused by SerializationException: Class 'ArrayList' is not registered for polymorphic serialization in the scope of 'Any'.
+        Tree.serializer(ListSerializer(Int.serializer())),
+        serializersModule = serializersModule
+      ) shouldBe branch(leaf(list(a)), branch(leaf(list(b)), leaf(list(c))))
     }
   }
 })
