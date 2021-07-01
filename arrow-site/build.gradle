@@ -29,6 +29,7 @@ dependencies {
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
 
+// Ank Plugin is not applied for every library to avoid adding runtime dependencies
 apply plugin: 'ank-gradle-plugin'
 
 ank {

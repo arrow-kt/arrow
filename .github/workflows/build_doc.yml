@@ -16,12 +16,18 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: "Setup"
-      run: brew install grep
     - name: "Set env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-    - name: "Show env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-    - name: "Create API doc and validate documentation"
+      run: |
+        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+    - name: "Assemble"
       working-directory: arrow-libs
-      run: ./gradlew buildDoc
+      run: |
+        echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
+        ./gradlew assemble
+    - name: "Create API doc"
+      working-directory: arrow-libs
+      run: ./gradlew dokka
+    - name: "Validate documentation"
+      working-directory: arrow-site
+      run: ./gradlew runAnk

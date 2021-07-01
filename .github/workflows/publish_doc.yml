@@ -27,45 +27,72 @@ jobs:
     timeout-minutes: 60
 
     steps:
+
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: "Setup"
       run: brew install grep
     - name: "Set env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
     - name: "Prepare environment"
       working-directory: arrow-site
       run: |
         mkdir $BASEDIR/logs
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
-    - name: "Create API doc and validate documentation"
+
+    - name: "Assemble"
       working-directory: arrow-libs
-      run: ./gradlew buildDoc
+      run: |
+        echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
+        ./gradlew assemble
+
+    - name: "Create API doc"
+      working-directory: arrow-libs
+      run: ./gradlew dokka
+
+    - name: "Validate documentation"
+      working-directory: arrow-site
+      run: ./gradlew runAnk
+
     - name: "Landing page: build"
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         bundle exec jekyll build -b docs -s build/site
-        tree _site > $BASEDIR/logs/content_docs.log
+        tree _site > $BASEDIR/logs/content.log
+
     - name: "Landing page: publish"
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
         ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+
+    - name: "Remove index for versions"
+      working-directory: arrow-site
+      run: rm -f build/site/index.md
+
+    - name: "Latest release: build (docs/)"
+      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+      working-directory: arrow-site
+      run: |
+        bundle exec jekyll build -b docs -s build/site
+        tree _site > $BASEDIR/logs/content_docs.log
+
     - name: "Latest release: publish (docs/)"
       if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
         ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
-    - name: "Remove index for versions"
-      working-directory: arrow-site
-      run: rm -f build/site/index.md
+
     - name: "Latest release: build release directory (docs/<major.minor>)"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
       working-directory: arrow-site
@@ -73,6 +100,7 @@ jobs:
         SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
         bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
         tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+
     - name: "Latest release: publish release directory (docs/<major.minor>)"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
       working-directory: arrow-site
@@ -84,28 +112,49 @@ jobs:
         else
           exit 1
         fi
+
     - name: "Next version: build (/docs/next)"
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         bundle exec jekyll build -b docs/next -s build/site
         tree _site > $BASEDIR/logs/content_docs-next.log
+
     - name: "Next version: publish (/docs/next)"
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: arrow-site
       run: |
         echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
         aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+
     - name: "Site: publish sitemap.xml"
       if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       run: |
         ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
         aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
+
     - name: CloudFront cache invalidation
       run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+
     - name: List S3
       run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
+
     - uses: actions/upload-artifact@v1
       with:
         name: logs
         path: arrow-libs/logs
+
+    - name: Prepare environment to create the issue
+      if: failure()
+      id: create-issue
+      run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+    - name: Create an issue whether failure
+      if: failure()
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{github.token}}
+        script: |
+           await github.issues.create({...context.repo,
+            title: "[PUBLISH DOC] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+            body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
