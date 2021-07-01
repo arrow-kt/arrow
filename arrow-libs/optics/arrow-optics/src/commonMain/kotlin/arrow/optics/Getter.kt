@@ -69,10 +69,10 @@ fun interface Getter<S, A> : Fold<S, A> {
   /**
    * Compose a [Getter] with a [Getter]
    */
-  infix fun <C> compose(other: Getter<A, C>): Getter<S, C> =
+  infix fun <C> compose(other: Getter<in A, out C>): Getter<S, C> =
     Getter(other::get compose this::get)
 
-  operator fun <C> plus(other: Getter<A, C>): Getter<S, C> =
+  operator fun <C> plus(other: Getter<in A, out C>): Getter<S, C> =
     this compose other
 
   companion object {
