@@ -812,92 +812,162 @@ fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
     acc.combine(MA, a)
   }
 
-fun <T> Iterable<T>.firstOrNone(): Option<T> {
+/**
+ * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
+ */
+fun <T> Iterable<T>.firstOrNone(): Option<T> =
   when (this) {
-    is List -> {
-      return if (isEmpty()) None else Some(this[0])
-    }
-    else -> {
-      val iterator = iterator()
-      if (!iterator.hasNext())
-        return None
-      return Some(iterator.next())
-    }
+    is Collection -> firstOrNone()
+    else -> iterator().nextOrNone()
   }
-}
 
-inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
-  for (element in this) if (predicate(element)) return Some(element)
-  return None
-}
+/**
+ * Returns the first element as [Some(element)][Some], or [None] if the collection is empty.
+ */
+fun <T> Collection<T>.firstOrNone(): Option<T> =
+  if (isEmpty()) {
+    None
+  } else {
+    Some(first())
+  }
 
-fun <T> Iterable<T>.singleOrNone(): Option<T> {
+private fun <T> Iterator<T>.nextOrNone(): Option<T> =
+  if (hasNext()) {
+    Some(next())
+  } else {
+    None
+  }
+
+/**
+ * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
+ */
+fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> =
+  iterator().firstOrNone(predicate)
+
+private tailrec fun <T> Iterator<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> =
+  if (hasNext()) {
+    val next = next()
+    when {
+      predicate(next) -> Some(next)
+      else -> firstOrNone(predicate)
+    }
+  } else {
+    None
+  }
+
+/**
+ * Returns single element as [Some(element)][Some], or [None] if the iterable is empty or has more than one element.
+ */
+fun <T> Iterable<T>.singleOrNone(): Option<T> =
   when (this) {
-    is List -> return if (size == 1) Some(this[0]) else None
-    else -> {
-      val iterator = iterator()
-      if (!iterator.hasNext())
-        return None
-      val single = iterator.next()
-      if (iterator.hasNext())
-        return None
-      return Some(single)
-    }
+    is Collection -> singleOrNone()
+    else -> iterator().run { nextOrNone().filter { !hasNext() } }
   }
-}
 
-inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
-  val list = mutableListOf<T>()
-  var found = false
-  for (element in this) {
-    if (predicate(element)) {
-      if (found) return None
-      list.add(element)
-      found = true
-    }
+/**
+ * Returns single element as [Some(element)][Some], or [None] if the collection is empty or has more than one element.
+ */
+fun <T> Collection<T>.singleOrNone(): Option<T> =
+  when (size) {
+    1 -> firstOrNone()
+    else -> None
   }
-  if (!found) return None
-  return Some(list[0])
-}
 
-fun <T> Iterable<T>.lastOrNone(): Option<T> {
+/**
+ * Returns the single element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
+ */
+fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> =
+  iterator().singleOrNone(predicate, current = None)
+
+private tailrec fun <T> Iterator<T>.singleOrNone(
+  predicate: (T) -> Boolean,
+  current: Option<T>,
+): Option<T> =
+  if (hasNext()) {
+    val next = next()
+    when {
+      predicate(next) -> when (current) {
+        None -> singleOrNone(predicate, Some(next))
+        is Some -> None
+      }
+      else -> singleOrNone(predicate, current)
+    }
+  } else {
+    current
+  }
+
+/**
+ * Returns the last element as [Some(element)][Some], or [None] if the iterable is empty.
+ */
+fun <T> Iterable<T>.lastOrNone(): Option<T> =
   when (this) {
-    is List -> return if (isEmpty()) None else Some(this[size - 1])
-    else -> {
-      val iterator = iterator()
-      if (!iterator.hasNext())
-        return None
-      var last = iterator.next()
-      while (iterator.hasNext())
-        last = iterator.next()
-      return Some(last)
+    is Collection -> lastOrNone()
+    else -> iterator().run {
+      if (hasNext()) {
+        var last: T
+        do last = next() while (hasNext())
+        Some(last)
+      } else {
+        None
+      }
     }
   }
-}
 
+/**
+ * Returns the last element as [Some(element)][Some], or [None] if the collection is empty.
+ */
+fun <T> Collection<T>.lastOrNone(): Option<T> =
+  if (isEmpty()) {
+    None
+  } else {
+    Some(last())
+  }
+
+/**
+ * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
+ */
 fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
-  var found = false
   val list = mutableListOf<T>()
   for (element in this) {
     if (predicate(element)) {
-      if (found) list[0] = element else list.add(element)
-      found = true
+      if (list.isEmpty()) {
+        list.add(element)
+      } else {
+        list[0] = element
+      }
     }
   }
-  return if (found) Some(list[0]) else None
+
+  return list.firstOrNone()
 }
 
-fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> {
-  if (this is List) return if (index in 0..lastIndex) Some(get(index)) else None
-  if (index < 0) return None
-  val iterator = iterator()
-  var count = 0
-  while (iterator.hasNext()) {
-    val element = iterator.next()
-    if (index == count++) return Some(element)
+/**
+ * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this iterable.
+ */
+fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
+  when {
+    index < 0 -> None
+    this is Collection -> elementAtOrNone(index)
+    else -> iterator().skip(index).nextOrNone()
   }
-  return None
-}
+
+/**
+ * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this collection.
+ */
+fun <T> Collection<T>.elementAtOrNone(index: Int): Option<T> =
+  when (index) {
+    in 0 until size -> Some(elementAt(index))
+    else -> None
+  }
+
+private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
+  when {
+    count > 0 && hasNext() -> {
+      next()
+      skip(count - 1)
+    }
+    else -> this
+  }
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
