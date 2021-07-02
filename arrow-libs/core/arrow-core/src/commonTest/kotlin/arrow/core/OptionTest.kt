@@ -121,6 +121,20 @@ class OptionTest : UnitSpec() {
       some.filterNot { it.startsWith('k') } shouldBe None
     }
 
+    "filterIsInstance" {
+      val someAny: Option<Any> = some
+      someAny.filterIsInstance<String>() shouldBe Some("kotlin")
+      someAny.filterIsInstance<Int>() shouldBe None
+
+      val someNullableAny: Option<Any?> = null.some()
+      someNullableAny.filterIsInstance<String?>() shouldBe Some(null)
+      someNullableAny.filterIsInstance<String>() shouldBe None
+
+      val noneAny: Option<Any> = none
+      noneAny.filterIsInstance<String>() shouldBe None
+      noneAny.filterIsInstance<Int>() shouldBe None
+    }
+
     "exists" {
       some.exists { it.startsWith('k') } shouldBe true
       some.exists { it.startsWith('j') } shouldBe false

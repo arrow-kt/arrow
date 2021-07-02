@@ -985,12 +985,15 @@ inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): O
   }
 
 /**
- * Returns an Option containing all elements that are instances of specified type parameter R.
+ * Returns an Option containing all elements that are instances of specified type parameter [B].
  */
-inline fun <reified B> Option<*>.filterIsInstance(): Option<B> {
-  val f: (Any?) -> B? = { it as? B }
-  return this.mapNotNull(f)
-}
+inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
+  flatMap {
+    when (it) {
+      is B -> Some(it)
+      else -> None
+    }
+  }
 
 inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
   handleErrorWith { Some(f(Unit)) }
