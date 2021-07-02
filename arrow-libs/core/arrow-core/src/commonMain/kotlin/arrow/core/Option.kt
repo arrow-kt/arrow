@@ -563,11 +563,27 @@ sealed class Option<out A> {
       is Some -> f(value)
     }
 
-  fun <B> align(b: Option<B>): Option<Ior<A, B>> =
-    Ior.fromNullables(this.orNull(), b.orNull()).toOption()
+  /**
+   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
+   */
+  infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
+    when (this) {
+      None -> when (b) {
+        None -> None
+        is Some -> Some(b.value.rightIor())
+      }
+      is Some -> when (b) {
+        None -> Some(this.value.leftIor())
+        is Some -> Some(Pair(this.value, b.value).bothIor())
+      }
+    }
 
-  inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
-    Ior.fromNullables(this.orNull(), b.orNull())?.let(f).toOption()
+  /**
+   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior], and then, if it's not [None], map it using [f].
+   *
+   * @note This function works like a regular `align` function, but is then mapped by the `map` function.
+   */
+  inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> = align(b).map(f)
 
   /**
    * Returns true if this option is empty '''or''' the predicate

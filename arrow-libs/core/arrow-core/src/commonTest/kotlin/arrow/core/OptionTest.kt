@@ -109,6 +109,27 @@ class OptionTest : UnitSpec() {
       none.flatMap { Some(it.toUpperCase()) } shouldBe None
     }
 
+    "align" {
+      some align some shouldBe Some(Ior.Both("kotlin", "kotlin"))
+      some align none shouldBe Some(Ior.Left("kotlin"))
+      none align some shouldBe Some(Ior.Right("kotlin"))
+      none align none shouldBe None
+
+      some.align(some) { "$it" } shouldBe Some("Ior.Both(kotlin, kotlin)")
+      some.align(none) { "$it" } shouldBe Some("Ior.Left(kotlin)")
+      none.align(some) { "$it" } shouldBe Some("Ior.Right(kotlin)")
+      none.align(none) { "$it" } shouldBe None
+
+      val nullable = null.some()
+      some align nullable shouldBe Some(Ior.Both("kotlin", null))
+      nullable align some shouldBe Some(Ior.Both(null, "kotlin"))
+      nullable align nullable shouldBe Some(Ior.Both(null, null))
+
+      some.align(nullable) { "$it" } shouldBe Some("Ior.Both(kotlin, null)")
+      nullable.align(some) { "$it" } shouldBe Some("Ior.Both(null, kotlin)")
+      nullable.align(nullable) { "$it" } shouldBe Some("Ior.Both(null, null)")
+    }
+
     "filter" {
       some.filter { it == "java" } shouldBe None
       none.filter { it == "java" } shouldBe None
