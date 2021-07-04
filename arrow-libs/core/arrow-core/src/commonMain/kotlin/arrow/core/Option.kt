@@ -857,19 +857,14 @@ private fun <T> Iterator<T>.nextOrNone(): Option<T> =
 /**
  * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
  */
-fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> =
-  iterator().firstOrNone(predicate)
-
-private tailrec fun <T> Iterator<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> =
-  if (hasNext()) {
-    val next = next()
-    when {
-      predicate(next) -> Some(next)
-      else -> firstOrNone(predicate)
+inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
+  for (element in this) {
+    if (predicate(element)) {
+      return Some(element)
     }
-  } else {
-    None
   }
+  return None
+}
 
 /**
  * Returns single element as [Some(element)][Some], or [None] if the iterable is empty or has more than one element.
@@ -892,25 +887,18 @@ fun <T> Collection<T>.singleOrNone(): Option<T> =
 /**
  * Returns the single element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
  */
-fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> =
-  iterator().singleOrNone(predicate, current = None)
-
-private tailrec fun <T> Iterator<T>.singleOrNone(
-  predicate: (T) -> Boolean,
-  current: Option<T>,
-): Option<T> =
-  if (hasNext()) {
-    val next = next()
-    when {
-      predicate(next) -> when (current) {
-        None -> singleOrNone(predicate, Some(next))
-        is Some -> None
+inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
+  val list = mutableListOf<T>()
+  for (element in this) {
+    if (predicate(element)) {
+      if (list.isNotEmpty()) {
+        return None
       }
-      else -> singleOrNone(predicate, current)
+      list.add(element)
     }
-  } else {
-    current
   }
+  return list.firstOrNone()
+}
 
 /**
  * Returns the last element as [Some(element)][Some], or [None] if the iterable is empty.
@@ -942,7 +930,7 @@ fun <T> Collection<T>.lastOrNone(): Option<T> =
 /**
  * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
  */
-fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
+inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
   val list = mutableListOf<T>()
   for (element in this) {
     if (predicate(element)) {
@@ -953,7 +941,6 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
       }
     }
   }
-
   return list.firstOrNone()
 }
 
