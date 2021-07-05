@@ -93,9 +93,9 @@ class SingleShotContTestSuite : ContTestSuite() {
   override fun capabilities(): Set<ScopeCapabilities> = emptySet()
 }
 
-class MultiShotContTestSuite : ContTestSuite() {
-  override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
-    MultiShotDelimContScope.reset { func(this) }
-
-  override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
-}
+// class MultiShotContTestSuite : ContTestSuite() {
+//   override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
+//     MultiShotDelimContScope.reset { func(this) }
+//
+//   override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
+// }
