@@ -1,7 +1,6 @@
 package generic
 
 import arrow.continuations.Reset
-import arrow.continuations.generic.MultiShotDelimContScope
 import arrow.continuations.generic.RestrictedScope
 import arrow.core.Either
 import arrow.core.Either.Left
