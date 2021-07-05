@@ -434,7 +434,7 @@ sealed class Validated<out E, out A> {
   companion object {
 
     @JvmStatic
-    fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(NonEmptyList(e, listOf()))
+    fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(nonEmptyListOf(e))
 
     @JvmStatic
     fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)

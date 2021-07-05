@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.test.UnitSpec
 import io.kotest.matchers.shouldBe
-import arrow.continuations.generic.MultiShotDelimContScope
 
 abstract class ContTestSuite : UnitSpec() {
   abstract suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A
@@ -93,9 +92,9 @@ class SingleShotContTestSuite : ContTestSuite() {
   override fun capabilities(): Set<ScopeCapabilities> = emptySet()
 }
 
-class MultiShotContTestSuite : ContTestSuite() {
-  override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
-    MultiShotDelimContScope.reset { func(this) }
-
-  override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
-}
+// class MultiShotContTestSuite : ContTestSuite() {
+//  override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
+//    MultiShotDelimContScope.reset { func(this) }
+//
+//  override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
+// }

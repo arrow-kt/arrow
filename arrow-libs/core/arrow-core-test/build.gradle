@@ -10,8 +10,22 @@ apply plugin: 'kotlinx-atomicfu'
 
 kotlin {
     js(BOTH) {
-        browser()
-        nodejs()
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    println("${project.projectDir}/karma")
+                    useConfigDirectory("${project.projectDir}/karma")
+                }
+            }
+        }
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "10000"
+                }
+            }
+        }
     }
     sourceSets {
         commonMain {

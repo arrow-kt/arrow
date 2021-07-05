@@ -34,6 +34,5 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
-
     }
 }

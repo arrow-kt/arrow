@@ -25,10 +25,8 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.flatMap
-import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
@@ -239,8 +237,8 @@ fun Arb.Companion.any(): Arb<Any> =
     Arb.string() as Arb<Any>,
     Arb.int() as Arb<Any>,
     Arb.long() as Arb<Any>,
-    Arb.float() as Arb<Any>,
-    Arb.double() as Arb<Any>,
+//    Arb.float() as Arb<Any>,
+//    Arb.double() as Arb<Any>,
     Arb.bool() as Arb<Any>,
     Arb.throwable() as Arb<Any>,
     Arb.unit() as Arb<Any>

@@ -122,7 +122,7 @@ class EvalTest : UnitSpec() {
     }
 
     "flatMap should complete without blowing up the stack" {
-      val limit = 10000
+      val limit = stackSafeIteration()
       val sideEffect = SideEffect()
       val flatMapped = Eval.now(0).flatMap(recur(limit, sideEffect))
       sideEffect.counter shouldBe 0
