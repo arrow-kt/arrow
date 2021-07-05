@@ -17,14 +17,17 @@ import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.Validated
 import arrow.core.left
+import arrow.core.prependTo
 import arrow.core.right
 import arrow.core.toOption
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.edgecases
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
@@ -37,7 +40,9 @@ import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
+import kotlin.jvm.JvmOverloads
 import kotlin.math.abs
+import kotlin.random.nextInt
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
@@ -243,3 +248,26 @@ fun Arb.Companion.any(): Arb<Any> =
     Arb.throwable() as Arb<Any>,
     Arb.unit() as Arb<Any>
   )
+
+@JvmOverloads
+inline fun <reified A> Arb.Companion.array(
+  gen: Arb<A>,
+  range: IntRange = 0..100
+): Arb<Array<A>> {
+  check(!range.isEmpty())
+  check(range.first >= 0)
+  return arb(edgecases = emptyArray<A>() prependTo gen.edgecases().map { arrayOf(it) }) {
+    sequence {
+      val genIter = gen.generate(it).iterator()
+      while (true) {
+        val targetSize = it.random.nextInt(range)
+        val list = ArrayList<A>(targetSize)
+        while (list.size < targetSize && genIter.hasNext()) {
+          list.add(genIter.next().value)
+        }
+        check(list.size == targetSize)
+        yield(list.toTypedArray())
+      }
+    }
+  }
+}

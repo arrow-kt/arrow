@@ -1,4 +1,4 @@
-package arrow.core
+package arrow.core.test
 
 expect fun isJvm(): Boolean
 expect fun isJs(): Boolean

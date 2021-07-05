@@ -1,6 +1,7 @@
-@file:Suppress("UNUSED", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-package arrow.continuations
+package generic
 
+import arrow.continuations.Reset
+import arrow.continuations.generic.MultiShotDelimContScope
 import arrow.continuations.generic.RestrictedScope
 import arrow.core.Either
 import arrow.core.Either.Left
@@ -92,9 +93,9 @@ class SingleShotContTestSuite : ContTestSuite() {
   override fun capabilities(): Set<ScopeCapabilities> = emptySet()
 }
 
-// class MultiShotContTestSuite : ContTestSuite() {
-//  override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
-//    MultiShotDelimContScope.reset { func(this) }
-//
-//  override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
-// }
+class MultiShotContTestSuite : ContTestSuite() {
+  override suspend fun <A> runScope(func: (suspend RestrictedScope<A>.() -> A)): A =
+    MultiShotDelimContScope.reset { func(this) }
+
+  override fun capabilities(): Set<ScopeCapabilities> = setOf(ScopeCapabilities.MultiShot)
+}

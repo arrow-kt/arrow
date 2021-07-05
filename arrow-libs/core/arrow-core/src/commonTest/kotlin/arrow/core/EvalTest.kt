@@ -6,6 +6,7 @@ import arrow.core.computations.eval
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.FxLaws
+import arrow.core.test.stackSafeIteration
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int

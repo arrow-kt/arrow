@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.core.test.generators.functionAToB
+import arrow.core.test.stackSafeIteration
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
