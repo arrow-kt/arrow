@@ -22,7 +22,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
@@ -290,7 +289,7 @@ class EitherTest : UnitSpec() {
     "replicate should return Right(empty list) when n <= 0" {
       checkAll(
         Arb.choice(Arb.negativeInts(), Arb.constant(0)),
-        Arb.int()
+        Arb.int(0..100)
       ) { n: Int, a: Int ->
         val expected: Either<Int, List<Int>> = Right(emptyList())
 
@@ -301,7 +300,7 @@ class EitherTest : UnitSpec() {
 
     "replicate should return Right(list of repeated value size n) when Right and n is positive" {
       checkAll(
-        Arb.intSmall().filter { it > 0 },
+        Arb.int(1..10),
         Arb.int()
       ) { n: Int, a: Int ->
         Right(a).replicate(n) shouldBe Right(List(n) { a })
