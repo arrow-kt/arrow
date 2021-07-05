@@ -19,7 +19,6 @@ jobs:
       SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
       ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
-      GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
     runs-on: macos-latest
 
@@ -27,17 +26,22 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: "Setup"
       run: brew install grep
+
     - name: "Set env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
     - name: "Show env"
       run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
     - name: "Publish"
       working-directory: arrow-libs
       run: |
         ./gradlew publish
         echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
+
     - name: "Create tag"
       if: env.NEW_RELEASE_VERSION_EXISTS == '1'
       run: |
@@ -46,6 +50,22 @@ jobs:
         git config --global user.name "arrow-kt"
         git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION"
         git push origin $RELEASE_VERSION
+
     - name: "Create release notes"
       if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
       run: ${GITHUB_WORKSPACE}/.github/scripts/create-release-notes.sh
+
+    - name: Prepare environment to create the issue
+      if: failure()
+      id: create-issue
+      run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+    - name: Create an issue whether failure
+      if: failure()
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{github.token}}
+        script: |
+           await github.issues.create({...context.repo,
+            title: "[PUBLISH] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+            body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});

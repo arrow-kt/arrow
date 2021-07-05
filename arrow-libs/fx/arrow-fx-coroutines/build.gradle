@@ -15,7 +15,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":arrow-core")
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
             }
         }
@@ -28,11 +28,11 @@ kotlin {
         commonTest {
             dependencies {
                 implementation project(":arrow-fx-coroutines-test")
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
             }
         }
         jvmTest {
             dependencies {
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
                 implementation "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }

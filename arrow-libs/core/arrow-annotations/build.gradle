@@ -9,10 +9,24 @@ apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
+    js(BOTH) {
+        browser()
+        nodejs()
+    }
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+            }
+        }
+        jvmMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+            }
+        }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
     }

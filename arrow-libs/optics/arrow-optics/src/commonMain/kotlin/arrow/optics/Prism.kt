@@ -103,13 +103,13 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
   /**
    * Compose a [PPrism] with another [PPrism]
    */
-  infix fun <C, D> compose(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> =
+  infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
       getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
       reverseGet = this::reverseGet compose other::reverseGet
     )
 
-  operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> =
+  operator fun <C, D> plus(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     this compose other
 
   companion object {

@@ -29,6 +29,7 @@ dependencies {
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
 
+// Ank Plugin is not applied for every library to avoid adding runtime dependencies
 apply plugin: 'ank-gradle-plugin'
 
 ank {
@@ -36,3 +37,21 @@ ank {
     target = file("${rootDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task generateAndValidateDoc(type: Exec) {
+  workingDir "../arrow-libs"
+  commandLine "sh", "gradlew", "buildDoc"
+}
+
+task generateSite(type: Exec) {
+  commandLine "sh", "gradle/scripts/generate-site.sh"
+}
+
+task buildSite {
+  group = "documentation"
+  description = "Generates and validates the documentation, and generates the website"
+  dependsOn 'generateAndValidateDoc'
+  dependsOn 'generateSite'
+}
+
+generateSite.mustRunAfter generateAndValidateDoc

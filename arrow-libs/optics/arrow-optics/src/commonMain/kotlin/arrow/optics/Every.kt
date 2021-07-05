@@ -33,7 +33,7 @@ interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T,
   /**
    * Compose a [PEvery] with a [PEvery]
    */
-  infix fun <C, D> compose(other: PEvery<A, B, C, D>): PEvery<S, T, C, D> =
+  infix fun <C, D> compose(other: PEvery<in A, out B, out C, in D>): PEvery<S, T, C, D> =
     object : PEvery<S, T, C, D> {
       override fun <R> foldMap(M: Monoid<R>, source: S, map: (C) -> R): R =
         this@PEvery.foldMap(M, source) { c -> other.foldMap(M, c, map) }
@@ -42,7 +42,7 @@ interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T,
         this@PEvery.modify(source) { b -> other.modify(b, map) }
     }
 
-  operator fun <C, D> plus(other: PEvery<A, B, C, D>): PEvery<S, T, C, D> =
+  operator fun <C, D> plus(other: PEvery<in A, out B, out C, in D>): PEvery<S, T, C, D> =
     this compose other
 
   companion object {

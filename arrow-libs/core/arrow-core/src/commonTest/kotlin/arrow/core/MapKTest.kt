@@ -20,7 +20,12 @@ import io.kotest.property.arbitrary.string
 class MapKTest : UnitSpec() {
 
   init {
-    testLaws(MonoidLaws.laws(Monoid.map(Semigroup.int()), Arb.map(Arb.longSmall(), Arb.intSmall())))
+    testLaws(
+      MonoidLaws.laws(
+        Monoid.map(Semigroup.int()),
+        Arb.map(Arb.longSmall(), Arb.intSmall(), maxSize = 10)
+      )
+    )
 
     "traverseEither is stacksafe" {
       val acc = mutableListOf<Int>()

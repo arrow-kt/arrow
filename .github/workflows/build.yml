@@ -16,12 +16,24 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: "Setup"
-      run: brew install grep
     - name: "Set env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-    - name: "Show env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+      run: |
+        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
     - name: Build
       working-directory: arrow-libs
       run: ./gradlew build
+    - name: "Prepare test reports"
+      if: ${{ always() }}
+      run: |
+        mkdir test-reports
+        for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
+          module=$(echo $report | cut -d/ -f3)
+          cp -r $report test-reports/$module
+        done
+    - name: "Make test reports available to download"
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-reports
+        path: test-reports

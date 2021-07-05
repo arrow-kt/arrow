@@ -97,13 +97,13 @@ class IterableTest : UnitSpec() {
       res shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated acummulates" {
+    "traverseValidated acumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
           .sequenceValidated()
 
         val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
-          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+          .fold({ Valid(ints.filter { it % 2 == 0 }) }, { Invalid(it) })
 
         res shouldBe expected
       }
