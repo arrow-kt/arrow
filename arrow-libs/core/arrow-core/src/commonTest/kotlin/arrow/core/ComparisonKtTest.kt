@@ -8,8 +8,6 @@ import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.byte
-import io.kotest.property.arbitrary.double
-import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.short
@@ -225,96 +223,5 @@ class ComparisonKtTest : StringSpec() {
         res shouldBe expected
       }
     }
-
-    // TODO equals is not total for Double
-    "Float - sort2".config(enabled = false) {
-      checkAll(Arb.float(), Arb.float()) { a, b ->
-        val (first, second) = sort(a, b)
-        val (aa, bb) = listOf(a, b).sorted()
-
-        first.eqv(aa) && second.eqv(bb)
-      }
-    }
-
-    // TODO equals is not total for Double
-    "Float - sort3".config(enabled = false) {
-      checkAll(Arb.float(), Arb.float(), Arb.float()) { a, b, c ->
-        val (first, second, third) = sort(a, b, c)
-        val (aa, bb, cc) = listOf(a, b, c).sorted()
-
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
-      }
-    }
-
-    // TODO equals is not total for Double
-    "Float - sortAll".config(enabled = false) {
-      checkAll(Arb.float(), Arb.float(), Arb.float(), Arb.float()) { a, b, c, d ->
-        val res = sort(a, b, c, d)
-        val expected = listOf(a, b, c, d).sorted()
-
-        res shouldBe expected
-      }
-    }
-
-    // TODO equals is not total for Double
-    "Double - sort2".config(enabled = false) {
-      checkAll(Arb.double(), Arb.double()) { a, b ->
-        val (first, second) = sort(a, b)
-        val (aa, bb) = listOf(a, b).sorted()
-
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
-      }
-    }
-
-    // TODO equals is not total for Double
-    "Double - sort3".config(enabled = false) {
-      checkAll(Arb.double(), Arb.double(), Arb.double()) { a, b, c ->
-        val (first, second, third) = sort(a, b, c)
-        val (aa, bb, cc) = listOf(a, b, c).sorted()
-
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
-      }
-    }
-
-    // TODO equals is not total for Double
-    "Double - sortAll".config(enabled = false) {
-      checkAll(Arb.double(), Arb.double(), Arb.double(), Arb.double()) { a, b, c, d ->
-        val res = sort(a, b, c, d)
-        val expected = listOf(a, b, c, d).sorted()
-
-        res shouldBe expected
-      }
-    }
   }
 }
-
-/**
- * Equality for Float to check sorting order.
- * So we need `NaN == NaN` to be true.
- */
-fun Float.eqv(other: Float): Boolean =
-  if (isNaN() && other.isNaN()) true else {
-    this shouldBe other
-    true
-  }
-
-/**
- * Equality for Double to check sorting order.
- * So we need `NaN == NaN` to be true.
- */
-fun Double.eqv(other: Double): Boolean =
-  if (isNaN() && other.isNaN()) true else {
-    this shouldBe other
-    true
-  }
