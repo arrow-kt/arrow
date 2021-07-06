@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        java: [8, 8.0.192, 11, 11.0.2, 13, 13.0.4, 15, 16-ea]
+        os: [macos-latest]
+        java: [8, 11, 13, 15, 16-ea]
     name: Build libraries ${{ matrix.java }}, ${{ matrix.os }}
     timeout-minutes: 60
 
