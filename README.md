@@ -45,6 +45,8 @@ Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 Make sure to have the latest version of JDK 1.8 (or higher) installed.
 
+JDK 16 doesn't currently work but will do once we upgrade to [Gradle 7.0](https://github.com/arrow-kt/arrow/issues/2442)
+
 ### Android
 
 Arrow supports Android starting on API 21 and up.
