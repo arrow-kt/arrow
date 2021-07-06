@@ -38,5 +38,5 @@ kotlin {
 
 dependencies {
     kaptTest project(":arrow-meta")
-    testCompile project(":arrow-optics-test")
+    testImplementation project(":arrow-optics-test")
 }
