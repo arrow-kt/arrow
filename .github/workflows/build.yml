@@ -9,17 +9,22 @@ jobs:
       BASEDIR: ${{github.workspace}}/arrow-libs
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        java: [8, 8.0.192, 11, 11.0.2, 13, 13.0.4, 15, 16-ea]
+    name: Build libraries ${{ matrix.java }}, ${{ matrix.os }}
     timeout-minutes: 60
 
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: "Set env"
-      run: |
-        echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-        echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
     - name: Build
       working-directory: arrow-libs
       run: ./gradlew build
