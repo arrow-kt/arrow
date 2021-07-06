@@ -236,17 +236,21 @@ class SequenceKTest : UnitSpec() {
       }
     }
 
-    "can align sequences" {
+    "can align sequences - 1" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
+    }
 
+    "can align sequences - 2" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
           it.isBoth shouldBe true
         }
       }
+    }
 
+    "can align sequences - 3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()

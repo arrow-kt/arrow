@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.typeclasses.Monoid
+import kotlin.js.JsName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -259,7 +260,7 @@ sealed class Eval<out A> {
    * This type should be used when an A value is already in hand, or when the computation to produce an A value is
    * pure and very fast.
    */
-  data class Now<out A>(val value: A) : Eval<A>() {
+  data class Now<out A>(@JsName("_value") val value: A) : Eval<A>() {
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
 
@@ -284,6 +285,7 @@ sealed class Eval<out A> {
    * will be available for garbage collection.
    */
   data class Later<out A>(private val f: () -> A) : Eval<A>() {
+    @JsName("_name")
     val value: A by lazy(f)
 
     override fun value(): A = value

@@ -12,6 +12,23 @@ apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
+    js(BOTH) {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    useConfigDirectory("${project.rootDir}/karma")
+                }
+            }
+        }
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "10000000000"
+                }
+            }
+        }
+    }
     sourceSets {
         commonMain {
             dependencies {
@@ -33,6 +50,16 @@ kotlin {
         jvmTest {
             dependencies {
                 runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+            }
+        }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
             }
         }
     }
