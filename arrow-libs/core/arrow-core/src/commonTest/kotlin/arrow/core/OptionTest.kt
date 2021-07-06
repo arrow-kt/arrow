@@ -179,27 +179,18 @@ class OptionTest : UnitSpec() {
     }
 
     "Iterable.firstOrNone" {
-      val iterable = object : Iterable<Int> {
-        private val list = listOf(1, 2, 3, 4, 5, 6)
-        override fun iterator(): Iterator<Int> = list.iterator()
-      }
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
       iterable.firstOrNone() shouldBe Some(1)
       iterable.firstOrNone { it > 2 } shouldBe Some(3)
       iterable.firstOrNone { it > 7 } shouldBe None
 
-      val emptyIterable = object : Iterable<Int> {
-        private val emptyList = emptyList<Int>()
-        override fun iterator(): Iterator<Int> = emptyList.iterator()
-      }
+      val emptyIterable = iterableOf<Int>()
       emptyIterable.firstOrNone() shouldBe None
 
-      val nullableIterable1 = object : Iterable<Int?> {
-        private val nullableList1 = listOf(null, 2, 3, 4, 5, 6)
-        override fun iterator(): Iterator<Int?> = nullableList1.iterator()
-      }
+      val nullableIterable1 = iterableOf(null, 2, 3, 4, 5, 6)
       nullableIterable1.firstOrNone() shouldBe Some(null)
 
-      val nullableIterable2 = listOf(1, 2, 3, null, 5, null)
+      val nullableIterable2 = iterableOf(1, 2, 3, null, 5, null)
       nullableIterable2.firstOrNone { it == null } shouldBe Some(null)
     }
 
@@ -215,30 +206,21 @@ class OptionTest : UnitSpec() {
     }
 
     "Iterable.singleOrNone" {
-      val iterable = object : Iterable<Int> {
-        private val list = listOf(1, 2, 3, 4, 5, 6)
-        override fun iterator(): Iterator<Int> = list.iterator()
-      }
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
       iterable.singleOrNone() shouldBe None
       iterable.singleOrNone { it > 2 } shouldBe None
 
-      val singleIterable = object : Iterable<Int> {
-        private val singleList = listOf(3)
-        override fun iterator(): Iterator<Int> = singleList.iterator()
-      }
+      val singleIterable = iterableOf(3)
       singleIterable.singleOrNone() shouldBe Some(3)
       singleIterable.singleOrNone { it == 3 } shouldBe Some(3)
 
-      val nullableSingleIterable1 = object : Iterable<Int?> {
-        private val nullableSingleList1 = listOf(null)
-        override fun iterator(): Iterator<Int?> = nullableSingleList1.iterator()
-      }
+      val nullableSingleIterable1 = iterableOf<Int?>(null)
       nullableSingleIterable1.singleOrNone() shouldBe Some(null)
 
-      val nullableSingleIterable2 = listOf(1, 2, 3, null, 5, 6)
+      val nullableSingleIterable2 = iterableOf(1, 2, 3, null, 5, 6)
       nullableSingleIterable2.singleOrNone { it == null } shouldBe Some(null)
 
-      val nullableSingleIterable3 = listOf(1, 2, 3, null, 5, null)
+      val nullableSingleIterable3 = iterableOf(1, 2, 3, null, 5, null)
       nullableSingleIterable3.singleOrNone { it == null } shouldBe None
     }
 
@@ -254,27 +236,18 @@ class OptionTest : UnitSpec() {
     }
 
     "Iterable.lastOrNone" {
-      val iterable = object : Iterable<Int> {
-        private val list = listOf(1, 2, 3, 4, 5, 6)
-        override fun iterator(): Iterator<Int> = list.iterator()
-      }
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
       iterable.lastOrNone() shouldBe Some(6)
       iterable.lastOrNone { it < 4 } shouldBe Some(3)
       iterable.lastOrNone { it > 7 } shouldBe None
 
-      val emptyIterable = object : Iterable<Int> {
-        private val emptyList = emptyList<Int>()
-        override fun iterator(): Iterator<Int> = emptyList.iterator()
-      }
+      val emptyIterable = iterableOf<Int>()
       emptyIterable.lastOrNone() shouldBe None
 
-      val nullableIterable1 = object : Iterable<Int?> {
-        private val nullableList1 = listOf(1, 2, 3, 4, 5, null)
-        override fun iterator(): Iterator<Int?> = nullableList1.iterator()
-      }
+      val nullableIterable1 = iterableOf(1, 2, 3, 4, 5, null)
       nullableIterable1.lastOrNone() shouldBe Some(null)
 
-      val nullableIterable2 = listOf(null, 2, 3, null, 5, 6)
+      val nullableIterable2 = iterableOf(null, 2, 3, null, 5, 6)
       nullableIterable2.lastOrNone { it == null } shouldBe Some(null)
     }
 
@@ -290,18 +263,12 @@ class OptionTest : UnitSpec() {
     }
 
     "Iterable.elementAtOrNone" {
-      val iterable = object : Iterable<Int> {
-        private val list = listOf(1, 2, 3, 4, 5, 6)
-        override fun iterator(): Iterator<Int> = list.iterator()
-      }
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
       iterable.elementAtOrNone(index = 3 - 1) shouldBe Some(3)
       iterable.elementAtOrNone(index = -1) shouldBe None
       iterable.elementAtOrNone(index = 100) shouldBe None
 
-      val nullableIterable = object : Iterable<Int?> {
-        private val nullableList = listOf(1, 2, null, 4, 5, 6)
-        override fun iterator(): Iterator<Int?> = nullableList.iterator()
-      }
+      val nullableIterable = iterableOf(1, 2, null, 4, 5, 6)
       nullableIterable.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
     }
 
@@ -400,3 +367,8 @@ class OptionTest : UnitSpec() {
     }
   }
 }
+
+
+// Utils
+
+private fun <T> iterableOf(vararg elements: T): Iterable<T> = Iterable { iterator { yieldAll(elements.toList()) } }
