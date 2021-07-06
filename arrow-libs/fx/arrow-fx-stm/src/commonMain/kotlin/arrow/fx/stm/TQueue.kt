@@ -1,6 +1,7 @@
 package arrow.fx.stm
 
 import arrow.core.Predicate
+import kotlin.js.JsName
 
 fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(PList.Nil))
 
@@ -249,7 +250,7 @@ data class TQueue<A> internal constructor(
  *   implement queues.
  */
 internal sealed class PList<out A> {
-  data class Cons<A>(val value: A, val tail: PList<A>) : PList<A>()
+  data class Cons<A>(val value: A, @JsName("_tail") val tail: PList<A>) : PList<A>()
   object Nil : PList<Nothing>()
 
   /**
