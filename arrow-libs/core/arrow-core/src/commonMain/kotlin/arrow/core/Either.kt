@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -727,12 +728,14 @@ sealed class Either<out A, out B> {
    * Returns `true` if this is a [Right], `false` otherwise.
    * Used only for performance instead of fold.
    */
+  @JsName("_isRight")
   internal abstract val isRight: Boolean
 
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
    * Used only for performance instead of fold.
    */
+  @JsName("_isLeft")
   internal abstract val isLeft: Boolean
 
   fun isLeft(): Boolean = isLeft

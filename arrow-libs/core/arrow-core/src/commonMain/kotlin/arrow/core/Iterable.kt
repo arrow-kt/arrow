@@ -318,7 +318,7 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
       }
       is Validated.Invalid -> when (acc) {
         is Valid -> res
-        is Invalid -> acc.value.combine(res.value).invalid()
+        is Invalid -> Invalid(acc.value.combine(res.value))
       }
     }
   }

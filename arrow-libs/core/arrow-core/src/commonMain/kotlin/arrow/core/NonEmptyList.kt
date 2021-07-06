@@ -440,7 +440,7 @@ inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
       }
       is Invalid -> when (acc) {
         is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+        is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
       }
     }
   }.map { NonEmptyList.fromListUnsafe(it) }
