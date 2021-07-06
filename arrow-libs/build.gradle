@@ -18,3 +18,21 @@ plugins {
 }
 
 apply from: "gradle/$ROOT_PROJECT"
+
+task generateDoc(type: Exec) {
+  commandLine "sh", "gradlew", "dokka"
+}
+
+task runValidation(type: Exec) {
+  workingDir "../arrow-site"
+  commandLine "sh", "gradlew", "runAnk"
+}
+
+task buildDoc {
+  group = "documentation"
+  description = "Generates and validates the documentation"
+  dependsOn 'generateDoc'
+  dependsOn 'runValidation'
+}
+
+runValidation.mustRunAfter generateDoc

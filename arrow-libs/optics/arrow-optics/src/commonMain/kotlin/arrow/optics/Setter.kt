@@ -53,10 +53,10 @@ fun interface PSetter<S, T, A, B> {
   /**
    * Compose a [PSetter] with a [PSetter]
    */
-  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> =
+  infix fun <C, D> compose(other: PSetter<in A, out B, out C, in D>): PSetter<S, T, C, D> =
     PSetter { s, fb -> modify(s) { a -> other.modify(a, fb) } }
 
-  operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> =
+  operator fun <C, D> plus(other: PSetter<in A, out B, out C, in D>): PSetter<S, T, C, D> =
     this compose other
 
   companion object {

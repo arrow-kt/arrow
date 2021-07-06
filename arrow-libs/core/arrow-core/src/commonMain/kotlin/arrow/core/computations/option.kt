@@ -7,6 +7,7 @@ import arrow.core.identity
 import kotlin.coroutines.RestrictsSuspension
 
 fun interface OptionEffect<A> : Effect<Option<A>> {
+  // TODO conflicts with outer scoped Effect context
   suspend fun <B> B?.bind(): B =
     this ?: control().shift(None)
 

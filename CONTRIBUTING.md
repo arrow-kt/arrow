@@ -56,8 +56,14 @@ In order to generate the documentation and validate it:
 
 ```bash
 cd arrow-libs
-./gradlew dokka
+./gradlew buildDoc
+```
 
+That Gradle task is equivalent to run Dokka and Ank:
+
+```bash
+cd arrow-libs
+./gradlew dokka
 cd ../arrow-site
 ./gradlew runAnk
 ```
@@ -83,10 +89,18 @@ Also note that you can make your Ank snippets **editable and runnable in the act
 
 ## How to run the website in your local workspace
 
-After generating and validating the documentation (previous step):
-
 ```sh
 cd arrow-site
+./gradlew buildSite
+```
+
+That Gradle task is equivalent to run Dokka, Ank and Jekyll build:
+
+```bash
+cd arrow-libs
+./gradlew dokka
+cd ../arrow-site
+./gradlew runAnk
 bundle install --gemfile Gemfile --path vendor/bundle
 bundle exec jekyll serve -s build/site
 ```

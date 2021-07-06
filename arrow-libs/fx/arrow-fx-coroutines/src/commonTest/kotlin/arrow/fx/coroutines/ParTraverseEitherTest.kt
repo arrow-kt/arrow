@@ -60,7 +60,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val containsError = l.any(Either<String, Int>::isLeft)
         val res = l.parTraverseEither { it }
 
-        if (containsError) l.contains(res) shouldBe true
+        if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
         else res shouldBe l.sequenceEither()
       }
     }

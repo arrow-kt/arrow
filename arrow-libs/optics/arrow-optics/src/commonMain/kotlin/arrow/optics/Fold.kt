@@ -133,13 +133,13 @@ interface Fold<S, A> {
   /**
    * Compose a [Fold] with a [Fold]
    */
-  infix fun <C> compose(other: Fold<A, C>): Fold<S, C> =
+  infix fun <C> compose(other: Fold<in A, out C>): Fold<S, C> =
     object : Fold<S, C> {
       override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: C) -> R): R =
         this@Fold.foldMap(M, source) { c -> other.foldMap(M, c, map) }
     }
 
-  operator fun <C> plus(other: Fold<A, C>): Fold<S, C> =
+  operator fun <C> plus(other: Fold<in A, out C>): Fold<S, C> =
     this compose other
 
   companion object {
