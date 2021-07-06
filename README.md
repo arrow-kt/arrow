@@ -43,7 +43,7 @@ Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 ### JDK
 
-Make sure to have the latest version of JDK 1.8 installed.
+Make sure to have the latest version of JDK 1.8 (or higher) installed.
 
 ### Android
 
