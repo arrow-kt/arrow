@@ -6,8 +6,13 @@ plugins {
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
+apply plugin: 'kotlinx-atomicfu'
 
 kotlin {
+    js(BOTH) {
+        browser()
+        nodejs()
+    }
     sourceSets {
         commonMain {
             dependencies {
@@ -23,6 +28,11 @@ kotlin {
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+            }
+        }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
     }

@@ -7,6 +7,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 
 class FoldTest : UnitSpec() {
@@ -56,14 +57,15 @@ class FoldTest : UnitSpec() {
       }
 
       "Find the first element matching the predicate" {
-        checkAll(Arb.list(Arb.int(-100..100))) { ints ->
-          findOrNull(ints) { it > 10 } shouldBe ints.firstOrNull { it > 10 }
+        checkAll(Arb.list(Arb.int(-100..100).orNull())) { ints ->
+          val predicate = { i: Int? -> i?.let { it > 10 } ?: false }
+          Fold.list<Int?>().findOrNull(ints, predicate) shouldBe ints.firstOrNull(predicate)
         }
       }
 
       "Checking existence of a target" {
-        checkAll(Arb.list(Arb.int()), Arb.bool()) { ints, predicate ->
-          exists(ints) { predicate } shouldBe (predicate && ints.isNotEmpty())
+        checkAll(Arb.list(Arb.int().orNull()), Arb.bool()) { ints, predicate ->
+          Fold.list<Int?>().exists(ints) { predicate } shouldBe (predicate && ints.isNotEmpty())
         }
       }
 

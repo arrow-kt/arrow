@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 
 class EveryTest : UnitSpec() {
@@ -50,14 +51,14 @@ class EveryTest : UnitSpec() {
       }
 
       "asFold should behave as valid Fold: headOption" {
-        checkAll(Arb.list(Arb.int())) { ints ->
-          firstOrNull(ints) shouldBe ints.firstOrNull()
+        checkAll(Arb.list(Arb.int().orNull())) { ints ->
+          Every.list<Int?>().firstOrNull(ints) shouldBe ints.firstOrNull()
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        checkAll(Arb.list(Arb.int())) { ints ->
-          lastOrNull(ints) shouldBe ints.lastOrNull()
+        checkAll(Arb.list(Arb.int().orNull())) { ints ->
+          Every.list<Int?>().lastOrNull(ints) shouldBe ints.lastOrNull()
         }
       }
     }
@@ -83,8 +84,9 @@ class EveryTest : UnitSpec() {
       }
 
       "Finding an number larger than 10" {
-        checkAll(Arb.list(Arb.int(-100..100))) { ints ->
-          findOrNull(ints) { it > 10 } shouldBe ints.firstOrNull { it > 10 }
+        checkAll(Arb.list(Arb.int(-100..100).orNull())) { ints ->
+          val predicate = { i: Int? -> i?.let { it > 10 } ?: false }
+          Every.list<Int?>().findOrNull(ints, predicate) shouldBe ints.firstOrNull(predicate)
         }
       }
 
