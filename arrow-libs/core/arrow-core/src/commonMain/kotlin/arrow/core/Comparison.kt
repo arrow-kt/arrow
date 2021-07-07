@@ -84,6 +84,10 @@ fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
 fun sort(a: Long, vararg aas: Long): List<Long> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
+const val FloatInstanceDeprecation: String =
+  "Comparison operators for Float are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
+
+@Deprecated(FloatInstanceDeprecation)
 fun sort(a: Float, b: Float): Pair<Float, Float> =
   when {
     a.isNaN() -> Pair(b, a)
@@ -91,6 +95,7 @@ fun sort(a: Float, b: Float): Pair<Float, Float> =
     else -> if (a <= b) Pair(a, b) else Pair(b, a)
   }
 
+@Deprecated(FloatInstanceDeprecation)
 fun sort(a: Float, b: Float, c: Float): Triple<Float, Float, Float> =
   when {
     a.isNaN() -> when {
@@ -109,9 +114,14 @@ fun sort(a: Float, b: Float, c: Float): Triple<Float, Float, Float> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
+@Deprecated(FloatInstanceDeprecation)
 fun sort(a: Float, vararg aas: Float): List<Float> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
+const val DoubleInstanceDeprecation: String =
+  "Comparison operators for Double are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
+
+@Deprecated(DoubleInstanceDeprecation)
 fun sort(a: Double, b: Double): Pair<Double, Double> =
   when {
     a.isNaN() -> Pair(b, a)
@@ -119,6 +129,7 @@ fun sort(a: Double, b: Double): Pair<Double, Double> =
     else -> if (a <= b) Pair(a, b) else Pair(b, a)
   }
 
+@Deprecated(DoubleInstanceDeprecation)
 fun sort(a: Double, b: Double, c: Double): Triple<Double, Double, Double> =
   when {
     a.isNaN() -> when {
@@ -137,5 +148,6 @@ fun sort(a: Double, b: Double, c: Double): Triple<Double, Double, Double> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
+@Deprecated(DoubleInstanceDeprecation)
 fun sort(a: Double, vararg aas: Double): List<Double> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
