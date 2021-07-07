@@ -1,5 +1,7 @@
 config.set({
     "browsers": ["MyChromeHeadless"],
+    "browserNoActivityTimeout": 10000000000,
+    "pingTimeout": 10000000000,
     "customLaunchers": {
         "MyChromeHeadless": {
             base: "ChromeHeadless",
