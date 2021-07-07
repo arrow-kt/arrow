@@ -1,12 +1,6 @@
 package arrow.core.extensions
 
-import arrow.core.eqv
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.byteSmall
-import arrow.core.test.generators.floatSmall
-import arrow.core.test.generators.intSmall
-import arrow.core.test.generators.longSmall
-import arrow.core.test.generators.shortSmall
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.SemiringLaws
 import arrow.typeclasses.Monoid
@@ -14,6 +8,8 @@ import arrow.typeclasses.Semiring
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.byte
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.numericDoubles
 import io.kotest.property.arbitrary.numericFloats
 import io.kotest.property.arbitrary.short
@@ -32,11 +28,10 @@ class NumberInstancesTest : UnitSpec() {
   }
 
   init {
-    testAllLaws(Semiring.byte(), Monoid.byte(), Arb.byteSmall())
-    testAllLaws(Semiring.short(), Monoid.short(), Arb.shortSmall())
-    testAllLaws(Semiring.int(), Monoid.int(), Arb.intSmall())
-    testAllLaws(Semiring.long(), Monoid.long(), Arb.longSmall())
-    MonoidLaws.laws(Monoid.float(), Arb.floatSmall(), Float::eqv)
+    testAllLaws(Semiring.byte(), Monoid.byte(), Arb.byte())
+    testAllLaws(Semiring.short(), Monoid.short(), Arb.short())
+    testAllLaws(Semiring.int(), Monoid.int(), Arb.int())
+    testAllLaws(Semiring.long(), Monoid.long(), Arb.long())
 
     /** Semigroup specific instance check */
 
