@@ -22,7 +22,7 @@ kotlin {
         nodejs {
             testTask {
                 useMocha {
-                    timeout = "10000000000"
+                    timeout = "600000"
                 }
             }
         }
