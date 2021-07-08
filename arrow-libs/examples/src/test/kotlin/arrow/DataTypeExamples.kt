@@ -180,9 +180,3 @@ fun playLottery(guess: Int): Int {
         else -> throw NoConnectionException
     }
 }
-
-fun test() {
-  listOf(1, 2, 3).fold(0.right())  { acc, i ->
-    acc.map { it + i }
-  }
-}
