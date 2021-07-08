@@ -14,7 +14,6 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.handleError
 import arrow.core.handleErrorWith
-import arrow.core.right
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 
