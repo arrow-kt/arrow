@@ -207,7 +207,7 @@ class STMTest : ArrowFxSpec(
       }
       tv.unsafeRead() shouldBeExactly 10
     }
-    "concurrent example 1" {
+    "concurrent example 1".config(enabled = false) {
       checkAll {
         val acc1 = TVar.new(100)
         val acc2 = TVar.new(200)
