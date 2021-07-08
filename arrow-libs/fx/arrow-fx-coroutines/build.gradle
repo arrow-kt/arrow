@@ -11,6 +11,22 @@ apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
 
 kotlin {
+    js(BOTH) {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "600000"
+                }
+            }
+        }
+    }
     sourceSets {
         commonMain {
             dependencies {
@@ -34,6 +50,17 @@ kotlin {
             dependencies {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
                 implementation "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+            }
+        }
+        jsMain {
+            dependencies {
+                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+
             }
         }
     }
