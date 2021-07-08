@@ -20,6 +20,6 @@ config.set({
     },
   },
   "pingTimeout": 600000,
-//  "browserNoActivityTimeout": 600000,
-//  "browserDisconnectTimeout": 600000
+  "browserNoActivityTimeout": 600000,
+  "browserDisconnectTimeout": 600000
 });
