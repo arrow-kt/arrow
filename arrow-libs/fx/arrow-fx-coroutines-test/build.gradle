@@ -46,6 +46,7 @@ kotlin {
         jsTest {
             dependencies {
                 implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+
             }
         }
     }
