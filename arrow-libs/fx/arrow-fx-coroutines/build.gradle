@@ -16,7 +16,6 @@ kotlin {
             testTask {
                 useKarma {
                     useChromeHeadless()
-                    useConfigDirectory("${project.rootDir}/karma")
                 }
             }
         }
