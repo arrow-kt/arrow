@@ -14,6 +14,7 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.handleError
 import arrow.core.handleErrorWith
+import arrow.core.right
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 
@@ -178,4 +179,10 @@ fun playLottery(guess: Int): Int {
         in 0..9 -> throw AuthorizationException
         else -> throw NoConnectionException
     }
+}
+
+fun test() {
+  listOf(1, 2, 3).fold(0.right())  { acc, i ->
+    acc.map { it + i }
+  }
 }

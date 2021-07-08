@@ -1,1 +1,1 @@
-../karma.config.d
+../../karma.config.d
