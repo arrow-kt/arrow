@@ -62,14 +62,28 @@ interface Fold<S, A> {
   /**
    * Get the first target or null
    */
-  fun firstOrNull(source: S): A? =
-    foldMap(firstOptionMonoid<A>(), source, ::identity)
+  fun firstOrNull(source: S): A? {
+    val fold = ::fold as (Monoid<Any?>, S) -> Any?
+    val res = fold(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun Any?.combine(b: Any?): Any? =
+        if (this === EMPTY_VALUE) b else this
+    }, source)
+    return EMPTY_VALUE.unbox(res)
+  }
 
   /**
    * Get the last target or null
-   */ // TODO FIX
-  fun lastOrNull(source: S): A? =
-    foldMap(lastOptionMonoid<A>(), source, ::identity)
+   */
+  fun lastOrNull(source: S): A? {
+    val fold = ::fold as (Monoid<Any?>, S) -> Any?
+    val res = fold(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun Any?.combine(b: Any?): Any? =
+        if (b !== EMPTY_VALUE) b else this
+    }, source)
+    return EMPTY_VALUE.unbox(res)
+  }
 
   /**
    * Fold using the given [Monoid] instance.
@@ -92,16 +106,28 @@ interface Fold<S, A> {
   /**
    * Find the first element matching the predicate, if one exists.
    */
-  fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? =
-    foldMap(firstOptionMonoid<A>(), source) { b -> if (predicate(b)) b else null }
+  fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? {
+    val res = foldMap(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun Any?.combine(b: Any?): Any? =
+        if (this === EMPTY_VALUE) b else this
+    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
+    return EMPTY_VALUE.unbox(res)
+  }
 
   /**
    * Check whether at least one element satisfies the predicate.
    *
    * If there are no elements, the result is false.
    */
-  fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    findOrNull(source, predicate)?.let { true } ?: false
+  fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean {
+    val res = foldMap(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun Any?.combine(b: Any?): Any? =
+        if (this === EMPTY_VALUE) b else this
+    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
+    return res !== EMPTY_VALUE
+  }
 
   /**
    * Join two [Fold] with the same target
@@ -118,7 +144,9 @@ interface Fold<S, A> {
   fun <C> left(): Fold<Either<S, C>, Either<A, C>> =
     object : Fold<Either<S, C>, Either<A, C>> {
       override fun <R> foldMap(M: Monoid<R>, source: Either<S, C>, map: (Either<A, C>) -> R): R =
-        source.fold({ a1: S -> this@Fold.foldMap(M, a1) { b -> map(Either.Left(b)) } }, { c -> map(Either.Right(c)) })
+        source.fold(
+          { a1: S -> this@Fold.foldMap(M, a1) { b -> map(Either.Left(b)) } },
+          { c -> map(Either.Right(c)) })
     }
 
   /**
