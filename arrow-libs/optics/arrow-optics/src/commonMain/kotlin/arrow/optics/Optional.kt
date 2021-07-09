@@ -6,6 +6,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.prependTo
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -76,7 +77,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
     getOrModify(source).fold(::identity) { a -> set(source, map(a)) }
 
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrNull(source)?.let(map) ?: M.empty()
+    getOrModify(source).map(map).fold({ M.empty() }, ::identity)
 
   /**
    * Get the focus of a [POptional] or `null` if the is not there
@@ -141,7 +142,11 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
    */
   infix fun <C, D> compose(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
     POptional(
-      { source -> getOrModify(source).flatMap { a -> other.getOrModify(a).bimap({ b -> set(source, b) }, ::identity) } },
+      { source ->
+        getOrModify(source).flatMap { a ->
+          other.getOrModify(a).bimap({ b -> set(source, b) }, ::identity)
+        }
+      },
       { source, d -> modify(source) { a -> other.set(a, d) } }
     )
 
@@ -186,8 +191,8 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
      */
     @JvmStatic
     fun <A> listHead(): Optional<List<A>, A> = Optional(
-      getOption = { Option.fromNullable(it.firstOrNull()) },
-      set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
+      getOption = { if (it.isNotEmpty()) Some(it[0]) else None },
+      set = { list, newHead -> if (list.isNotEmpty()) newHead prependTo list.drop(1) else emptyList() }
     )
 
     /**
@@ -196,11 +201,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
     @JvmStatic
     fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
       getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
-      set = { list, newTail ->
-        list.firstOrNull()?.let {
-          listOf(it) + newTail
-        } ?: emptyList()
-      }
+      set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
     )
   }
 }

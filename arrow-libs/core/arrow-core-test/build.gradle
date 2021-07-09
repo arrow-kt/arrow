@@ -9,49 +9,15 @@ apply from: "$ANIMALSNIFFER_MPP"
 apply plugin: 'kotlinx-atomicfu'
 
 kotlin {
-    js(BOTH) {
-        browser()
-        nodejs()
-    }
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 api project(":arrow-core")
                 api project(":arrow-continuations")
                 api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
                 api "io.kotest:kotest-property:$KOTEST_VERSION"
                 api "io.kotest:kotest-framework-api:$KOTEST_VERSION"
                 api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation project(":arrow-core-test")
-            }
-        }
-        jvmMain {
-            dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
-            }
-        }
-        jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-                implementation project(":arrow-core-retrofit")
-                implementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
-                implementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
-            }
-        }
-        jsMain {
-            dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
-            }
-        }
-        jsTest {
-            dependencies {
-                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-
             }
         }
     }
