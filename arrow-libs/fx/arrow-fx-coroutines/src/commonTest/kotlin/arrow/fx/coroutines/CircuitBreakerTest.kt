@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.test.stackSafeIteration
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -253,15 +254,15 @@ class CircuitBreakerTest : ArrowFxSpec(
     "should be stack safe for successful async tasks" {
       stackSafeSuspend(
         CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes)!!,
-        20_000, 0
-      ) shouldBe 20_000
+        stackSafeIteration(), 0
+      ) shouldBe stackSafeIteration()
     }
 
     "should be stack safe for successful immediate tasks" {
       stackSafeImmediate(
         CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes)!!,
-        20_000, 0
-      ) shouldBe 20_000
+        stackSafeIteration(), 0
+      ) shouldBe stackSafeIteration()
     }
   }
 )
