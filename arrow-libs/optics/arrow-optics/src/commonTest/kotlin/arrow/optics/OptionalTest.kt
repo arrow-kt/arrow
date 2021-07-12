@@ -15,7 +15,9 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
 class OptionalTest : UnitSpec() {
@@ -62,65 +64,64 @@ class OptionalTest : UnitSpec() {
     with(Optional.listHead<Int>()) {
 
       "asFold should behave as valid Fold: size" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           size(ints) shouldBe ints.firstOrNull().toOption().map { 1 }.getOrElse { 0 }
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           isNotEmpty(ints) shouldBe ints.firstOrNull().toOption().nonEmpty()
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           isEmpty(ints) shouldBe ints.firstOrNull().toOption().isEmpty()
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           getAll(ints) shouldBe ints.firstOrNull().toOption().toList()
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           combineAll(Monoid.int(), ints) shouldBe
             ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        checkAll { ints: List<Int> ->
+        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           fold(Monoid.int(), ints) shouldBe
             ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
+    }
 
-      "asFold should behave as valid Fold: headOption" {
-        checkAll { ints: List<Int> ->
-          firstOrNull(ints) shouldBe ints.firstOrNull()
-        }
+    "listHead.firstOrNull == firstOrNull" {
+      checkAll(Arb.list(Arb.int().orNull())) { ints ->
+        Optional.listHead<Int?>().firstOrNull(ints) shouldBe ints.firstOrNull()
       }
+    }
 
-      // TODO FIX
-//      "asFold should behave as valid Fold: lastOption" {
-//        checkAll { ints: List<Int> ->
-//          lastOrNull(ints) shouldBe ints.lastOrNull()
-//        }
-//      }
+    "listHead.lastOrNull == firstOrNull" {
+      checkAll(Arb.list(Arb.int().orNull())) { ints ->
+        Optional.listHead<Int?>().lastOrNull(ints) shouldBe ints.firstOrNull()
+      }
     }
 
     "unit should always " {
-      checkAll { string: String ->
+      checkAll(Arb.string()) { string: String ->
         Optional.void<String, Int>().getOrNull(string) shouldBe null
       }
     }
 
     "unit should always return source when setting target" {
-      checkAll { int: Int, string: String ->
+      checkAll(Arb.int(), Arb.string()) { int: Int, string: String ->
         Optional.void<String, Int>().set(string, int) shouldBe string
       }
     }
@@ -152,8 +153,8 @@ class OptionalTest : UnitSpec() {
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      checkAll(Arb.list(Arb.int()), Arb.bool()) { list, predicate ->
-        Optional.listHead<Int>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
+      checkAll(Arb.list(Arb.int().orNull()), Arb.bool()) { list, predicate ->
+        Optional.listHead<Int?>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
       }
     }
 
