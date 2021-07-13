@@ -7,9 +7,9 @@ import arrow.core.Either.Right
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
-typealias Valid<A> = Validated.Valid<A>
-typealias Invalid<E> = Validated.Invalid<E>
+public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
+public typealias Valid<A> = Validated.Valid<A>
+public typealias Invalid<E> = Validated.Invalid<E>
 
 /**
  *
@@ -429,28 +429,28 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```
  */
-sealed class Validated<out E, out A> {
+public sealed class Validated<out E, out A> {
 
-  companion object {
-
-    @JvmStatic
-    fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(nonEmptyListOf(e))
+  public companion object {
 
     @JvmStatic
-    fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
+    public fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(nonEmptyListOf(e))
+
+    @JvmStatic
+    public fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
     @JvmStatic
-    fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
+    public fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
     /**
      * Converts an `Option<A>` to a `Validated<E, A>`, where the provided `ifNone` output value is returned as [Invalid]
      * when the specified `Option` is `None`.
      */
     @JvmStatic
-    inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
+    public inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
       o.fold(
         { Invalid(ifNone()) },
         { Valid(it) }
@@ -461,12 +461,12 @@ sealed class Validated<out E, out A> {
      * when the specified value is null.
      */
     @JvmStatic
-    inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
+    public inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
+    public inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
       try {
         f().valid()
       } catch (e: Throwable) {
@@ -475,11 +475,11 @@ sealed class Validated<out E, out A> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
+    public inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
       catch(f).mapLeft(recover)
 
     @JvmStatic
-    inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
+    public inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
       } catch (e: Throwable) {
@@ -504,7 +504,7 @@ sealed class Validated<out E, out A> {
      * ```
      */
     @JvmStatic
-    inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
+    public inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
       { fa -> fa.map(f) }
 
     /**
@@ -525,7 +525,7 @@ sealed class Validated<out E, out A> {
      * ```
      */
     @JvmStatic
-    inline fun <A, B, C, D> lift(
+    public inline fun <A, B, C, D> lift(
       crossinline fl: (A) -> C,
       crossinline fr: (B) -> D
     ): (Validated<A, B>) -> Validated<C, D> =
@@ -548,25 +548,25 @@ sealed class Validated<out E, out A> {
    * }
    * ```
    */
-  fun void(): Validated<E, Unit> =
+  public fun void(): Validated<E, Unit> =
     map { Unit }
 
-  inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
+  public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
-  inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
+  public inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> this.right()
     }
 
-  inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
+  public inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> None
     }
 
-  inline fun <B> bifoldLeft(
+  public inline fun <B> bifoldLeft(
     c: B,
     fe: (B, E) -> B,
     fa: (B, A) -> B
@@ -574,33 +574,33 @@ sealed class Validated<out E, out A> {
     fold({ fe(c, it) }, { fa(c, it) })
 
   @Deprecated(FoldRightDeprecation)
-  inline fun <B> bifoldRight(
+  public inline fun <B> bifoldRight(
     c: Eval<B>,
     fe: (E, Eval<B>) -> Eval<B>,
     fa: (A, Eval<B>) -> Eval<B>
   ): Eval<B> =
     fold({ fe(it, c) }, { fa(it, c) })
 
-  inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B) = MN.run {
+  public inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B): B = MN.run {
     bifoldLeft(MN.empty(), { c, b -> c.combine(g(b)) }) { c, a -> c.combine(f(a)) }
   }
 
-  inline fun <EE, B> bitraverse(fe: (E) -> Iterable<EE>, fa: (A) -> Iterable<B>): List<Validated<EE, B>> =
+  public inline fun <EE, B> bitraverse(fe: (E) -> Iterable<EE>, fa: (A) -> Iterable<B>): List<Validated<EE, B>> =
     fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
 
-  inline fun <EE, B, C> bitraverseEither(
+  public inline fun <EE, B, C> bitraverseEither(
     fe: (E) -> Either<EE, B>,
     fa: (A) -> Either<EE, C>
   ): Either<EE, Validated<B, C>> =
     fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
 
-  inline fun <B, C> bitraverseOption(
+  public inline fun <B, C> bitraverseOption(
     fe: (E) -> Option<B>,
     fa: (A) -> Option<C>
   ): Option<Validated<B, C>> =
     fold({ fe(it).map(::Invalid) }, { fa(it).map(::Valid) })
 
-  inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
+  public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
 
   override fun toString(): String = fold(
@@ -608,78 +608,78 @@ sealed class Validated<out E, out A> {
     { "Validated.Valid($it)" }
   )
 
-  data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
+  public data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
     override fun toString(): String = "Validated.Valid($value)"
 
-    companion object {
+    public companion object {
       @PublishedApi
       internal val unit: Validated<Nothing, Unit> =
         Validated.Valid(Unit)
     }
   }
 
-  data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
+  public data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
     override fun toString(): String = "Validated.Invalid($value)"
   }
 
-  inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
+  public inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
       is Valid -> fa(value)
       is Invalid -> (fe(value))
     }
 
-  val isValid =
+  public val isValid: Boolean =
     fold({ false }, { true })
-  val isInvalid =
+  public val isInvalid: Boolean =
     fold({ true }, { false })
 
   /**
    * Is this Valid and matching the given predicate
    */
-  inline fun exist(predicate: (A) -> Boolean): Boolean =
+  public inline fun exist(predicate: (A) -> Boolean): Boolean =
     fold({ false }, predicate)
 
-  inline fun findOrNull(predicate: (A) -> Boolean): A? =
+  public inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
       is Valid -> if (predicate(this.value)) this.value else null
       is Invalid -> null
     }
 
-  inline fun all(predicate: (A) -> Boolean): Boolean =
+  public inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
-  fun isEmpty(): Boolean = isInvalid
+  public fun isEmpty(): Boolean = isInvalid
 
-  fun isNotEmpty(): Boolean = isValid
+  public fun isNotEmpty(): Boolean = isValid
 
   /**
    * Converts the value to an Either<E, A>
    */
-  fun toEither(): Either<E, A> =
+  public fun toEither(): Either<E, A> =
     fold(::Left, ::Right)
 
   /**
    * Returns Valid values wrapped in Some, and None for Invalid values
    */
-  fun toOption(): Option<A> =
+  public fun toOption(): Option<A> =
     fold({ None }, ::Some)
 
   /**
    * Convert this value to a single element List if it is Valid,
    * otherwise return an empty List
    */
-  fun toList(): List<A> =
+  public fun toList(): List<A> =
     fold({ listOf() }, ::listOf)
 
   /** Lift the Invalid value into a NonEmptyList. */
-  fun toValidatedNel(): ValidatedNel<E, A> =
+  public fun toValidatedNel(): ValidatedNel<E, A> =
     fold({ invalidNel(it) }, ::Valid)
 
   /**
    * Convert to an Either, apply a function, convert back. This is handy
    * when you want to use the Monadic properties of the Either type.
    */
-  inline fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> =
+  public inline fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> =
     fromEither(f(toEither()))
 
   /**
@@ -687,44 +687,44 @@ sealed class Validated<out E, out A> {
    *
    * Apply a function to an Invalid or Valid value, returning a new Invalid or Valid value respectively.
    */
-  inline fun <EE, B> bimap(fe: (E) -> EE, fa: (A) -> B): Validated<EE, B> =
+  public inline fun <EE, B> bimap(fe: (E) -> EE, fa: (A) -> B): Validated<EE, B> =
     fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
 
   /**
    * Apply a function to a Valid value, returning a new Valid value
    */
-  inline fun <B> map(f: (A) -> B): Validated<E, B> =
+  public inline fun <B> map(f: (A) -> B): Validated<E, B> =
     bimap(::identity, f)
 
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
    * Or, if the original valid was Valid, return it.
    */
-  inline fun <EE> mapLeft(f: (E) -> EE): Validated<EE, A> =
+  public inline fun <EE> mapLeft(f: (E) -> EE): Validated<EE, A> =
     bimap(f, ::identity)
 
   /**
    * apply the given function to the value with the given B when
    * valid, otherwise return the given B
    */
-  inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
+  public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     fold({ b }, { f(b, it) })
 
   @Deprecated(FoldRightDeprecation)
-  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  public fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     when (this) {
       is Valid -> Eval.defer { f(this.value, lb) }
       is Invalid -> lb
     }
 
-  fun swap(): Validated<A, E> =
+  public fun swap(): Validated<A, E> =
     fold(::Valid, ::Invalid)
 }
 
-fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
+public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
   zip(SE, fb, ::Pair)
 
-inline fun <E, A, B, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   f: (A, B) -> Z
@@ -744,7 +744,7 @@ inline fun <E, A, B, Z> Validated<E, A>.zip(
     f(a, b)
   }
 
-inline fun <E, A, B, C, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -765,7 +765,7 @@ inline fun <E, A, B, C, Z> Validated<E, A>.zip(
     f(a, b, c)
   }
 
-inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -787,7 +787,7 @@ inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
     f(a, b, c, d)
   }
 
-inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -810,7 +810,7 @@ inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
     f(a, b, c, d, e)
   }
 
-inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -834,7 +834,7 @@ inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
     f(a, b, c, d, e, ff)
   }
 
-inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -848,7 +848,7 @@ inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
     f(a, b, c, d, e, ff, g)
   }
 
-inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -863,7 +863,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
     f(a, b, c, d, e, ff, g, h)
   }
 
-inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -879,7 +879,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
     f(a, b, c, d, e, ff, g, h, i)
   }
 
-inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   c: Validated<E, C>,
@@ -920,20 +920,20 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
     Validated.Invalid(accumulatedError as E)
   }
 
-inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   f: (A, B) -> Z
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, f)
 
-inline fun <E, A, B, C, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   f: (A, B, C) -> Z
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, f)
 
-inline fun <E, A, B, C, D, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -941,7 +941,7 @@ inline fun <E, A, B, C, D, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, f)
 
-inline fun <E, A, B, C, D, EE, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -950,7 +950,7 @@ inline fun <E, A, B, C, D, EE, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, f)
 
-inline fun <E, A, B, C, D, EE, FF, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, FF, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -960,7 +960,7 @@ inline fun <E, A, B, C, D, EE, FF, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, f)
 
-inline fun <E, A, B, C, D, EE, F, G, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -971,7 +971,7 @@ inline fun <E, A, B, C, D, EE, F, G, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, f)
 
-inline fun <E, A, B, C, D, EE, F, G, H, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -983,7 +983,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, f)
 
-inline fun <E, A, B, C, D, EE, F, G, H, I, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -996,7 +996,7 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, Z> ValidatedNel<E, A>.zip(
 ): ValidatedNel<E, Z> =
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, f)
 
-inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
   b: ValidatedNel<E, B>,
   c: ValidatedNel<E, C>,
   d: ValidatedNel<E, D>,
@@ -1026,46 +1026,46 @@ inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  * }
  * ```
  */
-fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
+public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
 
-fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
+public fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
   this
 
-fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
+public fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
   if (n <= 0) emptyList<A>().valid()
   else this.zip(SE, replicate(SE, n - 1)) { a, xs -> listOf(a) + xs }
 
-fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): Validated<E, A> =
+public fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): Validated<E, A> =
   if (n <= 0) MA.empty().valid()
   else this@replicate.zip(SE, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
-fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
+public fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
   bitraverse(::identity, ::identity)
 
-fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
+public fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
   bitraverseEither(::identity, ::identity)
 
-fun <A, B> Validated<Option<A>, Option<B>>.bisequenceOption(): Option<Validated<A, B>> =
+public fun <A, B> Validated<Option<A>, Option<B>>.bisequenceOption(): Option<Validated<A, B>> =
   bitraverseOption(::identity, ::identity)
 
-fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
+public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
 
-fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
+public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 
-fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
+public fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
-fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
+public fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   traverseEither(::identity)
 
-fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
+public fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
   traverseOption(::identity)
 
-operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
+public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
     { l1 -> other.fold({ l2 -> l1.compareTo(l2) }, { -1 }) },
     { r1 -> other.fold({ 1 }, { r2 -> r1.compareTo(r2) }) }
@@ -1074,29 +1074,29 @@ operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(ot
 /**
  * Return the Valid value, or the default if Invalid
  */
-inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
+public inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
   fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid
  */
-fun <E, A> Validated<E, A>.orNull(): A? =
+public fun <E, A> Validated<E, A>.orNull(): A? =
   getOrElse { null }
 
-fun <E, A> Validated<E, A>.orNone(): Option<A> =
+public fun <E, A> Validated<E, A>.orNone(): Option<A> =
   fold({ None }, { Some(it) })
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
+public inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
   fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
  * This is similar to [orElse] except that here failures are accumulated.
  */
-inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
+public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
   fold(
     { e ->
       that().fold(
@@ -1112,34 +1112,34 @@ inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Valida
  * The functionality is similar to that of [findValid] except for failure accumulation,
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
-inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
+public inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
   fold(
     { default() },
     { Valid(it) }
   )
 
-inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
+public inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
   when (this) {
     is Validated.Valid -> this
     is Validated.Invalid -> f(this.value)
   }
 
-inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
+public inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
   when (this) {
     is Validated.Valid -> this
     is Validated.Invalid -> Valid(f(this.value))
   }
 
-inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
+public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
   when (this) {
     is Validated.Valid -> map(fa)
     is Validated.Invalid -> Valid(fe(this.value))
   }
 
-fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
+public fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
-fun <E, A> Validated<E, A>.combine(
+public fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,
   SA: Semigroup<A>,
   y: Validated<E, A>
@@ -1151,7 +1151,7 @@ fun <E, A> Validated<E, A>.combine(
     else -> y
   }
 
-fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Validated<E, A> {
+public fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Validated<E, A> {
   return when (this) {
     is Valid -> this
     is Invalid -> when (y) {
@@ -1164,17 +1164,17 @@ fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Valid
 /**
  * Converts the value to an Ior<E, A>
  */
-fun <E, A> Validated<E, A>.toIor(): Ior<E, A> =
+public fun <E, A> Validated<E, A>.toIor(): Ior<E, A> =
   fold({ Ior.Left(it) }, { Ior.Right(it) })
 
-inline fun <A> A.valid(): Validated<Nothing, A> =
+public inline fun <A> A.valid(): Validated<Nothing, A> =
   Valid(this)
 
-inline fun <E> E.invalid(): Validated<E, Nothing> =
+public inline fun <E> E.invalid(): Validated<E, Nothing> =
   Invalid(this)
 
-inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
+public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
   Validated.validNel(this)
 
-inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
+public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)

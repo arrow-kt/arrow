@@ -30,7 +30,7 @@ import kotlin.jvm.JvmName
  *
  * Note that calling this function with the same parameters in parallel might cause the function to be executed twice.
  */
-fun <R> (() -> R).memoize(): () -> R {
+public fun <R> (() -> R).memoize(): () -> R {
   val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
   return { m(MemoizeKey0(0)) }
 }
@@ -38,7 +38,7 @@ fun <R> (() -> R).memoize(): () -> R {
 /**
  * @see memoize
  */
-fun <P1, R> ((P1) -> R).memoize(): (P1) -> R {
+public fun <P1, R> ((P1) -> R).memoize(): (P1) -> R {
   val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
   return { p1 -> m(MemoizeKey1(p1)) }
 }
@@ -46,7 +46,7 @@ fun <P1, R> ((P1) -> R).memoize(): (P1) -> R {
 /**
  * @see memoize
  */
-fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R {
+public fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R {
   val m = MemoizedHandler<((P1, P2) -> R), MemoizeKey2<P1, P2, R>, R>(this@memoize)
   return { p1: P1, p2: P2 -> m(MemoizeKey2(p1, p2)) }
 }
@@ -54,7 +54,7 @@ fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R {
 /**
  * @see memoize
  */
-fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R {
+public fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R {
   val m = MemoizedHandler<((P1, P2, P3) -> R), MemoizeKey3<P1, P2, P3, R>, R>(this@memoize)
   return { p1: P1, p2: P2, p3: P3 -> m(MemoizeKey3(p1, p2, p3)) }
 }
@@ -62,7 +62,7 @@ fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R {
 /**
  * @see memoize
  */
-fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R {
+public fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R {
   val m = MemoizedHandler<((P1, P2, P3, P4) -> R), MemoizeKey4<P1, P2, P3, P4, R>, R>(this@memoize)
   return { p1: P1, p2: P2, p3: P3, p4: P4 -> m(MemoizeKey4(p1, p2, p3, p4)) }
 }
@@ -70,7 +70,7 @@ fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R
 /**
  * @see memoize
  */
-fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P2, P3, P4, P5) -> R {
+public fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P2, P3, P4, P5) -> R {
   val m = MemoizedHandler<((P1, P2, P3, P4, P5) -> R), MemoizeKey5<P1, P2, P3, P4, P5, R>, R>(this@memoize)
   return { p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 -> m(MemoizeKey5(p1, p2, p3, p4, p5)) }
 }

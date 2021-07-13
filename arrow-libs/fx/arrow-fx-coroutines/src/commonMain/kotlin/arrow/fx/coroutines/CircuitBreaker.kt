@@ -9,7 +9,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class CircuitBreaker
+public class CircuitBreaker
 private constructor(
   private val state: AtomicRefW<State>,
   private val maxFailures: Int,
@@ -24,7 +24,7 @@ private constructor(
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
-  suspend fun state(): State = state.value
+  public suspend fun state(): State = state.value
 
   /**
    * Awaits for this `CircuitBreaker` to be [CircuitBreaker.State.Closed].
@@ -34,7 +34,7 @@ private constructor(
    * the `CircuitBreaker` switches to the [CircuitBreaker.Closed]
    * state again.
    */
-  suspend fun awaitClose(): Unit =
+  public suspend fun awaitClose(): Unit =
     when (val curr = state.value) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
@@ -46,7 +46,7 @@ private constructor(
    * task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs, other than an [ExecutionRejected] exception, it will be rethrown.
    */
-  suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> =
+  public suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> =
     try {
       Either.Right(protectOrThrow(fa))
     } catch (e: ExecutionRejected) {
@@ -58,7 +58,7 @@ private constructor(
    * task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs it will be rethrown
    */
-  tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
+  public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
     when (val curr = state.value) {
       is Closed -> {
         val attempt = try {
@@ -201,7 +201,7 @@ private constructor(
    * @param callback will be executed when tasks get rejected.
    * @return a new circuit breaker wrapping the state of the source.
    */
-  fun doOnRejectedTask(callback: suspend () -> Unit): CircuitBreaker =
+  public fun doOnRejectedTask(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
@@ -227,7 +227,7 @@ private constructor(
    * @param callback will be executed when the state evolves into [CircuitBreaker.Closed].
    * @return a new circuit breaker wrapping the state of the source.
    */
-  fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
+  public fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
@@ -253,7 +253,7 @@ private constructor(
    * @param callback is to be executed when the state evolves into [CircuitBreaker.HalfOpen]
    * @return a new circuit breaker wrapping the state of the source
    */
-  fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
+  public fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
@@ -279,7 +279,7 @@ private constructor(
    * @param callback will be executed when the state evolves into [CircuitBreaker.Open]
    * @return a new circuit breaker wrapping the state of the source
    */
-  fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
+  public fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
@@ -301,7 +301,7 @@ private constructor(
    *  - [HalfOpen] in case a reset attempt was triggered and it is waiting for
    *    the result in order to evolve in [Closed], or back to [Open]
    */
-  sealed class State {
+  public sealed class State {
 
     /** The initial [State] of the [CircuitBreaker]. While in this
      * state, the circuit breaker allows tasks to be executed.
@@ -314,7 +314,7 @@ private constructor(
      *
      * @param failures is the current failures count
      */
-    class Closed(val failures: Int) : State() {
+    public class Closed(public val failures: Int) : State() {
       override fun hashCode(): Int =
         failures.hashCode()
 
@@ -326,9 +326,9 @@ private constructor(
         "Closed(failures=$failures)"
     }
 
-    class Open internal constructor(
-      val startedAt: Long,
-      val resetTimeoutNanos: Double,
+    public class Open internal constructor(
+      public val startedAt: Long,
+      public val resetTimeoutNanos: Double,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
 
@@ -349,7 +349,7 @@ private constructor(
        *        exponential backoff factor for the next transition from
        *        `HalfOpen` to `Open`, in case the reset attempt fails
        */
-      constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
+      public constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
         startedAt,
         resetTimeoutNanos,
         CompletableDeferred()
@@ -361,7 +361,7 @@ private constructor(
        * It is calculated as:
        * `startedAt + resetTimeout`
        */
-      val expiresAt: Long = startedAt + (resetTimeoutNanos.toLong() / 1_000_000)
+      public val expiresAt: Long = startedAt + (resetTimeoutNanos.toLong() / 1_000_000)
 
       override fun equals(other: Any?): Boolean =
         if (other is Open) this.startedAt == startedAt &&
@@ -380,8 +380,8 @@ private constructor(
       }
     }
 
-    class HalfOpen internal constructor(
-      val resetTimeoutNanos: Double,
+    public class HalfOpen internal constructor(
+      public val resetTimeoutNanos: Double,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
 
@@ -407,7 +407,7 @@ private constructor(
        *        the exponential backoff factor for the next transition to
        *        `Open`, in case the reset attempt fails.
        */
-      constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos, CompletableDeferred())
+      public constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos, CompletableDeferred())
 
       override fun hashCode(): Int =
         resetTimeoutNanos.hashCode()
@@ -421,9 +421,9 @@ private constructor(
     }
   }
 
-  class ExecutionRejected(val reason: String, val state: State) : Throwable()
+  public class ExecutionRejected(public val reason: String, public val state: State) : Throwable()
 
-  companion object {
+  public companion object {
     /**
      * Attempts to create a [CircuitBreaker].
      *
@@ -453,7 +453,7 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
-    suspend fun of(
+    public suspend fun of(
       maxFailures: Int,
       resetTimeoutNanos: Double,
       exponentialBackoffFactor: Double = 1.0,
@@ -507,7 +507,7 @@ private constructor(
      *
      */
     @ExperimentalTime
-    suspend fun of(
+    public suspend fun of(
       maxFailures: Int,
       resetTimeout: Duration,
       exponentialBackoffFactor: Double = 1.0,

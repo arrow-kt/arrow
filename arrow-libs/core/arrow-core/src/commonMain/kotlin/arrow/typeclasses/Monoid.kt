@@ -15,69 +15,69 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.collections.plus as _plus
 
-interface Monoid<A> : Semigroup<A> {
+public interface Monoid<A> : Semigroup<A> {
   /**
    * A zero value for this A
    */
-  fun empty(): A
+  public fun empty(): A
 
   /**
    * Combine an [Collection] of [A] values.
    */
-  fun Collection<A>.combineAll(): A =
+  public fun Collection<A>.combineAll(): A =
     if (isEmpty()) empty() else reduce { a, b -> a.combine(b) }
 
   /**
    * Combine an array of [A] values.
    */
-  fun combineAll(elems: List<A>): A = elems.combineAll()
+  public fun combineAll(elems: List<A>): A = elems.combineAll()
 
-  companion object {
+  public companion object {
     @JvmStatic
     @JvmName("Boolean")
-    fun boolean(): Monoid<Boolean> = AndMonoid
+    public fun boolean(): Monoid<Boolean> = AndMonoid
 
     @JvmStatic
     @JvmName("Byte")
-    fun byte(): Monoid<Byte> = ByteMonoid
+    public fun byte(): Monoid<Byte> = ByteMonoid
 
     @JvmStatic
     @JvmName("Double")
     @Deprecated(DoubleInstanceDeprecation)
-    fun double(): Monoid<Double> = DoubleMonoid
+    public fun double(): Monoid<Double> = DoubleMonoid
 
     @JvmStatic
     @JvmName("Integer")
-    fun int(): Monoid<Int> = IntMonoid
+    public fun int(): Monoid<Int> = IntMonoid
 
     @JvmStatic
     @JvmName("Long")
-    fun long(): Monoid<Long> = LongMonoid
+    public fun long(): Monoid<Long> = LongMonoid
 
     @JvmStatic
     @JvmName("Short")
-    fun short(): Monoid<Short> = ShortMonoid
+    public fun short(): Monoid<Short> = ShortMonoid
 
     @JvmStatic
     @JvmName("Float")
     @Deprecated(FloatInstanceDeprecation)
-    fun float(): Monoid<Float> = FloatMonoid
+    public fun float(): Monoid<Float> = FloatMonoid
 
     @JvmStatic
-    fun <A> list(): Monoid<List<A>> = ListMonoid as Monoid<List<A>>
+    public fun <A> list(): Monoid<List<A>> = ListMonoid as Monoid<List<A>>
 
     @JvmStatic
-    fun <A> sequence(): Monoid<Sequence<A>> = SequenceMonoid as Monoid<Sequence<A>>
+    public fun <A> sequence(): Monoid<Sequence<A>> = SequenceMonoid as Monoid<Sequence<A>>
 
     @JvmStatic
-    fun string(): Monoid<String> = StringMonoid
+    public fun string(): Monoid<String> = StringMonoid
 
     @JvmStatic
-    fun <A, B> either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
+    public fun <A, B> either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
       EitherMonoid(MA, MB)
 
     @JvmStatic
-    fun <A> endo(): Monoid<Endo<A>> =
+    public fun <A> endo(): Monoid<Endo<A>> =
       object : Monoid<Endo<A>> {
         override fun empty(): Endo<A> = Endo(::identity)
         override fun Endo<A>.combine(g: Endo<A>): Endo<A> = Endo(f.compose(g.f))
@@ -85,26 +85,26 @@ interface Monoid<A> : Semigroup<A> {
 
     @JvmStatic
     @JvmName("constant")
-    fun <A, T> const(MA: Monoid<A>): Monoid<Const<A, T>> =
+    public fun <A, T> const(MA: Monoid<A>): Monoid<Const<A, T>> =
       object : Monoid<Const<A, T>> {
         override fun empty(): Const<A, T> = Const(MA.empty())
         override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> = this.combine(MA, b)
       }
 
     @JvmStatic
-    fun <K, A> map(SG: Semigroup<A>): Monoid<Map<K, A>> =
+    public fun <K, A> map(SG: Semigroup<A>): Monoid<Map<K, A>> =
       MapMonoid(SG)
 
     @JvmStatic
-    fun <A> option(MA: Semigroup<A>): Monoid<Option<A>> =
+    public fun <A> option(MA: Semigroup<A>): Monoid<Option<A>> =
       OptionMonoid(MA)
 
     @JvmStatic
-    fun <E, A> validated(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
+    public fun <E, A> validated(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
       ValidatedMonoid(SE, MA)
 
     @JvmStatic
-    fun <A, B> pair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
+    public fun <A, B> pair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
       PairMonoid(MA, MB)
 
     private class ValidatedMonoid<A, B>(

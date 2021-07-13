@@ -25,29 +25,29 @@ import kotlinx.atomicfu.updateAndGet
  *
  * [AtomicRef] also offers some other interesting operators such as [modify], [tryUpdate], [access] & [lens].
  */
-interface Atomic<A> {
+public interface Atomic<A> {
 
   /**
    * Obtains the current value.
    * Since [AtomicRef] is always guaranteed to have a value, the returned action completes immediately after being bound.
    */
-  suspend fun get(): A
+  public suspend fun get(): A
 
   /**
    * Sets the current value to [a].
    * The returned action completes after the reference has been successfully set.
    */
-  suspend fun set(a: A): Unit
+  public suspend fun set(a: A): Unit
 
   /**
    * Replaces the current value with [a], returning the *old* value.
    */
-  suspend fun getAndSet(a: A): A
+  public suspend fun getAndSet(a: A): A
 
   /**
    * Replaces the current value with [a], returning the *new* value.
    */
-  suspend fun setAndGet(a: A): A
+  public suspend fun setAndGet(a: A): A
 
   /**
    * Updates the current value using the supplied function [f].
@@ -55,21 +55,21 @@ interface Atomic<A> {
    * If another modification occurs between the time the current value is read and subsequently updated,
    * the modification is retried using the new value. Hence, [f] may be invoked multiple times.
    */
-  suspend fun update(f: (A) -> A): Unit
+  public suspend fun update(f: (A) -> A): Unit
 
   /**
    * Modifies the current value using the supplied update function and returns the *old* value.
    *
    * @see [update], [f] may be invoked multiple times.
    */
-  suspend fun getAndUpdate(f: (A) -> A): A
+  public suspend fun getAndUpdate(f: (A) -> A): A
 
   /**
    * Modifies the current value using the supplied update function and returns the *new* value.
    *
    * @see [update], [f] may be invoked multiple times.
    */
-  suspend fun updateAndGet(f: (A) -> A): A
+  public suspend fun updateAndGet(f: (A) -> A): A
 
   /**
    * Modify allows to inspect the state [A] of the [AtomicRef], update it and extract a different state [B].
@@ -98,7 +98,7 @@ interface Atomic<A> {
    * }
    * ```
    */
-  suspend fun <B> modify(f: (A) -> Pair<A, B>): B
+  public suspend fun <B> modify(f: (A) -> Pair<A, B>): B
 
   /**
    * ModifyGet allows to inspect state [A], update it and extract a different state [B].
@@ -106,14 +106,14 @@ interface Atomic<A> {
    *
    * @see [modify] for an example
    */
-  suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B>
+  public suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B>
 
   /**
    * Attempts to modify the current value once, in contrast to [update] which calls [f] until it succeeds.
    *
    * @returns `false` if concurrent modification completes between the time the variable is read and the time it is set.
    */
-  suspend fun tryUpdate(f: (A) -> A): Boolean
+  public suspend fun tryUpdate(f: (A) -> A): Boolean
 
   /**
    * Attempts to inspect the state, uptade it, and extract a different state.
@@ -122,7 +122,7 @@ interface Atomic<A> {
    *
    * @returns `null` if the update fails and [B] otherwise.
    */
-  suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B?
+  public suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B?
 
   /**
    * Obtains a snapshot of the current value, and a setter for updating it.
@@ -134,7 +134,7 @@ interface Atomic<A> {
    *
    * Once it has returned `false` or been used once, a setter never succeeds again.
    */
-  suspend fun access(): Pair<A, suspend (A) -> Boolean>
+  public suspend fun access(): Pair<A, suspend (A) -> Boolean>
 
   /**
    * Creates an [AtomicRef] for [B] based on provided a [get] and [set] operation.
@@ -171,10 +171,10 @@ interface Atomic<A> {
    * }
    * ```
    */
-  fun <B> lens(get: (A) -> B, set: (A, B) -> A): arrow.fx.coroutines.Atomic<B> =
+  public fun <B> lens(get: (A) -> B, set: (A, B) -> A): arrow.fx.coroutines.Atomic<B> =
     LensAtomic(this, get, set)
 
-  companion object {
+  public companion object {
 
     /**
      * Creates an [AtomicRef] with an initial value of [A].
@@ -193,8 +193,8 @@ interface Atomic<A> {
      * }
      * ```
      */
-    suspend operator fun <A> invoke(a: A): arrow.fx.coroutines.Atomic<A> = unsafe(a)
-    fun <A> unsafe(a: A): arrow.fx.coroutines.Atomic<A> = DefaultAtomic(a)
+    public suspend operator fun <A> invoke(a: A): arrow.fx.coroutines.Atomic<A> = unsafe(a)
+    public fun <A> unsafe(a: A): arrow.fx.coroutines.Atomic<A> = DefaultAtomic(a)
   }
 }
 
@@ -202,28 +202,28 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
 
   private val ar: AtomicRef<A> = atomic(a)
 
-  override suspend fun get(): A =
+  public override suspend fun get(): A =
     ar.value
 
-  override suspend fun set(a: A): Unit {
+  public override suspend fun set(a: A): Unit {
     ar.value = a
   }
 
-  override suspend fun getAndSet(a: A): A =
+  public override suspend fun getAndSet(a: A): A =
     ar.getAndSet(a)
 
-  override suspend fun setAndGet(a: A): A {
+  public override suspend fun setAndGet(a: A): A {
     ar.value = a
     return a
   }
 
-  override suspend fun getAndUpdate(f: (A) -> A): A =
+  public override suspend fun getAndUpdate(f: (A) -> A): A =
     ar.getAndUpdate(f)
 
-  override suspend fun updateAndGet(f: (A) -> A): A =
+  public override suspend fun updateAndGet(f: (A) -> A): A =
     ar.updateAndGet(f)
 
-  override suspend fun access(): Pair<A, suspend (A) -> Boolean> {
+  public override suspend fun access(): Pair<A, suspend (A) -> Boolean> {
     val snapshot = ar.value
     val hasBeenCalled = AtomicBooleanW(false)
     val setter: suspend (A) -> Boolean = { a: A ->
@@ -233,20 +233,20 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
     return Pair(snapshot, setter)
   }
 
-  override suspend fun tryUpdate(f: (A) -> A): Boolean =
+  public override suspend fun tryUpdate(f: (A) -> A): Boolean =
     tryModify { a -> Pair(f(a), Unit) } != null
 
-  override suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B? {
+  public override suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B? {
     val a = ar.value
     val (u, b) = f(a)
     return if (ar.compareAndSet(a, u)) b
     else null
   }
 
-  override suspend fun update(f: (A) -> A): Unit =
+  public override suspend fun update(f: (A) -> A): Unit =
     modify { a -> Pair(f(a), Unit) }
 
-  override suspend fun <B> modify(f: (A) -> Pair<A, B>): B {
+  public override suspend fun <B> modify(f: (A) -> Pair<A, B>): B {
     tailrec fun go(): B {
       val a = ar.value
       val (u, b) = f(a)
@@ -256,7 +256,7 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
     return go()
   }
 
-  override suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B> {
+  public override suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B> {
     tailrec fun go(): Pair<A, B> {
       val a = ar.value
       val res = f(a)
@@ -273,62 +273,62 @@ private class LensAtomic<A, B>(
   private val lensSet: (A, B) -> A
 ) : arrow.fx.coroutines.Atomic<B> {
 
-  override suspend fun setAndGet(a: B): B =
+  public override suspend fun setAndGet(a: B): B =
     underlying.modify { old ->
       Pair(lensModify(old) { a }, a)
     }
 
-  override suspend fun getAndUpdate(f: (B) -> B): B =
+  public override suspend fun getAndUpdate(f: (B) -> B): B =
     underlying.modify { old ->
       Pair(lensModify(old, f), lensGet(old))
     }
 
-  override suspend fun updateAndGet(f: (B) -> B): B =
+  public override suspend fun updateAndGet(f: (B) -> B): B =
     underlying.modify { old ->
       val new = lensModify(old, f)
       Pair(new, lensGet(new))
     }
 
-  override suspend fun get(): B =
+  public override suspend fun get(): B =
     lensGet(underlying.get())
 
-  override suspend fun set(a: B) {
+  public override suspend fun set(a: B) {
     underlying.update { old -> lensModify(old) { a } }
   }
 
-  override suspend fun getAndSet(a: B): B =
+  public override suspend fun getAndSet(a: B): B =
     underlying.modify { old ->
       Pair(lensModify(old) { a }, lensGet(old))
     }
 
-  override suspend fun update(f: (B) -> B) =
+  public override suspend fun update(f: (B) -> B) =
     underlying.update { old -> lensModify(old, f) }
 
-  override suspend fun <C> modify(f: (B) -> Pair<B, C>): C =
+  public override suspend fun <C> modify(f: (B) -> Pair<B, C>): C =
     underlying.modify { old ->
       val oldB = lensGet(old)
       val (b, c) = f(oldB)
       Pair(lensSet(old, b), c)
     }
 
-  override suspend fun <C> modifyGet(f: (B) -> Pair<B, C>): Pair<B, C> =
+  public override suspend fun <C> modifyGet(f: (B) -> Pair<B, C>): Pair<B, C> =
     underlying.modifyGet { old ->
       val oldB = lensGet(old)
       val (b, c) = f(oldB)
       Pair(lensSet(old, b), c)
     }.let { (a, c) -> Pair(lensGet(a), c) }
 
-  override suspend fun tryUpdate(f: (B) -> B): Boolean =
+  public override suspend fun tryUpdate(f: (B) -> B): Boolean =
     tryModify { b -> Pair(f(b), Unit) } != null
 
-  override suspend fun <C> tryModify(f: (B) -> Pair<B, C>): C? =
+  public override suspend fun <C> tryModify(f: (B) -> Pair<B, C>): C? =
     underlying.tryModify { a ->
       val oldB = lensGet(a)
       val (b, result) = f(oldB)
       Pair(lensSet(a, b), result)
     }
 
-  override suspend fun access(): Pair<B, suspend (B) -> Boolean> {
+  public override suspend fun access(): Pair<B, suspend (B) -> Boolean> {
     val snapshotA = underlying.get()
     val snapshotB = lensGet(snapshotA)
 

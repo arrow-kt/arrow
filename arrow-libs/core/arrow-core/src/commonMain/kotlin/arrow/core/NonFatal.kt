@@ -42,4 +42,4 @@ import kotlin.coroutines.cancellation.CancellationException
  * ```
  *
  */
-expect fun NonFatal(t: Throwable): Boolean
+public expect fun NonFatal(t: Throwable): Boolean

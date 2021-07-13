@@ -1,7 +1,7 @@
 package arrow.core.test.concurrency
 
-data class SideEffect(var counter: Int = 0) {
-  fun increment() {
+public data class SideEffect(var counter: Int = 0) {
+  public fun increment() {
     counter++
   }
 }

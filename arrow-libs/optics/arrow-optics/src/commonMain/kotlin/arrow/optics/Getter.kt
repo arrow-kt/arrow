@@ -14,12 +14,12 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Getter]
  * @param A the focus of a [Getter]
  */
-fun interface Getter<S, A> : Fold<S, A> {
+public fun interface Getter<S, A> : Fold<S, A> {
 
   /**
    * Get the focus of a [Getter]
    */
-  fun get(source: S): A
+  public fun get(source: S): A
 
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (A) -> R): R =
     map(get(source))
@@ -27,13 +27,13 @@ fun interface Getter<S, A> : Fold<S, A> {
   /**
    * Create a product of the [Getter] and a type [C]
    */
-  fun <C> first(): Getter<Pair<S, C>, Pair<A, C>> =
+  public fun <C> first(): Getter<Pair<S, C>, Pair<A, C>> =
     Getter { (s, c) -> get(s) to c }
 
   /**
    * Create a product of type [C] and the [Getter]
    */
-  fun <C> second(): Getter<Pair<C, S>, Pair<C, A>> =
+  public fun <C> second(): Getter<Pair<C, S>, Pair<C, A>> =
     Getter { (c, s) -> c to get(s) }
 
   /**
@@ -51,39 +51,39 @@ fun interface Getter<S, A> : Fold<S, A> {
   /**
    * Join two [Getter] with the same focus
    */
-  infix fun <C> choice(other: Getter<C, A>): Getter<Either<S, C>, A> =
+  public infix fun <C> choice(other: Getter<C, A>): Getter<Either<S, C>, A> =
     Getter { s -> s.fold(this::get, other::get) }
 
   /**
    * Pair two disjoint [Getter]
    */
-  infix fun <C, D> split(other: Getter<C, D>): Getter<Pair<S, C>, Pair<A, D>> =
+  public infix fun <C, D> split(other: Getter<C, D>): Getter<Pair<S, C>, Pair<A, D>> =
     Getter { (s, c) -> get(s) to other.get(c) }
 
   /**
    * Zip two [Getter] optics with the same source [S]
    */
-  infix fun <C> zip(other: Getter<S, C>): Getter<S, Pair<A, C>> =
+  public infix fun <C> zip(other: Getter<S, C>): Getter<S, Pair<A, C>> =
     Getter { s -> get(s) to other.get(s) }
 
   /**
    * Compose a [Getter] with a [Getter]
    */
-  infix fun <C> compose(other: Getter<in A, out C>): Getter<S, C> =
+  public infix fun <C> compose(other: Getter<in A, out C>): Getter<S, C> =
     Getter(other::get compose this::get)
 
-  operator fun <C> plus(other: Getter<in A, out C>): Getter<S, C> =
+  public operator fun <C> plus(other: Getter<in A, out C>): Getter<S, C> =
     this compose other
 
-  companion object {
+  public companion object {
 
-    fun <S> id(): Getter<S, S> =
+    public fun <S> id(): Getter<S, S> =
       PIso.id()
 
     /**
      * [Getter] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <S> codiagonal(): Getter<Either<S, S>, S> =
+    public fun <S> codiagonal(): Getter<Either<S, S>, S> =
       Getter { aa -> aa.fold(::identity, ::identity) }
   }
 }

@@ -4,7 +4,7 @@ import arrow.core.Either
 import okhttp3.Headers
 import okhttp3.Response
 
-data class ResponseE<E, A>(
+public data class ResponseE<E, A>(
   val raw: Response,
   val body: Either<E, A>
 ) {

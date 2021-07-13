@@ -12,12 +12,12 @@ import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-sealed class Race3<out A, out B, out C> {
-  data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
-  data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
-  data class Third<C>(val winner: C) : Race3<Nothing, Nothing, C>()
+public sealed class Race3<out A, out B, out C> {
+  public data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
+  public data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
+  public data class Third<C>(val winner: C) : Race3<Nothing, Nothing, C>()
 
-  inline fun <D> fold(
+  public inline fun <D> fold(
     ifA: (A) -> D,
     ifB: (B) -> D,
     ifC: (C) -> D
@@ -35,7 +35,7 @@ sealed class Race3<out A, out B, out C> {
  *
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
-suspend inline fun <A, B, C> raceN(
+public suspend inline fun <A, B, C> raceN(
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,
   crossinline fc: suspend () -> C
@@ -52,7 +52,7 @@ suspend inline fun <A, B, C> raceN(
  *
  * @see raceN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C> raceN(
+public suspend inline fun <A, B, C> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B,

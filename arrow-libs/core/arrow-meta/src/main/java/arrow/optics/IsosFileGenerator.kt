@@ -3,13 +3,13 @@ package arrow.optics
 import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateIsos(ele: AnnotatedElement, target: IsoTarget) = Snippet(
+public fun generateIsos(ele: AnnotatedElement, target: IsoTarget): Snippet = Snippet(
   `package` = ele.packageName,
   name = ele.classData.simpleName,
   content = processElement(ele, target)
 )
 
-inline val Target.targetNames inline get() = foci.map(Focus::className)
+public inline val Target.targetNames: List<String> inline get() = foci.map(Focus::className)
 
 private fun processElement(iso: AnnotatedElement, target: Target): String {
   val foci = target.foci

@@ -8,7 +8,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.foldRight as _foldRight
 
-inline fun <B, C, D, E> Iterable<B>.zip(
+public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   transform: (B, C, D) -> E
@@ -29,7 +29,7 @@ inline fun <B, C, D, E> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F> Iterable<B>.zip(
+public inline fun <B, C, D, E, F> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -52,7 +52,7 @@ inline fun <B, C, D, E, F> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -78,7 +78,7 @@ inline fun <B, C, D, E, F, G> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -107,7 +107,7 @@ inline fun <B, C, D, E, F, G, H> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -139,7 +139,7 @@ inline fun <B, C, D, E, F, G, H, I> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -174,7 +174,7 @@ inline fun <B, C, D, E, F, G, H, I, J> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -224,7 +224,7 @@ inline fun <B, C, D, E, F, G, H, I, J, K> Iterable<B>.zip(
   return list
 }
 
-inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
+public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   c: Iterable<C>,
   d: Iterable<D>,
   e: Iterable<E>,
@@ -286,13 +286,13 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   "Iterable.foldRight is being deprecated because its functionality differs from other foldRight definitions within arrow. Use the stdlib foldRight instead",
   replaceWith = ReplaceWith("foldRight(initial) { acc, b -> operation(b, acc) }")
 )
-inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
+public inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
   when (this) {
     is List -> _foldRight(initial, operation)
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
-inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
+public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
   val acc = mutableListOf<B>()
   forEach { a ->
     when (val res = f(a)) {
@@ -303,10 +303,10 @@ inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<
   return acc.right()
 }
 
-fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
+public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
-inline fun <E, A, B> Iterable<A>.traverseValidated(
+public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> = semigroup.run {
@@ -324,16 +324,16 @@ inline fun <E, A, B> Iterable<A>.traverseValidated(
   }
 }
 
-inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
+public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverseValidated(Semigroup.nonEmptyList(), f)
 
-fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
+public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
+public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
-inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
+public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
   val acc = mutableListOf<B>()
   forEach { a ->
     when (val res = f(a)) {
@@ -344,14 +344,14 @@ inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B
   return acc.some()
 }
 
-fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
+public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   this.traverseOption { it }
 
-fun <A> Iterable<A>.void(): List<Unit> =
+public fun <A> Iterable<A>.void(): List<Unit> =
   map { Unit }
 
 @Deprecated(FoldRightDeprecation)
-fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+public fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun loop(fa_p: List<A>): Eval<B> = when {
     fa_p.isEmpty() -> lb
     else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1)) })
@@ -360,7 +360,7 @@ fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   return Eval.defer { loop(this) }
 }
 
-fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
+public fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
   val iterator = this.iterator()
   if (!iterator.hasNext()) return null
   var accumulator: B = initial(iterator.next())
@@ -371,7 +371,7 @@ fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) ->
 }
 
 @Deprecated(FoldRightDeprecation)
-inline fun <A, B> List<A>.reduceRightEvalOrNull(
+public inline fun <A, B> List<A>.reduceRightEvalOrNull(
   initial: (A) -> B,
   operation: (A, acc: Eval<B>) -> Eval<B>
 ): Eval<B?> {
@@ -384,7 +384,7 @@ inline fun <A, B> List<A>.reduceRightEvalOrNull(
   return accumulator
 }
 
-inline fun <A, B> List<A>.reduceRightNull(
+public inline fun <A, B> List<A>.reduceRightNull(
   initial: (A) -> B,
   operation: (A, acc: B) -> B
 ): B? {
@@ -417,7 +417,7 @@ inline fun <A, B> List<A>.reduceRightNull(
  * }
  * ```
  */
-fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
+public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   align(other) { ior ->
     ior.fold(
       { it to null },
@@ -447,7 +447,7 @@ fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
+public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
   padZip(other).map { fa(it.first, it.second) }
 
 /**
@@ -471,7 +471,7 @@ inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): 
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
+public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
 
 /**
@@ -495,7 +495,7 @@ inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> 
  * }
  * ```
  */
-fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
+public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
 
 /**
@@ -519,7 +519,7 @@ fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
+public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
 
 /**
@@ -543,7 +543,7 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
  * }
  * ```
  */
-fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
+public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
 
 /**
@@ -563,7 +563,7 @@ fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
+public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
   this.align(b).map(fa)
 
 /**
@@ -581,7 +581,7 @@ inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): Li
  * }
  * ```
  */
-fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
+public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   alignRec(this, b)
 
 @Suppress("NAME_SHADOWING")
@@ -598,7 +598,7 @@ private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-fun <A> Iterable<A>.salign(
+public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
 ): Iterable<A> = SG.run {
@@ -624,7 +624,7 @@ fun <A> Iterable<A>.salign(
  * }
  * ```
  */
-fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
+public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     l + x.first to r + x.second
   }
@@ -648,7 +648,7 @@ fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
+public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
 
 /**
@@ -667,7 +667,7 @@ inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, Lis
  * }
  * ```
  */
-fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
+public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     x.fold(
       { l + it to r },
@@ -693,10 +693,10 @@ fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
+public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
-fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
+public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
   this@combineAll.fold(empty()) { acc, a ->
     acc.combine(a)
   }
@@ -716,12 +716,12 @@ fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
  *   println(result)
  * }
  */
-fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
+public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
     tail() to first
   }
 
-fun <A> Iterable<A>.tail(): List<A> =
+public fun <A> Iterable<A>.tail(): List<A> =
   drop(1)
 
 /**
@@ -739,7 +739,7 @@ fun <A> Iterable<A>.tail(): List<A> =
  *   println(result)
  * }
  */
-fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
+public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   this.split()?.let { (fa, a) ->
     listOf(a) + other.interleave(fa)
   } ?: other.toList()
@@ -758,7 +758,7 @@ fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  *   println(result)
  * }
  */
-fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
+public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptyList()
@@ -781,15 +781,15 @@ fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  *   println(result)
  * }
  */
-inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
+public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
 
-fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
+public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
   flatMap { either ->
     either.fold({ emptyList() }, { b -> listOf(b) })
   }
 
-fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
+public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
   flatMap { validated ->
     validated.fold({ emptyList() }, { b -> listOf(b) })
   }
@@ -800,7 +800,7 @@ fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
-fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
+public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
   val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
   val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
   return asep to bsep
@@ -812,13 +812,13 @@ fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
-fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
+public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
   val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
   return asep to bsep
 }
 
-fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
+public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
 
 /**
@@ -838,25 +838,25 @@ fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
  *  }
  *  ```
  */
-fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
+public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
   this
 
-fun <B, A : B> List<A>.widen(): List<B> =
+public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-fun <A> Iterable<A>.fold(MA: Monoid<A>): A = MA.run {
+public fun <A> Iterable<A>.fold(MA: Monoid<A>): A = MA.run {
   this@fold.fold(empty()) { acc, a ->
     acc.combine(a)
   }
 }
 
-fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
+public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   this@foldMap.fold(empty()) { acc, a ->
     acc.combine(f(a))
   }
 }
 
-fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
+public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->
       ior.fold(
@@ -867,7 +867,7 @@ fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
     }
   }
 
-fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
+public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
   fold(emptyMap()) { bs, a ->
     f(a).align(bs) { (_, ior) ->
       ior.fold(
@@ -878,7 +878,7 @@ fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
     }
   }
 
-fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
+public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
   fold<A, List<B>?>(emptyList()) { bs, a ->
     Ior.fromNullables(f(a), bs)?.fold(
       { listOf(it) },
@@ -891,15 +891,15 @@ fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
 internal val listUnit: List<Unit> =
   listOf(Unit)
 
-fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
+public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
   if (n <= 0) emptyList()
   else toList().let { l -> List(n) { l } }
 
-fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
+public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
   if (n <= 0) listOf(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
-operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
+public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }
     .fold(0) { acc, i ->
       when (acc) {
@@ -908,10 +908,10 @@ operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int 
       }
     }
 
-infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
+public infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
   listOf(this) + list
 
-fun <T> Iterable<Option<T>>.filterOption(): List<T> =
+public fun <T> Iterable<Option<T>>.filterOption(): List<T> =
   flatMap { it.fold(::emptyList, ::listOf) }
 
-fun <T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()
+public fun <T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()

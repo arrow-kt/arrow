@@ -45,18 +45,18 @@ import javax.lang.model.util.Elements
 import kotlin.coroutines.Continuation
 
 @Suppress("LargeClass")
-interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, ProcessorUtils {
+public interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, ProcessorUtils {
 
-  fun processorUtils(): ProcessorUtils
+  public fun processorUtils(): ProcessorUtils
 
-  fun Element.kDoc(): String?
+  public fun Element.kDoc(): String?
 
-  val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper
+  public val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper
 
-  val TypeElement.meta: ClassOrPackageDataWrapper.Class
+  public val TypeElement.meta: ClassOrPackageDataWrapper.Class
     get() = typeElementToMeta(this) as ClassOrPackageDataWrapper.Class
 
-  fun Element.packageName(): Either<EncodingError, PackageName> =
+  public fun Element.packageName(): Either<EncodingError, PackageName> =
     when (this) {
       is PackageElement -> Either.Right(PackageName(qualifiedName.toString()))
       else -> Either.Left(
@@ -64,7 +64,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       )
     }
 
-  fun Element.tree(): Either<EncodingError, Tree> =
+  public fun Element.tree(): Either<EncodingError, Tree> =
     when (kind) {
       ElementKind.PACKAGE -> packageName()
       ElementKind.CLASS -> type()
@@ -72,28 +72,42 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       else -> Either.Left(EncodingError.UnsupportedElementType("Not supported: $kind", this))
     }
 
-  fun Element.type(): Either<EncodingError, Type> =
+  public fun Element.type(): Either<EncodingError, Type> =
     metaApi().run {
       val encodingResult: Either<EncodingError, Type> =
         elementUtils.getPackageOf(this@type).let { pckg ->
           val pckgName = pckg.qualifiedName.toString().asKotlin()
           when (kind) {
-            ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Shape.Interface))
+            ElementKind.INTERFACE -> Either.Right(
+              Type(
+                PackageName(pckgName),
+                asType().asTypeName().toMeta(),
+                Type.Shape.Interface
+              )
+            )
             ElementKind.CLASS -> {
               val typeElement = this@type as TypeElement
               val classBuilder = Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Shape.Class)
-              val declaredConstructorSignatures = meta.constructorList.map { it.getJvmConstructorSignature(meta.nameResolver, meta.classProto.typeTable) }
-              val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter { executableElement ->
-                declaredConstructorSignatures.any { it?.asString() == executableElement.jvmMethodSignature }
-              }.mapNotNull { it.asConstructor(this@type) }
+              val declaredConstructorSignatures =
+                meta.constructorList.map { it.getJvmConstructorSignature(meta.nameResolver, meta.classProto.typeTable) }
+              val constructors =
+                ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter { executableElement ->
+                  declaredConstructorSignatures.any { it?.asString() == executableElement.jvmMethodSignature }
+                }.mapNotNull { it.asConstructor(this@type) }
               Either.Right(
                 classBuilder.copy(
                   primaryConstructor = constructors.find { it.first }?.second,
-                  superclass = if (typeElement.superclass is NoType) null else typeElement.superclass.asTypeName().toMeta()
+                  superclass = if (typeElement.superclass is NoType) null else typeElement.superclass.asTypeName()
+                    .toMeta()
                 )
               )
             }
-            else -> Either.Left(EncodingError.UnsupportedElementType("Unsupported ${this@TypeElementEncoder}, as ($kind) to Type", this@type))
+            else -> Either.Left(
+              EncodingError.UnsupportedElementType(
+                "Unsupported ${this@TypeElementEncoder}, as ($kind) to Type",
+                this@type
+              )
+            )
           }
         }
       encodingResult.map {
@@ -114,7 +128,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     }
 
-  fun TypeElement.properties(): List<Property> =
+  public fun TypeElement.properties(): List<Property> =
     meta.propertyList.map { property ->
       val jvmPropertySignature: String = property.jvmPropertySignature.toString()
       val jvmFieldSignature = property.getJvmFieldSignature(meta.nameResolver, meta.classProto.typeTable)
@@ -156,8 +170,9 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       } else prop
     }
 
-  fun TypeElement.declaredFunctions(declaredElement: TypeElement): List<Func> {
-    val declaredFunctionSignatures = meta.functionList.map { it.getJvmMethodSignature(meta.nameResolver, meta.classProto.typeTable) }
+  public fun TypeElement.declaredFunctions(declaredElement: TypeElement): List<Func> {
+    val declaredFunctionSignatures =
+      meta.functionList.map { it.getJvmMethodSignature(meta.nameResolver, meta.classProto.typeTable) }
     return allFunctions(declaredElement).filter { function ->
       declaredFunctionSignatures.any { it?.asString() == function.jvmMethodSignature }
     }
@@ -189,10 +204,10 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     )
 
-  fun TypeName.ParameterizedType.isContinuation(): Boolean =
+  public fun TypeName.ParameterizedType.isContinuation(): Boolean =
     (rawType.fqName == Function1::class.qualifiedName || rawType.fqName == Function2::class.qualifiedName && typeArguments.size >= 2) && continuationType() != null
 
-  fun TypeName.ParameterizedType.continuationType(): TypeName.ParameterizedType? {
+  public fun TypeName.ParameterizedType.continuationType(): TypeName.ParameterizedType? {
     val wildcard = typeArguments.filterIsInstance<TypeName.WildcardType>().find {
       it.lowerBounds.isNotEmpty() && {
         val lowerBoundsContinuation = it.lowerBounds[0]
@@ -203,7 +218,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     return wildcard?.lowerBounds?.get(0) as? TypeName.ParameterizedType
   }
 
-  fun TypeName.ParameterizedType.isMonadContinuation(): Boolean =
+  public fun TypeName.ParameterizedType.isMonadContinuation(): Boolean =
     rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 && {
       val maybeContinuation = typeArguments[1]
       when {
@@ -217,7 +232,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     }() && (name.contains("Monad.*Continuation".toRegex()) || name.contains("Concurrent.*Continuation".toRegex()))
 
-  fun TypeName.ParameterizedType.isContinuationType() =
+  public fun TypeName.ParameterizedType.isContinuationType(): Boolean =
     rawType.fqName == Continuation::class.qualifiedName
 
   private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName =
@@ -234,7 +249,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       )
       isContinuation() -> {
         val continuation = continuationType()
-        val params = typeArguments.filterIsInstance<TypeName.WildcardType>().takeWhile { it.lowerBounds[0] != continuation }
+        val params =
+          typeArguments.filterIsInstance<TypeName.WildcardType>().takeWhile { it.lowerBounds[0] != continuation }
         TypeName.FunctionLiteral(
           receiverType = null,
           modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
@@ -245,7 +261,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       else -> this
     }
 
-  fun Func.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
+  public fun Func.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
     copy(
       receiverType = receiverType?.fixLiterals(meta, protoFun.receiverType),
       parameters = if (parameters.size <= protoFun.valueParameterList.size) {
@@ -254,7 +270,10 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       returnType = returnType?.fixLiterals(meta, protoFun.returnType)
     )
 
-  private fun Parameter.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoParam: ProtoBuf.ValueParameter): Parameter =
+  private fun Parameter.fixLiterals(
+    meta: ClassOrPackageDataWrapper.Class,
+    protoParam: ProtoBuf.ValueParameter
+  ): Parameter =
     copy(type = type.fixLiterals(meta, protoParam.type))
 
   private fun TypeName.fixLiterals(
@@ -290,7 +309,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
-  fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
+  public fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
       val superTypes = supertypes(
         declaredElement.meta,
@@ -313,7 +332,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
       val members = filteredMembers.mapNotNull { member ->
         val templateFunction = allFunctions.find { (proto, function) ->
-          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable)?.asString() == member.jvmMethodSignature
+          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable)
+            ?.asString() == member.jvmMethodSignature
         }
         @Suppress("SwallowedException")
         try {
@@ -353,7 +373,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       members
     }
 
-  fun TypeElement.superInterfaces(): List<TypeName> =
+  public fun TypeElement.superInterfaces(): List<TypeName> =
     meta.classProto.supertypeList.map { type ->
       val superTypeName = type.extractFullName(meta, true).removeVariance().asKotlin()
       val pckg = superTypeName.substringBefore("<").substringBeforeLast(".")
@@ -371,16 +391,16 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       } else TypeName.Classy(simpleName, superTypeName, PackageName(pckg), nullable = false)
     }
 
-  fun TypeElement.typeVariables(): List<TypeName.TypeVariable> =
+  public fun TypeElement.typeVariables(): List<TypeName.TypeVariable> =
     typeParameters.map { it.asTypeVariableName().toMeta() }
 
-  fun TypeElement.modifiers(): List<arrow.meta.ast.Modifier> =
+  public fun TypeElement.modifiers(): List<arrow.meta.ast.Modifier> =
     listOfNotNull(meta.classProto.modality?.asModifier(), meta.classProto.visibility?.asModifier())
 
-  fun TypeElement.asTypeName(): TypeName =
+  public fun TypeElement.asTypeName(): TypeName =
     asType().asTypeName().toMeta()
 
-  fun TypeElement.annotations(): List<Annotation> =
+  public fun TypeElement.annotations(): List<Annotation> =
     annotationMirrors.mapNotNull {
       when {
         it.annotationType.asTypeName().toString() != "kotlin.Metadata" -> AnnotationSpec.get(it).toMeta()
@@ -388,10 +408,11 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     }
 
-  fun ExecutableElement.asConstructor(typeElement: TypeElement): Pair<Boolean, Func>? =
+  public fun ExecutableElement.asConstructor(typeElement: TypeElement): Pair<Boolean, Func>? =
     kotlinMetadataUtils().run {
       typeElement.meta.constructorList.find {
-        it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable)?.asString() == this@asConstructor.jvmMethodSignature
+        it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable)
+          ?.asString() == this@asConstructor.jvmMethodSignature
       }?.let { constructor ->
         constructor.isPrimary to
           Func(
@@ -432,7 +453,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       Modifier.STRICTFP -> null
     }
 
-  fun TypeElement.sealedSubClassNames(): List<TypeName> =
+  public fun TypeElement.sealedSubClassNames(): List<TypeName> =
     if (meta.classProto.sealedSubclassFqNameList.isNotEmpty()) {
       meta.classProto.sealedSubclassFqNameList.map {
         val fqName = meta.nameOf(it).asKotlin()
@@ -440,7 +461,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     } else emptyList()
 
-  fun getTypeElement(name: String, elements: Elements): TypeElement? =
+  public fun getTypeElement(name: String, elements: Elements): TypeElement? =
     @Suppress("SwallowedException")
     try {
       elements.getTypeElement(name)
@@ -448,6 +469,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       null
     }
 
-  fun TypeElement.asMetaType(): Type? =
+  public fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })
 }

@@ -12,99 +12,99 @@ import arrow.core.compose
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-interface Semigroup<A> {
+public interface Semigroup<A> {
   /**
    * Combine two [A] values.
    */
-  fun A.combine(b: A): A
+  public fun A.combine(b: A): A
 
-  operator fun A.plus(b: A): A =
+  public operator fun A.plus(b: A): A =
     this.combine(b)
 
-  fun A.maybeCombine(b: A?): A =
+  public fun A.maybeCombine(b: A?): A =
     b?.let { combine(it) } ?: this
 
-  companion object {
+  public companion object {
     @JvmStatic
-    fun <A> list(): Semigroup<List<A>> = Monoid.list()
+    public fun <A> list(): Semigroup<List<A>> = Monoid.list()
 
     @JvmStatic
-    fun <A> sequence(): Semigroup<Sequence<A>> = Monoid.sequence()
+    public fun <A> sequence(): Semigroup<Sequence<A>> = Monoid.sequence()
 
     @JvmStatic
-    fun string(): Semigroup<String> = Monoid.string()
+    public fun string(): Semigroup<String> = Monoid.string()
 
     @JvmStatic
     @JvmName("Boolean")
-    fun boolean(): Semigroup<Boolean> = Monoid.boolean()
+    public fun boolean(): Semigroup<Boolean> = Monoid.boolean()
 
     @JvmStatic
     @JvmName("Byte")
-    fun byte(): Semigroup<Byte> = Monoid.byte()
+    public fun byte(): Semigroup<Byte> = Monoid.byte()
 
     @JvmStatic
     @JvmName("Double")
     @Deprecated(DoubleInstanceDeprecation)
-    fun double(): Semigroup<Double> = Monoid.double()
+    public fun double(): Semigroup<Double> = Monoid.double()
 
     @JvmStatic
     @JvmName("Integer")
-    fun int(): Semigroup<Int> = Monoid.int()
+    public fun int(): Semigroup<Int> = Monoid.int()
 
     @JvmStatic
     @JvmName("Long")
-    fun long(): Semigroup<Long> = Monoid.long()
+    public fun long(): Semigroup<Long> = Monoid.long()
 
     @JvmStatic
     @JvmName("Short")
-    fun short(): Semigroup<Short> = Monoid.short()
+    public fun short(): Semigroup<Short> = Monoid.short()
 
     @JvmStatic
     @JvmName("Float")
     @Deprecated(FloatInstanceDeprecation)
-    fun float(): Semigroup<Float> = Monoid.float()
+    public fun float(): Semigroup<Float> = Monoid.float()
 
     @JvmStatic
-    fun <A, B> either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
+    public fun <A, B> either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
       EitherSemigroup(SA, SB)
 
     @JvmStatic
-    fun <A, B> ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
+    public fun <A, B> ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
       IorSemigroup(SA, SB)
 
     @JvmStatic
-    fun <A> endo(): Semigroup<Endo<A>> =
+    public fun <A> endo(): Semigroup<Endo<A>> =
       object : Semigroup<Endo<A>> {
         override fun Endo<A>.combine(g: Endo<A>): Endo<A> = Endo(f.compose(g.f))
       }
 
     @JvmStatic
     @JvmName("constant")
-    fun <A, T> const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
+    public fun <A, T> const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
       object : Semigroup<Const<A, T>> {
         override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
           this.combine(SA, b)
       }
 
     @JvmStatic
-    fun <K, A> map(SG: Semigroup<A>): Semigroup<Map<K, A>> =
+    public fun <K, A> map(SG: Semigroup<A>): Semigroup<Map<K, A>> =
       MapSemigroup(SG)
 
     @JvmStatic
-    fun <A> option(SGA: Semigroup<A>): Semigroup<Option<A>> =
+    public fun <A> option(SGA: Semigroup<A>): Semigroup<Option<A>> =
       OptionSemigroup(SGA)
 
     @JvmStatic
-    fun <E, A> validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
+    public fun <E, A> validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
       ValidatedSemigroup(SE, SA)
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
-    fun <A> nonEmptyList(): Semigroup<NonEmptyList<A>> =
+    public fun <A> nonEmptyList(): Semigroup<NonEmptyList<A>> =
       NonEmptyListSemigroup as Semigroup<NonEmptyList<A>>
 
     @JvmStatic
-    fun <A, B> pair(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Pair<A, B>> =
+    public fun <A, B> pair(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Pair<A, B>> =
       PairSemigroup(SA, SB)
 
     private open class PairSemigroup<A, B>(
@@ -114,7 +114,7 @@ interface Semigroup<A> {
       override fun Pair<A, B>.combine(b: Pair<A, B>): Pair<A, B> = combine(SA, SB, b)
     }
 
-    object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
+    public object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
       override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =
         NonEmptyList(this.head, this.tail.plus(b))
     }

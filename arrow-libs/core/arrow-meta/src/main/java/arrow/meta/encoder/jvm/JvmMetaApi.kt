@@ -18,11 +18,11 @@ import kotlin.reflect.KClass
 /**
  * A JVM implementation of the Meta Api meant to be mixed in with kapt annotation processors
  */
-interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder {
+public interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder {
 
   override fun metaApi(): MetaApi = this
 
-  val typeNameDownKind: (typeName: arrow.meta.ast.TypeName) -> arrow.meta.ast.TypeName
+  public val typeNameDownKind: (typeName: arrow.meta.ast.TypeName) -> arrow.meta.ast.TypeName
 
   /**
    * @see [MetaApi.removeConstrains]
@@ -159,7 +159,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.TypeVariable.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.TypeVariable =
+  public fun TypeName.TypeVariable.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.TypeVariable =
     wrapped.let { (wrapper, wrapping) ->
       if (rawName == wrapper.rawName) copy(
         name = name.replace(wrapper.rawName, wrapping.rawName),
@@ -173,7 +173,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.WildcardType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.WildcardType =
+  public fun TypeName.WildcardType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.WildcardType =
     wrapped.let { (wrapper, wrapping) ->
       if (rawName == wrapper.rawName) copy(
         name = name.replace(wrapper.rawName, wrapping.rawName),
@@ -188,7 +188,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.ParameterizedType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.ParameterizedType =
+  public fun TypeName.ParameterizedType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.ParameterizedType =
     wrapped.let { (wrapper, wrapping) ->
       if (rawName == wrapper.rawName) copy(
         name = name.replace(wrapper.rawName, wrapping.rawName),
@@ -204,7 +204,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.Classy.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.Classy =
+  public fun TypeName.Classy.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.Classy =
     wrapped.let { (wrapper, wrapping) ->
       if (rawName == wrapper.rawName) wrapping.rawType
       else this
@@ -215,7 +215,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.FunctionLiteral.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.FunctionLiteral =
+  public fun TypeName.FunctionLiteral.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.FunctionLiteral =
     copy(
       receiverType = receiverType?.wrap(wrapped),
       parameters = parameters.map { it.wrap(wrapped) },
@@ -227,7 +227,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
-  fun TypeName.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName =
+  public fun TypeName.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName =
     when (this) {
       is TypeName.TypeVariable -> wrap(wrapped)
       is TypeName.WildcardType -> wrap(wrapped)
@@ -241,7 +241,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * over all three receiver, parameters and return type.
    * and [MetaApi.getDownKind] as needed
    */
-  fun Func.wrap(wrappedType: Pair<TypeName, TypeName.ParameterizedType>? = null): Func =
+  public fun Func.wrap(wrappedType: Pair<TypeName, TypeName.ParameterizedType>? = null): Func =
     wrappedType?.let { wrapped ->
       val receiverType = receiverType?.downKind?.wrap(wrapped)
       val parameters = parameters.map {
@@ -426,7 +426,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       )
     }
 
-  fun typeNameDownKindImpl(typeName: TypeName): TypeName =
+  public fun typeNameDownKindImpl(typeName: TypeName): TypeName =
     when (typeName) {
       is TypeName.TypeVariable -> typeName.downKind.asKotlin()
       is TypeName.WildcardType -> typeName.downKind.asKotlin()
@@ -626,7 +626,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * Returns a Pair matching a type as wrapper and the type it wraps
    * ex: SetK<A> to Set<A>
    */
-  val Type.kindWrapper: Pair<TypeName, TypeName.ParameterizedType>?
+  public val Type.kindWrapper: Pair<TypeName, TypeName.ParameterizedType>?
     get() = if (primaryConstructor?.parameters?.size == 1) {
       val wrappedType = primaryConstructor.parameters[0].type.asKotlin()
       when (wrappedType) {
@@ -648,7 +648,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * An interface annotated with @extension with at least one type argument and extending another interface
    * with one type argument as the first element in its extends clause
    */
-  fun TypeElement.typeClassInstance(): TypeClassInstance? {
+  public fun TypeElement.typeClassInstance(): TypeClassInstance? {
     val superInterfaces = superInterfaces()
     val instance = asMetaType()
     return when {
@@ -675,8 +675,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
                 dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.rawName),
                 typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawName),
                 projectedCompanion =
-                  if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
-                  else projectedCompanion
+                if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
+                else projectedCompanion
               )
               else -> null
             }

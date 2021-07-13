@@ -10,9 +10,9 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
-object OptionalLaws {
+public object OptionalLaws {
 
-  fun <A, B> laws(
+  public fun <A, B> laws(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -31,7 +31,7 @@ object OptionalLaws {
   /**
    * Warning: Use only when a `Gen.constant()` applies
    */
-  fun <A, B> laws(
+  public fun <A, B> laws(
     optional: Optional<A, B>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -40,7 +40,7 @@ object OptionalLaws {
     eqb: (B?, B?) -> Boolean = { a, b -> a == b }
   ): List<Law> = laws(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
 
-  suspend fun <A, B> getOptionSet(
+  public suspend fun <A, B> getOptionSet(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
@@ -52,7 +52,7 @@ object OptionalLaws {
       }
     }
 
-  suspend fun <A, B> setGetOption(
+  public suspend fun <A, B> setGetOption(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -65,7 +65,7 @@ object OptionalLaws {
       }
     }
 
-  suspend fun <A, B> setIdempotent(
+  public suspend fun <A, B> setIdempotent(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -78,7 +78,7 @@ object OptionalLaws {
       }
     }
 
-  suspend fun <A, B> modifyIdentity(
+  public suspend fun <A, B> modifyIdentity(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
@@ -90,7 +90,7 @@ object OptionalLaws {
       }
     }
 
-  suspend fun <A, B> composeModify(
+  public suspend fun <A, B> composeModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     funcGen: Arb<(B) -> B>,
@@ -103,7 +103,7 @@ object OptionalLaws {
       }
     }
 
-  suspend fun <A, B> consistentSetModify(
+  public suspend fun <A, B> consistentSetModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,

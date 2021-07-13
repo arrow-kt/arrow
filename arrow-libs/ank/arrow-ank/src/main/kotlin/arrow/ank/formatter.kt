@@ -21,20 +21,20 @@ private fun fill(ch: Char, len: Int): String {
   return sb.toString()
 }
 
-const val ANSI_RESET = "\u001B[0m"
-const val ANSI_BLACK = "\u001B[30m"
-const val ANSI_RED = "\u001B[31m"
-const val ANSI_GREEN = "\u001B[32m"
-const val ANSI_YELLOW = "\u001B[33m"
-const val ANSI_BLUE = "\u001B[34m"
-const val ANSI_PURPLE = "\u001B[35m"
-const val ANSI_CYAN = "\u001B[36m"
-const val ANSI_WHITE = "\u001B[37m"
+public const val ANSI_RESET: String = "\u001B[0m"
+public const val ANSI_BLACK: String = "\u001B[30m"
+public const val ANSI_RED: String = "\u001B[31m"
+public const val ANSI_GREEN: String = "\u001B[32m"
+public const val ANSI_YELLOW: String = "\u001B[33m"
+public const val ANSI_BLUE: String = "\u001B[34m"
+public const val ANSI_PURPLE: String = "\u001B[35m"
+public const val ANSI_CYAN: String = "\u001B[36m"
+public const val ANSI_WHITE: String = "\u001B[37m"
 
-fun colored(color: String, message: String) =
+public fun colored(color: String, message: String): String =
   "$color$message$ANSI_RESET"
 
-val AnkHeader =
+public val AnkHeader: String =
   """
             |      :::     ::::    ::: :::    :::
             |    :+: :+:   :+:+:   :+: :+:   :+:

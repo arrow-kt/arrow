@@ -39,11 +39,11 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
   /**
    * Small wrapper that handles invoking the correct continuations and appending continuations from shift blocks
    */
-  data class SingleShotCont<A, R>(
+  public data class SingleShotCont<A, R>(
     private val continuation: Continuation<A>,
     private val shiftFnContinuations: MutableList<Continuation<R>>
   ) : DelimitedContinuation<A, R> {
-    override suspend fun invoke(a: A): R = suspendCoroutineUninterceptedOrReturn { resumeShift ->
+    public override suspend fun invoke(a: A): R = suspendCoroutineUninterceptedOrReturn { resumeShift ->
       shiftFnContinuations.add(resumeShift)
       continuation.resume(a)
       COROUTINE_SUSPENDED
@@ -53,16 +53,16 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
   /**
    * Wrapper that handles invoking manually cps transformed continuations
    */
-  data class CPSCont<A, R>(
+  public data class CPSCont<A, R>(
     private val runFunc: suspend DelimitedScope<R>.(A) -> R
   ) : DelimitedContinuation<A, R> {
-    override suspend fun invoke(a: A): R = DelimContScope<R> { runFunc(a) }.invoke()
+    public override suspend fun invoke(a: A): R = DelimContScope<R> { runFunc(a) }.invoke()
   }
 
   /**
    * Captures the continuation and set [f] with the continuation to be executed next by the runloop.
    */
-  override suspend fun <A> shift(f: suspend RestrictedScope<R>.(DelimitedContinuation<A, R>) -> R): A =
+  public override suspend fun <A> shift(f: suspend RestrictedScope<R>.(DelimitedContinuation<A, R>) -> R): A =
     suspendCoroutineUninterceptedOrReturn { continueMain ->
       val delCont = SingleShotCont(continueMain, shiftFnContinuations)
       require(nextShift == null)
@@ -73,7 +73,7 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
   /**
    * Same as [shift] except we never resume execution because we only continue in [c].
    */
-  suspend fun <A, B> shiftCPS(f: suspend (DelimitedContinuation<A, B>) -> R, c: suspend DelimitedScope<B>.(A) -> B): Nothing =
+  public suspend fun <A, B> shiftCPS(f: suspend (DelimitedContinuation<A, B>) -> R, c: suspend DelimitedScope<B>.(A) -> B): Nothing =
     suspendCoroutineUninterceptedOrReturn {
       require(nextShift == null)
       nextShift = suspend { f(CPSCont(c)) }
@@ -128,6 +128,6 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
 @Suppress("ClassName")
 internal object EMPTY_VALUE {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  inline fun <T> unbox(value: Any?): T =
+  public inline fun <T> unbox(value: Any?): T =
     if (value === this) null as T else value as T
 }
