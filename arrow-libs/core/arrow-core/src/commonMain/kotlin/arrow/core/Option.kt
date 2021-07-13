@@ -583,7 +583,8 @@ sealed class Option<out A> {
    *
    * @note This function works like a regular `align` function, but is then mapped by the `map` function.
    */
-  inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> = align(b).map(f)
+  inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
+    align(b).map(f)
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -833,18 +834,14 @@ fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
  */
 fun <T> Iterable<T>.firstOrNone(): Option<T> =
   when (this) {
-    is Collection -> firstOrNone()
-    else -> iterator().nextOrNone()
-  }
-
-/**
- * Returns the first element as [Some(element)][Some], or [None] if the collection is empty.
- */
-fun <T> Collection<T>.firstOrNone(): Option<T> =
-  if (isEmpty()) {
-    None
-  } else {
-    Some(first())
+    is Collection -> if (!isEmpty()) {
+      Some(first())
+    } else {
+      None
+    }
+    else -> {
+      iterator().nextOrNone()
+    }
   }
 
 private fun <T> Iterator<T>.nextOrNone(): Option<T> =
@@ -871,17 +868,13 @@ inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
  */
 fun <T> Iterable<T>.singleOrNone(): Option<T> =
   when (this) {
-    is Collection -> singleOrNone()
-    else -> iterator().run { nextOrNone().filter { !hasNext() } }
-  }
-
-/**
- * Returns single element as [Some(element)][Some], or [None] if the collection is empty or has more than one element.
- */
-fun <T> Collection<T>.singleOrNone(): Option<T> =
-  when (size) {
-    1 -> firstOrNone()
-    else -> None
+    is Collection -> when (size) {
+      1 -> firstOrNone()
+      else -> None
+    }
+    else -> {
+      iterator().run { nextOrNone().filter { !hasNext() } }
+    }
   }
 
 /**
@@ -905,7 +898,11 @@ inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
  */
 fun <T> Iterable<T>.lastOrNone(): Option<T> =
   when (this) {
-    is Collection -> lastOrNone()
+    is Collection -> if (!isEmpty()) {
+      Some(last())
+    } else {
+      None
+    }
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -915,16 +912,6 @@ fun <T> Iterable<T>.lastOrNone(): Option<T> =
         None
       }
     }
-  }
-
-/**
- * Returns the last element as [Some(element)][Some], or [None] if the collection is empty.
- */
-fun <T> Collection<T>.lastOrNone(): Option<T> =
-  if (isEmpty()) {
-    None
-  } else {
-    Some(last())
   }
 
 /**
@@ -950,17 +937,11 @@ inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
   when {
     index < 0 -> None
-    this is Collection -> elementAtOrNone(index)
+    this is Collection -> when (index) {
+      in indices -> Some(elementAt(index))
+      else -> None
+    }
     else -> iterator().skip(index).nextOrNone()
-  }
-
-/**
- * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this collection.
- */
-fun <T> Collection<T>.elementAtOrNone(index: Int): Option<T> =
-  when (index) {
-    in 0 until size -> Some(elementAt(index))
-    else -> None
   }
 
 private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
