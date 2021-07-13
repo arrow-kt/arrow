@@ -4,6 +4,8 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
+apply plugin: 'kotlinx-atomicfu'
+
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
@@ -15,7 +17,6 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":arrow-core")
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
         commonTest {
@@ -23,20 +24,12 @@ kotlin {
                 implementation project(":arrow-optics-test")
             }
         }
-        jvmMain {
-            dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-            }
-        }
         jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-            }
+            kotlin.srcDirs += '/build/generated/source/kapt/test'
         }
     }
 }
 
 dependencies {
-    kaptTest project(":arrow-meta")
-    testCompile project(":arrow-optics-test")
+    "kaptTest"(project(":arrow-meta"))
 }

@@ -1,14 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
@@ -54,7 +51,7 @@ class ParTraverseTest : ArrowFxSpec(
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverse(Dispatchers.IO) { i ->
+          (0 until n).parTraverse { i ->
             if (i == killOn) throw e else unit()
           }
         } should leftException(e)
@@ -73,36 +70,12 @@ class ParTraverseTest : ArrowFxSpec(
       l shouldBe (0 until count).toList()
     }
 
-    "parTraverse runs on provided context " { // 100 is same default length as Arb.list
-      checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        val res = single.use { ctx ->
-          (0 until i).parTraverse(ctx) { Thread.currentThread().name }
-        }
-        assertSoftly {
-          res.forEach { it shouldStartWith "single" }
-        }
-      }
-    }
-
     "parTraverseN can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverseN(5) {
         ref.update { it + 1 }
       }
       ref.get() shouldBe 100
-    }
-
-    "parTraverseN runs on provided thread" {
-      checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        val res = single.use { ctx ->
-          (0 until i).parTraverseN(ctx, 3) {
-            Thread.currentThread().name
-          }
-        }
-        assertSoftly {
-          res.forEach { it shouldStartWith "single" }
-        }
-      }
     }
 
     "parTraverseN(3) runs in (3) parallel" {
@@ -162,7 +135,7 @@ class ParTraverseTest : ArrowFxSpec(
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverseN(Dispatchers.IO, 3) { i ->
+          (0 until n).parTraverseN(3) { i ->
             if (i == killOn) throw e else unit()
           }
         } should leftException(e)
