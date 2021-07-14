@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks
  */
-suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
+public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
   parTraverseEitherN(Dispatchers.Default, n) { it() }
 
 /**
@@ -34,7 +34,7 @@ suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: In
  *
  * Cancelling this operation cancels all running tasks
  */
-suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(
+public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Either<A, List<B>> =
@@ -47,7 +47,7 @@ suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
+public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
   parTraverseEither(Dispatchers.Default) { it() }
 
 /**
@@ -82,7 +82,7 @@ suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Eit
  * }
  * ```
  */
-suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(
+public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Either<A, List<B>> =
   parTraverseEither(ctx) { it() }
@@ -94,7 +94,7 @@ suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(
  *
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
+public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
   n: Int,
   f: suspend (A) -> Either<E, B>
 ): Either<E, List<B>> =
@@ -111,7 +111,7 @@ suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
+public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend (A) -> Either<E, B>
@@ -129,7 +129,7 @@ suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B, E> Iterable<A>.parTraverseEither(
+public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   f: suspend (A) -> Either<E, B>
 ): Either<E, List<B>> =
   parTraverseEither(Dispatchers.Default, f)
@@ -170,7 +170,7 @@ suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  * }
  * ```
  */
-suspend fun <A, B, E> Iterable<A>.parTraverseEither(
+public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend (A) -> Either<E, B>
 ): Either<E, List<B>> =

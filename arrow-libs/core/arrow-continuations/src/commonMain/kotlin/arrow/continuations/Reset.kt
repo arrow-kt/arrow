@@ -21,7 +21,7 @@ internal object Reset {
    * use `Either.catch`, `Validated.catch` etc or `e.nonFatalOrThrow()`
    * to ensure you're not catching `ShortCircuit`.
    */
-  suspend fun <A> suspended(block: suspend SuspendedScope<A>.() -> A): A =
+  public suspend fun <A> suspended(block: suspend SuspendedScope<A>.() -> A): A =
     suspendCoroutineUninterceptedOrReturn { cont ->
       SuspendMonadContinuation(cont, block)
         .startCoroutineUninterceptedOrReturn()

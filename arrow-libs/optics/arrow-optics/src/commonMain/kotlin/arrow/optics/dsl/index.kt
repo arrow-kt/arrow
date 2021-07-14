@@ -17,7 +17,7 @@ import arrow.optics.typeclasses.Index
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Optional] with a focus in [A] at given index [I]
  */
-fun <T, S, I, A> Lens<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Lens<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with an [Iso] for a structure [S] to focus in on [A] at given index [I]
@@ -27,7 +27,7 @@ fun <T, S, I, A> Lens<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = th
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Optional] with a focus in [A] at given index [I]
  */
-fun <T, S, I, A> Iso<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Iso<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with a [Prism] for a structure [S] to focus in on [A] at given index [I]
@@ -37,7 +37,7 @@ fun <T, S, I, A> Iso<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = thi
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Optional] with a focus in [A] at given index [I]
  */
-fun <T, S, I, A> Prism<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Prism<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with an [Optional] for a structure [S] to focus in on [A] at given index [I]
@@ -47,7 +47,7 @@ fun <T, S, I, A> Prism<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = t
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Optional] with a focus in [A] at given index [I]
  */
-fun <T, S, I, A> Optional<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Optional<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with a [Setter] for a structure [S] to focus in on [A] at given index [I]
@@ -57,7 +57,7 @@ fun <T, S, I, A> Optional<T, S>.index(ID: Index<S, I, A>, i: I): Optional<T, A> 
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Setter] with a focus in [A] at given index [I].
  */
-fun <T, S, I, A> Setter<T, S>.index(ID: Index<S, I, A>, i: I): Setter<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Setter<T, S>.index(ID: Index<S, I, A>, i: I): Setter<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with a [Traversal] for a structure [S] to focus in on [A] at given index [I]
@@ -67,7 +67,7 @@ fun <T, S, I, A> Setter<T, S>.index(ID: Index<S, I, A>, i: I): Setter<T, A> = th
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Traversal] with a focus in [A] at given index [I].
  */
-fun <T, S, I, A> Traversal<T, S>.index(ID: Index<S, I, A>, i: I): Traversal<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Traversal<T, S>.index(ID: Index<S, I, A>, i: I): Traversal<T, A> = this.compose(ID.index(i))
 
 /**
  * DSL to compose [Index] with a [Fold] for a structure [S] to focus in on [A] at given index [I]
@@ -77,4 +77,4 @@ fun <T, S, I, A> Traversal<T, S>.index(ID: Index<S, I, A>, i: I): Traversal<T, A
  * @param i index [I] to focus into [S] and find focus [A]
  * @return [Fold] with a focus in [A] at given index [I].
  */
-fun <T, S, I, A> Fold<T, S>.index(ID: Index<S, I, A>, i: I): Fold<T, A> = this.compose(ID.index(i))
+public fun <T, S, I, A> Fold<T, S>.index(ID: Index<S, I, A>, i: I): Fold<T, A> = this.compose(ID.index(i))

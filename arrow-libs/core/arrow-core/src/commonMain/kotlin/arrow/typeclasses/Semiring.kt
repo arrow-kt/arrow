@@ -3,10 +3,10 @@ package arrow.typeclasses
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-const val FloatInstanceDeprecation: String =
+public const val FloatInstanceDeprecation: String =
   "Float instances for Semigroup/Monoid & Semiring are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
 
-const val DoubleInstanceDeprecation: String =
+public const val DoubleInstanceDeprecation: String =
   "Double instances for Semigroup/Monoid & Semiring are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
 
 /**
@@ -87,71 +87,71 @@ const val DoubleInstanceDeprecation: String =
  * }
  * ```
  */
-interface Semiring<A> {
+public interface Semiring<A> {
 
   /**
    * A zero value for this A
    */
-  fun zero(): A
+  public fun zero(): A
 
   /**
    * A one value for this A
    */
-  fun one(): A
+  public fun one(): A
 
-  fun A.combine(b: A): A
+  public fun A.combine(b: A): A
 
-  operator fun A.plus(b: A): A =
+  public operator fun A.plus(b: A): A =
     combine(b)
 
   /**
    * Multiplicatively combine two [A] values.
    */
-  fun A.combineMultiplicate(b: A): A
+  public fun A.combineMultiplicate(b: A): A
 
-  operator fun A.times(b: A): A =
+  public operator fun A.times(b: A): A =
     this.combineMultiplicate(b)
 
   /**
    * Maybe additively combine two [A] values.
    */
-  fun A?.maybeCombineAddition(b: A?): A =
+  public fun A?.maybeCombineAddition(b: A?): A =
     if (this == null) zero()
     else b?.let { combine(it) } ?: this
 
   /**
    * Maybe multiplicatively combine two [A] values.
    */
-  fun A?.maybeCombineMultiplicate(b: A?): A =
+  public fun A?.maybeCombineMultiplicate(b: A?): A =
     if (this == null) one()
     else b?.let { combineMultiplicate(it) } ?: this
 
-  companion object {
+  public companion object {
     @JvmStatic
     @JvmName("Float")
     @Deprecated(FloatInstanceDeprecation)
-    fun float(): Semiring<Float> = FloatSemiring
+    public fun float(): Semiring<Float> = FloatSemiring
 
     @JvmStatic
     @JvmName("Short")
-    fun short(): Semiring<Short> = ShortSemiring
+    public fun short(): Semiring<Short> = ShortSemiring
 
     @JvmStatic
     @JvmName("Long")
-    fun long(): Semiring<Long> = LongSemiring
+    public fun long(): Semiring<Long> = LongSemiring
 
     @JvmStatic
     @JvmName("Integer")
-    fun int(): Semiring<Int> = IntSemiring
+    public fun int(): Semiring<Int> = IntSemiring
 
     @JvmStatic
     @JvmName("Double")
     @Deprecated(DoubleInstanceDeprecation)
-    fun double(): Semiring<Double> = DoubleSemiring
+    public fun double(): Semiring<Double> = DoubleSemiring
 
     @JvmStatic
     @JvmName("Byte")
-    fun byte(): Semiring<Byte> = ByteSemiring
+    public fun byte(): Semiring<Byte> = ByteSemiring
 
     private object ByteSemiring : Semiring<Byte> {
       override fun one(): Byte = 1

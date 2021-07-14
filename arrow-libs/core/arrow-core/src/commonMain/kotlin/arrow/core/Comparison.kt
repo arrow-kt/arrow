@@ -1,9 +1,9 @@
 package arrow.core
 
-fun <A : Comparable<A>> sort(a: A, b: A): Pair<A, A> =
+public fun <A : Comparable<A>> sort(a: A, b: A): Pair<A, A> =
   if (a <= b) Pair(a, b) else Pair(b, a)
 
-fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> =
+public fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> =
   when {
     a <= b && b <= c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
@@ -11,13 +11,13 @@ fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun <A : Comparable<A>> sort(a: A, vararg aas: A): List<A> =
+public fun <A : Comparable<A>> sort(a: A, vararg aas: A): List<A> =
   (listOf(a) + aas).sorted()
 
-fun <A> sort(a: A, b: A, comparator: Comparator<A>): Pair<A, A> =
+public fun <A> sort(a: A, b: A, comparator: Comparator<A>): Pair<A, A> =
   if (comparator.compare(a, b) <= 0) Pair(a, b) else Pair(b, a)
 
-fun <A> sort(a: A, b: A, c: A, comparator: Comparator<A>): Triple<A, A, A> =
+public fun <A> sort(a: A, b: A, c: A, comparator: Comparator<A>): Triple<A, A, A> =
   when {
     comparator.compare(a, b) <= 0 && comparator.compare(b, c) <= 0 -> Triple(a, b, c)
     comparator.compare(a, b) <= 0 -> if (comparator.compare(c, a) <= 0) Triple(c, a, b) else Triple(a, c, b)
@@ -25,13 +25,13 @@ fun <A> sort(a: A, b: A, c: A, comparator: Comparator<A>): Triple<A, A, A> =
     else -> if (comparator.compare(c, b) <= 0) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun <A> sort(a: A, vararg aas: A, comparator: Comparator<A>): List<A> =
+public fun <A> sort(a: A, vararg aas: A, comparator: Comparator<A>): List<A> =
   (listOf(a) + aas).sortedWith(comparator)
 
-fun sort(a: Byte, b: Byte): Pair<Byte, Byte> =
+public fun sort(a: Byte, b: Byte): Pair<Byte, Byte> =
   if (a <= b) Pair(a, b) else Pair(b, a)
 
-fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> =
+public fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> =
   when {
     a <= b && b <= c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
@@ -39,13 +39,13 @@ fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun sort(a: Byte, vararg aas: Byte): List<Byte> =
+public fun sort(a: Byte, vararg aas: Byte): List<Byte> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
-fun sort(a: Short, b: Short): Pair<Short, Short> =
+public fun sort(a: Short, b: Short): Pair<Short, Short> =
   if (a <= b) Pair(a, b) else Pair(b, a)
 
-fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> =
+public fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> =
   when {
     a <= b && b <= c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
@@ -53,13 +53,13 @@ fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun sort(a: Short, vararg aas: Short): List<Short> =
+public fun sort(a: Short, vararg aas: Short): List<Short> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
-fun sort(a: Int, b: Int): Pair<Int, Int> =
+public fun sort(a: Int, b: Int): Pair<Int, Int> =
   if (a <= b) Pair(a, b) else Pair(b, a)
 
-fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> =
+public fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> =
   when {
     a <= b && b <= c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
@@ -67,13 +67,13 @@ fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun sort(a: Int, vararg aas: Int): List<Int> =
+public fun sort(a: Int, vararg aas: Int): List<Int> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
-fun sort(a: Long, b: Long): Pair<Long, Long> =
+public fun sort(a: Long, b: Long): Pair<Long, Long> =
   if (a <= b) Pair(a, b) else Pair(b, a)
 
-fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
+public fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
   when {
     a <= b && b <= c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
@@ -81,14 +81,14 @@ fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
-fun sort(a: Long, vararg aas: Long): List<Long> =
+public fun sort(a: Long, vararg aas: Long): List<Long> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
-const val FloatInstanceDeprecation: String =
+public const val FloatInstanceDeprecation: String =
   "Comparison operators for Float are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
 
 @Deprecated(FloatInstanceDeprecation)
-fun sort(a: Float, b: Float): Pair<Float, Float> =
+public fun sort(a: Float, b: Float): Pair<Float, Float> =
   when {
     a.isNaN() -> Pair(b, a)
     b.isNaN() -> Pair(a, b)
@@ -96,7 +96,7 @@ fun sort(a: Float, b: Float): Pair<Float, Float> =
   }
 
 @Deprecated(FloatInstanceDeprecation)
-fun sort(a: Float, b: Float, c: Float): Triple<Float, Float, Float> =
+public fun sort(a: Float, b: Float, c: Float): Triple<Float, Float, Float> =
   when {
     a.isNaN() -> when {
       b.isNaN() -> Triple(c, b, a)
@@ -115,14 +115,14 @@ fun sort(a: Float, b: Float, c: Float): Triple<Float, Float, Float> =
   }
 
 @Deprecated(FloatInstanceDeprecation)
-fun sort(a: Float, vararg aas: Float): List<Float> =
+public fun sort(a: Float, vararg aas: Float): List<Float> =
   (arrayOf(a) + aas.toTypedArray()).sorted()
 
-const val DoubleInstanceDeprecation: String =
+public const val DoubleInstanceDeprecation: String =
   "Comparison operators for Double are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
 
 @Deprecated(DoubleInstanceDeprecation)
-fun sort(a: Double, b: Double): Pair<Double, Double> =
+public fun sort(a: Double, b: Double): Pair<Double, Double> =
   when {
     a.isNaN() -> Pair(b, a)
     b.isNaN() -> Pair(a, b)
@@ -130,7 +130,7 @@ fun sort(a: Double, b: Double): Pair<Double, Double> =
   }
 
 @Deprecated(DoubleInstanceDeprecation)
-fun sort(a: Double, b: Double, c: Double): Triple<Double, Double, Double> =
+public fun sort(a: Double, b: Double, c: Double): Triple<Double, Double, Double> =
   when {
     a.isNaN() -> when {
       b.isNaN() -> Triple(c, b, a)
@@ -149,5 +149,5 @@ fun sort(a: Double, b: Double, c: Double): Triple<Double, Double, Double> =
   }
 
 @Deprecated(DoubleInstanceDeprecation)
-fun sort(a: Double, vararg aas: Double): List<Double> =
+public fun sort(a: Double, vararg aas: Double): List<Double> =
   (arrayOf(a) + aas.toTypedArray()).sorted()

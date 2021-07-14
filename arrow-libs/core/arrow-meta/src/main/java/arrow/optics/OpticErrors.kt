@@ -2,14 +2,14 @@ package arrow.optics
 
 import javax.lang.model.element.Element
 
-val Element.otherClassTypeErrorMessage
+public val Element.otherClassTypeErrorMessage: String
   get() = """
       |$this cannot be annotated with @optics
       | ^
       |
       |Only data and sealed classes can be annotated with @optics annotation""".trimMargin()
 
-val Element.lensErrorMessage
+public val Element.lensErrorMessage: String
   get() = """
       |Cannot generate arrow.optics.Lens for $this
       |                                       ^
@@ -17,7 +17,7 @@ val Element.lensErrorMessage
       |It is only valid for data classes.
       """.trimMargin()
 
-val Element.optionalErrorMessage
+public val Element.optionalErrorMessage: String
   get() = """
       |Cannot generate arrow.optics.Optional for $this
       |                                           ^
@@ -25,7 +25,7 @@ val Element.optionalErrorMessage
       |It is only valid for data classes.
       """.trimMargin()
 
-val Element.prismErrorMessage
+public val Element.prismErrorMessage: String
   get() = """
       |Cannot generate arrow.optics.Prism for $this
       |                                        ^
@@ -33,7 +33,7 @@ val Element.prismErrorMessage
       |It is only valid for sealed classes.
       """.trimMargin()
 
-val Element.isoErrorMessage
+public val Element.isoErrorMessage: String
   get() = """
       |Cannot generate arrow.optics.Iso for $this
       |                                      ^
@@ -41,14 +41,14 @@ val Element.isoErrorMessage
       |It is only valid for data classes.
       """.trimMargin()
 
-val Element.isoTooBigErrorMessage
+public val Element.isoTooBigErrorMessage: String
   get() = """
       |Cannot generate arrow.optics.Iso for $this
       |                                      ^
       |Iso generation is supported for data classes with up to 22 constructor parameters.
       """.trimMargin()
 
-val Element.dslErrorMessage
+public val Element.dslErrorMessage: String
   get() = """
       |Cannot generate DSL (arrow.optics.BoundSetter) for $this
       |                                           ^

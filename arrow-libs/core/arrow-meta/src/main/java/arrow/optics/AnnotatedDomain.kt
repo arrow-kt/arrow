@@ -5,86 +5,86 @@ import arrow.common.utils.fullName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import javax.lang.model.element.TypeElement
 
-data class AnnotatedElement(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>) {
-  val sourceClassName = classData.fullName.escapedClassName
-  val sourceName = type.simpleName.toString().decapitalize()
-  val packageName = classData.`package`.escapedClassName
+public data class AnnotatedElement(val type: TypeElement, val classData: ClassOrPackageDataWrapper.Class, val targets: List<Target>) {
+  public val sourceClassName: String = classData.fullName.escapedClassName
+  public val sourceName: String = type.simpleName.toString().decapitalize()
+  public val packageName: String = classData.`package`.escapedClassName
 
-  operator fun Snippet.plus(snippet: Snippet): Snippet = copy(
+  public operator fun Snippet.plus(snippet: Snippet): Snippet = copy(
     imports = imports + snippet.imports,
     content = "$content\n${snippet.content}"
   )
 }
 
-typealias IsoTarget = Target.Iso
-typealias PrismTarget = Target.Prism
-typealias LensTarget = Target.Lens
-typealias OptionalTarget = Target.Optional
-typealias SealedClassDsl = Target.SealedClassDsl
-typealias DataClassDsl = Target.DataClassDsl
+public typealias IsoTarget = Target.Iso
+public typealias PrismTarget = Target.Prism
+public typealias LensTarget = Target.Lens
+public typealias OptionalTarget = Target.Optional
+public typealias SealedClassDsl = Target.SealedClassDsl
+public typealias DataClassDsl = Target.DataClassDsl
 
-sealed class Target {
-  abstract val foci: List<Focus>
+public sealed class Target {
+  public abstract val foci: List<Focus>
 
-  data class Iso(override val foci: List<Focus>) : Target()
-  data class Prism(override val foci: List<Focus>) : Target()
-  data class Lens(override val foci: List<Focus>) : Target()
-  data class Optional(override val foci: List<Focus>) : Target()
-  data class SealedClassDsl(override val foci: List<Focus>) : Target()
-  data class DataClassDsl(override val foci: List<Focus>) : Target()
+  public data class Iso(override val foci: List<Focus>) : Target()
+  public data class Prism(override val foci: List<Focus>) : Target()
+  public data class Lens(override val foci: List<Focus>) : Target()
+  public data class Optional(override val foci: List<Focus>) : Target()
+  public data class SealedClassDsl(override val foci: List<Focus>) : Target()
+  public data class DataClassDsl(override val foci: List<Focus>) : Target()
 }
 
-typealias NonNullFocus = Focus.NonNull
-typealias OptionFocus = Focus.Option
-typealias NullableFocus = Focus.Nullable
+public typealias NonNullFocus = Focus.NonNull
+public typealias OptionFocus = Focus.Option
+public typealias NullableFocus = Focus.Nullable
 
-sealed class Focus {
+public sealed class Focus {
 
-  companion object {
-    operator fun invoke(fullName: String, paramName: String): Focus = when {
+  public companion object {
+    public operator fun invoke(fullName: String, paramName: String): Focus = when {
       fullName.endsWith("?") -> Nullable(fullName, paramName)
       fullName.startsWith("`arrow`.`core`.`Option`") -> Option(fullName, paramName)
       else -> NonNull(fullName, paramName)
     }
   }
 
-  abstract val className: String
-  abstract val paramName: String
+  public abstract val className: String
+  public abstract val paramName: String
 
-  data class Nullable(override val className: String, override val paramName: String) : Focus() {
-    val nonNullClassName = className.dropLast(1)
+  public data class Nullable(override val className: String, override val paramName: String) : Focus() {
+    public val nonNullClassName: String = className.dropLast(1)
   }
 
-  data class Option(override val className: String, override val paramName: String) : Focus() {
-    val nestedClassName = Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
+  public data class Option(override val className: String, override val paramName: String) : Focus() {
+    public val nestedClassName: String = Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
   }
 
-  data class NonNull(override val className: String, override val paramName: String) : Focus()
+  public data class NonNull(override val className: String, override val paramName: String) : Focus()
 }
 
-const val Lens = "arrow.optics.Lens"
-const val Iso = "arrow.optics.Iso"
-const val Optional = "arrow.optics.Optional"
-const val Prism = "arrow.optics.Prism"
-const val Getter = "arrow.optics.Getter"
-const val Setter = "arrow.optics.Setter"
-const val Traversal = "arrow.optics.Traversal"
-const val Fold = "arrow.optics.Fold"
-const val Every = "arrow.optics.Every"
-const val Tuple = "arrow.core.Tuple"
-const val Pair = "kotlin.Pair"
-const val Triple = "kotlin.Triple"
+public const val Lens: String = "arrow.optics.Lens"
+public const val Iso: String = "arrow.optics.Iso"
+public const val Optional: String = "arrow.optics.Optional"
+public const val Prism: String = "arrow.optics.Prism"
+public const val Getter: String = "arrow.optics.Getter"
+public const val Setter: String = "arrow.optics.Setter"
+public const val Traversal: String = "arrow.optics.Traversal"
+public const val Fold: String = "arrow.optics.Fold"
+public const val Every: String = "arrow.optics.Every"
+public const val Tuple: String = "arrow.core.Tuple"
+public const val Pair: String = "kotlin.Pair"
+public const val Triple: String = "kotlin.Triple"
 
-data class Snippet(
+public data class Snippet(
   val `package`: String,
   val name: String,
   val imports: Set<String> = emptySet(),
   val content: String
 ) {
-  val fqName = "$`package`.$name"
+  public val fqName: String = "$`package`.$name"
 }
 
-fun Snippet.asFileText(): String = """
+public fun Snippet.asFileText(): String = """
             |${if (`package` != "`unnamed package`") "package $`package`" else ""}
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content

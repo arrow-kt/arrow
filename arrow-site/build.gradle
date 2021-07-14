@@ -17,7 +17,6 @@ plugins {
 }
 
 apply from: "../arrow-libs/gradle/main.gradle"
-apply from: "../arrow-libs/gradle/subproject.gradle"
 
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$VERSION_NAME"

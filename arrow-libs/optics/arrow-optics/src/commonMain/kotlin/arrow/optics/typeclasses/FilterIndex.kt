@@ -14,26 +14,26 @@ import kotlin.jvm.JvmStatic
  * @param I index that uniquely identifies every focus of the [Every]
  * @param A focus that is supposed to be unique for a given pair [S] and [I]
  */
-fun interface FilterIndex<S, I, A> {
+public fun interface FilterIndex<S, I, A> {
 
   /**
    * Filter the foci [A] of a [Every] with the predicate [p].
    */
-  fun filter(p: Predicate<I>): Every<S, A>
+  public fun filter(p: Predicate<I>): Every<S, A>
 
-  companion object {
+  public companion object {
 
     /**
      * Lift an instance of [FilterIndex] using an [Iso]
      */
-    fun <S, A, I, B> fromIso(FI: FilterIndex<A, I, B>, iso: Iso<S, A>): FilterIndex<S, I, B> =
+    public fun <S, A, I, B> fromIso(FI: FilterIndex<A, I, B>, iso: Iso<S, A>): FilterIndex<S, I, B> =
       FilterIndex { p -> iso compose FI.filter(p) }
 
     /**
      * [FilterIndex] instance definition for [List].
      */
     @JvmStatic
-    fun <A> list(): FilterIndex<List<A>, Int, A> =
+    public fun <A> list(): FilterIndex<List<A>, Int, A> =
       FilterIndex { p ->
         object : Every<List<A>, A> {
           override fun <R> foldMap(M: Monoid<R>, s: List<A>, map: (A) -> R): R = M.run {
@@ -46,7 +46,7 @@ fun interface FilterIndex<S, I, A> {
       }
 
     @JvmStatic
-    fun <K, V> map(): FilterIndex<Map<K, V>, K, V> =
+    public fun <K, V> map(): FilterIndex<Map<K, V>, K, V> =
       FilterIndex { p ->
         object : Every<Map<K, V>, V> {
           override fun <R> foldMap(M: Monoid<R>, source: Map<K, V>, map: (V) -> R): R = M.run {
@@ -64,7 +64,7 @@ fun interface FilterIndex<S, I, A> {
      * [FilterIndex] instance definition for [NonEmptyList].
      */
     @JvmStatic
-    fun <A> nonEmptyList(): FilterIndex<NonEmptyList<A>, Int, A> =
+    public fun <A> nonEmptyList(): FilterIndex<NonEmptyList<A>, Int, A> =
       FilterIndex { p ->
         object : Every<NonEmptyList<A>, A> {
           override fun <R> foldMap(M: Monoid<R>, source: NonEmptyList<A>, map: (A) -> R): R = M.run {
@@ -79,7 +79,7 @@ fun interface FilterIndex<S, I, A> {
       }
 
     @JvmStatic
-    fun <A> sequence(): FilterIndex<Sequence<A>, Int, A> =
+    public fun <A> sequence(): FilterIndex<Sequence<A>, Int, A> =
       FilterIndex { p ->
         object : Every<Sequence<A>, A> {
           override fun <R> foldMap(M: Monoid<R>, source: Sequence<A>, map: (A) -> R): R = M.run {
@@ -101,7 +101,7 @@ fun interface FilterIndex<S, I, A> {
      * @return [FilterIndex] instance
      */
     @JvmStatic
-    fun string(): FilterIndex<String, Int, Char> =
+    public fun string(): FilterIndex<String, Int, Char> =
       FilterIndex { p ->
         Iso.stringToList() compose list<Char>().filter(p)
       }

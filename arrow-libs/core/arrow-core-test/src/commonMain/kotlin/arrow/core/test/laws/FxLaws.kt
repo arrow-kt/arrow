@@ -17,9 +17,9 @@ import kotlin.coroutines.startCoroutine
 private typealias EagerFxBlock<Eff, F, A> = (suspend Eff.() -> A) -> F
 private typealias SuspendFxBlock<Eff, F, A> = suspend (suspend Eff.() -> A) -> F
 
-object FxLaws {
+public object FxLaws {
 
-  fun <Eff : Effect<*>, F, A> suspended(
+  public fun <Eff : Effect<*>, F, A> suspended(
     pureArb: Arb<F>,
     G: Arb<F>,
     eq: (F, F) -> Boolean,
@@ -44,7 +44,7 @@ object FxLaws {
     }
   )
 
-  fun <Eff : Effect<*>, F, A> eager(
+  public fun <Eff : Effect<*>, F, A> eager(
     pureArb: Arb<F>,
     G: Arb<F>,
     eq: (F, F) -> Boolean,

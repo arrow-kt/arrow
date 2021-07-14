@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks
  */
-suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
   parSequenceN(Dispatchers.Default, n)
 
 /**
@@ -33,7 +33,7 @@ suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
  *
  * Cancelling this operation cancels all running tasks
  */
-suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
   val s = Semaphore(n)
   return parTraverse(ctx) {
     s.withPermit { it.invoke() }
@@ -63,7 +63,7 @@ suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = E
  * }
  * ```
  */
-suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
+public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
   parSequence(Dispatchers.Default)
 
 /**
@@ -94,14 +94,14 @@ suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  * }
  * ```
  */
-suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
+public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
   parTraverse(ctx) { it.invoke() }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B): List<B> =
+public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B): List<B> =
   parTraverseN(Dispatchers.Default, n, f)
 
 /**
@@ -113,7 +113,7 @@ suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B): List<B
  *
  * Cancelling this operation cancels all running tasks.
  */
-suspend fun <A, B> Iterable<A>.parTraverseN(
+public suspend fun <A, B> Iterable<A>.parTraverseN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend (A) -> B
@@ -145,7 +145,7 @@ suspend fun <A, B> Iterable<A>.parTraverseN(
  * }
  * ```
  */
-suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
+public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
   parTraverse(Dispatchers.Default, f)
 
 /**
@@ -175,7 +175,7 @@ suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
  * }
  * ```
  */
-suspend fun <A, B> Iterable<A>.parTraverse(
+public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend (A) -> B
 ): List<B> = coroutineScope {

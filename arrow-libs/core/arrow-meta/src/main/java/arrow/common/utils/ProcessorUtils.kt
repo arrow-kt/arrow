@@ -23,9 +23,9 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 
-interface ProcessorUtils : KotlinMetadataUtils {
+public interface ProcessorUtils : KotlinMetadataUtils {
 
-  fun Element.getConstructorParamNames(): List<String> = kotlinMetadata
+  public fun Element.getConstructorParamNames(): List<String> = kotlinMetadata
     .let { it as KotlinClassMetadata }.data
     .let { (nameResolver, classProto) ->
       classProto.constructorOrBuilderList
@@ -35,12 +35,12 @@ interface ProcessorUtils : KotlinMetadataUtils {
         .map(nameResolver::getString)
     }
 
-  fun Element.getClassData(): ClassOrPackageDataWrapper.Class = kotlinMetadata
+  public fun Element.getClassData(): ClassOrPackageDataWrapper.Class = kotlinMetadata
     .let { it as KotlinClassMetadata }
     .data
     .asClassOrPackageDataWrapper(elementUtils.getPackageOf(this).toString())
 
-  fun Element.getConstructorTypesNames(): List<String> = kotlinMetadata
+  public fun Element.getConstructorTypesNames(): List<String> = kotlinMetadata
     .let { it as KotlinClassMetadata }.data
     .let { data ->
       data.proto.constructorOrBuilderList
@@ -49,12 +49,12 @@ interface ProcessorUtils : KotlinMetadataUtils {
         .map { it.type.extractFullName(data) }
     }
 
-  val Element.hasNoCompanion: Boolean
+  public val Element.hasNoCompanion: Boolean
     get() = (kotlinMetadata as? KotlinClassMetadata)?.data?.run {
       nameResolver.getName(proto.companionObjectName).asString() != "Companion"
     } ?: true
 
-  fun KotlinMetadata.asClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper? {
+  public fun KotlinMetadata.asClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper? {
     val `package` = elementUtils.getPackageOf(classElement).toString()
     return when (this) {
       is KotlinClassMetadata -> data.asClassOrPackageDataWrapper(`package`)
@@ -63,7 +63,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
   }
 
-  fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
+  public fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
     val metadata = (
       if (classElement.kotlinMetadata == null) {
         elementUtils.getTypeElement(classElement.qualifiedName.toString().asKotlin()).kotlinMetadata
@@ -74,14 +74,14 @@ interface ProcessorUtils : KotlinMetadataUtils {
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
-  fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement): ProtoBuf.Function? =
+  public fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement): ProtoBuf.Function? =
     getFunctionOrNull(methodElement, nameResolver, functionList)
 
   private fun kindedRex() = "(?i)Kind<(.)>".toRegex()
 
-  fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
+  public fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
-  fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
+  public fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
     typeTable: TypeTable
   ): List<ClassOrPackageDataWrapper> {
     val interfaces = this.classProto.supertypes(typeTable).map {
@@ -101,42 +101,51 @@ interface ProcessorUtils : KotlinMetadataUtils {
 private val ProtoBuf.ConstructorOrBuilder.isPrimary: Boolean get() = !isSecondary
 private val ProtoBuf.ConstructorOrBuilder.isSecondary: Boolean get() = Flags.IS_SECONDARY[flags]
 
-fun String.removeBackticks() = replace("`", "")
+public fun String.removeBackticks(): String = replace("`", "")
 
-fun String.toCamelCase(): String =
+public fun String.toCamelCase(): String =
   when {
     length <= 1 -> toLowerCase()
 
     else -> first().toLowerCase() + substring(1)
   }
 
-fun knownError(message: String, element: Element? = null): Nothing =
+public fun knownError(message: String, element: Element? = null): Nothing =
   throw KnownException(message, element)
 
-val ProtoBuf.Class.Kind.isCompanionOrObject
+public val ProtoBuf.Class.Kind.isCompanionOrObject: Boolean
   get() = when (this) {
     ProtoBuf.Class.Kind.OBJECT,
     ProtoBuf.Class.Kind.COMPANION_OBJECT -> true
     else -> false
   }
 
-val ProtoBuf.Class.isSealed
+public val ProtoBuf.Class.isSealed: Boolean
   get() = modality == ProtoBuf.Modality.SEALED
 
-val ClassOrPackageDataWrapper.Class.fullName: String
+public val ClassOrPackageDataWrapper.Class.fullName: String
   get() = nameResolver.getName(classProto.fqName).asString()
 
-val ClassOrPackageDataWrapper.Class.simpleName: String
+public val ClassOrPackageDataWrapper.Class.simpleName: String
   get() = fullName.substringAfterLast("/")
 
-fun ClassOrPackageDataWrapper.getParameter(function: ProtoBuf.Function, parameterElement: VariableElement) =
+public fun ClassOrPackageDataWrapper.getParameter(
+  function: ProtoBuf.Function,
+  parameterElement: VariableElement
+): ProtoBuf.ValueParameter =
   getValueParameterOrNull(nameResolver, function, parameterElement)
-    ?: knownError("Can't find annotated parameter ${parameterElement.simpleName} in ${function.getJvmMethodSignature(nameResolver)}")
+    ?: knownError(
+      "Can't find annotated parameter ${parameterElement.simpleName} in ${
+        function.getJvmMethodSignature(
+          nameResolver
+        )
+      }"
+    )
 
-fun ClassOrPackageDataWrapper.getPropertyOrNull(methodElement: ExecutableElement) =
+public fun ClassOrPackageDataWrapper.getPropertyOrNull(methodElement: ExecutableElement): ProtoBuf.Property? =
   getPropertyOrNull(methodElement, nameResolver, this::propertyList)
 
-fun ProtoBuf.Type.extractFullName(
+public fun ProtoBuf.Type.extractFullName(
   classData: ClassOrPackageDataWrapper,
   outputTypeAlias: Boolean = true
 ): String =
@@ -147,7 +156,7 @@ fun ProtoBuf.Type.extractFullName(
     throwOnGeneric = null
   )
 
-fun ClassOrPackageDataWrapper.typeConstraints(): String =
+public fun ClassOrPackageDataWrapper.typeConstraints(): String =
   typeParameters.flatMap { typeParameter ->
     val name = nameResolver.getString(typeParameter.name)
     typeParameter.upperBoundList.map { constraint ->
@@ -167,10 +176,10 @@ fun ClassOrPackageDataWrapper.typeConstraints(): String =
     }
   }
 
-fun recurseFilesUpwards(fileNames: Set<String>): File =
+public fun recurseFilesUpwards(fileNames: Set<String>): File =
   recurseFilesUpwards(fileNames, File(".").absoluteFile)
 
-fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
+public fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
   val filesInDir = currentDirectory.list()
 
   return if ((filesInDir.intersect(fileNames)).isNotEmpty()) {

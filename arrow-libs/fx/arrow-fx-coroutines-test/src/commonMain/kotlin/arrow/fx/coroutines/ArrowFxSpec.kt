@@ -9,7 +9,7 @@ import io.kotest.property.checkAll
 /**
  * Simple overwritten Kotest FreeSpec to reduce stress on tests.
  */
-abstract class ArrowFxSpec(
+public abstract class ArrowFxSpec(
   private val iterations: Int = 350,
   spec: ArrowFxSpec.() -> Unit = {}
 ) : FreeSpec() {
@@ -18,10 +18,10 @@ abstract class ArrowFxSpec(
     spec()
   }
 
-  suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
+  public suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
     checkAll(iterations, Arb.unit()) { property() }
 
-  suspend fun <A> checkAll(
+  public suspend fun <A> checkAll(
     genA: Arb<A>,
     property: suspend PropertyContext.(A) -> Unit
   ): PropertyContext =
@@ -31,7 +31,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B> checkAll(
+  public suspend fun <A, B> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     property: suspend PropertyContext.(A, B) -> Unit
@@ -43,7 +43,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B, C> checkAll(
+  public suspend fun <A, B, C> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -57,7 +57,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B, C, D> checkAll(
+  public suspend fun <A, B, C, D> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -73,7 +73,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B, C, D, E> checkAll(
+  public suspend fun <A, B, C, D, E> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -91,7 +91,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B, C, D, E, F> checkAll(
+  public suspend fun <A, B, C, D, E, F> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -111,7 +111,7 @@ abstract class ArrowFxSpec(
       property
     )
 
-  suspend fun <A, B, C, D, E, F, G> checkAll(
+  public suspend fun <A, B, C, D, E, F, G> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -133,7 +133,7 @@ abstract class ArrowFxSpec(
       property(a, b, c, d, e, f, g)
     }
 
-  suspend fun <A, B, C, D, E, F, G, H> checkAll(
+  public suspend fun <A, B, C, D, E, F, G, H> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
     genC: Arb<C>,
@@ -156,7 +156,7 @@ abstract class ArrowFxSpec(
       property(a, b, c, d, e, f, g, h)
     }
 
-  suspend fun forFew(
+  public suspend fun forFew(
     iterations: Int,
     property: suspend PropertyContext.(Unit) -> Unit
   ): PropertyContext =
