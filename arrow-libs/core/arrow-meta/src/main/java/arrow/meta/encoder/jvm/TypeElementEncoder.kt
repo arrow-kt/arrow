@@ -451,6 +451,7 @@ public interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder
       Modifier.SYNCHRONIZED -> null
       Modifier.NATIVE -> null
       Modifier.STRICTFP -> null
+      else -> null
     }
 
   public fun TypeElement.sealedSubClassNames(): List<TypeName> =
