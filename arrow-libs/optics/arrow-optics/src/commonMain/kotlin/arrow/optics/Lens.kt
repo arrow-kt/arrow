@@ -212,17 +212,3 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
       triplePThird()
   }
 }
-
-suspend fun <A> test(): A = TODO()
-
-inline fun <S, A> Lens<S, A>.modifySuspend(source: S, f: (A) -> A): S {
-  val focus = get(source)
-  f(focus)
-  return set(source, focus)
-}
-
-suspend fun main() {
-  Lens.id<Int>().modifySuspend(1) {
-    test()
-  }
-}

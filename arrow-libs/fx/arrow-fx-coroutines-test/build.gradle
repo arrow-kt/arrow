@@ -14,24 +14,12 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
                 api project(":arrow-core-test")
                 api project(":arrow-fx-coroutines")
                 api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
                 api "io.kotest:kotest-property:$KOTEST_VERSION"
                 api "io.kotest:kotest-framework-api:$KOTEST_VERSION"
                 api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
-            }
-        }
-        jvmMain {
-            dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-            }
-        }
-
-        jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
             }
         }
     }
