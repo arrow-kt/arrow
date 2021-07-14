@@ -244,5 +244,14 @@ class OptionTest : UnitSpec() {
       val recover: (Throwable) -> Option<Int> = { _ -> Some(recoverValue) }
       Option.catch(recover) { throw exception } shouldBe Some(recoverValue)
     }
+
+    "catch should return Some(result) when f does not throw" {
+      Option.catch { 1 } shouldBe Some(1)
+    }
+
+    "catch should return None when f throws" {
+      val exception = Exception("Boom!")
+      Option.catch { throw exception } shouldBe None
+    }
   }
 }
