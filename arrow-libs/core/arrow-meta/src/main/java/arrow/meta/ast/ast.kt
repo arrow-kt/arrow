@@ -5,44 +5,44 @@
 package arrow.meta.ast
 
 @Suppress("UtilityClassWithPublicConstructor")
-sealed class Tree {
-  companion object
+public sealed class Tree {
+  public companion object
 }
 
-data class Code(val value: String) {
+public data class Code(val value: String) {
   override fun toString(): String = value
 
-  companion object {
-    val empty = Code("")
+  public companion object {
+    public val empty: Code = Code("")
   }
 }
 
-data class PackageName(
+public data class PackageName(
   val value: String
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-data class TypeAlias(
+public data class TypeAlias(
   val name: String,
   val value: TypeName
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-data class Import(
+public data class Import(
   val qualifiedName: String,
   val alias: String? = null
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-sealed class TypeName : Tree() {
+public sealed class TypeName : Tree() {
 
-  abstract val simpleName: String
-  abstract val rawName: String
+  public abstract val simpleName: String
+  public abstract val rawName: String
 
-  data class TypeVariable(
+  public data class TypeVariable(
     val name: String,
     val bounds: List<TypeName> = emptyList(),
     val variance: Modifier? = null,
@@ -57,10 +57,10 @@ sealed class TypeName : Tree() {
     override val rawName: String
       get() = name.substringBefore("<")
 
-    companion object
+    public companion object
   }
 
-  data class WildcardType(
+  public data class WildcardType(
     val name: String,
     val upperBounds: List<TypeName>,
     val lowerBounds: List<TypeName>,
@@ -74,10 +74,10 @@ sealed class TypeName : Tree() {
     override val rawName: String
       get() = name.substringBefore("<")
 
-    companion object
+    public companion object
   }
 
-  data class FunctionLiteral(
+  public data class FunctionLiteral(
     val modifiers: List<Modifier> = emptyList(),
     val receiverType: TypeName?,
     val parameters: List<TypeName>,
@@ -85,9 +85,9 @@ sealed class TypeName : Tree() {
   ) : TypeName() {
     override val simpleName: String
       get() = if (receiverType != null) {
-        "(${receiverType.simpleName}).(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
+        "(${receiverType.simpleName}).(${parameters.joinToString(", ") { it.simpleName }}) -> ${returnType.simpleName}"
       } else {
-        "(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
+        "(${parameters.joinToString(", ") { it.simpleName }}) -> ${returnType.simpleName}"
       }
 
     override val rawName: String
@@ -97,7 +97,7 @@ sealed class TypeName : Tree() {
       }
   }
 
-  data class ParameterizedType(
+  public data class ParameterizedType(
     val name: String,
     val enclosingType: TypeName? = null,
     val rawType: Classy,
@@ -112,10 +112,10 @@ sealed class TypeName : Tree() {
     override val simpleName: String
       get() = rawType.simpleName
 
-    companion object
+    public companion object
   }
 
-  data class Classy(
+  public data class Classy(
     override val simpleName: String,
     val fqName: String,
     val pckg: PackageName,
@@ -126,57 +126,58 @@ sealed class TypeName : Tree() {
     override val rawName: String
       get() = fqName
 
-    fun companion(): Classy =
+    public fun companion(): Classy =
       copy(
         simpleName = "Companion",
         fqName = "$fqName.Companion",
         pckg = PackageName("${pckg.value}.$simpleName")
       )
 
-    companion object {
-      fun from(pck: String, simpleName: String): Classy =
+    public companion object {
+      public fun from(pck: String, simpleName: String): Classy =
         Classy(simpleName, "$pck.$simpleName", PackageName(pck))
     }
   }
 
-  companion object {
-    val Unit: TypeName = TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
-    val AnyNullable: TypeName = TypeName.TypeVariable("Any?")
+  public companion object {
+    public val Unit: TypeName =
+      TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
+    public val AnyNullable: TypeName = TypeName.TypeVariable("Any?")
   }
 }
 
-sealed class UseSiteTarget {
-  object File : UseSiteTarget()
-  object Property : UseSiteTarget()
-  object Field : UseSiteTarget()
-  object Get : UseSiteTarget()
-  object Set : UseSiteTarget()
-  object Receiver : UseSiteTarget()
-  object Param : UseSiteTarget()
-  object SetParam : UseSiteTarget()
-  object Delegate : UseSiteTarget()
-  companion object
+public sealed class UseSiteTarget {
+  public object File : UseSiteTarget()
+  public object Property : UseSiteTarget()
+  public object Field : UseSiteTarget()
+  public object Get : UseSiteTarget()
+  public object Set : UseSiteTarget()
+  public object Receiver : UseSiteTarget()
+  public object Param : UseSiteTarget()
+  public object SetParam : UseSiteTarget()
+  public object Delegate : UseSiteTarget()
+  public companion object
 }
 
-data class Parameter(
+public data class Parameter(
   val name: String,
   val type: TypeName,
   val defaultValue: Code? = null,
   val annotations: List<Annotation> = emptyList(),
   val modifiers: List<Modifier> = emptyList()
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-data class Annotation(
+public data class Annotation(
   val type: TypeName,
   val members: List<Code>,
   val useSiteTarget: UseSiteTarget?
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-data class Property(
+public data class Property(
   val name: String,
   val type: TypeName,
   val mutable: Boolean = false,
@@ -191,10 +192,10 @@ data class Property(
   val annotations: List<Annotation> = emptyList(),
   val modifiers: List<Modifier> = emptyList()
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-data class Func(
+public data class Func(
   val name: String,
   val kdoc: Code? = null,
   val receiverType: TypeName? = null,
@@ -206,44 +207,44 @@ data class Func(
   val parameters: List<Parameter> = emptyList(),
   val jvmMethodSignature: String = ""
 ) : Tree() {
-  companion object
+  public companion object
 }
 
-sealed class Modifier {
-  object Public : Modifier()
-  object Protected : Modifier()
-  object Private : Modifier()
-  object Internal : Modifier()
-  object Expect : Modifier()
-  object Actual : Modifier()
-  object Final : Modifier()
-  object Open : Modifier()
-  object Abstract : Modifier()
-  object Sealed : Modifier()
-  object Const : Modifier()
-  object External : Modifier()
-  object Override : Modifier()
-  object LateInit : Modifier()
-  object Tailrec : Modifier()
-  object Suspend : Modifier()
-  object Inner : Modifier()
-  object Enum : Modifier()
-  object Annotation : Modifier()
-  object CompanionObject : Modifier()
-  object Inline : Modifier()
-  object NoInline : Modifier()
-  object CrossInline : Modifier()
-  object Reified : Modifier()
-  object Infix : Modifier()
-  object Operator : Modifier()
-  object Data : Modifier()
-  object InVariance : Modifier()
-  object OutVariance : Modifier()
-  object VarArg : Modifier()
-  companion object
+public sealed class Modifier {
+  public object Public : Modifier()
+  public object Protected : Modifier()
+  public object Private : Modifier()
+  public object Internal : Modifier()
+  public object Expect : Modifier()
+  public object Actual : Modifier()
+  public object Final : Modifier()
+  public object Open : Modifier()
+  public object Abstract : Modifier()
+  public object Sealed : Modifier()
+  public object Const : Modifier()
+  public object External : Modifier()
+  public object Override : Modifier()
+  public object LateInit : Modifier()
+  public object Tailrec : Modifier()
+  public object Suspend : Modifier()
+  public object Inner : Modifier()
+  public object Enum : Modifier()
+  public object Annotation : Modifier()
+  public object CompanionObject : Modifier()
+  public object Inline : Modifier()
+  public object NoInline : Modifier()
+  public object CrossInline : Modifier()
+  public object Reified : Modifier()
+  public object Infix : Modifier()
+  public object Operator : Modifier()
+  public object Data : Modifier()
+  public object InVariance : Modifier()
+  public object OutVariance : Modifier()
+  public object VarArg : Modifier()
+  public companion object
 }
 
-data class Type(
+public data class Type(
   val packageName: PackageName,
   val name: TypeName,
   val kind: Type.Shape,
@@ -263,12 +264,12 @@ data class Type(
   val types: List<Type> = emptyList()
 ) : Tree() {
 
-  sealed class Shape {
-    object Class : Shape()
-    object Interface : Shape()
-    object Object : Shape()
-    companion object
+  public sealed class Shape {
+    public object Class : Shape()
+    public object Interface : Shape()
+    public object Object : Shape()
+    public companion object
   }
 
-  companion object
+  public companion object
 }

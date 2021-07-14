@@ -21,8 +21,6 @@ plugins {
 
 apply plugin: "com.47deg.hood"
 
-apply from: "$SUB_PROJECT"
-
 dependencies {
     compile project(":arrow-benchmarks-fx:arrow-scala-benchmarks")
     compile project(":arrow-benchmarks-fx:arrow-kio-benchmarks")

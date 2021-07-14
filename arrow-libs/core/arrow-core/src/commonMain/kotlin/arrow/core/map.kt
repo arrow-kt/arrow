@@ -21,7 +21,7 @@ import kotlin.collections.flatMap as _flatMap
  * }
  * ```
  */
-fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
+public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
   zip(other) { _, a, b -> Pair(a, b) }
 
 /**
@@ -42,7 +42,7 @@ fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * }
  * ```
  */
-inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
+public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
   val destination = LinkedHashMap<Key, C>(size)
   for ((key, bb) in this) {
     Nullable.zip(other[key]) { cc -> map(key, bb, cc) }
@@ -51,7 +51,7 @@ inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -
   return destination
 }
 
-inline fun <Key, B, C, D, E> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   map: (Key, B, C, D) -> E
@@ -64,7 +64,7 @@ inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -78,7 +78,7 @@ inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -93,7 +93,7 @@ inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -109,7 +109,7 @@ inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -126,7 +126,7 @@ inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -144,7 +144,7 @@ inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -163,7 +163,7 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   return destination
 }
 
-inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
+public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   e: Map<Key, E>,
@@ -184,12 +184,12 @@ inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   return destination
 }
 
-fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
+public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   _flatMap { entry ->
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
+public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
   val acc = mutableMapOf<K, B>()
   forEach { (k, v) ->
     when (val res = f(v)) {
@@ -200,10 +200,10 @@ inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either
   return acc.right()
 }
 
-fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
+public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   traverseEither(::identity)
 
-inline fun <K, E, A, B> Map<K, A>.traverseValidated(
+public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> {
@@ -221,10 +221,10 @@ inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   }
 }
 
-fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
+public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverseValidated(semigroup, ::identity)
 
-inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> {
+public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> {
   val acc = mutableMapOf<K, B>()
   forEach { (k, v) ->
     when (val res = f(v)) {
@@ -235,16 +235,16 @@ inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K
   return acc.some()
 }
 
-fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
+public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
   traverseOption { it }
 
-fun <K, A> Map<K, A>.void(): Map<K, Unit> =
+public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
 
-fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
+public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
 
-fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
+public fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
   val destination = LinkedHashMap<K, B>(mapCapacity(size))
   for ((key, a) in this) {
     f(a)?.let { l -> destination.put(key, l) }
@@ -252,12 +252,12 @@ fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
   return destination
 }
 
-fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
+public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
 
 /**
  * Returns a Map containing all elements that are instances of specified type parameter R.
  */
-inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
+public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
   filterMap { it as? R }
 
 /**
@@ -275,7 +275,7 @@ inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  * }
  * ```
  */
-fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
+public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
   (keys + b.keys).mapNotNull { key ->
     Ior.fromNullables(this[key], b[key])?.let { key to it }
   }.toMap()
@@ -297,13 +297,13 @@ fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
  * }
  * ```
  */
-fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
+public fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
   this.align(b).mapValues(fa)
 
 /**
  * aligns two structures and combine them with the given Semigroups '+'
  */
-fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> = SG.run {
+public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> = SG.run {
   align(other) { (_, ior) ->
     ior.fold(::identity, ::identity) { a, b ->
       a.combine(b)
@@ -314,7 +314,7 @@ fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> = SG.
 /**
  * Align two structures as in zip, but filling in blanks with null.
  */
-fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
+public fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
   align(other) { (_, ior) ->
     ior.fold(
       { it to null },
@@ -323,7 +323,7 @@ fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
     )
   }
 
-fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K, C> =
+public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K, C> =
   align(other) { (k, ior) ->
     ior.fold(
       { fa(k, it, null) },
@@ -351,7 +351,7 @@ fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K
  * }
  * ```
  */
-fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
+public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
   entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
     v.fold(
       { a -> ls.plus(k to a) to rs },
@@ -376,7 +376,7 @@ fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
  * }
  * ```
  */
-fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> =
+public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fa).unalign()
 
 /**
@@ -394,7 +394,7 @@ fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map
  * }
  * ```
  */
-fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
+public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
   entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
     ls.plus(k to v.first) to rs.plus(k to v.second)
   }
@@ -418,24 +418,24 @@ fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  * }
  * ```
  */
-fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
+public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
 
-fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
+public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
-fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
+public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
   if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
   else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
 }
 
-fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
+public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
 
 @Deprecated("Map<K, A>.foldRight is being deprecated because its functionality differs from other definitions of foldRight within arrow.")
-inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
+public inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
   this.entries.reversed().fold(b) { x, y: Map.Entry<K, A> -> f(y, x) }
 
-inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
+public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
   this.forEach { result = f(result, it) }
   return result

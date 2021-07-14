@@ -20,7 +20,7 @@ import kotlin.jvm.JvmStatic
  * @param I index
  * @param A focus of [Optional], [A] is supposed to be unique for a given pair [S] and [I].
  */
-fun interface Index<S, I, A> {
+public fun interface Index<S, I, A> {
 
   /**
    * Get [Optional] focus [A] for a structure [S] at index [i].
@@ -28,7 +28,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun index(i: I): Optional<S, A>
+  public fun index(i: I): Optional<S, A>
 
   /**
    * DSL to compose [Index] with a [Lens] for a structure [S] to focus in on [A] at given index [I].
@@ -37,7 +37,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Lens<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Lens<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with an [Iso] for a structure [S] to focus in on [A] at given index [I].
@@ -46,7 +46,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Iso<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Iso<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
@@ -55,7 +55,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Prism<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Prism<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
@@ -64,7 +64,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Optional<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Optional<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Setter] for a structure [S] to focus in on [A] at given index [I].
@@ -73,7 +73,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Setter] with a focus in [A] at given index [I].
    */
-  fun <T> Setter<T, S>.index(i: I): Setter<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Setter<T, S>.index(i: I): Setter<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Traversal] for a structure [S] to focus in on [A] at given index [I].
@@ -82,7 +82,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Traversal] with a focus in [A] at given index [I].
    */
-  fun <T> Traversal<T, S>.index(i: I): Traversal<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Traversal<T, S>.index(i: I): Traversal<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Fold] for a structure [S] to focus in on [A] at given index [I].
@@ -91,7 +91,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Fold] with a focus in [A] at given index [I].
    */
-  fun <T> Fold<T, S>.index(i: I): Fold<T, A> = this.compose(this@Index.index(i))
+  public fun <T> Fold<T, S>.index(i: I): Fold<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Lens] for a structure [S] to focus in on [A] at given index [I].
@@ -100,7 +100,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  operator fun <T> Lens<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Lens<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with an [Iso] for a structure [S] to focus in on [A] at given index [I].
@@ -109,7 +109,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  operator fun <T> Iso<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Iso<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
@@ -118,7 +118,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  operator fun <T> Prism<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Prism<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
@@ -127,7 +127,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  operator fun <T> Optional<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Optional<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Setter] for a structure [S] to focus in on [A] at given index [I].
@@ -136,7 +136,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Setter] with a focus in [A] at given index [I].
    */
-  operator fun <T> Setter<T, S>.get(i: I): Setter<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Setter<T, S>.get(i: I): Setter<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Traversal] for a structure [S] to focus in on [A] at given index [I].
@@ -145,7 +145,7 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Traversal] with a focus in [A] at given index [I].
    */
-  operator fun <T> Traversal<T, S>.get(i: I): Traversal<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Traversal<T, S>.get(i: I): Traversal<T, A> = this.compose(this@Index.index(i))
 
   /**
    * DSL to compose [Index] with a [Fold] for a structure [S] to focus in on [A] at given index [I].
@@ -154,9 +154,9 @@ fun interface Index<S, I, A> {
    * @param i index [I] to focus into [S] and find focus [A]
    * @return [Fold] with a focus in [A] at given index [I].
    */
-  operator fun <T> Fold<T, S>.get(i: I): Fold<T, A> = this.compose(this@Index.index(i))
+  public operator fun <T> Fold<T, S>.get(i: I): Fold<T, A> = this.compose(this@Index.index(i))
 
-  companion object {
+  public companion object {
     /**
      * Lift an instance of [Index] using an [Iso].
      *
@@ -164,14 +164,14 @@ fun interface Index<S, I, A> {
      * @param iso [Iso] that defines an isomorphism between a type [S] and [A]
      * @return [Index] for a structure [S] to focus in an optional [A] at a given index [I]
      */
-    fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> =
+    public fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> =
       Index { i -> iso compose ID.index(i) }
 
     /**
      * [Index] instance definition for [List].
      */
     @JvmStatic
-    fun <A> list(): Index<List<A>, Int, A> =
+    public fun <A> list(): Index<List<A>, Int, A> =
       Index { i ->
         POptional(
           getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
@@ -180,7 +180,7 @@ fun interface Index<S, I, A> {
       }
 
     @JvmStatic
-    fun <K, V> map(): Index<Map<K, V>, K, V> =
+    public fun <K, V> map(): Index<Map<K, V>, K, V> =
       Index { i ->
         POptional(
           getOrModify = { it[i]?.right() ?: it.left() },
@@ -192,7 +192,7 @@ fun interface Index<S, I, A> {
      * [Index] instance definition for [NonEmptyList].
      */
     @JvmStatic
-    fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> =
+    public fun <A> nonEmptyList(): Index<NonEmptyList<A>, Int, A> =
       Index { i ->
         POptional(
           getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
@@ -205,7 +205,7 @@ fun interface Index<S, I, A> {
       }
 
     @JvmStatic
-    fun <A> sequence(): Index<Sequence<A>, Int, A> =
+    public fun <A> sequence(): Index<Sequence<A>, Int, A> =
       Index { i ->
         POptional(
           getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
@@ -221,7 +221,7 @@ fun interface Index<S, I, A> {
      * @return [Index] instance
      */
     @JvmStatic
-    fun string(): Index<String, Int, Char> =
+    public fun string(): Index<String, Int, Char> =
       Index { i ->
         Iso.stringToList() compose Index.list<Char>().index(i)
       }

@@ -1,4 +1,4 @@
 package arrow.core.test
 
-actual fun isJvm(): Boolean = false
-actual fun isJs(): Boolean = true
+public actual fun isJvm(): Boolean = false
+public actual fun isJs(): Boolean = true

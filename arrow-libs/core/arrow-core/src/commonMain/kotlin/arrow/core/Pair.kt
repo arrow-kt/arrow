@@ -7,13 +7,13 @@ import arrow.typeclasses.Semigroup
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(other: Pair<A, B>): Int {
+public operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(other: Pair<A, B>): Int {
   val first = first.compareTo(other.first)
   return if (first == 0) second.compareTo(other.second)
   else first
 }
 
-fun <A, B> Pair<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, b: Pair<A, B>): Pair<A, B> {
+public fun <A, B> Pair<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, b: Pair<A, B>): Pair<A, B> {
   val (xa, xb) = this
   val (ya, yb) = b
   return Pair(SA.run { xa.combine(ya) }, SB.run { xb.combine(yb) })

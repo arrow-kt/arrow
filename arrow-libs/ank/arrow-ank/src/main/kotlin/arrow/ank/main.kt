@@ -4,7 +4,7 @@ package arrow.ank
 
 import java.nio.file.Paths
 
-suspend fun main(vararg args: String) =
+public suspend fun main(vararg args: String): Unit =
   when {
     args.size > 1 -> {
       ank(

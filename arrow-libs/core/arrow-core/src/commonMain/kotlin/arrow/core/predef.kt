@@ -2,12 +2,12 @@ package arrow.core
 
 import arrow.typeclasses.Semigroup
 
-inline fun <A> identity(a: A): A = a
+public inline fun <A> identity(a: A): A = a
 
-const val TailRecMDeprecation: String =
+public const val TailRecMDeprecation: String =
   "tailRecM is deprecated together with the Kind type classes since it's meant for writing kind-based polymorphic stack-safe programs."
 
-const val FoldRightDeprecation: String =
+public const val FoldRightDeprecation: String =
   "foldRight, and all lazy folds, are being deprecated as a normal fold can sufficiently cover all its use cases as long as it's inline. See https://github.com/arrow-kt/arrow/pull/2370 for more information."
 
 /**
@@ -19,7 +19,7 @@ const val FoldRightDeprecation: String =
 @PublishedApi
 internal object EmptyValue {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  inline fun <A> unbox(value: Any?): A =
+  public inline fun <A> unbox(value: Any?): A =
     if (value === this) null as A else value as A
 }
 

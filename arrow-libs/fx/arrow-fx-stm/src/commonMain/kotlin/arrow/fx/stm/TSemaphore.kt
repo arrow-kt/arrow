@@ -1,6 +1,6 @@
 package arrow.fx.stm
 
-fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNegative(initial)))
+public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNegative(initial)))
 
 /**
  * [TSemaphore] is the transactional Semaphore.
@@ -94,9 +94,9 @@ fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNegative(
  * ```
  *
  */
-data class TSemaphore internal constructor(internal val v: TVar<Int>) {
-  companion object {
-    suspend fun new(initial: Int): TSemaphore = TSemaphore(TVar.new(checkNotNegative(initial)))
+public data class TSemaphore internal constructor(internal val v: TVar<Int>) {
+  public companion object {
+    public suspend fun new(initial: Int): TSemaphore = TSemaphore(TVar.new(checkNotNegative(initial)))
   }
 }
 

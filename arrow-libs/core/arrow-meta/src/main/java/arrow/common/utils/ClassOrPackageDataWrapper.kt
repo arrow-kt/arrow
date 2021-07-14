@@ -8,18 +8,18 @@ import org.jetbrains.kotlin.metadata.ProtoBuf.Property
 import org.jetbrains.kotlin.metadata.ProtoBuf.TypeParameter
 import org.jetbrains.kotlin.metadata.deserialization.NameResolver
 
-sealed class ClassOrPackageDataWrapper {
-  abstract val `package`: String
-  abstract val nameResolver: NameResolver
-  abstract val constructorList: List<Constructor>
-  abstract val functionList: List<Function>
-  abstract val propertyList: List<Property>
-  abstract val typeParameters: List<TypeParameter>
-  abstract fun getTypeParameter(typeParameterIndex: Int): TypeParameter?
+public sealed class ClassOrPackageDataWrapper {
+  public abstract val `package`: String
+  public abstract val nameResolver: NameResolver
+  public abstract val constructorList: List<Constructor>
+  public abstract val functionList: List<Function>
+  public abstract val propertyList: List<Property>
+  public abstract val typeParameters: List<TypeParameter>
+  public abstract fun getTypeParameter(typeParameterIndex: Int): TypeParameter?
 
-  class Package(
+  public class Package(
     override val nameResolver: NameResolver,
-    val packageProto: org.jetbrains.kotlin.metadata.ProtoBuf.Package,
+    public val packageProto: org.jetbrains.kotlin.metadata.ProtoBuf.Package,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = emptyList()
@@ -29,9 +29,9 @@ sealed class ClassOrPackageDataWrapper {
     override fun getTypeParameter(typeParameterIndex: Int): TypeParameter? = null
   }
 
-  class Class(
+  public class Class(
     override val nameResolver: NameResolver,
-    val classProto: org.jetbrains.kotlin.metadata.ProtoBuf.Class,
+    public val classProto: org.jetbrains.kotlin.metadata.ProtoBuf.Class,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = classProto.constructorList
@@ -43,8 +43,8 @@ sealed class ClassOrPackageDataWrapper {
   }
 }
 
-fun ClassData.asClassOrPackageDataWrapper(`package`: String) =
+public fun ClassData.asClassOrPackageDataWrapper(`package`: String): ClassOrPackageDataWrapper.Class =
   ClassOrPackageDataWrapper.Class(nameResolver, classProto, `package`)
 
-fun PackageData.asClassOrPackageDataWrapper(`package`: String) =
+public fun PackageData.asClassOrPackageDataWrapper(`package`: String): ClassOrPackageDataWrapper.Package =
   ClassOrPackageDataWrapper.Package(nameResolver, packageProto, `package`)

@@ -722,7 +722,7 @@ import kotlin.jvm.JvmStatic
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  *
  */
-sealed class Either<out A, out B> {
+public sealed class Either<out A, out B> {
 
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
@@ -738,9 +738,9 @@ sealed class Either<out A, out B> {
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
 
-  fun isLeft(): Boolean = isLeft
+  public fun isLeft(): Boolean = isLeft
 
-  fun isRight(): Boolean = isRight
+  public fun isRight(): Boolean = isRight
 
   /**
    * Applies `ifLeft` if this is a [Left] or `ifRight` if this is a [Right].
@@ -758,36 +758,36 @@ sealed class Either<out A, out B> {
    * @param ifRight the function to apply if this is a [Right]
    * @return the results of applying the function
    */
-  inline fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
+  public inline fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
     is Right -> ifRight(value)
     is Left -> ifLeft(value)
   }
 
-  inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
+  public inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     when (this) {
       is Right -> rightOperation(initial, value)
       is Left -> initial
     }
 
   @Deprecated(FoldRightDeprecation)
-  inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  public inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     when (this) {
       is Right -> Eval.defer { rightOperation(value, initial) }
       is Left -> initial
     }
 
-  fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
+  public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
-  inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+  public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
 
   @Deprecated(FoldRightDeprecation)
-  inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  public inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) })
 
-  inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C = MN.run {
+  public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C = MN.run {
     bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
   }
 
@@ -800,7 +800,7 @@ sealed class Either<out A, out B> {
    * Right("right").swap() // Result: Left("right")
    * ```
    */
-  fun swap(): Either<B, A> =
+  public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
 
   /**
@@ -812,7 +812,7 @@ sealed class Either<out A, out B> {
    * Left(12).map { "flower" }  // Result: Left(12)
    * ```
    */
-  inline fun <C> map(f: (B) -> C): Either<A, C> =
+  public inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
 
   /**
@@ -824,13 +824,13 @@ sealed class Either<out A, out B> {
    * Left(12).mapLeft { "flower" }  // Result: Left("flower)
    * ```
    */
-  inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
+  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
 
   /**
    * Map over Left and Right of this Either
    */
-  inline fun <C, D> bimap(leftOperation: (A) -> C, rightOperation: (B) -> D): Either<C, D> =
+  public inline fun <C, D> bimap(leftOperation: (A) -> C, rightOperation: (B) -> D): Either<C, D> =
     fold({ Left(leftOperation(it)) }, { Right(rightOperation(it)) })
 
   /**
@@ -846,7 +846,7 @@ sealed class Either<out A, out B> {
    * left.exists { it > 10 }      // Result: false
    * ```
    */
-  inline fun exists(predicate: (B) -> Boolean): Boolean =
+  public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
 
   /**
@@ -867,64 +867,64 @@ sealed class Either<out A, out B> {
    * }
    * ```
    */
-  fun orNull(): B? = fold({ null }, { it })
+  public fun orNull(): B? = fold({ null }, { it })
 
-  fun orNone(): Option<B> = fold({ None }, { Some(it) })
+  public fun orNone(): Option<B> = fold({ None }, { Some(it) })
 
-  fun replicate(n: Int): Either<A, List<B>> =
+  public fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) emptyList<B>().right()
     else when (this) {
       is Left -> this
       is Right -> List(n) { this.value }.right()
     }
 
-  inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
+  public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
     fold({ emptyList() }, { fa(it).map { Right(it) } })
 
-  inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
+  public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
     fold({ None }, { right -> fa(right).map { Right(it) } })
 
-  inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
+  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
       is Right -> fa(this.value).map { Right(it) }
       is Left -> this.valid()
     }
 
-  inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
+  public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
-  inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
+  public inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
     fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
 
-  inline fun <AA, C, D> bitraverseValidated(
+  public inline fun <AA, C, D> bitraverseValidated(
     fe: (A) -> Validated<AA, C>,
     fa: (B) -> Validated<AA, D>
   ): Validated<AA, Either<C, D>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
-  inline fun findOrNull(predicate: (B) -> Boolean): B? =
+  public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
       is Right -> if (predicate(this.value)) this.value else null
       is Left -> null
     }
 
-  inline fun all(predicate: (B) -> Boolean): Boolean =
+  public inline fun all(predicate: (B) -> Boolean): Boolean =
     fold({ true }, predicate)
 
-  fun isEmpty(): Boolean = isLeft
+  public fun isEmpty(): Boolean = isLeft
 
-  fun isNotEmpty(): Boolean = isRight
+  public fun isNotEmpty(): Boolean = isRight
 
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
-  data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
+  public data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
     override val isLeft = true
     override val isRight = false
 
     override fun toString(): String = "Either.Left($value)"
 
-    companion object {
+    public companion object {
       @PublishedApi
       internal val leftUnit: Either<Unit, Nothing> =
         Left(Unit)
@@ -934,13 +934,13 @@ sealed class Either<out A, out B> {
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
-  data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
+  public data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
     override val isLeft = false
     override val isRight = true
 
     override fun toString(): String = "Either.Right($value)"
 
-    companion object {
+    public companion object {
       @PublishedApi
       internal val unit: Either<Nothing, Unit> = Right(Unit)
     }
@@ -951,19 +951,19 @@ sealed class Either<out A, out B> {
     { "Either.Right($it)" }
   )
 
-  fun toValidatedNel(): ValidatedNel<A, B> =
+  public fun toValidatedNel(): ValidatedNel<A, B> =
     fold({ Validated.invalidNel(it) }, ::Valid)
 
-  fun toValidated(): Validated<A, B> =
+  public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
 
-  companion object {
+  public companion object {
 
     @JvmStatic
-    fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
+    public fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
     @Deprecated(TailRecMDeprecation)
-    tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Either<L, Either<A, B>>): Either<L, B> {
+    public tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Either<L, Either<A, B>>): Either<L, B> {
       return when (val ev = f(a)) {
         is Left -> Left(ev.value)
         is Right -> {
@@ -988,12 +988,12 @@ sealed class Either<out A, out B> {
      * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
      */
     @JvmStatic
-    inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
+    public inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) Right(ifTrue()) else Left(ifFalse())
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <R> catch(f: () -> R): Either<Throwable, R> =
+    public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
       try {
         f().right()
       } catch (t: Throwable) {
@@ -1002,12 +1002,12 @@ sealed class Either<out A, out B> {
 
     @JvmStatic
     @JvmName("tryCatchAndFlatten")
-    inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
+    public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
       catch(f).fold({ it.left() }, { it })
 
     @JvmStatic
     @JvmName("tryCatch")
-    inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
+    public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
       try {
         f().right()
       } catch (t: Throwable) {
@@ -1026,7 +1026,7 @@ sealed class Either<out A, out B> {
      * @return the result of applying the [resolve] function.
      */
     @JvmStatic
-    inline fun <E, A, B> resolve(
+    public inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
       success: (a: A) -> Either<Throwable, B>,
       error: (e: E) -> Either<Throwable, B>,
@@ -1058,15 +1058,15 @@ sealed class Either<out A, out B> {
      *  ```
      */
     @JvmStatic
-    fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
+    public fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
       { it.map(f) }
 
     @JvmStatic
-    fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
+    public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
   }
 
-  fun void(): Either<A, Unit> =
+  public fun void(): Either<A, Unit> =
     map { Unit }
 }
 
@@ -1075,13 +1075,13 @@ sealed class Either<out A, out B> {
  *
  * @param f The function to bind across [Either.Right].
  */
-inline fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+public inline fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   when (this) {
     is Right -> f(this.value)
     is Left -> this
   }
 
-fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
+public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
 
 /**
@@ -1093,7 +1093,7 @@ fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
+public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
 
 /**
@@ -1105,7 +1105,7 @@ inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * Left(12).orNull()  // Result: null
  * ```
  */
-fun <B> Either<*, B>.orNull(): B? =
+public fun <B> Either<*, B>.orNull(): B? =
   getOrElse { null }
 
 /**
@@ -1118,7 +1118,7 @@ fun <B> Either<*, B>.orNull(): B? =
  * Left(12).getOrHandle { it + 5 } // Result: 17
  * ```
  */
-inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
+public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
 
 /**
@@ -1139,7 +1139,7 @@ inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
+public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
@@ -1175,7 +1175,7 @@ inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: 
  * left.filterOrOther({ it > 10 }, { -1 })
  * ```
  */
-inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
+public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap {
     if (predicate(it)) Right(it)
     else Left(default(it))
@@ -1190,7 +1190,7 @@ inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default:
  * Left(12).merge() // Result: 12
  * ```
  */
-inline fun <A> Either<A, A>.merge(): A =
+public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
 
 /**
@@ -1209,7 +1209,7 @@ inline fun <A> Either<A, A>.merge(): A =
  * Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * ```
  */
-inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
+public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   flatMap { it.rightIfNotNull { default() } }
 
 /**
@@ -1226,18 +1226,18 @@ inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
-fun <A, B> Either<A, B>.contains(elem: B): Boolean =
+public fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   exists { it == elem }
 
-fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
+public fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
   when (this) {
     is Left -> y
     else -> this
   }
 
-fun <A> A.left(): Either<A, Nothing> = Left(this)
+public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
-fun <A> A.right(): Either<Nothing, A> = Right(this)
+public fun <A> A.right(): Either<Nothing, A> = Right(this)
 
 /**
  * Returns [Either.Right] if the value of type B is not null, otherwise the specified A value wrapped into an
@@ -1249,7 +1249,7 @@ fun <A> A.right(): Either<Nothing, A> = Right(this)
  * null.rightIfNotNull { "left" }    // Left(a="left")
  * ```
  */
-inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
+public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Left(default())
   else -> Right(this)
 }
@@ -1258,7 +1258,7 @@ inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this
  * Returns [Either.Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
  * [Either.Left].
  */
-inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
+public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
   null -> Right(null)
   else -> Left(default())
 }
@@ -1267,31 +1267,31 @@ inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (t
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.
  */
-inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
+public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
   when (this) {
     is Left -> f(this.value)
     is Right -> this
   }
 
-inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
+public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
   when (this) {
     is Left -> f(value).right()
     is Right -> this
   }
 
-inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
+public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
   when (this) {
     is Left -> fe(value).right()
     is Right -> map(fa)
   }
 
-operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
+public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
     { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }) },
     { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
   )
 
-fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
+public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
   when (this) {
     is Left -> when (b) {
       is Left -> Left(SGA.run { value.combine(b.value) })
@@ -1303,7 +1303,7 @@ fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<
     }
   }
 
-fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
+public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
   fold(Right(MB.empty()) as Either<A, B>) { acc, e ->
     acc.combine(MA, MB, e)
   }
@@ -1324,23 +1324,23 @@ fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Eith
  * }
  * ```
  */
-fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
+public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
 
-fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
+public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
-fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
+public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
   flatMap { b ->
     fb.map { c -> f(b, c) }
   }
 
-fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
+public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
   flatMap { a ->
     fb.map { b -> Pair(a, b) }
   }
 
-inline fun <A, B, C, D, E> Either<A, B>.zip(
+public inline fun <A, B, C, D, E> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   map: (B, C, D) -> E
@@ -1357,7 +1357,7 @@ inline fun <A, B, C, D, E> Either<A, B>.zip(
     Right.unit
   ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
-inline fun <A, B, C, D, E, F> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1375,7 +1375,7 @@ inline fun <A, B, C, D, E, F> Either<A, B>.zip(
     Right.unit
   ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 
-inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1394,7 +1394,7 @@ inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
     Right.unit
   ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 
-inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1413,7 +1413,7 @@ inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
     )
   }
 
-inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1434,7 +1434,7 @@ inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
     )
   }
 
-inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1446,7 +1446,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
 ): Either<A, J> =
   zip(c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
 
-inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1459,7 +1459,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
 ): Either<A, K> =
   zip(c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 
-inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
+public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
@@ -1493,7 +1493,7 @@ inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
     }
   }
 
-fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
+public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()
   else MB.run {
     when (this@replicate) {
@@ -1502,32 +1502,32 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
     }
   }
 
-inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
+public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   when (this) {
     is Right -> if (predicate(this.value)) this else error().left()
     is Left -> this
   }
 
-inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
+public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
   when (this) {
     is Left -> fa(this.value)
     is Right -> fb(this.value)
   }
 
-fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
+public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   traverse(::identity)
 
-fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
+public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
   traverseOption(::identity)
 
-fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
+public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
   traverseValidated(::identity)
 
-fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
+public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)
 
-fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either<A, B>> =
+public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either<A, B>> =
   bitraverseOption(::identity, ::identity)
 
-fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
+public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)

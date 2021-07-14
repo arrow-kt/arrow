@@ -20,7 +20,7 @@ import kotlin.jvm.JvmStatic
  * @param I index that uniquely identifies the focus of the [Lens]
  * @param A focus that is supposed to be unique for a given pair [S] and [I].
  */
-fun interface At<S, I, A> {
+public fun interface At<S, I, A> {
 
   /**
    * Get a [Lens] for a structure [S] with focus in [A] at index [i].
@@ -28,7 +28,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Lens] with a focus in [A] at given index [I].
    */
-  fun at(i: I): Lens<S, A>
+  public fun at(i: I): Lens<S, A>
 
   /**
    * DSL to compose [At] with a [Lens] for a structure [S] to focus in on [A] at given index [I].
@@ -37,7 +37,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Lens] with a focus in [A] at given index [I].
    */
-  fun <T> Lens<T, S>.at(i: I): Lens<T, A> =
+  public fun <T> Lens<T, S>.at(i: I): Lens<T, A> =
     this@at.compose(this@At.at(i))
 
   /**
@@ -47,7 +47,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Lens] with a focus in [A] at given index [I].
    */
-  fun <T> Iso<T, S>.at(i: I): Lens<T, A> =
+  public fun <T> Iso<T, S>.at(i: I): Lens<T, A> =
     this.compose(this@At.at(i))
 
   /**
@@ -57,7 +57,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Prism<T, S>.at(i: I): Optional<T, A> = this.compose(this@At.at(i))
+  public fun <T> Prism<T, S>.at(i: I): Optional<T, A> = this.compose(this@At.at(i))
 
   /**
    *  DSL to compose [At] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
@@ -66,7 +66,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Optional] with a focus in [A] at given index [I].
    */
-  fun <T> Optional<T, S>.at(i: I): Optional<T, A> = this.compose(this@At.at(i))
+  public fun <T> Optional<T, S>.at(i: I): Optional<T, A> = this.compose(this@At.at(i))
 
   /**
    * DSL to compose [At] with a [Getter] for a structure [S] to focus in on [A] at given index [I].
@@ -75,7 +75,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Getter] with a focus in [A] at given index [I].
    */
-  fun <T> Getter<T, S>.at(i: I): Getter<T, A> = this.compose(this@At.at(i))
+  public fun <T> Getter<T, S>.at(i: I): Getter<T, A> = this.compose(this@At.at(i))
 
   /**
    * DSL to compose [At] with a [Setter] for a structure [S] to focus in on [A] at given index [I].
@@ -84,7 +84,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Setter] with a focus in [A] at given index [I].
    */
-  fun <T> Setter<T, S>.at(i: I): Setter<T, A> = this.compose(this@At.at(i))
+  public fun <T> Setter<T, S>.at(i: I): Setter<T, A> = this.compose(this@At.at(i))
 
   /**
    * DSL to compose [At] with a [Traversal] for a structure [S] to focus in on [A] at given index [I].
@@ -93,7 +93,7 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Traversal] with a focus in [A] at given index [I].
    */
-  fun <T> Traversal<T, S>.at(i: I): Traversal<T, A> = this.compose(this@At.at(i))
+  public fun <T> Traversal<T, S>.at(i: I): Traversal<T, A> = this.compose(this@At.at(i))
 
   /**
    * DSL to compose [At] with a [Fold] for a structure [S] to focus in on [A] at given index [I].
@@ -102,9 +102,9 @@ fun interface At<S, I, A> {
    * @param i index [I] to zoom into [S] and find focus [A]
    * @return [Fold] with a focus in [A] at given index [I].
    */
-  fun <T> Fold<T, S>.at(i: I): Fold<T, A> = this.compose(this@At.at(i))
+  public fun <T> Fold<T, S>.at(i: I): Fold<T, A> = this.compose(this@At.at(i))
 
-  companion object {
+  public companion object {
 
     /**
      * Lift an instance of [At] using an [Iso].
@@ -113,11 +113,11 @@ fun interface At<S, I, A> {
      * @param iso [Iso] that defines an isomorphism between [S] and [U]
      * @return [At] to provide [Lens] for structure [S] with focus in [A] at given index [I]
      */
-    fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> =
+    public fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> =
       At { i -> iso compose AT.at(i) }
 
     @JvmStatic
-    fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
+    public fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
       At { i ->
         PLens(
           get = { Option.fromNullable(it[i]) },
@@ -135,7 +135,7 @@ fun interface At<S, I, A> {
      * [At] instance definition for [Set].
      */
     @JvmStatic
-    fun <A> set(): At<Set<A>, A, Boolean> =
+    public fun <A> set(): At<Set<A>, A, Boolean> =
       At { i ->
         PLens(
           get = { it.contains(i) },
@@ -153,7 +153,7 @@ fun interface At<S, I, A> {
  * @param i index [I] to zoom into [S] and find focus [A]
  * @return [S] where focus [A] was removed at index [I]
  */
-fun <S, I, A> At<S, I, Option<A>>.remove(s: S, i: I): S = at(i).set(s, None)
+public fun <S, I, A> At<S, I, Option<A>>.remove(s: S, i: I): S = at(i).set(s, None)
 
 /**
  * Lift deletion of a value associated with a key in a Map-like container
@@ -162,4 +162,4 @@ fun <S, I, A> At<S, I, Option<A>>.remove(s: S, i: I): S = at(i).set(s, None)
  * @param i index [I] to zoom into [S] and find focus [A]
  * @return function that takes [S] and returns a new [S] where focus [A] was removed at index [I]
  */
-fun <S, I, A> At<S, I, Option<A>>.remove(i: I): (S) -> S = at(i).lift { None }
+public fun <S, I, A> At<S, I, Option<A>>.remove(i: I): (S) -> S = at(i).lift { None }

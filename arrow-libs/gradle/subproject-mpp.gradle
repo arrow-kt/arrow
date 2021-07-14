@@ -15,6 +15,7 @@
  */
 
 kotlin {
+    explicitApi()
     jvm {
         // JVM target ignores Java sources and compiles only Kotlin source files.
         // Fix:

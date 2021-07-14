@@ -9,9 +9,9 @@ internal const val ArrowExceptionMessage =
 
 internal class ArrowInternalException(override val message: String = ArrowExceptionMessage) : RuntimeException(message)
 
-object Platform {
+public object Platform {
 
-  fun composeErrors(first: Throwable, res: Result<Any?>): Throwable {
+  public fun composeErrors(first: Throwable, res: Result<Any?>): Throwable {
     res.fold({ first }, { e -> first.addSuppressed(e) })
     return first
   }
@@ -23,7 +23,7 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
-  fun composeErrors(first: Throwable, vararg rest: Throwable): Throwable {
+  public fun composeErrors(first: Throwable, vararg rest: Throwable): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
   }
@@ -35,7 +35,7 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
-  fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
+  public fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
   }
@@ -48,7 +48,7 @@ object Platform {
    * function would return a CompositeException.
    */
   @JvmName("composeErrorsNullable")
-  fun composeErrors(first: Throwable?, other: Throwable?): Throwable? =
+  public fun composeErrors(first: Throwable?, other: Throwable?): Throwable? =
     first?.let { a ->
       other?.let { b ->
         a.apply { addSuppressed(b) }
@@ -62,7 +62,7 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
-  fun composeErrors(first: Throwable, other: Throwable?): Throwable =
+  public fun composeErrors(first: Throwable, other: Throwable?): Throwable =
     other?.let { a ->
       a.apply { addSuppressed(first) }
     } ?: first
@@ -74,80 +74,80 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
-  fun composeErrors(all: List<Throwable>): Throwable? =
+  public fun composeErrors(all: List<Throwable>): Throwable? =
     all.firstOrNull()?.let { first ->
       composeErrors(first, all.drop(1))
     }
 }
 
-class AtomicRefW<A>(a: A) {
+public class AtomicRefW<A>(a: A) {
   private val atomicRef = atomic(a)
 
-  var value: A
+  public var value: A
     set(a) {
       atomicRef.value = a
     }
     get() = atomicRef.value
 
-  fun getAndSet(a: A) = atomicRef.getAndSet(a)
+  public fun getAndSet(a: A): A = atomicRef.getAndSet(a)
 
-  fun updateAndGet(function: (A) -> A) = atomicRef.updateAndGet(function)
+  public fun updateAndGet(function: (A) -> A): A = atomicRef.updateAndGet(function)
 
-  fun compareAndSet(expect: A, update: A) = atomicRef.compareAndSet(expect, update)
+  public fun compareAndSet(expect: A, update: A): Boolean = atomicRef.compareAndSet(expect, update)
 
-  fun lazySet(a: A) = atomicRef.lazySet(a)
+  public fun lazySet(a: A): Unit = atomicRef.lazySet(a)
 
   override fun toString(): String = value.toString()
 }
 
-class AtomicBooleanW(a: Boolean) {
+public class AtomicBooleanW(a: Boolean) {
   private val ref = atomic(a)
 
-  var value: Boolean
+  public var value: Boolean
     set(a) {
       ref.value = a
     }
     get() = ref.value
 
-  fun getAndSet(a: Boolean) = ref.getAndSet(a)
+  public fun getAndSet(a: Boolean): Boolean = ref.getAndSet(a)
 
-  fun updateAndGet(function: (Boolean) -> Boolean) = ref.updateAndGet(function)
+  public fun updateAndGet(function: (Boolean) -> Boolean): Boolean = ref.updateAndGet(function)
 
-  fun compareAndSet(expect: Boolean, update: Boolean) = ref.compareAndSet(expect, update)
+  public fun compareAndSet(expect: Boolean, update: Boolean): Boolean = ref.compareAndSet(expect, update)
 
-  fun lazySet(a: Boolean) = ref.lazySet(a)
+  public fun lazySet(a: Boolean): Unit = ref.lazySet(a)
 
   override fun toString(): String = value.toString()
 }
 
-class AtomicIntW(a: Int) {
+public class AtomicIntW(a: Int) {
   private val atomicRef = atomic(a)
 
-  var value: Int
+  public var value: Int
     set(a) {
       atomicRef.value = a
     }
     get() = atomicRef.value
 
-  fun getAndSet(a: Int) = atomicRef.getAndSet(a)
+  public fun getAndSet(a: Int): Int = atomicRef.getAndSet(a)
 
-  fun getAndAdd(delta: Int) = atomicRef.getAndAdd(delta)
+  public fun getAndAdd(delta: Int): Int = atomicRef.getAndAdd(delta)
 
-  fun addAndGet(delta: Int) = atomicRef.addAndGet(delta)
+  public fun addAndGet(delta: Int): Int = atomicRef.addAndGet(delta)
 
-  fun getAndIncrement() = atomicRef.getAndIncrement()
+  public fun getAndIncrement(): Int = atomicRef.getAndIncrement()
 
-  fun getAndDecrement() = atomicRef.getAndDecrement()
+  public fun getAndDecrement(): Int = atomicRef.getAndDecrement()
 
-  fun incrementAndGet() = atomicRef.incrementAndGet()
+  public fun incrementAndGet(): Int = atomicRef.incrementAndGet()
 
-  fun decrementAndGet() = atomicRef.decrementAndGet()
+  public fun decrementAndGet(): Int = atomicRef.decrementAndGet()
 
-  fun updateAndGet(function: (Int) -> Int) = atomicRef.updateAndGet(function)
+  public fun updateAndGet(function: (Int) -> Int): Int = atomicRef.updateAndGet(function)
 
-  fun compareAndSet(expect: Int, update: Int) = atomicRef.compareAndSet(expect, update)
+  public fun compareAndSet(expect: Int, update: Int): Boolean = atomicRef.compareAndSet(expect, update)
 
-  fun lazySet(a: Int) = atomicRef.lazySet(a)
+  public fun lazySet(a: Int): Unit = atomicRef.lazySet(a)
 
   override fun toString(): String = value.toString()
 }

@@ -3,8 +3,8 @@ package arrow.fx.stm
 import arrow.fx.stm.internal.Hamt
 import arrow.fx.stm.internal.newHamt
 
-fun <A> STM.newTSet(fn: (A) -> Int): TSet<A> = TSet(newHamt(), fn)
-fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
+public fun <A> STM.newTSet(fn: (A) -> Int): TSet<A> = TSet(newHamt(), fn)
+public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
 
 /**
  *
@@ -85,9 +85,9 @@ fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *  of [TSet] that keeps track of its size.
  *
  */
-data class TSet<A>internal constructor(internal val hamt: Hamt<A>, internal val hashFn: (A) -> Int) {
-  companion object {
-    suspend fun <A> new(fn: (A) -> Int): TSet<A> = TSet(Hamt.new(), fn)
-    suspend fun <A> new(): TSet<A> = new { it.hashCode() }
+public data class TSet<A>internal constructor(internal val hamt: Hamt<A>, internal val hashFn: (A) -> Int) {
+  public companion object {
+    public suspend fun <A> new(fn: (A) -> Int): TSet<A> = TSet(Hamt.new(), fn)
+    public suspend fun <A> new(): TSet<A> = new { it.hashCode() }
   }
 }

@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.common.utils.simpleName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 
-fun generateLenses(ele: AnnotatedElement, target: LensTarget) = Snippet(
+public fun generateLenses(ele: AnnotatedElement, target: LensTarget): Snippet = Snippet(
   `package` = ele.packageName,
   name = ele.classData.simpleName,
   content = processElement(ele, target.foci)
@@ -20,7 +20,7 @@ private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = f
   |""".trimMargin()
 }
 
-fun Focus.lensParamName(): String = when (this) {
+public fun Focus.lensParamName(): String = when (this) {
   is NullableFocus -> "nullable${paramName.toUpperCamelCase()}"
   is OptionFocus -> "option${paramName.toUpperCamelCase()}"
   is NonNullFocus -> paramName

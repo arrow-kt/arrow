@@ -2,19 +2,19 @@ package arrow.optics
 
 import arrow.common.utils.simpleName
 
-fun generateLensDsl(ele: AnnotatedElement, optic: DataClassDsl) = Snippet(
+public fun generateLensDsl(ele: AnnotatedElement, optic: DataClassDsl): Snippet = Snippet(
   `package` = ele.packageName,
   name = ele.classData.simpleName,
   content = processLensSyntax(ele, optic.foci)
 )
 
-fun generateOptionalDsl(ele: AnnotatedElement, optic: DataClassDsl) = Snippet(
+public fun generateOptionalDsl(ele: AnnotatedElement, optic: DataClassDsl): Snippet = Snippet(
   `package` = ele.packageName,
   name = ele.classData.simpleName,
   content = processOptionalSyntax(ele, optic)
 )
 
-fun generatePrismDsl(ele: AnnotatedElement, isoOptic: SealedClassDsl) = Snippet(
+public fun generatePrismDsl(ele: AnnotatedElement, isoOptic: SealedClassDsl): Snippet = Snippet(
   `package` = ele.packageName,
   name = ele.classData.simpleName,
   content = processPrismSyntax(ele, isoOptic)

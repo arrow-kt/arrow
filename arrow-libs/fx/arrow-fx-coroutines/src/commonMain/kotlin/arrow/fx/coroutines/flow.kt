@@ -37,7 +37,7 @@ import kotlin.jvm.JvmName
  *
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
-fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
+public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
   (schedule as Schedule.ScheduleImpl<Any?, Throwable, B>)
   var dec: Schedule.Decision<Any?, B>
   var state: Any? = schedule.initialState()

@@ -16,7 +16,7 @@ import kotlin.jvm.JvmStatic
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
  * and restricts the [PTraversal] to monomorphic updates.
  */
-typealias Traversal<S, A> = PTraversal<S, S, A, A>
+public typealias Traversal<S, A> = PTraversal<S, S, A, A>
 
 /**
  * A [Traversal] is an optic that allows to see into a structure with 0 to N foci.
@@ -29,11 +29,11 @@ typealias Traversal<S, A> = PTraversal<S, S, A, A>
  * @param A the target of a [PTraversal]
  * @param B the modified target of a [PTraversal]
  */
-fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
+public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
 
   override fun modify(source: S, map: (focus: A) -> B): T
 
-  fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
+  public fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
     PTraversal { s, f ->
       s.fold(
         { a -> Either.Left(this@PTraversal.modify(a, f)) },
@@ -44,32 +44,32 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
   /**
    * Compose a [PTraversal] with a [PTraversal]
    */
-  infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
+  public infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     PTraversal { s, f -> this@PTraversal.modify(s) { b -> other.modify(b, f) } }
 
-  operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
+  public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
 
-  companion object {
-    fun <S> id(): PTraversal<S, S, S, S> =
+  public companion object {
+    public fun <S> id(): PTraversal<S, S, S, S> =
       PIso.id()
 
-    fun <S> codiagonal(): Traversal<Either<S, S>, S> =
+    public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
       Traversal { s, f -> s.bimap(f, f) }
 
     /**
      * [PTraversal] that points to nothing
      */
-    fun <S, A> void(): Traversal<S, A> =
+    public fun <S, A> void(): Traversal<S, A> =
       POptional.void()
 
     /**
      * [PTraversal] constructor from multiple getters of the same source.
      */
-    operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> =
+    public operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -77,7 +77,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     ): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -86,7 +86,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     ): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -96,7 +96,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     ): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -107,7 +107,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     ): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -119,7 +119,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     ): PTraversal<S, T, A, B> =
       PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), s) }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -144,7 +144,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
         )
       }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -171,7 +171,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
         )
       }
 
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
       get2: (S) -> A,
       get3: (S) -> A,
@@ -204,7 +204,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] for [List] that focuses in each [A] of the source [List].
      */
     @JvmStatic
-    fun <A> list(): Traversal<List<A>, A> =
+    public fun <A> list(): Traversal<List<A>, A> =
       Every.list()
 
     /**
@@ -214,11 +214,11 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
      */
     @JvmStatic
-    fun <L, R> either(): Traversal<Either<L, R>, R> =
+    public fun <L, R> either(): Traversal<Either<L, R>, R> =
       Every.either()
 
     @JvmStatic
-    fun <K, V> map(): Traversal<Map<K, V>, V> =
+    public fun <K, V> map(): Traversal<Map<K, V>, V> =
       Every.map()
 
     /**
@@ -228,7 +228,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * @return [Traversal] with source [NonEmptyList] and focus every [A] of the source.
      */
     @JvmStatic
-    fun <A> nonEmptyList(): Traversal<NonEmptyList<A>, A> =
+    public fun <A> nonEmptyList(): Traversal<NonEmptyList<A>, A> =
       Every.nonEmptyList()
 
     /**
@@ -238,11 +238,11 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
      */
     @JvmStatic
-    fun <A> option(): Traversal<Option<A>, A> =
+    public fun <A> option(): Traversal<Option<A>, A> =
       Every.option()
 
     @JvmStatic
-    fun <A> sequence(): Traversal<Sequence<A>, A> =
+    public fun <A> sequence(): Traversal<Sequence<A>, A> =
       Every.sequence()
 
     /**
@@ -252,14 +252,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * @return [Traversal] with source [String] and foci every [Char] in the source.
      */
     @JvmStatic
-    fun string(): Traversal<String, Char> =
+    public fun string(): Traversal<String, Char> =
       Every.string()
 
     /**
      * [PTraversal] to focus into the first and second value of a [Pair]
      */
     @JvmStatic
-    fun <A, B> pPair(): PTraversal<Pair<A, A>, Pair<B, B>, A, B> =
+    public fun <A, B> pPair(): PTraversal<Pair<A, A>, Pair<B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -270,14 +270,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first and second value of a [Pair]
      */
     @JvmStatic
-    fun <A> pair(): Traversal<Pair<A, A>, A> =
+    public fun <A> pair(): Traversal<Pair<A, A>, A> =
       pPair()
 
     /**
      * [PTraversal] to focus into the first, second and third value of a [Triple]
      */
     @JvmStatic
-    fun <A, B> pTriple(): PTraversal<Triple<A, A, A>, Triple<B, B, B>, A, B> =
+    public fun <A, B> pTriple(): PTraversal<Triple<A, A, A>, Triple<B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -289,14 +289,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second and third value of a [Triple]
      */
     @JvmStatic
-    fun <A> triple(): Traversal<Triple<A, A, A>, A> =
+    public fun <A> triple(): Traversal<Triple<A, A, A>, A> =
       pTriple()
 
     /**
      * [PTraversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
      */
     @JvmStatic
-    fun <A, B> pTuple4(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> =
+    public fun <A, B> pTuple4(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -309,14 +309,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
      */
     @JvmStatic
-    fun <A> tuple4(): Traversal<Tuple4<A, A, A, A>, A> =
+    public fun <A> tuple4(): Traversal<Tuple4<A, A, A, A>, A> =
       pTuple4()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
      */
     @JvmStatic
-    fun <A, B> pTuple5(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple5(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -330,14 +330,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
      */
     @JvmStatic
-    fun <A> tuple5(): Traversal<Tuple5<A, A, A, A, A>, A> =
+    public fun <A> tuple5(): Traversal<Tuple5<A, A, A, A, A>, A> =
       pTuple5()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
      */
     @JvmStatic
-    fun <A, B> pTuple6(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple6(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -352,14 +352,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
      */
     @JvmStatic
-    fun <A> tuple6(): Traversal<Tuple6<A, A, A, A, A, A>, A> =
+    public fun <A> tuple6(): Traversal<Tuple6<A, A, A, A, A, A>, A> =
       pTuple6()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
      */
     @JvmStatic
-    fun <A, B> pTuple7(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple7(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -375,14 +375,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
      */
     @JvmStatic
-    fun <A> tuple7(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> =
+    public fun <A> tuple7(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> =
       pTuple7()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
      */
     @JvmStatic
-    fun <A, B> pTuple8(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple8(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -399,14 +399,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
      */
     @JvmStatic
-    fun <A> tuple8(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> =
+    public fun <A> tuple8(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> =
       pTuple8()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
      */
     @JvmStatic
-    fun <A, B> pTuple9(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple9(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -424,14 +424,14 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
      */
     @JvmStatic
-    fun <A> tuple9(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
+    public fun <A> tuple9(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
       pTuple9()
 
     /**
      * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
      */
     @JvmStatic
-    fun <A, B> pTuple10(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
+    public fun <A, B> pTuple10(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
       PTraversal(
         get1 = { it.first },
         get2 = { it.second },
@@ -450,7 +450,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
      * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
      */
     @JvmStatic
-    fun <A> tuple10(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
+    public fun <A> tuple10(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
       pTuple10()
   }
 
@@ -460,7 +460,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Lens] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this@every.compose(this@PTraversal)
 
@@ -470,7 +470,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Iso] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this@every.compose(this@PTraversal)
 
@@ -480,7 +480,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Prism] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 
@@ -490,7 +490,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Optional] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 
@@ -500,7 +500,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Setter] with a focus in [S]
    * @return [Setter] with a focus in [A]
    */
-  val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B>
+  public val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 
@@ -510,7 +510,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Traversal] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
-  val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 
@@ -520,7 +520,7 @@ fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [PEvery] with a focus in [S]
    * @return [PEvery] with a focus in [A]
    */
-  val <U, V> PEvery<U, V, S, T>.every: PTraversal<U, V, A, B>
+  public val <U, V> PEvery<U, V, S, T>.every: PTraversal<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 }
