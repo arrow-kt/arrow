@@ -109,6 +109,27 @@ class OptionTest : UnitSpec() {
       none.flatMap { Some(it.toUpperCase()) } shouldBe None
     }
 
+    "align" {
+      some align some shouldBe Some(Ior.Both("kotlin", "kotlin"))
+      some align none shouldBe Some(Ior.Left("kotlin"))
+      none align some shouldBe Some(Ior.Right("kotlin"))
+      none align none shouldBe None
+
+      some.align(some) { "$it" } shouldBe Some("Ior.Both(kotlin, kotlin)")
+      some.align(none) { "$it" } shouldBe Some("Ior.Left(kotlin)")
+      none.align(some) { "$it" } shouldBe Some("Ior.Right(kotlin)")
+      none.align(none) { "$it" } shouldBe None
+
+      val nullable = null.some()
+      some align nullable shouldBe Some(Ior.Both("kotlin", null))
+      nullable align some shouldBe Some(Ior.Both(null, "kotlin"))
+      nullable align nullable shouldBe Some(Ior.Both(null, null))
+
+      some.align(nullable) { "$it" } shouldBe Some("Ior.Both(kotlin, null)")
+      nullable.align(some) { "$it" } shouldBe Some("Ior.Both(null, kotlin)")
+      nullable.align(nullable) { "$it" } shouldBe Some("Ior.Both(null, null)")
+    }
+
     "filter" {
       some.filter { it == "java" } shouldBe None
       none.filter { it == "java" } shouldBe None
@@ -119,6 +140,20 @@ class OptionTest : UnitSpec() {
       some.filterNot { it == "java" } shouldBe Some("kotlin")
       none.filterNot { it == "java" } shouldBe None
       some.filterNot { it.startsWith('k') } shouldBe None
+    }
+
+    "filterIsInstance" {
+      val someAny: Option<Any> = some
+      someAny.filterIsInstance<String>() shouldBe Some("kotlin")
+      someAny.filterIsInstance<Int>() shouldBe None
+
+      val someNullableAny: Option<Any?> = null.some()
+      someNullableAny.filterIsInstance<String?>() shouldBe Some(null)
+      someNullableAny.filterIsInstance<String>() shouldBe None
+
+      val noneAny: Option<Any> = none
+      noneAny.filterIsInstance<String>() shouldBe None
+      noneAny.filterIsInstance<Int>() shouldBe None
     }
 
     "exists" {
@@ -143,10 +178,108 @@ class OptionTest : UnitSpec() {
       none.toList() shouldBe listOf()
     }
 
-    "firstOption" {
-      val l = listOf(1, 2, 3, 4, 5, 6)
-      l.firstOrNone() shouldBe Some(1)
-      l.firstOrNone { it > 2 } shouldBe Some(3)
+    "Iterable.firstOrNone" {
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
+      iterable.firstOrNone() shouldBe Some(1)
+      iterable.firstOrNone { it > 2 } shouldBe Some(3)
+      iterable.firstOrNone { it > 7 } shouldBe None
+
+      val emptyIterable = iterableOf<Int>()
+      emptyIterable.firstOrNone() shouldBe None
+
+      val nullableIterable1 = iterableOf(null, 2, 3, 4, 5, 6)
+      nullableIterable1.firstOrNone() shouldBe Some(null)
+
+      val nullableIterable2 = iterableOf(1, 2, 3, null, 5, null)
+      nullableIterable2.firstOrNone { it == null } shouldBe Some(null)
+    }
+
+    "Collection.firstOrNone" {
+      val list = listOf(1, 2, 3, 4, 5, 6)
+      list.firstOrNone() shouldBe Some(1)
+
+      val emptyList = emptyList<Int>()
+      emptyList.firstOrNone() shouldBe None
+
+      val nullableList = listOf(null, 2, 3, 4, 5, 6)
+      nullableList.firstOrNone() shouldBe Some(null)
+    }
+
+    "Iterable.singleOrNone" {
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
+      iterable.singleOrNone() shouldBe None
+      iterable.singleOrNone { it > 2 } shouldBe None
+
+      val singleIterable = iterableOf(3)
+      singleIterable.singleOrNone() shouldBe Some(3)
+      singleIterable.singleOrNone { it == 3 } shouldBe Some(3)
+
+      val nullableSingleIterable1 = iterableOf<Int?>(null)
+      nullableSingleIterable1.singleOrNone() shouldBe Some(null)
+
+      val nullableSingleIterable2 = iterableOf(1, 2, 3, null, 5, 6)
+      nullableSingleIterable2.singleOrNone { it == null } shouldBe Some(null)
+
+      val nullableSingleIterable3 = iterableOf(1, 2, 3, null, 5, null)
+      nullableSingleIterable3.singleOrNone { it == null } shouldBe None
+    }
+
+    "Collection.singleOrNone" {
+      val list = listOf(1, 2, 3, 4, 5, 6)
+      list.singleOrNone() shouldBe None
+
+      val singleList = listOf(3)
+      singleList.singleOrNone() shouldBe Some(3)
+
+      val nullableSingleList = listOf(null)
+      nullableSingleList.singleOrNone() shouldBe Some(null)
+    }
+
+    "Iterable.lastOrNone" {
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
+      iterable.lastOrNone() shouldBe Some(6)
+      iterable.lastOrNone { it < 4 } shouldBe Some(3)
+      iterable.lastOrNone { it > 7 } shouldBe None
+
+      val emptyIterable = iterableOf<Int>()
+      emptyIterable.lastOrNone() shouldBe None
+
+      val nullableIterable1 = iterableOf(1, 2, 3, 4, 5, null)
+      nullableIterable1.lastOrNone() shouldBe Some(null)
+
+      val nullableIterable2 = iterableOf(null, 2, 3, null, 5, 6)
+      nullableIterable2.lastOrNone { it == null } shouldBe Some(null)
+    }
+
+    "Collection.lastOrNone" {
+      val list = listOf(1, 2, 3, 4, 5, 6)
+      list.lastOrNone() shouldBe Some(6)
+
+      val emptyList = emptyList<Int>()
+      emptyList.lastOrNone() shouldBe None
+
+      val nullableList = listOf(1, 2, 3, 4, 5, null)
+      nullableList.lastOrNone() shouldBe Some(null)
+    }
+
+    "Iterable.elementAtOrNone" {
+      val iterable = iterableOf(1, 2, 3, 4, 5, 6)
+      iterable.elementAtOrNone(index = 3 - 1) shouldBe Some(3)
+      iterable.elementAtOrNone(index = -1) shouldBe None
+      iterable.elementAtOrNone(index = 100) shouldBe None
+
+      val nullableIterable = iterableOf(1, 2, null, 4, 5, 6)
+      nullableIterable.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
+    }
+
+    "Collection.elementAtOrNone" {
+      val list = listOf(1, 2, 3, 4, 5, 6)
+      list.elementAtOrNone(index = 3 - 1) shouldBe Some(3)
+      list.elementAtOrNone(index = -1) shouldBe None
+      list.elementAtOrNone(index = 100) shouldBe None
+
+      val nullableList = listOf(1, 2, null, 4, 5, 6)
+      nullableList.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
     }
 
     "and" {
@@ -234,3 +367,7 @@ class OptionTest : UnitSpec() {
     }
   }
 }
+
+// Utils
+
+private fun <T> iterableOf(vararg elements: T): Iterable<T> = Iterable { iterator { yieldAll(elements.toList()) } }

@@ -563,11 +563,28 @@ public sealed class Option<out A> {
       is Some -> f(value)
     }
 
-  public fun <B> align(b: Option<B>): Option<Ior<A, B>> =
-    Ior.fromNullables(this.orNull(), b.orNull()).toOption()
+  /**
+   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
+   */
+  public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
+    when (this) {
+      None -> when (b) {
+        None -> None
+        is Some -> Some(b.value.rightIor())
+      }
+      is Some -> when (b) {
+        None -> Some(this.value.leftIor())
+        is Some -> Some(Pair(this.value, b.value).bothIor())
+      }
+    }
 
+  /**
+   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior], and then, if it's not [None], map it using [f].
+   *
+   * @note This function works like a regular `align` function, but is then mapped by the `map` function.
+   */
   public inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
-    Ior.fromNullables(this.orNull(), b.orNull())?.let(f).toOption()
+    align(b).map(f)
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -812,20 +829,6 @@ public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
     acc.combine(MA, a)
   }
 
-public fun <T> Iterable<T>.firstOrNone(): Option<T> = this.firstOrNull().toOption()
-
-public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
-
-public fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
-
-public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
-
-public fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
-
-public fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.lastOrNull(predicate).toOption()
-
-public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
-
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
@@ -842,12 +845,15 @@ public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Bool
   }
 
 /**
- * Returns an Option containing all elements that are instances of specified type parameter R.
+ * Returns an Option containing all elements that are instances of specified type parameter [B].
  */
-public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> {
-  val f: (Any?) -> B? = { it as? B }
-  return this.mapNotNull(f)
-}
+public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
+  flatMap {
+    when (it) {
+      is B -> Some(it)
+      else -> None
+    }
+  }
 
 public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
   handleErrorWith { Some(f(Unit)) }
