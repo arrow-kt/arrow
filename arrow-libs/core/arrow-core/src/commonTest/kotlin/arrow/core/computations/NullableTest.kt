@@ -7,6 +7,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
 class NullableTest : UnitSpec() {
 
