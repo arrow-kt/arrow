@@ -24,11 +24,16 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * ```kotlin:ank
    * import arrow.core.computations.option
    *
-   * option<Int> {
-   *   ensure(true)
-   *   println("ensure(true) passes")
-   *   ensure(false)
-   *   1
+   * //sampleStart
+   * suspend fun main() {
+   *   option<Int> {
+   *     ensure(true)
+   *     println("ensure(true) passes")
+   *     ensure(false)
+   *     1
+   *   }
+   * //sampleEnd
+   *   .let(::println)
    * }
    * // println: "ensure(true) passes"
    * // res: None
@@ -46,11 +51,16 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * ```kotlin:ank
  * import arrow.core.computations.option
  *
- * option<Int> {
- *   val x: Int? = 1
- *   ensureNotNull(x)
- *   println(x)
- *   ensureNotNull(null)
+ * //sampleStart
+ * suspend fun main() {
+ *   option<Int> {
+ *     val x: Int? = 1
+ *     ensureNotNull(x)
+ *     println(x)
+ *     ensureNotNull(null)
+ *   }
+ * //sampleEnd
+ *   .let(::println)
  * }
  * // println: "1"
  * // res: None

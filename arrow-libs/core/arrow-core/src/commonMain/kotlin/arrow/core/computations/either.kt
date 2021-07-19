@@ -30,14 +30,19 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
    * In case it is `false`, then it short-circuits the binding and returns
    * the provided value by [orLeft] inside an [Either.Left].
    *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.core.computations.either
    *
-   * either<String, Int> {
-   *   ensure(true) { "" }
-   *   println("ensure(true) passes")
-   *   ensure(false) { "failed" }
-   *   1
+   * //sampleStart
+   * suspend fun main() {
+   *   either<String, Int> {
+   *     ensure(true) { "" }
+   *     println("ensure(true) passes")
+   *     ensure(false) { "failed" }
+   *     1
+   *   }
+   * //sampleEnd
+   *   .let(::println)
    * }
    * // println: "ensure(true) passes"
    * // res: Either.Left("failed")
@@ -55,11 +60,16 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  * ```kotlin:ank
  * import arrow.core.computations.either
  *
- * either<String, Int> {
- *   val x: Int? = 1
- *   ensureNotNull(x) { "passes" }
- *   println(x)
- *   ensureNotNull(null) { "failed" }
+ * //sampleStart
+ * suspend fun main() {
+ *   either<String, Int> {
+ *     val x: Int? = 1
+ *     ensureNotNull(x) { "passes" }
+ *     println(x)
+ *     ensureNotNull(null) { "failed" }
+ *   }
+ * //sampleEnd
+ *   .let(::println)
  * }
  * // println: "1"
  * // res: Either.Left("failed")

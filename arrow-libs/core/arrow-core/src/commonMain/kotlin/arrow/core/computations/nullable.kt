@@ -22,11 +22,16 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * ```kotlin:ank
    * import arrow.core.computations.nullable
    *
-   * nullable<Int> {
-   *   ensure(true)
-   *   println("ensure(true) passes")
-   *   ensure(false)
-   *   1
+   * //sampleStart
+   * suspend fun main() {
+   *   nullable<Int> {
+   *     ensure(true)
+   *     println("ensure(true) passes")
+   *     ensure(false)
+   *     1
+   *   }
+   * //sampleEnd
+   *   .let(::println)
    * }
    * // println: "ensure(true) passes"
    * // res: null
@@ -44,11 +49,16 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * ```kotlin:ank
  * import arrow.core.computations.nullable
  *
- * nullable<Int> {
- *   val x: Int? = 1
- *   ensureNotNull(x)
- *   println(x)
- *   ensureNotNull(null)
+ * //sampleStart
+ * suspend fun main() {
+ *   nullable<Int> {
+ *     val x: Int? = 1
+ *     ensureNotNull(x)
+ *     println(x)
+ *     ensureNotNull(null)
+ *   }
+ * //sampleEnd
+ *   .let(::println)
  * }
  * // println: "1"
  * // res: null
