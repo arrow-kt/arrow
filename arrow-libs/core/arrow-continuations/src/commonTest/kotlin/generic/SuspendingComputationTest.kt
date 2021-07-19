@@ -143,11 +143,13 @@ class SuspendingComputationTest : StringSpec({
     fun square(i: Int): Int = i * i
 
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, lValue: String ->
-      either<String, Int> {
+      val res = either<String, Int> {
         val ii = i
         ensureNotNull(ii) { lValue }
         square(ii) // Smart-cast by contract
-      } shouldBe i?.let(::square)?.right() ?: lValue.left()
+      }
+      val expected = i?.let(::square)?.right() ?: lValue.left()
+      res shouldBe expected
     }
   }
 
