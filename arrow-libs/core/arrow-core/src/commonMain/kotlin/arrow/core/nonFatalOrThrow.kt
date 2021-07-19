@@ -32,5 +32,5 @@ package arrow.core
  *
  */
 // https://youtrack.jetbrains.com/issue/KT-36036
-fun Throwable.nonFatalOrThrow(): Throwable =
+public fun Throwable.nonFatalOrThrow(): Throwable =
   if (NonFatal(this)) this else throw this

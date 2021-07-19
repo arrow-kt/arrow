@@ -25,13 +25,13 @@ import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class OpticsProcessor : AbstractProcessor() {
+public class OpticsProcessor : AbstractProcessor() {
 
   private val annotatedEles = mutableListOf<AnnotatedElement>()
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-  override fun getSupportedAnnotationTypes() = setOf(opticsAnnotationClass.canonicalName)
+  override fun getSupportedAnnotationTypes(): Set<String> = setOf(opticsAnnotationClass.canonicalName)
 
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
     roundEnv

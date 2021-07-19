@@ -10,7 +10,7 @@ import kotlin.jvm.JvmStatic
  * [Lens] is a type alias for [PLens] which fixes the type arguments
  * and restricts the [PLens] to monomorphic updates.
  */
-typealias Lens<S, A> = PLens<S, S, A, A>
+public typealias Lens<S, A> = PLens<S, S, A, A>
 
 /**
  * A [Lens] (or Functional Reference) is an optic that can focus into a structure for
@@ -28,7 +28,8 @@ typealias Lens<S, A> = PLens<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>,
+  PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   override fun get(source: S): A
 
@@ -43,7 +44,7 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
   /**
    * Join two [PLens] with the same focus in [A]
    */
-  infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
+  public infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
     { ss -> ss.fold(this::get, other::get) },
     { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
   )
@@ -51,7 +52,7 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
   /**
    * Pair two disjoint [PLens]
    */
-  infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
+  public infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
     PLens(
       { (s, c) -> get(s) to other.get(c) },
       { (s, s1), (b, b1) -> set(s, b) to other.set(s1, b1) }
@@ -76,22 +77,22 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
   /**
    * Compose a [PLens] with another [PLens]
    */
-  infix fun <C, D> compose(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> = Lens(
+  public infix fun <C, D> compose(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> = Lens(
     { a -> other.get(get(a)) },
     { s, c -> set(s, other.set(get(s), c)) }
   )
 
-  operator fun <C, D> plus(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> =
+  public operator fun <C, D> plus(other: PLens<in A, out B, out C, in D>): PLens<S, T, C, D> =
     this compose other
 
-  companion object {
+  public companion object {
 
-    fun <S> id() = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
+    public fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
       get = { it.fold(::identity, ::identity) },
       set = { s, b -> s.bimap({ b }, { b }) }
     )
@@ -100,17 +101,17 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * Invoke operator overload to create a [PLens] of type `S` with target `A`.
      * Can also be used to construct [Lens]
      */
-    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T) = object : PLens<S, T, A, B> {
-      override fun get(s: S): A = get(s)
-
-      override fun set(s: S, b: B): T = set(s, b)
-    }
+    public operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T): PLens<S, T, A, B> =
+      object : PLens<S, T, A, B> {
+        override fun get(s: S): A = get(s)
+        override fun set(s: S, b: B): T = set(s, b)
+      }
 
     /**
      * [Lens] to operate on the head of a [NonEmptyList]
      */
     @JvmStatic
-    fun <A> nonEmptyListHead(): Lens<NonEmptyList<A>, A> =
+    public fun <A> nonEmptyListHead(): Lens<NonEmptyList<A>, A> =
       Lens(
         get = NonEmptyList<A>::head,
         set = { nel, newHead -> NonEmptyList(newHead, nel.tail) }
@@ -120,7 +121,7 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to operate on the tail of a [NonEmptyList]
      */
     @JvmStatic
-    fun <A> nonEmptyListTail(): Lens<NonEmptyList<A>, List<A>> =
+    public fun <A> nonEmptyListTail(): Lens<NonEmptyList<A>, List<A>> =
       Lens(
         get = NonEmptyList<A>::tail,
         set = { nel, newTail -> NonEmptyList(nel.head, newTail) }
@@ -130,7 +131,7 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [PLens] to focus into the first value of a [Pair]
      */
     @JvmStatic
-    fun <A, B, R> pairPFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> =
+    public fun <A, B, R> pairPFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> =
       PLens(
         get = { it.first },
         set = { (_, b), r -> r to b }
@@ -140,14 +141,14 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to focus into the first value of a [Pair]
      */
     @JvmStatic
-    fun <A, B> pairFirst(): Lens<Pair<A, B>, A> =
+    public fun <A, B> pairFirst(): Lens<Pair<A, B>, A> =
       pairPFirst()
 
     /**
      * [PLens] to focus into the second value of a [Pair]
      */
     @JvmStatic
-    fun <A, B, R> pairPSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
+    public fun <A, B, R> pairPSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
       PLens(
         get = { it.second },
         set = { (a, _), r -> a to r }
@@ -157,14 +158,14 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to focus into the second value of a [Pair]
      */
     @JvmStatic
-    fun <A, B> pairSecond(): Lens<Pair<A, B>, B> =
+    public fun <A, B> pairSecond(): Lens<Pair<A, B>, B> =
       pairPSecond()
 
     /**
      * [PLens] to focus into the first value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C, R> triplePFirst(): PLens<Triple<A, B, C>, Triple<R, B, C>, A, R> =
+    public fun <A, B, C, R> triplePFirst(): PLens<Triple<A, B, C>, Triple<R, B, C>, A, R> =
       PLens(
         get = { it.first },
         set = { (_, b, c), r -> Triple(r, b, c) }
@@ -174,14 +175,14 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to focus into the first value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C> tripleFirst(): Lens<Triple<A, B, C>, A> =
+    public fun <A, B, C> tripleFirst(): Lens<Triple<A, B, C>, A> =
       triplePFirst()
 
     /**
      * [PLens] to focus into the second value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C, R> triplePSecond(): PLens<Triple<A, B, C>, Triple<A, R, C>, B, R> =
+    public fun <A, B, C, R> triplePSecond(): PLens<Triple<A, B, C>, Triple<A, R, C>, B, R> =
       PLens(
         get = { it.second },
         set = { (a, _, c), r -> Triple(a, r, c) }
@@ -191,14 +192,14 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to focus into the second value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C> tripleSecond(): Lens<Triple<A, B, C>, B> =
+    public fun <A, B, C> tripleSecond(): Lens<Triple<A, B, C>, B> =
       triplePSecond()
 
     /**
      * [PLens] to focus into the third value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C, R> triplePThird(): PLens<Triple<A, B, C>, Triple<A, B, R>, C, R> =
+    public fun <A, B, C, R> triplePThird(): PLens<Triple<A, B, C>, Triple<A, B, R>, C, R> =
       PLens(
         get = { it.third },
         set = { (a, b, _), r -> Triple(a, b, r) }
@@ -208,7 +209,7 @@ interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T,
      * [Lens] to focus into the third value of a [Triple]
      */
     @JvmStatic
-    fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
+    public fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
       triplePThird()
   }
 }

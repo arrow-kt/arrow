@@ -152,9 +152,9 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
  * In some special cases it is possible to detect if a STM transaction blocks indefinitely so we can
  *  abort here.
  */
-class BlockedIndefinitely : Throwable("Transaction blocked indefinitely")
+public class BlockedIndefinitely : Throwable("Transaction blocked indefinitely")
 
-expect object RetryException : Throwable
+public expect object RetryException : Throwable
 
 // --------
 /**

@@ -37,7 +37,7 @@ import kotlin.coroutines.CoroutineContext
  * }
  * ```
  */
-fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
+public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
   Resource(f) { s -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
 
 /**
@@ -56,7 +56,7 @@ fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<
  *     }
  * ```
  */
-fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resource<A> =
+public fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resource<A> =
   Resource(f) { s -> withContext(Dispatchers.IO) { s.close() } }
 
 /**
@@ -78,7 +78,7 @@ fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resourc
  *   }
  * ```
  */
-fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
+public fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
   fromExecutor {
     Executors.newSingleThreadExecutor { r ->
       Thread(r, name).apply {

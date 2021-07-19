@@ -56,9 +56,9 @@ import kotlin.jvm.JvmStatic
  * ```
  *
  */
-sealed class Eval<out A> {
+public sealed class Eval<out A> {
 
-  companion object {
+  public companion object {
 
     /**
      * Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
@@ -79,7 +79,7 @@ sealed class Eval<out A> {
      * It will return 2.
      */
     @JvmStatic
-    fun <A> now(a: A): Eval<A> =
+    public fun <A> now(a: A): Eval<A> =
       Now(a)
 
     /**
@@ -101,7 +101,7 @@ sealed class Eval<out A> {
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
     @JvmStatic
-    inline fun <A> later(crossinline f: () -> A): Later<A> =
+    public inline fun <A> later(crossinline f: () -> A): Later<A> =
       Later { f() }
 
     /**
@@ -123,15 +123,15 @@ sealed class Eval<out A> {
      * "expensive computation" is computed every time `value()` is invoked.
      */
     @JvmStatic
-    inline fun <A> always(crossinline f: () -> A) =
+    public inline fun <A> always(crossinline f: () -> A): Always<A> =
       Always { f() }
 
     @JvmStatic
-    inline fun <A> defer(crossinline f: () -> Eval<A>): Eval<A> =
+    public inline fun <A> defer(crossinline f: () -> Eval<A>): Eval<A> =
       Defer { f() }
 
     @JvmStatic
-    fun raise(t: Throwable): Eval<Nothing> =
+    public fun raise(t: Throwable): Eval<Nothing> =
       defer { throw t }
 
     /**
@@ -221,15 +221,15 @@ sealed class Eval<out A> {
     }
   }
 
-  abstract fun value(): A
+  public abstract fun value(): A
 
-  abstract fun memoize(): Eval<A>
+  public abstract fun memoize(): Eval<A>
 
-  inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
+  public inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
 
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
-  fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
+  public fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
     when (this) {
       is FlatMap<A> -> object : FlatMap<B>() {
         override fun <S> start(): Eval<S> = (this@Eval).start()
@@ -251,7 +251,7 @@ sealed class Eval<out A> {
       }
     }
 
-  inline fun <B> coflatMap(crossinline f: (Eval<A>) -> B): Eval<B> =
+  public inline fun <B> coflatMap(crossinline f: (Eval<A>) -> B): Eval<B> =
     Later { f(this) }
 
   /**
@@ -260,14 +260,14 @@ sealed class Eval<out A> {
    * This type should be used when an A value is already in hand, or when the computation to produce an A value is
    * pure and very fast.
    */
-  data class Now<out A>(@JsName("_value") val value: A) : Eval<A>() {
+  public data class Now<out A>(@JsName("_value") val value: A) : Eval<A>() {
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
 
     override fun toString(): String =
       "Eval.Now($value)"
 
-    companion object {
+    public companion object {
       @PublishedApi
       internal val unit: Eval<Unit> = Now(Unit)
     }
@@ -284,7 +284,7 @@ sealed class Eval<out A> {
    * Once Later has been evaluated, the closure (and any values captured by the closure) will not be retained, and
    * will be available for garbage collection.
    */
-  data class Later<out A>(private val f: () -> A) : Eval<A>() {
+  public data class Later<out A>(private val f: () -> A) : Eval<A>() {
     @JsName("_name")
     val value: A by lazy(f)
 
@@ -303,7 +303,7 @@ sealed class Eval<out A> {
    * This type will evaluate the computation every time the value is required. It should be avoided except when
    * laziness is required and caching must be avoided. Generally, prefer Later.
    */
-  data class Always<out A>(private val f: () -> A) : Eval<A>() {
+  public data class Always<out A>(private val f: () -> A) : Eval<A>() {
     override fun value(): A = f()
     override fun memoize(): Eval<A> = Later(f)
 
@@ -316,7 +316,7 @@ sealed class Eval<out A> {
    *
    * Users should not instantiate Defer instances themselves. Instead, they will be automatically created when needed.
    */
-  data class Defer<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
+  public data class Defer<out A>(val thunk: () -> Eval<A>) : Eval<A>() {
     override fun memoize(): Eval<A> = Memoize(this)
     override fun value(): A = collapse(this).value()
 
@@ -334,9 +334,9 @@ sealed class Eval<out A> {
    * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
    * more efficient implementation of the .value method.
    */
-  abstract class FlatMap<out A> : Eval<A>() {
-    abstract fun <S> start(): Eval<S>
-    abstract fun <S> run(s: S): Eval<A>
+  public abstract class FlatMap<out A> : Eval<A>() {
+    public abstract fun <S> start(): Eval<S>
+    public abstract fun <S> run(s: S): Eval<A>
     override fun memoize(): Eval<A> = Memoize(this)
     override fun value(): A = evaluate(this)
 
@@ -366,19 +366,19 @@ sealed class Eval<out A> {
     "Eval(...)"
 }
 
-fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+public fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun loop(): Eval<B> =
     Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
   return loop()
 }
 
-fun <A, B, Z> Eval<A>.zip(b: Eval<B>, map: (A, B) -> Z): Eval<Z> =
+public fun <A, B, Z> Eval<A>.zip(b: Eval<B>, map: (A, B) -> Z): Eval<Z> =
   flatMap { a: A -> b.map { bb: B -> map(a, bb) } }
 
-fun <A, B> Eval<A>.zip(b: Eval<B>): Eval<Pair<A, B>> =
+public fun <A, B> Eval<A>.zip(b: Eval<B>): Eval<Pair<A, B>> =
   flatMap { a: A -> b.map { bb: B -> Pair(a, bb) } }
 
-fun <A, B, C, D> Eval<A>.zip(
+public fun <A, B, C, D> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   map: (A, B, C) -> D
@@ -395,7 +395,7 @@ fun <A, B, C, D> Eval<A>.zip(
     Eval.Now.unit
   ) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
 
-fun <A, B, C, D, E> Eval<A>.zip(
+public fun <A, B, C, D, E> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -413,7 +413,7 @@ fun <A, B, C, D, E> Eval<A>.zip(
     Eval.Now.unit
   ) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
 
-fun <A, B, C, D, E, F> Eval<A>.zip(
+public fun <A, B, C, D, E, F> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -430,7 +430,7 @@ fun <A, B, C, D, E, F> Eval<A>.zip(
     )
   }
 
-fun <A, B, C, D, E, F, G> Eval<A>.zip(
+public fun <A, B, C, D, E, F, G> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -449,7 +449,7 @@ fun <A, B, C, D, E, F, G> Eval<A>.zip(
     )
   }
 
-fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
+public fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -470,7 +470,7 @@ fun <A, B, C, D, E, F, G, H> Eval<A>.zip(
     )
   }
 
-fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
+public fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -493,7 +493,7 @@ fun <A, B, C, D, E, F, G, H, I> Eval<A>.zip(
     )
   }
 
-fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
+public fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -518,7 +518,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Eval<A>.zip(
     )
   }
 
-fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
+public fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
   b: Eval<B>,
   c: Eval<C>,
   d: Eval<D>,
@@ -552,11 +552,11 @@ fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
+public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.now(emptyList())
   else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
 
-fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
+public fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
   if (n <= 0) Eval.now(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
 }

@@ -46,7 +46,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @see racePair for a version that does not automatically cancel the loser.
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
-suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb: suspend () -> B): Either<A, B> =
+public suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb: suspend () -> B): Either<A, B> =
   raceN(Dispatchers.Default, fa, fb)
 
 /**
@@ -87,7 +87,7 @@ suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb:
  * @return either [Either.Left] if [fa] won the race, or [Either.Right] if [fb] won the race.
  * @see raceN for a function that ensures it runs in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B> raceN(
+public suspend inline fun <A, B> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend () -> A,
   crossinline fb: suspend () -> B

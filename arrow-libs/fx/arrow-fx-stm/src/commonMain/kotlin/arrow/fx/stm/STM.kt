@@ -192,7 +192,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * - [Composable memory transactions, by Tim Harris, Simon Marlow, Simon Peyton Jones, and Maurice Herlihy, in ACM Conference on Principles and Practice of Parallel Programming 2005.](https://www.microsoft.com/en-us/research/publication/composable-memory-transactions/)
  */
 // TODO Explore this https://dl.acm.org/doi/pdf/10.1145/2976002.2976020 when benchmarks are set up
-interface STM {
+public interface STM {
   /**
    * Abort and retry the current transaction.
    *
@@ -215,7 +215,7 @@ interface STM {
    * }
    * ```
    */
-  fun retry(): Nothing
+  public fun retry(): Nothing
 
   /**
    * Run the given transaction and fallback to the other one if the first one calls [retry].
@@ -234,7 +234,7 @@ interface STM {
    * }
    * ```
    */
-  infix fun <A> (STM.() -> A).orElse(other: STM.() -> A): A
+  public infix fun <A> (STM.() -> A).orElse(other: STM.() -> A): A
 
   /**
    * Run [f] and handle any exception thrown with [onError].
@@ -252,7 +252,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> catch(f: STM.() -> A, onError: STM.(Throwable) -> A): A
+  public fun <A> catch(f: STM.() -> A, onError: STM.(Throwable) -> A): A
 
   /**
    * Read the value from a [TVar].
@@ -277,7 +277,7 @@ interface STM {
    * - When committing the transaction the value read has to be equal to the current value otherwise the
    *   transaction will retry
    */
-  fun <A> TVar<A>.read(): A
+  public fun <A> TVar<A>.read(): A
 
   /**
    * Set the value of a [TVar].
@@ -302,7 +302,7 @@ interface STM {
    * - When committing the value inside the [TVar], at the time of calling [write], has to be the
    *   same as the current value otherwise the transaction will retry
    */
-  fun <A> TVar<A>.write(a: A): Unit
+  public fun <A> TVar<A>.write(a: A): Unit
 
   /**
    * Modify the value of a [TVar]
@@ -324,7 +324,7 @@ interface STM {
    *
    * `modify(f) = write(f(read()))`
    */
-  fun <A> TVar<A>.modify(f: (A) -> A): Unit = write(f(read()))
+  public fun <A> TVar<A>.modify(f: (A) -> A): Unit = write(f(read()))
 
   /**
    * Swap the content of the [TVar]
@@ -347,12 +347,12 @@ interface STM {
    *
    * @return The previous value stored inside the [TVar]
    */
-  fun <A> TVar<A>.swap(a: A): A = read().also { write(a) }
+  public fun <A> TVar<A>.swap(a: A): A = read().also { write(a) }
 
   /**
    * Create a new [TVar] inside a transaction, because [TVar.new] is not possible inside [STM] transactions.
    */
-  fun <A> newTVar(a: A): TVar<A> = TVar(a)
+  public fun <A> newTVar(a: A): TVar<A> = TVar(a)
 
   // -------- TMVar
   /**
@@ -379,7 +379,7 @@ interface STM {
    * @see TMVar.tryTake for a version that does not retry.
    * @see TMVar.read for a version that does not remove the value after reading.
    */
-  fun <A> TMVar<A>.take(): A = when (val ret = v.read()) {
+  public fun <A> TMVar<A>.take(): A = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.None) }
     Option.None -> retry()
   }
@@ -406,7 +406,7 @@ interface STM {
    *
    * For a version of [TMVar.put] that does not retry see [TMVar.tryPut]
    */
-  fun <A> TMVar<A>.put(a: A): Unit = when (v.read()) {
+  public fun <A> TMVar<A>.put(a: A): Unit = when (v.read()) {
     is Option.Some -> retry()
     Option.None -> v.write(Option.Some(a))
   }
@@ -435,7 +435,7 @@ interface STM {
    * @see TMVar.tryRead for a version that does not retry.
    * @see TMVar.take for a version that leaves the [TMVar] empty after reading.
    */
-  fun <A> TMVar<A>.read(): A = when (val ret = v.read()) {
+  public fun <A> TMVar<A>.read(): A = when (val ret = v.read()) {
     is Option.Some -> ret.a
     Option.None -> retry()
   }
@@ -459,7 +459,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> TMVar<A>.tryTake(): A? = when (val ret = v.read()) {
+  public fun <A> TMVar<A>.tryTake(): A? = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.None) }
     Option.None -> null
   }
@@ -487,7 +487,7 @@ interface STM {
    *
    * @see TMVar.put for a function that retries if the [TMVar] is not empty.
    */
-  fun <A> TMVar<A>.tryPut(a: A): Boolean = when (v.read()) {
+  public fun <A> TMVar<A>.tryPut(a: A): Boolean = when (v.read()) {
     is Option.Some -> false
     Option.None -> true.also { v.write(Option.Some(a)) }
   }
@@ -513,7 +513,7 @@ interface STM {
    * @see TMVar.read for a function that retries if the [TMVar] is empty.
    * @see TMVar.tryTake for a function that leaves the [TMVar] empty after reading.
    */
-  fun <A> TMVar<A>.tryRead(): A? = when (val ret = v.read()) {
+  public fun <A> TMVar<A>.tryRead(): A? = when (val ret = v.read()) {
     is Option.Some -> ret.a
     Option.None -> null
   }
@@ -539,7 +539,7 @@ interface STM {
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
    */
-  fun <A> TMVar<A>.isEmpty(): Boolean = v.read() is Option.None
+  public fun <A> TMVar<A>.isEmpty(): Boolean = v.read() is Option.None
 
   /**
    * Check if a [TMVar] is not empty. This function never retries.
@@ -562,7 +562,7 @@ interface STM {
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
    */
-  fun <A> TMVar<A>.isNotEmpty(): Boolean =
+  public fun <A> TMVar<A>.isNotEmpty(): Boolean =
     isEmpty().not()
 
   /**
@@ -584,7 +584,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> TMVar<A>.swap(a: A): A = when (val ret = v.read()) {
+  public fun <A> TMVar<A>.swap(a: A): A = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.Some(a)) }
     Option.None -> retry()
   }
@@ -611,7 +611,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun TSemaphore.available(): Int =
+  public fun TSemaphore.available(): Int =
     v.read()
 
   /**
@@ -636,7 +636,7 @@ interface STM {
    *
    * @see TSemaphore.tryAcquire for a version that does not retry.
    */
-  fun TSemaphore.acquire(): Unit =
+  public fun TSemaphore.acquire(): Unit =
     acquire(1)
 
   /**
@@ -661,7 +661,7 @@ interface STM {
    *
    * @see TSemaphore.tryAcquire for a version that does not retry.
    */
-  fun TSemaphore.acquire(n: Int): Unit {
+  public fun TSemaphore.acquire(n: Int): Unit {
     val curr = v.read()
     check(curr - n >= 0)
     v.write(curr - n)
@@ -690,7 +690,7 @@ interface STM {
    *
    * @see TSemaphore.acquire for a version that retries if there are not enough permits.
    */
-  fun TSemaphore.tryAcquire(): Boolean =
+  public fun TSemaphore.tryAcquire(): Boolean =
     tryAcquire(1)
 
   /**
@@ -716,7 +716,7 @@ interface STM {
    *
    * @see TSemaphore.acquire for a version that retries if there are not enough permits.
    */
-  fun TSemaphore.tryAcquire(n: Int): Boolean =
+  public fun TSemaphore.tryAcquire(n: Int): Boolean =
     stm { acquire(n); true } orElse { false }
 
   /**
@@ -739,7 +739,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun TSemaphore.release(): Unit =
+  public fun TSemaphore.release(): Unit =
     v.write(v.read() + 1)
 
   /**
@@ -764,7 +764,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun TSemaphore.release(n: Int): Unit = when (n) {
+  public fun TSemaphore.release(n: Int): Unit = when (n) {
     0 -> Unit
     1 -> release()
     else ->
@@ -793,7 +793,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A> TQueue<A>.write(a: A): Unit =
+  public fun <A> TQueue<A>.write(a: A): Unit =
     writes.modify { it.cons(a) }
 
   /**
@@ -816,7 +816,7 @@ interface STM {
    *
    * This function never retries.
    */
-  operator fun <A> TQueue<A>.plusAssign(a: A): Unit = write(a)
+  public operator fun <A> TQueue<A>.plusAssign(a: A): Unit = write(a)
 
   /**
    * Remove the front element from the [TQueue] or retry if the [TQueue] is empty.
@@ -841,7 +841,7 @@ interface STM {
    * @see TQueue.tryRead for a version that does not retry.
    * @see TQueue.peek for a version that does not remove the element.
    */
-  fun <A> TQueue<A>.read(): A {
+  public fun <A> TQueue<A>.read(): A {
     val xs = reads.read()
     return if (xs.isNotEmpty()) reads.write(xs.tail()).let { xs.head() }
     else {
@@ -877,7 +877,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A> TQueue<A>.tryRead(): A? =
+  public fun <A> TQueue<A>.tryRead(): A? =
     (stm { read() } orElse { null })
 
   /**
@@ -904,7 +904,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A> TQueue<A>.flush(): List<A> {
+  public fun <A> TQueue<A>.flush(): List<A> {
     val xs = reads.read().also { if (it.isNotEmpty()) reads.write(PList.Nil) }
     val ys = writes.read().also { if (it.isNotEmpty()) writes.write(PList.Nil) }
     return xs.toList() + ys.reverse().toList()
@@ -936,7 +936,7 @@ interface STM {
    * @see TQueue.read for a version that removes the front element.
    * @see TQueue.tryPeek for a version that does not retry.
    */
-  fun <A> TQueue<A>.peek(): A =
+  public fun <A> TQueue<A>.peek(): A =
     read().also { writeFront(it) }
 
   /**
@@ -963,7 +963,7 @@ interface STM {
    * @see TQueue.tryRead for a version that removes the front element
    * @see TQueue.peek for a version that retries if the [TQueue] is empty.
    */
-  fun <A> TQueue<A>.tryPeek(): A? =
+  public fun <A> TQueue<A>.tryPeek(): A? =
     tryRead()?.also { writeFront(it) }
 
   /**
@@ -990,7 +990,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A> TQueue<A>.writeFront(a: A): Unit =
+  public fun <A> TQueue<A>.writeFront(a: A): Unit =
     reads.read().let { reads.write(it.cons(a)) }
 
   /**
@@ -1015,7 +1015,7 @@ interface STM {
    *
    * > This function has to access both [TVar]'s and thus may lead to increased contention, use sparingly.
    */
-  fun <A> TQueue<A>.isEmpty(): Boolean =
+  public fun <A> TQueue<A>.isEmpty(): Boolean =
     reads.read().isEmpty() && writes.read().isEmpty()
 
   /**
@@ -1040,7 +1040,7 @@ interface STM {
    *
    * > This function has to access both [TVar]'s and thus may lead to increased contention, use sparingly.
    */
-  fun <A> TQueue<A>.isNotEmpty(): Boolean =
+  public fun <A> TQueue<A>.isNotEmpty(): Boolean =
     reads.read().isNotEmpty() || writes.read().isNotEmpty()
 
   /**
@@ -1066,7 +1066,7 @@ interface STM {
    *
    * > This function has to access both [TVar]'s and thus may lead to increased contention, use sparingly.
    */
-  fun <A> TQueue<A>.removeAll(pred: (A) -> Boolean): Unit {
+  public fun <A> TQueue<A>.removeAll(pred: (A) -> Boolean): Unit {
     reads.modify { it.filter(pred) }
     writes.modify { it.filter(pred) }
   }
@@ -1093,7 +1093,7 @@ interface STM {
    *
    * > This function has to access both [TVar]'s and thus may lead to increased contention, use sparingly.
    */
-  fun <A> TQueue<A>.size(): Int = reads.read().size() + writes.read().size()
+  public fun <A> TQueue<A>.size(): Int = reads.read().size() + writes.read().size()
 
   // -------- TArray
   /**
@@ -1118,7 +1118,7 @@ interface STM {
    *
    * This function never retries.
    */
-  operator fun <A> TArray<A>.get(i: Int): A =
+  public operator fun <A> TArray<A>.get(i: Int): A =
     v[i].read()
 
   /**
@@ -1145,7 +1145,7 @@ interface STM {
    *
    * This function never retries.
    */
-  operator fun <A> TArray<A>.set(i: Int, a: A): Unit =
+  public operator fun <A> TArray<A>.set(i: Int, a: A): Unit =
     v[i].write(a)
 
   /**
@@ -1167,7 +1167,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A> TArray<A>.transform(f: (A) -> A): Unit =
+  public fun <A> TArray<A>.transform(f: (A) -> A): Unit =
     v.forEach { it.modify(f) }
 
   /**
@@ -1190,7 +1190,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <A, B> TArray<A>.fold(init: B, f: (B, A) -> B): B =
+  public fun <A, B> TArray<A>.fold(init: B, f: (B, A) -> B): B =
     v.fold(init) { acc, v -> f(acc, v.read()) }
 
   // -------- TMap
@@ -1215,7 +1215,7 @@ interface STM {
    *
    * This function never retries.
    */
-  fun <K, V> TMap<K, V>.member(k: K): Boolean =
+  public fun <K, V> TMap<K, V>.member(k: K): Boolean =
     lookup(k) != null
 
   /**
@@ -1241,7 +1241,7 @@ interface STM {
    *
    * > If the key is not present [STM.lookup] will not retry, instead it returns `null`.
    */
-  fun <K, V> TMap<K, V>.lookup(k: K): V? =
+  public fun <K, V> TMap<K, V>.lookup(k: K): V? =
     lookupHamtWithHash(hamt, hashFn(k)) { it.first == k }?.second
 
   /**
@@ -1267,7 +1267,7 @@ interface STM {
    *
    * > If the key is not present [STM.get] will not retry, instead it returns `null`.
    */
-  operator fun <K, V> TMap<K, V>.get(k: K): V? = lookup(k)
+  public operator fun <K, V> TMap<K, V>.get(k: K): V? = lookup(k)
 
   /**
    * Add a key value pair to the map
@@ -1286,7 +1286,7 @@ interface STM {
    * }
    * ```
    */
-  fun <K, V> TMap<K, V>.insert(k: K, v: V): Unit {
+  public fun <K, V> TMap<K, V>.insert(k: K, v: V): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { k to v }
   }
 
@@ -1307,7 +1307,7 @@ interface STM {
    * }
    * ```
    */
-  operator fun <K, V> TMap<K, V>.set(k: K, v: V): Unit = insert(k, v)
+  public operator fun <K, V> TMap<K, V>.set(k: K, v: V): Unit = insert(k, v)
 
   /**
    * Add a key value pair to the map
@@ -1326,7 +1326,7 @@ interface STM {
    * }
    * ```
    */
-  operator fun <K, V> TMap<K, V>.plusAssign(kv: Pair<K, V>): Unit = insert(kv.first, kv.second)
+  public operator fun <K, V> TMap<K, V>.plusAssign(kv: Pair<K, V>): Unit = insert(kv.first, kv.second)
 
   /**
    * Update a value at a key if it exists.
@@ -1348,7 +1348,7 @@ interface STM {
    * }
    * ```
    */
-  fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V): Unit {
+  public fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { it?.second?.let(fn)?.let { k to it } }
   }
 
@@ -1370,7 +1370,7 @@ interface STM {
    * }
    * ```
    */
-  fun <K, V> TMap<K, V>.remove(k: K): Unit {
+  public fun <K, V> TMap<K, V>.remove(k: K): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { null }
   }
 
@@ -1394,7 +1394,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> TSet<A>.member(a: A): Boolean =
+  public fun <A> TSet<A>.member(a: A): Boolean =
     lookupHamtWithHash(hamt, hashFn(a)) { it == a } != null
 
   /**
@@ -1414,7 +1414,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> TSet<A>.insert(a: A): Unit {
+  public fun <A> TSet<A>.insert(a: A): Unit {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { a }
   }
 
@@ -1435,7 +1435,7 @@ interface STM {
    * }
    * ```
    */
-  operator fun <A> TSet<A>.plusAssign(a: A): Unit = insert(a)
+  public operator fun <A> TSet<A>.plusAssign(a: A): Unit = insert(a)
 
   /**
    * Remove an element from the set.
@@ -1455,7 +1455,7 @@ interface STM {
    * }
    * ```
    */
-  fun <A> TSet<A>.remove(a: A): Unit {
+  public fun <A> TSet<A>.remove(a: A): Unit {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { null }
   }
 }
@@ -1483,7 +1483,7 @@ interface STM {
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
-inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
+public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
 
 /**
  * Retry if [b] is false otherwise does nothing.
@@ -1508,7 +1508,7 @@ inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
  *
  * `check(b) = if (b.not()) retry() else Unit`
  */
-fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
+public fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
 
 /**
  * Run a transaction to completion.
@@ -1535,4 +1535,4 @@ fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
  * Rethrows all exceptions not caught by inside [f]. Remember to use [STM.catch] to handle exceptions as `try {} catch` will not handle transaction
  *  state properly!
  */
-suspend fun <A> atomically(f: STM.() -> A): A = STMTransaction(f).commit()
+public suspend fun <A> atomically(f: STM.() -> A): A = STMTransaction(f).commit()

@@ -19,12 +19,12 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import kotlin.streams.asSequence
 
-val extensionMappings = mapOf(
+public val extensionMappings: Map<String, String> = mapOf(
   "java" to "java",
   "kotlin" to "kts"
 )
 
-val SupportedMarkdownExtensions: Set<String> = setOf(
+public val SupportedMarkdownExtensions: Set<String> = setOf(
   "markdown",
   "mdown",
   "mkdn",
@@ -37,7 +37,7 @@ val SupportedMarkdownExtensions: Set<String> = setOf(
   "Rmd"
 )
 
-data class CompilationException(
+public data class CompilationException(
   val path: Path,
   val snippet: Snippet,
   val underlying: Throwable,
@@ -46,13 +46,13 @@ data class CompilationException(
   override fun toString(): String = msg
 }
 
-data class AnkFailedException(val msg: String) : NoStackTrace(msg) {
+public data class AnkFailedException(val msg: String) : NoStackTrace(msg) {
   override fun toString(): String = msg
 }
 
-abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
+public abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
 
-data class Snippet(
+public data class Snippet(
   val fence: String,
   val lang: String,
   val code: String,
@@ -65,22 +65,22 @@ data class Snippet(
   val isPlaygroundExtension: Boolean = fence.contains(AnkPlaygroundExtension)
 )
 
-const val AnkBlock = ":ank"
-const val AnkSilentBlock = ":ank:silent"
-const val AnkReplaceBlock = ":ank:replace"
-const val AnkOutFileBlock = ":ank:outFile"
-const val AnkPlayground = ":ank:playground"
-const val AnkFailBlock = ":ank:fail"
-const val AnkPlaygroundExtension = ":ank:playground:extension"
+public const val AnkBlock: String = ":ank"
+public const val AnkSilentBlock: String = ":ank:silent"
+public const val AnkReplaceBlock: String = ":ank:replace"
+public const val AnkOutFileBlock: String = ":ank:outFile"
+public const val AnkPlayground: String = ":ank:playground"
+public const val AnkFailBlock: String = ":ank:fail"
+public const val AnkPlaygroundExtension: String = ":ank:playground:extension"
 
-sealed class SnippetParserState {
-  data class CollectingCode(val snippet: Snippet) : SnippetParserState()
-  object Searching : SnippetParserState()
+public sealed class SnippetParserState {
+  public data class CollectingCode(val snippet: Snippet) : SnippetParserState()
+  public object Searching : SnippetParserState()
 }
 
-val interpreter: AnkOps = object : AnkOps {
+public val interpreter: AnkOps = object : AnkOps {
 
-  override suspend fun printConsole(msg: String): Unit {
+  public override suspend fun printConsole(msg: String): Unit {
     println(msg)
   }
 
@@ -89,7 +89,7 @@ val interpreter: AnkOps = object : AnkOps {
       it.lines().anyMatch { s -> s.contains(AnkBlock) }
     }
 
-  override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
+  public override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
     withContext(Dispatchers.IO) { Files.walk(this@ankFiles) }
       .filter { Files.isDirectory(it).not() }
       .filter { path ->
@@ -100,7 +100,7 @@ val interpreter: AnkOps = object : AnkOps {
         AnkProcessingContext(index, path)
       }
 
-  override suspend fun createTargetDirectory(source: Path, target: Path): Path {
+  public override suspend fun createTargetDirectory(source: Path, target: Path): Path {
     source.toFile().copyRecursively(target.toFile(), overwrite = true)
     return target
   }
@@ -140,7 +140,7 @@ val interpreter: AnkOps = object : AnkOps {
     return result.second to result.third
   }
 
-  override suspend fun compileCode(snippets: Pair<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> =
+  public override suspend fun compileCode(snippets: Pair<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> =
     getEngineCache(snippets.second, compilerArgs).let { engineCache ->
       // run each snipped and handle its result
       snippets.second.mapIndexed { i, snip ->
@@ -222,7 +222,7 @@ val interpreter: AnkOps = object : AnkOps {
       )
     })
 
-  override suspend fun generateFile(path: Path, newContent: Sequence<String>): Path =
+  public override suspend fun generateFile(path: Path, newContent: Sequence<String>): Path =
     Files.write(path, newContent.asIterable())
 
   private val engineCache: ConcurrentMap<List<String>, Map<String, ScriptEngine>> = ConcurrentHashMap()

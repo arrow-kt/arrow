@@ -18,13 +18,13 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.tools.StandardLocation
 
-class KnownException(message: String, val element: Element?) : RuntimeException(message) {
+public class KnownException(message: String, public val element: Element?) : RuntimeException(message) {
   override val message: String get() = super.message as String
-  operator fun component1() = message
-  operator fun component2() = element
+  public operator fun component1(): String = message
+  public operator fun component2(): Element? = element
 }
 
-abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, KotlinMetatadataEncoder {
+public abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, KotlinMetatadataEncoder {
 
   private fun Element.kDocLocation(): File =
     locationName()
@@ -33,7 +33,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       .let { "$tmpDir/build/kdocs/meta/$it.javadoc" }
       .let(::File)
 
-  fun Element.kDoc(): String? =
+  public fun Element.kDoc(): String? =
     @Suppress("SwallowedException")
     try {
       kDocLocation()
@@ -114,13 +114,13 @@ private fun String.replaceInvalidPathCharacters() = replace('?', '_')
 
 /** Writes this to `filer`.  */
 @Throws(IOException::class)
-fun Filer.writeSafe(
+public fun Filer.writeSafe(
   pkg: CharSequence,
   name: CharSequence,
   fileString: CharSequence,
   logger: ((message: CharSequence) -> Unit)? = null,
   vararg originatingElements: Element?
-) = catchDoubleAttempt({
+): Unit = catchDoubleAttempt({
   when (pkg) {
     "unnamed package" -> knownError("package not found")
     else -> {
@@ -138,7 +138,7 @@ fun Filer.writeSafe(
 
 /** Writes this to `filer`.  */
 @Throws(IOException::class)
-fun FileSpec.writeSafeTo(filer: Filer, logger: ((message: CharSequence) -> Unit)? = null) =
+public fun FileSpec.writeSafeTo(filer: Filer, logger: ((message: CharSequence) -> Unit)? = null): Unit =
   catchDoubleAttempt({
     writeTo(filer)
   }) {

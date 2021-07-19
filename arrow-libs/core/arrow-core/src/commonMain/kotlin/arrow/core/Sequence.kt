@@ -5,7 +5,7 @@ import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
-fun <B, C, D, E> Sequence<B>.zip(
+public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   map: (B, C, D) -> E
@@ -23,7 +23,7 @@ fun <B, C, D, E> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F> Sequence<B>.zip(
+public fun <B, C, D, E, F> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -43,7 +43,7 @@ fun <B, C, D, E, F> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G> Sequence<B>.zip(
+public fun <B, C, D, E, F, G> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -65,7 +65,7 @@ fun <B, C, D, E, F, G> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G, H> Sequence<B>.zip(
+public fun <B, C, D, E, F, G, H> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -89,7 +89,7 @@ fun <B, C, D, E, F, G, H> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
+public fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -122,7 +122,7 @@ fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
+public fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -158,7 +158,7 @@ fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
+public fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -197,7 +197,7 @@ fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
   }
 }
 
-fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
+public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
   e: Sequence<E>,
@@ -256,7 +256,7 @@ fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
  * }
  * ```
  */
-fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
+public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
   this.align(b).map(fa)
 
 /**
@@ -274,7 +274,7 @@ fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<
  * }
  * ```
  */
-fun <A, B> Sequence<A>.align(b: Sequence<B>): Sequence<Ior<A, B>> =
+public fun <A, B> Sequence<A>.align(b: Sequence<B>): Sequence<Ior<A, B>> =
   alignRec(this, b)
 
 private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y>> {
@@ -295,13 +295,13 @@ private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y
   }
 }
 
-fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
+public fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
   this@combineAll.fold(empty()) { acc, a ->
     acc.combine(a)
   }
 }
 
-fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequence<B>> =
+public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequence<B>> =
   fold(emptySequence()) { bs, a ->
     f(a).align(bs) { ior ->
       ior.fold(
@@ -312,7 +312,7 @@ fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequence<B>> =
     }
   }
 
-fun <A, K, V> Sequence<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Sequence<V>> =
+public fun <A, K, V> Sequence<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Sequence<V>> =
   fold(emptyMap()) { bs, a ->
     f(a).align(bs) { (_, ior) ->
       ior.fold(
@@ -323,7 +323,7 @@ fun <A, K, V> Sequence<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Sequence<V>>
     }
   }
 
-fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
+public fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
   fold<A, Sequence<B>?>(emptySequence()) { bs, a ->
     Ior.fromNullables(f(a), bs)?.fold(
       { sequenceOf(it) },
@@ -332,23 +332,23 @@ fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
     )
   }
 
-fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
+public fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
   flatMap(::identity)
 
-fun <A> Sequence<A>.fold(MA: Monoid<A>): A = MA.run {
+public fun <A> Sequence<A>.fold(MA: Monoid<A>): A = MA.run {
   this@fold.fold(empty()) { acc, a ->
     acc.combine(a)
   }
 }
 
-fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
+public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   this@foldMap.fold(empty()) { acc, a ->
     acc.combine(f(a))
   }
 }
 
 @Deprecated(FoldRightDeprecation)
-fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+public fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
   fun Iterator<A>.loop(): Eval<B> =
     if (hasNext()) f(next(), Eval.defer { loop() }) else lb
   return Eval.defer { this.iterator().loop() }
@@ -372,7 +372,7 @@ fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<
  *   println(result.toList())
  * }
  */
-fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequence<B> =
+public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
     ffa(a) + fa.flatMap(ffa)
   } ?: fb
@@ -392,7 +392,7 @@ fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequenc
  *   println(result.toList())
  * }
  */
-fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
+public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
   sequence {
     val lsIterator = this@interleave.iterator()
     val rsIterator = other.iterator()
@@ -426,7 +426,7 @@ fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
  * }
  * ```
  */
-fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> C): Sequence<C> =
+public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> C): Sequence<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
 
 /**
@@ -450,14 +450,14 @@ fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> C): Seq
  * }
  * ```
  */
-fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
+public fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
 
-fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
+public fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
   if (none()) sequenceOf(emptySequence())
   else map { generateSequence { it } }
 
-fun <A> Sequence<A>.once(): Sequence<A> =
+public fun <A> Sequence<A>.once(): Sequence<A> =
   firstOrNull()?.let { sequenceOf(it) } ?: emptySequence()
 
 /**
@@ -480,7 +480,7 @@ fun <A> Sequence<A>.once(): Sequence<A> =
  * }
  * ```
  */
-fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
+public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
   align(other) { ior ->
     ior.fold(
       { it to null },
@@ -510,21 +510,21 @@ fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
  * }
  * ```
  */
-fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
+public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
   padZip(other).map { fa(it.first, it.second) }
 
 @Deprecated(FoldRightDeprecation)
-fun <A, B> Sequence<A>.reduceRightEvalOrNull(
+public fun <A, B> Sequence<A>.reduceRightEvalOrNull(
   initial: (A) -> B,
   operation: (A, acc: Eval<B>) -> Eval<B>
 ): Eval<B?> =
   toList().reduceRightEvalOrNull(initial, operation)
 
-fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
+public fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
   if (n <= 0) emptySequence()
   else this.let { l -> Sequence { List(n) { l }.iterator() } }
 
-fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
+public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
   if (n <= 0) sequenceOf(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
@@ -549,7 +549,7 @@ fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
  * }
  * ```
  */
-fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> C): Sequence<C> =
+public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> C): Sequence<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
 
 /**
@@ -573,13 +573,13 @@ fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> C): Seq
  * }
  * ```
  */
-fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, B?>> =
+public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-fun <A> Sequence<A>.salign(
+public fun <A> Sequence<A>.salign(
   SG: Semigroup<A>,
   other: Sequence<A>
 ): Sequence<A> = SG.run {
@@ -596,7 +596,7 @@ fun <A> Sequence<A>.salign(
  * @receiver Iterable of Validated
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
-fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> {
+public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> {
   val asep = flatMap { gab -> gab.fold({ sequenceOf(it) }, { emptySequence() }) }
   val bsep = flatMap { gab -> gab.fold({ emptySequence() }, { sequenceOf(it) }) }
   return asep to bsep
@@ -608,22 +608,22 @@ fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B
  * @receiver Iterable of Validated
  * @return a tuple containing Sequence with [Validated.Invalid] and another Sequence with its [Validated.Valid] values.
  */
-fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> {
+public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> {
   val asep = flatMap { gab -> gab.fold({ sequenceOf(it) }, { emptySequence() }) }
   val bsep = flatMap { gab -> gab.fold({ emptySequence() }, { sequenceOf(it) }) }
   return asep to bsep
 }
 
-fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
+public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   traverseEither(::identity)
 
-fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
+public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   traverseOption(::identity)
 
-fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
+public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
-fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
+public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
   else map { generateSequence { it } }
 
@@ -640,15 +640,15 @@ fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
  *   result?.let { println("(${it.first.toList()}, ${it.second.toList()})") }
  * }
  */
-fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
+public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
   firstOrNull()?.let { first ->
     Pair(tail(), first)
   }
 
-fun <A> Sequence<A>.tail(): Sequence<A> =
+public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
-fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> {
+public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -662,7 +662,7 @@ fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequ
   return acc.asSequence().right()
 }
 
-fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> {
+public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -676,7 +676,7 @@ fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> 
   return Some(acc.asSequence())
 }
 
-fun <E, A, B> Sequence<A>.traverseValidated(
+public fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Sequence<B>> = fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
@@ -708,7 +708,7 @@ fun <E, A, B> Sequence<A>.traverseValidated(
  * }
  * ```
  */
-fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
+public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
   fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     x.fold(
       { l + it to r },
@@ -732,15 +732,15 @@ fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
  * }
  * ```
  */
-fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
+public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
   map(fa).unalign()
 
-fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
+public fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
   flatMap { either ->
     either.fold({ emptySequence() }, { b -> sequenceOf(b) })
   }
 
-fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
+public fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
   flatMap { validated ->
     validated.fold({ emptySequence() }, { b -> sequenceOf(b) })
   }
@@ -758,7 +758,7 @@ fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
  *   println(result.toList())
  * }
  */
-fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
+public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptySequence()
@@ -777,7 +777,7 @@ fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
  * }
  * ```
  */
-fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
+public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
   fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     l + x.first to r + x.second
   }
@@ -801,10 +801,10 @@ fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
  * }
  * ```
  */
-fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
+public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
   map(fc).unzip()
 
-fun <A> Sequence<A>.void(): Sequence<Unit> =
+public fun <A> Sequence<A>.void(): Sequence<Unit> =
   map { Unit }
 
 /**
@@ -824,7 +824,7 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  *  }
  *  ```
  */
-fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
+public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
 
-fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> = this.mapNotNull { it.orNull() }
+public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> = this.mapNotNull { it.orNull() }
