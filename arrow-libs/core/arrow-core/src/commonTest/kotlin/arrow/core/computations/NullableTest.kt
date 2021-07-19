@@ -3,6 +3,10 @@ package arrow.core.computations
 import arrow.core.Some
 import arrow.core.test.UnitSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.orNull
 
 class NullableTest : UnitSpec() {
 
@@ -71,6 +75,25 @@ class NullableTest : UnitSpec() {
         }.bind()
         string
       } shouldBe null
+    }
+    "ensure null in nullable computation" {
+      checkAll(Arb.bool(), Arb.int()) { predicate, i ->
+        nullable {
+          ensure(predicate)
+          i
+        } shouldBe if (predicate) i else null
+      }
+    }
+
+    "ensureNotNull in nullable computation" {
+      fun square(i: Int): Int = i * i
+      checkAll(Arb.int().orNull()) { i: Int? ->
+        nullable {
+          val ii = i
+          ensureNotNull(ii)
+          square(ii) // Smart-cast by contract
+        } shouldBe i?.let(::square)
+      }
     }
   }
 }

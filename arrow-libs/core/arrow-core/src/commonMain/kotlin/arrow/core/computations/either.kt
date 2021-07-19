@@ -4,7 +4,10 @@ import arrow.continuations.Effect
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Validated
+import arrow.core.left
 import arrow.core.right
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
 public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
@@ -12,7 +15,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
   public suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
-      is Either.Left -> control().shift(this@bind)
+      is Left -> control().shift(this@bind)
     }
 
   public suspend fun <B> Validated<E, B>.bind(): B =
@@ -20,6 +23,18 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
       is Validated.Valid -> value
       is Validated.Invalid -> control().shift(Left(value))
     }
+
+  public suspend fun ensure(boolean: Boolean, orLeft: () -> E): Unit =
+    if (boolean) Unit else orLeft().left().bind()
+}
+
+@OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
+public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {
+  contract {
+    returns() implies (value != null)
+  }
+
+  return value ?: orLeft().left().bind()
 }
 
 @RestrictsSuspension

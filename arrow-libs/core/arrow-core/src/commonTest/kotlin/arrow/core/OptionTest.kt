@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.computations.OptionEffect
 import arrow.core.computations.RestrictedOptionEffect
+import arrow.core.computations.ensureNotNull
 import arrow.core.computations.option
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
@@ -12,8 +13,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.checkAll
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 
 class OptionTest : UnitSpec() {
@@ -43,16 +46,31 @@ class OptionTest : UnitSpec() {
       }
     )
 
-    "bind null in option computation" {
-      option {
-        "s".length.bind()
-      } shouldBe Some(1)
+    "ensure null in option computation" {
+      checkAll(Arb.bool(), Arb.int()) { predicate, i ->
+        option {
+          ensure(predicate)
+          i
+        } shouldBe if (predicate) Some(i) else None
+      }
+    }
+
+    "ensureNotNull in option computation" {
+      fun square(i: Int): Int = i * i
+      checkAll(Arb.int().orNull()) { i: Int? ->
+        option {
+          val ii = i
+          ensureNotNull(ii)
+          square(ii) // Smart-cast by contract
+        } shouldBe i.toOption().map(::square)
+      }
     }
 
     "short circuit null" {
       option {
         val number: Int = "s".length
-        (number.takeIf { it > 1 }?.toString()).bind()
+        val x = ensureNotNull(number.takeIf { it > 1 })
+        x
         throw IllegalStateException("This should not be executed")
       } shouldBe None
     }

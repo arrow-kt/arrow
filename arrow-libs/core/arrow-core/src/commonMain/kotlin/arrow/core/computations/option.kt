@@ -4,17 +4,30 @@ import arrow.continuations.Effect
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.identity
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
 public fun interface OptionEffect<A> : Effect<Option<A>> {
-  // TODO conflicts with outer scoped Effect context
+  @Deprecated("Conflicts with other bind syntax from outer scopes, use ensureNotNull instead.", ReplaceWith("ensureNotNull(this)"))
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(None)
 
   public suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, ::identity)
+
+  public suspend fun ensure(boolean: Boolean): Unit =
+    if (boolean) Unit else control().shift(None)
 }
 
+@OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
+public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
+  contract {
+    returns() implies (value != null)
+  }
+
+  return value ?: (this as OptionEffect<Any?>).control().shift(None)
+}
 @RestrictsSuspension
 public fun interface RestrictedOptionEffect<A> : OptionEffect<A>
 
