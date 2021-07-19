@@ -16,10 +16,46 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
   public suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, ::identity)
 
-  public suspend fun ensure(boolean: Boolean): Unit =
-    if (boolean) Unit else control().shift(None)
+  /**
+   * Ensure check if the [value] is `true`,
+   * and if it is it allows the `option { }` binding to continue.
+   * In case it is `false`, then it short-circuits the binding and returns [None].
+   *
+   * ```kotlin:ank
+   * import arrow.core.computations.option
+   *
+   * option<Int> {
+   *   ensure(true)
+   *   println("ensure(true) passes")
+   *   ensure(false)
+   *   1
+   * }
+   * // println: "ensure(true) passes"
+   * // res: None
+   * ```
+   */
+  public suspend fun ensure(value: Boolean): Unit =
+    if (value) Unit else control().shift(None)
 }
 
+/**
+ * Ensures that [value] is not null.
+ * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
+ * Otherwise, if the [value] is null then the [option] binding will short-circuit with [None].
+ *
+ * ```kotlin:ank
+ * import arrow.core.computations.option
+ *
+ * option<Int> {
+ *   val x: Int? = 1
+ *   ensureNotNull(x)
+ *   println(x)
+ *   ensureNotNull(null)
+ * }
+ * // println: "1"
+ * // res: None
+ * ```
+ */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
   contract {

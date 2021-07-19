@@ -24,10 +24,47 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
       is Validated.Invalid -> control().shift(Left(value))
     }
 
-  public suspend fun ensure(boolean: Boolean, orLeft: () -> E): Unit =
-    if (boolean) Unit else orLeft().left().bind()
+  /**
+   * Ensure check if the [value] is `true`,
+   * and if it is it allows the `either { }` binding to continue.
+   * In case it is `false`, then it short-circuits the binding and returns
+   * the provided value by [orLeft] inside an [Either.Left].
+   *
+   * ```kotlin:ank
+   * import arrow.core.computations.either
+   *
+   * either<String, Int> {
+   *   ensure(true) { "" }
+   *   println("ensure(true) passes")
+   *   ensure(false) { "failed" }
+   *   1
+   * }
+   * // println: "ensure(true) passes"
+   * // res: Either.Left("failed")
+   * ```
+   */
+  public suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
+    if (value) Unit else orLeft().left().bind()
 }
 
+/**
+ * Ensures that [value] is not null.
+ * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
+ * Otherwise, if the [value] is null then the [either] binding will short-circuit with [orLeft] inside of [Either.Left].
+ *
+ * ```kotlin:ank
+ * import arrow.core.computations.either
+ *
+ * either<String, Int> {
+ *   val x: Int? = 1
+ *   ensureNotNull(x) { "passes" }
+ *   println(x)
+ *   ensureNotNull(null) { "failed" }
+ * }
+ * // println: "1"
+ * // res: Either.Left("failed")
+ * ```
+ */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {
   contract {
