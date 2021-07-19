@@ -59,6 +59,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  *
  * ```kotlin:ank
  * import arrow.core.computations.either
+ * import arrow.core.computations.ensureNotNull
  *
  * //sampleStart
  * suspend fun main() {
