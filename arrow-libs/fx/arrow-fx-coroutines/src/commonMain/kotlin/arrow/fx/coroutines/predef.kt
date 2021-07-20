@@ -1,3 +1,3 @@
 package arrow.fx.coroutines
 
-expect fun timeInMillis(): Long
+public expect fun timeInMillis(): Long

@@ -14,10 +14,10 @@ import kotlin.jvm.JvmStatic
  * [Optional] is a type alias for [POptional] which fixes the type arguments
  * and restricts the [POptional] to monomorphic updates.
  */
-typealias Optional<S, A> = POptional<S, S, A, A>
+public typealias Optional<S, A> = POptional<S, S, A, A>
 
 @Suppress("FunctionName")
-fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
+public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
   POptional({ s -> getOption(s).toEither { s } }, set)
 
 /**
@@ -58,7 +58,7 @@ fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus:
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   /**
    * Get the modified source of a [POptional]
@@ -68,7 +68,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Get the focus of a [POptional] or return the original value while allowing the type to change if it does not match
    */
-  fun getOrModify(source: S): Either<T, A>
+  public fun getOrModify(source: S): Either<T, A>
 
   /**
    * Modify the focus of a [POptional] with a function [map]
@@ -82,27 +82,27 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Get the focus of a [POptional] or `null` if the is not there
    */
-  fun getOrNull(source: S): A? =
+  public fun getOrNull(source: S): A? =
     getOrModify(source).orNull()
 
   /**
    * Set the focus of a [POptional] with a value.
    * @return null if the [POptional] is not matching
    */
-  fun setNullable(source: S, b: B): T? =
+  public fun setNullable(source: S, b: B): T? =
     modifyNullable(source) { b }
 
   /**
    * Modify the focus of a [POptional] with a function [map]
    * @return null if the [POptional] is not matching
    */
-  fun modifyNullable(source: S, map: (focus: A) -> B): T? =
+  public fun modifyNullable(source: S, map: (focus: A) -> B): T? =
     getOrNull(source)?.let { set(source, map(it)) }
 
   /**
    * Join two [POptional] with the same focus [B]
    */
-  infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
+  public infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
     POptional(
       { sources ->
         sources.fold(
@@ -122,7 +122,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Create a product of the [POptional] and a type [C]
    */
-  fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
+  public fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     POptional(
       { (source, c) -> getOrModify(source).bimap({ Pair(it, c) }, { Pair(it, c) }) },
       { (source, c2), (update, c) -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
@@ -131,7 +131,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Create a product of a type [C] and the [POptional]
    */
-  fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
+  public fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
       { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
       { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: c2 to set(s, b) }
@@ -140,7 +140,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
   /**
    * Compose a [POptional] with a [POptional]
    */
-  infix fun <C, D> compose(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
+  public infix fun <C, D> compose(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
     POptional(
       { source ->
         getOrModify(source).flatMap { a ->
@@ -150,17 +150,17 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
       { source, d -> modify(source) { a -> other.set(a, d) } }
     )
 
-  operator fun <C, D> plus(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
+  public operator fun <C, D> plus(other: POptional<in A, out B, out C, in D>): POptional<S, T, C, D> =
     this compose other
 
-  companion object {
+  public companion object {
 
-    fun <S> id() = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <S> codiagonal(): Optional<Either<S, S>, S> = POptional(
+    public fun <S> codiagonal(): Optional<Either<S, S>, S> = POptional(
       { sources -> sources.fold({ Either.Right(it) }, { Either.Right(it) }) },
       { sources, focus -> sources.bimap({ focus }, { focus }) }
     )
@@ -169,7 +169,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
-    operator fun <S, T, A, B> invoke(
+    public operator fun <S, T, A, B> invoke(
       getOrModify: (source: S) -> Either<T, A>,
       set: (source: S, focus: B) -> T
     ): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
@@ -181,7 +181,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
     /**
      * [POptional] that never sees its focus
      */
-    fun <A, B> void(): Optional<A, B> = POptional(
+    public fun <A, B> void(): Optional<A, B> = POptional(
       { Either.Left(it) },
       { source, _ -> source }
     )
@@ -190,7 +190,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
      * [Optional] to safely operate on the head of a list
      */
     @JvmStatic
-    fun <A> listHead(): Optional<List<A>, A> = Optional(
+    public fun <A> listHead(): Optional<List<A>, A> = Optional(
       getOption = { if (it.isNotEmpty()) Some(it[0]) else None },
       set = { list, newHead -> if (list.isNotEmpty()) newHead prependTo list.drop(1) else emptyList() }
     )
@@ -199,7 +199,7 @@ interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S,
      * [Optional] to safely operate on the tail of a list
      */
     @JvmStatic
-    fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
+    public fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
       getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
       set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
     )

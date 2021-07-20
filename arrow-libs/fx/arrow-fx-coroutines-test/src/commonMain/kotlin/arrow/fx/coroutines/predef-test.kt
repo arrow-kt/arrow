@@ -32,68 +32,68 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.coroutines.startCoroutine
 
-data class SideEffect(var counter: Int = 0) {
-  fun increment() {
+public data class SideEffect(var counter: Int = 0) {
+  public fun increment() {
     counter++
   }
 }
 
-fun Arb.Companion.throwable(): Arb<Throwable> =
+public fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.string().map(::RuntimeException)
 
-fun <L, R> Arb.Companion.either(left: Arb<L>, right: Arb<R>): Arb<Either<L, R>> {
+public fun <L, R> Arb.Companion.either(left: Arb<L>, right: Arb<R>): Arb<Either<L, R>> {
   val failure: Arb<Either<L, R>> = left.map { l -> l.left() }
   val success: Arb<Either<L, R>> = right.map { r -> r.right() }
   return Arb.choice(failure, success)
 }
 
-fun <L, R> Arb.Companion.validated(left: Arb<L>, right: Arb<R>): Arb<Validated<L, R>> {
+public fun <L, R> Arb.Companion.validated(left: Arb<L>, right: Arb<R>): Arb<Validated<L, R>> {
   val failure: Arb<Validated<L, R>> = left.map { l -> l.invalid() }
   val success: Arb<Validated<L, R>> = right.map { r -> r.valid() }
   return Arb.choice(failure, success)
 }
 
-fun <L, R> Arb.Companion.validatedNel(left: Arb<L>, right: Arb<R>): Arb<ValidatedNel<L, R>> {
+public fun <L, R> Arb.Companion.validatedNel(left: Arb<L>, right: Arb<R>): Arb<ValidatedNel<L, R>> {
   val failure: Arb<ValidatedNel<L, R>> = left.map { l -> l.invalidNel() }
   val success: Arb<ValidatedNel<L, R>> = right.map { r -> r.validNel() }
   return Arb.choice(failure, success)
 }
 
-fun Arb.Companion.intRange(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Arb<IntRange> =
+public fun Arb.Companion.intRange(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Arb<IntRange> =
   Arb.bind(Arb.int(min, max), Arb.int(min, max)) { a, b ->
     if (a < b) a..b else b..a
   }
 
-fun Arb.Companion.longRange(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): Arb<LongRange> =
+public fun Arb.Companion.longRange(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): Arb<LongRange> =
   Arb.bind(Arb.long(min, max), Arb.long(min, max)) { a, b ->
     if (a < b) a..b else b..a
   }
 
-fun Arb.Companion.charRange(): Arb<CharRange> =
+public fun Arb.Companion.charRange(): Arb<CharRange> =
   Arb.bind(Arb.char(), Arb.char()) { a, b ->
     if (a < b) a..b else b..a
   }
 
-fun <O> Arb.Companion.function(arb: Arb<O>): Arb<() -> O> =
+public fun <O> Arb.Companion.function(arb: Arb<O>): Arb<() -> O> =
   arb.map { { it } }
 
-fun Arb.Companion.unit(): Arb<Unit> =
+public fun Arb.Companion.unit(): Arb<Unit> =
   Arb.constant(Unit)
 
-fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
+public fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
 
-fun <A> Arb.Companion.nullable(arb: Arb<A>): Arb<A?> =
+public fun <A> Arb.Companion.nullable(arb: Arb<A>): Arb<A?> =
   Arb.Companion.choice(arb, arb.map { null })
 
 /** Useful for testing success & error scenarios with an `Either` generator **/
-fun <A> Either<Throwable, A>.rethrow(): A =
+public fun <A> Either<Throwable, A>.rethrow(): A =
   fold({ throw it }, ::identity)
 
-fun <A> Result<A>.toEither(): Either<Throwable, A> =
+public fun <A> Result<A>.toEither(): Either<Throwable, A> =
   fold({ a -> Either.Right(a) }, { e -> Either.Left(e) })
 
-suspend fun Throwable.suspend(): Nothing =
+public suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { throw this }.startCoroutine(
       Continuation(Dispatchers.Default) {
@@ -104,7 +104,7 @@ suspend fun Throwable.suspend(): Nothing =
     COROUTINE_SUSPENDED
   }
 
-suspend fun <A> A.suspend(): A =
+public suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { this }.startCoroutine(
       Continuation(Dispatchers.Default) {
@@ -115,7 +115,7 @@ suspend fun <A> A.suspend(): A =
     COROUTINE_SUSPENDED
   }
 
-fun <A> A.suspended(): suspend () -> A =
+public fun <A> A.suspended(): suspend () -> A =
   suspend { suspend() }
 
 /**
@@ -128,7 +128,7 @@ fun <A> A.suspended(): suspend () -> A =
  * ```
  * @see Assertions.assertThrows
  */
-inline fun <A> assertThrowable(executable: () -> A): Throwable {
+public inline fun <A> assertThrowable(executable: () -> A): Throwable {
   val a = try {
     executable.invoke()
   } catch (e: Throwable) {
@@ -138,7 +138,7 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable {
   return if (a is Throwable) a else fail("Expected an exception but found: $a")
 }
 
-suspend fun CoroutineContext.shift(): Unit =
+public suspend fun CoroutineContext.shift(): Unit =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { this }.startCoroutine(
       Continuation(this) {
@@ -149,7 +149,7 @@ suspend fun CoroutineContext.shift(): Unit =
     COROUTINE_SUSPENDED
   }
 
-fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
+public fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
   object : Matcher<Either<Throwable, *>> {
     override fun test(value: Either<Throwable, *>): MatcherResult =
       when (value) {
@@ -178,7 +178,7 @@ fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
       }
   }
 
-fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
+public fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
   object : Matcher<Either<Throwable, A>> {
     override fun test(value: Either<Throwable, A>): MatcherResult =
       when (value) {

@@ -86,7 +86,7 @@ import arrow.core.identity
  * suspend fun main(): Unit = resourceProgram.invoke()
  * ```
  **/
-sealed class Resource<out A> {
+public sealed class Resource<out A> {
 
   /**
    * Use the created resource
@@ -107,13 +107,13 @@ sealed class Resource<out A> {
    * ```
    */
   @Suppress("UNCHECKED_CAST")
-  suspend infix fun <B> use(f: suspend (A) -> B): B =
+  public suspend infix fun <B> use(f: suspend (A) -> B): B =
     useLoop(this as Resource<Any?>, f as suspend (Any?) -> Any?, emptyList()) as B
 
-  fun <B> map(f: (A) -> B): Resource<B> =
+  public fun <B> map(f: (A) -> B): Resource<B> =
     flatMap { a -> just(f(a)) }
 
-  fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
+  public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
     flatMap { res -> ff.map { it(res) } }
 
   /**
@@ -145,18 +145,18 @@ sealed class Resource<out A> {
    * }
    * ```
    */
-  fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
+  public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
     Bind(this, f)
 
-  fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
+  public fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
    flatMap { r ->
       other.map { r2 -> combine(r, r2) }
     }
 
-  fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
+  public fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     zip(other, ::Pair)
 
-  inline fun <B, C, D> zip(
+  public inline fun <B, C, D> zip(
     b: Resource<B>,
     c: Resource<C>,
     crossinline map: (A, B, C) -> D
@@ -165,7 +165,7 @@ sealed class Resource<out A> {
       map(a, b, c)
     }
 
-  inline fun <B, C, D, E> zip(
+  public inline fun <B, C, D, E> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -175,7 +175,7 @@ sealed class Resource<out A> {
       map(a, b, c, d)
     }
 
-  inline fun <B, C, D, E, F, G> zip(
+  public inline fun <B, C, D, E, F, G> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -186,7 +186,7 @@ sealed class Resource<out A> {
       map(a, b, c, d, e)
     }
 
-  inline fun <B, C, D, E, F, G, H> zip(
+  public inline fun <B, C, D, E, F, G, H> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -198,7 +198,7 @@ sealed class Resource<out A> {
       map(b, c, d, e, f, g)
     }
 
-  inline fun <B, C, D, E, F, G, H> zip(
+  public inline fun <B, C, D, E, F, G, H> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -211,7 +211,7 @@ sealed class Resource<out A> {
       map(a, b, c, d, e, f, g)
     }
 
-  inline fun <B, C, D, E, F, G, H, I> zip(
+  public inline fun <B, C, D, E, F, G, H, I> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -225,7 +225,7 @@ sealed class Resource<out A> {
       map(a, b, c, d, e, f, g, h)
     }
 
-  inline fun <B, C, D, E, F, G, H, I, J> zip(
+  public inline fun <B, C, D, E, F, G, H, I, J> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -240,7 +240,7 @@ sealed class Resource<out A> {
       map(a, b, c, d, e, f, g, h, i)
     }
 
-  inline fun <B, C, D, E, F, G, H, I, J, K> zip(
+  public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
@@ -274,16 +274,16 @@ sealed class Resource<out A> {
       }
     }
 
-  class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
+  public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
 
-  class Allocate<A>(
-    val acquire: suspend () -> A,
-    val release: suspend (A, ExitCase) -> Unit
+  public class Allocate<A>(
+    public val acquire: suspend () -> A,
+    public val release: suspend (A, ExitCase) -> Unit
   ) : Resource<A>()
 
-  class Defer<A>(val resource: suspend () -> Resource<A>) : Resource<A>()
+  public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
 
-  companion object {
+  public companion object {
 
     @PublishedApi
     internal val unit: Resource<Unit> = just(Unit)
@@ -307,7 +307,7 @@ sealed class Resource<out A> {
      * }
      * ```
      */
-    operator fun <A> invoke(
+    public operator fun <A> invoke(
       acquire: suspend () -> A,
       release: suspend (A, ExitCase) -> Unit
     ): Resource<A> = Allocate(acquire, release)
@@ -317,7 +317,7 @@ sealed class Resource<out A> {
      *
      * @see [use] For a version that provides an [ExitCase] to [release]
      */
-    operator fun <A> invoke(
+    public operator fun <A> invoke(
       acquire: suspend () -> A,
       release: suspend (A) -> Unit
     ): Resource<A> = invoke(acquire, { r, _ -> release(r) })
@@ -325,14 +325,14 @@ sealed class Resource<out A> {
     /**
      * Create a [Resource] from a pure value [A].
      */
-    fun <A> just(r: A): Resource<A> =
+    public fun <A> just(r: A): Resource<A> =
       Resource({ r }, { _, _ -> Unit })
 
-    fun <A> defer(f: suspend () -> Resource<A>): Resource<A> =
+    public fun <A> defer(f: suspend () -> Resource<A>): Resource<A> =
       Resource.Defer(f)
 
     @Suppress("UNCHECKED_CAST")
-    fun <A, B> tailRecM(a: A, f: (A) -> Resource<Either<A, B>>): Resource<B> {
+    public fun <A, B> tailRecM(a: A, f: (A) -> Resource<Either<A, B>>): Resource<B> {
       fun loop(r: Resource<Either<A, B>>): Resource<B> = when (r) {
         is Bind<*, *> -> Bind(
           r.source as Resource<A>,
@@ -416,23 +416,23 @@ sealed class Resource<out A> {
  * }
  * ```
  */
-inline class Use<A>(internal val acquire: suspend () -> A)
+public inline class Use<A>(internal val acquire: suspend () -> A)
 
 /**
  * Marks an [acquire] operation as the [Resource.use] step of a [Resource].
  */
-fun <A> resource(acquire: suspend () -> A): Use<A> = Use(acquire)
+public fun <A> resource(acquire: suspend () -> A): Use<A> = Use(acquire)
 
 /**
  * Composes a [release] action to a [Resource.use] action creating a [Resource].
  */
-infix fun <A> Use<A>.release(release: suspend (A) -> Unit): Resource<A> =
+public infix fun <A> Use<A>.release(release: suspend (A) -> Unit): Resource<A> =
   Resource(acquire, release)
 
 /**
  * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
  */
-infix fun <A> Use<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
+public infix fun <A> Use<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
   Resource(acquire, release)
 
 /**
@@ -471,7 +471,7 @@ infix fun <A> Use<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resour
  * }
  * ```
  */
-inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
+public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
   fold(Resource.just(emptyList())) { acc: Resource<List<B>>, a: A ->
     f(a).ap(acc.map { { b: B -> it + b } })
   }
@@ -514,5 +514,5 @@ inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>
  * ```
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
+public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
   traverseResource(::identity)

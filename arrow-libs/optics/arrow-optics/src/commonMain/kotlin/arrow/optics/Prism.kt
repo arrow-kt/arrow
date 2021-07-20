@@ -14,7 +14,7 @@ import kotlin.jvm.JvmStatic
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
  * and restricts the [PPrism] to monomorphic updates.
  */
-typealias Prism<S, A> = PPrism<S, S, A, A>
+public typealias Prism<S, A> = PPrism<S, S, A, A>
 
 /**
  * A [Prism] is a loss less invertible optic that can look into a structure and optionally find its focus.
@@ -32,11 +32,11 @@ typealias Prism<S, A> = PPrism<S, S, A, A>
  * @param A the focus of a [PPrism]
  * @param B the modified focus of a [PPrism]
  */
-interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   override fun getOrModify(source: S): Either<T, A>
 
-  fun reverseGet(focus: B): T
+  public fun reverseGet(focus: B): T
 
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrNull(source)?.let(map) ?: M.empty()
@@ -56,7 +56,7 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
   /**
    * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T?`
    */
-  fun liftNullable(f: (focus: A) -> B): (source: S) -> T? =
+  public fun liftNullable(f: (focus: A) -> B): (source: S) -> T? =
     { s -> getOrNull(s)?.let { b -> reverseGet(f(b)) } }
 
   /**
@@ -82,7 +82,11 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
    */
   override fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
     PPrism(
-      { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
+      {
+        it.fold(
+          { a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) },
+          { c -> Either.Right(Either.Right(c)) })
+      },
       {
         when (it) {
           is Either.Left -> Either.Left(reverseGet(it.value))
@@ -96,31 +100,38 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
    */
   override fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
     PPrism(
-      { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
+      {
+        it.fold(
+          { c -> Either.Right(Either.Left(c)) },
+          { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) })
+      },
       { it.map(this::reverseGet) }
     )
 
   /**
    * Compose a [PPrism] with another [PPrism]
    */
-  infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
+  public infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
       getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
       reverseGet = this::reverseGet compose other::reverseGet
     )
 
-  operator fun <C, D> plus(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
+  public operator fun <C, D> plus(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     this compose other
 
-  companion object {
+  public companion object {
 
-    fun <S> id() = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
      * Can also be used to construct [Prism]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, reverseGet: (B) -> T) =
+    public operator fun <S, T, A, B> invoke(
+      getOrModify: (S) -> Either<T, A>,
+      reverseGet: (B) -> T
+    ): PPrism<S, T, A, B> =
       object : PPrism<S, T, A, B> {
         override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
@@ -130,7 +141,7 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
     /**
      * A [PPrism] that checks for equality with a given value [a]
      */
-    fun <A> only(a: A, eq: (constant: A, other: A) -> Boolean = { aa, b -> aa == b }): Prism<A, Unit> = Prism(
+    public fun <A> only(a: A, eq: (constant: A, other: A) -> Boolean = { aa, b -> aa == b }): Prism<A, Unit> = Prism(
       getOrModify = { a2 -> (if (eq(a, a2)) Either.Left(a) else Either.Right(Unit)) },
       reverseGet = { a }
     )
@@ -139,7 +150,7 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
      * [PPrism] to focus into an [arrow.core.Some]
      */
     @JvmStatic
-    fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
+    public fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
       PPrism(
         getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
         reverseGet = ::Some
@@ -149,14 +160,14 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
      * [Prism] to focus into an [arrow.core.Some]
      */
     @JvmStatic
-    fun <A> some(): Prism<Option<A>, A> =
+    public fun <A> some(): Prism<Option<A>, A> =
       pSome()
 
     /**
      * [Prism] to focus into an [arrow.core.None]
      */
     @JvmStatic
-    fun <A> none(): Prism<Option<A>, Unit> =
+    public fun <A> none(): Prism<Option<A>, Unit> =
       Prism(
         getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
         reverseGet = { _ -> None }
@@ -169,7 +180,7 @@ interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<
  * Can also be used to construct [Prism]
  */
 @Suppress("FunctionName")
-fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
+public fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }
 )

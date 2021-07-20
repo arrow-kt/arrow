@@ -33,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
-suspend inline fun <A, B, C> parZip(
+public suspend inline fun <A, B, C> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline f: suspend CoroutineScope.(A, B) -> C
@@ -70,7 +70,7 @@ suspend inline fun <A, B, C> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C> parZip(
+public suspend inline fun <A, B, C> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -108,7 +108,7 @@ suspend inline fun <A, B, C> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D> parZip(
+public suspend inline fun <A, B, C, D> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -148,7 +148,7 @@ suspend inline fun <A, B, C, D> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D> parZip(
+public suspend inline fun <A, B, C, D> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -190,7 +190,7 @@ suspend inline fun <A, B, C, D> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D, E> parZip(
+public suspend inline fun <A, B, C, D, E> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -234,7 +234,7 @@ suspend inline fun <A, B, C, D, E> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D, E> parZip(
+public suspend inline fun <A, B, C, D, E> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -281,7 +281,7 @@ suspend inline fun <A, B, C, D, E> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D, E, F> parZip(
+public suspend inline fun <A, B, C, D, E, F> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -328,7 +328,7 @@ suspend inline fun <A, B, C, D, E, F> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D, E, F> parZip(
+public suspend inline fun <A, B, C, D, E, F> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -379,7 +379,7 @@ suspend inline fun <A, B, C, D, E, F> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D, E, F, G> parZip(
+public suspend inline fun <A, B, C, D, E, F, G> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -429,7 +429,7 @@ suspend inline fun <A, B, C, D, E, F, G> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D, E, F, G> parZip(
+public suspend inline fun <A, B, C, D, E, F, G> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -484,7 +484,7 @@ suspend inline fun <A, B, C, D, E, F, G> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D, E, F, G, H> parZip(
+public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -537,7 +537,7 @@ suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D, E, F, G, H> parZip(
+public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
@@ -596,7 +596,7 @@ suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
-suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
+public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C,
@@ -651,7 +651,7 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
+public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,

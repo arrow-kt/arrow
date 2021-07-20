@@ -28,10 +28,4 @@ dependencies {
     testCompileOnly("junit:junit:$JUNIT_VERSION")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
     testImplementation "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow
-    def toolsJar = Jvm.current().getToolsJar()
-
-    if (!toolsJar)
-        throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
-                "Building with a JRE or JDK9 is currently not supported.")
-    testCompileOnly files(toolsJar)
 }

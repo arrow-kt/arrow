@@ -5,9 +5,9 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
 import java.util.Properties
 
-class AnkPlugin : Plugin<Project> {
+public class AnkPlugin : Plugin<Project> {
 
-  companion object {
+  public companion object {
     private const val EXTENSION_NAME = "ank"
     private const val TASK_NAME = "runAnk"
   }

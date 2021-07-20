@@ -1,7 +1,7 @@
 package arrow.core.test
 
-expect fun isJvm(): Boolean
-expect fun isJs(): Boolean
+public expect fun isJvm(): Boolean
+public expect fun isJs(): Boolean
 
-fun stackSafeIteration(): Int =
+public fun stackSafeIteration(): Int =
   if (isJvm()) 500_000 else 1000

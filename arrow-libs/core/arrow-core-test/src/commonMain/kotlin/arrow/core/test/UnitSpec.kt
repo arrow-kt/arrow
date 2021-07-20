@@ -13,23 +13,23 @@ import io.kotest.property.checkAll
 /**
  * Base class for unit tests
  */
-abstract class UnitSpec : StringSpec() {
+public abstract class UnitSpec : StringSpec() {
 
-  fun testLaws(vararg laws: List<Law>): Unit = laws
+  public fun testLaws(vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
     .forEach { law: Law ->
       registration().addTest(createTestName(law.name), xdisabled = false, law.test)
     }
 
-  fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
+  public fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
     .forEach { law: Law ->
       registration().addTest(createTestName(prefix, law.name, true), xdisabled = false, law.test)
     }
 
-  suspend fun <A, B, C, D, E, F, G> checkAll(
+  public suspend fun <A, B, C, D, E, F, G> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
     genc: Arb<C>,
@@ -44,7 +44,7 @@ abstract class UnitSpec : StringSpec() {
     }
   }
 
-  suspend fun <A, B, C, D, E, F, G, H> checkAll(
+  public suspend fun <A, B, C, D, E, F, G, H> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
     genc: Arb<C>,
@@ -60,7 +60,7 @@ abstract class UnitSpec : StringSpec() {
     }
   }
 
-  suspend fun <A, B, C, D, E, F, G, H, I> checkAll(
+  public suspend fun <A, B, C, D, E, F, G, H, I> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
     genc: Arb<C>,
@@ -77,7 +77,7 @@ abstract class UnitSpec : StringSpec() {
     }
   }
 
-  suspend fun <A, B, C, D, E, F, G, H, I, J> checkAll(
+  public suspend fun <A, B, C, D, E, F, G, H, I, J> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
     genc: Arb<C>,

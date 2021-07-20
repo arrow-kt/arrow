@@ -5,14 +5,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
-sealed class ExitCase {
-  object Completed : ExitCase() {
+public sealed class ExitCase {
+  public object Completed : ExitCase() {
     override fun toString(): String =
       "ExitCase.Completed"
   }
 
-  data class Cancelled(val exception: CancellationException) : ExitCase()
-  data class Failure(val failure: Throwable) : ExitCase()
+  public data class Cancelled(val exception: CancellationException) : ExitCase()
+  public data class Failure(val failure: Throwable) : ExitCase()
 }
 
 /**
@@ -26,7 +26,7 @@ sealed class ExitCase {
  * @see guarantee for registering a handler that is guaranteed to always run.
  * @see guaranteeCase for registering a handler that executes for any [ExitCase].
  */
-suspend inline fun <A> onCancel(
+public suspend inline fun <A> onCancel(
   fa: suspend () -> A,
   crossinline onCancel: suspend () -> Unit
 ): A = guaranteeCase(fa) { case ->
@@ -49,7 +49,7 @@ suspend inline fun <A> onCancel(
  * @param finalizer handler to run after [fa].
  * @see guaranteeCase for registering a handler that tracks the [ExitCase] of [fa].
  */
-suspend inline fun <A> guarantee(
+public suspend inline fun <A> guarantee(
   fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
 ): A {
@@ -78,7 +78,7 @@ suspend inline fun <A> guarantee(
  * @param finalizer handler to run after [fa].
  * @see guarantee for registering a handler that ignores the [ExitCase] of [fa].
  */
-suspend inline fun <A> guaranteeCase(
+public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
 ): A {
@@ -132,7 +132,7 @@ suspend inline fun <A> guaranteeCase(
  * }
  * ```
  */
-suspend inline fun <A, B> bracket(
+public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,
   crossinline release: suspend (A) -> Unit
@@ -214,7 +214,7 @@ suspend inline fun <A, B> bracket(
  * }
  *  ```
  */
-suspend inline fun <A, B> bracketCase(
+public suspend inline fun <A, B> bracketCase(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit

@@ -1,18 +1,19 @@
 @file:JvmName("Composition")
+
 package arrow.core
 
 import kotlin.jvm.JvmName
 
-actual infix fun <P1, P2, IP, R> ((P1, P2) -> IP).andThen(f: (IP) -> R): (P1, P2) -> R =
+public actual infix fun <P1, P2, IP, R> ((P1, P2) -> IP).andThen(f: (IP) -> R): (P1, P2) -> R =
   AndThen2(this).andThen(f)
 
-actual infix fun <IP, R> (() -> IP).andThen(f: (IP) -> R): () -> R =
+public actual infix fun <IP, R> (() -> IP).andThen(f: (IP) -> R): () -> R =
   AndThen0(this).andThen(f)
 
-actual infix fun <P1, IP, R> ((P1) -> IP).andThen(f: (IP) -> R): (P1) -> R =
+public actual infix fun <P1, IP, R> ((P1) -> IP).andThen(f: (IP) -> R): (P1) -> R =
   AndThen1(this).andThen(f)
 
-actual infix fun <IP, R, P1> ((IP) -> R).compose(f: (P1) -> IP): (P1) -> R =
+public actual infix fun <IP, R, P1> ((IP) -> R).compose(f: (P1) -> IP): (P1) -> R =
   AndThen1(this).compose(f)
 
 /**
@@ -33,8 +34,7 @@ private const val maxStackDepthSize = 127
 
 private sealed class AndThen0<A> : () -> A {
 
-  @PublishedApi
-  internal data class Single<A>(val f: () -> A, val index: Int) : AndThen0<A>()
+  private data class Single<A>(val f: () -> A, val index: Int) : AndThen0<A>()
 
   private data class Concat<A, B>(val left: AndThen0<A>, val right: AndThen1<A, B>) : AndThen0<B>() {
     override fun toString(): String = "AndThen.Concat(...)"

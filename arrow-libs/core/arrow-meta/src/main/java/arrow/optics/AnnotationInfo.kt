@@ -1,4 +1,6 @@
 package arrow.optics
 
-val opticsAnnotationKClass = optics::class
-val opticsAnnotationClass = opticsAnnotationKClass.java
+import kotlin.reflect.KClass
+
+public val opticsAnnotationKClass: KClass<optics> = optics::class
+public val opticsAnnotationClass: Class<optics> = opticsAnnotationKClass.java

@@ -31,4 +31,4 @@ package arrow
   AnnotationTarget.TYPEALIAS
 )
 @MustBeDocumented
-annotation class synthetic
+public annotation class synthetic

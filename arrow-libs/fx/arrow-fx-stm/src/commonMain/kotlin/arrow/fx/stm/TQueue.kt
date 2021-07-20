@@ -3,7 +3,7 @@ package arrow.fx.stm
 import arrow.core.Predicate
 import kotlin.js.JsName
 
-fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(PList.Nil))
+public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(PList.Nil))
 
 /**
  * A [TQueue] is a transactional unbounded queue which can be written to and read from concurrently.
@@ -217,12 +217,12 @@ fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(PList.Ni
  *
  * > This method also access both ends of the queue and thus should be used infrequently to avoid contention.
  */
-data class TQueue<A> internal constructor(
+public data class TQueue<A> internal constructor(
   internal val reads: TVar<PList<A>>,
   internal val writes: TVar<PList<A>>
 ) {
-  companion object {
-    suspend fun <A> new(): TQueue<A> = TQueue(TVar.new(PList.Nil), TVar.new(PList.Nil))
+  public companion object {
+    public suspend fun <A> new(): TQueue<A> = TQueue(TVar.new(PList.Nil), TVar.new(PList.Nil))
   }
 }
 
@@ -250,7 +250,7 @@ data class TQueue<A> internal constructor(
  *   implement queues.
  */
 internal sealed class PList<out A> {
-  data class Cons<A>(val value: A, @JsName("_tail") val tail: PList<A>) : PList<A>()
+  public data class Cons<A>(val value: A, @JsName("_tail") val tail: PList<A>) : PList<A>()
   object Nil : PList<Nothing>()
 
   /**

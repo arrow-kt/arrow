@@ -118,7 +118,7 @@ import kotlin.coroutines.resume
  * }
  * ```
  */
-class TVar<A> internal constructor(a: A) {
+public class TVar<A> internal constructor(a: A) {
   /**
    * The ref for a TVar stores either the STMFrame that currently locks the value or the value itself
    * This is used to implement locking. Reading threads have to loop until the value is released by a
@@ -155,7 +155,7 @@ class TVar<A> internal constructor(a: A) {
    *
    * Much faster than `atomically { v.read() }` because it avoids creating a transaction, it just reads the value.
    */
-  suspend fun unsafeRead(): A = this.readI()
+  public suspend fun unsafeRead(): A = this.readI()
 
   /**
    * Internal unsafe (non-suspend) version of read. Used by various other internals and [unsafeRead] to
@@ -237,13 +237,13 @@ class TVar<A> internal constructor(a: A) {
     waiting.getAndSet(emptyList()).forEach { it.getCont()?.resume(Unit) }
   }
 
-  companion object {
+  public companion object {
     /**
      * Return a new [TVar]
      *
      * More efficient than `atomically { newVar(a) }` because it skips creating a transaction.
      */
-    suspend fun <A> new(a: A): TVar<A> = TVar(a)
+    public suspend fun <A> new(a: A): TVar<A> = TVar(a)
   }
 }
 

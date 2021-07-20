@@ -2,36 +2,36 @@ package arrow.core
 
 import arrow.typeclasses.Semigroup
 
-data class Const<A, out T>(private val value: A) {
+public data class Const<A, out T>(private val value: A) {
 
   @Suppress("UNCHECKED_CAST")
-  fun <U> retag(): Const<A, U> =
+  public fun <U> retag(): Const<A, U> =
     this as Const<A, U>
 
-  companion object {
+  public companion object {
 
     @Deprecated(
       "This constructor is duplicated with Const. Use Const instead.",
       ReplaceWith("Const(a)", "arrow.core.Const")
     )
-    fun <A, T> just(a: A): Const<A, T> =
+    public fun <A, T> just(a: A): Const<A, T> =
       Const(a)
   }
 
-  fun value(): A =
+  public fun value(): A =
     value
 
-  fun <U> map(f: (T) -> U): Const<A, U> =
+  public fun <U> map(f: (T) -> U): Const<A, U> =
     retag()
 
-  inline fun <B, C> zip(
+  public inline fun <B, C> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     map: (T, B) -> C
   ): Const<A, C> =
     retag<C>().combine(SG, b.retag())
 
-  inline fun <B, C, D> zip(
+  public inline fun <B, C, D> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -41,7 +41,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, b.retag())
       .combine(SG, c.retag())
 
-  inline fun <B, C, D, E> zip(
+  public inline fun <B, C, D, E> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -53,7 +53,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, c.retag())
       .combine(SG, d.retag())
 
-  inline fun <B, C, D, E, F> zip(
+  public inline fun <B, C, D, E, F> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -67,7 +67,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, d.retag())
       .combine(SG, e.retag())
 
-  inline fun <B, C, D, E, F, G> zip(
+  public inline fun <B, C, D, E, F, G> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -83,7 +83,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, e.retag())
       .combine(SG, f.retag())
 
-  inline fun <B, C, D, E, F, G, H> zip(
+  public inline fun <B, C, D, E, F, G, H> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -101,7 +101,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, f.retag())
       .combine(SG, g.retag())
 
-  inline fun <B, C, D, E, F, G, H, I> zip(
+  public inline fun <B, C, D, E, F, G, H, I> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -121,7 +121,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, g.retag())
       .combine(SG, h.retag())
 
-  inline fun <B, C, D, E, F, G, H, I, J> zip(
+  public inline fun <B, C, D, E, F, G, H, I, J> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -143,7 +143,7 @@ data class Const<A, out T>(private val value: A) {
       .combine(SG, h.retag())
       .combine(SG, i.retag())
 
-  inline fun <B, C, D, E, F, G, H, I, J, K> zip(
+  public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
     SG: Semigroup<A>,
     b: Const<A, B>,
     c: Const<A, C>,
@@ -171,14 +171,14 @@ data class Const<A, out T>(private val value: A) {
     "$Const($value)"
 }
 
-fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> =
+public fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> =
   Const(SG.run { this@combine.value().combine(that.value()) })
 
-inline fun <A> A.const(): Const<A, Nothing> =
+public inline fun <A> A.const(): Const<A, Nothing> =
   Const(this)
 
-fun <A, T, U> Const<A, T>.contramap(f: (U) -> T): Const<A, U> =
+public fun <A, T, U> Const<A, T>.contramap(f: (U) -> T): Const<A, U> =
   retag()
 
-operator fun <A : Comparable<A>, T> Const<A, T>.compareTo(other: Const<A, T>): Int =
+public operator fun <A : Comparable<A>, T> Const<A, T>.compareTo(other: Const<A, T>): Int =
   value().compareTo(other.value())

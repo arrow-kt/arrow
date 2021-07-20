@@ -18,11 +18,11 @@ import com.squareup.kotlinpoet.WildcardTypeName
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import javax.lang.model.element.ExecutableElement
 
-interface KotlinPoetEncoder {
+public interface KotlinPoetEncoder {
 
-  fun metaApi(): MetaApi
+  public fun metaApi(): MetaApi
 
-  fun kotlinMetadataUtils(): KotlinMetadataUtils
+  public fun kotlinMetadataUtils(): KotlinMetadataUtils
 
   private fun com.squareup.kotlinpoet.CodeBlock.toMeta(): Code =
     Code(this.toString())
@@ -49,7 +49,7 @@ interface KotlinPoetEncoder {
       defaultValue = defaultValue?.toMeta()
     )
 
-  fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func =
+  public fun com.squareup.kotlinpoet.FunSpec.toMeta(element: ExecutableElement): Func =
     Func(
       name = element.simpleName.toString(),
       annotations = annotations.map { it.toMeta() },
@@ -63,7 +63,7 @@ interface KotlinPoetEncoder {
       jvmMethodSignature = kotlinMetadataUtils().run { element.jvmMethodSignature }
     )
 
-  fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
+  public fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
     Annotation(className.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
 
   private fun com.squareup.kotlinpoet.WildcardTypeName.toMeta(): TypeName.WildcardType =
@@ -131,7 +131,7 @@ interface KotlinPoetEncoder {
       KModifier.OUT -> Modifier.OutVariance
     }
 
-  fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
+  public fun com.squareup.kotlinpoet.TypeVariableName.toMeta(): TypeName.TypeVariable =
     TypeName.TypeVariable(
       name = name.asKotlin(),
       bounds = bounds.map
@@ -143,12 +143,12 @@ interface KotlinPoetEncoder {
       variance = variance?.toMeta()
     )
 
-  val typeNameToMeta: (typeName: com.squareup.kotlinpoet.TypeName) -> TypeName
+  public val typeNameToMeta: (typeName: com.squareup.kotlinpoet.TypeName) -> TypeName
 
-  fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName =
+  public fun com.squareup.kotlinpoet.TypeName.toMeta(): TypeName =
     typeNameToMeta(this)
 
-  fun typeNameToMetaImpl(typeName: com.squareup.kotlinpoet.TypeName): TypeName =
+  public fun typeNameToMetaImpl(typeName: com.squareup.kotlinpoet.TypeName): TypeName =
     when (typeName) {
       is ClassName -> typeName.toMeta()
       is ParameterizedTypeName -> typeName.toMeta()

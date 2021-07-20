@@ -10,7 +10,7 @@ import kotlin.math.pow
 /**
  * From https://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
  */
-fun Long.humanBytes(): String {
+public fun Long.humanBytes(): String {
   val unit = 1024
   if (this < unit) return toString() + " B"
   val exp = (ln(toDouble()) / ln(unit.toDouble())).toInt()
@@ -18,7 +18,7 @@ fun Long.humanBytes(): String {
   return String.format("%.1f %sB", this / unit.toDouble().pow(exp.toDouble()), pre)
 }
 
-suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Unit = with(ankOps) {
+public suspend fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Unit = with(ankOps) {
   printConsole(colored(ANSI_PURPLE, AnkHeader))
   val heapSize = Runtime.getRuntime().totalMemory()
   val heapMaxSize = Runtime.getRuntime().maxMemory()
