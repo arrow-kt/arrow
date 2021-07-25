@@ -20,10 +20,13 @@ import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -37,6 +40,10 @@ public data class SideEffect(var counter: Int = 0) {
     counter++
   }
 }
+
+
+public fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
+  Arb.list(arbA).map { it.asFlow() }
 
 public fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.string().map(::RuntimeException)

@@ -1,20 +1,13 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -29,16 +22,18 @@ class FlowTest : ArrowFxSpec(
   spec = {
 
     "Retry - flow fails" {
+      val bang = RuntimeException("Bang!")
+
       checkAll(Arb.int(), Arb.positiveInts(10)) { a, n ->
         var counter = 0
-        val e = shouldThrow<RuntimeException> {
+        val e = assertThrowable {
           flow {
             emit(a)
-            if (++counter <= 11) throw RuntimeException("Bang!")
+            if (++counter <= 11) throw bang
           }.retry(Schedule.recurs(n))
             .collect()
         }
-        e.message shouldBe "Bang!"
+        e shouldBe bang
       }
     }
 
@@ -80,7 +75,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        try {
+        assertThrowable {
           flowOf(1, 2).parMap { index ->
             if (index == n) {
               guaranteeCase({
@@ -93,9 +88,7 @@ class FlowTest : ArrowFxSpec(
             }
           }.collect()
           fail("Cannot reach here. CancellationException should be thrown.")
-        } catch (e: CancellationException) {
-          // Pass
-        }
+        }.shouldBeTypeOf<CancellationException>()
 
         val (ii, ex) = exit.await()
         ii shouldBe i
@@ -108,7 +101,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        try {
+        assertThrowable {
           flowOf(1, 2).parMap { index ->
             if (index == n) {
               guaranteeCase({
@@ -121,9 +114,7 @@ class FlowTest : ArrowFxSpec(
             }
           }.collect()
           fail("Cannot reach here. $e should be thrown.")
-        } catch (error: Throwable) {
-          error shouldBe e
-        }
+        } shouldBe e
 
         val (ii, ex) = exit.await()
         ii shouldBe i
@@ -186,7 +177,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        try {
+        assertThrowable {
           flowOf(1, 2).parMapUnordered { index ->
             if (index == n) {
               guaranteeCase({
@@ -199,9 +190,7 @@ class FlowTest : ArrowFxSpec(
             }
           }.collect()
           fail("Cannot reach here. CancellationException should be thrown.")
-        } catch (e: CancellationException) {
-          // Pass
-        }
+        }.shouldBeTypeOf<CancellationException>()
 
         val (ii, ex) = exit.await()
         ii shouldBe i
@@ -214,7 +203,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        try {
+        assertThrowable {
           flowOf(1, 2).parMapUnordered { index ->
             if (index == n) {
               guaranteeCase({
@@ -227,9 +216,7 @@ class FlowTest : ArrowFxSpec(
             }
           }.collect()
           fail("Cannot reach here. $e should be thrown.")
-        } catch (error: Throwable) {
-          error shouldBe e
-        }
+        } shouldBe e
 
         val (ii, ex) = exit.await()
         ii shouldBe i
@@ -269,6 +256,3 @@ class FlowTest : ArrowFxSpec(
     }
   }
 )
-
-fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
-  Arb.list(arbA).map { it.asFlow() }
