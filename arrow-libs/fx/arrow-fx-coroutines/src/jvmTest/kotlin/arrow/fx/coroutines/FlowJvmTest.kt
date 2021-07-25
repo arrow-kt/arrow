@@ -49,4 +49,13 @@ class FlowJvmTest : ArrowFxSpec(spec = {
       }
     }
   }
+
+  "parMapUnordered - single thread - identity" {
+    single.use { ctx ->
+      checkAll(Arb.flow(Arb.int())) { flow ->
+        flow.parMapUnordered(ctx) { it }
+          .toList() shouldBe flow.toList()
+      }
+    }
+  }
 })
