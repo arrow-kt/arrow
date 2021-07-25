@@ -112,7 +112,7 @@ class ResourceTest : ArrowFxSpec(
 
     "parZip - Right CancellationException on acquire" {
       checkAll(Arb.int()) { i ->
-        val cancel = CancellationException(null)
+        val cancel = CancellationException(null, null)
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         shouldThrow<CancellationException> {
@@ -130,7 +130,7 @@ class ResourceTest : ArrowFxSpec(
 
     "parZip - Left CancellationException on acquire" {
       checkAll(Arb.int()) { i ->
-        val cancel = CancellationException(null)
+        val cancel = CancellationException(null, null)
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         shouldThrow<CancellationException> {
@@ -185,7 +185,7 @@ class ResourceTest : ArrowFxSpec(
 
     "parZip - Right CancellationException on release" {
       checkAll(Arb.int()) { i ->
-        val cancel = CancellationException(null)
+        val cancel = CancellationException(null, null)
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         shouldThrow<CancellationException> {
@@ -204,7 +204,7 @@ class ResourceTest : ArrowFxSpec(
 
     "parZip - Left CancellationException on release" {
       checkAll(Arb.int()) { i ->
-        val cancel = CancellationException(null)
+        val cancel = CancellationException(null, null)
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         shouldThrow<CancellationException> {
