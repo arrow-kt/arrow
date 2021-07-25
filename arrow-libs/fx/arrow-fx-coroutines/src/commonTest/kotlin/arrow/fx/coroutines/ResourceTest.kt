@@ -21,7 +21,7 @@ class ResourceTest : ArrowFxSpec(
 
     "Can consume resource" {
       checkAll(Arb.int()) { n ->
-        val r = Resource({ n }, { _ -> Unit })
+        val r = Resource({ n }, { _, _ -> Unit })
 
         r.use { it + 1 } shouldBe n + 1
       }
@@ -202,24 +202,24 @@ class ResourceTest : ArrowFxSpec(
       }
     }
 
-//    "parZip - Left CancellationException on release" {
-//      checkAll(Arb.int()) { i ->
-//        val cancel = CancellationException(null)
-//        val released = CompletableDeferred<Pair<Int, ExitCase>>()
-//
-//        shouldThrow<CancellationException> {
-//          Resource({ }) { _, _ -> throw cancel }
-//            .parZip(
-//              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
-//            ) { _, _ -> }
-//            .use { /*fail("It should never reach here")*/ }
-//        }
-//
-//        val (ii, ex) = released.await()
-//        ii shouldBe i
-//        ex.shouldBeTypeOf<ExitCase.Completed>()
-//      }
-//    }
+    "parZip - Left CancellationException on release" {
+      checkAll(Arb.int()) { i ->
+        val cancel = CancellationException(null)
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        shouldThrow<CancellationException> {
+          Resource({ }) { _, _ -> throw cancel }
+            .parZip(
+              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            ) { _, _ -> }
+            .use { /*fail("It should never reach here")*/ }
+        }
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Completed>()
+      }
+    }
 
     "parZip - Right error on release" {
       checkAll(Arb.int(), Arb.throwable()) { i, throwable ->

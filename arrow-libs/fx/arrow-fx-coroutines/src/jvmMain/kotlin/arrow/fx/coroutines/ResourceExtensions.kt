@@ -38,7 +38,7 @@ import kotlin.coroutines.CoroutineContext
  * ```
  */
 public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
-  Resource(f) { s -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
+  Resource(f) { s, _ -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
 
 /**
  * Creates a [Resource] from an [Closeable], which uses [Closeable.close] for releasing.
@@ -57,7 +57,11 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
  * ```
  */
 public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
-  Resource(f) { s -> withContext(Dispatchers.IO) { s.close() } }
+  Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
+
+@Deprecated("Typo in the function name, use fromCloseable instead.", ReplaceWith("Resource.fromCloseable(f)"))
+public fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resource<A> =
+  fromCloseable(f)
 
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
@@ -76,7 +80,7 @@ public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A):
  * ```
  */
 public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend () -> A): Resource<A> =
-  Resource(f) { s -> withContext(Dispatchers.IO) { s.close() } }
+  Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
 
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].
