@@ -3,7 +3,6 @@
 
 package arrow.fx.coroutines
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.retryWhen
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmMultifileClass

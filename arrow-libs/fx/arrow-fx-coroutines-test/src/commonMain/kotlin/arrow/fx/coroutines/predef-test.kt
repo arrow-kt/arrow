@@ -41,7 +41,6 @@ public data class SideEffect(var counter: Int = 0) {
   }
 }
 
-
 public fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
   Arb.list(arbA).map { it.asFlow() }
 
