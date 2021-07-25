@@ -83,15 +83,17 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList
+ * import kotlinx.coroutines.flow.collect
  * import arrow.fx.coroutines.parMap
  *
  * //sampleStart
- * suspend fun main(): Unit =
- * flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
- *   .parMap { a ->
- *     delay(100)
- *     a
- *   }.toList() // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ * suspend fun main(): Unit {
+ *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+ *     .parMap { a ->
+ *       delay(100)
+ *       a
+ *     }.toList() // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ * }
  * //sampleEnd
  * ```
  */
@@ -132,15 +134,17 @@ public inline fun <A, B> Flow<A>.parMap(
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList
+ * import kotlinx.coroutines.flow.collect
  * import arrow.fx.coroutines.parMapUnordered
  *
  * //sampleStart
- * suspend fun main(): Unit =
- * flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
- *   .parMapUnordered { a ->
- *     delay(100)
- *     a
- *   }.toList() // [3, 5, 4, 6, 2, 8, 7, 1, 9, 10]
+ * suspend fun main(): Unit {
+ *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+ *     .parMapUnordered { a ->
+ *       delay(100)
+ *       a
+ *     }.toList() // [3, 5, 4, 6, 2, 8, 7, 1, 9, 10]
+ * }
  * //sampleEnd
  * ```
  */
