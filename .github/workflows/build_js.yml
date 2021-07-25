@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew ktlintCheck jsIrTest jsLegacyTest
+        run: ./gradlew jsIrTest jsLegacyTest
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
