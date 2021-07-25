@@ -1,4 +1,4 @@
-name: "Build libraries"
+name: "Run test JS"
 
 on: pull_request
 
@@ -16,14 +16,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: 8
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew build
+        run: ./gradlew ktlintCheck jsIrTest jsLegacyTest
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
