@@ -56,26 +56,7 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
  *     }
  * ```
  */
-public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
-  Resource(f) { s -> withContext(Dispatchers.IO) { s.close() } }
-
-/**
- * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
- *
- * ```kotlin:ank:playground
- * import arrow.fx.coroutines.*
- * import java.io.FileInputStream
- *
- * suspend fun copyFile(src: String, dest: String): Unit =
- *   Resource.fromAutoCloseable { FileInputStream(src) }
- *     .zip(Resource.fromAutoCloseable { FileInputStream(dest) })
- *     .use { (a: FileInputStream, b: FileInputStream) ->
- *        /** read from [a] and write to [b]. **/
- *        // Both resources will be closed accordingly to their #close methods
- *     }
- * ```
- */
-public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend () -> A): Resource<A> =
+public fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resource<A> =
   Resource(f) { s -> withContext(Dispatchers.IO) { s.close() } }
 
 /**
