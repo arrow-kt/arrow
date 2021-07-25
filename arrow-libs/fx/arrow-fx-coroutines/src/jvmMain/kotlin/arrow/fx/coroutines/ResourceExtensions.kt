@@ -48,8 +48,8 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
  * import java.io.FileInputStream
  *
  * suspend fun copyFile(src: String, dest: String): Unit =
- *   Resource.fromClosable { FileInputStream(src) }
- *     .zip(Resource.fromClosable { FileInputStream(dest) })
+ *   Resource.fromCloseable { FileInputStream(src) }
+ *     .zip(Resource.fromCloseable { FileInputStream(dest) })
  *     .use { (a: FileInputStream, b: FileInputStream) ->
  *        /** read from [a] and write to [b]. **/
  *        // Both resources will be closed accordingly to their #close methods
