@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -54,7 +55,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
     single.use { ctx ->
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMapUnordered(ctx) { it }
-          .toList() shouldBe flow.toList()
+          .toSet() shouldBe flow.toSet()
       }
     }
   }

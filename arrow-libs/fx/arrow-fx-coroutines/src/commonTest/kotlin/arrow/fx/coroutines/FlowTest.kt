@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -10,6 +11,8 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
@@ -77,7 +80,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        shouldThrow<CancellationException> {
+        try {
           flowOf(1, 2).parMap { index ->
             if (index == n) {
               guaranteeCase({
@@ -89,6 +92,9 @@ class FlowTest : ArrowFxSpec(
               throw CancellationException(null, null)
             }
           }.collect()
+          fail("Cannot reach here. CancellationException should be thrown.")
+        } catch (e: CancellationException) {
+          // Pass
         }
 
         val (ii, ex) = exit.await()
@@ -102,7 +108,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        shouldThrow<Throwable> {
+        try {
           flowOf(1, 2).parMap { index ->
             if (index == n) {
               guaranteeCase({
@@ -114,7 +120,10 @@ class FlowTest : ArrowFxSpec(
               throw e
             }
           }.collect()
-        } shouldBe e
+          fail("Cannot reach here. $e should be thrown.")
+        } catch (error: Throwable) {
+          error shouldBe e
+        }
 
         val (ii, ex) = exit.await()
         ii shouldBe i
@@ -177,7 +186,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        shouldThrow<CancellationException> {
+        try {
           flowOf(1, 2).parMapUnordered { index ->
             if (index == n) {
               guaranteeCase({
@@ -189,6 +198,9 @@ class FlowTest : ArrowFxSpec(
               throw CancellationException(null, null)
             }
           }.collect()
+          fail("Cannot reach here. CancellationException should be thrown.")
+        } catch (e: CancellationException) {
+          // Pass
         }
 
         val (ii, ex) = exit.await()
@@ -202,7 +214,7 @@ class FlowTest : ArrowFxSpec(
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        shouldThrow<Throwable> {
+        try {
           flowOf(1, 2).parMapUnordered { index ->
             if (index == n) {
               guaranteeCase({
@@ -214,7 +226,10 @@ class FlowTest : ArrowFxSpec(
               throw e
             }
           }.collect()
-        } shouldBe e
+          fail("Cannot reach here. $e should be thrown.")
+        } catch (error: Throwable) {
+          error shouldBe e
+        }
 
         val (ii, ex) = exit.await()
         ii shouldBe i
