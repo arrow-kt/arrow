@@ -36,12 +36,12 @@ class AtomicTest : ArrowFxSpec(
     }
 
     "access - setter should fail if value is modified before setter is called" {
-      checkAll(Arb.int(), Arb.int(), Arb.int()) { x, y, z ->
+      checkAll(Arb.int(), Arb.int()) { x, z ->
         val ref = Atomic(x)
         val (_, setter) = ref.access()
-        ref.set(y)
+        ref.update { it + 1 }
         setter(z) shouldBe false
-        ref.get() shouldBe y
+        ref.get() shouldBe x + 1
       }
     }
 
