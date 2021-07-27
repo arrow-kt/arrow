@@ -14,6 +14,7 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.flow.map
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
@@ -123,7 +124,6 @@ public fun fixedRate(
 ): Flow<Unit> =
   if (period == 0L) flowOf(Unit).repeat()
   else flow {
-    val period = period
     var lastAwakeAt = timeStampInMillis()
 
     while (true) {
@@ -131,8 +131,7 @@ public fun fixedRate(
       val next = lastAwakeAt + period
 
       if (next > now) {
-        val remaining = next - now
-        delay(remaining)
+        delay(next - now)
         emit(Unit)
         lastAwakeAt = next
       } else {
@@ -147,9 +146,9 @@ public fun fixedRate(
     }
   }
 
-public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (Int, A) -> B): Flow<B> = flow {
+public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (Int, A) -> B): Flow<B> {
   var index = 0
-  collect { value ->
-    emit(f(index++, value))
+  return map { value ->
+    f(index++, value)
   }
 }
