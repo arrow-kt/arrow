@@ -6,7 +6,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.foldRight as _foldRight
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
