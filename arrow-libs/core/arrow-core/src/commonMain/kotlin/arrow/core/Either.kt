@@ -1541,7 +1541,7 @@ public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidate
  * import arrow.core.Either
  * import arrow.core.shouldBeLeft
  *
- * public fun main() {
+ * fun main() {
  *   //sampleStart
  *   val either = Either.conditionally(false, { "Always false" }, { throw RuntimeException("Will never execute") })
  *   val a = either.shouldBeLeft()
@@ -1569,7 +1569,7 @@ public fun <A, B> Either<A, B>.shouldBeLeft(failureMessage: (B) -> String = { "E
  * import arrow.core.Either
  * import arrow.core.shouldBeRight
  *
- * public fun main() {
+ * fun main() {
  *   //sampleStart
  *   fun squared(i: Int): Int = i * i
  *   val result = squared(5)
