@@ -1,14 +1,17 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 
@@ -17,7 +20,7 @@ class ResourceTest : ArrowFxSpec(
 
     "Can consume resource" {
       checkAll(Arb.int()) { n ->
-        val r = Resource({ n }, { _ -> Unit })
+        val r = Resource({ n }, { _, _ -> Unit })
 
         r.use { it + 1 } shouldBe n + 1
       }
@@ -103,6 +106,195 @@ class ResourceTest : ArrowFxSpec(
         val mutable = mutableListOf<Int>()
         list.traverseResource { mutable.add(it); Resource.just(Unit) }
         mutable.toList() shouldBe list
+      }
+    }
+
+    "parZip - Right CancellationException on acquire" {
+      checkAll(Arb.int()) { i ->
+        val cancel = CancellationException(null, null)
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ i }, { ii, ex ->
+            released.complete(ii to ex)
+          }).parZip(Resource({ throw cancel }) { _, _ -> }) { _, _ -> }
+            .use { fail("It should never reach here") }
+        }.shouldBeTypeOf<CancellationException>()
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Cancelled>()
+      }
+    }
+
+    "parZip - Left CancellationException on acquire" {
+      checkAll(Arb.int()) { i ->
+        val cancel = CancellationException(null, null)
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ throw cancel }) { _, _ -> }
+            .parZip(Resource({ i }, { ii, ex ->
+              released.complete(ii to ex)
+            })) { _, _ -> }
+            .use { fail("It should never reach here") }
+        }.shouldBeTypeOf<CancellationException>()
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Cancelled>()
+      }
+    }
+
+    "parZip - Right error on acquire" {
+      checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            .parZip(
+              Resource({ throw throwable }) { _, _ -> }
+            ) { _, _ -> }
+            .use { fail("It should never reach here") }
+        } shouldBe throwable
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Failure>()
+      }
+    }
+
+    "parZip - Left error on acquire" {
+      checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ throw throwable }) { _, _ -> }
+            .parZip(
+              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            ) { _, _ -> }
+            .use { fail("It should never reach here") }
+        } shouldBe throwable
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Failure>()
+      }
+    }
+
+    "parZip - Right CancellationException on release" {
+      checkAll(Arb.int()) { i ->
+        val cancel = CancellationException(null, null)
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            .parZip(
+              Resource({ }) { _, _ -> throw cancel }
+            ) { _, _ -> }
+            .use { }
+        }.shouldBeTypeOf<CancellationException>()
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Completed>()
+      }
+    }
+
+    "parZip - Left CancellationException on release" {
+      checkAll(Arb.int()) { i ->
+        val cancel = CancellationException(null, null)
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ }) { _, _ -> throw cancel }
+            .parZip(
+              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            ) { _, _ -> }
+            .use { /*fail("It should never reach here")*/ }
+        }.shouldBeTypeOf<CancellationException>()
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Completed>()
+      }
+    }
+
+    "parZip - Right error on release" {
+      checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            .parZip(
+              Resource({ }) { _, _ -> throw throwable }
+            ) { _, _ -> }
+            .use { }
+        } shouldBe throwable
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Completed>()
+      }
+    }
+
+    "parZip - Left error on release" {
+      checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+        val released = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ }) { _, _ -> throw throwable }
+            .parZip(
+              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+            ) { _, _ -> }
+            .use { }
+        } shouldBe throwable
+
+        val (ii, ex) = released.await()
+        ii shouldBe i
+        ex.shouldBeTypeOf<ExitCase.Completed>()
+      }
+    }
+
+    "parZip - error in use" {
+      checkAll(Arb.int(), Arb.int(), Arb.throwable()) { a, b, throwable ->
+        val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
+        val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
+
+        assertThrowable {
+          Resource({ a }) { aa, ex -> releasedA.complete(aa to ex) }
+            .parZip(
+              Resource({ b }) { bb, ex -> releasedB.complete(bb to ex) }
+            ) { _, _ -> }
+            .use { throw throwable }
+        } shouldBe throwable
+
+        val (aa, exA) = releasedA.await()
+        aa shouldBe a
+        exA.shouldBeTypeOf<ExitCase.Failure>()
+
+        val (bb, exB) = releasedB.await()
+        bb shouldBe b
+        exB.shouldBeTypeOf<ExitCase.Failure>()
+      }
+    }
+
+    "parZip - runs in parallel" {
+      checkAll(Arb.int(), Arb.int()) { a, b ->
+        val r = Atomic("")
+        val modifyGate = CompletableDeferred<Int>()
+
+        Resource({
+          modifyGate.await()
+          r.update { i -> "$i$a" }
+        }) { _, _ -> }
+          .parZip(Resource({
+            r.set("$b")
+            modifyGate.complete(0)
+          }) { _, _ -> }) { _a, _b -> _a to _b }
+          .use {
+            r.get() shouldBe "$b$a"
+          }
       }
     }
   }

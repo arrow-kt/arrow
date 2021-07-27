@@ -11,6 +11,8 @@ import io.kotest.property.arbitrary.positiveInts
 import kotlin.time.Duration
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -44,6 +46,24 @@ class FlowJvmTest : ArrowFxSpec(spec = {
 
         timestamps.last() shouldBeGreaterThanOrEqual min
         timestamps.last() shouldBeLessThan max
+      }
+    }
+  }
+
+  "parMap - single thread - identity" {
+    single.use { ctx ->
+      checkAll(Arb.flow(Arb.int())) { flow ->
+        flow.parMap(ctx) { it }
+          .toList() shouldBe flow.toList()
+      }
+    }
+  }
+
+  "parMapUnordered - single thread - identity" {
+    single.use { ctx ->
+      checkAll(Arb.flow(Arb.int())) { flow ->
+        flow.parMapUnordered(ctx) { it }
+          .toSet() shouldBe flow.toSet()
       }
     }
   }
