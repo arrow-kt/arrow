@@ -7,11 +7,14 @@ options:
         url: /fx/
 
       - title: Coroutines
-        url: /fx/async/
+        url: /fx/coroutines/
 
-  - title: Types
+      - title: Pure & Referentially Transparent Functions
+        url: /fx/purity-and-referentially-transparent-functions/
 
+  - title: Patterns and types
     nested_options:
+      -
       - title: suspend () -> A
         url: /effects/io/
 
