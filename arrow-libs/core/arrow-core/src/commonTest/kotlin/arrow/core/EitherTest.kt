@@ -22,10 +22,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
 import io.kotest.property.arbitrary.string
+import io.kotest.property.forAll
 
 class EitherTest : UnitSpec() {
 
@@ -516,6 +518,18 @@ class EitherTest : UnitSpec() {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() shouldBe
           either.bitraverseValidated({ it.invalid() }, { it.valid() })
+      }
+    }
+
+    "shouldBeLeft or shouldBeRight smart casts to the exact type" {
+      forAll(Arb.either(Arb.string(), Arb.int()).filter { it.isRight }) { either ->
+        if (either.isLeft) {
+          val a = either.shouldBeLeft()
+          either is Left<String>
+        } else {
+          val b = either.shouldBeRight()
+          either is Right<Int>
+        }
       }
     }
   }
