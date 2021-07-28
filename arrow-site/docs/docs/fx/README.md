@@ -15,21 +15,27 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 
 ## Arrow Fx Coroutines Overview 
 
- - Getting Started
-    - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
-    - [Pure & Referentially Transparent Functions](...)
-    - [Coroutines](..) 
- - [Parallel operators](race / parZip / parTraverse & co)
- - [Schedule](link to Schedule)
- - [Resource handling](link to Resource / small reference to bracket from Resource docs)
- - [Flow Extensions](link to types)
- - [CircuitBreaker](link to CircuitBreaker)
- - [Atomic](link to Atomic)
- - [STM](link to STM)
+- Quick Start
+  - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
+  - [Pure & Referentially Transparent Functions](purity-and-referentially-transparent-functions/)
+  - [Coroutines](coroutines/)
+  - [Why suspend over IO monad](/effects/io/)
+- Extensions and data types   
+  - [Parallel combinators](parallel/)
+  - [Flow combinators](flow/)  
+  - [Schedule](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
+  - [Resource](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
+  - [CircuitBreaker](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
+  - [Atomic](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
+  - [STM](/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/index.html)
+- Gradle Setup
+ - Snapshot
+ - BOM
+- Maven Setup
+ - BOM
+- Integrating with 3rd-party libraries
 
-## Depending on Arrow Fx libraries
-
-### Gradle
+## Gradle Setup
 
 ```groovy
 dependencies {
@@ -38,7 +44,7 @@ dependencies {
 }
 ```
 
-#### Snapshot version
+### Snapshot version
 
 If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this repository:
 
@@ -50,7 +56,7 @@ allprojects {
 }
 ```
 
-#### BOM file
+### BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
@@ -61,9 +67,7 @@ implementation "io.arrow-kt:arrow-fx-coroutines"
 implementation "io.arrow-kt:arrow-fx-stm"
 ```
 
-### Maven
-
-#### Basic Setup
+## Maven Setup
 
 Add the dependencies that you want to use:
 ```xml
@@ -74,7 +78,7 @@ Add the dependencies that you want to use:
 </dependency>
 ```
 
-#### BOM file
+### BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
@@ -91,3 +95,9 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
   </dependencies>
 </dependencyManagement>
 ```
+
+## Integrating with 3rd-party libraries
+
+Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
+
+If you are interested in the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.

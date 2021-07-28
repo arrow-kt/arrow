@@ -1,10 +1,10 @@
 ---
 layout: docs-fx
-title: Arrow Fx Coroutines - Asynchronous & Concurrent Programming
-permalink: /fx/async/
+title: "Parallel combinators"
+permalink: /fx/parallel/
 ---
 
-# Asynchronous & Concurrent Programming
+# Parallel Combinators
 
 Arrow Fx benefits from the `suspend` syntax for extremely succinct programs without callbacks.
 This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime, and bind their results to the left-hand side.
@@ -190,42 +190,3 @@ suspend fun main(): Unit {
   println(res)
 }
 ```
-
-## Arrow Fx Coroutines, KotlinX Coroutines & Kotlin Standard Library
- 
-### Demystify Coroutine 
-
-Kotlin's standard library defines a `Coroutine` as an instance of a suspendable computation.
-
-In other words, a `Coroutine` is a compiled `suspend () -> A` program wired to a `Continuation`.
-
-Which can be created by using [`kotlin.coroutines.intrinsics.createCoroutineUnintercepted`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.intrinsics/create-coroutine-unintercepted.html).
-
-So let's take a quick look at an example.
-
-```kotlin:ank:playground
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
-import kotlin.coroutines.resume
-
-suspend fun one(): Int = 1
-
-val cont: Continuation<Unit> = ::one
-  .createCoroutineUnintercepted(Continuation(EmptyCoroutineContext) { println(it) })
-
-fun main() {
-  cont.resume(Unit)
-}
-```
-
-As you can see here above we create a `Coroutine` using `createCoroutineUnintercepted` which returns us `Continuation<Unit>`.
-Strange, you might've expected a `Coroutine` type but a `Coroutine` is represented by `Continuation<Unit>`.
-
-This `typealias Coroutine = Contination<Unit>` will start running every time you call `resume(Unit)`, which allows you to run the suspend program N times.
-
-## Integrating with third-party libraries
-
-Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
-
-If you are interested in the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.

@@ -12,11 +12,17 @@ options:
       - title: Pure & Referentially Transparent Functions
         url: /fx/purity-and-referentially-transparent-functions/
 
-  - title: Patterns and types
-    nested_options:
-      -
-      - title: suspend () -> A
+      - title: Why suspend over IO monad
         url: /effects/io/
+
+  - title: Extensions and data types
+    nested_options:
+
+      - title: Parallel combinators
+        url: parallel/
+
+      - title: Flow combinators
+        url: flow/
 
       - title: Atomic
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/
@@ -33,7 +39,7 @@ options:
   - title: Media
     url: https://media.arrow-kt.io/tags/fx/
 
-  - title: Docs
+  - title: Api Docs
 
     nested_options:
 
