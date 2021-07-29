@@ -2,73 +2,112 @@ package arrow.core.computations
 
 import arrow.core.test.UnitSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arbitrary
+import io.kotest.property.arbitrary.flatMap
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
+import io.kotest.property.checkAll
 
 class IterableEffectTest : UnitSpec() {
 
   init {
-    "empty - expect 2" {
-      val result: String? = emptyList<Int>().iterateOrNull {
-        val a = next()
-        val b = next()
-        "$a $b"
+    "expect 2 items" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          val a = next()
+          val b = next()
+          "$a $b"
+        }
+        result shouldBe when (list.size) {
+          0, 1 -> null
+          else -> list.let { (a, b) -> "$a $b" }
+        }
       }
-      result shouldBe null
     }
-    "single - expect 1" {
-      val result: String? = listOf(1).iterateOrNull {
-        val a = next()
-        "$a"
+    "expect 1 item" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          val a = next()
+          "$a"
+        }
+        result shouldBe when (list.size) {
+          0 -> null
+          else -> "${list.first()}"
+        }
       }
-      result shouldBe "1"
     }
-    "single - expect 2" {
-      val result: String? = listOf(1).iterateOrNull {
-        val a = next()
-        val b = next()
-        "$a $b"
+    "drop first" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          dropNext()
+          val a = next()
+          "$a"
+        }
+        result shouldBe when (list.size) {
+          0, 1 -> null
+          else -> "${list.drop(1).first()}"
+        }
       }
-      result shouldBe null
     }
-    "double - expect 2" {
-      val result: String? = listOf(1, 2).iterateOrNull {
-        val a = next()
-        val b = next()
-        "$a $b"
+
+    "drop middle" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          val a = next()
+          dropNext()
+          val b = next()
+          "$a $b"
+        }
+        result shouldBe when (list.size) {
+          0, 1, 2 -> null
+          else -> list.let { (a, _, c) -> "$a $c" }
+        }
       }
-      result shouldBe "1 2"
     }
-    "drop middle values" {
-      val result: String? = listOf(1, 2, 3, 4).iterateOrNull {
-        val a = next()
-        drop(2)
-        val b = next()
-        "$a $b"
+
+    "drop multiple" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          val a = next()
+          drop(2)
+          val b = next()
+          "$a $b"
+        }
+        result shouldBe when (list.size) {
+          0, 1, 2, 3 -> null
+          else -> list.let { (a, _, _, d) -> "$a $d" }
+        }
       }
-      result shouldBe "1 4"
     }
-    "drop second value" {
-      val result: String? = listOf(1, 2, 3).iterateOrNull {
-        val a = next()
-        dropNext()
-        val b = next()
-        "$a $b"
+    "drop only" {
+      checkAll { list: List<Int> ->
+        val result: String? = list.iterateOrNull {
+          dropNext()
+          "not empty"
+        }
+        result shouldBe when (list.size) {
+          0 -> null
+          else -> "not empty"
+        }
       }
-      result shouldBe "1 3"
-    }
-    "drop from empty" {
-      val result: String? = emptyList<Int>().iterateOrNull {
-        drop(1)
-        "won't see me"
-      }
-      result shouldBe null
     }
     "cancel iteration" {
-      val result: String? = listOf<Number>(1, 2.0).iterateOrNull {
-        val a = next()
-        val b = next() as? Long ?: cancel()
-        "$a $b"
+      checkAll { ints: List<Int>, longs: List<Long> ->
+        val list: List<Number> = (ints + longs).shuffled()
+        val result: String? = list.iterateOrNull {
+          val a = next()
+          val b = next() as? Long ?: cancel()
+          "$a $b"
+        }
+        result shouldBe when (list.size) {
+          0, 1 -> null
+          else -> when {
+            list[1] !is Long -> null
+            else -> list.let { (a, b) -> "$a $b" }
+          }
+        }
       }
-      result shouldBe null
     }
   }
 }
