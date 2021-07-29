@@ -56,11 +56,11 @@ import arrow.continuations.generic.DelimitedScope
  * result shouldBe null
  * ```
  */
-suspend fun <A, R> Iterable<A>.iterateOrNull(
+public suspend fun <A, R> Iterable<A>.iterateOrNull(
   block: suspend IterableEffect<A, R?>.() -> R,
 ): R? = Effect.suspended(eff = { IterableEffect(it, iterator()) }, f = block, just = { it })
 
-class IterableEffect<A, R>(
+public class IterableEffect<A, R>(
   private val delimitedScope: DelimitedScope<R?>,
   private val iterator: Iterator<A>,
 ) : Effect<R?> {
@@ -68,24 +68,26 @@ class IterableEffect<A, R>(
   /**
    * returns the next items in the current iteration if available.
    */
-  suspend fun next(): A = iterator.takeIf { it.hasNext() }?.next() ?: cancel()
+  public suspend fun next(): A = iterator.takeIf { it.hasNext() }?.next() ?: cancel()
 
   /**
    * Drops the next item in the current iteration without returning the value, alias of [next].
    */
-  suspend fun dropNext() {
+  public suspend fun dropNext() {
     next()
   }
 
   /**
    * Drops [n] items from the current iteration.
    */
-  suspend fun drop(n: Int) = repeat(n) { dropNext() }
+  public suspend fun drop(n: Int) {
+    repeat(n) { dropNext() }
+  }
 
   /**
    * Cancels the current iteration returning null and skipping any further operations.
    */
-  suspend fun <B> cancel(): B = control().shift(null)
+  public suspend fun <B> cancel(): B = control().shift(null)
 
   override fun control(): DelimitedScope<R?> = delimitedScope
 }
