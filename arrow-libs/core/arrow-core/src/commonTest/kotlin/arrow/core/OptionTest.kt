@@ -5,21 +5,20 @@ import arrow.core.computations.RestrictedOptionEffect
 import arrow.core.computations.ensureNotNull
 import arrow.core.computations.option
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
 import arrow.core.test.generators.option
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.property.checkAll
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 class OptionTest : UnitSpec() {
 
