@@ -36,7 +36,7 @@ import arrow.continuations.generic.DelimitedScope
  * ```kotlin:ank
  * val result: String? = listOf(1, 2, 3, 4).iterateOrNull {
  *    val a = next() // gets 1
- *    drop(2) // drops 2 and 3
+ *    dropNext(2) // drops 2 and 3
  *    val b = next() // gets 4
  *    "$a $b"
  * }
