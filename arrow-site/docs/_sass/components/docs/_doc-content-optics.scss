@@ -5,7 +5,7 @@
 .doc-content-optics {
     .doc-content {
         a {
-            color: $optics-color;
+            //color: $optics-color;
         }
 
         p,
@@ -17,10 +17,23 @@
         }
 
         .cm-s-arrow span.cm-keyword {
-            color: $optics-color;
+            //color: $optics-color;
         }
-        
-        
+
+        // Codemirror
+        .cm-s-arrow.CodeMirror {
+          background: rgba($optics-background, 0.08);
+        }
+
+        .cm-s-arrow .CodeMirror-gutters {
+          background-color: rgba($optics-background, 0.08);
+        }
+
+        .CodeMirror-linebackground.unmodifiable-line {
+          background-color: rgba($optics-background, 0.06);
+        }
+
+
                 .hljs-variable,
         .hljs-template-variable,
         .hljs-tag,
@@ -29,11 +42,11 @@
         .hljs-selector-class,
         .hljs-regexp,
         .hljs-deletion {
-            color: $optics-color;
+            //color: $optics-color;
         }
 
         .button-video {
-            background: $white;
+            background: $optics-color;
             border: 2px solid $optics-color;
             transition: background $base-duration;
 

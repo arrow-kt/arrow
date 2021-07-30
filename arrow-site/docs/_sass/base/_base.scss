@@ -45,6 +45,7 @@ h6 {
   color: $header-font-color;
   font-family: $header-font-family;
   font-weight: $font-semibold;
+  line-height: $heading-line-height;
 }
 
 a {
@@ -58,7 +59,7 @@ a {
 
   &:hover {
     color: $link-hover;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   &:active {

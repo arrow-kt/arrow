@@ -8,7 +8,7 @@
 @import "utils/mixins/general-mixins";
 
 // Vendors
-@import "vendors/highlight/color-brewer";
+@import "vendors/highlight/default";
 
 // Base
 @import "base/reset";
@@ -17,6 +17,8 @@
 @import "base/fonts";
 
 // Components
+@import "components/docs/playground-theme";
+@import "components/docs/highlight";
 @import "components/docs/code";
 @import "components/docs/doc-body";
 @import "components/docs/doc-content-core";
@@ -30,8 +32,10 @@
 @import "components/docs/sidebar-menu";
 @import "components/docs/sidebar";
 @import "components/docs/sidebar-core";
+@import "components/docs/sidebar-quickstart";
 @import "components/docs/navigation";
 @import "components/common/dropdown";
 @import "components/common/button";
+@import "components/docs/quickstart-doc";
 
 @include dropdown($dropdown-config...);

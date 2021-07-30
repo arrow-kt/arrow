@@ -3,82 +3,102 @@
 // -----------------------------------------------
 
 .doc-header {
+  display: flex;
+  align-items: center;
+  height: ($base-point-grid * 8);
+  background: $white;
+  box-shadow: 0 2px 16px 0 rgba($core-background, 0.06);
+
+  .search-wrapper {
     display: flex;
-    align-items: center;
-    height: ($base-point-grid * 8);
-    background: $white;
-    border-bottom: 1px solid $doc-header-border;
+    position: relative;
+    width: 100%;
 
-    .search-wrapper {
-        display: flex;
-        position: relative;
-        width: 100%;
-
-        .search {
-            display: block;
-            width: calc(100% - 1.5rem);
-            padding: $base-point-grid 0;
-            font-family: $base-font-family;
-            font-size: $base-docs-font-size;
-            margin-left: 1.5rem;
-            border: none;
-            cursor: auto;
-            position: relative;
-            outline: none;
-             -webkit-appearance: textfield;
-        }
-
-        /* clears the 'X' from Internet Explorer */
-        input[type=search]::-ms-clear {
-            display: none;
-            width: 0;
-            height: 0;
-        }
-
-        input[type=search]::-ms-reveal {
-            display: none;
-            width: 0;
-            height: 0;
-        }
-
-        /* clears the 'X' from Chrome */
-        input[type="search"]::-webkit-search-decoration,
-        input[type="search"]::-webkit-search-cancel-button,
-        input[type="search"]::-webkit-search-results-button,
-        input[type="search"]::-webkit-search-results-decoration {
-            display: none;
-        }
+    .search {
+      display: block;
+      width: calc(100% - 1.5rem);
+      padding: $base-point-grid 0;
+      font-family: $doc-font-family;
+      font-size: $base-docs-font-size;
+      margin-left: 1.5rem;
+      border: none;
+      cursor: auto;
+      position: relative;
+      outline: none;
+      -webkit-appearance: textfield;
+    }
+    /* clears the 'X' from Internet Explorer */
+    input[type=search]::-ms-clear {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
-    a {
-        &:hover {
-            text-decoration: none;
+    input[type=search]::-ms-reveal {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    /* clears the 'X' from Chrome */
+    input[type="search"]::-webkit-search-decoration,
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-results-button,
+    input[type="search"]::-webkit-search-results-decoration {
+      display: none;
+    }
+  }
+
+  a {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .fa {
+    margin-right: ($base-point-grid / 2);
+  }
+
+  .menu-doc-search {
+    display: inline-flex;
+    margin-right: ($base-point-grid * 2);
+
+    li {
+      &:first-child {
+        padding-right: 1rem;
+        margin-right: 1rem;
+        border-right: 1px solid rgba($dark-color-doc, 0.1);
+
+        .menu-links {
+          display: flex;
+          align-items: center;
+
+          span {
+            font-family: $doc-font-family;
+            font-size: 0.813rem;
+            margin-right: 0.75rem;
+            font-style: italic;
+            text-transform: none;
+            font-weight: $font-regular;
+          }
         }
-    }
-
-    .fa {
-        margin-right: ($base-point-grid / 2);
-    }
-
-    .menu-doc-search {
-      display: inline-flex;
+      }
 
       .menu-links {
         padding-bottom: 4px;
+        font-size: 0.938rem;
+        font-family: $base-font-family;
         text-transform: uppercase;
         font-weight: $font-semibold;
+        white-space: nowrap;
         @include links($link-color, $link-color, lighten($link-color, 30%), lighten($link-color, 30%));
 
         &:hover {
           text-decoration: none;
         }
       }
-      &:last-child {
-          margin-right: ($base-point-grid * 2);
-      }
     }
+  }
 }
-
 // Responsive
 @include bp(large) {
   #doc-wrapper {
@@ -86,10 +106,21 @@
       .doc-stars-container {
         display: none;
       }
+
+      .menu-doc-search {
+        li {
+          &:first-child {
+            .menu-links {
+              span {
+                display: none;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
-
 @include bp(medium) {
   #doc-wrapper {
     .doc-header {

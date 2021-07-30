@@ -3,29 +3,32 @@
 // -----------------------------------------------
 
 p,
-ul {
+ul,
+table {
     code {
-        font-family: $code-font-family;
-        padding: 0 $base-point-grid ($base-point-grid - 4) $base-point-grid;
+        font-family: $code-doc-font-famil;
+        padding: 0 0.3rem;
+        margin: 0;
         font-size: 16px;
-        border-radius: 3px;
-        color: rgba(#263238, 0.7);
+        border-radius: 2px;
+        color: rgba($dark-color-doc, 0.9);
+        background: rgba($quickstart-background, 0.08);
     }
 }
 
 
 .doc-content {
 
-
     .CodeMirror,
     .hljs {
-        font-size: 15px;
-        font-family: $code-font-family;
+        font-size: 1rem;
+        font-family: $code-doc-font-famil;
+        line-height: 1.9;
 
-        pre {
-            line-height: 1.8;
-        }
+    }
 
+    .hljs {
+      background: rgba($quickstart-background, 0.06);
     }
 
     .cm-s-arrow span.cm-keyword {
@@ -35,16 +38,19 @@ ul {
         pre {
 
         &.highlight {
-            border: 1px solid $code-border-color;
             margin-bottom: $code-margin;
+            border: none;
 
-            .hljs {
-                padding: $code-padding;
-            }
         }
     }
-
+    .executable-fragment-wrapper {
+      margin: 1.5rem 0 2.5rem 0;
+    }
     .executable-fragment {
+    border: none;
+    .js-code-output-executor {
+      border: none;
+    }
       .console-close,
       .run-button {
         width: 24px;

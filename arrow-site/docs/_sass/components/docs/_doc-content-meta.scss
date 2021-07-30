@@ -5,20 +5,35 @@
 .doc-content-meta {
     .doc-content {
         a {
-            color: $meta-color;
+            //color: $meta-color;
         }
 
         p,
-        ul {
+        ul,
+        table {
             code {
                 background: rgba($meta-background, 0.08);
+                font-family: $code-doc-font-famil;
             }
         }
 
         .cm-s-arrow span.cm-keyword {
-            color: $meta-color;
+            //color: $meta-color;
         }
-        
+
+        // Codemirror
+        .cm-s-arrow.CodeMirror {
+          background: rgba($meta-background, 0.06);
+        }
+
+        .cm-s-arrow .CodeMirror-gutters {
+          background-color: rgba($meta-background, 0.08);
+        }
+
+        .CodeMirror-linebackground.unmodifiable-line {
+          background-color: rgba($meta-background, 0.06);
+        }
+
                 .hljs-variable,
         .hljs-template-variable,
         .hljs-tag,
@@ -27,11 +42,11 @@
         .hljs-selector-class,
         .hljs-regexp,
         .hljs-deletion {
-            color: $meta-color;
+            //color: $meta-color;
         }
 
         .button-video {
-            background: $white;
+            background: $meta-color;
             border: 2px solid $meta-color;
             transition: background $base-duration;
 

@@ -81,10 +81,11 @@
       transition: all $base-duration $base-timing;
       font-weight: bold;
 
-      ul {
+      > ul {
         display: flex;
 
         .nav-menu-item {
+          position: relative;
           &:not(:last-child) {
             margin-right: ($base-point-grid * 5);
           }
@@ -94,9 +95,25 @@
             text-transform: uppercase;
             font-size: ($base-point-grid * 2);
 
+            i {
+              margin-left: 8px;
+            }
+
+            &:after {
+              display: block;
+              content: '';
+              border-bottom: 2px solid $brand-primary;
+              transform: scaleX(0);
+              transition: transform 0.3s ease-in-out;
+              margin-top: 0;
+            }
+
             &:hover {
               text-decoration: none;
-              border-bottom: 2px solid $brand-primary;
+
+              &:after {
+                transform: scaleX(1);
+              }
             }
 
             &.hover-mode {
@@ -119,22 +136,72 @@
     }
 
     .nav-icon-close {
-        display: none;
-        padding: 6px;
-        left: 85%;
-        top: 32px;
+      display: none;
+      padding: 6px;
+      left: 85%;
+      top: 32px;
 
-        img {
-            display: block;
-            transition: transform .3s ease;
+      img {
+        display: block;
+        transition: transform 0.3s ease;
 
-            &:hover {
-              transform: rotate(180deg);
-            }
+        &:hover {
+          transform: rotate(180deg);
         }
+      }
     }
   }
 }
+
+.dropdown-btn {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.dropdown-content {
+  padding: 16px 0;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  overflow: auto;
+  z-index: 1;
+  transition: all 0.35s ease-out;
+  visibility: hidden;
+  opacity: 0;
+  background: rgba(#fff, 0.95);
+  box-shadow: 0px 0px 6px rgba($box-text-color, 0.3);
+  border-radius: 2px;
+  min-width: 148px;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    li {
+      a {
+        display: block;
+        padding: 2px 16px;
+        white-space: nowrap;
+        color: $box-text-color;
+        text-transform: uppercase;
+        transition: all 0.4s ease-out;
+        &:hover {
+          color: $box-text-color;
+          text-decoration: none;
+          background: rgba($box-text-color, 0.07);
+          border-radius: 2px;
+        }
+      }
+    }
+  }
+
+  &.show {
+    top: 40px;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 // Responsive
 // -----------------------------------------------
 @include bp(medium) {
@@ -170,6 +237,7 @@
             margin-top: ($base-point-grid * 4);
           }
         }
+
         &.top-scroll {
           padding-top: $base-point-grid;
         }

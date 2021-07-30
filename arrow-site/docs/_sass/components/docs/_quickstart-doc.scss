@@ -1,0 +1,273 @@
+// Quickstart docs
+// -----------------------------------------------
+// -----------------------------------------------
+
+.card-quickstart {
+  padding: 3rem;
+  background: #fff;
+  box-shadow: $base-box-shadow;
+}
+
+
+
+
+.quickstart-wrapper {
+  background: url("../img/quickstart-pattern.svg") repeat-y;
+
+  .doc-content {
+    margin: 0;
+    background: none;
+    box-shadow: none;
+    max-width: 1072px;
+  }
+}
+
+.quick-snap {
+  display: flex;
+  justify-content: center;
+}
+
+.quickstart-doc {
+  .modular-libraries {
+    margin-bottom: 7.75rem;
+
+    .modular-libraries-header {
+      text-align: center;
+
+      h1 {
+        margin: 2rem 0;
+        font-size: 3.5rem;
+      }
+
+      p {
+        font-size: 1.5rem;
+      }
+    }
+
+    .libraries-list {
+      margin-top: 4.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 2.5rem;
+
+      .library-item {
+        display: flex;
+        @extend .card-quickstart;
+
+        .library-item-content {
+          margin-right: 2rem;
+
+          h3 {
+            font-size: 1.5rem;
+          }
+
+          p {
+            &:nth-child(3) {
+              margin: 0;
+            }
+          }
+
+          .library-cta {
+            padding: 0.75rem 1.5rem;
+            font-family: $heading-font-family;
+            font-size: 0.9375rem;
+            color: #fff;
+            display: inline-block;
+            transition: background-color 300ms $base-timing;
+
+            &:hover {
+              text-decoration: none;
+            }
+
+            &.core {
+              background: $core-color;
+
+              &:hover {
+                background: darken($core-color, 10%);
+              }
+            }
+
+            &.fx {
+              background: $fx-color;
+
+              &:hover {
+                background: darken($fx-color, 10%);
+              }
+            }
+
+            &.optics {
+              background: $optics-color;
+
+              &:hover {
+                background: darken($optics-color, 10%);
+              }
+            }
+
+            &.meta {
+              background: $meta-color;
+
+              &:hover {
+                background: darken($meta-color, 10%);
+              }
+            }
+          }
+        }
+
+        .library-item-brand {
+          p {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .setup {
+    h2 {
+      padding-bottom: 0;
+      border-bottom: none;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .setup-subtitle {
+      margin-bottom: 4rem;
+      text-align: center;
+      font-size: 1.25rem;
+    }
+
+    .setup-jdk-android {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      @extend .card-quickstart;
+
+      .jdk-item {
+        padding-right: 4.5rem;
+        border-right: 1px solid rgba($dark-color-doc, 0.14);
+      }
+
+      .android-item {
+        margin-left: 4.5rem;
+      }
+
+      .android-item,
+      .jdk-item {
+        display: flex;
+        align-items: center;
+
+        p {
+          margin-bottom: 0;
+
+          &:first-child {
+            margin-right: 2rem;
+          }
+        }
+      }
+    }
+
+    .setup-graddle-maven {
+      margin-top: 2.5rem;
+      background: #fff;
+      box-shadow: $base-box-shadow;
+
+      .tab {
+        overflow: hidden;
+        p {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          button:nth-child(2) {
+            border-right: 1px solid #DCDEE1;
+            border-left: 1px solid #DCDEE1;
+          }
+        }
+      }
+
+      .tab button {
+        background-color: rgba($dark-color-doc, 0.03);
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 1.75rem 1rem;
+        font-size: 1.25rem;
+        font-family: $heading-font-family;
+        font-weight: $font-bold;
+        transition: 0.3s;
+        box-shadow: 0 1px #DCDEE1;
+      }
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: rgba($dark-color-doc, 0.01);
+      }
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background: none;
+        box-shadow: none;
+
+
+
+      }
+      /* Style the tab content */
+      .tabcontent {
+        display: none;
+        padding: 2.5rem;
+      }
+    }
+  }
+}
+
+@include bp(large) {
+  .card-quickstart {
+    padding: 1.5rem 1rem;
+  }
+
+  .quickstart-doc {
+    .modular-libraries {
+      .modular-libraries-header {
+        text-align: center;
+
+        h1 {
+          margin: 2rem 0;
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1.5rem;
+        }
+      }
+      .libraries-list {
+        .library-item {
+          flex-direction: column-reverse;
+          text-align: center;
+
+          .library-item-content {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+
+    .setup {
+      .setup-jdk-android {
+        grid-template-columns: 1fr;
+
+        .jdk-item {
+          padding-right: 0;
+          border-right: none;
+          border-bottom: 1px solid rgba($dark-color-doc, 0.14);
+          padding-bottom: 2rem;
+          margin-bottom: 2rem;
+        }
+
+        .android-item {
+          margin-left: 0;
+        }
+      }
+      .setup-graddle-maven {
+        .tabcontent {
+          padding: 1rem;
+        }
+      }
+
+    }
+  }
+}

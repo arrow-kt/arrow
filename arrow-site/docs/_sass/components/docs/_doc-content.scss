@@ -3,125 +3,247 @@
 // -----------------------------------------------
 
 .doc-content {
-    font-family: $doc-font-family;
+  padding: 3rem 3.5rem;
+  margin: 2.5rem;
+  background: #fff;
+  box-shadow: $base-box-shadow;
+  max-width: 100%;
+  font-family: $doc-font-family;
+  position: relative;
+  box-sizing: content-box;
+  color: rgba($dark-color-doc, 0.9);
+  font-size: 1rem;
+  //border-right: 1px solid rgba($core-background, 0.15);
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 1.5rem;
+    margin-top: 3rem;
+    font-family: $heading-font-family;
+    font-weight: $font-bold;
+    color: $header-font-color;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    padding-bottom: 1rem;
+    font-size: 1.8rem;
+    border-bottom: 1px solid rgba($core-background, 0.15);
+  }
+
+  h3 {
+    font-size: 1.6rem;
+  }
+
+  h4 {
+    font-size: 1.3rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin-bottom: ($base-point-grid * 2);
+  }
+
+  a {
+    border-bottom: 1px solid rgba($dark-color-doc, 0.3);
+
+    &:hover {
+      border-bottom: 1px solid rgba($dark-color-doc, 0.6);
+    }
+
+    &:not( > img) {
+      border-bottom: none;
+    }
+  }
+
+  .browser {
+    margin-top: ($base-point-grid * 3);
+  }
+
+  ol,
+  ul {
+    padding-left: 2.5rem;
+    margin: 2.2rem 0;
+  }
+
+  ul {
+    list-style: none;
+
+    li {
+      margin-bottom: 0.55rem;
+
+      &::before {
+        content: "\2022";
+        color: $dark-color-doc;
+        font-weight: bold;
+        position: absolute;
+        width: 1em;
+        margin-left: -1em;
+      }
+    }
+  }
+
+  ol {
+    li {
+      list-style-type: decimal;
+    }
+  }
+
+  strong {
+    font-weight: $font-bold;
+  }
+
+  del {
+    text-decoration: line-through;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  blockquote {
     position: relative;
-    padding: ($base-point-grid * 4);
-    font-size: 1.125rem;
+    padding: 1rem;
+    background: rgba($blocquote-info, 0.2);
+    margin-bottom: 1rem;
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-bottom: ($base-point-grid * 2);
-        margin-top: ($base-point-grid * 4);
-        color: $header-font-color;
 
-        &:first-child {
-            margin-top: 0;
-        }
+    &::before {
+      position: absolute;
+      font-size: 1.375rem;
+      top: 13px;
+      content: "";
+      color: rgba($blocquote-info, 0.9);
+      font-family: 'Font Awesome 5 Pro';
     }
 
-    h1 {
-        font-size: 2.25rem;
+
+    &.blockquote-alert {
+      background: rgba($blocquote-alert, 0.2);
+      &::before {
+        content: "";
+        color: rgba($blocquote-alert, 0.9);
+      }
     }
-
-    h2 {
-        font-size: 1.9rem;
-    }
-
-    h3 {
-        font-size: 1.675rem;
-    }
-
-    h4 {
-        font-size: 1.425rem;
-    }
-
-    h5 {}
-
-    h6 {}
 
     p {
-        margin-bottom: ($base-point-grid * 2);
+      padding-left: 1rem;
+      margin-bottom: 0;
+      padding-left: 2.4rem;
+    }
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    width: 100%;
+    background: rgba($dark-color-doc, 0.26);
+  }
+
+  table {
+    width: 100%;
+    font-size: 16px;
+
+    thead {
+      text-align: left;
+      font-weight: bold;
     }
 
-    .browser {
-        margin-top: ($base-point-grid * 3);
+    tbody {
+      width: 100%;
     }
 
-    ul, ol {
-        padding-left: ($base-point-grid * 3);
+    tr {
+      &:nth-child(2n) {
+        background: rgba($dark-color-doc, 0.03);
+      }
     }
 
-    ul {
-
-        li {
-            list-style: circle;
-        }
+    td,
+    th {
+      padding: 1rem;
+      border: 1px solid rgba($dark-color-doc, 0.16);
+      border-left: 0;
+      border-right: 0;
     }
+  }
 
-    ol {
-        li {
-            list-style-type: decimal;
-        }
-    }
+  .header-link {
+    float: left;
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-left: -24px;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity $base-duration $base-timing;
+  }
 
-    strong {
-        font-weight: $font-bold;
-    }
-
-    del {
-        text-decoration: line-through;
-    }
-
-    em {
-        font-style: italic;
-    }
-
-    hr {
-        border: none;
-        height: 1px;
-        width: 100%;
-        background: rgba($brand-secondary, 0.9);
-    }
-    
-    table {
-        width: 100%;
-        thead {
-            text-align: left;
-            font-weight: bold;
-        }
-        
-        th, td {
-            padding: $base-point-grid;
-            border: 1px solid rgba($brand-secondary, 0.9);
-        }
-        
-        tr:nth-child(2n) {
-            background: $background-color;
-        }
-    }
-
+  h1:hover,
+  h2:hover,
+  h3:hover,
+  h4:hover,
+  h5:hover,
+  h6:hover {
     .header-link {
-        float: left;
-        font-size: 1.4rem;
-        line-height: 1;
-        margin-left: -24px;
-        margin-top: 10px;
-        opacity: 0;
-        transition: opacity $base-duration $base-timing;
+      opacity: 1;
+    }
+  }
+  .content-edit-page {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -20px;
+    a {
+      border: 1px solid rgba($dark-color-doc, 0.2);
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      span {
+        font-size: 0.813rem;
+      }
+
+      i {
+        font-size: 1.125rem;
+        margin-right: 0.25rem;
+      }
+      &:hover {
+        background: rgba($dark-color-doc, 0.08);
+      }
+    }
+  }
+}
+@include bp(large) {
+  .doc-content {
+    padding: 1.5rem 1rem;
+    margin: 1rem;
+
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
     }
 
-    h1:hover,
-    h2:hover,
-    h3:hover,
-    h4:hover,
-    h5:hover,
-    h6:hover {
-        .header-link {
-            opacity: 1;
-        }
-    }
+      .content-edit-page {
+        display: none;
+      }
+
+  }
 }

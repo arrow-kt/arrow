@@ -9,7 +9,7 @@ options:
         url: /fx/parallel/
 
       - title: Flow combinators
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow/-flow/
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/
 
       - title: Atomic
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/
