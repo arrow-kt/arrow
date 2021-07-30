@@ -80,7 +80,7 @@ public class IterableEffect<A, R>(
   /**
    * Drops [n] items from the current iteration.
    */
-  public suspend fun drop(n: Int) {
+  public suspend fun dropNext(n: Int) {
     repeat(n) { dropNext() }
   }
 

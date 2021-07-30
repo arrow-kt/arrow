@@ -2,11 +2,6 @@ package arrow.core.computations
 
 import arrow.core.test.UnitSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.property.Arb
-import io.kotest.property.arbitrary.arbitrary
-import io.kotest.property.arbitrary.flatMap
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
 
 class IterableEffectTest : UnitSpec() {
@@ -70,7 +65,7 @@ class IterableEffectTest : UnitSpec() {
       checkAll { list: List<Int> ->
         val result: String? = list.iterateOrNull {
           val a = next()
-          drop(2)
+          dropNext(2)
           val b = next()
           "$a $b"
         }
