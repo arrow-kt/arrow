@@ -6,187 +6,165 @@ permalink: /fx/parallel/
 
 # Parallel Combinators
 
-Arrow Fx benefits from the `suspend` syntax for extremely succinct programs without callbacks.
-This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime, and bind their results to the left-hand side.
+Arrow Fx benefits from the `suspend` syntax for very succinct programs without callbacks.
+This allows us to use direct style syntax with asynchronous, concurrent and parallel operations while preserving effect control in the types and runtime.
 The resulting expressions enjoy the same syntax that most OOP and Java programmers are already accustomed to—direct blocking imperative style.
+
+This page discuss the semantics of parallel operations in Arrow Fx, which follows the system of Structured Concurrency.
+
+You can find all functions in the API docs [here](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/index.html#functions), and all the parallel traverse extensions can be find on [`Iterable`](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlin.collections.-iterable/index.html).
 
 ## Parallelization & Concurrency
 
-Arrow Fx comes with built-in versions of `parZip`, `parTraverse`, and `parSequence` and many more allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
-All parallel suspend operators in Arrow Fx behave in the following way.
+Arrow Fx comes with a set of built-in concurrent and parallel functions and data types that acompany what you find in KotlinX Coroutines. This allows users to write complex parallel and concurrent code in suspend style, in a elegant and imperative way without wrappers.
 
- - When one of the parallel task fails, the others are also cancelled since a result cannot be determined. This will allow the other parallel operations to gracefully exit and close their resources before returning.
+All parallel suspend operators in Arrow Fx behave in the following way, to follow the patterns of [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async).
 
- - When the resulting suspend operation is cancelled than all running fibers inside will also be cancelled so that all paralell running task can gracefully exit and close their resources before returning.
+#### Parallel exceptions
 
-For more documentation on parallel operations see below.
+All parallel functions guarantee that when one of their children fails that all other children will be cancelled before the parallel function returns. This allows the other paralell running tasks to gracefully exit and close their resources before the parallel function returns.
 
-### `parZip`
-
-`parZip` allows *N#* effects to run in parallel on a given `CoroutineContext` suspending until all results completed, and then apply the user-provided transformation over the results.
-All input suspend functions are guaranteed to dispatch on the given CoroutineContext before they start running.
-It also wires their respective cancellation. That means that cancelling the resulting suspend fun will cancel both functions running in parallel inside.
-Additionally, the function does not return until both tasks are finished and their results combined by f: (A, B) -> C.
-
-```kotlin:ank:playground
+```
 import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
 
 //sampleStart
-suspend fun threadName(): String =
-  Thread.currentThread().name
+suspend fun main(): Unit = coroutineScope {
+    val fiber = async {
+        parZip({
+            delay(100)
+            throw RuntimeException("Boom")
+        }, {
+            guaranteeCase({
+                never<Unit>()
+            }) { exitCase -> println("I never complete: $exitCase") }
+        }) { _, _ -> println("I am never called!") }
+    }
 
-data class ThreadInfo(
-  val threadA: String,
-  val threadB: String
-)
-
-suspend fun main(): Unit {
-  val (threadA: String, threadB: String) =
-    parZip({ threadName() }, { threadName() }) { threadA, threadB -> ThreadInfo(threadA, threadB) }
-
-  println(threadA)
-  println(threadB)
+    delay(200) // Wait until after task 1 threw
+    fiber.await()
 }
+
 //sampleEnd
+I never complete: Cancelled(exception=kotlinx.coroutines.JobCancellationException: Parent job is Cancelling; job=ScopeCoroutine{Cancelling}@157f5e97)
+
+Exception in thread "main" java.lang.RuntimeException: Boom
+  at TestKt$main$2$fiber$1$invokeSuspend$$inlined$parZip$1$1.invokeSuspend(ParZip.kt:679)
+  at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+  at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
+  at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:571)
+  at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:750)
+  at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:678)
+  at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:665)
 ```
 
-### `parTraverse`
+ In the snippet above we can see that the second task _never_ completes, and it gets cancelled with `ExitCase.Cancelled` by the `RuntimeException` that occurs in the first task.
+ After `parZip` has gracefully finished, it will rethrow the original `RuntimeException`.
+ 
+ All parallel operators you find in Arrow Fx Coroutines follow this same pattern when exceptions occur.
 
-`parTraverse` allows to map elements of the same type `A` in parallel for a given `Iterable`, and then gather all the transformed results in a `List<B>`.
-Cancelling the caller will cancel all running operations inside parTraverse gracefully.
+#### Parallel cancellation
 
-```kotlin:ank:playground
+All parallel functions guarantee that if they get cancelled, that all children will also get cancelled before the parallel function returns. This allows the other paralell running tasks to gracefully exit and close their resources before returning.
+
+```
 import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
 
 //sampleStart
-suspend fun threadName(i: Int): String =
-  "$i on ${Thread.currentThread().name}"
+suspend fun main(): Unit = coroutineScope {
+    val fiber = async {
+        parZip({
+            guaranteeCase({
+                // Finish immediately
+            }) { exitCase -> println("I completed immediately: $exitCase") }
+        }, {
+            guaranteeCase({
+                never<Unit>()
+            }) { exitCase -> println("I never complete: $exitCase") }
+        }) { _, _ -> println("I am never called!") }
+    }
 
-suspend fun main(): Unit {
-  val result: List<String> = 
-    listOf(1, 2, 3).parTraverse(::threadName)
-
-  println(result)
+    delay(50)
+    fiber.cancel()
+    fiber.await()
 }
+
 //sampleEnd
+I completed immediately: ExitCase.Completed
+
+I never complete: Cancelled(exception=kotlinx.coroutines.JobCancellationException: DeferredCoroutine was cancelled; job=DeferredCoroutine{Cancelling}@56783f97)
+
+Exception in thread "main" kotlinx.coroutines.JobCancellationException: DeferredCoroutine was cancelled; job=DeferredCoroutine{Cancelled}@56783f97
 ```
 
-### `raceN`
+ In the snippet above we can see that first task finished immediately and prints `ExitCase.Completed`, the second task _never_ completes, and it gets cancelled with `ExitCase.Cancelled` by the parent scope.
+ After `parZip` has gracefully cancelled all it's children, `async` will throw the `JobCancellationException`.
+ 
+ All parallel operators you find in Arrow Fx Coroutines follow this same pattern when exceptions occur.
 
-`raceN` allows *N#* effects to race in parallel and non-blocking waiting for the first results to complete, and then cancel all remaining racers.
-Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side.
+### Co-operative cancellation / Semi-Automatic cancellation
 
-```kotlin:ank:playground
-import kotlinx.coroutines.delay
-import arrow.fx.coroutines.raceN
-import arrow.fx.coroutines.never
-import kotlin.time.milliseconds
-import kotlin.time.ExperimentalTime
+The cancellation system is inherited from KotlinX Coroutines and works the same. See [KotlinX Coroutines documentation on cancellation](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html).
 
-//sampleStart
-suspend fun loser(): Unit =
-  never() // Never wins
+All operators found in Arrow Fx check for cancellation, and make you `suspend` code cancellable.
 
-@ExperimentalTime
-suspend fun winner(): Int {
-  delay(5.milliseconds)
-  return 5
-}
-
-@ExperimentalTime
-suspend fun main(): Unit {
-  val res = raceN({ loser() }, { winner() })
-
-  println(res)
-}
-//sampleEnd
-```
-
-## Cancellation
-
-The cancellation system is inherited from KotlinX Coroutines and works the same.
-See [KotlinX Coroutines documentation](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html)
-
-All operators found in Arrow Fx check for cancellation.
-In the small example of an infinite loop below `parZip` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
+A small example of an infinite loop below, where `parZip` checks for cancellation and this the `sleeper` function is cancellable even though it runs in an infinite recursion loop.
 
 ```kotlin:ank
-import kotlinx.coroutines.Dispatchers
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
 
+//sampleStart
 tailrec suspend fun sleeper(): Unit {
-  println("I am sleepy. I'm going to nap")
-  parZip(Dispatchers.IO, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b -> Pair(a, b) } // <-- cancellation check-point
-  println("1 second nap.. Going to sleep some more")
-  sleeper()
-}
-```
-
-## Resource Safety
-
-To ensure resource safety we need to take care with cancellation since we don't wont our process to be cancelled but our resources to remain open.
-
-There Arrow Fx offers 2 tools `Resource` and `suspend fun bracketCase`. Any `resource` operations exists out of 3 steps.
-
-1. Acquiring the resource
-2. Using the resource
-3. Releasing the resource with either a result, a `Throwable` or `Cancellation`.
-
-To ensure the resource can be correctly acquired we make the `acquire` & `release` step `uncancelable`.
-If the `bracketCase` was cancelled during `acquire` it'll immediately go to `release`, skipping the `use` step.
-
-`bracketCase` is defined below, in the `release` step you can inspect the `ExitCase` of the `acquire`/`use`.
-
-```
-sealed ExitCase {
-  object Completed: ExitCase()
-  object Cancelled: ExitCase()
-  data class Error(val error: Throwable): ExitCase()
+    println("I am sleepy. I'm going to nap")
+    parZip(                                   // <-- cancellation check-point
+        { Thread.currentThread().name },
+        { Thread.currentThread().name }
+    ) { a, b -> println("A on $a, B on $b") }
+    println("Too short nap.. Going to sleep some more")
+    sleeper()                                // <-- cancellation check-point
 }
 
-suspend fun <A, B> bracketCase(acquire: suspend () -> A, use: suspend (A) -> B, release: (a, ExitCase) -> B): B
-```
-
-`bracket` is an overload of `bracketCase` that ignores the `ExitCase` value, a simple example.
-We want to create a function to safely create and consume a `DatabaseConnection` that always needs to be closed no matter what the _ExitCase_.
-
-```kotlin:ank
-class DatabaseConnection {
-  suspend fun open(): Unit = println("Database connection opened")
-  suspend fun close(): Unit = println("Database connection closed")
+suspend fun main(): Unit = coroutineScope {
+    val fiber = async {
+        guaranteeCase({ sleeper() }) { exitCase ->
+            println("Somebody woke me up with $exitCase")
+        }
+    }
+    delay(100)
+    fiber.cancel()
 }
-
-suspend fun <A> onDbConnection(f: suspend (DatabaseConnection) -> A): A =
-  bracket(
-    acquire = { DatabaseConnection().apply { open() } },
-    use = f,
-    release = DatabaseConnection::close
-  )
+//sampleEnd
 ```
 
-The difference between `Resource` is that `bracketCase` is simple function, while `Resource` is a data type, both ensure that resources are `acquire`d and `release`d correctly.
-It also forms a `Monad` so you can use it to safely compose `Resource`s, map them or safely traverse `Resource`s.
+### Racing parallel operations
 
-```kotlin:ank:playground
+Racing parallel task has an additional propety to the ones described above.
+
+When racing multiple parallel tasks against each-other, the winning task cancels the others. When the winner of a race is known, we can cancel all other tasks because their results will get discarded anyway.
+This allows the other paralell running tasks to gracefully exit and close their resources as soon as possible.
+
+```kotlin
 import arrow.fx.coroutines.*
 
-class DatabaseConnection {
-  suspend fun open(): Unit = println("Database connection opened")
-  suspend fun close(): Unit = println("Database connection closed")
-  suspend fun query(id: String): String =
-    id.toUpperCase()
-}
-
-val conn: Resource<DatabaseConnection> =
-  Resource(
-    { DatabaseConnection().apply { open() } },  
-    DatabaseConnection::close
-  )
-
+//sampleStart
 suspend fun main(): Unit {
-  val res = conn.use { db ->
-    db.query("hello, world!")
-  }
-
-  println(res)
+    val winner = raceN({
+        guaranteeCase({ never<Unit>() }) { exitcase ->
+            println("I can never win the race. Finished with $exitcase")
+        }
+    }, {
+        "I am going to win, immediately"
+    })
+    println(winner)
 }
+//sampleEnd
+I can never win the race. Finished with Cancelled(exception=kotlinx.coroutines.JobCancellationException: DeferredCoroutine was cancelled; job=DeferredCoroutine{Cancelling}@89897d5)
+
+Either.Right(I am going to win, immediately)
 ```
+
+Here we see that if we race a first task that is never going to finish, with a second task that wins immediately that the first losing task gets cancelled before we declare the second task the winner.
+
+So this also follows the pattern of [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async), where all children are completed before continuing. 

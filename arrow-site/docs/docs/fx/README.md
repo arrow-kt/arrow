@@ -16,24 +16,22 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 ## Arrow Fx Coroutines Overview 
 
 - Quick Start
-  - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
-  - [Pure & Referentially Transparent Functions](purity-and-referentially-transparent-functions/)
-  - [Coroutines](coroutines/)
-  - [Why suspend over IO monad](/effects/io/)
+  - [Gradle Setup](Gradle-Setup)
+  - [Maven Setup](Maven-setup)
 - Extensions and data types   
   - [Parallel combinators](parallel/)
-  - [Flow combinators](flow/)  
+  - [Flow combinators](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/) 
   - [Schedule](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
   - [Resource](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
   - [CircuitBreaker](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
   - [Atomic](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
   - [STM](/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/index.html)
-- Gradle Setup
- - Snapshot
- - BOM
-- Maven Setup
- - BOM
-- Integrating with 3rd-party libraries
+- [Integrating with 3rd-party libraries](Integrating-with-3rd-party-libraries)
+- Additional Information
+  - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
+  - [Pure & Referentially Transparent Functions](purity-and-referentially-transparent-functions/)
+  - [Kotlin's Std Coroutines package](coroutines/)
+  - [Why suspend over IO monad](/effects/io/)
 
 ## Gradle Setup
 
@@ -56,7 +54,7 @@ allprojects {
 }
 ```
 
-### BOM file
+### Gradle BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
@@ -78,7 +76,7 @@ Add the dependencies that you want to use:
 </dependency>
 ```
 
-### BOM file
+### Maven BOM file
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
