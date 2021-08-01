@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 
 @ExperimentalTime
 class FlowJvmTest : ArrowFxSpec(spec = {
