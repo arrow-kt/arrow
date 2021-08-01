@@ -12,7 +12,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
