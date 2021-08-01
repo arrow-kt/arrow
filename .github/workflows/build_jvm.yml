@@ -1,4 +1,4 @@
-name: "Verify JDK compilation"
+name: "Run test with JDK"
 
 on: pull_request
 
@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest]
-        java: [8, 11, 13, 15]
-    name: Verify compilation with JDK ${{ matrix.java }} on ${{ matrix.os }}
+        java: [8, 11, 13, 15, 16]
+    name: Run test with JDK ${{ matrix.java }} on ${{ matrix.os }}
     timeout-minutes: 60
 
     steps:

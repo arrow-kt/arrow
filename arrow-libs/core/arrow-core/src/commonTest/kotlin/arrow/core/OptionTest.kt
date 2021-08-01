@@ -11,13 +11,14 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.property.checkAll
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 class OptionTest : UnitSpec() {
 
@@ -73,6 +74,32 @@ class OptionTest : UnitSpec() {
         x
         throw IllegalStateException("This should not be executed")
       } shouldBe None
+    }
+
+    "tap applies effects returning the original value" {
+      checkAll(Arb.option(Arb.long())) { option ->
+        var effect = 0
+        val res = option.tap { effect += 1 }
+        val expected = when (option) {
+          is Some -> 1
+          is None -> 0
+        }
+        effect shouldBe expected
+        res shouldBe option
+      }
+    }
+
+    "tapNone applies effects returning the original value" {
+      checkAll(Arb.option(Arb.long())) { option ->
+        var effect = 0
+        val res = option.tapNone { effect += 1 }
+        val expected = when (option) {
+          is Some -> 0
+          is None -> 1
+        }
+        effect shouldBe expected
+        res shouldBe option
+      }
     }
 
     "fromNullable should work for both null and non-null values of nullable types" {

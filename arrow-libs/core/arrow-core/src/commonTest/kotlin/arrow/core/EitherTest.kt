@@ -16,16 +16,17 @@ import arrow.core.test.generators.suspendFunThatThrows
 import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import io.kotest.property.Arb
-import io.kotest.property.checkAll
-import io.kotest.matchers.shouldBe
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 class EitherTest : UnitSpec() {
 
@@ -61,6 +62,32 @@ class EitherTest : UnitSpec() {
     "isRight should return false if Left and true if Right" {
       checkAll { a: Int ->
         !Left(a).isRight() && Right(a).isRight()
+      }
+    }
+
+    "tap applies effects returning the original value" {
+      checkAll(Arb.either(Arb.long(), Arb.int())) { either ->
+        var effect = 0
+        val res = either.tap { effect += 1 }
+        val expected = when (either) {
+          is Left -> 0
+          is Right -> 1
+        }
+        effect shouldBe expected
+        res shouldBe either
+      }
+    }
+
+    "tapLeft applies effects returning the original value" {
+      checkAll(Arb.either(Arb.long(), Arb.int())) { either ->
+        var effect = 0
+        val res = either.tapLeft { effect += 1 }
+        val expected = when (either) {
+          is Left -> 1
+          is Right -> 0
+        }
+        effect shouldBe expected
+        res shouldBe either
       }
     }
 

@@ -1,4 +1,4 @@
-name: "Build documentation"
+name: "KtLint & Build documentation"
 
 on: pull_request
 
@@ -25,9 +25,12 @@ jobs:
       run: |
         echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
         ./gradlew assemble
+    - name: "Run KtLint"
+      working-directory: arrow-libs
+      run: ./gradlew ktlintCheck
     - name: "Create API doc"
       working-directory: arrow-libs
-      run: ./gradlew dokka
+      run: ./gradlew dokkaJekyll
     - name: "Validate documentation"
       working-directory: arrow-site
       run: ./gradlew runAnk

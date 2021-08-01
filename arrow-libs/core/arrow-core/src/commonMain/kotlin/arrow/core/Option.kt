@@ -411,6 +411,48 @@ public sealed class Option<out A> {
       Some.unit
     ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `None`.
+   * When applied the result is ignored and the original
+   * None value is returned
+   *
+   * Example:
+   * ```
+   * Some(12).tapNone { println("flower") } // Result: Some(12)
+   * none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+   * ```
+   */
+  public inline fun tapNone(f: () -> Unit): Option<A> =
+    when (this) {
+      is None -> {
+        f()
+        this
+      }
+      is Some -> this
+    }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `some`.
+   * When applied the result is ignored and the original
+   * Some value is returned
+   *
+   * Example:
+   * ```
+   * Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
+   * none<Int>().tap { println("flower") }  // Result: None
+   * ```
+   */
+  public inline fun tap(f: (A) -> Unit): Option<A> =
+    when (this) {
+      is None -> this
+      is Some -> {
+        f(this.value)
+        this
+      }
+    }
+
   public inline fun <B, C, D, E> zip(
     b: Option<B>,
     c: Option<C>,
