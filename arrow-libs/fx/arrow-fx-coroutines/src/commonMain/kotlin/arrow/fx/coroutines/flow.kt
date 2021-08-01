@@ -19,8 +19,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.produceIn
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+import kotlinx.coroutines.channels.Channel
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
@@ -70,9 +73,14 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
 }
 
 /**
- * Like [Flow.map], but will evaluate effects in parallel, emitting the results
- * downstream in the same order as the input stream. The number of concurrent effects
+ * Like [map], but will evaluate [transform] in parallel, emitting the results
+ * downstream in **the same order as the input stream**. The number of concurrent effects
  * is limited by [concurrency].
+ *
+ * If [concurrency] is more than 1, then inner flows are be collected by this operator concurrently.
+ * With `concurrency == 1` this operator is identical to [map].
+ *
+ * Applications of [flowOn], [buffer], and [produceIn] after this operator are fused with its concurrent merging so that only one properly configured channel is used for execution of merging logic.
  *
  * See [parMapUnordered] if there is no requirement to retain the order of the original stream.
  *
@@ -93,8 +101,8 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
- * This operator suspends upstream *after* receiving the element,
- * so this effectively has a result of a prefetch of a single element. I.e.
+ * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
+ * concurrently runs, "prefetching", the next element. i.e.
  *
  *  ```kotlin:ank:playground
  *  suspend fun main(): Unit {
@@ -109,7 +117,6 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * ```
  *
  * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
- * This is because parMap _pre-fetch_ `3` before it can suspend on the downstream buffer of `parMap`.
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -119,9 +126,10 @@ public inline fun <A, B> Flow<A>.parMap(
 ): Flow<B> =
   channelFlow<Deferred<B>> {
     map { a ->
+      // We create deferrable values to keep track of order we receive elements from `map`
       val deferred = CompletableDeferred<B>()
       send(deferred)
-      flow<Unit> {
+      flow<Unit> { // Effect as flow, no emissions
         try {
           val b = transform(a)
           deferred.complete(b)
@@ -132,6 +140,8 @@ public inline fun <A, B> Flow<A>.parMap(
       }
     }
       .flattenMerge(concurrency)
+      // We don't need a buffer, this flow doesn't emit and we immediately collect
+      .buffer(Channel.RENDEZVOUS)
       .launchIn(this)
   }
     .buffer(concurrency)

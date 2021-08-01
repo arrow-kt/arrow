@@ -17,10 +17,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.channelFlow
 
 @ExperimentalTime
 class FlowTest : ArrowFxSpec(
