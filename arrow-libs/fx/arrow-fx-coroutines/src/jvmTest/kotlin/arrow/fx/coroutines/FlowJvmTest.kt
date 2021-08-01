@@ -13,6 +13,13 @@ import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.debug.DebugProbes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 @ExperimentalTime
 class FlowJvmTest : ArrowFxSpec(spec = {
@@ -45,7 +52,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
   "parMap - single thread - identity" {
     single.use { ctx ->
       checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMap(ctx) { it }
+        flow.parMap { it }
           .toList() shouldBe flow.toList()
       }
     }
@@ -54,7 +61,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
   "parMapUnordered - single thread - identity" {
     single.use { ctx ->
       checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMapUnordered(ctx) { it }
+        flow.parMapUnordered { it }.flowOn(ctx)
           .toSet() shouldBe flow.toSet()
       }
     }

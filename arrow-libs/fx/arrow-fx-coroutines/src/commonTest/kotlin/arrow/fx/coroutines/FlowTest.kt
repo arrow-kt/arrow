@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -16,6 +17,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.channelFlow
 
 @ExperimentalTime
 class FlowTest : ArrowFxSpec(
@@ -52,7 +57,7 @@ class FlowTest : ArrowFxSpec(
 
     "parMap - concurrency = 1 - identity" {
       checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMap(concurrency = 1) { it }
+        flow.parMap(1) { it }
           .toList() shouldBe flow.toList()
       }
     }
@@ -152,6 +157,7 @@ class FlowTest : ArrowFxSpec(
         ex2.shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
+
     "parMapUnordered - concurrency = 1 - identity" {
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMapUnordered(concurrency = 1) { it }

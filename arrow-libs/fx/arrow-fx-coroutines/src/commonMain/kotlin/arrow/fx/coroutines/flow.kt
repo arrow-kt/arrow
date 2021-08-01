@@ -6,7 +6,6 @@ package arrow.fx.coroutines
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -17,11 +16,9 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -96,11 +93,27 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
+ * This operator suspends upstream *after* receiving the element,
+ * so this effectively has a result of a prefetch of a single element. I.e.
+ *
+ *  ```kotlin:ank:playground
+ *  suspend fun main(): Unit {
+ *  //sampleStart
+ *  val source = flowOf(1, 2, 3, 4)
+ *  source.parMap(concurrency= 2) {
+ *      println("Processing $it")
+ *      never<Unit>()
+ *    }.collect()
+ * //sampleEnd
+ * }
+ * ```
+ *
+ * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
+ * This is because parMap _pre-fetch_ `3` before it can suspend on the downstream buffer of `parMap`.
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
 public inline fun <A, B> Flow<A>.parMap(
-  context: CoroutineContext = Dispatchers.Default,
   concurrency: Int = DEFAULT_CONCURRENCY,
   crossinline transform: suspend CoroutineScope.(a: A) -> B
 ): Flow<B> =
@@ -116,7 +129,7 @@ public inline fun <A, B> Flow<A>.parMap(
           require(deferred.completeExceptionally(e))
           throw e
         }
-      }.flowOn(context)
+      }
     }
       .flattenMerge(concurrency)
       .launchIn(this)
@@ -150,12 +163,11 @@ public inline fun <A, B> Flow<A>.parMap(
  */
 @FlowPreview
 public inline fun <A, B> Flow<A>.parMapUnordered(
-  ctx: CoroutineContext = Dispatchers.Default,
   concurrency: Int = DEFAULT_CONCURRENCY,
   crossinline transform: suspend (a: A) -> B
 ): Flow<B> =
   map { o ->
     flow {
       emit(transform(o))
-    }.flowOn(ctx)
+    }
   }.flattenMerge(concurrency)
