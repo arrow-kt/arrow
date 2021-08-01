@@ -136,6 +136,32 @@ class ValidatedTest : UnitSpec() {
       }
     }
 
+    "tap applies effects returning the original value" {
+      checkAll(Arb.validated(Arb.long(), Arb.int())) { validated ->
+        var effect = 0
+        val res = validated.tap { effect += 1 }
+        val expected = when (validated) {
+          is Validated.Valid -> 1
+          is Validated.Invalid -> 0
+        }
+        effect shouldBe expected
+        res shouldBe validated
+      }
+    }
+
+    "tapInvalid applies effects returning the original value" {
+      checkAll(Arb.validated(Arb.long(), Arb.int())) { validated ->
+        var effect = 0
+        val res = validated.tapInvalid { effect += 1 }
+        val expected = when (validated) {
+          is Validated.Valid -> 0
+          is Validated.Invalid -> 1
+        }
+        effect shouldBe expected
+        res shouldBe validated
+      }
+    }
+
     "zip is derived from flatMap" {
       checkAll(
         Arb.validated(Arb.long().orNull(), Arb.int().orNull()),
