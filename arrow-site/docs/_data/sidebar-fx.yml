@@ -5,10 +5,10 @@ options:
   - title: Extensions and data types
     nested_options:
 
-      - title: Parallel combinators
+      - title: Parallel
         url: /fx/parallel/
 
-      - title: Flow combinators
+      - title: Flow
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow/-flow/
 
       - title: Atomic
@@ -24,7 +24,7 @@ options:
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/
 
 
-  - title: Additional information
+  - title: Misc
     nested_options:
 
       - title: Coroutines

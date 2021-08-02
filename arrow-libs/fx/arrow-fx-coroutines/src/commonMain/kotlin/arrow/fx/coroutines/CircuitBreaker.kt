@@ -16,7 +16,7 @@ import kotlin.time.ExperimentalTime
  * Especially when combined with retry mechanisms such as [Schedule],
  * in some cases simply using a back-off retry policy might not be sufficient during peak traffics.
  *
- * To allow such overloaded resources from overloading [CircuitBreaker] can help you `protect` the service by failing-fast.
+ * To allow such overloaded resources from overloading, [CircuitBreaker] can help you `protect` the service by failing-fast.
  * Thus [CircuitBreaker] helps us to achieve stability and prevent cascading failures in distributed systems.
  *
  * [CircuitBreaker] has three [CircuitBreaker.State]:
@@ -35,7 +35,7 @@ import kotlin.time.ExperimentalTime
  *    - If the `test request` fails, then the [CircuitBreaker] is tripped back into [Open], the [resetTimeout] is multiplied by the [exponentialBackoffFactor], up to the configured [maxResetTimeout].
  *
  * Let's say we'd want to create a [CircuitBreaker] that only allows us to call a remote service twice,
- * and then it won't will fail-fast.
+ * and then whenever more than two requests fail with an exception, the circuit breaker starts short-circuiting failing fast.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -73,9 +73,9 @@ import kotlin.time.ExperimentalTime
  * A common pattern to make fault-tolerant/resilient systems this can be combined with a backing-off policy retry policy to guarantee not overloading the resource
  * but also not the client that is interacting with the resource.
  * Below you can see how the simple `retry` function will result in `Either.Left<CircuitBreaker.RejectedExecution>`,
- * but when we combine it with another schedule that will result in always calling the `CircuitBreaker` on times that it could've gone in [HalfOpen] state.
+ * but when we combine it with another schedule, it will always call the `CircuitBreaker` on times that it could've gone in [HalfOpen] state.
  * The reason why [Schedule] is not sufficient to make your system resilient is because you also have to take into account parallel calls to your functions,
- * and a [CircuitBreaker] can track failures of every function call or even different functions to the same resource or service.
+ *; In contrast, a [CircuitBreaker] can track failures of every function call or even different functions to the same resource or service.
  *
  * ```kotlin:ank
  * import arrow.core.Either
@@ -447,7 +447,7 @@ private constructor(
      * @param resetTimeoutNanos is the current `resetTimeout` that is
      *        applied to this `Open` state, to be multiplied by the
      *        exponential backoff factor for the next transition from
-     *        `HalfOpen` to `Open`, in case the reset attempt fails
+     *        `HalfOpen` to `Open`.
      */
     public class Open internal constructor(
       public val startedAt: Long,
@@ -487,9 +487,9 @@ private constructor(
     }
 
     /**
-     * The [CircuitBreaker] is in [HalfOpen] state while it's allowing a request to go through, as as a `test request`
-     *   - All other requests made while `test request` is still running will short-circuit/fail-fast.
-     *   - If the `test request` succeeds then the [CircuitBreaker] is tripped back into [Closed], with the resetTimeout and the failures count also reset to initial values.
+     * The [CircuitBreaker] is in [HalfOpen] state while it's allowing a test request to go through.
+     *   - All other requests made while the test request is still running will short-circuit/fail-fast.
+     *   - If the `test request` succeeds, then the [CircuitBreaker] is tripped back into [Closed], with the reset timeout, and the failures count also reset to their initial values.
      *   - If the `test request` fails, then the [CircuitBreaker] is tripped back into [Open], the [resetTimeout] is multiplied by the [exponentialBackoffFactor], up to the configured [maxResetTimeout].
      *
      * @param resetTimeoutNanos is the current `resetTimeout` that was

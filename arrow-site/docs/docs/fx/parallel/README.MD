@@ -4,7 +4,7 @@ title: "Parallel combinators"
 permalink: /fx/parallel/
 ---
 
-# Parallel Combinators
+# Parallel functions
 
 Arrow Fx benefits from the `suspend` syntax for very succinct programs without callbacks.
 This allows us to use direct style syntax with asynchronous, concurrent and parallel operations while preserving effect control in the types and runtime.
@@ -18,7 +18,7 @@ You can find all functions in the API docs [here](/apidocs/arrow-fx-coroutines/a
 
 Arrow Fx comes with a set of built-in concurrent and parallel functions and data types that acompany what you find in KotlinX Coroutines. This allows users to write complex parallel and concurrent code in suspend style, in a elegant and imperative way without wrappers.
 
-All parallel suspend operators in Arrow Fx behave in the following way, to follow the patterns of [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async).
+To follow [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async), all parallel suspend operators in Arrow Fx behave in the following way:
 
 #### Parallel exceptions
 

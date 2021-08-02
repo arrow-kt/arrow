@@ -6,12 +6,10 @@ permalink: /fx/coroutines/
 
 # Kotlin Std Coroutines & Arrow Computation blocks
 
-Arrow computation blocks are build on top of Kotlin Std's Coroutines, and doesn't rely on KotlinX Coroutines.
-Yet, it automatically supports `Cancellation`.
+Arrow computation blocks are built on top of Kotlin Std's Coroutines intrinsics and don't depend on the KotlinX Coroutines library.
+Computation blocks support cancellation automatically observing [`CancellationException`],(https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/) available in the Kotlin Standard Library.
 
-This is possible through the new [`CancellationException`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/) in the Kotlin Standard Library!
-
-So let's take a deeper look at we can actually find in the Kotlin Std Coroutines package.
+Let's take a deeper look at what we can find in the Kotlin Std Coroutines package.
 
 ## Demystify Coroutine 
 

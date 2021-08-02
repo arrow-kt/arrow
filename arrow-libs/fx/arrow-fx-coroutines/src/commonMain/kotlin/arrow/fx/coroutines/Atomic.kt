@@ -9,7 +9,7 @@ import kotlinx.atomicfu.updateAndGet
  * An [Atomic] with a initial value of [A],
  * this is a wrapper around [`Atomic Fu`](https://github.com/Kotlin/kotlinx.atomicfu).
  *
- * Atomic FU is compiler plugin that allows us to write `atomic` properties inside a class,
+ * Atomic FU is a compiler plugin that allows us to write `atomic` properties inside a class,
  * and uses the most performant implementation for every platform.
  *
  * [Atomic] wraps `atomic`, so that you can also use it on a top-level function or pass it around.

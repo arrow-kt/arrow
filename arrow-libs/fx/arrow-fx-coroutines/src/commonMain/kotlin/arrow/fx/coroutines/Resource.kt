@@ -56,9 +56,9 @@ import kotlin.coroutines.CoroutineContext
  * }
  * //sampleEnd
  * ```
- * Here we are creating and then using a service that has a dependency on two resources: A database and a processor of some sort. All resources need to be closed in the correct order at the end.
- * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs in whilst using the service.
- * So it does not guarantee correct releasing of resources if something failed in between, and manually keeping track of acquisition order is also unnecessary overhead.
+ * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
+ * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
+ * As a consequence of the resource leak, this program does not guarantee the correct releasing of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
  *
  * We can split the above program into 3 different steps:
  *   1. Acquiring the resource
@@ -127,15 +127,14 @@ import kotlin.coroutines.CoroutineContext
  * //sampleEnd
  * ```
  *
- * Here you can see how we can create [Resource]s as immutable values, and compose them together using [zip] or [parZip].
- * When using [Resource] you're always guaranteed that the release finalizers are invoked in the correct order,
- * whether an exception occurred or the program got cancelled.
+ * [Resource]s are immutable that can be composed using [zip] or [parZip].
+ * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
  *
  * To achieve this [Resource] ensures that the `acquire` & `release` step are [NonCancellable].
  * If a cancellation signal, or an exception is received during `acquire` it immediately goes through since there is nothing yet to release.
  *  => Any composed resources that are already acquired they will be guaranteed to release as expected.
  *
- * If you don't need a data-type like [Resource] but want a functional alternative to `try/catch/finally` but with automatic error composition,
+ * If you don't need a data-type like [Resource] but want a function alternative to `try/catch/finally` with automatic error composition,
  * and automatic [NonCancellable] `acquire` and `release` steps use [bracketCase] or [bracket].
  **/
 public sealed class Resource<out A> {
@@ -187,7 +186,7 @@ public sealed class Resource<out A> {
   /**
    * Create a resource value of [B] from a resource [A] by mapping [f].
    *
-   * This is useful when you need to create a resources that depends on other resources,
+   * Useful when there is a need to create resources that depend on other resources,
    * for combining independent values [zip] provides nicer syntax without the need for callback nesting.
    *
    * ```kotlin:ank
@@ -410,7 +409,7 @@ public sealed class Resource<out A> {
    * Composes two [Resource]s together by zipping them in parallel,
    * by running both their `acquire` handlers in parallel, and both `release` handlers in parallel.
    *
-   * This is extremely useful in case that starting a resource is heavy, or takes a long time to start
+   * Useful in the case that starting a resource takes considerable computing resources or time.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.coroutines.*

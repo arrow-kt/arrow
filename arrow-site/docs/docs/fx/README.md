@@ -1,6 +1,6 @@
 ---
 layout: docs-fx
-title: Arrow Fx. Typed FP for the masses
+title: Arrow Fx. Async and Concurrent Functional Programming for Kotlin
 permalink: /fx/
 ---
 
@@ -19,8 +19,8 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
   - [Gradle Setup](Gradle-Setup)
   - [Maven Setup](Maven-setup)
 - Extensions and data types   
-  - [Parallel combinators](parallel/)
-  - [Flow combinators](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/) 
+  - [Parallel](parallel/)
+  - [Flow](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/) 
   - [Schedule](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
   - [Resource](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
   - [CircuitBreaker](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
@@ -98,4 +98,4 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
 
-If you are interested in the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
+If you are interested in the Arrow Fx library, please contact us in the #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.

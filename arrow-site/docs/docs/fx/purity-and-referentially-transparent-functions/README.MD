@@ -121,11 +121,9 @@ This is because Arrow Fx brings the most popular imperative style to effectful p
 # Conclusion
 
 Arrow Fx offers an idiomatic way of doing effectfull FP with Kotlin's coroutine system.
-It does this by providing support for cancellation, error handling, resource handling and all goodies you might be familiar with from other functional effect systems.
+It does this by providing support for cancellation, error handling, resource handling, and all features you might be familiar with from other functional effect systems.
 
 Arrow Fx offers direct style syntax and effect control without compromises, and removes the syntactic burden of type parametrization while still yielding programs that are pure, safe, and referentially transparent.
 
-Despite some limitations of the Kotlin type system, like lack of Higher Kinded Types, the Kotlin language is excellent for encoding typed programs with a first-class imperative syntax for FP.
-These programs are approachable by the broader programming community, and arguably easier to encode than some solutions currently used in mainstream Kotlin and Scala FP communities.
 
 Come check out Arrow fx and join the discussion in the [Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) and [Gitter](https://gitter.im/arrow-kt/Lobby)
