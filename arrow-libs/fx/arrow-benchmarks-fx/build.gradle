@@ -25,7 +25,7 @@ dependencies {
     compile project(":arrow-benchmarks-fx:arrow-scala-benchmarks")
     compile project(":arrow-benchmarks-fx:arrow-kio-benchmarks")
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    compileOnly "org.openjdk.jmh:jmh-core:$JMH_CORE_VERSION"
+    implementation "org.openjdk.jmh:jmh-core:$JMH_CORE_VERSION"
 }
 
 jmh {

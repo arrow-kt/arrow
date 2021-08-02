@@ -46,30 +46,30 @@ kotlin {
             }
         }
     }
+    linuxX64()
+
+    mingwX64()
+
     macosX64()
-    iosArm32()
-    iosArm64()
-    iosX64()
+    tvos()
+
     watchosArm32()
     watchosArm64()
     watchosX86()
     watchosX64()
-    tvosArm64()
-    tvosX64()
-    mingwX64()
-    mingwX86()
-    linuxX64()
-    linuxArm32Hfp()
-    linuxMips32()
+
+    iosX64()
+    iosArm64()
+    iosArm32()
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
         jvmMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
             }
         }
         jvmTest {
@@ -79,7 +79,7 @@ kotlin {
         }
         jsMain {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
         jsTest {
