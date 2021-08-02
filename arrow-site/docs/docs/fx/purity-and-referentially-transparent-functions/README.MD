@@ -60,7 +60,7 @@ A continuation is a Kotlin Interface, `Continuation<A>`, that proves we know how
 
 This is a great built-in feature of the Kotlin compiler that already makes it an ideal choice for Typed FP, but it's not the only one.
 
-Continue reading on if you're curious to see how the Kotlin Compiler and Arrow Fx can eliminate many of the functional idioms by using direct syntax, overall effectful monads.
+Continue reading on if you're curious to see how the Kotlin Compiler and Arrow Fx can eliminate many of the functional idioms by using direct syntax, over effect monads.
 
 #### `suspend` composition
 
@@ -113,7 +113,7 @@ fun main(): Unit = runBlocking { // The edge of our world
 //sampleEnd
 ```
 
-Arrow Fx emphasizes the guarantee that users understand when they are performing side effects in their program declaration.
+Arrow Fx emphasizes the guarantee that users understand where they are performing side effects in their program declaration.
 
 If you're not very familiar with Functional Programming, and you've made it this far, you may realize that, despite the buzzwords and some FP jargon, you already know how to use Arrow Fx in general.
 This is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming.

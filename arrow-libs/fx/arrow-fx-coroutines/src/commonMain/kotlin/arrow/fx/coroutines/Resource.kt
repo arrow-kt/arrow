@@ -58,7 +58,7 @@ import kotlin.coroutines.CoroutineContext
  * ```
  * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
  * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
- * As a consequence of the resource leak, this program does not guarantee the correct releasing of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
+ * As a consequence of the resource leak, this program does not guarantee the correct release of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
  *
  * We can split the above program into 3 different steps:
  *   1. Acquiring the resource
@@ -127,11 +127,11 @@ import kotlin.coroutines.CoroutineContext
  * //sampleEnd
  * ```
  *
- * [Resource]s are immutable that can be composed using [zip] or [parZip].
+ * [Resource]s are immutable and can be composed using [zip] or [parZip].
  * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
  *
  * To achieve this [Resource] ensures that the `acquire` & `release` step are [NonCancellable].
- * If a cancellation signal, or an exception is received during `acquire` it immediately goes through since there is nothing yet to release.
+ * If a cancellation signal, or an exception is received during `acquire`, the resource is assumed to not have been acquired and thus will not trigger the release function.
  *  => Any composed resources that are already acquired they will be guaranteed to release as expected.
  *
  * If you don't need a data-type like [Resource] but want a function alternative to `try/catch/finally` with automatic error composition,
