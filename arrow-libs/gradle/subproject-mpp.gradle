@@ -46,6 +46,21 @@ kotlin {
             }
         }
     }
+    macosX64()
+    iosArm32()
+    iosArm64()
+    iosX64()
+    watchosArm32()
+    watchosArm64()
+    watchosX86()
+    watchosX64()
+    tvosArm64()
+    tvosX64()
+    mingwX64()
+    mingwX86()
+    linuxX64()
+    linuxArm32Hfp()
+    linuxMips32()
     sourceSets {
         commonMain {
             dependencies {
@@ -72,6 +87,52 @@ kotlin {
                 implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
 
             }
+        }
+        nativeMain {
+            dependsOn commonMain
+        }
+        macosX64Main {
+            dependsOn nativeMain
+        }
+
+        mingwX64Main {
+            dependsOn nativeMain
+        }
+
+        linuxX64Main {
+            dependsOn nativeMain
+        }
+
+        iosX64Main {
+            dependsOn nativeMain
+        }
+
+        iosArm64Main {
+            dependsOn nativeMain
+        }
+
+        iosArm32Main {
+            dependsOn nativeMain
+        }
+
+        watchosX86Main {
+            dependsOn nativeMain
+        }
+
+        watchosArm32Main {
+            dependsOn nativeMain
+        }
+
+        watchosArm64Main {
+            dependsOn nativeMain
+        }
+
+        watchosX64Main {
+            dependsOn nativeMain
+        }
+
+        tvosMain {
+            dependsOn nativeMain
         }
     }
 }
