@@ -7,11 +7,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.positiveInt
 import kotlin.time.Duration
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
@@ -19,7 +18,6 @@ import kotlin.time.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withTimeoutOrNull
 
 @ExperimentalTime
@@ -50,27 +48,9 @@ class FlowJvmTest : ArrowFxSpec(spec = {
     }
   }
 
-  "parMap - single thread - identity" {
-    single.use { ctx ->
-      checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMap(ctx) { it }
-          .toList() shouldBe flow.toList()
-      }
-    }
-  }
-
-  "parMapUnordered - single thread - identity" {
-    single.use { ctx ->
-      checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMapUnordered(ctx) { it }
-          .toSet() shouldBe flow.toSet()
-      }
-    }
-  }
-
   "fixedDelay" {
     runBlockingTest {
-      checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+      checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
         val emissionDuration = waitPeriod / 10L
         var state: Long? = null
 
@@ -96,7 +76,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
 
   "fixedRate" {
     runBlockingTest {
-      checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+      checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
         val emissionDuration = waitPeriod / 10
         var state: Long? = null
 

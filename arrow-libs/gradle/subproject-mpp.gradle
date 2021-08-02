@@ -30,7 +30,7 @@ kotlin {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
-    js(BOTH) {
+    js(IR) {
         browser {
             testTask {
                 useKarma {
@@ -52,27 +52,31 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
+        commonTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+            }
+        }
         jvmMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
             }
         }
-        jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-            }
-        }
+//        jvmTest {
+//            dependencies {
+//                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+//            }
+//        }
         jsMain {
             dependencies {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
-        jsTest {
-            dependencies {
-                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-
-            }
-        }
+//        jsTest {
+//            dependencies {
+//                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+//            }
+//        }
     }
 }
 

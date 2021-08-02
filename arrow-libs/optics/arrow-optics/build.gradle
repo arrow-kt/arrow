@@ -2,6 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
+    id "io.kotest.multiplatform"
 }
 
 apply plugin: 'kotlinx-atomicfu'
