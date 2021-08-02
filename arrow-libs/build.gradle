@@ -4,6 +4,7 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots" }
     }
     dependencies {
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"

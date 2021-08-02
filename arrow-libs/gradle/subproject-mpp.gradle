@@ -72,6 +72,11 @@ kotlin {
                 compileOnly "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
             }
         }
+        jsTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine-js:$KOTEST_VERSION"
+            }
+        }
     }
 }
 
