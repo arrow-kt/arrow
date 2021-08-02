@@ -29,9 +29,9 @@ dokkaJekyll {
             // Repeat for multiple mappings
             sourceLink {
                 // Source directory
-                localDirectory.set(file("src/main/kotlin"))
+                localDirectory.set(file("src/commonMain/kotlin"))
                 // URL showing where the source code can be accessed through the web browser
-                remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/main/kotlin')}").toURL())
+                remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/commonMain/kotlin')}").toURL())
 
                 // Suffix which is used to append the line number to the URL. Use #L for GitHub
                 remoteLineSuffix.set("#L")

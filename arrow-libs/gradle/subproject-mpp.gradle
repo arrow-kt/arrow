@@ -81,7 +81,7 @@ ktlint {
 }
 
 clean.doFirst {
-    delete "${projectDir}/docs/apidocs"
+    delete "${projectDir}/../../../arrow-site/docs/apidocs"
 }
 
 group = GROUP
