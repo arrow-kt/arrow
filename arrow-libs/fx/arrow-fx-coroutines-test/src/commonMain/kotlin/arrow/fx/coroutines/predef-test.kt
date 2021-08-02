@@ -18,6 +18,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.choose
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
@@ -34,6 +35,10 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.coroutines.startCoroutine
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.emptyFlow
 
 public data class SideEffect(var counter: Int = 0) {
   public fun increment() {
@@ -42,7 +47,11 @@ public data class SideEffect(var counter: Int = 0) {
 }
 
 public fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
-  Arb.list(arbA).map { it.asFlow() }
+  Arb.choose(
+    10 to Arb.list(arbA).map { it.asFlow() },
+    10 to Arb.list(arbA).map { channelFlow { it.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
+    1 to Arb.constant(emptyFlow()),
+  )
 
 public fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.string().map(::RuntimeException)
