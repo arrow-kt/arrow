@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
@@ -53,8 +55,19 @@ class FlowJvmTest : ArrowFxSpec(spec = {
   "parMap - single thread - identity" {
     single.use { ctx ->
       checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMap(ctx) { it }
+        flow.parMap { it }.flowOn(ctx)
           .toList() shouldBe flow.toList()
+      }
+    }
+  }
+
+  "parMap - flowOn" {
+    single.use { ctx ->
+      checkAll(Arb.flow(Arb.int())) { flow ->
+        flow.parMap { Thread.currentThread().name }.flowOn(ctx)
+          .toList().forEach {
+            it shouldContain singleThreadName
+          }
       }
     }
   }
@@ -62,8 +75,19 @@ class FlowJvmTest : ArrowFxSpec(spec = {
   "parMapUnordered - single thread - identity" {
     single.use { ctx ->
       checkAll(Arb.flow(Arb.int())) { flow ->
-        flow.parMapUnordered(ctx) { it }
+        flow.parMapUnordered { it }.flowOn(ctx)
           .toSet() shouldBe flow.toSet()
+      }
+    }
+  }
+
+  "parMapUnordered - flowOn" {
+    single.use { ctx ->
+      checkAll(Arb.flow(Arb.int())) { flow ->
+        flow.parMap { Thread.currentThread().name }.flowOn(ctx)
+          .toList().forEach {
+            it shouldContain singleThreadName
+          }
       }
     }
   }
