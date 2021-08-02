@@ -8,7 +8,7 @@ plugins {
 dependencies {
     kapt project(":arrow-meta")
     kaptTest project(":arrow-meta")
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testImplementation project(":arrow-annotations")
     testImplementation project(":arrow-core")
     testImplementation project(":arrow-optics")
