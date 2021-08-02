@@ -821,11 +821,53 @@ public sealed class Either<out A, out B> {
    * Example:
    * ```
    * Right(12).mapLeft { "flower" } // Result: Right(12)
-   * Left(12).mapLeft { "flower" }  // Result: Left("flower)
+   * Left(12).mapLeft { "flower" }  // Result: Left("flower")
    * ```
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `Left`.
+   * When applied the result is ignored and the original
+   * Either value is returned
+   *
+   * Example:
+   * ```
+   * Right(12).tapLeft { println("flower") } // Result: Right(12)
+   * Left(12).tapLeft { println("flower") }  // Result: prints "flower" and returns: Left(12)
+   * ```
+   */
+  public inline fun tapLeft(f: (A) -> Unit): Either<A, B> =
+    when (this) {
+      is Left -> {
+        f(this.value)
+        this
+      }
+      is Right -> this
+    }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `Right`.
+   * When applied the result is ignored and the original
+   * Either value is returned
+   *
+   * Example:
+   * ```
+   * Right(12).tap { println("flower") } // Result: prints "flower" and returns: Right(12)
+   * Left(12).tap { println("flower") }  // Result: Left(12)
+   * ```
+   */
+  public inline fun tap(f: (B) -> Unit): Either<A, B> =
+    when (this) {
+      is Left -> this
+      is Right -> {
+        f(this.value)
+        this
+      }
+    }
 
   /**
    * Map over Left and Right of this Either
