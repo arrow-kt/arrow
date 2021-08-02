@@ -55,7 +55,7 @@ jobs:
 
     - name: "Create API doc"
       working-directory: arrow-libs
-      run: ./gradlew dokka
+      run: ./gradlew dokkaJekyll
 
     - name: "Validate documentation"
       working-directory: arrow-site

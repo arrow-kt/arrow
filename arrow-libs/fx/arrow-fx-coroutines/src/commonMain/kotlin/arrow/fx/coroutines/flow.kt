@@ -6,6 +6,7 @@ package arrow.fx.coroutines
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -16,15 +17,18 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.retryWhen
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.flow.zip
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.flow.map
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
@@ -101,6 +105,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
 @FlowPreview
 @ExperimentalCoroutinesApi
 public inline fun <A, B> Flow<A>.parMap(
+  context: CoroutineContext = Dispatchers.Default,
   concurrency: Int = DEFAULT_CONCURRENCY,
   crossinline transform: suspend CoroutineScope.(a: A) -> B
 ): Flow<B> =
@@ -116,7 +121,7 @@ public inline fun <A, B> Flow<A>.parMap(
           require(deferred.completeExceptionally(e))
           throw e
         }
-      }
+      }.flowOn(context)
     }
       .flattenMerge(concurrency)
       .launchIn(this)
@@ -150,13 +155,14 @@ public inline fun <A, B> Flow<A>.parMap(
  */
 @FlowPreview
 public inline fun <A, B> Flow<A>.parMapUnordered(
+  ctx: CoroutineContext = Dispatchers.Default,
   concurrency: Int = DEFAULT_CONCURRENCY,
   crossinline transform: suspend (a: A) -> B
 ): Flow<B> =
   map { o ->
     flow {
       emit(transform(o))
-    }
+    }.flowOn(ctx)
   }.flattenMerge(concurrency)
 
 /** Repeats the Flow forever */
