@@ -7,8 +7,121 @@ import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
+/**
+ * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
+ * When a service is being overloaded, interacting with it more will only worsen its overloaded state.
+ * Especially when combined with retry mechanisms such as [Schedule],
+ * in some cases simply using a back-off retry policy might not be sufficient during peak traffics.
+ *
+ * To allow such overloaded resources from overloading [CircuitBreaker] can help you `protect` the service by failing-fast.
+ * Thus [CircuitBreaker] helps us to achieve stability and prevent cascading failures in distributed systems.
+ *
+ * [CircuitBreaker] has three [CircuitBreaker.State]:
+ *  1. [Closed]: This is its normal state, where requests are being made. The state in which [CircuitBreaker] starts.
+ *    - When an exceptions occurs it increments the failure counter
+ *    - A successful request will reset the failure counter to zero
+ *    - When the failure counter reaches the [maxFailures] threshold, the breaker is tripped into the [Open] state
+ *
+ *  2. [Open]: The [CircuitBreaker] will short-circuit/fail-fast all requests
+ *    - All requests short-circuit/fail-fast with `ExecutionRejected`
+ *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
+ *
+ *  3. [HalfOpen]: The [CircuitBreaker] is in this state while it's allowing a request to go through, as as a `test request`
+ *    - All other requests made while `test request` is still running will short-circuit/fail-fast.
+ *    - If the `test request` succeeds then the [CircuitBreaker] is tripped back into [Closed], with the resetTimeout and the failures count also reset to initial values.
+ *    - If the `test request` fails, then the [CircuitBreaker] is tripped back into [Open], the [resetTimeout] is multiplied by the [exponentialBackoffFactor], up to the configured [maxResetTimeout].
+ *
+ * Let's say we'd want to create a [CircuitBreaker] that only allows us to call a remote service twice,
+ * and then it won't will fail-fast.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.core.flatten
+ * import arrow.fx.coroutines.CircuitBreaker
+ * import kotlin.time.Duration
+ * import kotlin.time.ExperimentalTime
+ * import kotlinx.coroutines.delay
+ *
+ * @ExperimentalTime
+ * suspend fun main(): Unit {
+ * //sampleStart
+ *   val circuitBreaker = CircuitBreaker.of(
+ *     maxFailures = 2,
+ *     resetTimeout = Duration.seconds(2),
+ *     exponentialBackoffFactor = 1.2,
+ *     maxResetTimeout = Duration.seconds(60),
+ *   )
+ *   circuitBreaker.protectOrThrow { "I am in Closed: ${circuitBreaker.state()}" }.also(::println)
+ *
+ *   println("Service getting overloaded . . .")
+ *
+ *   Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)
+ *   Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)
+ *   circuitBreaker.protectEither { }.also { println("I am Open and short-circuit with ${it}. ${circuitBreaker.state()}") }
+ *
+ *   println("Service recovering . . .").also { delay(2000) }
+ *
+ *   circuitBreaker.protectOrThrow { "I am running test-request in HalfOpen: ${circuitBreaker.state()}" }.also(::println)
+ *   println("I am back to normal state closed ${circuitBreaker.state()}")
+ * //sampleEnd
+ * }
+ * ```
+ *
+ * A common pattern to make fault-tolerant/resilient systems this can be combined with a backing-off policy retry policy to guarantee not overloading the resource
+ * but also not the client that is interacting with the resource.
+ * Below you can see how the simple `retry` function will result in `Either.Left<CircuitBreaker.RejectedExecution>`,
+ * but when we combine it with another schedule that will result in always calling the `CircuitBreaker` on times that it could've gone in [HalfOpen] state.
+ * The reason why [Schedule] is not sufficient to make your system resilient is because you also have to take into account parallel calls to your functions,
+ * and a [CircuitBreaker] can track failures of every function call or even different functions to the same resource or service.
+ *
+ * ```kotlin:ank
+ * import arrow.core.Either
+ * import arrow.fx.coroutines.CircuitBreaker
+ * import arrow.fx.coroutines.Schedule
+ * import arrow.fx.coroutines.retry
+ * import kotlin.time.Duration.Companion.seconds
+ * import kotlin.time.ExperimentalTime
+ * import kotlinx.coroutines.delay
+ *
+ * @ExperimentalTime
+ * public suspend fun main(): Unit {
+ *   suspend fun apiCall(): Unit {
+ *     println("apiCall . . .")
+ *     throw RuntimeException("Overloaded service")
+ *   }
+ *
+ *   //sampleStart
+ *   val circuitBreaker = CircuitBreaker.of(
+ *     maxFailures = 2,
+ *     resetTimeout = seconds(2),
+ *     exponentialBackoffFactor = 2.0, // enable exponentialBackoffFactor
+ *     maxResetTimeout = seconds(60), // limit exponential back-off time
+ *   )
+ *
+ *   suspend fun <A> resilient(schedule: Schedule<Throwable, *>, f: suspend () -> A): A =
+ *     schedule.retry { circuitBreaker.protectOrThrow(f) }
+ *
+ *   Either.catch {
+ *     resilient(Schedule.recurs(5), ::apiCall)
+ *   }.let { println("recurs(5) apiCall twice and 4x short-circuit result from CircuitBreaker: $it") }
+ *
+ *   delay(2000)
+ *   println("CircuitBreaker ready to half-open")
+ *
+ *   // Retry once and when the CircuitBreaker opens after 2 failures then retry with exponential back-off with same time as CircuitBreaker's resetTimeout
+ *   val fiveTimesWithBackOff = Schedule.recurs<Throwable>(1) andThen
+ *     Schedule.exponential(seconds(2)) and Schedule.recurs(5)
+ *
+ *   Either.catch {
+ *     resilient(fiveTimesWithBackOff, ::apiCall)
+ *   }.let { println("exponential(seconds(2)) and recurs(5) always retries with actual apiCall: $it") }
+ *   //sampleEnd
+ * }
+ * ```
+ */
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRefW<State>,
@@ -303,14 +416,11 @@ private constructor(
    */
   public sealed class State {
 
-    /** The initial [State] of the [CircuitBreaker]. While in this
-     * state, the circuit breaker allows tasks to be executed.
-     *
-     * Contract:
-     *  - Exceptions increment the `failures` counter.
-     *  - Successes reset the failure count to zero.
-     *  - When the `failures` counter reaches the `maxFailures` count,
-     *    the breaker is tripped into the [CircuitBreaker.Open] state.
+    /**
+     * [Closed] is the normal state of the [CircuitBreaker], where requests are being made. The state in which [CircuitBreaker] starts.
+     *    - When an exceptions occurs it increments the failure counter
+     *    - A successful request will reset the failure counter to zero
+     *    - When the failure counter reaches the [maxFailures] threshold, the breaker is tripped into the [Open] state
      *
      * @param failures is the current failures count
      */
@@ -326,29 +436,25 @@ private constructor(
         "Closed(failures=$failures)"
     }
 
+    /**
+     *  When the [CircuitBreaker] is in the [Open] state it will short-circuit/fail-fast all requests
+     *    - All requests short-circuit/fail-fast with `ExecutionRejected`
+     *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
+     *
+     * @param startedAt is the timestamp in milliseconds since the
+     *        epoch when the transition to [Open] happened.
+     *
+     * @param resetTimeoutNanos is the current `resetTimeout` that is
+     *        applied to this `Open` state, to be multiplied by the
+     *        exponential backoff factor for the next transition from
+     *        `HalfOpen` to `Open`, in case the reset attempt fails
+     */
     public class Open internal constructor(
       public val startedAt: Long,
       public val resetTimeoutNanos: Double,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
 
-      /** [State] of the [CircuitBreaker] in which the circuit
-       * breaker rejects all tasks with an [ExecutionRejected].
-       *
-       * Contract:
-       *  - All tasks fail fast with [ExecutionRejected].
-       *  - After the configured `resetTimeout`, the circuit breaker
-       *    enters a [HalfOpen] state, allowing one task to go through
-       *    for testing the connection.
-       *
-       * @param startedAt is the timestamp in milliseconds since the
-       *        epoch when the transition to `Open` happened.
-       *
-       * @param resetTimeoutNanos is the current `resetTimeout` that is
-       *        applied to this `Open` state, to be multiplied by the
-       *        exponential backoff factor for the next transition from
-       *        `HalfOpen` to `Open`, in case the reset attempt fails
-       */
       public constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
         startedAt,
         resetTimeoutNanos,
@@ -380,33 +486,22 @@ private constructor(
       }
     }
 
+    /**
+     * The [CircuitBreaker] is in [HalfOpen] state while it's allowing a request to go through, as as a `test request`
+     *   - All other requests made while `test request` is still running will short-circuit/fail-fast.
+     *   - If the `test request` succeeds then the [CircuitBreaker] is tripped back into [Closed], with the resetTimeout and the failures count also reset to initial values.
+     *   - If the `test request` fails, then the [CircuitBreaker] is tripped back into [Open], the [resetTimeout] is multiplied by the [exponentialBackoffFactor], up to the configured [maxResetTimeout].
+     *
+     * @param resetTimeoutNanos is the current `resetTimeout` that was
+     *        applied to the previous `Open` state, to be multiplied by
+     *        the exponential backoff factor for the next transition to
+     *        `Open`, in case the reset attempt fails.
+     */
     public class HalfOpen internal constructor(
       public val resetTimeoutNanos: Double,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
 
-      /** [State] of the [CircuitBreaker] in which the circuit
-       * breaker has already allowed a task to go through, as a reset
-       * attempt, in order to test the connection.
-       *
-       * Contract:
-       *  - The first task when `Open` has expired is allowed through
-       *    without failing fast, just before the circuit breaker is
-       *    evolved into the `HalfOpen` state.
-       *  - All tasks attempted in `HalfOpen` fail-fast with an exception
-       *    just as in [Open] state.
-       *  - If that task attempt succeeds, the breaker is reset back to
-       *    the `Closed` state, with the `resetTimeout` and the
-       *    `failures` count also reset to initial values.
-       *  - If the first call fails, the breaker is tripped again into
-       *    the `Open` state (the `resetTimeout` is multiplied by the
-       *    exponential backoff factor).
-       *
-       * @param resetTimeoutNanos is the current `resetTimeout` that was
-       *        applied to the previous `Open` state, to be multiplied by
-       *        the exponential backoff factor for the next transition to
-       *        `Open`, in case the reset attempt fails.
-       */
       public constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos, CompletableDeferred())
 
       override fun hashCode(): Int =
@@ -458,24 +553,22 @@ private constructor(
       resetTimeoutNanos: Double,
       exponentialBackoffFactor: Double = 1.0,
       maxResetTimeout: Double = Double.POSITIVE_INFINITY,
-      onRejected: suspend () -> Unit = suspend { Unit },
-      onClosed: suspend () -> Unit = suspend { Unit },
-      onHalfOpen: suspend () -> Unit = suspend { Unit },
-      onOpen: suspend () -> Unit = suspend { Unit }
-    ): CircuitBreaker? =
-      if (maxFailures >= 0 && resetTimeoutNanos > 0 && exponentialBackoffFactor > 0 && maxResetTimeout > 0) {
-        CircuitBreaker(
-          state = AtomicRefW(Closed(0)),
-          maxFailures = maxFailures,
-          resetTimeout = resetTimeoutNanos,
-          exponentialBackoffFactor = exponentialBackoffFactor,
-          maxResetTimeout = maxResetTimeout,
-          onRejected = onRejected,
-          onClosed = onClosed,
-          onHalfOpen = onHalfOpen,
-          onOpen = onOpen
-        )
-      } else null
+      onRejected: suspend () -> Unit = { },
+      onClosed: suspend () -> Unit = { },
+      onHalfOpen: suspend () -> Unit = { },
+      onOpen: suspend () -> Unit = { }
+    ): CircuitBreaker =
+      CircuitBreaker(
+        state = AtomicRefW(Closed(0)),
+        maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
+        resetTimeout = requireNotNull(resetTimeoutNanos.takeIf { it > 0 }) { "resetTimeoutNanos expected to be higher than 0" },
+        exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
+        maxResetTimeout = requireNotNull(maxResetTimeout.takeIf { it > 0 }) { "maxResetTimeout expected to be higher than 0" },
+        onRejected = onRejected,
+        onClosed = onClosed,
+        onHalfOpen = onHalfOpen,
+        onOpen = onOpen
+      )
 
     /**
      * Attempts to create a [CircuitBreaker].
@@ -512,16 +605,16 @@ private constructor(
       resetTimeout: Duration,
       exponentialBackoffFactor: Double = 1.0,
       maxResetTimeout: Duration = Duration.INFINITE,
-      onRejected: suspend () -> Unit = suspend { Unit },
-      onClosed: suspend () -> Unit = suspend { Unit },
-      onHalfOpen: suspend () -> Unit = suspend { Unit },
-      onOpen: suspend () -> Unit = suspend { Unit }
-    ): CircuitBreaker? =
+      onRejected: suspend () -> Unit = suspend { },
+      onClosed: suspend () -> Unit = suspend { },
+      onHalfOpen: suspend () -> Unit = suspend { },
+      onOpen: suspend () -> Unit = suspend { }
+    ): CircuitBreaker =
       of(
         maxFailures,
-        resetTimeout.inNanoseconds,
+        resetTimeout.toDouble(DurationUnit.NANOSECONDS),
         exponentialBackoffFactor,
-        maxResetTimeout.inNanoseconds,
+        maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
         onRejected,
         onClosed,
         onHalfOpen,

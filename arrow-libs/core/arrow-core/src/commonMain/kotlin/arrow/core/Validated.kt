@@ -704,6 +704,48 @@ public sealed class Validated<out E, out A> {
     bimap(f, ::identity)
 
   /**
+   * The given function is applied as a fire and forget effect
+   * if this is `Invalid`.
+   * When applied the result is ignored and the original
+   * Validated value is returned
+   *
+   * Example:
+   * ```
+   * Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
+   * Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
+   * ```
+   */
+  public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
+    when (this) {
+      is Invalid -> {
+        f(this.value)
+        this
+      }
+      is Valid -> this
+    }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is `Valid`.
+   * When applied the result is ignored and the original
+   * Validated value is returned
+   *
+   * Example:
+   * ```
+   * Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
+   * Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+   * ```
+   */
+  public inline fun tap(f: (A) -> Unit): Validated<E, A> =
+    when (this) {
+      is Invalid -> this
+      is Valid -> {
+        f(this.value)
+        this
+      }
+    }
+
+  /**
    * apply the given function to the value with the given B when
    * valid, otherwise return the given B
    */
