@@ -7,14 +7,22 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import kotlinx.coroutines.flow.collect
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.positiveInts
+import kotlin.time.Duration
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.withTimeoutOrNull
 
 @ExperimentalTime
 class FlowJvmTest : ArrowFxSpec(spec = {
@@ -82,5 +90,92 @@ class FlowJvmTest : ArrowFxSpec(spec = {
           }
       }
     }
+  }
+
+  "fixedDelay" {
+    runBlockingTest {
+      checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        val emissionDuration = waitPeriod / 10L
+        var state: Long? = null
+
+        val rate = flow { emit(delay(Duration.milliseconds(waitPeriod))) }.repeat()
+          .map {
+            val now = state ?: currentTime
+            val nextNow = currentTime
+            val lapsed = nextNow - now
+            state = nextNow
+            delay(emissionDuration)
+            lapsed
+          }
+          .take(n)
+          .toList()
+
+        rate.first() shouldBe 0 // First element is immediately
+        rate.drop(1).forEach { act ->
+          act shouldBe (waitPeriod + emissionDuration) // Remaining elements all take delay + emission duration
+        }
+      }
+    }
+  }
+
+  "fixedRate" {
+    runBlockingTest {
+      checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        val emissionDuration = waitPeriod / 10
+        var state: Long? = null
+
+        val rate = fixedRate(Duration.milliseconds(waitPeriod)) { currentTime }
+          .map {
+            val now = state ?: currentTime
+            val nextNow = currentTime
+            val lapsed = nextNow - now
+            state = nextNow
+            delay(emissionDuration)
+            lapsed
+          }
+          .take(n)
+          .toList()
+
+        rate.first() shouldBe 0 // First element is immediately
+        rate.drop(1).forEach { act ->
+          // Remaining elements all take total of waitPeriod, emissionDuration is correctly taken into account.
+          act shouldBe waitPeriod
+        }
+      }
+    }
+  }
+
+  "fixedRate(dampen = true)" {
+    val waitPeriod = 1000L
+    val n = 3
+    val timeout = (n + 1) * waitPeriod + 500
+    val buffer = mutableListOf<Unit>()
+
+    withTimeoutOrNull(timeout) {
+      fixedRate(Duration.milliseconds(waitPeriod), true) { timeInMillis() }
+        .mapIndexed { index, _ ->
+          if (index == 0) delay(waitPeriod * n) else Unit
+        }
+        .collect(buffer::add)
+    }
+
+    buffer.size shouldBe 2
+  }
+
+  "fixedRate(dampen = false)" {
+    val waitPeriod = 1000L
+    val n = 3
+    val timeout = (n + 1) * waitPeriod + 500
+    val buffer = mutableListOf<Unit>()
+
+    withTimeoutOrNull(timeout) {
+      fixedRate(Duration.milliseconds(waitPeriod), false) { timeInMillis() }
+        .mapIndexed { index, _ ->
+          if (index == 0) delay(waitPeriod * n) else Unit
+        }
+        .collect(buffer::add)
+    }
+
+    buffer.size shouldBe n + 1
   }
 })
