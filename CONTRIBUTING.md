@@ -85,7 +85,7 @@ Public docs in Arrow follow a particular structure that ensures users have a sim
 
 Declarations including classes, functions, and others must include docs in the following structure:
 
-All Kdocs should include a short title that describes what the data type or function is for and an `ank` fenced block demonstrating its use
+All Kdocs should include a short header that describes what the data type or function is for and an `ank` fenced block demonstrating its use
 
 for example
 
