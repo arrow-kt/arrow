@@ -206,7 +206,7 @@ public fun fixedRate(
 /**
  * Flow that emits [Unit] every [period] while taking into account how much time it takes downstream to consume the emission.
  * If downstream takes longer to process than [period] than it immediately emits another [Unit],
- * if you set [dampen] to true it will send `n = downstream / period` [Unit] elements immediately.
+ * if you set [dampen] to false it will send `n = downstreamTime / period` [Unit] elements immediately.
  *
  * Use `onEach { delay(timeMillis) }` for an alternative that sleeps [period] between every element.
  * This is different in that the time between every element is equal to the specified period,
@@ -216,7 +216,7 @@ public fun fixedRate(
  * Whereas with `onEach { delay(timeMillis) }` it would run at timestamps 1s, 2.1s, 3.2s, ...
  *
  * @param period period between [Unit] emits of the resulting [Flow].
- * @param dampen if you set [dampen] to true it will send `n` times [period] time it took downstream to process the emission.
+ * @param dampen if you set [dampen] to false it will send `n` times [period] time it took downstream to process the emission.
  * @param timeStampInMillis allows for supplying a different timestamp function, useful to override with `runBlockingTest`
  */
 public fun fixedRate(
