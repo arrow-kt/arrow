@@ -22,7 +22,9 @@ dokkaJekyll {
 
     dokkaSourceSets {
         main {
-            includes.from(files("README.md"))
+            if (file("README.md").exists()) {
+                includes.from(files("README.md"))
+            }
             reportUndocumented.set(false)
             // Specifies the location of the project source code on the Web.
             // If provided, Dokka generates "source" links for each declaration.
