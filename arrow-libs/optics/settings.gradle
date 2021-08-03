@@ -22,3 +22,6 @@ project(":arrow-continuations").projectDir = file("../core/arrow-continuations")
 project(":arrow-meta:arrow-meta-test-models").projectDir = file("../core/arrow-meta/arrow-meta-test-models")
 project(":arrow-meta").projectDir = file("../core/arrow-meta")
 project(":arrow-core-retrofit").projectDir = file("../core/arrow-core-retrofit")
+
+include 'jekyll'
+project(":jekyll").projectDir = file("dokka/jekyll")

@@ -56,5 +56,8 @@ include 'arrow-ank-gradle'
 project(":arrow-ank").projectDir = file("ank/arrow-ank")
 project(":arrow-ank-gradle").projectDir = file("ank/arrow-ank-gradle")
 
+include 'jekyll'
+project(":jekyll").projectDir = file("dokka/jekyll")
+
 // Examples
 include 'examples'

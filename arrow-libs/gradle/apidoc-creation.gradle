@@ -16,7 +16,7 @@
 
 apply plugin: "org.jetbrains.dokka"
 
-dokkaJekyll {
+dokkaGfm {
     enabled = file("README.md").exists()
     outputDirectory = file("${rootDir}/../arrow-site/docs/apidocs")
     dokkaSourceSets {
@@ -38,4 +38,8 @@ dokkaJekyll {
             }
         }
     }
+}
+
+dependencies {
+    dokkaGfmPlugin(project(":jekyll"))
 }
