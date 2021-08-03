@@ -14,7 +14,7 @@ Lenses can be seen as a pair of functions, a getter, and a setter. A `Lens<S, A>
 
 Given a simple structure `Player`, we can create a `Lens<Player, Int>` to get, set, or modify its value.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.optics.*
 
 data class Player(val health: Int)
@@ -26,19 +26,19 @@ val playerLens: Lens<Player, Int> = Lens(
 
 val player = Player(70)
 ```
-```kotlin:ank
+###kotlin:ank
 playerLens.get(player)
 ```
-```kotlin:ank
+###kotlin:ank
 playerLens.set(player, 100)
 ```
-```kotlin:ank
+###kotlin:ank
 playerLens.modify(player) { it - 20 }
 ```
 
 We can also `lift` above function `(Int) -> Int` to `(Player) -> Player`.
 
-```kotlin:ank
+###kotlin:ank
 val lift: (Player) -> Player = playerLens.lift { it + 10 }
 lift(player)
 ```
@@ -51,20 +51,20 @@ At first sight, a `Lens` does not seem very useful, as it is just a getter/sette
 
 Let's examine the following example. We have an `Employee`, and he works for a certain `Company` located at a certain `Address` on a `Street`. And, as a business requirement, we have to capitalize `Street::name` in order to print nicer business cards.
 
-```kotlin
+###kotlin
 data class Street(val number: Int, val name: String)
 data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 ```
-```kotlin:ank
+###kotlin:ank
 val employee = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 employee
 ```
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
 
-```kotlin:ank
+###kotlin:ank
 employee.copy(
         company = employee.company.copy(
                 address = employee.company.address.copy(
@@ -80,7 +80,7 @@ As we can immediately see, this is hard to read, does not scale very well, and i
 
 What we actually wanted to do here is the following: focus into employee's company, `and then` focus into the company's address, `and then` focus into the street address, and finally, modify the street name by capitalizing it.
 
-```kotlin
+###kotlin
 val employeeCompany: Lens<Employee, Company> = Lens(
         get = { it.company },
         set = { employee, company -> employee.copy(company = company) }
@@ -119,7 +119,7 @@ Don't worry about the boilerplate of the lenses written above because it can be 
 Lenses can be generated for a `data class` by the `@optics` annotation. For every constructor parameter of the `data class`, a `Lens` will be generated.
 The lenses will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
-```kotlin
+###kotlin
 @optics data class Account(val balance: Int, val available: Int) {
   companion object
 }
@@ -127,14 +127,14 @@ The lenses will be generated as extension properties on the companion object `va
 
 For `Account`, two lenses will be generated: `val Account.Companion.balance: Lens<Account, Int>` and `val Account.Companion.available: Lens<Account, Int>`.
 
-```kotlin:ank:silent
+###kotlin:ank:silent
 val balanceLens: Lens<Account, Int> = Account.balance
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
 When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `PLens.pPairFirst<A, B, R>()` in the `arrow.optics` package.
 
-```kotlin:ank
+###kotlin:ank
 fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
         { it.first },
         { ab, r -> r to ab.second }

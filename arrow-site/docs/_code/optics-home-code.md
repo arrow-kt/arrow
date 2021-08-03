@@ -2,7 +2,7 @@
 library: optics
 ---
 {: data-executable="true"}
-```kotlin:ank
+###kotlin:ank
 package example
 import arrow.core.*
 import arrow.optics.*

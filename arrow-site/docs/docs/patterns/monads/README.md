@@ -54,7 +54,7 @@ The base element of each functional program is Function. In typed languages, eac
 
 Kotlin is a hybrid functional / object-oriented language, so we use top level functions or methods to declare functions. There are two ways to define a method comparable to function `func` above. I can use a top level "static" function:
 
-```kotlin:ank
+###kotlin:ank
 class ClassA
 class ClassB
 fun func(a: ClassA): ClassB = TODO()
@@ -62,7 +62,7 @@ fun func(a: ClassA): ClassB = TODO()
 
 ... or an instance method:
 
-```kotlin:ank
+###kotlin:ank
 class ClassA {
     // Instance method
     fun func(): ClassB = TODO()
@@ -75,7 +75,7 @@ How do we compose more complex workflows, programs, and applications out of such
 
 My sample code is going to be about conferences and speakers. The method implementations aren't really important. Just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
 
-```kotlin:ank
+###kotlin:ank
 class Speaker {
     fun nextTalk(): Talk = TODO()
 }
@@ -93,7 +93,7 @@ class City
 
 These methods are currently very easy to compose into a workflow:
 
-```kotlin:ank
+###kotlin:ank
 fun nextTalkCity(speaker: Speaker): City {
     val talk = speaker.nextTalk()
     val conf = talk.getConference()
@@ -104,7 +104,7 @@ fun nextTalkCity(speaker: Speaker): City {
 
 Because the return type of the previous step always matches the input type of the next step, we can write it even shorter:
 
-```kotlin:ank
+###kotlin:ank
 fun nextTalkCity(speaker: Speaker): City =
   speaker
     .nextTalk()
@@ -124,7 +124,7 @@ In the example above, I might get runtime errors if one of the methods ever retu
 
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
-```kotlin:ank
+###kotlin:ank
 class Speaker {
     fun nextTalk(): Talk? = null
 }
@@ -140,7 +140,7 @@ class Conference {
 
 Now, when composing our workflow, we need to take care of null results:
 
-```kotlin:ank
+###kotlin:ank
 fun nextTalkCity(speaker: Speaker?): City? {
     if (speaker == null) return null
 
@@ -159,7 +159,7 @@ It's still the same method, but it has more noise now. Even though I used short-
 
 To fight that problem, smart language designers came up with the [Safe Call Operator](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls):
 
-```kotlin:ank
+###kotlin:ank
 fun nextTalkCity(speaker: Speaker?): City? =
   speaker
     ?.nextTalk()
@@ -177,7 +177,7 @@ Quite often, a function returns a `success` or an `error`, not just a `null` val
 
 Our sample API could look like this:
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.Either
 import arrow.core.Either.Left
 
@@ -201,7 +201,7 @@ class Conference {
 
 How would we combine the methods into one workflow? The traditional version would look like this:
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.flatMap
 
 fun cityToVisit(speaker: Speaker): Either<NotFound, City> =
@@ -215,7 +215,7 @@ It still reads ok-ish. But the combination of flatMaps can get unreadable pretty
 
 Let me do one additional trick and format the same code in an unusual way:
 
-```kotlin:ank
+###kotlin:ank
 fun cityToVisit(speaker: Speaker): Either<NotFound, City> =
   speaker
    .getTalk()           .flatMap { x -> x
@@ -234,7 +234,7 @@ and we can imagine a library providing a `Task<T>`, `IO<A>`, `Mono<A>` type for 
 Luckily in Kotlin we have `suspend` functions which fix the problem of nesting and callbacks all around.
 Kotlin suspension is an ideal place to use monads because it allows imperative and direct syntax over monadic data types without the burden of flatMap chains.
 
-```kotlin:ank
+###kotlin:ank
 class Speaker {
     suspend fun nextTalk(): Talk = TODO()
 }
@@ -250,7 +250,7 @@ class Conference {
 
 This change fixes our nice workflow composition again.
 
-```kotlin:ank
+###kotlin:ank
 suspend fun nextTalkCity(speaker: Speaker): City {
   val talk = speaker.nextTalk()
   val conf = talk.getConference()
@@ -261,7 +261,7 @@ suspend fun nextTalkCity(speaker: Speaker): City {
 
 or simply
 
-```kotlin:ank
+###kotlin:ank
 suspend fun nextTalkCity(speaker: Speaker): City =
   speaker.nextTalk().getConference().getCity()
 ```
@@ -274,7 +274,7 @@ Can you see a pattern yet?
 
 I'll repeat the `T?`, `Either<NotFound, T>`, `suspend () -> T`-based workflows again:
 
-```kotlin
+###kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
     return
         speaker               ?
@@ -308,7 +308,7 @@ Using `suspend` callback and completion features Arrow is able to bring direct s
 Let's try to generalize this approach from the very beginning. 
 Given some generic container type `WorkflowThatReturns<T>`, we have a method to combine an instance of such a workflow with a function that accepts the result of that workflow and returns another workflow back:
 
-```kotlin
+###kotlin
 class WorkflowThatReturns<T> {
     fun addStep(step: (T) -> WorkflowThatReturns<U>): WorkflowThatReturns<U>
 }
@@ -330,7 +330,7 @@ Now we are ready to add another step!
 
 In the following code, `nextTalk` returns the first instance inside the container:
 
-```kotlin
+###kotlin
 fun workflow(speaker: Speaker): WorkflowThatReturns<City> {
     return
         speaker
@@ -352,7 +352,7 @@ In Arrow terms, a Monad can be implemented by means of the Effect interface.
 
 The `Effect` interface defines the ability to have a scope in which a coroutine can be used to complete the context or yield a value.
 
-```kotlin
+###kotlin
 fun interface Effect<F> {
   fun control(): DelimitedScope<F>
 }
@@ -360,7 +360,7 @@ fun interface Effect<F> {
 
 We can then define specific effects for our data types that implement Monad bind.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.continuations.Effect
 
 fun interface NullableEffect<A> : Effect<A?> {
@@ -375,7 +375,7 @@ Monad `bind` is then implemented by shifting out of the context with `null` if t
 
 With `control().shift` based on the `Effect` interface we can implement monad bind short-circuiting and other patterns supported by the Continuation monad for arbitrary data types.
 
-```kotlin:ank
+###kotlin:ank
 object nullable {
   operator fun <A> invoke(func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.restricted(eff = { NullableEffect { it } }, f = func, just = { it })
@@ -390,7 +390,7 @@ The Effect interface provides a `restricted` scope for pure computations that do
 
 Finally we can use our new `nullable` effect block, and its `bind` function to compute over the happy path of nullable typed values.
 
-```kotlin:ank
+###kotlin:ank
 suspend fun nextTalkCity(maybeSpeaker: Speaker?): City? =
   nullable {
     val speaker = maybeSpeaker.bind()
@@ -418,7 +418,7 @@ The client will see that Option type is used, so it will be forced to handle the
 
 Given an imaginary repository contract (which does something with customers and orders):
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.Option
 import arrow.core.None
 
@@ -436,7 +436,7 @@ interface OptionRepository {
 
 The monad `bind` behavior can be written without `flatMap` in a direct style:
 
-```kotlin:ank
+###kotlin:ank
 fun interface OptionEffect<A> : Effect<Option<A>> {
   suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, { it })
@@ -487,7 +487,7 @@ Let us re-write the laws in effect-notation. `effect` here represents `either`, 
 To demonstrate the laws we will use this version of the Identity monad and we will name it `Just`.
 Unlike `Option`, `Either` and other types here `Just` has no effect and simply models access to the identity of a value of type `A`
 
-```kotlin:ank
+###kotlin:ank
 data class Just<out A>(val value: A)
 
 fun interface JustEffect<A> : Effect<Just<A>> {
@@ -504,14 +504,14 @@ Left identity:
 
 Let's define `x` && `f` as
 
-```kotlin:ank
+###kotlin:ank
 fun f(x: Int): Just<Int> = Just(x)
 val x = 1
 ```
 
 then
 
-```kotlin:ank
+###kotlin:ank
 effect { 
   val x2 = Just(x).bind()
   f(x2).bind()
@@ -520,7 +520,7 @@ effect {
 
 is the same as 
 
-```kotlin:ank
+###kotlin:ank
 effect { 
  f(x).bind() 
 }
@@ -532,13 +532,13 @@ Right identity:
 
 Given `m` defined as
 
-```kotlin:ank
+###kotlin:ank
 val m = Just(0)
 ```
 
 then
 
-```kotlin:ank
+###kotlin:ank
 effect { 
   val x = m.bind()
   Just(x).bind()
@@ -547,7 +547,7 @@ effect {
 
 is the same as
 
-```kotlin:ank
+###kotlin:ank
 effect { m.bind() }
 ```
 
@@ -557,7 +557,7 @@ Associativity:
 
 Given `m`, `f` and `g` are defined as
 
-```kotlin:ank
+###kotlin:ank
 val m = Just(0)
 fun f(x: Int): Just<Int> = Just(x)
 fun g(x: Int): Just<Int> = Just(x + 1)
@@ -565,7 +565,7 @@ fun g(x: Int): Just<Int> = Just(x + 1)
 
 All the 3 example below are the same
 
-```kotlin:ank
+###kotlin:ank
 effect { 
   val y = effect { 
     val x = m.bind()
@@ -575,7 +575,7 @@ effect {
 }
 ```
 
-```kotlin:ank
+###kotlin:ank
 effect { 
   val x = m.bind()
   effect { 
@@ -585,7 +585,7 @@ effect {
 }
 ```
 
-```kotlin:ank
+###kotlin:ank
 effect { 
   val x = m.bind()
   val y = f(x).bind()

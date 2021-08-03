@@ -15,7 +15,7 @@ We can use that `Lens` to operate on that focus `S` to get, set, and modify the 
 
 A `MapK<Int, String>` can be indexed by its keys `Int`, but not for every index where an entry can be found.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.*
 import arrow.optics.typeclasses.At
 
@@ -32,7 +32,7 @@ mapAt.set(map, "new value".some())
 
 By setting an empty value for a key, we delete that entry by removing the value.
 
-```kotlin:ank
+###kotlin:ank
 mapAt.set(map, none())
 ```
 

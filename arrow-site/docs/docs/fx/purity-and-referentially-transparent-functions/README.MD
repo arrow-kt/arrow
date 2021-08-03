@@ -13,7 +13,7 @@ Referential transparency allows us to reason about the different pieces of our p
 
 To create a pure function in Kotlin, let's use the keyword `fun`:
 
-```kotlin:ank:playground
+###kotlin:ank:playground
 //sampleStart
 fun helloWorld(): String =
   "Hello World"
@@ -38,7 +38,7 @@ In the example below, `println(a : Any): Unit` is a side effect because, every t
 
 When we denote side effects as `suspend`, the Kotlin compiler will ensure that we're not applying uncontrolled side effects in the pure environment.
 
-```kotlin
+###kotlin
 //sampleStart
 fun helloWorld(): String =
   "Hello World"
@@ -68,7 +68,7 @@ Applying and composing suspended side effects is allowed in the presence of othe
 
 In the example below, `sayHello` and `sayGoodBye` are valid inside `greet` because they are all suspended functions.
 
-```kotlin
+###kotlin
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
@@ -91,7 +91,7 @@ KotlinX Coroutines offers `runBlocking`, `launch` and `async` to run a suspended
 Usage of unsafe runner functions (like `runBlocking` in this case) is reserved for the end of the world and may be the only impure execution of a well-typed functional program.
 `launch` and `async` can however also be used in pure/safe ways if they're used within another `suspend fun`.
 
-```kotlin:ank:playground
+###kotlin:ank:playground
 import kotlinx.coroutines.*
 import arrow.fx.coroutines.*
 

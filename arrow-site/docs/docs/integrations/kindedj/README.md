@@ -37,7 +37,7 @@ class IdJ<A> implements io.kindedj.Hk<ForIdJ, A> {
 
 You can convert it to Arrow using the extension function `fromKindedJ()`:
 
-```kotlin
+###kotlin
 val idj = IdJ(1)
 
 val id: Kind2<ForConvert, ForIdJ, A> = idj.fromKindedJ()
@@ -45,7 +45,7 @@ val id: Kind2<ForConvert, ForIdJ, A> = idj.fromKindedJ()
 
 and convert it back using `fromArrow()`:
 
-```kotlin
+###kotlin
 val idj2: io.kindedj.Hk<ForIdJ, A> = id.fromArrow()
 ```
 

@@ -26,7 +26,7 @@ Below we discuss a couple topics why we favor `suspend` over `IO`.
 `IO` requires a wrapper in the return type: `fun number(): IO<Int>`, and thus we always have to work with the `IO` type to access the value we care about within.
 A typical pattern for this using `flatMap`, so let's say we want to calculate 3 numbers and return them as a `Triple`.
 
-```kotlin
+###kotlin
 fun number(): IO<Int> = IO.just(1)
 
 fun triple(): IO<Triple<Int, Int, Int>> =
@@ -43,7 +43,7 @@ So simply to call a function 3 times, and combine the result into a `Triple` we 
 What that means under the hood we'll discuss in the performance section but in terms of ergonomics this is not ideal.
 Especially not if we can compare it to the following `suspend` code:
 
-```kotlin
+###kotlin
 suspend fun number(): Int = 1
 
 suspend fun triple(): Triple<Int, Int, Int> = 
@@ -78,7 +78,7 @@ Both also forces us to go through certain set of methods to execute/run the effe
 When writing functional code style we often want to express our domain errors as clearly as possible, a popular pattern is to return `Either<DomainError, SuccessValue>`.
 Let's assume following domain, and compare two snippets one using `IO<Either<E, A>>` and another `suspend () -> Either<E, A>`.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -99,7 +99,7 @@ suspend fun User.process(): Either<PersistenceError, ProcessedUser> =
 
 ###### IO<Either<E, A>>
 
- ```kotlin
+ ###kotlin
 import arrow.fx.*
 
 fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
@@ -120,7 +120,7 @@ suspend suspendedIOProgram(): Either<PersistenceError, ProcessedUser> =
 
 ##### suspend () -> Either<E, A>
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.computations.either
 
 suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
@@ -140,7 +140,7 @@ They allow us to elegantly define `syntax` for a certain type. Let's see a simpl
 
 Let's reuse our previous domain of`User`, `ProcessedUser`, but let's introduce `Repo` and `Persistence` layers to mimick what could be a small app with a couple layers.
 
-```kotlin:ank
+###kotlin:ank
 interface Repo {
     suspend fun fetchUsers(): List<User>
 }
@@ -155,7 +155,7 @@ interface Persistence {
 
 Given the above defined layers we can easily compose them by creating a product which implements the dependencies by delegation.
 
-```kotlin:ank
+###kotlin:ank
 class DataModule(
     persistence: Persistence,
     repo: Repo
@@ -165,7 +165,7 @@ class DataModule(
 We can also define top-level functions based on constraints on the receiver.
 Here we define `getProcessedUsers` which can only be called where `R` is both `Repo` and `Persistence`.
 
-```kotlin:ank
+###kotlin:ank
 /**
  * Generic top-level function based on syntax enabled by [Persistence] & [Repo] constraint
  */
@@ -185,7 +185,7 @@ In contrast, when using `suspend`, the Kotlin compiler is aware of function comp
 
 Let's take our previous example from ergonomics:
  
-```kotlin
+###kotlin
 import arrow.fx.IO
 
 fun number(): IO<Int> = IO.just(1)
@@ -202,7 +202,7 @@ fun triple(): IO<Triple<Int, Int, Int>> =
 
 If we translate this piece of code to the `data class` it uses it results in the following:
 
-```kotlin
+###kotlin
 fun number(): IO<Int> = IO.Just(1)
 
 fun triple(): IO<Triple<Int, Int, Int>> =

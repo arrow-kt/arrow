@@ -111,7 +111,7 @@ All operators found in Arrow Fx check for cancellation, and make you `suspend` c
 
 A small example of an infinite loop below, where `parZip` checks for cancellation and this the `sleeper` function is cancellable even though it runs in an infinite recursion loop.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.*
 
@@ -145,7 +145,7 @@ Racing parallel task has an additional propety to the ones described above.
 When racing multiple parallel tasks against each-other, the winning task cancels the others. When the winner of a race is known, we can cancel all other tasks because their results will get discarded anyway.
 This allows the other paralell running tasks to gracefully exit and close their resources as soon as possible.
 
-```kotlin
+###kotlin
 import arrow.fx.coroutines.*
 
 //sampleStart

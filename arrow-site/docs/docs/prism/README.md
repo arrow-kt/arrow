@@ -18,7 +18,7 @@ Given a `Prism<S, A>`, we can write functions that work on the focus `A` without
 
 For a sum type `NetworkResult`, we can create a `Prism` that has a focus into `Success`.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.*
 import arrow.optics.*
 
@@ -42,7 +42,7 @@ As is clear from above `Prism` definition, it gathers two concepts: pattern matc
 
 As mentioned, we can now operate on `NetworkResult` as if it were `Success`.
 
-```kotlin:ank
+###kotlin:ank
 val networkResult = NetworkResult.Success("content")
 
 networkSuccessPrism.modify(networkResult) { success ->
@@ -52,7 +52,7 @@ networkSuccessPrism.modify(networkResult) { success ->
 
 We can also lift such functions.
 
-```kotlin:ank
+###kotlin:ank
 val lifted: (NetworkResult) -> NetworkResult = networkSuccessPrism.lift { success ->
         success.copy(content = "different content")
 }
@@ -61,7 +61,7 @@ lifted(NetworkResult.Failure)
 
 `Prisms` can easily be created by using any of the already mentioned constructors, although, for a `sealed class`, a `Prism` could easily be [generated](#generated-prisms). But we can also use a `PartialFunction` to create a `Prism`.
 
-```kotlin:ank
+###kotlin:ank
 val doubleToInt: Prism<Double, Int> = Prism(
   getOption = { double: Double ->
     val i = double.toInt()
@@ -77,7 +77,7 @@ Nesting pattern matching blocks are tedious. We would prefer to define them sepa
 
 Let's imagine from our previous example that we want to retrieve an `Int` from the network. We get a `Success` OR a `Failure` from the network. In case of a `Success`, we want to safely cast the `String` to an `Int`.
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
@@ -87,13 +87,13 @@ val successToInt: Prism<NetworkResult.Success, Int> = Prism(
 
 val networkInt: Prism<NetworkResult, Int> = networkSuccessPrism compose successToInt
 ```
-```kotlin:ank
+###kotlin:ank
 networkInt.getOrNull(NetworkResult.Success("invalid int"))
 ```
-```kotlin:ank
+###kotlin:ank
 networkInt.getOrNull(NetworkResult.Failure)
 ```
-```kotlin:ank
+###kotlin:ank
 networkInt.getOrNull(NetworkResult.Success("5"))
 ```
 `Prism` can be composed with all optics but `Getter`, and result in the following optics:
@@ -107,14 +107,14 @@ networkInt.getOrNull(NetworkResult.Success("5"))
 Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype, a `Prism` will be generated.
 The prisms will be generated as extension properties on the companion object `val T.Companion.subTypeName`.
 
-```kotlin
+###kotlin
 @optics sealed class Shape {
   companion object { }
   data class Circle(val radius: Double) : Shape()
   data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
-```kotlin:ank:silent
+###kotlin:ank:silent
 val circleShape: Prism<Shape, Shape.Circle> = Shape.circle
 val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```
@@ -122,7 +122,7 @@ val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ### Polymorphic prisms <a id="PPrism"></a>
 When dealing with polymorphic sum types like `Option<A>`, we can also have polymorphic prisms that allow us to polymorphically change the type of the focus of our `PPrism`. The following method is also available as `PSome<A, B>()` in the `arrow.optics` package:
 
-```kotlin
+###kotlin
 fun <A, B> optionSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
     getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
     reverseGet = { b -> Some(b) }
@@ -131,7 +131,7 @@ fun <A, B> optionSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
 val liftSome: (Option<Int>) -> Option<String> = PSome<Int, String>().lift(Int::toString)
 liftSome(Some(5))
 ```
-```kotlin
+###kotlin
 liftSuccess(None)
 ```
 

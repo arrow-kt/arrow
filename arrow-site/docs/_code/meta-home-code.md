@@ -1,7 +1,7 @@
 ---
 library: meta
 ---
-```kotlin
+###kotlin
 import arrow.meta.CliPlugin
 import arrow.meta.Meta
 import arrow.meta.invoke

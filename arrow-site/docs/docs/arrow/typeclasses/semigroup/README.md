@@ -11,13 +11,13 @@ permalink: /arrow/typeclasses/semigroup/
 
 A semigroup for some given type `A` has a single operation (which we will call `combine`), which takes two values of type `A`, and returns a value of type `A`. This operation must be guaranteed to be associative. That is to say that,
 
-```kotlin
+###kotlin
 (a.combine(b)).combine(c)
 ```
 
 must be the same as
 
-```kotlin
+###kotlin
 a.combine(b.combine(c))
 ```
 
@@ -30,13 +30,13 @@ For example, `Int` values are combined using addition by default, but multiplica
 
 Now that you've learned about the Semigroup instance for Int, try to guess how it works in the following examples:
 
-```kotlin:ank
+###kotlin:ank
 import arrow.typeclasses.Semigroup
 
 Semigroup.int().run { 1.combine(2) }
 ```
 
-```kotlin:ank
+###kotlin:ank
 import arrow.typeclasses.Semigroup
 
 Semigroup.list<Int>().run {
@@ -44,7 +44,7 @@ Semigroup.list<Int>().run {
 }
 ```
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.Option
 import arrow.typeclasses.Semigroup
 
@@ -53,7 +53,7 @@ Semigroup.option(Semigroup.int()).run {
 }
 ```
 
-```kotlin:ank
+###kotlin:ank
 import arrow.core.Option
 import arrow.core.None
 import arrow.typeclasses.Semigroup
@@ -67,7 +67,7 @@ Many of these types have methods defined directly on them, which allow for this 
 
 Additionally, `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
 
-```kotlin:ank
+###kotlin:ank
 Semigroup.option(Semigroup.int()).run {
     Option(1) + Option(2)
 }

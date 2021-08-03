@@ -17,7 +17,7 @@ A structure `S` that has a focus `A`:
 
 An `Every` can simply be created by providing the `map` & `foldMap` function.
 
-```kotlin:ank:playground
+###kotlin:ank:playground
 import arrow.optics.*
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
@@ -42,7 +42,7 @@ fun main(): Unit {
 
 Or by using any of the pre-defined of `Every` on its `Companion` object.
 
-```kotlin:ank:playground
+###kotlin:ank:playground
 Every.list<Int>().modify(listOf(1, 2, 3, 4), Int::inc)
 ```
 
@@ -50,14 +50,14 @@ Arrow optics also provides a number of predefined `Traversal` optics.
 
 ## Usage
 
-```kotlin
+###kotlin
 data class Street(val number: Int, val name: String)
 data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 data class Employees(val employees: List<Employee>)
 ```
-```kotlin:ank
+###kotlin:ank
 val john = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val jane = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val employees = Employees(listOf(john, jane))
@@ -65,7 +65,7 @@ val employees = Employees(listOf(john, jane))
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
 
-```kotlin:ank
+###kotlin:ank
 employees.employees.map { employee ->
   employee.copy(
           company = employee.company.copy(
@@ -84,7 +84,7 @@ This is hard to read, does not scale very well, and it draws attention away from
 
 What we actually wanted to do here is the following: focus into _every_ employee, `and then` focus into the employee's company, `and then` focus into the company's address, `and then` focus into the street address, and finally, modify the street name by capitalizing it.
 
-```kotlin
+###kotlin
 val employees: Lens<Employees, List<Employee>> = Lens(
   get = { it.company },
   set = { employee, company -> employee.copy(company = company) }
