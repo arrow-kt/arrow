@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2020 The Arrow Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: "org.jetbrains.dokka"
+
+// configuration in afterEvaluate, because we want to manually extract the classpath
+// from the kotlin-multiplatform plugin after its configuration (in `customName` closure)
+afterEvaluate {
+
+    //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
+    dokka {
+        outputFormat = 'jekyll'
+        outputDirectory = "${rootDir}/../arrow-site/docs/apidocs"
+        impliedPlatforms = ["Common"]
+
+        multiplatform {
+            js {} // this platform uses autoconfiguration. Sources are fetched from kotlin-multiplatform plugin
+            common {} // this platform uses autoconfiguration
+
+            customName { // the name is different than `jvm` in Kotlin plugin, so
+                // sourceRoots, classpath, platform and targets must be passed explicitly
+                targets = ["JVM"]
+                platform = "jvm"
+                sourceRoot {
+                    path = kotlin.sourceSets.getByName("jvmMain").kotlin.srcDirs.first().toString()
+                }
+                sourceRoot {
+                    path = kotlin.sourceSets.getByName("commonMain").kotlin.srcDirs.first().toString()
+                }
+
+                // we don't use autoconfiguration for this platform so we need to pass the classpath manually
+                // otherwise we'll end up with <ERROR CLASS> markers
+                classpath = kotlin.targets
+                        .findAll { it.name.contains("metadata") || it.name.contains("jvm") }
+                        .collect { target ->
+                            target.compilations.getByName("main").compileDependencyFiles.files.collect { it.path }
+                        }.flatten()
+            }
+        }
+    }
+}

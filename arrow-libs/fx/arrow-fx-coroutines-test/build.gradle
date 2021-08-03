@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'kotlinx-atomicfu'
 
 apply from: "$SUB_PROJECT_MPP"
-apply from: "$DOC_CREATION"
+apply from: "$DOC_CREATION_MPP"
 apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
