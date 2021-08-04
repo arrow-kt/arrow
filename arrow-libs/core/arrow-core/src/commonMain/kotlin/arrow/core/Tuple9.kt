@@ -6,7 +6,7 @@ package arrow.core
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(
+public data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(
   val first: A,
   val second: B,
   val third: C,
@@ -21,10 +21,10 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
   override fun toString(): String =
     "($first, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth, $ninth)"
 
-  companion object
+  public companion object
 }
 
-operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>>
+public operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>>
 Tuple9<A, B, C, D, E, F, G, H, I>.compareTo(other: Tuple9<A, B, C, D, E, F, G, H, I>): Int {
   val first = first.compareTo(other.first)
   return if (first == 0) {

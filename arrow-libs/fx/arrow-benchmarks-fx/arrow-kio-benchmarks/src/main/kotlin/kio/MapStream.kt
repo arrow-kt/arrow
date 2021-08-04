@@ -21,7 +21,7 @@ object MapStream {
     return unsafeRunSync(sum(0)(stream)).getOrThrow()
   }
 
-  data class Stream(val value: Int, val next: Task<Stream?>)
+  public data class Stream(val value: Int, val next: Task<Stream?>)
 
   val addOne = { x: Int -> x + 1 }
 

@@ -57,3 +57,7 @@ configurations.all {
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
+
+kotlin {
+    explicitApi()
+}

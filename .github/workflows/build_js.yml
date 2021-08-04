@@ -1,0 +1,35 @@
+name: "Run test JS"
+
+on: pull_request
+
+jobs:
+  build:
+
+    env:
+      BASEDIR: ${{github.workspace}}/arrow-libs
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build
+        working-directory: arrow-libs
+        run: ./gradlew jsIrTest jsLegacyTest
+      - name: "Prepare test reports"
+        if: ${{ always() }}
+        run: |
+          mkdir test-reports
+          for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
+            module=$(echo $report | cut -d/ -f3)
+            cp -r $report test-reports/$module
+          done
+      - name: "Make test reports available to download"
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v1
+        with:
+          name: test-reports
+          path: test-reports

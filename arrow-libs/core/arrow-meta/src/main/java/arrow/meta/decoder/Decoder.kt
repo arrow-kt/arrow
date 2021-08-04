@@ -26,19 +26,19 @@ import com.squareup.kotlinpoet.TypeVariableName
 /**
  * Provides ways to go from a [Tree] to [Code] for the purposes of code gen and reporting
  */
-interface MetaDecoder<in A : Tree> {
-  fun decode(tree: A): Code
+public interface MetaDecoder<in A : Tree> {
+  public fun decode(tree: A): Code
 }
 
 /**
  * Type decoder that leverages Kotlin Poet to organize imports and output formatted code
  */
-interface TypeDecoder : MetaDecoder<Type> {
+public interface TypeDecoder : MetaDecoder<Type> {
 
   override fun decode(tree: Type): Code =
     Code(tree.lyrics().toString())
 
-  fun Type.lyrics(): TypeSpec {
+  public fun Type.lyrics(): TypeSpec {
     val className = (name as TypeName.Classy).lyrics()
     val builder = when (kind) {
       Type.Shape.Class -> TypeSpec.classBuilder(className)
@@ -69,13 +69,13 @@ interface TypeDecoder : MetaDecoder<Type> {
       .build()
   }
 
-  fun CodeBlock.Companion.empty(): CodeBlock =
+  public fun CodeBlock.Companion.empty(): CodeBlock =
     CodeBlock.builder().build()
 
-  fun Code.lyrics(): CodeBlock =
+  public fun Code.lyrics(): CodeBlock =
     CodeBlock.of(value)
 
-  fun Parameter.lyrics(): ParameterSpec {
+  public fun Parameter.lyrics(): ParameterSpec {
     val builder = ParameterSpec.builder(
       name = name,
       type = type.lyrics(),
@@ -85,7 +85,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     return builderDefaultValue.build()
   }
 
-  fun UseSiteTarget.lyrics(): AnnotationSpec.UseSiteTarget =
+  public fun UseSiteTarget.lyrics(): AnnotationSpec.UseSiteTarget =
     when (this) {
       UseSiteTarget.File -> AnnotationSpec.UseSiteTarget.FILE
       UseSiteTarget.Property -> AnnotationSpec.UseSiteTarget.PROPERTY
@@ -98,7 +98,7 @@ interface TypeDecoder : MetaDecoder<Type> {
       UseSiteTarget.Delegate -> AnnotationSpec.UseSiteTarget.DELEGATE
     }
 
-  fun Annotation.lyrics(): AnnotationSpec {
+  public fun Annotation.lyrics(): AnnotationSpec {
     val className =
       if (type is TypeName.Classy) ClassName(type.pckg.value, type.simpleName)
       else ClassName.bestGuess(type.toString())
@@ -108,7 +108,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     }.build()
   }
 
-  fun Property.lyrics(): PropertySpec {
+  public fun Property.lyrics(): PropertySpec {
     val builder = PropertySpec.builder(name, type.lyrics())
       .addAnnotations(annotations.map { it.lyrics() })
       .addKdoc(kdoc?.lyrics() ?: CodeBlock.empty())
@@ -123,7 +123,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     return builderwithInitializer.build()
   }
 
-  fun Func.lyrics(): FunSpec {
+  public fun Func.lyrics(): FunSpec {
     val builder = FunSpec.builder(name)
       .addAnnotations(annotations.map { it.lyrics() })
       .addCode(body?.lyrics() ?: CodeBlock.empty())
@@ -141,7 +141,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   }
 
   @Suppress("ComplexMethod")
-  fun Modifier.lyrics(): KModifier =
+  public fun Modifier.lyrics(): KModifier =
     when (this) {
       Modifier.Public -> KModifier.PUBLIC
       Modifier.Protected -> KModifier.PROTECTED
@@ -175,7 +175,7 @@ interface TypeDecoder : MetaDecoder<Type> {
       Modifier.VarArg -> KModifier.VARARG
     }
 
-  fun TypeName.TypeVariable.lyrics(): TypeVariableName {
+  public fun TypeName.TypeVariable.lyrics(): TypeVariableName {
     val bounds = bounds.map { it.lyrics() }
 
     return (
@@ -185,7 +185,7 @@ interface TypeDecoder : MetaDecoder<Type> {
       )
   }
 
-  fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
+  public fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
     when {
       name == "*" -> STAR
       lowerBounds.isNotEmpty() -> lowerBounds[0].lyrics()
@@ -196,24 +196,24 @@ interface TypeDecoder : MetaDecoder<Type> {
   private fun String.removeVariance(): String =
     replace("out ", "").replace("in ", "")
 
-  fun TypeName.ParameterizedType.lyrics(): com.squareup.kotlinpoet.TypeName =
+  public fun TypeName.ParameterizedType.lyrics(): com.squareup.kotlinpoet.TypeName =
     ParameterizedTypeName.run {
       val className = rawType.lyrics()
       className.parameterizedBy(*typeArguments.map { it.lyrics() }.toTypedArray())
     }
 
-  fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName =
+  public fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName =
     LambdaTypeName.get(
       receiver = receiverType?.lyrics(),
       parameters = parameters.map { it.lyrics() }.toTypedArray(),
       returnType = returnType.lyrics()
     ).copy(suspending = modifiers.contains(Modifier.Suspend))
 
-  fun TypeName.Classy.lyrics(): ClassName =
+  public fun TypeName.Classy.lyrics(): ClassName =
     ClassName(packageName = pckg.value, simpleNames = listOf(simpleName))
       .copy(nullable = nullable, annotations = annotations.map { it.lyrics() }, tags = emptyMap())
 
-  fun TypeName.lyrics(): com.squareup.kotlinpoet.TypeName =
+  public fun TypeName.lyrics(): com.squareup.kotlinpoet.TypeName =
     when (this) {
       is TypeName.TypeVariable -> lyrics()
       is TypeName.WildcardType -> lyrics()
@@ -222,26 +222,26 @@ interface TypeDecoder : MetaDecoder<Type> {
       is TypeName.FunctionLiteral -> lyrics()
     }
 
-  operator fun Code.Companion.invoke(f: () -> String): Code =
+  public operator fun Code.Companion.invoke(f: () -> String): Code =
     Code(f().trimMargin())
 
-  operator fun TypeName?.unaryPlus(): Code =
+  public operator fun TypeName?.unaryPlus(): Code =
     if (this != null) Code(CodeBlock.of("%T", lyrics()).toString())
     else Code("")
 
-  operator fun String.unaryPlus(): Code =
+  public operator fun String.unaryPlus(): Code =
     Code(CodeBlock.of("%N", this).toString())
 
-  operator fun List<String>.unaryPlus(): Code =
+  public operator fun List<String>.unaryPlus(): Code =
     Code(joinToCode("%N").toString())
 
-  fun Iterable<Parameter>.codeNames(): Code =
+  public fun Iterable<Parameter>.codeNames(): Code =
     code {
       if (it.modifiers.contains(Modifier.VarArg)) Code("*${it.name}")
       else Code(it.name)
     }
 
-  fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
+  public fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
     else Code(
@@ -251,7 +251,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     )
   }
 
-  fun Iterable<Func>.code(dummy: Unit = Unit): Code {
+  public fun Iterable<Func>.code(dummy: Unit = Unit): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
     else Code(
@@ -261,13 +261,13 @@ interface TypeDecoder : MetaDecoder<Type> {
     )
   }
 
-  operator fun Iterable<TypeName.TypeVariable>.unaryPlus(): Code {
+  public operator fun Iterable<TypeName.TypeVariable>.unaryPlus(): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
     else Code("<${list.joinToCode("%T")}>")
   }
 
-  fun <A : Any> List<A>.joinToCode(separator: String): Code =
+  public fun <A : Any> List<A>.joinToCode(separator: String): Code =
     if (isEmpty()) Code("")
     else {
       val code = joinToString(",·") { separator }

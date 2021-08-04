@@ -8,7 +8,7 @@ import arrow.meta.encoder.KotlinReservedKeywords
 internal fun String.removeVariance(): String =
   replace("out ", "").replace("in ", "")
 
-fun String.asPlatform(): String =
+public fun String.asPlatform(): String =
   removeBackticks()
     .replaceFirst("kotlin.collections.", "java.util.")
     .replaceFirst("kotlin.", "java.lang.")
@@ -16,7 +16,7 @@ fun String.asPlatform(): String =
 /**
  * TODO this is horrible is there a canonical way to obtain a kotlin type given a fqn java type name?
  */
-fun String.asKotlin(): String =
+public fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
     .replace("java.lang.Iterable", "kotlin.collections.Iterable")
@@ -47,7 +47,7 @@ internal fun String.asClassy(): TypeName.Classy {
 private val kindRegex: Regex =
   "(arrow\\.Kind|arrow\\.typeclasses\\.Conested)<(.*), (.*)>".toRegex()
 
-fun String.downKParts(): List<String> =
+public fun String.downKParts(): List<String> =
   when (val matchResult = kindRegex.find(this)) {
     null -> listOf(this)
     else -> {
@@ -57,7 +57,7 @@ fun String.downKParts(): List<String> =
     }
   }
 
-data class DownKindReduction(
+public data class DownKindReduction(
   val pckg: String,
   val name: String,
   val additionalTypeArgs: List<String> = emptyList()
@@ -91,7 +91,7 @@ internal fun String.downKind(): DownKindReduction {
   }
 }
 
-fun String.quote(): String =
+public fun String.quote(): String =
   split(".").joinToString(".") {
     if (KotlinReservedKeywords.contains(it)) "`$it`"
     else it

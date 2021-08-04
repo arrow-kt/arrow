@@ -1,12 +1,11 @@
 package arrow.core.test.laws
 
 import arrow.continuations.Effect
+import arrow.core.Either
 import arrow.core.test.generators.throwable
 import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bind
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.Continuation
@@ -18,9 +17,9 @@ import kotlin.coroutines.startCoroutine
 private typealias EagerFxBlock<Eff, F, A> = (suspend Eff.() -> A) -> F
 private typealias SuspendFxBlock<Eff, F, A> = suspend (suspend Eff.() -> A) -> F
 
-object FxLaws {
+public object FxLaws {
 
-  fun <Eff : Effect<*>, F, A> suspended(
+  public fun <Eff : Effect<*>, F, A> suspended(
     pureArb: Arb<F>,
     G: Arb<F>,
     eq: (F, F) -> Boolean,
@@ -45,7 +44,7 @@ object FxLaws {
     }
   )
 
-  fun <Eff : Effect<*>, F, A> eager(
+  public fun <Eff : Effect<*>, F, A> eager(
     pureArb: Arb<F>,
     G: Arb<F>,
     eq: (F, F) -> Boolean,
@@ -82,7 +81,7 @@ object FxLaws {
     invoke: suspend Eff.(F) -> A
   ) {
     checkAll(G, Arb.throwable()) { f, exception ->
-      shouldThrow<Throwable> {
+      Either.catch {
         fxBlock {
           val res = invoke(f)
           throw exception
@@ -90,7 +89,7 @@ object FxLaws {
         }
 
         fail("It should never reach here. fx should've thrown $exception")
-      } == exception
+      } shouldBe Either.Left(exception)
     }
   }
 
@@ -100,14 +99,12 @@ object FxLaws {
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    G.samples()
-      .take(1001)
-      .forEach { f ->
-        fxBlock {
-          val res = invoke(f.value)
-          res
-        }.equalUnderTheLaw(f.value, eq)
-      }
+    checkAll(G) { value ->
+      fxBlock {
+        val res = invoke(value)
+        res
+      }.equalUnderTheLaw(value, eq)
+    }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindSuspendedValues(
@@ -116,14 +113,12 @@ object FxLaws {
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    G.samples()
-      .take(10)
-      .forEach { f ->
-        fxBlock {
-          val res = invoke(f.value.suspend())
-          res
-        }.equalUnderTheLaw(f.value, eq)
-      }
+    checkAll(10, G) { value ->
+      fxBlock {
+        val res = invoke(value.suspend())
+        res
+      }.equalUnderTheLaw(value, eq)
+    }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindImmediateExceptions(
@@ -131,19 +126,16 @@ object FxLaws {
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    Arb.bind(G, Arb.throwable(), ::Pair)
-      .samples()
-      .take(1001)
-      .forEach { (f, _) ->
-        shouldThrow<Throwable> {
-          fxBlock {
-            val res = invoke(f.first)
-            throw f.second
-            res
-          }
-          fail("It should never reach here. fx should've thrown ${f.second}")
-        } shouldBe f.second
-      }
+    checkAll(G, Arb.throwable()) { value, e ->
+      Either.catch {
+        fxBlock {
+          val res = invoke(value)
+          throw e
+          res
+        }
+        fail("It should never reach here. fx should've thrown $e but found $e")
+      } shouldBe Either.Left(e)
+    }
   }
 
   private suspend fun <Eff : Effect<*>, F, A> suspendedCanBindSuspendedExceptions(
@@ -151,19 +143,16 @@ object FxLaws {
     fxBlock: SuspendFxBlock<Eff, F, A>,
     invoke: suspend Eff.(F) -> A
   ) {
-    Arb.bind(G, Arb.throwable(), ::Pair)
-      .samples()
-      .take(10)
-      .forEach { (f, _) ->
-        shouldThrow<Throwable> {
-          fxBlock {
-            val res = invoke(f.first)
-            f.second.suspend()
-            res
-          }
-          fail("It should never reach here. fx should've thrown ${f.second}")
-        } shouldBe f.second
-      }
+    checkAll(10, G, Arb.throwable()) { value, e ->
+      Either.catch {
+        val res = fxBlock {
+          val res = invoke(value)
+          e.suspend()
+          res
+        }
+        fail("It should never reach here. fx should've thrown $e but found $res")
+      } shouldBe Either.Left(e)
+    }
   }
 }
 

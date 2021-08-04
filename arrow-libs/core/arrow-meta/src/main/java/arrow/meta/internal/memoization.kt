@@ -2,7 +2,7 @@ package arrow.meta.internal
 
 import java.util.concurrent.ConcurrentHashMap
 
-fun <P1, R> ((P1) -> R).memoize(): (P1) -> R = object : (P1) -> R {
+public fun <P1, R> ((P1) -> R).memoize(): (P1) -> R = object : (P1) -> R {
   private val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
   override fun invoke(p1: P1) = m(MemoizeKey1(p1))
 }
@@ -20,13 +20,13 @@ private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
   operator fun invoke(k: K): R = m[k] ?: run { m.putSafely(k, k(f)) }
 }
 
-object Platform {
+public object Platform {
 
-  interface ConcurrentMap<K, V> : MutableMap<K, V> {
-    fun putSafely(k: K, v: V): V
+  public interface ConcurrentMap<K, V> : MutableMap<K, V> {
+    public fun putSafely(k: K, v: V): V
   }
 
-  fun <K, V> newConcurrentMap(): ConcurrentMap<K, V> {
+  public fun <K, V> newConcurrentMap(): ConcurrentMap<K, V> {
     val map by lazy { ConcurrentHashMap<K, V>() }
     return object : ConcurrentMap<K, V>, MutableMap<K, V> by map {
       override fun putSafely(k: K, v: V): V =

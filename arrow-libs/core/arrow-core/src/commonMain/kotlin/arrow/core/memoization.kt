@@ -1,4 +1,5 @@
 @file:JvmName("Memoization")
+
 package arrow.core
 
 import kotlinx.atomicfu.atomic
@@ -29,49 +30,49 @@ import kotlin.jvm.JvmName
  *
  * Note that calling this function with the same parameters in parallel might cause the function to be executed twice.
  */
-fun <R> (() -> R).memoize(): () -> R = object : () -> R {
-  private val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
-  override fun invoke(): R = m(MemoizeKey0(0))
+public fun <R> (() -> R).memoize(): () -> R {
+  val m = MemoizedHandler<() -> R, MemoizeKey0<R>, R>(this@memoize)
+  return { m(MemoizeKey0(0)) }
 }
 
 /**
  * @see memoize
  */
-fun <P1, R> ((P1) -> R).memoize(): (P1) -> R = object : (P1) -> R {
-  private val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
-  override fun invoke(p1: P1) = m(MemoizeKey1(p1))
+public fun <P1, R> ((P1) -> R).memoize(): (P1) -> R {
+  val m = MemoizedHandler<((P1) -> R), MemoizeKey1<P1, R>, R>(this@memoize)
+  return { p1 -> m(MemoizeKey1(p1)) }
 }
 
 /**
  * @see memoize
  */
-fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R = object : (P1, P2) -> R {
-  private val m = MemoizedHandler<((P1, P2) -> R), MemoizeKey2<P1, P2, R>, R>(this@memoize)
-  override fun invoke(p1: P1, p2: P2) = m(MemoizeKey2(p1, p2))
+public fun <P1, P2, R> ((P1, P2) -> R).memoize(): (P1, P2) -> R {
+  val m = MemoizedHandler<((P1, P2) -> R), MemoizeKey2<P1, P2, R>, R>(this@memoize)
+  return { p1: P1, p2: P2 -> m(MemoizeKey2(p1, p2)) }
 }
 
 /**
  * @see memoize
  */
-fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R = object : (P1, P2, P3) -> R {
-  private val m = MemoizedHandler<((P1, P2, P3) -> R), MemoizeKey3<P1, P2, P3, R>, R>(this@memoize)
-  override fun invoke(p1: P1, p2: P2, p3: P3) = m(MemoizeKey3(p1, p2, p3))
+public fun <P1, P2, P3, R> ((P1, P2, P3) -> R).memoize(): (P1, P2, P3) -> R {
+  val m = MemoizedHandler<((P1, P2, P3) -> R), MemoizeKey3<P1, P2, P3, R>, R>(this@memoize)
+  return { p1: P1, p2: P2, p3: P3 -> m(MemoizeKey3(p1, p2, p3)) }
 }
 
 /**
  * @see memoize
  */
-fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R = object : (P1, P2, P3, P4) -> R {
-  private val m = MemoizedHandler<((P1, P2, P3, P4) -> R), MemoizeKey4<P1, P2, P3, P4, R>, R>(this@memoize)
-  override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4) = m(MemoizeKey4(p1, p2, p3, p4))
+public fun <P1, P2, P3, P4, R> ((P1, P2, P3, P4) -> R).memoize(): (P1, P2, P3, P4) -> R {
+  val m = MemoizedHandler<((P1, P2, P3, P4) -> R), MemoizeKey4<P1, P2, P3, P4, R>, R>(this@memoize)
+  return { p1: P1, p2: P2, p3: P3, p4: P4 -> m(MemoizeKey4(p1, p2, p3, p4)) }
 }
 
 /**
  * @see memoize
  */
-fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P2, P3, P4, P5) -> R = object : (P1, P2, P3, P4, P5) -> R {
-  private val m = MemoizedHandler<((P1, P2, P3, P4, P5) -> R), MemoizeKey5<P1, P2, P3, P4, P5, R>, R>(this@memoize)
-  override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5) = m(MemoizeKey5(p1, p2, p3, p4, p5))
+public fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P2, P3, P4, P5) -> R {
+  val m = MemoizedHandler<((P1, P2, P3, P4, P5) -> R), MemoizeKey5<P1, P2, P3, P4, P5, R>, R>(this@memoize)
+  return { p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 -> m(MemoizeKey5(p1, p2, p3, p4, p5)) }
 }
 
 private interface MemoizedCall<in F, out R> {
@@ -90,15 +91,23 @@ private data class MemoizeKey2<out P1, out P2, R>(val p1: P1, val p2: P2) : Memo
   override fun invoke(f: (P1, P2) -> R) = f(p1, p2)
 }
 
-private data class MemoizeKey3<out P1, out P2, out P3, R>(val p1: P1, val p2: P2, val p3: P3) : MemoizedCall<(P1, P2, P3) -> R, R> {
+private data class MemoizeKey3<out P1, out P2, out P3, R>(val p1: P1, val p2: P2, val p3: P3) :
+  MemoizedCall<(P1, P2, P3) -> R, R> {
   override fun invoke(f: (P1, P2, P3) -> R) = f(p1, p2, p3)
 }
 
-private data class MemoizeKey4<out P1, out P2, out P3, out P4, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4) : MemoizedCall<(P1, P2, P3, P4) -> R, R> {
+private data class MemoizeKey4<out P1, out P2, out P3, out P4, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4) :
+  MemoizedCall<(P1, P2, P3, P4) -> R, R> {
   override fun invoke(f: (P1, P2, P3, P4) -> R) = f(p1, p2, p3, p4)
 }
 
-private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(val p1: P1, val p2: P2, val p3: P3, val p4: P4, val p5: P5) : MemoizedCall<(P1, P2, P3, P4, P5) -> R, R> {
+private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
+  val p1: P1,
+  val p2: P2,
+  val p3: P3,
+  val p4: P4,
+  val p5: P5
+) : MemoizedCall<(P1, P2, P3, P4, P5) -> R, R> {
   override fun invoke(f: (P1, P2, P3, P4, P5) -> R) = f(p1, p2, p3, p4, p5)
 }
 

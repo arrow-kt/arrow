@@ -12,19 +12,8 @@ apply plugin: 'kotlinx-atomicfu'
 
 kotlin {
     sourceSets {
-        commonMain {
+        commonTest {
             dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
-            }
-        }
-        jvmMain {
-            dependencies {
-                compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-            }
-        }
-        jvmTest {
-            dependencies {
-                runtimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
                 implementation project(":arrow-core-test")
             }
         }

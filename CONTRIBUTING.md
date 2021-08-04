@@ -79,6 +79,37 @@ If the snippet is just docs for a public method of a type (as in arguments, retu
 
 That will automatically inline the docs of each method into the docs of the given data type. This is intended to be used just for public APIs exposed to users of the library.
 
+All public classes, functions, and properties must include public docs in Arrow before merging into `main`.
+
+Public docs in Arrow follow a particular structure that ensures users have a similar experience when browsing the arrow website and documentation.
+
+Declarations including classes, functions, and others must include docs in the following structure:
+
+All Kdocs should include a short header that describes what the data type or function is for and an `ank` fenced block demonstrating its use
+
+for example
+
+```kotlin
+/**
+ * [Refined] is an Abstract class providing predicate validation in refined types companions.
+ *
+ * The example below shows a refined type `Positive` that ensures [Int] is > than 0.
+ *
+ * ```kotlin:ank
+ * import arrow.refinement.Refined
+ * import arrow.refinement.ensure
+ *
+ * @JvmInline
+ * value class Positive /* private constructor */ (val value: Int) {
+ *  companion object : Refined<Int, Positive>(::Positive, {
+ *    ensure((it > 0) to "$it should be > 0")
+ *  })
+ * }
+ * ```
+ */
+abstract class Refined<A, out B>
+```
+
 #### 2. Snippets for broader samples
 
 If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.

@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.core.test.generators.array
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
@@ -7,19 +8,18 @@ import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.byte
-import io.kotest.property.arbitrary.double
-import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 
 data class Person(val age: Int, val name: String) : Comparable<Person> {
   companion object {
-    val comparator: Comparator<Person> =
-      Comparator.comparingInt(Person::age)
-        .thenComparing(Person::name)
+    val comparator: Comparator<Person> = Comparator { a, b ->
+      val res = a.age.compareTo(b.age)
+      if (res != 0) res
+      else a.name.compareTo(b.name)
+    }
   }
 
   override fun compareTo(other: Person): Int =
@@ -57,9 +57,9 @@ class ComparisonKtTest : StringSpec() {
     }
 
     "Arberic - sortAll" {
-      checkAll(Arb.person(), Arb.list(Arb.person())) { a, aas ->
-        val res = sort(a, *aas.toTypedArray())
-        val expected = listOf(a, *aas.toTypedArray()).sorted()
+      checkAll(Arb.person(), Arb.array(Arb.person(), 0..50)) { a, aas ->
+        val res = sort(a, *aas)
+        val expected = listOf(a, *aas).sorted()
 
         res shouldBe expected
       }
@@ -223,83 +223,5 @@ class ComparisonKtTest : StringSpec() {
         res shouldBe expected
       }
     }
-
-    "Float - sort2" {
-      checkAll(Arb.float(), Arb.float()) { a, b ->
-        val (first, second) = sort(a, b)
-        val (aa, bb) = listOf(a, b).sorted()
-
-        first.eqv(aa) && second.eqv(bb)
-      }
-    }
-
-    "Float - sort3" {
-      checkAll(Arb.float(), Arb.float(), Arb.float()) { a, b, c ->
-        val (first, second, third) = sort(a, b, c)
-        val (aa, bb, cc) = listOf(a, b, c).sorted()
-
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
-      }
-    }
-
-    "Float - sortAll" {
-      checkAll(Arb.float(), Arb.float(), Arb.float(), Arb.float()) { a, b, c, d ->
-        val res = sort(a, b, c, d)
-        val expected = listOf(a, b, c, d).sorted()
-
-        res shouldBe expected
-      }
-    }
-
-    "Double - sort2" {
-      checkAll(Arb.double(), Arb.double()) { a, b ->
-        val (first, second) = sort(a, b)
-        val (aa, bb) = listOf(a, b).sorted()
-
-        first.eqv(aa) && second.eqv(bb)
-      }
-    }
-
-    "Double - sort3" {
-      checkAll(Arb.double(), Arb.double(), Arb.double()) { a, b, c ->
-        val (first, second, third) = sort(a, b, c)
-        val (aa, bb, cc) = listOf(a, b, c).sorted()
-
-        first.eqv(aa) && second.eqv(bb) && third.eqv(cc)
-      }
-    }
-
-    "Double - sortAll" {
-      checkAll(Arb.double(), Arb.double(), Arb.double(), Arb.double()) { a, b, c, d ->
-        val res = sort(a, b, c, d)
-        val expected = listOf(a, b, c, d).sorted()
-
-        res shouldBe expected
-      }
-    }
   }
 }
-
-/**
- * Equality for Float to check sorting order.
- * So we need `NaN == NaN` to be true.
- */
-fun Float.eqv(other: Float): Boolean =
-  if (isNaN() && other.isNaN()) true else {
-    this shouldBe other
-    true
-  }
-
-/**
- * Equality for Double to check sorting order.
- * So we need `NaN == NaN` to be true.
- */
-fun Double.eqv(other: Double): Boolean =
-  if (isNaN() && other.isNaN()) true else {
-    this shouldBe other
-    true
-  }

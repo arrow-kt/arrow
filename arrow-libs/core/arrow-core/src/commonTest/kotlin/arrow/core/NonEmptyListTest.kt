@@ -116,8 +116,8 @@ class NonEmptyListTest : UnitSpec() {
 
     "sequenceValidated should be consistent with traverseValidated" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) it.valid() else it.invalid() }.sequenceValidated(Semigroup.int()) shouldBe
-          ints.traverseValidated(Semigroup.int()) { if (it % 2 == 0) it.valid() else it.invalid() }
+        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequenceValidated(Semigroup.int()) shouldBe
+          ints.traverseValidated(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
       }
     }
 

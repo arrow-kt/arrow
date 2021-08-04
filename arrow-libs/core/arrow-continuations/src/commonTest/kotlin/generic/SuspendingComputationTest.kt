@@ -1,12 +1,23 @@
-package generic
+package arrow.continuations
 
+import arrow.core.Either
 import arrow.core.computations.either
 import arrow.core.Either.Right
 import arrow.core.Either.Left
+import arrow.core.Eval
+import arrow.core.computations.ensureNotNull
+import arrow.core.computations.eval
+import arrow.core.left
+import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -49,29 +60,29 @@ class SuspendingComputationTest : StringSpec({
 
   "Rethrows immediate exceptions" {
     val e = RuntimeException("test")
-    shouldThrow<RuntimeException> {
+    Either.catch {
       either<String, Int> {
         Right(1).bind()
         Right(1).suspend().bind()
         throw e
       }
-    } shouldBe e
+    } shouldBe Left(e)
   }
 
   "Rethrows suspended exceptions" {
     val e = RuntimeException("test")
-    shouldThrow<RuntimeException> {
+    Either.catch {
       either<String, Int> {
         Right(1).bind()
         Right(1).suspend().bind()
         e.suspend()
       }
-    } shouldBe e
+    } shouldBe Either.Left(e)
   }
 
   "Can short-circuit immediately from nested blocks" {
     either<String, Int> {
-      val x = maybeEff {
+      val x = eval {
         Left("test").bind()
         5L
       }
@@ -83,7 +94,7 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit suspended from nested blocks" {
     either<String, Int> {
-      val x = maybeEff {
+      val x = eval {
         Left("test").suspend().bind()
         5L
       }
@@ -95,8 +106,8 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit immediately after suspending from nested blocks" {
     either<String, Int> {
-      val x = maybeEff {
-        Just(1L).suspend().bind()
+      val x = eval {
+        Eval.Now(1L).suspend().bind()
         Left("test").suspend().bind()
         5L
       }
@@ -108,8 +119,8 @@ class SuspendingComputationTest : StringSpec({
 
   "Can short-circuit suspended after suspending from nested blocks" {
     either<String, Int> {
-      val x = maybeEff {
-        Just(1L).suspend().bind()
+      val x = eval {
+        Eval.Now(1L).suspend().bind()
         Left("test").suspend().bind()
         5L
       }
@@ -117,6 +128,29 @@ class SuspendingComputationTest : StringSpec({
       println(x)
       1
     } shouldBe Left("test")
+  }
+
+  "ensure null in either computation" {
+    checkAll(Arb.bool(), Arb.int(), Arb.string()) { predicate, rValue, lValue ->
+      either<String, Int> {
+        ensure(predicate) { lValue }
+        rValue
+      } shouldBe if (predicate) rValue.right() else lValue.left()
+    }
+  }
+
+  "ensureNotNull in either computation" {
+    fun square(i: Int): Int = i * i
+
+    checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, lValue: String ->
+      val res = either<String, Int> {
+        val ii = i
+        ensureNotNull(ii) { lValue }
+        square(ii) // Smart-cast by contract
+      }
+      val expected = i?.let(::square)?.right() ?: lValue.left()
+      res shouldBe expected
+    }
   }
 
   "Short-circuiting cancels KotlinX Coroutines" {

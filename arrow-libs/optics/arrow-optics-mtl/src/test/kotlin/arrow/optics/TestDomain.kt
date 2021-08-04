@@ -8,8 +8,8 @@ import arrow.typeclasses.Eq
 import io.kotest.property.Arb
 
 sealed class SumType {
-  data class A(val string: String) : SumType()
-  data class B(val int: Int) : SumType()
+  public data class A(val string: String) : SumType()
+  public data class B(val int: Int) : SumType()
 }
 
 val genSumTypeA: Arb<SumType.A> = Arb.string().map { SumType.A(it) }
@@ -50,8 +50,8 @@ internal val userSetter: Setter<User, Token> = Setter { user, s ->
   user.copy(token = s(user.token))
 }
 
-internal data class Token(val value: String) {
-  companion object {
+internal public data class Token(val value: String) {
+  public companion object {
     fun eq() = object : Eq<Token> {
       override fun Token.eqv(b: Token): Boolean = this == b
     }
@@ -60,11 +60,11 @@ internal data class Token(val value: String) {
 
 internal val genToken: Arb<Token> = Arb.string().map { Token(it) }
 
-internal data class User(val token: Token)
+internal public data class User(val token: Token)
 
 internal val genUser: Arb<User> = genToken.map { User(it) }
 
-internal data class IncompleteUser(val token: Token?)
+internal public data class IncompleteUser(val token: Token?)
 
 internal val genIncompleteUser: Arb<IncompleteUser> = Gen.constant(IncompleteUser(null))
 

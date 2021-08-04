@@ -11,8 +11,6 @@ IO is being deprecated in Arrow in favor of Arrow Fx Coroutines which transparen
 Arrow has adopted suspend as system to model monadic computations and offers the same api and additional features as top level extensions functions over `suspend () -> A` whereas before it was `IO<A>`.
 Some functions like flatMap are now replaced by simple function invocation.
 
-For an overview of the functions offered by Arrow Fx Coroutines visit: [https://arrow-kt.io/docs/fx/async/](https://arrow-kt.io/docs/fx/async/)
-
 ## Why `suspend () -> A` instead of `IO<A>`
 
 This section explains the rationale about why Arrow dropped `IO` in favor of `suspend`.

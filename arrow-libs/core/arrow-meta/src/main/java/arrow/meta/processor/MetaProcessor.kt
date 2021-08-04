@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
  * The Current [JvmMetaApi] impl includes support for extracting information with a blend
  * of Kotlin Poet, TypeElement java api's and the Kotlin Metadata Library.
  */
-abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) : AbstractProcessor(), JvmMetaApi {
+public abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) : AbstractProcessor(), JvmMetaApi {
 
   override fun processorUtils(): ProcessorUtils = this
 
@@ -50,12 +50,12 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
   override val typeNameToMeta: (typeName: com.squareup.kotlinpoet.TypeName) -> TypeName =
     ::typeNameToMetaImpl.memoize()
 
-  sealed class AnnotatedElement {
-    data class Interface(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
-    data class Class(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
+  public sealed class AnnotatedElement {
+    public data class Interface(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
+    public data class Class(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
   }
 
-  abstract fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder>
+  public abstract fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder>
 
   private val transformList = mutableListOf<FileSpec>()
 

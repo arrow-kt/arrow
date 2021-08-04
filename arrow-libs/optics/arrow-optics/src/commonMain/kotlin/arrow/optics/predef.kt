@@ -2,15 +2,11 @@ package arrow.optics
 
 import arrow.typeclasses.Monoid
 
-@PublishedApi
-internal fun <A> firstOptionMonoid(): Monoid<A?> = object : Monoid<A?> {
-  override fun empty(): A? = null
-  override fun A?.combine(b: A?): A? = this ?: b
-}
-
-internal fun <A> lastOptionMonoid(): Monoid<A?> = object : Monoid<A?> {
-  override fun empty(): A? = null
-  override fun A?.combine(b: A?): A? = b ?: this
+@Suppress("ClassName")
+internal object EMPTY_VALUE {
+  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+  inline fun <T> unbox(value: Any?): T =
+    if (value === this) null as T else value as T
 }
 
 private object BooleanOr : Monoid<Boolean> {

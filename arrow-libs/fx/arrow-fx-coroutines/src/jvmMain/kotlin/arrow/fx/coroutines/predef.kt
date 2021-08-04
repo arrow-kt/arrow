@@ -11,5 +11,5 @@ package arrow.fx.coroutines
  *   - `getTimeMillis()`
  *   - https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.system/get-time-millis.html
  */
-actual fun timeInMillis(): Long =
+public actual fun timeInMillis(): Long =
   System.currentTimeMillis()

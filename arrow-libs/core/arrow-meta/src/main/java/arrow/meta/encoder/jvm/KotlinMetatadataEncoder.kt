@@ -20,9 +20,9 @@ import org.jetbrains.kotlin.metadata.deserialization.TypeTable
 import org.jetbrains.kotlin.metadata.deserialization.supertypes
 import javax.lang.model.element.ExecutableElement
 
-interface KotlinMetatadataEncoder {
+public interface KotlinMetatadataEncoder {
 
-  fun supertypes(
+  public fun supertypes(
     current: ClassOrPackageDataWrapper.Class,
     typeTable: TypeTable,
     processorUtils: ProcessorUtils,
@@ -53,10 +53,10 @@ interface KotlinMetatadataEncoder {
       }
     }
 
-  fun modifiersFromFlags(flags: Int): List<Modifier> =
+  public fun modifiersFromFlags(flags: Int): List<Modifier> =
     supportedFlags.filter { it.first.get(flags) }.map { it.second }
 
-  fun ProtoBuf.Visibility.asModifier(): Modifier? =
+  public fun ProtoBuf.Visibility.asModifier(): Modifier? =
     when (this) {
       ProtoBuf.Visibility.INTERNAL -> Modifier.Internal
       ProtoBuf.Visibility.PRIVATE -> Modifier.Private
@@ -66,7 +66,7 @@ interface KotlinMetatadataEncoder {
       ProtoBuf.Visibility.LOCAL -> null
     }
 
-  fun ProtoBuf.Modality.asModifier(): Modifier =
+  public fun ProtoBuf.Modality.asModifier(): Modifier =
     when (this) {
       ProtoBuf.Modality.FINAL -> Modifier.Final
       ProtoBuf.Modality.OPEN -> Modifier.Open
@@ -74,7 +74,7 @@ interface KotlinMetatadataEncoder {
       ProtoBuf.Modality.SEALED -> Modifier.Sealed
     }
 
-  fun ProtoBuf.Type.extractFullName(
+  public fun ProtoBuf.Type.extractFullName(
     classData: ClassOrPackageDataWrapper,
     outputTypeAlias: Boolean = true
   ): String =
@@ -85,7 +85,7 @@ interface KotlinMetatadataEncoder {
       throwOnGeneric = null
     )
 
-  fun ProtoBuf.Type.asTypeName(meta: ClassOrPackageDataWrapper.Class): TypeName {
+  public fun ProtoBuf.Type.asTypeName(meta: ClassOrPackageDataWrapper.Class): TypeName {
     val fullName = extractFullName(meta).asKotlin()
     val pck = fullName.substringBefore("<").substringBeforeLast(".")
     val simpleName = fullName.substringBefore("<").substringAfterLast(".")
@@ -108,7 +108,7 @@ interface KotlinMetatadataEncoder {
     )
   }
 
-  fun ProtoBuf.Modality.toMeta(): Modifier =
+  public fun ProtoBuf.Modality.toMeta(): Modifier =
     when (this) {
       ProtoBuf.Modality.FINAL -> Modifier.Final
       ProtoBuf.Modality.OPEN -> Modifier.Open
@@ -116,7 +116,7 @@ interface KotlinMetatadataEncoder {
       ProtoBuf.Modality.SEALED -> Modifier.Sealed
     }
 
-  fun ClassOrPackageDataWrapper.Class.nameOf(id: Int): String =
+  public fun ClassOrPackageDataWrapper.Class.nameOf(id: Int): String =
     nameResolver.getString(id)
 
   private fun ProtoBuf.Type.extractFullName(
@@ -153,20 +153,20 @@ interface KotlinMetatadataEncoder {
     return name + arguments + nullability
   }
 
-  fun ProtoBuf.ValueParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): Parameter =
+  public fun ProtoBuf.ValueParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): Parameter =
     Parameter(
       name = owner.nameResolver.getString(name),
       type = type.asTypeName(owner)
     )
 
-  fun ProtoBuf.TypeParameter.Variance.toMeta(): Modifier =
+  public fun ProtoBuf.TypeParameter.Variance.toMeta(): Modifier =
     when (this) {
       ProtoBuf.TypeParameter.Variance.IN -> Modifier.InVariance
       ProtoBuf.TypeParameter.Variance.OUT -> Modifier.OutVariance
       ProtoBuf.TypeParameter.Variance.INV -> Modifier.InVariance
     }
 
-  fun ProtoBuf.TypeParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): TypeName.TypeVariable =
+  public fun ProtoBuf.TypeParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): TypeName.TypeVariable =
     TypeName.TypeVariable(
       name = owner.nameResolver.getString(name),
       bounds = upperBoundList.map { it.asTypeName(owner) },
@@ -174,7 +174,10 @@ interface KotlinMetatadataEncoder {
       reified = if (hasReified()) reified else false
     )
 
-  fun ProtoBuf.Function.toMeta(owner: ClassOrPackageDataWrapper.Class, executableElement: ExecutableElement): Func =
+  public fun ProtoBuf.Function.toMeta(
+    owner: ClassOrPackageDataWrapper.Class,
+    executableElement: ExecutableElement
+  ): Func =
     Func(
       name = owner.nameResolver.getString(name),
       parameters = valueParameterList.map { it.toMeta(owner) },

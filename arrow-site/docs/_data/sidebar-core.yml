@@ -15,6 +15,9 @@ options:
       - title: Monad Comprehensions
         url: /patterns/monad_comprehensions/
 
+      - title: Coroutines & Computation blocks
+        url: /fx/coroutines/
+
   - title: Types
 
     nested_options:

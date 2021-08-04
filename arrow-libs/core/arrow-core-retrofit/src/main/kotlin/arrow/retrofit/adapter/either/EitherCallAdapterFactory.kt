@@ -27,10 +27,10 @@ import java.lang.reflect.Type
  *
  * [ResponseE] is similar to [retrofit2.Response] but uses [Either] for the response body.
  */
-class EitherCallAdapterFactory : CallAdapter.Factory() {
+public class EitherCallAdapterFactory : CallAdapter.Factory() {
 
-  companion object {
-    fun create(): EitherCallAdapterFactory = EitherCallAdapterFactory()
+  public companion object {
+    public fun create(): EitherCallAdapterFactory = EitherCallAdapterFactory()
   }
 
   override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *>? {
