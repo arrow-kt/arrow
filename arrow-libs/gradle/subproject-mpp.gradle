@@ -80,10 +80,6 @@ ktlint {
     version = KTLINT_VERSION
 }
 
-clean.doFirst {
-    delete "${projectDir}/docs/apidocs"
-}
-
 group = GROUP
 archivesBaseName = POM_ARTIFACT_ID
 
