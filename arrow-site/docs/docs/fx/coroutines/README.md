@@ -1,10 +1,15 @@
 ---
 layout: docs-fx
-title: "Kotlin Standard Library and Arrow Fx Coroutines"
+title: "Kotlin Std Coroutines package"
 permalink: /fx/coroutines/
 ---
 
-# Kotlin Standard Library & Arrow Fx Coroutines
+# Kotlin Std Coroutines & Arrow Computation blocks
+
+Arrow computation blocks are built on top of Kotlin Std's Coroutines intrinsics and don't depend on the KotlinX Coroutines library.
+Computation blocks support cancellation automatically observing [`CancellationException`],(https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/) available in the Kotlin Standard Library.
+
+Let's take a deeper look at what we can find in the Kotlin Std Coroutines package.
 
 ## Demystify Coroutine 
 
@@ -45,10 +50,16 @@ together with the compiler's ability to rewrite continuation based code to a bea
 They can be used to implement a very wide range use-cases, and or *not* bound to asynchronous -or concurrency use-cases.
 
 - Arrow Core, offers computational DSLs build on top of Kotlin's Coroutines `either { }`, `validated { }`, etc
+
 - [`DeepRecursiveFunction`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-deep-recursive-function/) explained [here](https://medium.com/@elizarov/deep-recursion-with-coroutines-7c53e15993e3)
+
 - Another well-known async/concurrency implementation beside Arrow Fx Coroutines is [KotlinX Coroutines](https://github.com/Kotlin/kotlinx.coroutines).
+
+- [`transactionEither`](https://gist.github.com/nomisRev/b6aced8ce552ae718791e187ebd6cdd4) which mixes the `either { }` DSL with the `transaction { }` of [SqlDelight](https://github.com/cashapp/sqldelight)
 
 The above image is not exhaustive list of the primitives you can find in the standard library.
 For an exhaustive list check the Kotlin Standard Library API docs:
+
  - [`kotlin.coroutines`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/)
+
  - [`kotlin.coroutines.intrinsics`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.intrinsics/)

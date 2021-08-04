@@ -6,9 +6,16 @@ import kotlinx.atomicfu.getAndUpdate
 import kotlinx.atomicfu.updateAndGet
 
 /**
- * Creates an [AtomicRef] with a initial value of [A].
+ * An [Atomic] with a initial value of [A],
+ * this is a wrapper around [`Atomic Fu`](https://github.com/Kotlin/kotlinx.atomicfu).
  *
- * Data type on top of [atomic] to use in parallel functions.
+ * Atomic FU is a compiler plugin that allows us to write `atomic` properties inside a class,
+ * and uses the most performant implementation for every platform.
+ *
+ * [Atomic] wraps `atomic`, so that you can also use it on a top-level function or pass it around.
+ * In other languages this data type is also now as `Ref`, `IORef` or Concurrent safe Reference.
+ * So in case you don't need to pass around an atomic reference, or use it in top-level functions
+ * it's advised to use `atomic` from Atomic Fu directly.
  *
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
@@ -23,7 +30,7 @@ import kotlinx.atomicfu.updateAndGet
  * }
  * ```
  *
- * [AtomicRef] also offers some other interesting operators such as [modify], [tryUpdate], [access] & [lens].
+ * [Atomic] also offers some other interesting operators such as [modify], [tryUpdate], [access] & [lens].
  */
 public interface Atomic<A> {
 

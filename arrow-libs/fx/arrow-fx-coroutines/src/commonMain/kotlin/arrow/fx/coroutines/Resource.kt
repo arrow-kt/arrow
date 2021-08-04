@@ -16,8 +16,9 @@ import kotlin.coroutines.CoroutineContext
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
  *  need to be acquired and later released in reverse order.
+ * Or when you want to load independent resources in parallel.
  *
- * When a resource is created one can make use of [use] to run a computation with the resource. The finalizers are then
+ * When a resource is created we can call [use] to run a suspend computation with the resource. The finalizers are then
  *  guaranteed to run afterwards in reverse order of acquisition.
  *
  * Consider the following use case:
@@ -25,75 +26,116 @@ import kotlin.coroutines.CoroutineContext
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
  *
- * object Consumer
- * object Handle
+ * class UserProcessor {
+ *   fun start(): Unit = println("Creating UserProcessor")
+ *   fun shutdown(): Unit = println("Shutting down UserProcessor")
+ *   fun process(ds: DataSource): List<String> =
+ *    ds.users().map { "Processed $it" }
+ * }
  *
- * class Service(val handle: Handle, val consumer: Consumer)
+ * class DataSource {
+ *   fun connect(): Unit = println("Connecting dataSource")
+ *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+ *   fun close(): Unit = println("Closed dataSource")
+ * }
  *
- * suspend fun createConsumer(): Consumer = Consumer.also { println("Creating consumer") }
- * suspend fun createDBHandle(): Handle = Handle.also { println("Creating db handle") }
- * suspend fun createFancyService(consumer: Consumer, handle: Handle): Service =
- *   Service(handle, consumer).also { println("Creating service") }
- *
- * suspend fun closeConsumer(consumer: Consumer): Unit = println("Closed consumer")
- * suspend fun closeDBHandle(handle: Handle): Unit = println("Closed db handle")
- * suspend fun shutDownFancyService(service: Service): Unit = println("Closed service")
+ * class Service(val db: DataSource, val userProcessor: UserProcessor) {
+ *   suspend fun processData(): List<String> = throw RuntimeException("I'm going to leak resources by not closing them")
+ * }
  *
  * //sampleStart
- * val program = suspend {
- *   val consumer = createConsumer()
- *   val handle = createDBHandle()
- *   val service = createFancyService(consumer, handle)
+ * suspend fun main(): Unit {
+ *   val userProcessor = UserProcessor().also { it.start() }
+ *   val dataSource = DataSource().also { it.connect() }
+ *   val service = Service(dataSource, userProcessor)
  *
- *   // use service
- *   // <...>
+ *   service.processData()
  *
- *   // we are done, now onto releasing resources
- *   shutDownFancyService(service)
- *   closeDBHandle(handle)
- *   closeConsumer(consumer)
+ *   dataSource.close()
+ *   userProcessor.shutdown()
  * }
  * //sampleEnd
- * suspend fun main(): Unit = program.invoke()
  * ```
- * Here we are creating and then using a service that has a dependency on two resources: A database handle and a consumer of some sort. All three resources need to be closed in the correct order at the end.
- * However this program is not correct. It does not guarantee release if something failed in between, and keeping track of acquisition order is unnecessary overhead.
+ * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
+ * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
+ * As a consequence of the resource leak, this program does not guarantee the correct release of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
  *
- * That is where `Resource` comes in:
+ * We can split the above program into 3 different steps:
+ *   1. Acquiring the resource
+ *   2. Using the resource
+ *   3. Releasing the resource with either [ExitCase.Completed], [ExitCase.Failure] or [ExitCase.Cancelled].
+ *
+ * That is exactly what `Resource` does, and how we can solve our problem:
+ *
+ * # Constructing Resource
+ *
+ * Creating a resource can be easily done by the `resource` DSL,
+ * and there are two ways to define the finalizers with `release` or `releaseCase`.
+ *
+ * ```kotlin
+ * val resourceA = resource {
+ *   "A"
+ * } release { a ->
+ *   println("Releasing $a")
+ * }
+ *
+ * val resourceB = resource {
+ *  "B"
+ * } releaseCase { b, exitCase ->
+ *   println("Releasing $b with exit: $exitCase")
+ * }
+ * ```
+ *
+ * Here `releaseCase` also signals with what [ExitCase] state the `use` step finished.
+ *
+ * # Using and composing Resource
  *
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
  *
- * object Consumer
- * object Handle
+ * class UserProcessor {
+ *   fun start(): Unit = println("Creating UserProcessor")
+ *   fun shutdown(): Unit = println("Shutting down UserProcessor")
+ *   fun process(ds: DataSource): List<String> =
+ *    ds.users().map { "Processed $it" }
+ * }
  *
- * class Service(val handle: Handle, val consumer: Consumer)
+ * class DataSource {
+ *   fun connect(): Unit = println("Connecting dataSource")
+ *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+ *   fun close(): Unit = println("Closed dataSource")
+ * }
  *
- * suspend fun createConsumer(): Consumer = Consumer.also { println("Creating consumer") }
- * suspend fun createDBHandle(): Handle = Handle.also { println("Creating db handle") }
- * suspend fun createFancyService(consumer: Consumer, handle: Handle): Service =
- *   Service(handle, consumer).also { println("Creating service") }
- *
- * suspend fun closeConsumer(consumer: Consumer): Unit = println("Closed consumer")
- * suspend fun closeDBHandle(handle: Handle): Unit = println("Closed db handle")
- * suspend fun shutDownFancyService(service: Service): Unit = println("Closed service")
+ * class Service(val db: DataSource, val userProcessor: UserProcessor) {
+ *   suspend fun processData(): List<String> = userProcessor.process(db)
+ * }
  *
  * //sampleStart
- * val resourceProgram = suspend {
- *   Resource(::createConsumer, ::closeConsumer)
- *     .zip(Resource(::createDBHandle, ::closeDBHandle))
- *     .flatMap { (consumer, handle) ->
- *       Resource({ createFancyService(consumer, handle) }, { service -> shutDownFancyService(service) })
- *     }.use { service ->
- *       // use service
- *       // <...>
- *       Unit
- *     }
+ * val userProcessor = resource {
+ *   UserProcessor().also(UserProcessor::start)
+ * } release UserProcessor::shutdown
+ *
+ * val dataSource = resource {
+ *   DataSource().also { it.connect() }
+ * } release DataSource::close
+ *
+ * suspend fun main(): Unit {
+ *   userProcessor.parZip(dataSource) { userProcessor, ds ->
+ *       Service(ds, userProcessor)
+ *     }.use { service -> service.processData() }
  * }
  * //sampleEnd
- *
- * suspend fun main(): Unit = resourceProgram.invoke()
  * ```
+ *
+ * [Resource]s are immutable and can be composed using [zip] or [parZip].
+ * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
+ *
+ * To achieve this [Resource] ensures that the `acquire` & `release` step are [NonCancellable].
+ * If a cancellation signal, or an exception is received during `acquire`, the resource is assumed to not have been acquired and thus will not trigger the release function.
+ *  => Any composed resources that are already acquired they will be guaranteed to release as expected.
+ *
+ * If you don't need a data-type like [Resource] but want a function alternative to `try/catch/finally` with automatic error composition,
+ * and automatic [NonCancellable] `acquire` and `release` steps use [bracketCase] or [bracket].
  **/
 public sealed class Resource<out A> {
 
@@ -104,13 +146,21 @@ public sealed class Resource<out A> {
    * ```kotlin:ank:playground
    * import arrow.fx.coroutines.*
    *
-   * suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
-   * suspend fun releaseResource(r: Int): Unit = println("Releasing expensive resource: $r")
+   * class DataSource {
+   *   fun connect(): Unit = println("Connecting dataSource")
+   *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+   *   fun close(): Unit = println("Closed dataSource")
+   * }
    *
    * suspend fun main(): Unit {
    *   //sampleStart
-   *   Resource(::acquireResource, ::releaseResource)
-   *     .use { println("Expensive resource under use! $it") }
+   *   val dataSource = resource {
+   *     DataSource().also { it.connect() }
+   *   } release DataSource::close
+   *
+   *   val res = dataSource
+   *     .use { ds -> "Using data source: ${ds.users()}" }
+   *     .also(::println)
    *   //sampleEnd
    * }
    * ```
@@ -134,38 +184,50 @@ public sealed class Resource<out A> {
     flatMap { res -> ff.map { it(res) } }
 
   /**
-   * Create a new resource [B] from a resource [A] by mapping [f].
+   * Create a resource value of [B] from a resource [A] by mapping [f].
    *
-   * This is useful when you need to create a resource that depends on other resources.
+   * Useful when there is a need to create resources that depend on other resources,
+   * for combining independent values [zip] provides nicer syntax without the need for callback nesting.
    *
    * ```kotlin:ank
    * import arrow.fx.coroutines.*
    *
-   * object Consumer
-   * object DBHandle
-   * data class DatabaseConsumer(val db: DBHandle, val consumer: Consumer)
+   * object Connection
+   * class DataSource {
+   *   fun connect(): Unit = println("Connecting dataSource")
+   *   fun connection(): Connection = Connection
+   *   fun close(): Unit = println("Closed dataSource")
+   * }
    *
-   * fun consumer(): Resource<Consumer> = Resource({ Consumer }, { _ -> println("Closed consumer") })
-   * fun dhHandle(): Resource<DBHandle> = Resource({ DBHandle }, { _ -> println("Closed db handle") })
+   * class Database(private val database: DataSource) {
+   *   fun init(): Unit = println("Database initialising . . .")
+   *   fun shutdown(): Unit = println("Database shutting down . . .")
+   * }
    *
    * suspend fun main(): Unit {
    *   //sampleStart
-   *   consumer()
-   *     .zip(dhHandle())
-   *     .flatMap { (consumer, dbHandle) ->
-   *       Resource(
-   *         { DatabaseConsumer(dbHandle, consumer) },
-   *         { _ -> println("Closed DatabaseConsumer") }
-   *       )
-   *     }.use { println("Expensive resource under use! $it") }
+   *   val dataSource = resource {
+   *     DataSource().also { it.connect() }
+   *   } release DataSource::close
+   *
+   *   fun database(ds: DataSource): Resource<Database> =
+   *     resource {
+   *       Database(ds).also(Database::init)
+   *     } release Database::shutdown
+   *
+   *   dataSource.flatMap(::database)
+   *     .use { println("Using database which uses dataSource") }
    *   //sampleEnd
    * }
    * ```
+   *
+   * @see zip to combine independent resources together
+   * @see parZip for combining independent resources in parallel
    */
   public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
     Bind(this, f)
 
-  public fun <B, C> zip(other: Resource<B>, combine: (A, B) -> C): Resource<C> =
+  public inline fun <B, C> zip(other: Resource<B>, crossinline combine: (A, B) -> C): Resource<C> =
     flatMap { r ->
       other.map { r2 -> combine(r, r2) }
     }
@@ -173,6 +235,55 @@ public sealed class Resource<out A> {
   public fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     zip(other, ::Pair)
 
+  /**
+   * Combines two independent resource values with the provided [map] function,
+   * returning the resulting immutable [Resource] value.
+   * The finalizers run in order of left to right by using [flatMap] under the hood,
+   * but [zip] provides a nicer syntax for combining values that don't depend on each-other.
+   *
+   * Useful to compose up to 9 independent resources,
+   * see example for more details on how to use in code.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.coroutines.*
+   *
+   * class UserProcessor {
+   *   fun start(): Unit = println("Creating UserProcessor")
+   *   fun shutdown(): Unit = println("Shutting down UserProcessor")
+   *   fun process(ds: DataSource): List<String> =
+   *    ds.users().map { "Processed $it" }
+   * }
+   *
+   * class DataSource {
+   *   fun connect(): Unit = println("Connecting dataSource")
+   *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+   *   fun close(): Unit = println("Closed dataSource")
+   * }
+   *
+   * class Service(val db: DataSource, val userProcessor: UserProcessor) {
+   *   suspend fun processData(): List<String> = userProcessor.process(db)
+   * }
+   *
+   * //sampleStart
+   * val userProcessor = resource {
+   *   UserProcessor().also(UserProcessor::start)
+   * } release UserProcessor::shutdown
+   *
+   * val dataSource = resource {
+   *   DataSource().also { it.connect() }
+   * } release DataSource::close
+   *
+   * suspend fun main(): Unit {
+   *   userProcessor.zip(dataSource) { userProcessor, ds ->
+   *       Service(ds, userProcessor)
+   *     }.use { service -> service.processData() }
+   * }
+   * //sampleEnd
+   * ```
+   *
+   * @see parZip if you want to combine independent resources in parallel
+   * @see flatMap to combine resources that rely on each-other.
+   */
   public inline fun <B, C, D> zip(
     b: Resource<B>,
     c: Resource<C>,
@@ -291,17 +402,59 @@ public sealed class Resource<out A> {
       }
     }
 
-  public fun <B, C> parZip(fb: Resource<B>, f: (A, B) -> C): Resource<C> =
+  public fun <B, C> parZip(fb: Resource<B>, f: suspend (A, B) -> C): Resource<C> =
     parZip(Dispatchers.Default, fb, f)
 
   /**
    * Composes two [Resource]s together by zipping them in parallel,
    * by running both their `acquire` handlers in parallel, and both `release` handlers in parallel.
+   *
+   * Useful in the case that starting a resource takes considerable computing resources or time.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.coroutines.*
+   * import kotlinx.coroutines.delay
+   *
+   * class UserProcessor {
+   *   suspend fun start(): Unit { delay(750); println("Creating UserProcessor") }
+   *   fun shutdown(): Unit = println("Shutting down UserProcessor")
+   *   fun process(ds: DataSource): List<String> =
+   *    ds.users().map { "Processed $it" }
+   * }
+   *
+   * class DataSource {
+   *   suspend fun connect(): Unit { delay(1000); println("Connecting dataSource") }
+   *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+   *   fun close(): Unit = println("Closed dataSource")
+   * }
+   *
+   * class Service(val db: DataSource, val userProcessor: UserProcessor) {
+   *   suspend fun processData(): List<String> = userProcessor.process(db)
+   * }
+   *
+   * //sampleStart
+   * val userProcessor = resource {
+   *   UserProcessor().also { it.start() }
+   * } release UserProcessor::shutdown
+   *
+   * val dataSource = resource {
+   *   DataSource().also { it.connect() }
+   * } release DataSource::close
+   *
+   * suspend fun main(): Unit {
+   *   userProcessor.parZip(dataSource) { userProcessor, ds ->
+   *       Service(ds, userProcessor)
+   *     }.use { service -> service.processData() }
+   * }
+   * //sampleEnd
+   * ```
+   *
+   *
    */
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
     fb: Resource<B>,
-    f: (A, B) -> C
+    f: suspend (A, B) -> C
   ): Resource<C> =
     Resource({
       supervisorScope {
