@@ -51,5 +51,5 @@ options:
   - title: Media
     url: https://media.arrow-kt.io/tags/optics/
 
-  - title: Docs
+  - title: Api Docs
     url: /apidocs/arrow-optics/

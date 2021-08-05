@@ -16,8 +16,8 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 ## Arrow Fx Coroutines Overview 
 
 - Quick Start
-  - [Gradle Setup](Gradle-Setup)
-  - [Maven Setup](Maven-setup)
+  - [Gradle Setup](#gradle-setup)
+  - [Maven Setup](#maven-setup)
 - Extensions and data types   
   - [Parallel](parallel/)
   - [Flow](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/) 
@@ -25,8 +25,8 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
   - [Resource](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
   - [CircuitBreaker](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
   - [Atomic](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
-  - [STM](/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/)
-- [Integrating with 3rd-party libraries](Integrating-with-3rd-party-libraries)
+  - [STM](/apidocs/arrow-fx-stm/arrow.fx.stm/)
+- [Integrating with 3rd-party libraries](#integrating-with-3rd-party-libraries)
 - Additional Information
   - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
   - [Pure & Referentially Transparent Functions](purity-and-referentially-transparent-functions/)

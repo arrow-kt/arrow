@@ -30,7 +30,7 @@ jobs:
       run: ./gradlew ktlintCheck
     - name: "Create API doc"
       working-directory: arrow-libs
-      run: ./gradlew dokkaJekyll
+      run: ./gradlew dokkaGfm
     - name: "Validate documentation"
       working-directory: arrow-site
       run: ./gradlew runAnk
