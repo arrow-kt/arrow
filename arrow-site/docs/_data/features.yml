@@ -26,5 +26,5 @@ content:
     - title: Meta
       description: Metaprogramming library for Kotlin compiler plugins
       icon: img/home/arrow-meta-lines
-      url: https://meta.arrow-kt.io/
+      url: /meta/
       id: meta
