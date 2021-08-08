@@ -17,13 +17,19 @@ import org.jetbrains.dokka.model.doc.CodeBlock
 import org.jetbrains.dokka.model.doc.DocTag
 import org.jetbrains.dokka.model.properties.PropertyContainer
 import org.jetbrains.dokka.model.toDisplaySourceSets
+import org.jetbrains.dokka.pages.ContentBreakLine
 import org.jetbrains.dokka.pages.ContentCodeBlock
 import org.jetbrains.dokka.pages.ContentCodeInline
+import org.jetbrains.dokka.pages.ContentDRILink
+import org.jetbrains.dokka.pages.ContentGroup
 import org.jetbrains.dokka.pages.ContentNode
 import org.jetbrains.dokka.pages.ContentPage
+import org.jetbrains.dokka.pages.ContentText
 import org.jetbrains.dokka.pages.DCI
 import org.jetbrains.dokka.pages.SimpleAttr
 import org.jetbrains.dokka.pages.Style
+import org.jetbrains.dokka.pages.TextStyle
+import org.jetbrains.dokka.pages.hasStyle
 import org.jetbrains.dokka.plugability.DokkaContext
 import org.jetbrains.dokka.plugability.DokkaPlugin
 import org.jetbrains.dokka.plugability.Extension
@@ -77,6 +83,31 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
     append("\n")
   }
 
+  public fun StringBuilder.buildParagraph() {
+    buildNewLine()
+    buildNewLine()
+  }
+
+  override fun StringBuilder.wrapGroup(
+    node: ContentGroup,
+    pageContext: ContentPage,
+    childrenCallback: StringBuilder.() -> Unit
+  ) {
+    return when {
+      node.hasStyle(TextStyle.Monospace) -> {
+        buildParagraph()
+        inlineCodeBlock(node, pageContext)
+        buildParagraph()
+      }
+      node.hasStyle(TextStyle.Block) || node.hasStyle(TextStyle.Paragraph) -> {
+        buildParagraph()
+        childrenCallback()
+        buildParagraph()
+      }
+      else -> childrenCallback()
+    }
+  }
+
   override fun buildPage(page: ContentPage, content: (StringBuilder, ContentPage) -> Unit): String {
     val builder = StringBuilder()
     builder.append("---\n")
@@ -86,16 +117,88 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
     return builder.toString()
   }
 
-  override fun StringBuilder.buildCodeBlock(code: ContentCodeBlock, pageContext: ContentPage) {
-    append("```${code.language}\n")
-    code.children.forEach { buildContentNode(it, pageContext) }
-    append("\n```")
+  override fun StringBuilder.buildCodeBlock(
+    code: ContentCodeBlock,
+    pageContext: ContentPage
+  ) {
+    fun buildGroup(group: ContentNode, pageContext: ContentPage) {
+      group.children.forEach { node ->
+        when (node) {
+          is ContentText -> append(node.text)
+          is ContentBreakLine -> buildNewLine()
+          else -> buildGroup(node, pageContext)
+        }
+      }
+    }
+    append("```${code.language}")
+    buildNewLine()
+    buildGroup(code, pageContext)
+    buildNewLine()
+    append("```")
   }
 
   override fun StringBuilder.buildCodeInline(code: ContentCodeInline, pageContext: ContentPage) {
-    append('`')
-    code.children.forEach { buildContentNode(it, pageContext) }
-    append('`')
+    inlineCodeBlock(code, pageContext)
+  }
+
+  private fun StringBuilder.inlineCodeBlock(
+    node: ContentNode,
+    pageContext: ContentPage
+  ) {
+    val code = StringBuilder()
+
+    fun buildCode() {
+      if (code.isNotEmpty()) {
+        val decorators = "`".repeat(code.count { it == '`' } + 1) +
+          if (code.first() == '`' || code.last() == '`' ||
+            (code.first() == ' ' && code.last() == ' ')
+          ) " " else ""
+        append(decorators)
+        append(code)
+        append(decorators.reversed())
+        code.clear()
+      }
+    }
+
+    fun buildGroup(
+      group: ContentNode,
+      pageContext: ContentPage
+    ): Unit = group.children.forEach { node ->
+      when (node) {
+        is ContentText -> if (!node.text.contains('\n')) {
+          code.append(node.text)
+        } else {
+          val chunks = node.text.split('\n')
+          chunks.dropLast(1).forEach {
+            code.append(it)
+            buildCode()
+            buildNewLine()
+          }
+          chunks.last().apply {
+            code.append(node)
+          }
+        }
+        is ContentBreakLine -> {
+          buildCode()
+          buildNewLine()
+        }
+        is ContentDRILink -> {
+          val link = locationProvider.resolve(node.address, node.sourceSets, pageContext)
+          if (link.isNullOrEmpty()) {
+            buildGroup(node, pageContext)
+          } else {
+            buildCode()
+            append("[")
+            buildGroup(node, pageContext)
+            buildCode()
+            append("]($link)")
+          }
+        }
+        else -> buildGroup(node, pageContext)
+      }
+    }
+    buildGroup(node, pageContext)
+    buildCode()
   }
 }
 
