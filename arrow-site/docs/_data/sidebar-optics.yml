@@ -52,4 +52,4 @@ options:
     url: https://media.arrow-kt.io/tags/optics/
 
   - title: Api Docs
-    url: /apidocs/arrow-optics/
+    url: /apidocs/arrow-optics/arrow.optics

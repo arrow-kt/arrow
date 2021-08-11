@@ -16,23 +16,22 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 ## Arrow Fx Coroutines Overview 
 
 - Quick Start
-  - [Gradle Setup](#gradle-setup)
-  - [Maven Setup](#maven-setup)
-- Extensions and data types   
-  - [Parallel](parallel/)
-  - [Flow](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlinx.coroutines.flow.-flow/) 
-  - [Schedule](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
-  - [Resource](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
-  - [CircuitBreaker](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
-  - [Atomic](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
-  - [STM](/apidocs/arrow-fx-stm/arrow.fx.stm/)
-- [Integrating with 3rd-party libraries](#integrating-with-3rd-party-libraries)
+  - [Gradle Setup](/docs/fx/#gradle-setup)
+  - [Maven Setup](/docs/fx/#maven-setup)
+- Extensions and data types
+  - [Parallel](/docs/fx/parallel/)
+  - [Schedule](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
+  - [Resource](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
+  - [CircuitBreaker](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
+  - [Atomic](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
+  - [STM](/docs/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/)
+- [Integrating with 3rd-party libraries](/docs/fx/#integrating-with-3rd-party-libraries)
 - Additional Information
   - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
-  - [Pure & Referentially Transparent Functions](purity-and-referentially-transparent-functions/)
-  - [Kotlin's Std Coroutines package](coroutines/)
-  - [Why suspend over IO monad](/effects/io/)
-
+  - [Pure & Referentially Transparent Functions](/docs/fx/purity-and-referentially-transparent-functions/)
+  - [Kotlin's Std Coroutines package](/docs/fx/coroutines/)
+  - [Why suspend over IO monad](/docs/effects/io/)
+  
 ## Gradle Setup
 
 ```groovy
