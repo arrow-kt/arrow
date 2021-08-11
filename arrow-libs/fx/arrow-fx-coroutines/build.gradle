@@ -29,10 +29,5 @@ kotlin {
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
             }
         }
-        nativeMain {
-            dependencies {
-                implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.2.1"
-            }
-        }
     }
 }
