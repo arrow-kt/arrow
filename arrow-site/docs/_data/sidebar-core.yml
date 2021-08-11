@@ -32,7 +32,7 @@ options:
         url: /apidocs/arrow-core/arrow.core/-option/
 
       - title: NonEmptyList
-        url: /apidocs/arrow-core/arrow.core/-nonemptylist/
+        url: /apidocs/arrow-core/arrow.core/-non-empty-list/
 
       - title: Ior
         url: /apidocs/arrow-core/arrow.core/-ior/
@@ -56,7 +56,7 @@ options:
     url: https://media.arrow-kt.io/tags/core/
 
   - title: Docs
-    url: /apidocs/arrow-core/
+    url: /apidocs/arrow-core/arrow.core
 
   - title: License
     url: https://github.com/arrow-kt/arrow/blob/main/LICENSE
