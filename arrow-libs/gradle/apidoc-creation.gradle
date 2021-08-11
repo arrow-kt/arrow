@@ -21,6 +21,11 @@ dokkaGfm {
     dokkaSourceSets {
         if (file("src/commonMain/kotlin").exists()) {
             commonMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
                 reportUndocumented.set(false)
                 sourceLink {
                     localDirectory.set(file("src/commonMain/kotlin"))
@@ -30,6 +35,11 @@ dokkaGfm {
             }
         } else if(file("src/main/kotlin").exists()) {
             main {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
                 reportUndocumented.set(false)
                 sourceLink {
                     localDirectory.set(file("src/main/kotlin"))
@@ -40,6 +50,11 @@ dokkaGfm {
         }
         if(file("src/jvmMain/kotlin").exists()) {
             jvmMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
                 reportUndocumented.set(false)
                 sourceLink {
                     localDirectory.set(file("src/jvmMain/kotlin"))
@@ -50,6 +65,11 @@ dokkaGfm {
         }
         if(file("src/jsMain/kotlin").exists()) {
             jsMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
                 reportUndocumented.set(false)
                 sourceLink {
                     localDirectory.set(file("src/jsMain/kotlin"))
