@@ -71,6 +71,7 @@ import kotlin.jvm.JvmStatic
  *  println(left)
  * }
  * ```
+ *
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
  *
  * Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
