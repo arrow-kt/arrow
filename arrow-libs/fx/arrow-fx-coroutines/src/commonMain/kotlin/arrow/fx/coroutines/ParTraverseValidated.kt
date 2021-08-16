@@ -25,6 +25,9 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks.
  */
+public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidatedN(semigroup: Semigroup<E>, n: Int): Validated<E, List<A>> =
+  parTraverseValidatedN(Dispatchers.Default, semigroup, n) { it() }
+
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidatedN(semigroup: Semigroup<E>, n: Int): Validated<E, List<A>> =
   parTraverseValidatedN(Dispatchers.Default, semigroup, n) { it() }
 
@@ -38,6 +41,13 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *
  * Cancelling this operation cancels all running tasks.
  */
+public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidatedN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  semigroup: Semigroup<E>,
+  n: Int
+): Validated<E, List<A>> =
+  parTraverseValidatedN(ctx, semigroup, n) { it() }
+
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidatedN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
@@ -54,7 +64,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
   semigroup: Semigroup<E>,
   n: Int,
-  f: suspend (A) -> Validated<E, B>
+  f: suspend CoroutineScope.(A) -> Validated<E, B>
 ): Validated<E, List<B>> =
   parTraverseValidatedN(Dispatchers.Default, semigroup, n, f)
 
@@ -72,7 +82,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
   n: Int,
-  f: suspend (A) -> Validated<E, B>
+  f: suspend CoroutineScope.(A) -> Validated<E, B>
 ): Validated<E, List<B>> {
   val semaphore = Semaphore(n)
   return parTraverseValidated(ctx, semigroup) { a ->
@@ -86,6 +96,9 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceEither(semigroup: Semigroup<E>): Validated<E, List<A>> =
+  parTraverseValidated(Dispatchers.Default, semigroup) { it() }
+
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEither(semigroup: Semigroup<E>): Validated<E, List<A>> =
   parTraverseValidated(Dispatchers.Default, semigroup) { it() }
 
@@ -120,6 +133,12 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEit
  * }
  * ```
  */
+public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  semigroup: Semigroup<E>
+): Validated<E, List<A>> =
+  parTraverseValidated(ctx, semigroup) { it() }
+
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>
@@ -134,7 +153,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  */
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   semigroup: Semigroup<E>,
-  f: suspend (A) -> Validated<E, B>
+  f: suspend CoroutineScope.(A) -> Validated<E, B>
 ): Validated<E, List<B>> =
   parTraverseValidated(Dispatchers.Default, semigroup, f)
 
@@ -177,9 +196,9 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
-  f: suspend (A) -> Validated<E, B>
+  f: suspend CoroutineScope.(A) -> Validated<E, B>
 ): Validated<E, List<B>> =
   coroutineScope {
-    map { async(ctx) { f.invoke(it) } }.awaitAll()
+    map { async(ctx) { f.invoke(this, it) } }.awaitAll()
       .sequenceValidated(semigroup)
   }
