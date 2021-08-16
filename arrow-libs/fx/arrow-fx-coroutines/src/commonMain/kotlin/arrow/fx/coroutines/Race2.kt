@@ -24,9 +24,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     suspendCancellableCoroutine { cont ->
- *        // Wait forever and never complete callback
- *        cont.invokeOnCancellation { println("Never got cancelled for losing.") }
+ *     guaranteeCase({ never() }) { exitCase ->
+ *       println("I can never win the race. Finished with $exitCase.")
  *     }
  *
  *   val winner = raceN({ loser() }, { 5 })
@@ -66,9 +65,8 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinl
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     suspendCancellableCoroutine { cont ->
- *        // Wait forever and never complete callback
- *        cont.invokeOnCancellation { println("Never got cancelled for losing.") }
+ *     guaranteeCase({ never() }) { exitCase ->
+ *       println("I can never win the race. Finished with $exitCase.")
  *     }
  *
  *   val winner = raceN(Dispatchers.IO, { loser() }, { 5 })
