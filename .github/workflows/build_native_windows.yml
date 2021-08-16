@@ -9,7 +9,7 @@ jobs:
       BASEDIR: ${{github.workspace}}/arrow-libs
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 60
 
     steps:
