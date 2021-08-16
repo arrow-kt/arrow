@@ -30,21 +30,10 @@ kotlin {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
-    js(BOTH) {
-        browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
-                }
-            }
-        }
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "600000"
-                }
-            }
-        }
+//    js(BOTH) {
+    js(IR) {
+        browser()
+        nodejs()
     }
     linuxX64()
 
