@@ -25,6 +25,7 @@ import kotlin.jvm.JvmName
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
   parTraverseEitherN(Dispatchers.Default, n) { it() }
 
+@JvmName("parSequenceEitherNScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
   parTraverseEitherN(Dispatchers.Default, n) { it() }
 
@@ -37,6 +38,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *
  * Cancelling this operation cancels all running tasks
  */
+@JvmName("parSequenceEitherNScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
@@ -59,6 +61,7 @@ public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
   parTraverseEither(Dispatchers.Default) { it() }
 
+@JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
   parTraverseEither(Dispatchers.Default) { it() }
 
@@ -94,6 +97,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  * }
  * ```
  */
+@JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Either<A, List<B>> =

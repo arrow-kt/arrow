@@ -25,6 +25,7 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks.
  */
+@JvmName("parSequenceValidatedNScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidatedN(semigroup: Semigroup<E>, n: Int): Validated<E, List<A>> =
   parTraverseValidatedN(Dispatchers.Default, semigroup, n) { it() }
 
@@ -41,6 +42,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *
  * Cancelling this operation cancels all running tasks.
  */
+@JvmName("parSequenceValidatedNScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidatedN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
@@ -96,6 +98,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@JvmName("parSequenceEitherScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceEither(semigroup: Semigroup<E>): Validated<E, List<A>> =
   parTraverseValidated(Dispatchers.Default, semigroup) { it() }
 
@@ -133,6 +136,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEit
  * }
  * ```
  */
+@JvmName("parSequenceValidatedScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>

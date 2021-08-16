@@ -24,6 +24,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
  *
  * Cancelling this operation cancels all running tasks
  */
+@JvmName("parSequenceNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(n: Int): List<A> =
   parSequenceN(Dispatchers.Default, n)
 
@@ -43,6 +44,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineCont
  *
  * Cancelling this operation cancels all running tasks
  */
+@JvmName("parSequenceNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
   val s = Semaphore(n)
   return parTraverse(ctx) {
@@ -76,6 +78,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  * }
  * ```
  */
+@JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
   parSequence(Dispatchers.Default)
 
@@ -110,6 +113,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  * }
  * ```
  */
+@JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
   parTraverse(ctx) { it.invoke(this) }
 
