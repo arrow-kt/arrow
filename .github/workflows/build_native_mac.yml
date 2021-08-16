@@ -1,4 +1,4 @@
-name: "Run test JS"
+name: "Build Mac Os"
 
 on: pull_request
 
@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jsTest
+        run: ./gradlew macosX64Test
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
