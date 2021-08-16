@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew macosX64Test
+        run: ./gradlew macosX64Test --stacktrace
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |

@@ -28,7 +28,7 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jvmTest
+        run: ./gradlew jvmTest --stacktrace
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
