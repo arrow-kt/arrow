@@ -21,12 +21,7 @@ jobs:
         run: ./gradlew mingwX64Test --stacktrace
       - name: "Prepare test reports"
         if: ${{ always() }}
-        run: |
-          mkdir test-reports
-          for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
-            module=$(echo $report | cut -d/ -f3)
-            cp -r $report test-reports/$module
-          done
+        run: find . -type d -name 'reports' | zip -@ -r test-reports.zip
       - name: "Make test reports available to download"
         if: ${{ always() }}
         uses: actions/upload-artifact@v1
