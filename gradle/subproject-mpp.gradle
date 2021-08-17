@@ -56,6 +56,11 @@ kotlin {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
+        commonTest {
+            dependencies {
+                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+            }
+        }
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
@@ -69,12 +74,6 @@ kotlin {
         jsMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
-            }
-        }
-        jsTest {
-            dependencies {
-                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-
             }
         }
         nativeMain {
@@ -145,7 +144,7 @@ tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
-tasks.jvmTest{
+tasks.jvmTest {
     useJUnitPlatform()
     testLogging {
         exceptionFormat 'full'
