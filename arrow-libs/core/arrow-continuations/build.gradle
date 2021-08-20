@@ -11,12 +11,14 @@ apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 apply plugin: 'kotlinx-atomicfu'
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
 kotlin {
     sourceSets {
         commonTest {
-            dependencies {
-                implementation project(":arrow-core-test")
-            }
         }
     }
 }

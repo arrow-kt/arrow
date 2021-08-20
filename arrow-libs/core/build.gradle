@@ -7,6 +7,7 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
@@ -22,3 +23,10 @@ plugins {
 }
 
 apply from: "$ROOT_PROJECT"
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}

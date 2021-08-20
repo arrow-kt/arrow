@@ -8,3 +8,8 @@ apply from: "$SUB_PROJECT_MPP"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}

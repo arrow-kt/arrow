@@ -1,10 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
-    id("io.kotest.multiplatform")
     id "org.jlleitschuh.gradle.ktlint"
 }
 
 apply plugin: 'kotlinx-atomicfu'
+apply plugin: 'io.kotest.multiplatform'
 
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
@@ -12,7 +19,32 @@ apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
 kotlin {
+
+    targets {
+        jvm {
+            compilations.all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
+            }
+        }
+
+        js(IR) {
+            browser()
+            nodejs()
+        }
+
+        linuxX64()
+        mingwX64()
+        macosX64()
+    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -22,7 +54,10 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation project(":arrow-core-test")
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
     }

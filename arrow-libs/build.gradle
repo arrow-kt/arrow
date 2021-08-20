@@ -4,6 +4,7 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
@@ -19,6 +20,13 @@ plugins {
 }
 
 apply from: "gradle/$ROOT_PROJECT"
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
 
 task generateDoc(type: Exec) {
   commandLine "sh", "gradlew", "dokkaJekyll"
