@@ -1,18 +1,18 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.FreeSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.checkAll
 
 /**
- * Simple overwritten Kotest FreeSpec to reduce stress on tests.
+ * Simple overwritten Kotest StringSpec to reduce stress on tests.
  */
 public abstract class ArrowFxSpec(
   private val iterations: Int = 350,
   spec: ArrowFxSpec.() -> Unit = {}
-) : FreeSpec() {
+) : StringSpec() {
 
   init {
     spec()

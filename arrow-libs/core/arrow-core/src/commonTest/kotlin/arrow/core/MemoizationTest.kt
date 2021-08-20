@@ -1,13 +1,13 @@
 package arrow.core
 
-import io.kotest.core.spec.style.FreeSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlin.random.Random
 
-class MemoizationTest : FreeSpec() {
+class MemoizationTest : StringSpec() {
 
   init {
     "Memoize races" {

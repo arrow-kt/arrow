@@ -4,6 +4,7 @@ plugins {
 }
 
 apply plugin: 'kotlinx-atomicfu'
+apply plugin: 'io.kotest.multiplatform'
 
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
@@ -22,7 +23,11 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation project(":arrow-fx-coroutines-test")
+                api project(":arrow-fx-coroutines-test")
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
     }

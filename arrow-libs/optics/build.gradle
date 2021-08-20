@@ -8,9 +8,6 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
-    }
 }
 
 plugins {

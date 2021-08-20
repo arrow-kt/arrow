@@ -56,6 +56,14 @@ kotlin {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
+//        commmonTest {
+//            dependencies {
+//                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+//                api "io.kotest:kotest-property:$KOTEST_VERSION"
+//                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+//                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
+//            }
+//        }
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
@@ -63,7 +71,11 @@ kotlin {
         }
         jvmTest {
             dependencies {
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
                 runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
         jsMain {
@@ -73,56 +85,113 @@ kotlin {
         }
         jsTest {
             dependencies {
-                implementation "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
         nativeMain {
-            dependsOn commonMain
+            dependsOn(commonMain)
+            macosX64Main.dependsOn(it)
+            mingwX64Main.dependsOn(it)
+            linuxX64Main.dependsOn(it)
+            iosX64Main.dependsOn(it)
+            iosArm64Main.dependsOn(it)
+            iosArm32Main.dependsOn(it)
+            watchosX86Main.dependsOn(it)
+            watchosArm32Main.dependsOn(it)
+            watchosArm64Main.dependsOn(it)
+            watchosX64Main.dependsOn(it)
+            tvosMain.dependsOn(it)
         }
-        macosX64Main {
-            dependsOn nativeMain
+        nativeTest {
+            dependencies {
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
+            }
+            macosX64Test.dependsOn(it)
+            mingwX64Test.dependsOn(it)
+            linuxX64Test.dependsOn(it)
+            iosX64Test.dependsOn(it)
+            iosArm64Test.dependsOn(it)
+            iosArm32Test.dependsOn(it)
+            watchosX86Test.dependsOn(it)
+            watchosArm32Test.dependsOn(it)
+            watchosArm64Test.dependsOn(it)
+            watchosX64Test.dependsOn(it)
+            tvosTest.dependsOn(it)
         }
-
-        mingwX64Main {
-            dependsOn nativeMain
-        }
-
-        linuxX64Main {
-            dependsOn nativeMain
-        }
-
-        iosX64Main {
-            dependsOn nativeMain
-        }
-
-        iosArm64Main {
-            dependsOn nativeMain
-        }
-
-        iosArm32Main {
-            dependsOn nativeMain
-        }
-
-        watchosX86Main {
-            dependsOn nativeMain
-        }
-
-        watchosArm32Main {
-            dependsOn nativeMain
-        }
-
-        watchosArm64Main {
-            dependsOn nativeMain
-        }
-
-        watchosX64Main {
-            dependsOn nativeMain
-        }
-
-        tvosMain {
-            dependsOn nativeMain
-        }
+//        macosX64Test {
+//            dependencies {
+//                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+//                api "io.kotest:kotest-property:$KOTEST_VERSION"
+//                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+//                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
+//            }
+//        }
+//        mingwX64Main {
+//            dependsOn nativeMain
+//        }
+//        mingwX64Test {
+//            dependsOn nativeTest
+//        }
+//        linuxX64Main {
+//            dependsOn nativeMain
+//        }
+//        linuxX64Test {
+//            dependsOn nativeTest
+//        }
+//        iosX64Main {
+//            dependsOn nativeMain
+//        }
+//        iosX64Test {
+//            dependsOn nativeTest
+//        }
+//        iosArm64Main {
+//            dependsOn nativeMain
+//        }
+//        iosArm64Test {
+//            dependsOn nativeTest
+//        }
+//        iosArm32Main {
+//            dependsOn nativeMain
+//        }
+//        iosArm32Test {
+//            dependsOn nativeTest
+//        }
+//        watchosX86Main {
+//            dependsOn nativeMain
+//        }
+//        watchosX86Test {
+//            dependsOn nativeTest
+//        }
+//        watchosArm32Main {
+//            dependsOn nativeMain
+//        }
+//        watchosArm32Test {
+//            dependsOn nativeTest
+//        }
+//        watchosArm64Main {
+//            dependsOn nativeMain
+//        }
+//        watchosArm64Test {
+//            dependsOn nativeTest
+//        }
+//        watchosX64Main {
+//            dependsOn nativeMain
+//        }
+//        watchosX64Test {
+//            dependsOn nativeTest
+//        }
+//        tvosMain {
+//            dependsOn nativeMain
+//        }
+//        tvosTest {
+//            dependsOn nativeTest
+//        }
     }
 }
 
@@ -145,7 +214,7 @@ tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
-tasks.jvmTest{
+tasks.jvmTest {
     useJUnitPlatform()
     testLogging {
         exceptionFormat 'full'
