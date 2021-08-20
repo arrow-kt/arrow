@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.NonEmptyList
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
 import kotlin.jvm.JvmName
@@ -78,6 +79,9 @@ public object Platform {
     all.firstOrNull()?.let { first ->
       composeErrors(first, all.drop(1))
     }
+
+  public fun composeErrors(all: NonEmptyList<Throwable>): Throwable =
+      composeErrors(all.head, all.tail)
 }
 
 public class AtomicRefW<A>(a: A) {
