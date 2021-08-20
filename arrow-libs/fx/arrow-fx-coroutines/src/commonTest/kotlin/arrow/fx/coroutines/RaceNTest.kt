@@ -11,6 +11,7 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 
@@ -34,8 +35,8 @@ class RaceNTest : ArrowFxSpec(
         val pa = CompletableDeferred<Pair<Int, ExitCase>>()
         val pb = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
 
         val f = async { raceN(loserA, loserB) }
 
@@ -64,8 +65,8 @@ class RaceNTest : ArrowFxSpec(
         val s = Channel<Unit>()
         val pa = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val winner = suspend { s.send(Unit); eith.rethrow() }
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val winner: suspend CoroutineScope.() -> Int = { s.send(Unit); eith.rethrow() }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never() }) { ex -> pa.complete(Pair(a, ex)) } }
 
         val res = Either.catch {
           if (leftWinner) raceN(winner, loserA)
@@ -105,9 +106,9 @@ class RaceNTest : ArrowFxSpec(
         val pb = CompletableDeferred<Pair<Int, ExitCase>>()
         val pc = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
-        val loserC = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never() }) { ex -> pc.complete(Pair(c, ex)) } }
 
         val f = async { raceN(loserA, loserB, loserC) }
 
@@ -142,9 +143,9 @@ class RaceNTest : ArrowFxSpec(
         val pa = CompletableDeferred<Pair<Int, ExitCase>>()
         val pb = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val winner = suspend { s.send(Unit); s.send(Unit); eith.rethrow() }
-        val loserA = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB = suspend { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val winner: suspend CoroutineScope.() -> Int = { s.send(Unit); s.send(Unit); eith.rethrow() }
+        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
 
         val res = Either.catch {
           when (leftWinner) {

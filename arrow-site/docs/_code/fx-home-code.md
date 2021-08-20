@@ -32,7 +32,7 @@ suspend fun main() {
     val audrey = parZip({ "Audrey" }, { company("Arrow") }) { name, company -> Employee(name, company) }
     val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { name, company -> Employee(name, company) }
     val candidates = listOf(audrey, pepe)
-    val employees = candidates.parTraverse(::hire) //hires in parallel
+    val employees = candidates.parTraverse { hire(it) } //hires in parallel
     //sampleEnd
     println(employees)
 }
