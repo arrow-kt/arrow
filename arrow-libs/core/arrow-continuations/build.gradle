@@ -15,10 +15,6 @@ kotlin {
     sourceSets {
         commonTest {
             dependencies {
-                // WORKS: ./gradlew :arrow-continuations:macosX64Test :arrow-continuations:jsTest :arrow-continuations:jvmTest
-//                api project(":arrow-core")
-
-                // FAILS: ./gradlew :arrow-continuations:macosX64Test :arrow-continuations:jsTest :arrow-continuations:jvmTest
                 api project(":arrow-core-test")
                 api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
                 api "io.kotest:kotest-property:$KOTEST_VERSION"

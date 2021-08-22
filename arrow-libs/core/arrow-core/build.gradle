@@ -1,6 +1,5 @@
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
-    id("io.kotest.multiplatform")
     id "org.jlleitschuh.gradle.ktlint"
 }
 
