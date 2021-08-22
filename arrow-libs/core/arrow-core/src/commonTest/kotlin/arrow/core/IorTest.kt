@@ -204,7 +204,7 @@ class IorTest : UnitSpec() {
     }
 
     "traverse should wrap ior in a list" {
-      checkAll((Arb.int(), Arb.string())) { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
