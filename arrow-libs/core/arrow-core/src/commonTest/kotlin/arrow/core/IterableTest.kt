@@ -6,7 +6,7 @@ import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlin.math.max
@@ -274,17 +274,17 @@ class IterableTest : UnitSpec() {
     }
 
     "can align lists with different lengths" {
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).size shouldBe max(a.size, b.size)
       }
 
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).take(min(a.size, b.size)).forEach {
           it.isBoth shouldBe true
         }
       }
 
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).drop(min(a.size, b.size)).forEach {
           if (a.size < b.size) {
             it.isRight shouldBe true

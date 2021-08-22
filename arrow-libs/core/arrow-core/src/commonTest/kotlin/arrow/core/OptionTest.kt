@@ -12,7 +12,7 @@ import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
@@ -48,7 +48,7 @@ class OptionTest : UnitSpec() {
     )
 
     "ensure null in option computation" {
-      checkAll(Arb.bool(), Arb.int()) { predicate, i ->
+      checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
         option {
           ensure(predicate)
           i

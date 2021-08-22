@@ -21,7 +21,7 @@ import arrow.core.right
 import arrow.core.toOption
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
@@ -240,7 +240,7 @@ public fun Arb.Companion.any(): Arb<Any> =
     Arb.long() as Arb<Any>,
 //    Arb.float() as Arb<Any>,
 //    Arb.double() as Arb<Any>,
-    Arb.bool() as Arb<Any>,
+    Arb.boolean() as Arb<Any>,
     Arb.throwable() as Arb<Any>,
     Arb.unit() as Arb<Any>
   )

@@ -6,7 +6,7 @@
 //import arrow.optics.test.laws.LensLaws
 //import arrow.optics.typeclasses.At
 //import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.bool
+//import io.kotest.property.arbitrary.boolean
 //import io.kotest.property.arbitrary.int
 //import io.kotest.property.arbitrary.map
 //import io.kotest.property.arbitrary.set
@@ -29,8 +29,8 @@
 //      LensLaws.laws(
 //        lensGen = Arb.string().map { At.set<String>().at(it) },
 //        aGen = Arb.set(Arb.string()),
-//        bGen = Arb.bool(),
-//        funcGen = Arb.functionAToB(Arb.bool()),
+//        bGen = Arb.boolean(),
+//        funcGen = Arb.functionAToB(Arb.boolean()),
 //      )
 //    )
 //  }
