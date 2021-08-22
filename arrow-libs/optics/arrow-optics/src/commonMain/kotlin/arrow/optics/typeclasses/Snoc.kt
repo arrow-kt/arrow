@@ -75,11 +75,11 @@ public fun interface Snoc<S, A> {
     public fun <A> list(): Snoc<List<A>, A> =
       Snoc {
         object : Prism<List<A>, Pair<List<A>, A>> {
-          override fun getOrModify(s: List<A>): Either<List<A>, Pair<List<A>, A>> =
-            Nullable.zip(s.dropLast(1), s.lastOrNull(), ::Pair)?.right() ?: s.left()
+          override fun getOrModify(source: List<A>): Either<List<A>, Pair<List<A>, A>> =
+            Nullable.zip(source.dropLast(1), source.lastOrNull(), ::Pair)?.right() ?: source.left()
 
-          override fun reverseGet(b: Pair<List<A>, A>): List<A> =
-            b.first + b.second
+          override fun reverseGet(focus: Pair<List<A>, A>): List<A> =
+            focus.first + focus.second
         }
       }
 

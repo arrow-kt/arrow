@@ -86,7 +86,7 @@ class IorTest : UnitSpec() {
     }
 
     "bimap() should allow modify both value" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Right(b).bimap({ "5" }, { a * 2 }) shouldBe Ior.Right(a * 2)
         Ior.Left(a).bimap({ a * 3 }, { "5" }) shouldBe Ior.Left(a * 3)
         Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) shouldBe Ior.Both(2, "power of $b")
@@ -94,7 +94,7 @@ class IorTest : UnitSpec() {
     }
 
     "mapLeft() should modify only left value" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Right(b).mapLeft { a * 2 } shouldBe Ior.Right(b)
         Ior.Left(a).mapLeft { b } shouldBe Ior.Left(b)
         Ior.Both(a, b).mapLeft { "power of $it" } shouldBe Ior.Both("power of $a", b)
@@ -102,20 +102,20 @@ class IorTest : UnitSpec() {
     }
 
     "swap() should interchange value" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Both(a, b).swap() shouldBe Ior.Both(b, a)
       }
     }
 
     "swap() should interchange entity" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Ior.Left(a).swap() shouldBe Ior.Right(a)
         Ior.Right(a).swap() shouldBe Ior.Left(a)
       }
     }
 
     "unwrap() should return the isomorphic either" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).unwrap() shouldBe Either.Left(Either.Left(a))
         Ior.Right(b).unwrap() shouldBe Either.Left(Either.Right(b))
         Ior.Both(a, b).unwrap() shouldBe Either.Right(Pair(a, b))
@@ -123,7 +123,7 @@ class IorTest : UnitSpec() {
     }
 
     "padNull() should return the correct Pair of nullables" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).padNull() shouldBe Pair(a, null)
         Ior.Right(b).padNull() shouldBe Pair(null, b)
         Ior.Both(a, b).padNull() shouldBe Pair(a, b)
@@ -131,7 +131,7 @@ class IorTest : UnitSpec() {
     }
 
     "toEither() should convert values into a valid Either" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).toEither() shouldBe Either.Left(a)
         Ior.Right(b).toEither() shouldBe Either.Right(b)
         Ior.Both(a, b).toEither() shouldBe Either.Right(b)
@@ -139,7 +139,7 @@ class IorTest : UnitSpec() {
     }
 
     "orNull() should convert right values into a nullable" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).orNull() shouldBe null
         Ior.Right(b).orNull() shouldBe b
         Ior.Both(a, b).orNull() shouldBe b
@@ -147,7 +147,7 @@ class IorTest : UnitSpec() {
     }
 
     "leftOrNull() should convert left values into a nullable" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).leftOrNull() shouldBe a
         Ior.Right(b).leftOrNull() shouldBe null
         Ior.Both(a, b).leftOrNull() shouldBe a
@@ -155,7 +155,7 @@ class IorTest : UnitSpec() {
     }
 
     "toValidated() should convert values into a valid Validated" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.Left(a).toValidated() shouldBe Invalid(a)
         Ior.Right(b).toValidated() shouldBe Valid(b)
         Ior.Both(a, b).toValidated() shouldBe Valid(b)
@@ -163,7 +163,7 @@ class IorTest : UnitSpec() {
     }
 
     "fromNullables() should build a correct Ior" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.fromNullables(a, null) shouldBe Ior.Left(a)
         Ior.fromNullables(a, b) shouldBe Ior.Both(a, b)
         Ior.fromNullables(null, b) shouldBe Ior.Right(b)
@@ -172,7 +172,7 @@ class IorTest : UnitSpec() {
     }
 
     "getOrElse() should return value" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         Ior.Right(a).getOrElse { b } shouldBe a
         Ior.Left(a).getOrElse { b } shouldBe b
         Ior.Both(a, b).getOrElse { a * 2 } shouldBe b
@@ -204,7 +204,7 @@ class IorTest : UnitSpec() {
     }
 
     "traverse should wrap ior in a list" {
-      checkAll { a: Int, b: String ->
+      checkAll((Arb.int(), Arb.string())) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
@@ -222,7 +222,7 @@ class IorTest : UnitSpec() {
     }
 
     "traverseOption should wrap ior in an Option" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
@@ -240,7 +240,7 @@ class IorTest : UnitSpec() {
     }
 
     "traverseEither should wrap ior in an Option" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
@@ -258,7 +258,7 @@ class IorTest : UnitSpec() {
     }
 
     "bitraverse should wrap ior in a list" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
@@ -278,7 +278,7 @@ class IorTest : UnitSpec() {
     }
 
     "bitraverseOption should wrap ior in an Option" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
@@ -297,7 +297,7 @@ class IorTest : UnitSpec() {
     }
 
     "bitraverseEither should wrap ior in an Either" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()

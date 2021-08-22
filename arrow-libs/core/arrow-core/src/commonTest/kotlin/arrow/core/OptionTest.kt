@@ -103,7 +103,7 @@ class OptionTest : UnitSpec() {
     }
 
     "fromNullable should work for both null and non-null values of nullable types" {
-      checkAll { a: Int? ->
+      checkAll(Arb.int().orNull()) { a: Int? ->
         // This seems to be generating only non-null values, so it is complemented by the next test
         val o: Option<Int> = Option.fromNullable(a)
         if (a == null) o shouldBe None else o shouldBe Some(a)
@@ -131,7 +131,7 @@ class OptionTest : UnitSpec() {
     }
 
     "zip" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         val op: Option<Int> = a.some()
         some.zip(op) { a, b -> a + b } shouldBe Some("kotlin$a")
         none.zip(op) { a, b -> a + b } shouldBe None
