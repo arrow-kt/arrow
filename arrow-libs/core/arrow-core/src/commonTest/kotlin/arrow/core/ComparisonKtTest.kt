@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.array
 import io.kotest.assertions.assertSoftly
 import io.kotest.property.Arb
 import io.kotest.property.checkAll

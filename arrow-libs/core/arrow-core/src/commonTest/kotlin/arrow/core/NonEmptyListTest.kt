@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
