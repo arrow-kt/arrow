@@ -1,93 +1,86 @@
-// package arrow.optics
-//
-// import arrow.core.Either.Left
-// import arrow.core.Either.Right
-// import arrow.core.test.UnitSpec
-// import arrow.typeclasses.Monoid
-// import io.kotest.matchers.shouldBe
-// import io.kotest.property.Arb
-// import io.kotest.property.arbitrary.int
-// import io.kotest.property.arbitrary.string
-// import io.kotest.property.arbitrary.boolean
-// import io.kotest.property.checkAll
-//
-// class GetterTest : UnitSpec() {
-//
-//  init {
-//
-//    val userGetter = userIso
-//    val length = Getter<String, Int> { it.length }
-//    val upper = Getter<String, String> { it.toUpperCase() }
-//
-//    with(tokenGetter) {
-//
-//      "asFold should behave as valid Fold: size" {
-//        checkAll(genToken) { token ->
-//          size(token) shouldBe 1
-//        }
+package arrow.optics
+
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.core.test.UnitSpec
+import arrow.typeclasses.Monoid
+import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.boolean
+
+class GetterTest : UnitSpec() {
+
+  init {
+
+    val userGetter = userIso
+    val length = Getter<String, Int> { it.length }
+    val upper = Getter<String, String> { it.uppercase() }
+
+//    "asFold should behave as valid Fold: size" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.size(token) shouldBe 1
 //      }
-//
-//      "asFold should behave as valid Fold: nonEmpty" {
-//        checkAll(genToken) { token ->
-//          isNotEmpty(token) shouldBe true
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: isEmpty" {
-//        checkAll(genToken) { token ->
-//          !isEmpty(token) shouldBe true
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: getAll" {
-//        checkAll(genToken) { token ->
-//          getAll(token) shouldBe listOf(token.value)
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: combineAll" {
-//        checkAll(genToken) { token ->
-//          combineAll(Monoid.string(), token) shouldBe token.value
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: fold" {
-//        checkAll(genToken) { token ->
-//          fold(Monoid.string(), token) shouldBe token.value
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: headOption" {
-//        checkAll(genToken) { token ->
-//          firstOrNull(token) shouldBe token.value
-//        }
-//      }
-//
-//      "asFold should behave as valid Fold: lastOption" {
-//        checkAll(genToken) { token ->
-//          lastOrNull(token) shouldBe token.value
-//        }
+//    }
+
+//    "asFold should behave as valid Fold: nonEmpty" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.isNotEmpty(token) shouldBe true
 //      }
 //    }
 //
-//    with(tokenGetter) {
-//
-//      "Getting the target should always yield the exact result" {
-//        checkAll(Arb.string()) { value: String ->
-//          get(Token(value)) shouldBe value
-//        }
+//    "asFold should behave as valid Fold: isEmpty" {
+//      checkAll(genToken) { token ->
+//        !tokenGetter.isEmpty(token) shouldBe true
 //      }
+//    }
 //
-//      "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
-//        checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
-//          findOrNull(Token(value)) { predicate }?.let { true } ?: false shouldBe predicate
-//        }
+//    "asFold should behave as valid Fold: getAll" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.getAll(token) shouldBe listOf(token.value)
 //      }
+//    }
 //
-//      "Checking existence of a target should always result in the same result as predicate" {
-//        checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
-//          any(Token(value)) { predicate } shouldBe predicate
-//        }
+//    "asFold should behave as valid Fold: combineAll" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.combineAll(Monoid.string(), token) shouldBe token.value
+//      }
+//    }
+//
+//    "asFold should behave as valid Fold: fold" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.fold(Monoid.string(), token) shouldBe token.value
+//      }
+//    }
+//
+//    "asFold should behave as valid Fold: headOption" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.firstOrNull(token) shouldBe token.value
+//      }
+//    }
+//
+//    "asFold should behave as valid Fold: lastOption" {
+//      checkAll(genToken) { token ->
+//        tokenGetter.lastOrNull(token) shouldBe token.value
+//      }
+//    }
+//
+//    "Getting the target should always yield the exact result" {
+//      checkAll(Arb.string()) { value: String ->
+//        tokenGetter.get(Token(value)) shouldBe value
+//      }
+//    }
+//
+//    "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
+//      checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
+//        tokenGetter.findOrNull(Token(value)) { predicate }?.let { true } ?: false shouldBe predicate
+//      }
+//    }
+//
+//    "Checking existence of a target should always result in the same result as predicate" {
+//      checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
+//        tokenGetter.any(Token(value)) { predicate } shouldBe predicate
 //      }
 //    }
 //
@@ -128,5 +121,5 @@
 //        first.get(int to token) shouldBe (int to token.value)
 //      }
 //    }
-//  }
-// }
+  }
+}

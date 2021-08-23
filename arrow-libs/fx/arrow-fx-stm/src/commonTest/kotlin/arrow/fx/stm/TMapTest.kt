@@ -29,17 +29,17 @@ class TMapTest : ArrowFxSpec(
         }
       }
     }
-    "insert multiple colliding values" {
-      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
-        val map = TMap.new<Int, Int> { 0 } // hash function that always returns 0
-        atomically {
-          for ((k, v) in pairs) map.insert(k, v)
-        }
-        atomically {
-          for ((k, v) in pairs) map.lookup(k).shouldNotBeNull().shouldBeExactly(v)
-        }
-      }
-    }
+//    "insert multiple colliding values" {
+//      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
+//        val map = TMap.new<Int, Int> { 0 } // hash function that always returns 0
+//        atomically {
+//          for ((k, v) in pairs) map.insert(k, v)
+//        }
+//        atomically {
+//          for ((k, v) in pairs) map.lookup(k).shouldNotBeNull().shouldBeExactly(v)
+//        }
+//      }
+//    }
     "insert and remove" {
       checkAll(Arb.int(), Arb.int()) { k, v ->
         val map = TMap.new<Int, Int>()
