@@ -205,32 +205,32 @@ class STMTest : ArrowFxSpec(
       }
       tv.unsafeRead() shouldBeExactly 10
     }
-    "concurrent example 1" {
-      checkAll {
-        val acc1 = TVar.new(100)
-        val acc2 = TVar.new(200)
-        parZip(
-          {
-            // transfer acc1 to acc2
-            val amount = 50
-            atomically {
-              val acc1Balance = acc1.read()
-              check(acc1Balance - amount >= 0)
-              acc1.write(acc1Balance - amount)
-              acc2.modify { it + 50 }
-            }
-          },
-          {
-            atomically { acc1.modify { it - 60 } }
-            delay(20.milliseconds)
-            atomically { acc1.modify { it + 60 } }
-          },
-          { _, _ -> Unit }
-        )
-        acc1.unsafeRead() shouldBeExactly 50
-        acc2.unsafeRead() shouldBeExactly 250
-      }
-    }
+//    "concurrent example 1" {
+//      checkAll {
+//        val acc1 = TVar.new(100)
+//        val acc2 = TVar.new(200)
+//        parZip(
+//          {
+//            // transfer acc1 to acc2
+//            val amount = 50
+//            atomically {
+//              val acc1Balance = acc1.read()
+//              check(acc1Balance - amount >= 0)
+//              acc1.write(acc1Balance - amount)
+//              acc2.modify { it + 50 }
+//            }
+//          },
+//          {
+//            atomically { acc1.modify { it - 60 } }
+//            delay(20.milliseconds)
+//            atomically { acc1.modify { it + 60 } }
+//          },
+//          { _, _ -> Unit }
+//        )
+//        acc1.unsafeRead() shouldBeExactly 50
+//        acc2.unsafeRead() shouldBeExactly 250
+//      }
+//    }
 
     // TypeError: Cannot read property 'toString' of undefined
     // at ObjectLiteral_0.test(/var/folders/x5/6r18d9w52c7czy6zh5m1spvw0000gn/T/_karma_webpack_624630/commons.js:3661)
