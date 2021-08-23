@@ -1,14 +1,13 @@
 package arrow.core
 
+import arrow.core.test.UnitSpec
 import io.kotest.assertions.fail
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.Sample
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.checkAll
 
-class EvalJvmTest : StringSpec({
+class EvalJvmTest : UnitSpec(spec = {
   "stack safety stress test" {
     checkAll(DeepEval.gen) { d: DeepEval ->
       try {

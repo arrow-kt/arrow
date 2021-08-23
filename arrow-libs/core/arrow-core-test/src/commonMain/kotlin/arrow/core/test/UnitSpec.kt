@@ -2,10 +2,12 @@ package arrow.core.test
 
 import arrow.core.Tuple4
 import arrow.core.Tuple5
+import arrow.core.test.generators.unit
 import arrow.core.test.laws.Law
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.createTestName
 import io.kotest.property.Arb
+import io.kotest.property.Gen
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.checkAll
@@ -13,7 +15,16 @@ import io.kotest.property.checkAll
 /**
  * Base class for unit tests
  */
-public abstract class UnitSpec : StringSpec() {
+public abstract class UnitSpec(
+  private val iterations: Int = 250,
+  spec: UnitSpec.() -> Unit = {}
+) : StringSpec() {
+
+  public constructor(spec: UnitSpec.() -> Unit): this(250, spec)
+
+  init {
+      spec()
+  }
 
   public fun testLaws(vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
@@ -28,6 +39,99 @@ public abstract class UnitSpec : StringSpec() {
     .forEach { law: Law ->
       registration().addTest(createTestName(prefix, law.name, true), xdisabled = false, law.test)
     }
+
+  public suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
+    checkAll(iterations, Arb.unit()) { property() }
+
+  public suspend fun <A> checkAll(
+    genA: Arb<A>,
+    property: suspend PropertyContext.(A) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      property
+    )
+
+  public suspend fun <A, B> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    property: suspend PropertyContext.(A, B) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      property
+    )
+
+  public suspend fun <A, B, C> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    genC: Arb<C>,
+    property: suspend PropertyContext.(A, B, C) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      genC,
+      property
+    )
+
+  public suspend fun <A, B, C, D> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    genC: Arb<C>,
+    genD: Arb<D>,
+    property: suspend PropertyContext.(A, B, C, D) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      genC,
+      genD,
+      property
+    )
+
+  public suspend fun <A, B, C, D, E> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    genC: Arb<C>,
+    genD: Arb<D>,
+    genE: Arb<E>,
+    property: suspend PropertyContext.(A, B, C, D, E) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      genC,
+      genD,
+      genE,
+      property
+    )
+
+  public suspend fun <A, B, C, D, E, F> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    genC: Arb<C>,
+    genD: Arb<D>,
+    genE: Arb<E>,
+    genF: Arb<F>,
+    property: suspend PropertyContext.(A, B, C, D, E, F) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      genC,
+      genD,
+      genE,
+      genF,
+      property
+    )
 
   public suspend fun <A, B, C, D, E, F, G> checkAll(
     gena: Arb<A>,
@@ -101,4 +205,14 @@ public abstract class UnitSpec : StringSpec() {
       fn(a, b, c, d, e, f, g, h, i, j)
     }
   }
+
+  public suspend fun forFew(
+    iterations: Int,
+    property: suspend PropertyContext.(Unit) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      Arb.unit(),
+      property
+    )
 }

@@ -1,15 +1,13 @@
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
+import arrow.core.test.UnitSpec
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlin.random.Random
 
-class MemoizationTest : StringSpec() {
-
-  init {
+class MemoizationTest : UnitSpec({
     "Memoize races" {
       checkAll<Int> {
         fun sum(): Int =
@@ -133,7 +131,6 @@ class MemoizationTest : StringSpec() {
       memoized(3, 4, 5, 1, 2) shouldBe result
       runs shouldBe 3
     }
-  }
-}
+})
 
 private fun consecSumResult(n: Int): Int = (n * (n + 1)) / 2
