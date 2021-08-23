@@ -130,9 +130,9 @@ clean.doFirst {
 group = GROUP
 archivesBaseName = POM_ARTIFACT_ID
 
-//configurations.all {
-//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-//}
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
 
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()

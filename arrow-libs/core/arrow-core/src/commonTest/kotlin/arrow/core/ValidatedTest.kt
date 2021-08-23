@@ -204,7 +204,7 @@ class ValidatedTest : UnitSpec() {
             ) { a, b -> a + b }
           })
           else Invalid(
-            all.filterIsInstance<Invalid<Long?>>().map { it.value } .combineAll(nullableLongSemigroup)
+            all.filterIsInstance<Invalid<Long?>>().map { it.value }.combineAll(nullableLongSemigroup)
           )
 
         res shouldBe expected
