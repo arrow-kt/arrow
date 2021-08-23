@@ -36,7 +36,7 @@ class TMapTest : ArrowFxSpec(
           for ((k, v) in pairs) map.insert(k, v)
         }
         atomically {
-          for ((k, v) in pairs) map.lookup(k).shouldNotBeNull().shouldBeExactly(v)
+          for ((k, v) in pairs) map.lookup(k) shouldBe v
         }
       }
     }
