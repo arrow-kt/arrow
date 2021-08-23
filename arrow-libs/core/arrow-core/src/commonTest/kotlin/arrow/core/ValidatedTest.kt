@@ -195,7 +195,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         val all = listOf(a, b, c, d, e, f, g, h, i, j)
-        val isValid = all.all(Validated<Long?, Int?>::isValid)
+        val isValid = all.all { it.isValid }
         val expected: Validated<Long?, Int?> =
           if (isValid) Valid(all.fold<Validated<Long?, Int?>, Int?>(0) { acc, validated ->
             Nullable.zip(
@@ -204,7 +204,7 @@ class ValidatedTest : UnitSpec() {
             ) { a, b -> a + b }
           })
           else Invalid(
-            all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup)
+            all.filterIsInstance<Invalid<Long?>>().map { it.value } .combineAll(nullableLongSemigroup)
           )
 
         res shouldBe expected
