@@ -1,20 +1,20 @@
-//package arrow.optics.std
+// package arrow.optics.std
 //
-//import arrow.core.Invalid
-//import arrow.core.Valid
-//import arrow.core.Validated
-//import arrow.core.test.UnitSpec
-//import arrow.core.test.generators.either
-//import arrow.core.test.generators.functionAToB
-//import arrow.core.test.generators.validated
-//import arrow.optics.Iso
-//import arrow.optics.test.laws.IsoLaws
-//import arrow.typeclasses.Monoid
-//import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.int
-//import io.kotest.property.arbitrary.string
+// import arrow.core.Invalid
+// import arrow.core.Valid
+// import arrow.core.Validated
+// import arrow.core.test.UnitSpec
+// import arrow.core.test.generators.either
+// import arrow.core.test.generators.functionAToB
+// import arrow.core.test.generators.validated
+// import arrow.optics.Iso
+// import arrow.optics.test.laws.IsoLaws
+// import arrow.typeclasses.Monoid
+// import io.kotest.property.Arb
+// import io.kotest.property.arbitrary.int
+// import io.kotest.property.arbitrary.string
 //
-//class EitherTest : UnitSpec() {
+// class EitherTest : UnitSpec() {
 //
 //  init {
 //    val VAL_MONOID: Monoid<Validated<String, Int>> = object : Monoid<Validated<String, Int>> {
@@ -45,4 +45,4 @@
 //      )
 //    )
 //  }
-//}
+// }

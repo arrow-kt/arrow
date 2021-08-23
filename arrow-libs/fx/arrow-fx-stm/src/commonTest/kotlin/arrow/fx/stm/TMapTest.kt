@@ -1,6 +1,8 @@
 package arrow.fx.stm
 
 import arrow.fx.coroutines.ArrowFxSpec
+import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -34,7 +36,7 @@ class TMapTest : ArrowFxSpec(
           for ((k, v) in pairs) map.insert(k, v)
         }
         atomically {
-          for ((k, v) in pairs) map.lookup(k) shouldBe v
+          for ((k, v) in pairs) map.lookup(k).shouldNotBeNull().shouldBeExactly(v)
         }
       }
     }

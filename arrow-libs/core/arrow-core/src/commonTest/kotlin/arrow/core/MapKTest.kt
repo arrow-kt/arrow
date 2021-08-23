@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.longSmall
-import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup

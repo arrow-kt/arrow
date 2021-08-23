@@ -1,15 +1,15 @@
-//package arrow.optics.std
+// package arrow.optics.std
 //
-//import arrow.core.test.UnitSpec
-//import arrow.optics.Iso
-//import arrow.optics.test.laws.IsoLaws
-//import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.char
-//import io.kotest.property.arbitrary.list
-//import io.kotest.property.arbitrary.map
-//import io.kotest.property.arbitrary.string
+// import arrow.core.test.UnitSpec
+// import arrow.optics.Iso
+// import arrow.optics.test.laws.IsoLaws
+// import io.kotest.property.Arb
+// import io.kotest.property.arbitrary.char
+// import io.kotest.property.arbitrary.list
+// import io.kotest.property.arbitrary.map
+// import io.kotest.property.arbitrary.string
 //
-//class StringTest : UnitSpec() {
+// class StringTest : UnitSpec() {
 //
 //  init {
 //
@@ -23,4 +23,4 @@
 //      )
 //    )
 //  }
-//}
+// }

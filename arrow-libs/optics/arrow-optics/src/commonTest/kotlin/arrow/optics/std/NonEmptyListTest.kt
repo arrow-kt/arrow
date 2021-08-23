@@ -1,15 +1,15 @@
-//package arrow.optics.std
+// package arrow.optics.std
 //
-//import arrow.core.test.UnitSpec
-//import arrow.core.test.generators.functionAToB
-//import arrow.core.test.generators.nonEmptyList
-//import arrow.optics.Lens
-//import arrow.optics.test.laws.LensLaws
-//import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.list
-//import io.kotest.property.arbitrary.string
+// import arrow.core.test.UnitSpec
+// import arrow.core.test.generators.functionAToB
+// import arrow.core.test.generators.nonEmptyList
+// import arrow.optics.Lens
+// import arrow.optics.test.laws.LensLaws
+// import io.kotest.property.Arb
+// import io.kotest.property.arbitrary.list
+// import io.kotest.property.arbitrary.string
 //
-//class NonEmptyListTest : UnitSpec() {
+// class NonEmptyListTest : UnitSpec() {
 //
 //  init {
 //
@@ -33,4 +33,4 @@
 //      )
 //    )
 //  }
-//}
+// }

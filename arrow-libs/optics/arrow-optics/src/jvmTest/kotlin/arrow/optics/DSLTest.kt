@@ -1,48 +1,48 @@
-//package arrow.optics
+// package arrow.optics
 //
-//import arrow.core.None
-//import arrow.core.test.UnitSpec
-//import arrow.optics.typeclasses.At
-//import arrow.optics.typeclasses.Index
-//import io.kotest.matchers.shouldBe
+// import arrow.core.None
+// import arrow.core.test.UnitSpec
+// import arrow.optics.typeclasses.At
+// import arrow.optics.typeclasses.Index
+// import io.kotest.matchers.shouldBe
 //
-//@optics
-//data class Street(val number: Int, val name: String) {
+// @optics
+// data class Street(val number: Int, val name: String) {
 //  companion object
-//}
+// }
 //
-//@optics
-//data class Address(val city: String, val street: Street) {
+// @optics
+// data class Address(val city: String, val street: Street) {
 //  companion object
-//}
+// }
 //
-//@optics
-//data class Company(val name: String, val address: Address) {
+// @optics
+// data class Company(val name: String, val address: Address) {
 //  companion object
-//}
+// }
 //
-//@optics
-//data class Employee(val name: String, val company: Company?) {
+// @optics
+// data class Employee(val name: String, val company: Company?) {
 //  companion object
-//}
+// }
 //
-//@optics
-//data class CompanyEmployees(val employees: List<Employee>) {
+// @optics
+// data class CompanyEmployees(val employees: List<Employee>) {
 //  companion object
-//}
+// }
 //
-//sealed class Keys
-//object One : Keys()
-//object Two : Keys()
-//object Three : Keys()
-//object Four : Keys()
+// sealed class Keys
+// object One : Keys()
+// object Two : Keys()
+// object Three : Keys()
+// object Four : Keys()
 //
-//@optics
-//data class Db(val content: Map<Keys, String>) {
+// @optics
+// data class Db(val content: Map<Keys, String>) {
 //  companion object
-//}
+// }
 //
-//class BoundedTest : UnitSpec() {
+// class BoundedTest : UnitSpec() {
 //
 //  init {
 //
@@ -102,4 +102,4 @@
 //      } shouldBe (Db.content compose Every.map()).modify(db, String::toUpperCase)
 //    }
 //  }
-//}
+// }

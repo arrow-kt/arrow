@@ -1,5 +1,6 @@
 package arrow.core.test
 
+import arrow.core.NonEmptyList
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.test.generators.unit
@@ -10,20 +11,48 @@ import io.kotest.property.Arb
 import io.kotest.property.Gen
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.bind
+import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.list as KList
+import io.kotest.property.arbitrary.map as KMap
 import io.kotest.property.checkAll
+import kotlin.jvm.JvmOverloads
+import kotlin.math.max
 
 /**
  * Base class for unit tests
  */
 public abstract class UnitSpec(
-  private val iterations: Int = 250,
+  public val iterations: Int = 250,
+  public val maxDepth: Int = 15,
   spec: UnitSpec.() -> Unit = {}
 ) : StringSpec() {
 
-  public constructor(spec: UnitSpec.() -> Unit): this(250, spec)
+  public constructor(spec: UnitSpec.() -> Unit) : this(250, 15, spec)
+
+  public fun <A> Arb.Companion.list(gen: Gen<A>, range: IntRange = 0..maxDepth): Arb<List<A>> =
+    Arb.KList(gen, range)
+
+  public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, depth: Int = maxDepth): Arb<NonEmptyList<A>> =
+    Arb.list(arb, 1..max(1, maxDepth)).filter(List<A>::isNotEmpty).map(NonEmptyList.Companion::fromListUnsafe)
+
+  public fun <A> Arb.Companion.sequence(arbA: Arb<A>, range: IntRange = 0..maxDepth): Arb<Sequence<A>> =
+    Arb.list(arbA, range).map { it.asSequence() }
+
+  @JvmOverloads
+  public inline fun <reified A> Arb.Companion.array(gen: Arb<A>, range: IntRange = 0..maxDepth): Arb<Array<A>> =
+    Arb.list(gen, range).map { it.toTypedArray() }
+
+  public fun <K, V> Arb.Companion.map(
+    keyArb: Arb<K>,
+    valueArb: Arb<V>,
+    minSize: Int = 1,
+    maxSize: Int = 15
+  ): Arb<Map<K, V>> =
+    Arb.KMap(keyArb, valueArb, minSize = minSize, maxSize = maxSize)
 
   init {
-      spec()
+    spec()
   }
 
   public fun testLaws(vararg laws: List<Law>): Unit = laws

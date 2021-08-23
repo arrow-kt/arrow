@@ -56,14 +56,6 @@ kotlin {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
-//        commmonTest {
-//            dependencies {
-//                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-//                api "io.kotest:kotest-property:$KOTEST_VERSION"
-//                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-//                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
-//            }
-//        }
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
@@ -124,74 +116,6 @@ kotlin {
             watchosX64Test.dependsOn(it)
             tvosTest.dependsOn(it)
         }
-//        macosX64Test {
-//            dependencies {
-//                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-//                api "io.kotest:kotest-property:$KOTEST_VERSION"
-//                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-//                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
-//            }
-//        }
-//        mingwX64Main {
-//            dependsOn nativeMain
-//        }
-//        mingwX64Test {
-//            dependsOn nativeTest
-//        }
-//        linuxX64Main {
-//            dependsOn nativeMain
-//        }
-//        linuxX64Test {
-//            dependsOn nativeTest
-//        }
-//        iosX64Main {
-//            dependsOn nativeMain
-//        }
-//        iosX64Test {
-//            dependsOn nativeTest
-//        }
-//        iosArm64Main {
-//            dependsOn nativeMain
-//        }
-//        iosArm64Test {
-//            dependsOn nativeTest
-//        }
-//        iosArm32Main {
-//            dependsOn nativeMain
-//        }
-//        iosArm32Test {
-//            dependsOn nativeTest
-//        }
-//        watchosX86Main {
-//            dependsOn nativeMain
-//        }
-//        watchosX86Test {
-//            dependsOn nativeTest
-//        }
-//        watchosArm32Main {
-//            dependsOn nativeMain
-//        }
-//        watchosArm32Test {
-//            dependsOn nativeTest
-//        }
-//        watchosArm64Main {
-//            dependsOn nativeMain
-//        }
-//        watchosArm64Test {
-//            dependsOn nativeTest
-//        }
-//        watchosX64Main {
-//            dependsOn nativeMain
-//        }
-//        watchosX64Test {
-//            dependsOn nativeTest
-//        }
-//        tvosMain {
-//            dependsOn nativeMain
-//        }
-//        tvosTest {
-//            dependsOn nativeTest
-//        }
     }
 }
 
@@ -206,9 +130,9 @@ clean.doFirst {
 group = GROUP
 archivesBaseName = POM_ARTIFACT_ID
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
+//configurations.all {
+//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+//}
 
 tasks.withType(Test) {
     maxParallelForks = Runtime.runtime.availableProcessors()

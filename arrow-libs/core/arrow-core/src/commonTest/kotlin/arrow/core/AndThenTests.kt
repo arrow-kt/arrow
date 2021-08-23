@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 
-class AndThenTests : UnitSpec(spec= {
+class AndThenTests : UnitSpec(spec = {
   val count = stackSafeIteration()
 
   "AndThen0 - compose a chain of functions with andThen should be same with AndThen" {

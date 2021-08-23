@@ -1,24 +1,24 @@
-//package arrow.optics
+// package arrow.optics
 //
-//import arrow.core.Either
-//import arrow.core.test.UnitSpec
-//import arrow.core.test.generators.functionAToB
-//import arrow.optics.test.laws.IsoLaws
-//import arrow.optics.test.laws.LensLaws
-//import arrow.optics.test.laws.OptionalLaws
-//import arrow.optics.test.laws.PrismLaws
-//import arrow.optics.test.laws.SetterLaws
-//import arrow.optics.test.laws.TraversalLaws
-//import arrow.typeclasses.Monoid
-//import io.kotest.matchers.shouldBe
-//import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.boolean
-//import io.kotest.property.arbitrary.boolean
-//import io.kotest.property.arbitrary.int
-//import io.kotest.property.arbitrary.string
-//import io.kotest.property.checkAll
+// import arrow.core.Either
+// import arrow.core.test.UnitSpec
+// import arrow.core.test.generators.functionAToB
+// import arrow.optics.test.laws.IsoLaws
+// import arrow.optics.test.laws.LensLaws
+// import arrow.optics.test.laws.OptionalLaws
+// import arrow.optics.test.laws.PrismLaws
+// import arrow.optics.test.laws.SetterLaws
+// import arrow.optics.test.laws.TraversalLaws
+// import arrow.typeclasses.Monoid
+// import io.kotest.matchers.shouldBe
+// import io.kotest.property.Arb
+// import io.kotest.property.arbitrary.boolean
+// import io.kotest.property.arbitrary.boolean
+// import io.kotest.property.arbitrary.int
+// import io.kotest.property.arbitrary.string
+// import io.kotest.property.checkAll
 //
-//class IsoTest : UnitSpec() {
+// class IsoTest : UnitSpec() {
 //
 //  init {
 //
@@ -212,4 +212,4 @@
 //      }
 //    }
 //  }
-//}
+// }

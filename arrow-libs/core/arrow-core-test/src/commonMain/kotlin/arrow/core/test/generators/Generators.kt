@@ -5,8 +5,6 @@ import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
-import arrow.core.NonEmptyList
-import arrow.core.NonEmptyList.Companion.fromListUnsafe
 import arrow.core.Option
 import arrow.core.Tuple10
 import arrow.core.Tuple4
@@ -28,7 +26,6 @@ import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.numericDoubles
@@ -37,7 +34,6 @@ import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
-import kotlin.jvm.JvmOverloads
 import kotlin.math.abs
 
 public fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
@@ -196,12 +192,6 @@ public fun <E, A> Arb<E>.or(arbA: Arb<A>): Arb<Either<E, A>> = Arb.either(this, 
 public fun <E, A> Arb.Companion.validated(arbE: Arb<E>, arbA: Arb<A>): Arb<Validated<E, A>> =
   Arb.either(arbE, arbA).map { Validated.fromEither(it) }
 
-public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>): Arb<NonEmptyList<A>> =
-  Arb.list(arb).filter(List<A>::isNotEmpty).map(::fromListUnsafe)
-
-public fun <A> Arb.Companion.sequence(arbA: Arb<A>): Arb<Sequence<A>> =
-  Arb.list(arbA).map { it.asSequence() }
-
 public fun Arb.Companion.unit(): Arb<Unit> =
   Arb.constant(Unit)
 
@@ -238,16 +228,7 @@ public fun Arb.Companion.any(): Arb<Any> =
     Arb.string() as Arb<Any>,
     Arb.int() as Arb<Any>,
     Arb.long() as Arb<Any>,
-//    Arb.float() as Arb<Any>,
-//    Arb.double() as Arb<Any>,
     Arb.boolean() as Arb<Any>,
     Arb.throwable() as Arb<Any>,
     Arb.unit() as Arb<Any>
   )
-
-@JvmOverloads
-public inline fun <reified A> Arb.Companion.array(
-  gen: Arb<A>,
-  range: IntRange = 0..100
-): Arb<Array<A>> =
-  Arb.list(gen, range).map { it.toTypedArray() }

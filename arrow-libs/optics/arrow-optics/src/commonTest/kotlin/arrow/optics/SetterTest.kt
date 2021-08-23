@@ -1,18 +1,18 @@
-//package arrow.optics
+// package arrow.optics
 //
-//import arrow.core.getOrElse
-//import arrow.core.left
-//import arrow.core.right
-//import arrow.core.test.UnitSpec
-//import arrow.core.test.generators.functionAToB
-//import arrow.optics.test.laws.SetterLaws
-//import io.kotest.matchers.shouldBe
-//import io.kotest.property.Arb
-//import io.kotest.property.arbitrary.int
-//import io.kotest.property.arbitrary.string
-//import io.kotest.property.checkAll
+// import arrow.core.getOrElse
+// import arrow.core.left
+// import arrow.core.right
+// import arrow.core.test.UnitSpec
+// import arrow.core.test.generators.functionAToB
+// import arrow.optics.test.laws.SetterLaws
+// import io.kotest.matchers.shouldBe
+// import io.kotest.property.Arb
+// import io.kotest.property.arbitrary.int
+// import io.kotest.property.arbitrary.string
+// import io.kotest.property.checkAll
 //
-//class SetterTest : UnitSpec() {
+// class SetterTest : UnitSpec() {
 //
 //  init {
 //
@@ -55,4 +55,4 @@
 //      }
 //    }
 //  }
-//}
+// }
