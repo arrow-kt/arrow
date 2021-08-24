@@ -10,7 +10,7 @@ apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
-//apply from: "$ANIMALSNIFFER_MPP"
+apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
     sourceSets {

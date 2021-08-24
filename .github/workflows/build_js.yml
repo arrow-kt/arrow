@@ -7,9 +7,8 @@ jobs:
 
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
-      JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
@@ -18,7 +17,7 @@ jobs:
           fetch-depth: 0
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jsTest --stacktrace
+        run: ./gradlew :arrow-continuations:jsTest :arrow-core:jsTest :arrow-fx-coroutines:jsTest :arrow-optics:jsTest --stacktrace
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |

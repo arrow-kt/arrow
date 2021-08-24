@@ -19,12 +19,3 @@ jobs:
       - name: Build
         working-directory: arrow-libs
         run: ./gradlew mingwX64Test --stacktrace
-#      - name: "Prepare test reports"
-#        if: ${{ always() }}
-#        run: find . -type d -name 'reports' | zip -@ -r test-reports.zip
-#      - name: "Make test reports available to download"
-#        if: ${{ always() }}
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: test-reports
-#          path: test-reports
