@@ -3,6 +3,10 @@ package arrow.fx.stm
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.property.checkAll
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
+import kotlin.random.Random
 
 class TQueueTest : StringSpec() {
   init {
