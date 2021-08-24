@@ -20,15 +20,6 @@ kotlin {
         // JVM target ignores Java sources and compiles only Kotlin source files.
         // Fix:
         withJava()
-
-        compilations.all {
-            kotlinOptions {
-                freeCompilerArgs += ["-Xskip-runtime-version-check"]
-                jvmTarget = "1.8"
-            }
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-        }
     }
 //    js(BOTH) {
     js(IR) {
@@ -50,12 +41,22 @@ kotlin {
     iosX64()
     iosArm64()
     iosArm32()
+
+    targets.all {
+        compilations.all {
+            kotlinOptions {
+                verbose = true
+            }
+        }
+    }
+
     sourceSets {
         commonMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
+
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"

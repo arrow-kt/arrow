@@ -10,15 +10,14 @@ apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
-apply from: "$ANIMALSNIFFER_MPP"
+//apply from: "$ANIMALSNIFFER_MPP"
 
 kotlin {
     sourceSets {
         commonMain {
             dependencies {
                 api project(":arrow-core")
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
             }
         }
         commonTest {

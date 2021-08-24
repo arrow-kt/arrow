@@ -3,6 +3,9 @@ package arrow.fx.stm
 import arrow.fx.stm.internal.STMTransaction
 import arrow.fx.stm.internal.alterHamtWithHash
 import arrow.fx.stm.internal.lookupHamtWithHash
+import kotlin.coroutines.startCoroutine
+import kotlinx.coroutines.intrinsics.startCoroutineCancellable
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * # Consistent and safe concurrent state updates
@@ -667,57 +670,57 @@ public interface STM {
     v.write(curr - n)
   }
 
-  /**
-   * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.stm.TSemaphore
-   * import arrow.fx.stm.atomically
-   *
-   * suspend fun main() {
-   *   //sampleStart
-   *   val tsem = TSemaphore.new(0)
-   *   val result = atomically {
-   *     tsem.tryAcquire()
-   *   }
-   *   //sampleEnd
-   *   println("Result $result")
-   *   println("Permits remaining ${atomically { tsem.available() }}")
-   * }
-   * ```
-   *
-   * This function never retries.
-   *
-   * @see TSemaphore.acquire for a version that retries if there are not enough permits.
-   */
-  public fun TSemaphore.tryAcquire(): Boolean =
-    tryAcquire(1)
+//  /**
+//   * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
+//   *
+//   * ```kotlin:ank:playground
+//   * import arrow.fx.stm.TSemaphore
+//   * import arrow.fx.stm.atomically
+//   *
+//   * suspend fun main() {
+//   *   //sampleStart
+//   *   val tsem = TSemaphore.new(0)
+//   *   val result = atomically {
+//   *     tsem.tryAcquire()
+//   *   }
+//   *   //sampleEnd
+//   *   println("Result $result")
+//   *   println("Permits remaining ${atomically { tsem.available() }}")
+//   * }
+//   * ```
+//   *
+//   * This function never retries.
+//   *
+//   * @see TSemaphore.acquire for a version that retries if there are not enough permits.
+//   */
+//  public fun TSemaphore.tryAcquire(): Boolean =
+//    tryAcquire(1)
 
-  /**
-   * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.stm.TSemaphore
-   * import arrow.fx.stm.atomically
-   *
-   * suspend fun main() {
-   *   //sampleStart
-   *   val tsem = TSemaphore.new(0)
-   *   val result = atomically {
-   *     tsem.tryAcquire(3)
-   *   }
-   *   //sampleEnd
-   *   println("Result $result")
-   *   println("Permits remaining ${atomically { tsem.available() }}")
-   * }
-   * ```
-   *
-   * This function never retries.
-   *
-   * @see TSemaphore.acquire for a version that retries if there are not enough permits.
-   */
-  public fun TSemaphore.tryAcquire(n: Int): Boolean =
-    stm { acquire(n); true } orElse { false }
+//  /**
+//   * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
+//   *
+//   * ```kotlin:ank:playground
+//   * import arrow.fx.stm.TSemaphore
+//   * import arrow.fx.stm.atomically
+//   *
+//   * suspend fun main() {
+//   *   //sampleStart
+//   *   val tsem = TSemaphore.new(0)
+//   *   val result = atomically {
+//   *     tsem.tryAcquire(3)
+//   *   }
+//   *   //sampleEnd
+//   *   println("Result $result")
+//   *   println("Permits remaining ${atomically { tsem.available() }}")
+//   * }
+//   * ```
+//   *
+//   * This function never retries.
+//   *
+//   * @see TSemaphore.acquire for a version that retries if there are not enough permits.
+//   */
+//  public fun TSemaphore.tryAcquire(n: Int): Boolean =
+//    stm { acquire(n); true } orElse { false }
 
   /**
    * Release a permit back to the [TSemaphore].
@@ -856,29 +859,29 @@ public interface STM {
     }
   }
 
-  /**
-   * Same as [TQueue.read] except it returns null if the [TQueue] is empty.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.stm.TQueue
-   * import arrow.fx.stm.atomically
-   *
-   * suspend fun main() {
-   *   //sampleStart
-   *   val tq = TQueue.new<Int>()
-   *   val result = atomically {
-   *     tq.tryRead()
-   *   }
-   *   //sampleEnd
-   *   println("Result $result")
-   *   println("Items in queue ${atomically { tq.flush() }}")
-   * }
-   * ```
-   *
-   * This function never retries.
-   */
-  public fun <A> TQueue<A>.tryRead(): A? =
-    (stm { read() } orElse { null })
+//  /**
+//   * Same as [TQueue.read] except it returns null if the [TQueue] is empty.
+//   *
+//   * ```kotlin:ank:playground
+//   * import arrow.fx.stm.TQueue
+//   * import arrow.fx.stm.atomically
+//   *
+//   * suspend fun main() {
+//   *   //sampleStart
+//   *   val tq = TQueue.new<Int>()
+//   *   val result = atomically {
+//   *     tq.tryRead()
+//   *   }
+//   *   //sampleEnd
+//   *   println("Result $result")
+//   *   println("Items in queue ${atomically { tq.flush() }}")
+//   * }
+//   * ```
+//   *
+//   * This function never retries.
+//   */
+//  public fun <A> TQueue<A>.tryRead(): A? =
+//    (stm { read() } orElse { null })
 
   /**
    * Drains all entries of a [TQueue] into a single list.
@@ -939,32 +942,32 @@ public interface STM {
   public fun <A> TQueue<A>.peek(): A =
     read().also { writeFront(it) }
 
-  /**
-   * Same as [TQueue.peek] except it returns null if the [TQueue] is empty.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.stm.TQueue
-   * import arrow.fx.stm.atomically
-   *
-   * suspend fun main() {
-   *   //sampleStart
-   *   val tq = TQueue.new<Int>()
-   *   val result = atomically {
-   *     tq.tryPeek()
-   *   }
-   *   //sampleEnd
-   *   println("Result $result")
-   *   println("Items in queue ${atomically { tq.flush() }}")
-   * }
-   * ```
-   *
-   * This function never retries.
-   *
-   * @see TQueue.tryRead for a version that removes the front element
-   * @see TQueue.peek for a version that retries if the [TQueue] is empty.
-   */
-  public fun <A> TQueue<A>.tryPeek(): A? =
-    tryRead()?.also { writeFront(it) }
+//  /**
+//   * Same as [TQueue.peek] except it returns null if the [TQueue] is empty.
+//   *
+//   * ```kotlin:ank:playground
+//   * import arrow.fx.stm.TQueue
+//   * import arrow.fx.stm.atomically
+//   *
+//   * suspend fun main() {
+//   *   //sampleStart
+//   *   val tq = TQueue.new<Int>()
+//   *   val result = atomically {
+//   *     tq.tryPeek()
+//   *   }
+//   *   //sampleEnd
+//   *   println("Result $result")
+//   *   println("Items in queue ${atomically { tq.flush() }}")
+//   * }
+//   * ```
+//   *
+//   * This function never retries.
+//   *
+//   * @see TQueue.tryRead for a version that removes the front element
+//   * @see TQueue.peek for a version that retries if the [TQueue] is empty.
+//   */
+//  public fun <A> TQueue<A>.tryPeek(): A? =
+//    tryRead()?.also { writeFront(it) }
 
   /**
    * Prepend an element to the [TQueue].
@@ -1483,7 +1486,7 @@ public interface STM {
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
-public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
+//public fun <A> stm(f: STM.() -> A): STM.() -> A = f
 
 /**
  * Retry if [b] is false otherwise does nothing.
@@ -1535,4 +1538,5 @@ public fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
  * Rethrows all exceptions not caught by inside [f]. Remember to use [STM.catch] to handle exceptions as `try {} catch` will not handle transaction
  *  state properly!
  */
-public suspend fun <A> atomically(f: STM.() -> A): A = STMTransaction(f).commit()
+public suspend fun <A> atomically(f: STM.() -> A): A =
+  STMTransaction(f).commit()
