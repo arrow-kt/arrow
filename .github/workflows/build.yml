@@ -48,7 +48,7 @@ jobs:
         working-directory: arrow-site
         run: ./gradlew runAnk
 
-  linux:
+  linux_and_jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
