@@ -8,7 +8,7 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  build_doc:
+  ktlint_dokka_ank:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
