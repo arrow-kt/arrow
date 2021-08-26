@@ -1483,7 +1483,7 @@ public interface STM {
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
-public fun <A> stm(f: STM.() -> A): STM.() -> A = f
+public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
 
 /**
  * Retry if [b] is false otherwise does nothing.
@@ -1535,5 +1535,4 @@ public fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
  * Rethrows all exceptions not caught by inside [f]. Remember to use [STM.catch] to handle exceptions as `try {} catch` will not handle transaction
  *  state properly!
  */
-public suspend fun <A> atomically(f: STM.() -> A): A =
-  STMTransaction(f).commit()
+public suspend fun <A> atomically(f: STM.() -> A): A = STMTransaction(f).commit()

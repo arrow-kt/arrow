@@ -80,7 +80,7 @@ kotlin {
             dependencies {
                 api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
                 api "io.kotest:kotest-property:$KOTEST_VERSION"
-                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:4.6.2"
                 api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }

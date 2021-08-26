@@ -42,7 +42,7 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
   override fun <A> catch(f: STM.() -> A, onError: STM.(Throwable) -> A): A =
     runLocal(f, { this@STMFrame.retry() }) { this@STMFrame.onError(it) }
 
-  private fun <A> runLocal(
+  private inline fun <A> runLocal(
     f: STM.() -> A,
     onRetry: () -> A,
     onError: (Throwable) -> A
@@ -177,32 +177,30 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
   //  If they both pass a threshold we should probably kill the transaction and throw
   //  "live-locked" transactions are those that are continuously retry due to accessing variables with high contention and
   //   taking longer than the transactions updating those variables.
-  tailrec suspend fun commit(): A {
-    val frame = STMFrame()
-    try {
-      val res = frame.f()
+  suspend fun commit(): A {
+    loop@ while (true) {
+      val frame = STMFrame()
+      try {
+        val res = frame.f()
 
-      if (frame.validateAndCommit()) return res
-    } catch (ignored: RetryException) {
-      if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
+        if (frame.validateAndCommit()) return@commit res
+      } catch (ignored: RetryException) {
+        if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
 
-      val registered = mutableListOf<TVar<Any?>>()
-      awaitCancellable(frame, registered)
-      registered.forEach { it.removeWaiting(this) }
-    } catch (e: Throwable) {
-      if (frame.validate()) throw e
-    }
+        val registered = mutableListOf<TVar<Any?>>()
+        suspendCancellableCoroutine<Unit> susp@{ k ->
+          cont.value = k
 
-    return commit()
-  }
-
-  private suspend fun awaitCancellable(frame: STMFrame, registered: MutableList<TVar<Any?>>): Unit =
-    suspendCancellableCoroutine susp@{ k ->
-      cont.value = k
-
-      frame.accessMap.forEach { (tv, entry) ->
-        if (tv.registerWaiting(this, entry.initialVal)) registered.add(tv)
-        else return@susp
+          frame.accessMap
+            .forEach { (tv, entry) ->
+              if (tv.registerWaiting(this, entry.initialVal)) registered.add(tv)
+              else return@susp
+            }
+        }
+        registered.forEach { it.removeWaiting(this) }
+      } catch (e: Throwable) {
+        if (frame.validate()) throw e
       }
     }
+  }
 }

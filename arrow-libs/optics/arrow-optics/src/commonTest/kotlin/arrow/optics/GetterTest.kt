@@ -82,7 +82,8 @@ class GetterTest : UnitSpec() {
 
     "Zipping two lenses should yield a tuple of the targets" {
       checkAll(Arb.string()) { value: String ->
-        Getter<String, Int> { it.length }.zip { it.uppercase() }.get(value) shouldBe (value.length to value.toUpperCase())
+        Getter<String, Int> { it.length }.zip { it.uppercase() }
+          .get(value) shouldBe (value.length to value.toUpperCase())
       }
     }
 

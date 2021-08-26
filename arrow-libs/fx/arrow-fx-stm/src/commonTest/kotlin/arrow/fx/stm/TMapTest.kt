@@ -1,25 +1,23 @@
 package arrow.fx.stm
 
-import io.kotest.core.spec.style.StringSpec
+import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
-import io.kotest.property.checkAll
 
-class TMapTest : StringSpec() {
-  init {
+class TMapTest : ArrowFxSpec(
+  spec = {
     "insert values" {
-      checkAll(100, Arb.int(), Arb.int()) { k, v ->
+      checkAll(Arb.int(), Arb.int()) { k, v ->
         val map = TMap.new<Int, Int>()
         atomically { map.insert(k, v) }
         atomically { map.lookup(k) } shouldBe v
       }
     }
-
     "insert multiple values" {
-      checkAll(100, Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
+      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
         val map = TMap.new<Int, Int>()
         atomically {
           for ((k, v) in pairs) map.insert(k, v)
@@ -29,9 +27,8 @@ class TMapTest : StringSpec() {
         }
       }
     }
-
     "insert multiple colliding values" {
-      checkAll(100, Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
+      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
         val map = TMap.new<Int, Int> { 0 } // hash function that always returns 0
         atomically {
           for ((k, v) in pairs) map.insert(k, v)
@@ -41,9 +38,8 @@ class TMapTest : StringSpec() {
         }
       }
     }
-
     "insert and remove" {
-      checkAll(100, Arb.int(), Arb.int()) { k, v ->
+      checkAll(Arb.int(), Arb.int()) { k, v ->
         val map = TMap.new<Int, Int>()
         atomically { map.insert(k, v) }
         atomically { map.lookup(k) } shouldBe v
@@ -51,9 +47,8 @@ class TMapTest : StringSpec() {
         atomically { map.lookup(k) } shouldBe null
       }
     }
-
     "update" {
-      checkAll(100, Arb.int(), Arb.int(), Arb.int()) { k, v, g ->
+      checkAll(Arb.int(), Arb.int(), Arb.int()) { k, v, g ->
         val map = TMap.new<Int, Int>()
         atomically { map.insert(k, v) }
         atomically { map.lookup(k) } shouldBe v
@@ -62,4 +57,4 @@ class TMapTest : StringSpec() {
       }
     }
   }
-}
+)
