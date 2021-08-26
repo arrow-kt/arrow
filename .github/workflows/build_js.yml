@@ -7,17 +7,34 @@ jobs:
 
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew :arrow-continuations:jsTest :arrow-core:jsTest :arrow-fx-coroutines:jsTest :arrow-optics:jsTest --stacktrace
+        run: ./gradlew jsTest --stacktrace --scan
+
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
@@ -26,6 +43,7 @@ jobs:
             module=$(echo $report | cut -d/ -f3)
             cp -r $report test-reports/$module
           done
+
       - name: "Make test reports available to download"
         if: ${{ always() }}
         uses: actions/upload-artifact@v1
