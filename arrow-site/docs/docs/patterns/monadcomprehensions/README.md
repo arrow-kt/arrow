@@ -73,7 +73,7 @@ private val universities = mapOf(
 
 /* in memory db of deans */
 private val deans = mapOf(
-  UniversityId("UCA") to Dean(Name("James"))
+  Name("James") to Dean(Name("James"))
 )
 
 /* gets a student by name */
@@ -84,15 +84,15 @@ suspend fun student(name: Name): Either<NotFound, Student> =
 suspend fun university(id: UniversityId): Either<NotFound, University> =
   universities[id]?.let(::Right) ?: Left(NotFound)
 
-/* gets a university by id */
-suspend fun dean(id: UniversityId): Either<NotFound, Dean> =
-  deans[id]?.let(::Right) ?: Left(NotFound)
+/* gets a dean by name */
+suspend fun dean(name: Name): Either<NotFound, Dean> =
+  deans[name]?.let(::Right) ?: Left(NotFound)
 
 suspend fun main(): Unit {
   //sampleStart
   val dean = student(Name("Alice")).flatMap { alice ->
     university(alice.universityId).flatMap { university ->
-      dean(alice.universityId)
+      dean(university.deanName)
     }
   }
   //sampleEnd
@@ -214,7 +214,7 @@ private val universities = mapOf(
 
 /* in memory db of deans */
 private val deans = mapOf(
-  UniversityId("UCA") to Dean(Name("James"))
+  Name("James") to Dean(Name("James"))
 )
 
 /* gets a student by name */
@@ -225,16 +225,16 @@ suspend fun student(name: Name): Either<NotFound, Student> =
 suspend fun university(id: UniversityId): Either<NotFound, University> =
   universities[id]?.let(::Right) ?: Left(NotFound)
 
-/* gets a university by id */
-suspend fun dean(id: UniversityId): Either<NotFound, Dean> =
-  deans[id]?.let(::Right) ?: Left(NotFound)
+/* gets a dean by name */
+suspend fun dean(name: Name): Either<NotFound, Dean> =
+  deans[name]?.let(::Right) ?: Left(NotFound)
 
 suspend fun main(): Unit {
   //sampleStart
   val dean = either<NotFound, Dean> {
     val alice = student(Name("Alice")).bind()
     val uca = university(alice.universityId).bind()
-    val james = dean(alice.universityId).bind()
+    val james = dean(uca.deanName).bind()
     james
   }
   //sampleEnd
