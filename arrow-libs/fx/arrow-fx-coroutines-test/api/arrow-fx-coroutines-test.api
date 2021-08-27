@@ -21,16 +21,12 @@ public final class arrow/fx/coroutines/NamedThreadFactory : java/util/concurrent
 
 public final class arrow/fx/coroutines/Predef_testKt {
 	public static final fun assertThrowable (Lkotlin/jvm/functions/Function0;)Ljava/lang/Throwable;
-	public static final fun catchSystemErr (Lkotlin/jvm/functions/Function0;)Ljava/lang/String;
-	public static final fun catchSystemErrInto (Ljava/io/OutputStream;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun charRange (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun either (Larrow/core/Either;)Lio/kotest/matchers/Matcher;
 	public static final fun either (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun flow (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun function (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun functionAToB (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
-	public static final fun getSingle ()Larrow/fx/coroutines/Resource;
-	public static final fun getSingleThreadName ()Ljava/lang/String;
-	public static final fun getThreadName ()Lkotlin/jvm/functions/Function1;
 	public static final fun intRange (Lio/kotest/property/Arb$Companion;II)Lio/kotest/property/Arb;
 	public static synthetic fun intRange$default (Lio/kotest/property/Arb$Companion;IIILjava/lang/Object;)Lio/kotest/property/Arb;
 	public static final fun leftException (Ljava/lang/Throwable;)Lio/kotest/matchers/Matcher;
@@ -47,6 +43,12 @@ public final class arrow/fx/coroutines/Predef_testKt {
 	public static final fun unit (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun validated (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun validatedNel (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+}
+
+public final class arrow/fx/coroutines/Predef_test_jvmKt {
+	public static final fun getSingle ()Larrow/fx/coroutines/Resource;
+	public static final fun getSingleThreadName ()Ljava/lang/String;
+	public static final fun getThreadName ()Lkotlin/jvm/functions/Function1;
 }
 
 public final class arrow/fx/coroutines/SideEffect {
