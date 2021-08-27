@@ -1,6 +1,6 @@
 public final class arrow/ExtensionKt {
-	public static final fun getGiven ()Ljava/lang/Void;
-	public static final fun given ()Ljava/lang/Object;
+	public static final synthetic fun getGiven ()Ljava/lang/Void;
+	public static final synthetic fun given ()Ljava/lang/Object;
 }
 
 public final class arrow/optics/OpticsTarget : java/lang/Enum {
