@@ -1172,6 +1172,7 @@ public final class arrow/meta/encoder/jvm/KotlinMetatadataEncoder$DefaultImpls {
 	public static fun asTypeName (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
 	public static fun extractFullName (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
 	public static synthetic fun extractFullName$default (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;ZILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun extractFullName$default (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Lkotlin/jvm/functions/Function1;ZLjava/lang/Throwable;ILjava/lang/Object;)Ljava/lang/String;
 	public static fun modifiersFromFlags (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;I)Ljava/util/List;
 	public static fun nameOf (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
 	public static fun supertypes (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
