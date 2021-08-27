@@ -1,0 +1,27 @@
+public final class arrow/retrofit/adapter/either/EitherCallAdapterFactory : retrofit2/CallAdapter$Factory {
+	public static final field Companion Larrow/retrofit/adapter/either/EitherCallAdapterFactory$Companion;
+	public fun <init> ()V
+	public fun get (Ljava/lang/reflect/Type;[Ljava/lang/annotation/Annotation;Lretrofit2/Retrofit;)Lretrofit2/CallAdapter;
+}
+
+public final class arrow/retrofit/adapter/either/EitherCallAdapterFactory$Companion {
+	public final fun create ()Larrow/retrofit/adapter/either/EitherCallAdapterFactory;
+}
+
+public final class arrow/retrofit/adapter/either/ResponseE {
+	public fun <init> (Lokhttp3/Response;Larrow/core/Either;)V
+	public final fun component1 ()Lokhttp3/Response;
+	public final fun component2 ()Larrow/core/Either;
+	public final fun copy (Lokhttp3/Response;Larrow/core/Either;)Larrow/retrofit/adapter/either/ResponseE;
+	public static synthetic fun copy$default (Larrow/retrofit/adapter/either/ResponseE;Lokhttp3/Response;Larrow/core/Either;ILjava/lang/Object;)Larrow/retrofit/adapter/either/ResponseE;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Larrow/core/Either;
+	public final fun getCode ()I
+	public final fun getHeaders ()Lokhttp3/Headers;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getRaw ()Lokhttp3/Response;
+	public fun hashCode ()I
+	public final fun isSuccessful ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
