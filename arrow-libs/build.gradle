@@ -20,10 +20,6 @@ plugins {
 
 apply from: "gradle/$ROOT_PROJECT"
 
-apiValidation {
-  ignoredProjects += ["examples"]
-}
-
 task generateDoc(type: Exec) {
   commandLine "sh", "gradlew", "dokkaJekyll"
 }
