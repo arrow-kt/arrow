@@ -71,7 +71,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jsTest --stacktrace --scan
+        run: ./gradlew jsTest
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -111,7 +111,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew linuxX64Test jvmTest --stacktrace --scan
+        run: ./gradlew linuxX64Test jvmTest
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew macosX64Test iosX64Test --stacktrace --scan
+        run: ./gradlew macosX64Test iosX64Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -191,7 +191,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew tvosX64Test watchosX64Test --stacktrace --scan
+        run: ./gradlew tvosX64Test watchosX64Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -231,4 +231,4 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew mingwX64Test --stacktrace  --scan
+        run: ./gradlew mingwX64Test
