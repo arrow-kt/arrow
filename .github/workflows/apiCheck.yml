@@ -3,7 +3,7 @@ name: "Run api check for binary compatibility"
 on: pull_request
 
 jobs:
-  build:
+  apiCheck:
 
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
