@@ -1,0 +1,29 @@
+name: "Run api check for binary compatibility"
+
+on: pull_request
+
+jobs:
+  build:
+
+    env:
+      BASEDIR: ${{github.workspace}}/arrow-libs
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        java: 8
+    name: Run test with JDK ${{ matrix.java }} on ${{ matrix.os }}
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          fetch-depth: 0
+          distribution: 'adopt'
+          java-version: ${{ matrix.java }}
+      - name: Build
+        working-directory: arrow-libs
+        run: ./gradlew apiCheck
