@@ -11,7 +11,6 @@ public final class arrow/ank/AnkFailedException : arrow/ank/NoStackTrace {
 
 public final class arrow/ank/AnkKt {
 	public static final fun ank (Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/util/List;Larrow/ank/AnkOps;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun catchNel (Larrow/core/Validated$Companion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun humanBytes (J)Ljava/lang/String;
 }
 

@@ -1,6 +1,6 @@
 plugins {
-    id "org.jetbrains.kotlin.multiplatform"
-    id "org.jlleitschuh.gradle.ktlint"
+  id "org.jetbrains.kotlin.multiplatform"
+  id "org.jlleitschuh.gradle.ktlint"
 }
 
 apply from: "$SUB_PROJECT_MPP"
