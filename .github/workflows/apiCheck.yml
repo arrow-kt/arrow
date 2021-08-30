@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [macos-latest]
         java: 8
-    name: Run test with JDK ${{ matrix.java }} on ${{ matrix.os }}
+    name: Run apiCheck with JDK ${{ matrix.java }} on ${{ matrix.os }}
     timeout-minutes: 20
 
     steps:
