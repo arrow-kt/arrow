@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest]
-        java: 8
+        java: [8]
     name: Run apiCheck with JDK ${{ matrix.java }} on ${{ matrix.os }}
     timeout-minutes: 20
 
