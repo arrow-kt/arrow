@@ -93,13 +93,13 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
 
   override fun StringBuilder.buildCodeBlock(code: ContentCodeBlock, pageContext: ContentPage) {
     append("```${code.language}\n")
-    code.children.forEach { buildContentNode(it, pageContext) }
+    code.children.forEach { it.build(this, pageContext) }
     append("\n```")
   }
 
   override fun StringBuilder.buildCodeInline(code: ContentCodeInline, pageContext: ContentPage) {
     append('`')
-    code.children.forEach { buildContentNode(it, pageContext) }
+    code.children.forEach { it.build(this, pageContext) }
     append('`')
   }
 }
