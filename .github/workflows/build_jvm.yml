@@ -29,6 +29,9 @@ jobs:
       - name: Build
         working-directory: arrow-libs
         run: ./gradlew jvmTest
+      - name: ApiCheck
+        working-directory: arrow-libs
+        run: ./gradlew apiCheck
       - name: "Prepare test reports"
         if: ${{ always() }}
         run: |
