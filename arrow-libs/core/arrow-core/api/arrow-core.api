@@ -2407,6 +2407,19 @@ public final class arrow/core/computations/EvalEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/EvalEffect;Larrow/core/Eval;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/core/computations/IterableEffect : arrow/continuations/Effect {
+	public fun <init> (Larrow/continuations/generic/DelimitedScope;Ljava/util/Iterator;)V
+	public final fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun control ()Larrow/continuations/generic/DelimitedScope;
+	public final fun dropNext (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun dropNext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun next (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/computations/IterableKt {
+	public static final fun iterateOrNull (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public abstract interface class arrow/core/computations/NullableEffect : arrow/continuations/Effect {
 	public abstract fun bind (Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
