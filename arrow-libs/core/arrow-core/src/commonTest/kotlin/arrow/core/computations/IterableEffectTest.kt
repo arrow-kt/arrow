@@ -110,7 +110,7 @@ class IterableEffectTest : UnitSpec() {
           list shouldHaveAtLeastSize 2
           "$a $b"
         }
-        result shouldBe when  {
+        result shouldBe when {
           list.size in 0..1 -> null
           list[1] !is Long -> null
           else -> list.let { (a, b) -> "$a $b" }
