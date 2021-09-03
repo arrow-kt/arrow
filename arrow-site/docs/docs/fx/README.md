@@ -1,8 +1,19 @@
 ---
-layout: docs-fx
+layout: quickstart-fx
 title: Arrow Fx. Async and Concurrent Functional Programming for Kotlin
 permalink: /fx/
 ---
+
+<div class="quick-snap" markdown="1">
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+[![Latest snapshot](https://img.shields.io/badge/dynamic/xml?color=orange&label=latest%20snapshot&prefix=v&query=%2F%2Fmetadata%2Fversioning%2Flatest&url=https%3A%2F%2Foss.sonatype.org%2Fservice%2Flocal%2Frepositories%2Fsnapshots%2Fcontent%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/)
+[![Kotlin version](https://img.shields.io/badge/Kotlin-1.4-blue)](https://kotlinlang.org/docs/reference/whatsnew14.html)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![StackOverflow](https://img.shields.io/badge/arrow--kt-grey.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
+[![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=blue&style=flat)](https://twitter.com/arrow_kt)
+</div>
+
+<div class="quickstart-doc" markdown="1">
 
 # Arrow Fx. Typed FP for the masses
 
@@ -13,24 +24,24 @@ The library brings purity, referential transparency, and direct imperative synta
 
 If you're not familiar yet with Coroutines in Kotlin, it's recommended to first read Kotlin's [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on KotlinX Coroutines.
 
-## Arrow Fx Coroutines Overview 
+## Arrow Fx Coroutines Overview
 
 - Quick Start
-  - [Gradle Setup](/docs/fx/#gradle-setup)
-  - [Maven Setup](/docs/fx/#maven-setup)
+  - [Gradle Setup]({{ '/fx/#gradle-setup' | relative_url }})
+  - [Maven Setup]({{ '/fx/#maven-setup' | relative_url }})
 - Extensions and data types
-  - [Parallel](/docs/fx/parallel/)
-  - [Schedule](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/)
-  - [Resource](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/)
-  - [CircuitBreaker](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/)
-  - [Atomic](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/)
-  - [STM](/docs/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/)
-- [Integrating with 3rd-party libraries](/docs/fx/#integrating-with-3rd-party-libraries)
+  - [Parallel]({{ '/fx/parallel' | relative_url }})
+  - [Schedule]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/' | relative_url }})
+  - [Resource]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/' | relative_url }})
+  - [CircuitBreaker]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker' | relative_url }})
+  - [Atomic]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/' | relative_url }})
+  - [STM]({{ '/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/' | relative_url }})
+- [Integrating with 3rd-party libraries]({{ '/fx/#integrating-with-3rd-party-libraries' | relative_url }})
 - Additional Information
   - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
-  - [Pure & Referentially Transparent Functions](/docs/fx/purity-and-referentially-transparent-functions/)
-  - [Kotlin's Std Coroutines package](/docs/fx/coroutines/)
-  - [Why suspend over IO monad](/docs/effects/io/)
+  - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
+  - [Kotlin's Std Coroutines package]({{ '/fx/coroutines/' | relative_url }})
+  - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
 
 <!--- Setup
 --------------------------------------------------------------------------------
@@ -71,7 +82,7 @@ Arrow supports Android starting on API 21 and up.
 
 In your project's root `build.gradle.kts`, append this repository to your list:
 
-```kotlin
+```
 allprojects {
     repositories {
         mavenCentral()
@@ -81,7 +92,7 @@ allprojects {
 
 Add the dependencies into the project's `build.gradle.kts`:
 
-```kotlin
+```
 dependencies {
     implementation("io.arrow-kt:arrow-fx-coroutines:0.13.2")
     implementation("io.arrow-kt:arrow-fx-stm:0.13.2")
@@ -92,7 +103,7 @@ dependencies {
 
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
-```kotlin
+```
 dependencies {
     implementation(platform("io.arrow-kt:arrow-stack:0.13.2"))
 
@@ -105,7 +116,7 @@ dependencies {
 
 If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
 
-```kotlin
+```
 allprojects {
     repositories {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
@@ -288,10 +299,10 @@ If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` a
 </div>
 
 
-</div>
-
 ## Integrating with 3rd-party libraries
 
 Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
 
 If you are interested in the Arrow Fx library, please contact us in the #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
+
+</div>

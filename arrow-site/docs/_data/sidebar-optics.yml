@@ -1,5 +1,8 @@
 options:
   - title: Quick Start
+    url: /optics/
+
+  - title: DSL
     url: /optics/dsl/
 
   - title: Types

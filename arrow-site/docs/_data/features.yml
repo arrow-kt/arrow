@@ -20,7 +20,7 @@ content:
     - title: Optics
       description: Deep access and transformations over immutable data
       icon: img/home/arrow-optics-lines
-      url: /optics/dsl/
+      url: /optics/
       id: optics
 
     - title: Meta
