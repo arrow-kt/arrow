@@ -14,6 +14,7 @@ permalink: /fx/
 </div>
 
 <div class="quickstart-doc" markdown="1">
+<div class="quickstart-intro" markdown="1">
 
 # Arrow Fx. Typed FP for the masses
 
@@ -27,8 +28,8 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 ## Arrow Fx Coroutines Overview
 
 - Quick Start
-  - [Gradle Setup]({{ '/fx/#gradle-setup' | relative_url }})
-  - [Maven Setup]({{ '/fx/#maven-setup' | relative_url }})
+  - [Gradle Setup]({{ '/fx/#Gradle-kotlin' | relative_url }})
+  - [Maven Setup]({{ '/fx/#Maven' | relative_url }})
 - Extensions and data types
   - [Parallel]({{ '/fx/parallel' | relative_url }})
   - [Schedule]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/' | relative_url }})
@@ -42,6 +43,7 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
   - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
   - [Kotlin's Std Coroutines package]({{ '/fx/coroutines/' | relative_url }})
   - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
+</div>
 
 <!--- Setup
 --------------------------------------------------------------------------------
@@ -298,11 +300,11 @@ If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` a
 
 </div>
 
-
+<div class="quickstart-intro" markdown="1">
 ## Integrating with 3rd-party libraries
 
 Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
 
 If you are interested in the Arrow Fx library, please contact us in the #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
-
+</div>
 </div>
