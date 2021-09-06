@@ -14,11 +14,13 @@ permalink: /core/
 </div>
 
 <div class="quickstart-doc" markdown="1">
+<div class="quickstart-intro" markdown="1">
 
 # Arrow Core. Functional companion to Kotlin’s Standard Library
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' | relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 
 Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
+</div>
 
 <div class="setup" markdown="1">
 ## Setup

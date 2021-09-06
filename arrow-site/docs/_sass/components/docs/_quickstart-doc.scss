@@ -28,6 +28,13 @@
 }
 
 .quickstart-doc {
+  .quickstart-intro {
+    margin: 3.5rem 0 5.5rem 0;
+    @extend .card-quickstart;
+    h1 {
+      font-size: 2.5rem;
+    }
+  }
   .modular-libraries {
     margin-bottom: 7.75rem;
 
