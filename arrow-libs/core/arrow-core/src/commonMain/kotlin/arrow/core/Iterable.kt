@@ -306,6 +306,21 @@ public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): 
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
+public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    val res = f(a)
+    res.fold(
+      { acc.add(it) },
+      { return@traverseResult Result.failure(it) }
+    )
+  }
+  return Result.success(acc)
+}
+
+public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
+  traverseResult(::identity)
+
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>

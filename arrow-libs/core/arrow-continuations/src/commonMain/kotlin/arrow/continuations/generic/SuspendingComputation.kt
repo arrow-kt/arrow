@@ -35,6 +35,7 @@ internal open class SuspendMonadContinuation<R>(
           val r: R? = result.fold({ it }) { EMPTY_VALUE.unbox(it.shiftedOrNull()) }
           when {
             r == null -> {
+              println(" ====> ${result.exceptionOrNull()}")
               parent.resumeWithException(result.exceptionOrNull()!!)
               return
             }
