@@ -98,11 +98,11 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-@JvmName("parSequenceEitherScoped")
-public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceEither(semigroup: Semigroup<E>): Validated<E, List<A>> =
+@JvmName("parSequenceValidatedScoped")
+public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   parTraverseValidated(Dispatchers.Default, semigroup) { it() }
 
-public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceEither(semigroup: Semigroup<E>): Validated<E, List<A>> =
+public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   parTraverseValidated(Dispatchers.Default, semigroup) { it() }
 
 /**
