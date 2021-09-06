@@ -595,6 +595,7 @@ public final class arrow/core/IterableKt {
 	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun sequenceEither (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun sequenceOption (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun sequenceResult (Ljava/lang/Iterable;)Ljava/lang/Object;
 	public static final fun sequenceValidated (Ljava/lang/Iterable;)Larrow/core/Validated;
 	public static final fun sequenceValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun singleOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
@@ -603,6 +604,7 @@ public final class arrow/core/IterableKt {
 	public static final fun tail (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun traverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseOption (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseResult (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun traverseValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverseValidated (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unalign (Ljava/lang/Iterable;)Lkotlin/Pair;
@@ -1381,6 +1383,22 @@ public final class arrow/core/PredefKt {
 	public static final field TailRecMDeprecation Ljava/lang/String;
 	public static final fun emptyCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static final fun identity (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class arrow/core/ResultKt {
+	public static final fun composeErrors ([Ljava/lang/Throwable;)Ljava/lang/Throwable;
+	public static final fun flatMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun handleErrorWith (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun redeemWith (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function10;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function8;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function7;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function6;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function5;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function4;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)Ljava/lang/Object;
+	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
 public final class arrow/core/SequenceKt {
@@ -2383,6 +2401,11 @@ public final class arrow/core/ValidatedKt {
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 }
 
+public final class arrow/core/computations/EagerResultEffect {
+	public static final field INSTANCE Larrow/core/computations/EagerResultEffect;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect {
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2473,6 +2496,11 @@ public final class arrow/core/computations/RestrictedOptionEffect$DefaultImpls {
 	public static fun ensure (Larrow/core/computations/RestrictedOptionEffect;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/core/computations/ResultEffect {
+	public static final field INSTANCE Larrow/core/computations/ResultEffect;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class arrow/core/computations/either {
 	public static final field INSTANCE Larrow/core/computations/either;
 	public final fun eager (Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
@@ -2495,6 +2523,11 @@ public final class arrow/core/computations/option {
 	public static final field INSTANCE Larrow/core/computations/option;
 	public final fun eager (Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/computations/result {
+	public static final field INSTANCE Larrow/core/computations/result;
+	public final fun invoke-IoAF18A (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Semigroup {
