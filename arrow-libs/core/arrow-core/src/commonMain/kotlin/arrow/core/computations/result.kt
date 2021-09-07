@@ -29,13 +29,12 @@ public object result {
    * import arrow.core.*
    *
    * fun main() {
-   *   result {
-   *     throw RuntimeException("Boom")
-   *   } // Result.Failure(RuntimeException("Boom"))
+   *   result { // We can safely use assertion based operation inside blocks
+   *     kotlin.require(false) { "Boom" }
+   *   } // Result.Failure(IllegalArgumentException("Boom"))
    *
    *   result {
-   *     Result
-   *       .failure(RuntimeException("Boom"))
+   *     Result.failure(RuntimeException("Boom"))
    *       .recover { 1 }
    *       .bind()
    *   } // Result.Success(1)
@@ -48,6 +47,6 @@ public object result {
    * }
    * ```
    */
-  public inline operator fun <A> invoke(c: ResultEffect.() -> A): Result<A> =
-    kotlin.runCatching { c(ResultEffect) }
+  public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
+    kotlin.runCatching { block(ResultEffect) }
 }
