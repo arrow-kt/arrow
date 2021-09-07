@@ -716,10 +716,6 @@ public final class arrow/optics/PTraversal$DefaultImpls {
 	public static fun set (Larrow/optics/PTraversal;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class arrow/optics/PredefKt {
-	public static final fun firstOptionMonoid ()Larrow/typeclasses/Monoid;
-}
-
 public final class arrow/optics/PrismKt {
 	public static final fun Prism (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
 }
