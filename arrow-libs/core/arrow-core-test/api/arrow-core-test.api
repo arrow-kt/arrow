@@ -61,7 +61,6 @@ public final class arrow/core/test/generators/GeneratorsKt {
 	public static final fun nonZeroInt (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun option (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun or (Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
-	public static final fun result (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun sequence (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun shortSmall (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun suspendFunThatReturnsAnyLeft (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
@@ -78,11 +77,6 @@ public final class arrow/core/test/generators/GeneratorsKt {
 	public static final fun tuple9 (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun unit (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun validated (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
-}
-
-public final class arrow/core/test/generators/UtilsKt {
-	public static final fun suspend (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun suspend (Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/test/laws/FxLaws {
