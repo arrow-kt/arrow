@@ -93,8 +93,8 @@ public final class arrow/fx/coroutines/CircuitBreaker {
 public final class arrow/fx/coroutines/CircuitBreaker$Companion {
 	public final fun of (IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun of$default (Larrow/fx/coroutines/CircuitBreaker$Companion;IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun of-3c68mSE (IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun of-3c68mSE$default (Larrow/fx/coroutines/CircuitBreaker$Companion;IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun of-3c68mSE (IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun of-3c68mSE$default (Larrow/fx/coroutines/CircuitBreaker$Companion;IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/CircuitBreaker$ExecutionRejected : java/lang/Throwable {
@@ -163,6 +163,18 @@ public final class arrow/fx/coroutines/ExitCase$Failure : arrow/fx/coroutines/Ex
 }
 
 public final class arrow/fx/coroutines/FlowExtensions {
+	public static final fun fixedRate (JZLkotlin/jvm/functions/Function0;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun fixedRate$default (JZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun fixedRate-KLykuaI (JZLkotlin/jvm/functions/Function0;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun fixedRate-KLykuaI$default (JZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun mapIndexed (Lkotlinx/coroutines/flow/Flow;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun metered (Lkotlinx/coroutines/flow/Flow;J)Lkotlinx/coroutines/flow/Flow;
+	public static final fun metered-HG0u8IE (Lkotlinx/coroutines/flow/Flow;J)Lkotlinx/coroutines/flow/Flow;
+	public static final fun parMap (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun parMap$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun parMapUnordered (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun parMapUnordered$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun repeat (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/coroutines/Schedule;)Lkotlinx/coroutines/flow/Flow;
 }
 
@@ -177,32 +189,50 @@ public final class arrow/fx/coroutines/ParTraverse {
 	public static final fun parSequenceEitherN (Ljava/lang/Iterable;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parSequenceEitherN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceEitherN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceEitherNScoped (Ljava/lang/Iterable;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceEitherNScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceEitherNScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceEitherScoped (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceEitherScoped (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceEitherScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceEitherScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parSequenceN (Ljava/lang/Iterable;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parSequenceN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceNScoped (Ljava/lang/Iterable;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceNScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceNScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceScoped (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parSequenceValidated (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceValidated$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parSequenceValidatedN (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parSequenceValidatedN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceValidatedN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverse$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseEither (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseEither$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseEitherN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseEitherN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseEitherN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseValidated (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseValidated$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseValidatedN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceValidatedNScoped (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parSequenceValidatedNScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceValidatedNScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parSequenceValidatedScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parSequenceValidatedScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverse$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverseEither (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverseEither$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverseEitherN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverseEitherN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverseEitherN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverseN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverseN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverseN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverseValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverseValidated (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverseValidated$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parTraverseValidatedN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/ParZipKt {
@@ -231,6 +261,7 @@ public final class arrow/fx/coroutines/ParZipKt {
 
 public final class arrow/fx/coroutines/Platform {
 	public static final field INSTANCE Larrow/fx/coroutines/Platform;
+	public final fun composeErrors (Larrow/core/NonEmptyList;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/lang/Object;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/util/List;)Ljava/lang/Throwable;
@@ -239,14 +270,14 @@ public final class arrow/fx/coroutines/Platform {
 	public final fun composeErrorsNullable (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
 }
 
-public final class arrow/fx/coroutines/PlatformKt {
-	public static final fun nonFatalOrThrow (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+public final class arrow/fx/coroutines/PredefKt {
+	public static final fun timeInMillis ()J
 }
 
 public final class arrow/fx/coroutines/Race2Kt {
-	public static final fun raceN (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun raceN (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun raceN$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun raceN (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raceN (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun raceN$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public abstract class arrow/fx/coroutines/Race3 {
@@ -288,16 +319,21 @@ public final class arrow/fx/coroutines/Race3$Third : arrow/fx/coroutines/Race3 {
 
 public final class arrow/fx/coroutines/Race3Kt {
 	public static final fun cancelAndCompose (Lkotlinx/coroutines/Deferred;Lkotlinx/coroutines/Deferred;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun raceN (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun raceN (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun raceN$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun raceN (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raceN (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun raceN$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public abstract class arrow/fx/coroutines/Resource {
 	public static final field Companion Larrow/fx/coroutines/Resource$Companion;
 	public final fun ap (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
 	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public final synthetic fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public final fun map (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+	public final fun parZip (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
+	public final fun parZip (Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
+	public static synthetic fun parZip$default (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Larrow/fx/coroutines/Resource;
+	public final fun tap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun use (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun zip (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
 	public final fun zip (Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function10;)Larrow/fx/coroutines/Resource;
@@ -325,18 +361,23 @@ public final class arrow/fx/coroutines/Resource$Bind : arrow/fx/coroutines/Resou
 
 public final class arrow/fx/coroutines/Resource$Companion {
 	public final fun defer (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public final fun fromClosable (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public final fun fromExecutor (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun just (Ljava/lang/Object;)Larrow/fx/coroutines/Resource;
-	public final fun singleThreadContext (Ljava/lang/String;)Larrow/fx/coroutines/Resource;
 	public final fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 }
 
 public final class arrow/fx/coroutines/Resource$Defer : arrow/fx/coroutines/Resource {
 	public fun <init> (Lkotlin/jvm/functions/Function1;)V
 	public final fun getResource ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/fx/coroutines/ResourceExtensionsKt {
+	public static final fun fromAutoCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static final fun fromClosable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static final fun fromCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static final fun fromExecutor (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static final fun singleThreadContext (Larrow/fx/coroutines/Resource$Companion;Ljava/lang/String;)Larrow/fx/coroutines/Resource;
 }
 
 public final class arrow/fx/coroutines/ResourceKt {
@@ -402,22 +443,22 @@ public final class arrow/fx/coroutines/Schedule$Companion {
 	public final fun duration ()Larrow/fx/coroutines/Schedule;
 	public final fun exponential (DD)Larrow/fx/coroutines/Schedule;
 	public static synthetic fun exponential$default (Larrow/fx/coroutines/Schedule$Companion;DDILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
-	public final fun exponential-VtjQ1oo (DD)Larrow/fx/coroutines/Schedule;
-	public static synthetic fun exponential-VtjQ1oo$default (Larrow/fx/coroutines/Schedule$Companion;DDILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
+	public final fun exponential-VtjQ1oo (JD)Larrow/fx/coroutines/Schedule;
+	public static synthetic fun exponential-VtjQ1oo$default (Larrow/fx/coroutines/Schedule$Companion;JDILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
 	public final fun fibonacci (D)Larrow/fx/coroutines/Schedule;
-	public final fun fibonacci-LRDsOJo (D)Larrow/fx/coroutines/Schedule;
+	public final fun fibonacci-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
 	public final fun forever ()Larrow/fx/coroutines/Schedule;
 	public final fun identity ()Larrow/fx/coroutines/Schedule;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public final fun linear (D)Larrow/fx/coroutines/Schedule;
-	public final fun linear-LRDsOJo (D)Larrow/fx/coroutines/Schedule;
+	public final fun linear-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
 	public final fun logInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public final fun logOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public final fun never ()Larrow/fx/coroutines/Schedule;
 	public final fun once ()Larrow/fx/coroutines/Schedule;
 	public final fun recurs (I)Larrow/fx/coroutines/Schedule;
 	public final fun spaced (D)Larrow/fx/coroutines/Schedule;
-	public final fun spaced-LRDsOJo (D)Larrow/fx/coroutines/Schedule;
+	public final fun spaced-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
 	public final fun unfold (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
 	public final fun unfoldLazy (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public final fun unit ()Larrow/fx/coroutines/Schedule;
@@ -438,7 +479,7 @@ public final class arrow/fx/coroutines/Schedule$Decision {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCont ()Z
 	public final fun getDelayInNanos ()D
-	public final fun getDuration-UwyO8pc ()D
+	public final fun getDuration-UwyO8pc ()J
 	public final fun getFinish ()Larrow/core/Eval;
 	public final fun getState ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -450,9 +491,9 @@ public final class arrow/fx/coroutines/Schedule$Decision {
 
 public final class arrow/fx/coroutines/Schedule$Decision$Companion {
 	public final fun cont (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun cont-KLykuaI (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun cont-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun done (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun done-KLykuaI (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun done-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
 }
 
 public final class arrow/fx/coroutines/ScheduleKt {

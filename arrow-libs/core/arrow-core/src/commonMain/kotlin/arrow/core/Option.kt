@@ -507,7 +507,7 @@ public sealed class Option<out A> {
       )
     }
 
-  public inline fun <B, C, D, E, F, G, H, I> zip(
+  public inline fun <B, C, D, E, F, G, H> zip(
     b: Option<B>,
     c: Option<C>,
     d: Option<D>,
