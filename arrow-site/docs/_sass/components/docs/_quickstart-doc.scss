@@ -35,6 +35,28 @@
       font-size: 2.5rem;
     }
   }
+
+  .quickstart-coroutines-list {
+    display: grid;
+    gap: 32px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+    .quickstart-coroutines-item {
+      padding: 2rem;
+      background: rgba($core-background, 0.03);
+
+      ul {
+        padding-left: 1rem;
+        margin: 2rem 0 0 0;
+      }
+
+      &:nth-child(1) {}
+      &:nth-child(2) {}
+      &:nth-child(3) {}
+      &:nth-child(4) {}
+    }
+  }
+
   .modular-libraries {
     margin-bottom: 7.75rem;
 

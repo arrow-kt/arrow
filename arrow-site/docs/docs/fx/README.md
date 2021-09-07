@@ -24,25 +24,42 @@ Arrow Fx is a functional companion to KotlinX Coroutines augmenting its api with
 The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
 
 If you're not familiar yet with Coroutines in Kotlin, it's recommended to first read Kotlin's [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on KotlinX Coroutines.
+</div>
 
+<div class="quickstart-intro" markdown="1">
 ## Arrow Fx Coroutines Overview
 
-- Quick Start
+<div class="quickstart-coroutines-list" markdown="1">
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Quick Start
   - [Gradle Setup]({{ '/fx/#Gradle-kotlin' | relative_url }})
   - [Maven Setup]({{ '/fx/#Maven' | relative_url }})
-- Extensions and data types
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Extensions and data types
   - [Parallel]({{ '/fx/parallel' | relative_url }})
   - [Schedule]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/' | relative_url }})
   - [Resource]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/' | relative_url }})
   - [CircuitBreaker]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker' | relative_url }})
   - [Atomic]({{ '/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/' | relative_url }})
   - [STM]({{ '/apidocs/arrow-fx-stm/arrow.fx.stm/-s-t-m/' | relative_url }})
-- [Integrating with 3rd-party libraries]({{ '/fx/#integrating-with-3rd-party-libraries' | relative_url }})
-- Additional Information
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Integrating 
+  - [Integrating with 3rd-party libraries]({{ '/fx/#integrating-with-3rd-party-libraries' | relative_url }})
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Additional Information
   - [Kotlin's Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html)
   - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
   - [Kotlin's Std Coroutines package]({{ '/fx/coroutines/' | relative_url }})
   - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
+</div>
+</div>
 </div>
 
 <!--- Setup
