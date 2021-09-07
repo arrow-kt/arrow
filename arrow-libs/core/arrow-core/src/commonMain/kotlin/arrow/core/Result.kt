@@ -4,100 +4,94 @@ import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 
 @PublishedApi
-internal inline val unitResult: Result<Unit>
+internal inline val UnitResult: Result<Unit>
   inline get() = success(Unit)
 
+/**
+ * Compose a [transform] operation on the success value [A] into [B] whilst flattening [Result].
+ * @see mapCatching if you want run a function that catches and maps with `(A) -> B`
+ */
 public inline fun <A, B> Result<A>.flatMap(transform: (value: A) -> Result<B>): Result<B> =
-  fold({ a ->
-    try {
-      transform(a)
-    } catch (e: Throwable) {
-      failure(e)
-    }
-  }) { throwable ->
-    failure(throwable)
-  }
+  map(transform).fold(::identity, ::failure)
 
+/**
+ * Compose a recovering [transform] operation on the failure value [Throwable] whilst flattening [Result].
+ * @see recoverCatching if you want run a function that catches and maps recovers with `(Throwable) -> A`.
+ */
 public inline fun <A> Result<A>.handleErrorWith(transform: (throwable: Throwable) -> Result<A>): Result<A> =
-  fold({ a -> success(a) }) { throwable ->
-    try {
-      transform(throwable)
-    } catch (e: Throwable) {
-      failure(e)
-    }
+  when (val exception = exceptionOrNull()) {
+    null -> this
+    else -> transform(exception)
   }
 
+/**
+ * Compose both:
+ *  - a [transform] operation on the success value [A] into [B] whilst flattening [Result].
+ *  - a recovering [transform] operation on the failure value [Throwable] whilst flattening [Result].
+ *
+ * Combining the powers of [flatMap] and [handleErrorWith].
+ */
 public inline fun <A, B> Result<A>.redeemWith(
   handleErrorWith: (throwable: Throwable) -> Result<B>,
   transform: (value: A) -> Result<B>
-): Result<B> =
-  fold({ a ->
-    try {
-      transform(a)
-    } catch (e: Throwable) {
-      failure(e)
-    }
-  }) { throwable ->
-    try {
-      handleErrorWith(throwable)
-    } catch (e: Throwable) {
-      failure(e)
-    }
-  }
+): Result<B> = fold(transform, handleErrorWith)
 
-public inline fun <A, B, C> Result<A>.zip(b: Result<B>, map: (A, B) -> C): Result<C> =
+/**
+ * Combines n-arity independent [Result] values with a [transform] function.
+ */
+public inline fun <A, B, C> Result<A>.zip(b: Result<B>, transform: (A, B) -> C): Result<C> =
   zip(
     b,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult
-  ) { a, b, _, _, _, _, _, _, _, _ -> map(a, b) }
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult
+  ) { a, b, _, _, _, _, _, _, _, _ -> transform(a, b) }
 
-public inline fun <A, B, C, D> Result<A>.zip(b: Result<B>, c: Result<C>, map: (A, B, C) -> D): Result<D> =
+public inline fun <A, B, C, D> Result<A>.zip(b: Result<B>, c: Result<C>, transform: (A, B, C) -> D): Result<D> =
   zip(
     b,
     c,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult
-  ) { a, b, c, _, _, _, _, _, _, _ -> map(a, b, c) }
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult
+  ) { a, b, c, _, _, _, _, _, _, _ -> transform(a, b, c) }
 
 public inline fun <A, B, C, D, E> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
   d: Result<D>,
-  map: (A, B, C, D) -> E
+  transform: (A, B, C, D) -> E
 ): Result<E> =
   zip(
     b,
     c,
     d,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult,
-    unitResult
-  ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult,
+    UnitResult
+  ) { a, b, c, d, _, _, _, _, _, _ -> transform(a, b, c, d) }
 
 public inline fun <A, B, C, D, E, F> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
   d: Result<D>,
   e: Result<E>,
-  map: (A, B, C, D, E) -> F
+  transform: (A, B, C, D, E) -> F
 ): Result<F> =
-  zip(b, c, d, e, unitResult, unitResult, unitResult, unitResult, unitResult) { a, b, c, d, e, f, _, _, _, _ ->
-    map(
+  zip(b, c, d, e, UnitResult, UnitResult, UnitResult, UnitResult, UnitResult) { a, b, c, d, e, f, _, _, _, _ ->
+    transform(
       a,
       b,
       c,
@@ -112,10 +106,10 @@ public inline fun <A, B, C, D, E, F, G> Result<A>.zip(
   d: Result<D>,
   e: Result<E>,
   f: Result<F>,
-  map: (A, B, C, D, E, F) -> G
+  transform: (A, B, C, D, E, F) -> G
 ): Result<G> =
-  zip(b, c, d, e, f, unitResult, unitResult, unitResult, unitResult) { a, b, c, d, e, f, _, _, _, _ ->
-    map(
+  zip(b, c, d, e, f, UnitResult, UnitResult, UnitResult, UnitResult) { a, b, c, d, e, f, _, _, _, _ ->
+    transform(
       a,
       b,
       c,
@@ -132,9 +126,9 @@ public inline fun <A, B, C, D, E, F, G, H> Result<A>.zip(
   e: Result<E>,
   f: Result<F>,
   g: Result<G>,
-  map: (A, B, C, D, E, F, G) -> H
+  transform: (A, B, C, D, E, F, G) -> H
 ): Result<H> =
-  zip(b, c, d, e, f, g, unitResult, unitResult, unitResult) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+  zip(b, c, d, e, f, g, UnitResult, UnitResult, UnitResult) { a, b, c, d, e, f, g, _, _, _ -> transform(a, b, c, d, e, f, g) }
 
 public inline fun <A, B, C, D, E, F, G, H, I> Result<A>.zip(
   b: Result<B>,
@@ -144,9 +138,9 @@ public inline fun <A, B, C, D, E, F, G, H, I> Result<A>.zip(
   f: Result<F>,
   g: Result<G>,
   h: Result<H>,
-  map: (A, B, C, D, E, F, G, H) -> I
+  transform: (A, B, C, D, E, F, G, H) -> I
 ): Result<I> =
-  zip(b, c, d, e, f, g, h, unitResult, unitResult) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+  zip(b, c, d, e, f, g, h, UnitResult, UnitResult) { a, b, c, d, e, f, g, h, _, _ -> transform(a, b, c, d, e, f, g, h) }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
   b: Result<B>,
@@ -157,9 +151,9 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
   g: Result<G>,
   h: Result<H>,
   i: Result<I>,
-  map: (A, B, C, D, E, F, G, H, I) -> J
+  transform: (A, B, C, D, E, F, G, H, I) -> J
 ): Result<J> =
-  zip(b, c, d, e, f, g, h, i, unitResult) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+  zip(b, c, d, e, f, g, h, i, UnitResult) { a, b, c, d, e, f, g, h, i, _ -> transform(a, b, c, d, e, f, g, h, i) }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   b: Result<B>,
@@ -171,7 +165,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   h: Result<H>,
   i: Result<I>,
   j: Result<J>,
-  map: (A, B, C, D, E, F, G, H, I, J) -> K
+  transform: (A, B, C, D, E, F, G, H, I, J) -> K
 ): Result<K> = Nullable.zip(
   getOrNull(),
   b.getOrNull(),
@@ -183,7 +177,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   h.getOrNull(),
   i.getOrNull(),
   j.getOrNull(),
-  map
+  transform
 )?.let { success(it) } ?: composeErrors(
   exceptionOrNull(),
   b.exceptionOrNull(),
@@ -198,14 +192,8 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
 )!!.let(::failure)
 
 @PublishedApi
-internal fun composeErrors(vararg other: Throwable?): Throwable? {
-  var a: Throwable? = null
-  other.forEach { b ->
-    when {
-      a == null -> a = b
-      b != null -> a?.addSuppressed(b)
-      else -> Unit
-    }
+internal fun composeErrors(vararg other: Throwable?): Throwable? =
+  other.reduceOrNull { a, b ->
+    Nullable.zip(a, b, Throwable::addSuppressed)
+    a ?: b
   }
-  return a
-}
