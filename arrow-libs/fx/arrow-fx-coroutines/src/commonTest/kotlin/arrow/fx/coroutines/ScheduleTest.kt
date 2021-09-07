@@ -128,8 +128,11 @@ class ScheduleTest : ArrowFxSpec(
       res.map { it.delayInNanos.nanoseconds } shouldBe res.map { duration }
     }
 
+    fun secondsToNanos(sec: Int): Double =
+      sec * 1_000_000_000.0
+
     "Schedule.fibonacci()" {
-      val i = 10.0.seconds
+      val i = secondsToNanos(10)
       val n = 10
       val res = Schedule.fibonacci<Any?>(i).calculateSchedule(0, n)
 
@@ -143,7 +146,7 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "Schedule.linear()" {
-      val i = 10.0.seconds
+      val i = secondsToNanos(10)
       val n = 10
       val res = Schedule.linear<Any?>(i).calculateSchedule(0, n)
 
@@ -155,7 +158,7 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "Schedule.exponential()" {
-      val i = 10.0.seconds
+      val i = secondsToNanos(10)
       val n = 10
       val res = Schedule.exponential<Any?>(i).calculateSchedule(0, n)
 
@@ -228,26 +231,26 @@ class ScheduleTest : ArrowFxSpec(
 )
 
 @ExperimentalTime
-private fun fibs(one: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
-  generateSequence(Pair(0.0.nanoseconds, one)) { (a, b) ->
+private fun fibs(one: Double): Sequence<Double> =
+  generateSequence(Pair(0.0, one)) { (a, b) ->
     Pair(b, (a + b))
   }.map { it.first }
 
 @ExperimentalTime
-private fun exp(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
+private fun exp(base: Double): Sequence<Double> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair(base * 2.0.pow(n), n + 1)
   }.map { it.first }
 
 @ExperimentalTime
-private fun linear(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
+private fun linear(base: Double): Sequence<Double> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair((base * n), (n + 1))
   }.map { it.first }
 
 @ExperimentalTime
-internal fun Sequence<kotlin.time.Duration>.sum(): kotlin.time.Duration {
-  var sum: kotlin.time.Duration = 0.0.nanoseconds
+internal fun Sequence<Double>.sum(): Double {
+  var sum = 0.0
   for (element in this) {
     sum += element
   }
