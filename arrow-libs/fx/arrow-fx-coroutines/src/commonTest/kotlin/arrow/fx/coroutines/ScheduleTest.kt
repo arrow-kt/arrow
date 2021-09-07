@@ -133,8 +133,8 @@ class ScheduleTest : ArrowFxSpec(
       val n = 10
       val res = Schedule.fibonacci<Any?>(i).calculateSchedule(0, n)
 
-      val sum = res.fold(0.nanoseconds) { acc, v ->
-        acc + v.delayInNanos.nanoseconds
+      val sum = res.fold(0.0) { acc, v ->
+        acc + v.delayInNanos
       }
       val fib = fibs(i).drop(1).take(n)
 
@@ -147,7 +147,7 @@ class ScheduleTest : ArrowFxSpec(
       val n = 10
       val res = Schedule.linear<Any?>(i).calculateSchedule(0, n)
 
-      val sum = res.fold(0.nanoseconds) { acc, v -> acc + v.delayInNanos.nanoseconds }
+      val sum = res.fold(0.0) { acc, v -> acc + v.delayInNanos }
       val exp = linear(i).drop(1).take(n)
 
       res.all { it.cont } shouldBe true
@@ -159,7 +159,7 @@ class ScheduleTest : ArrowFxSpec(
       val n = 10
       val res = Schedule.exponential<Any?>(i).calculateSchedule(0, n)
 
-      val sum = res.fold(0.nanoseconds) { acc, v -> acc + v.delayInNanos.nanoseconds }
+      val sum = res.fold(0.0) { acc, v -> acc + v.delayInNanos }
       val expSum = exp(i).drop(1).take(n).sum()
 
       res.all { it.cont } shouldBe true
