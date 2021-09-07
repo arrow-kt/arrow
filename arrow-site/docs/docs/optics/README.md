@@ -14,11 +14,13 @@ permalink: /optics/
 </div>
 
 <div class="quickstart-doc" markdown="1">
+<div class="quickstart-intro" markdown="1">
 
 # Arrow Optics. Transforming and computing over immutable data models in Kotlin
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 
 Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.s
+</div>
 
 <!--- Setup
 --------------------------------------------------------------------------------
