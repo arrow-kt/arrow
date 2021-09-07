@@ -2409,14 +2409,12 @@ public final class arrow/core/computations/EagerResultEffect {
 public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect {
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/EitherEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/computations/EitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/EitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2470,7 +2468,6 @@ public abstract interface class arrow/core/computations/RestrictedEitherEffect :
 public final class arrow/core/computations/RestrictedEitherEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/RestrictedEitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2501,8 +2498,6 @@ public final class arrow/core/computations/RestrictedOptionEffect$DefaultImpls {
 
 public final class arrow/core/computations/ResultEffect {
 	public static final field INSTANCE Larrow/core/computations/ResultEffect;
-	public final fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public final fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
