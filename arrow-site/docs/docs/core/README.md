@@ -22,6 +22,49 @@ Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/
 Core also includes the base continuation effects system, which includes patterns to remove callbacks and enables controlled effects in direct syntax. Some applications of the effect system reduce boilerplate and enable direct syntax including [monad comprehensions and computation expressions]({{ '/patterns/monad_comprehensions/' | relative_url }}).
 </div>
 
+<div class="quickstart-intro" markdown="1">
+## Arrow Core Overview
+
+<div class="quickstart-coroutines-list" markdown="1">
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Quick Start
+  - [Gradle Setup]({{ '/core/#Gradle-kotlin' | relative_url }})
+  - [Maven Setup]({{ '/core/#Maven' | relative_url }})
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Extensions and data types
+  - [Either]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }})
+  - [Validated]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }})
+  - [Option]({{ '/apidocs/arrow-core/arrow.core/-option/' | relative_url }})
+  - [NonEmptyList]({{ '/apidocs/arrow-core/arrow.core/-non-empty-list/' | relative_url }})
+  - [Ior]({{ '/apidocs/arrow-core/arrow.core/-ior/' | relative_url }})
+  - [Eval]({{ '/apidocs/arrow-core/arrow.core/-eval/' | relative_url }})
+  - [Monoid]({{ '/arrow/typeclasses/monoid/' | relative_url }})
+  - [Semiring]({{ '/apidocs/arrow-core/arrow.typeclasses/-semiring/' | relative_url }})
+  - [Extensions]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' | relative_url }})
+
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Tutorials 
+  - [Error Handling]({{ '/patterns/error_handling/' | relative_url }})
+  - [Monads]({{ '/patterns/monads/' | relative_url }})
+  - [Monad Comprehensions]({{ '/patterns/monad_comprehensions/' | relative_url }})
+  - [Coroutines & Computation blocks]({{ '/fx/coroutines/' | relative_url }})
+
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### Additional information
+  - [Kotlin's Std Lib Guide](https://kotlinlang.org/api/latest/jvm/stdlib/)
+  - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
+  - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
+</div>
+</div>
+</div>
+
 <div class="setup" markdown="1">
 ## Setup
 
