@@ -21,7 +21,6 @@ kotlin {
         // Fix:
         withJava()
     }
-//    js(BOTH) {
     js(IR) {
         browser()
         nodejs()
@@ -56,7 +55,6 @@ kotlin {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
             }
         }
-
         jvmMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
@@ -64,24 +62,12 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-                api "io.kotest:kotest-property:$KOTEST_VERSION"
-                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
                 runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
         jsMain {
             dependencies {
                 implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
-            }
-        }
-        jsTest {
-            dependencies {
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-                api "io.kotest:kotest-property:$KOTEST_VERSION"
-                api "io.kotest:kotest-framework-engine:4.6.2"
-                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
         nativeMain {
@@ -99,12 +85,7 @@ kotlin {
             tvosMain.dependsOn(it)
         }
         nativeTest {
-            dependencies {
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-                api "io.kotest:kotest-property:$KOTEST_VERSION"
-                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
-            }
+            dependsOn(commonTest)
             macosX64Test.dependsOn(it)
             mingwX64Test.dependsOn(it)
             linuxX64Test.dependsOn(it)

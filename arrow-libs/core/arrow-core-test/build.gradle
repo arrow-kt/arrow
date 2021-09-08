@@ -12,10 +12,10 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":arrow-core")
-                compileOnly "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-                compileOnly "io.kotest:kotest-property:$KOTEST_VERSION"
-                compileOnly "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
-                compileOnly "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+                api "io.kotest:kotest-property:$KOTEST_VERSION"
+                api "io.kotest:kotest-framework-engine:$KOTEST_VERSION"
+                api "io.kotest:kotest-assertions-core:$KOTEST_VERSION"
             }
         }
     }
