@@ -13,15 +13,21 @@ import org.jetbrains.dokka.base.transformers.pages.comments.DocTagToContentConve
 import org.jetbrains.dokka.gfm.GfmPlugin
 import org.jetbrains.dokka.gfm.renderer.BriefCommentPreprocessor
 import org.jetbrains.dokka.gfm.renderer.CommonmarkRenderer
+import org.jetbrains.dokka.model.DisplaySourceSet
 import org.jetbrains.dokka.model.doc.CodeBlock
 import org.jetbrains.dokka.model.doc.DocTag
 import org.jetbrains.dokka.model.properties.PropertyContainer
 import org.jetbrains.dokka.model.toDisplaySourceSets
 import org.jetbrains.dokka.pages.ContentCodeBlock
 import org.jetbrains.dokka.pages.ContentCodeInline
+import org.jetbrains.dokka.pages.ContentDivergentGroup
+import org.jetbrains.dokka.pages.ContentDivergentInstance
+import org.jetbrains.dokka.pages.ContentGroup
 import org.jetbrains.dokka.pages.ContentNode
 import org.jetbrains.dokka.pages.ContentPage
+import org.jetbrains.dokka.pages.ContentTable
 import org.jetbrains.dokka.pages.DCI
+import org.jetbrains.dokka.pages.PlatformHintedContent
 import org.jetbrains.dokka.pages.SimpleAttr
 import org.jetbrains.dokka.pages.Style
 import org.jetbrains.dokka.plugability.DokkaContext
@@ -90,6 +96,98 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
     content(builder, page)
     return builder.toString()
   }
+
+  override fun StringBuilder.buildDivergent(node: ContentDivergentGroup, pageContext: ContentPage) {
+
+    val distinct =
+      node.groupDivergentInstances(pageContext, { instance, contentPage, sourceSet ->
+        instance.before?.let { before ->
+          buildString { buildContentNode(before, pageContext, sourceSet) }
+        } ?: ""
+      }, { instance, contentPage, sourceSet ->
+        instance.after?.let { after ->
+          buildString { buildContentNode(after, pageContext, sourceSet) }
+        } ?: ""
+      })
+
+    distinct.values.forEach { entry ->
+      val (instance, sourceSets) = entry.getInstanceAndSourceSets()
+
+      buildParagraph()
+      buildSourceSetTags(sourceSets)
+      buildNewLine()
+
+      instance.before?.let {
+        buildContentNode(
+          it,
+          pageContext,
+          sourceSets.first()
+        ) // It's workaround to render content only once
+        buildParagraph()
+      }
+
+      entry.groupBy { buildString { buildContentNode(it.first.divergent, pageContext, setOf(it.second)) } }
+        .values.forEach { innerEntry ->
+          val (innerInstance, innerSourceSets) = innerEntry.getInstanceAndSourceSets()
+          if (sourceSets.size > 1) {
+            buildSourceSetTags(innerSourceSets)
+            buildNewLine()
+          }
+          innerInstance.divergent.build(
+            this@buildDivergent,
+            pageContext,
+            setOf(innerSourceSets.first())
+          ) // It's workaround to render content only once
+          buildParagraph()
+        }
+
+      instance.after?.let {
+        buildContentNode(
+          it,
+          pageContext,
+          sourceSets.first()
+        ) // It's workaround to render content only once
+      }
+
+      buildParagraph()
+    }
+  }
+
+  private fun List<Pair<ContentDivergentInstance, DisplaySourceSet>>.getInstanceAndSourceSets() =
+    this.let { Pair(it.first().first, it.map { it.second }.toSet()) }
+
+  override fun StringBuilder.buildPlatformDependent(
+    content: PlatformHintedContent,
+    pageContext: ContentPage,
+    sourceSetRestriction: Set<DisplaySourceSet>?
+  ) {
+    buildPlatformDependentItem(content.inner, content.sourceSets, pageContext)
+  }
+
+  private fun StringBuilder.buildPlatformDependentItem(
+    content: ContentNode,
+    sourceSets: Set<DisplaySourceSet>,
+    pageContext: ContentPage,
+  ) {
+    if (content is ContentGroup && content.children.firstOrNull { it is ContentTable } != null) {
+      buildContentNode(content, pageContext, sourceSets)
+    } else {
+      val distinct = sourceSets.map {
+        it to buildString { buildContentNode(content, pageContext, setOf(it)) }
+      }.groupBy(Pair<DisplaySourceSet, String>::second, Pair<DisplaySourceSet, String>::first)
+
+      distinct.filter { it.key.isNotBlank() }.forEach { (text, platforms) ->
+        buildParagraph()
+        buildSourceSetTags(platforms.toSet())
+        buildNewLine()
+        append(text.trim())
+        buildParagraph()
+      }
+    }
+  }
+
+  private fun StringBuilder.buildSourceSetTags(sourceSets: Set<DisplaySourceSet>) =
+    sourceSets.forEach { append("""<span class="platform-${it.name}">${it.name}</span>""") }
 
   override fun StringBuilder.buildCodeBlock(code: ContentCodeBlock, pageContext: ContentPage) {
     append("```${code.language}\n")
