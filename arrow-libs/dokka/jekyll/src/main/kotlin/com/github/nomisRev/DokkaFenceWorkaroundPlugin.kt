@@ -20,6 +20,8 @@ import org.jetbrains.dokka.model.properties.PropertyContainer
 import org.jetbrains.dokka.model.toDisplaySourceSets
 import org.jetbrains.dokka.pages.ContentCodeBlock
 import org.jetbrains.dokka.pages.ContentCodeInline
+import org.jetbrains.dokka.pages.ContentDivergentGroup
+import org.jetbrains.dokka.pages.ContentDivergentInstance
 import org.jetbrains.dokka.pages.ContentGroup
 import org.jetbrains.dokka.pages.ContentNode
 import org.jetbrains.dokka.pages.ContentPage
@@ -94,6 +96,65 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
     content(builder, page)
     return builder.toString()
   }
+
+  override fun StringBuilder.buildDivergent(node: ContentDivergentGroup, pageContext: ContentPage) {
+
+    val distinct =
+      node.groupDivergentInstances(pageContext, { instance, contentPage, sourceSet ->
+        instance.before?.let { before ->
+          buildString { buildContentNode(before, pageContext, sourceSet) }
+        } ?: ""
+      }, { instance, contentPage, sourceSet ->
+        instance.after?.let { after ->
+          buildString { buildContentNode(after, pageContext, sourceSet) }
+        } ?: ""
+      })
+
+    distinct.values.forEach { entry ->
+      val (instance, sourceSets) = entry.getInstanceAndSourceSets()
+
+      buildParagraph()
+      buildSourceSetTags(sourceSets)
+      buildNewLine()
+
+      instance.before?.let {
+        buildContentNode(
+          it,
+          pageContext,
+          sourceSets.first()
+        ) // It's workaround to render content only once
+        buildParagraph()
+      }
+
+      entry.groupBy { buildString { buildContentNode(it.first.divergent, pageContext, setOf(it.second)) } }
+        .values.forEach { innerEntry ->
+          val (innerInstance, innerSourceSets) = innerEntry.getInstanceAndSourceSets()
+          if (sourceSets.size > 1) {
+            buildSourceSetTags(innerSourceSets)
+            buildNewLine()
+          }
+          innerInstance.divergent.build(
+            this@buildDivergent,
+            pageContext,
+            setOf(innerSourceSets.first())
+          ) // It's workaround to render content only once
+          buildParagraph()
+        }
+
+      instance.after?.let {
+        buildContentNode(
+          it,
+          pageContext,
+          sourceSets.first()
+        ) // It's workaround to render content only once
+      }
+
+      buildParagraph()
+    }
+  }
+
+  private fun List<Pair<ContentDivergentInstance, DisplaySourceSet>>.getInstanceAndSourceSets() =
+    this.let { Pair(it.first().first, it.map { it.second }.toSet()) }
 
   override fun StringBuilder.buildPlatformDependent(
     content: PlatformHintedContent,
