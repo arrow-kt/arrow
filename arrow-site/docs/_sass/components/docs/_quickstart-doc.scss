@@ -40,7 +40,6 @@
     display: grid;
     gap: 32px;
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 1fr;
     .quickstart-coroutines-item {
       padding: 2rem;
       background: rgba($core-background, 0.03);
@@ -48,6 +47,18 @@
       ul {
         padding-left: 1rem;
         margin: 2rem 0 0 0;
+
+        li {
+          &::before {
+            content: "\f178";
+            color: $dark-color-doc;
+            position: relative;
+            font-weight: lighter;
+            margin-right: 0.5rem;
+            width: auto;
+            font-family: "Font Awesome 5 Pro"
+          }
+        }
       }
 
       &:nth-child(1) {}
