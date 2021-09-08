@@ -125,7 +125,6 @@
     background: rgba($blocquote-info, 0.2);
     margin-bottom: 1rem;
 
-
     &::before {
       position: absolute;
       font-size: 1.375rem;
@@ -135,9 +134,9 @@
       font-family: 'Font Awesome 5 Pro';
     }
 
-
     &.blockquote-alert {
       background: rgba($blocquote-alert, 0.2);
+
       &::before {
         content: "";
         color: rgba($blocquote-alert, 0.9);
@@ -206,10 +205,12 @@
       opacity: 1;
     }
   }
+
   .content-edit-page {
     display: flex;
     justify-content: flex-end;
     margin-top: -20px;
+
     a {
       border: 1px solid rgba($dark-color-doc, 0.2);
       display: flex;
@@ -217,6 +218,7 @@
       padding: 0.25rem 0.5rem;
       border-radius: 3px;
       background: $white;
+
       span {
         font-size: 0.813rem;
       }
@@ -225,11 +227,53 @@
         font-size: 1.125rem;
         margin-right: 0.25rem;
       }
+
       &:hover {
         background: darken($white, 3%);
       }
     }
   }
+
+
+  .platform-common,
+  .platform-native,
+  .platform-jvm,
+  .platform-js {
+    position: relative;
+    display: inline-block;
+    &:before {
+      position: relative;
+    }
+  }
+
+  .platform-common {
+    background: $label-common;
+    &:before {
+      content: 'test';
+    }
+  }
+
+  .platform-native {
+    background: $label-native;
+    &:before {
+      content: 'test';
+    }
+  }
+
+  .platform-jvm {
+    background: $label-jvm;
+    &:before {
+      content: 'test';
+    }
+  }
+
+  .platform-js {
+    background: $label-js;
+    &:before {
+      content: 'test';
+    }
+  }
+
 }
 @include bp(large) {
   .doc-content {
@@ -242,9 +286,8 @@
       white-space: nowrap;
     }
 
-      .content-edit-page {
-        display: none;
-      }
-
+    .content-edit-page {
+      display: none;
+    }
   }
 }
