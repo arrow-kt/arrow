@@ -310,7 +310,7 @@ public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
-    f(item).fold(::identity) { throwable ->
+    f(item).fold(destination::add) { throwable ->
       return@traverseResult Result.failure(throwable)
     }
   }
