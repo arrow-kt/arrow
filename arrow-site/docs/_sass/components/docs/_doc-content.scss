@@ -234,46 +234,69 @@
     }
   }
 
-
   .platform-common,
-  .platform-native,
+  .platform-js,
   .platform-jvm,
-  .platform-js {
+  .platform-native {
+    font-family: $heading-font-family;
+    color: $white;
+    font-weight: $font-medium;
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0 0.5rem 0 1.4rem;
+    border-radius: 1px;
     position: relative;
     display: inline-block;
+    align-items: center;
+
     &:before {
-      position: relative;
+      margin-right: 0.5rem;
+      display: inline-block;
+      background: #765;
+      width: 20px;
+      height: 20px;
+      background-color: rgba(#000, 0.04);
+      position: absolute;
+      left: 0;
     }
   }
 
   .platform-common {
     background: $label-common;
+
     &:before {
-      content: 'test';
+      content: '';
+      background: url("../img/labels/icon-label-common.svg") repeat-y;
     }
   }
 
   .platform-native {
     background: $label-native;
+
     &:before {
-      content: 'test';
+      content: '';
+      background: url("../img/labels/icon-label-native.svg") repeat-y;
     }
   }
 
   .platform-jvm {
     background: $label-jvm;
+
     &:before {
-      content: 'test';
+      content: '';
+      background: url("../img/labels/icon-label-jvm.svg") repeat-y;
     }
   }
 
   .platform-js {
     background: $label-js;
+
+
     &:before {
-      content: 'test';
+      content: '';
+      background: url("../img/labels/icon-label-js.svg") repeat-y;
     }
   }
-
 }
 @include bp(large) {
   .doc-content {
