@@ -4,11 +4,9 @@ import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.checkAll
 
 class FoldTest : UnitSpec() {
 
@@ -64,7 +62,7 @@ class FoldTest : UnitSpec() {
       }
 
       "Checking existence of a target" {
-        checkAll(Arb.list(Arb.int().orNull()), Arb.bool()) { ints, predicate ->
+        checkAll(Arb.list(Arb.int().orNull()), Arb.boolean()) { ints, predicate ->
           Fold.list<Int?>().exists(ints) { predicate } shouldBe (predicate && ints.isNotEmpty())
         }
       }

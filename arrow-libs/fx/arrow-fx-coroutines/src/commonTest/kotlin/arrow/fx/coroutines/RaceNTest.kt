@@ -7,7 +7,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.CompletableDeferred
@@ -59,7 +59,7 @@ class RaceNTest : ArrowFxSpec(
     "race 2 cancels losers with first success or failure determining winner" {
       checkAll(
         Arb.either(Arb.throwable(), Arb.int()),
-        Arb.bool(),
+        Arb.boolean(),
         Arb.int()
       ) { eith, leftWinner, a ->
         val s = Channel<Unit>()

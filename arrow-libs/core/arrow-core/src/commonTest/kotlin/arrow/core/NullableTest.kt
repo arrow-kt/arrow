@@ -2,17 +2,16 @@
 
 package arrow.core
 
+import arrow.core.test.UnitSpec
 import arrow.core.test.generators.intSmall
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 
-class NullableTest : StringSpec({
+class NullableTest : UnitSpec(spec = {
   "map1 short circuits if any arg is null" {
     Nullable.zip(null) { Unit }.shouldBeNull()
   }
@@ -51,7 +50,12 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05),
     ) { a: String?, b: String?, c: String?, d: String? ->
-      if (a == null || b == null || c == null || d == null) Nullable.zip(a, b, c, d, { a, b, c, d -> a + b + c + d }) shouldBe null
+      if (a == null || b == null || c == null || d == null) Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        { a, b, c, d -> a + b + c + d }) shouldBe null
       else Nullable.zip(a, b, c, d, { a, b, c, d -> a + b + c + d }) shouldBe a + b + c + d
     }
   }
@@ -64,7 +68,13 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05),
     ) { a: String?, b: String?, c: String?, d: String?, e: String? ->
-      if (a == null || b == null || c == null || d == null || e == null) Nullable.zip(a, b, c, d, e, { _, _, _, _, _ -> Unit }) shouldBe null
+      if (a == null || b == null || c == null || d == null || e == null) Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        { _, _, _, _, _ -> Unit }) shouldBe null
       else Nullable.zip(a, b, c, d, e, { a, b, c, d, e -> a + b + c + d + e }) shouldBe a + b + c + d + e
     }
   }
@@ -78,7 +88,14 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05),
     ) { a: String?, b: String?, c: String?, d: String?, e: String?, f: String? ->
-      if (a == null || b == null || c == null || d == null || e == null || f == null) Nullable.zip(a, b, c, d, e, f, { _, _, _, _, _, _ -> Unit }) shouldBe null
+      if (a == null || b == null || c == null || d == null || e == null || f == null) Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        { _, _, _, _, _, _ -> Unit }) shouldBe null
       else Nullable.zip(a, b, c, d, e, f, { a, b, c, d, e, f -> a + b + c + d + e + f }) shouldBe a + b + c + d + e + f
     }
   }
@@ -93,8 +110,24 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05),
     ) { a: String?, b: String?, c: String?, d: String?, e: String?, f: String?, g: String? ->
-      if (a == null || b == null || c == null || d == null || e == null || f == null || g == null) Nullable.zip(a, b, c, d, e, f, g, { _, _, _, _, _, _, _ -> Unit }) shouldBe null
-      else Nullable.zip(a, b, c, d, e, f, g, { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }) shouldBe a + b + c + d + e + f + g
+      if (a == null || b == null || c == null || d == null || e == null || f == null || g == null) Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        { _, _, _, _, _, _, _ -> Unit }) shouldBe null
+      else Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }) shouldBe a + b + c + d + e + f + g
     }
   }
 
@@ -109,8 +142,26 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05),
     ) { a: String?, b: String?, c: String?, d: String?, e: String?, f: String?, g: String?, h: String? ->
-      if (a == null || b == null || c == null || d == null || e == null || f == null || g == null || h == null) Nullable.zip(a, b, c, d, e, f, g, h, { _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
-      else Nullable.zip(a, b, c, d, e, f, g, h, { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }) shouldBe a + b + c + d + e + f + g + h
+      if (a == null || b == null || c == null || d == null || e == null || f == null || g == null || h == null) Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        h,
+        { _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
+      else Nullable.zip(
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        h,
+        { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }) shouldBe a + b + c + d + e + f + g + h
     }
   }
 
@@ -129,7 +180,17 @@ class NullableTest : StringSpec({
       if (a == null || b == null || c == null || d == null || e == null || f == null || g == null || h == null || i == null) {
         Nullable.zip(a, b, c, d, e, f, g, h, i, { _, _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
       } else {
-        Nullable.zip(a, b, c, d, e, f, g, h, i, { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i }) shouldBe a + b + c + d + e + f + g + h + i
+        Nullable.zip(
+          a,
+          b,
+          c,
+          d,
+          e,
+          f,
+          g,
+          h,
+          i,
+          { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i }) shouldBe a + b + c + d + e + f + g + h + i
       }
     }
   }

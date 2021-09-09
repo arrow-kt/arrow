@@ -12,14 +12,10 @@ include 'arrow-core'
 include 'arrow-core-test'
 include 'arrow-annotations'
 include 'arrow-continuations'
-include 'arrow-meta:arrow-meta-test-models'
-include 'arrow-meta'
 include 'arrow-core-retrofit'
 
 project(":arrow-core").projectDir = file("../core/arrow-core")
 project(":arrow-core-test").projectDir = file("../core/arrow-core-test")
 project(":arrow-annotations").projectDir = file("../core/arrow-annotations")
 project(":arrow-continuations").projectDir = file("../core/arrow-continuations")
-project(":arrow-meta:arrow-meta-test-models").projectDir = file("../core/arrow-meta/arrow-meta-test-models")
-project(":arrow-meta").projectDir = file("../core/arrow-meta")
 project(":arrow-core-retrofit").projectDir = file("../core/arrow-core-retrofit")

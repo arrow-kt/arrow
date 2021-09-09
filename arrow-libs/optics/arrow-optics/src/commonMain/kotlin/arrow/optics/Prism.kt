@@ -133,9 +133,9 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
       reverseGet: (B) -> T
     ): PPrism<S, T, A, B> =
       object : PPrism<S, T, A, B> {
-        override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
+        override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
 
-        override fun reverseGet(b: B): T = reverseGet(b)
+        override fun reverseGet(focus: B): T = reverseGet(focus)
       }
 
     /**

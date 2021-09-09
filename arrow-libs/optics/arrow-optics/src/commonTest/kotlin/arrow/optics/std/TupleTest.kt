@@ -14,7 +14,7 @@ import arrow.optics.Traversal
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
@@ -78,9 +78,9 @@ class TupleTest : UnitSpec() {
       "Traversal pair - ",
       TraversalLaws.laws(
         traversal = Traversal.pair(),
-        aGen = Arb.pair(Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.pair(Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -88,9 +88,9 @@ class TupleTest : UnitSpec() {
       "Traversal triple - ",
       TraversalLaws.laws(
         traversal = Traversal.triple(),
-        aGen = Arb.triple(Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.triple(Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -98,9 +98,9 @@ class TupleTest : UnitSpec() {
       "Traversal tuple4 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple4(),
-        aGen = Arb.tuple4(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.tuple4(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -108,9 +108,9 @@ class TupleTest : UnitSpec() {
       "Traversal tuple5 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple5(),
-        aGen = Arb.tuple5(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.tuple5(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -118,9 +118,9 @@ class TupleTest : UnitSpec() {
       "Traversal tuple6 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple6(),
-        aGen = Arb.tuple6(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.tuple6(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -128,9 +128,17 @@ class TupleTest : UnitSpec() {
       "Traversal tuple7 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple7(),
-        aGen = Arb.tuple7(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.tuple7(
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
+        ),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -138,9 +146,18 @@ class TupleTest : UnitSpec() {
       "Traversal tuple8 - ",
       TraversalLaws.laws(
         traversal = Traversal.tuple8(),
-        aGen = Arb.tuple8(Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool(), Arb.bool()),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        aGen = Arb.tuple8(
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
+        ),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
 
@@ -149,17 +166,17 @@ class TupleTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = Traversal.tuple9(),
         aGen = Arb.tuple9(
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool()
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
         ),
-        bGen = Arb.bool(),
+        bGen = Arb.boolean(),
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
@@ -169,19 +186,19 @@ class TupleTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = Traversal.tuple10(),
         aGen = Arb.tuple10(
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool(),
-          Arb.bool()
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
         ),
-        bGen = Arb.bool(),
-        funcGen = Arb.functionAToB(Arb.bool()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
       )
     )
   }

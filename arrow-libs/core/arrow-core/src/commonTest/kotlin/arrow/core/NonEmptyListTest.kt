@@ -1,13 +1,12 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import kotlin.math.max
 import kotlin.math.min
@@ -122,11 +121,11 @@ class NonEmptyListTest : UnitSpec() {
     }
 
     "can align lists with different lengths" {
-      checkAll(Arb.nonEmptyList(Arb.bool()), Arb.nonEmptyList(Arb.bool())) { a, b ->
+      checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
         a.align(b).size shouldBe max(a.size, b.size)
       }
 
-      checkAll(Arb.nonEmptyList(Arb.bool()), Arb.nonEmptyList(Arb.bool())) { a, b ->
+      checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
         a.align(b).all.take(min(a.size, b.size)).forEach {
           it.isBoth shouldBe true
         }

@@ -2,14 +2,11 @@ package arrow.optics.instances
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.nonEmptyList
-import arrow.core.test.generators.sequence
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.typeclasses.Index
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 

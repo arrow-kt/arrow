@@ -5,6 +5,7 @@ plugins {
 }
 
 apply plugin: 'kotlinx-atomicfu'
+apply plugin: 'io.kotest.multiplatform'
 
 apply from: "$SUB_PROJECT_MPP"
 apply from: "$TEST_COVERAGE"

@@ -19,10 +19,6 @@ processResources {
     }
 }
 
-dependencies {
-    testImplementation "junit:junit:$JUNIT_VERSION"
-}
-
 gradlePlugin {
     plugins {
         ank {

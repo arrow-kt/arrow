@@ -1,8 +1,7 @@
 package arrow.core
 
-import arrow.core.test.generators.array
+import arrow.core.test.UnitSpec
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
@@ -29,8 +28,7 @@ data class Person(val age: Int, val name: String) : Comparable<Person> {
 fun Arb.Companion.person(): Arb<Person> =
   Arb.bind(Arb.int(), Arb.string(), ::Person)
 
-class ComparisonKtTest : StringSpec() {
-  init {
+class ComparisonKtTest : UnitSpec({
     "Arberic - sort2" {
       checkAll(Arb.person(), Arb.person()) { a, b ->
         val (first, second) = sort(a, b)
@@ -223,5 +221,4 @@ class ComparisonKtTest : StringSpec() {
         res shouldBe expected
       }
     }
-  }
-}
+})

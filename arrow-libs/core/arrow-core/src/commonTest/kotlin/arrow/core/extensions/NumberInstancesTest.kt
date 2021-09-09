@@ -36,7 +36,7 @@ class NumberInstancesTest : UnitSpec() {
     /** Semigroup specific instance check */
 
     "should semigroup with the instance passed - int" {
-      checkAll { value: Int ->
+      checkAll(Arb.int()) { value: Int ->
         val seen = Monoid.int().run { value.combine(value) }
         val expected = value + value
 
@@ -63,7 +63,7 @@ class NumberInstancesTest : UnitSpec() {
     }
 
     "should semigroup with the instance passed - long" {
-      checkAll { value: Long ->
+      checkAll(Arb.long()) { value: Long ->
         val seen = Monoid.long().run { value.combine(value) }
         val expected = value + value
 

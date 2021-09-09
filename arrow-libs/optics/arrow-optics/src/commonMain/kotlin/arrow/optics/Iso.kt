@@ -147,8 +147,8 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
      */
     public operator fun <S, T, A, B> invoke(get: (S) -> (A), reverseGet: (B) -> T): PIso<S, T, A, B> =
       object : PIso<S, T, A, B> {
-        override fun get(s: S): A = get(s)
-        override fun reverseGet(b: B): T = reverseGet(b)
+        override fun get(source: S): A = get(source)
+        override fun reverseGet(focus: B): T = reverseGet(focus)
       }
 
     /**

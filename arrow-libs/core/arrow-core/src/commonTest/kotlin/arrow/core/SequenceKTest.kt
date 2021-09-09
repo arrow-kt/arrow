@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
-import arrow.core.test.generators.sequence
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup

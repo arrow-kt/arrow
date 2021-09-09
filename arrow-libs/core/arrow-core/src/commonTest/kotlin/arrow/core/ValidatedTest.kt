@@ -13,6 +13,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.string
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
@@ -194,7 +195,7 @@ class ValidatedTest : UnitSpec() {
         }
 
         val all = listOf(a, b, c, d, e, f, g, h, i, j)
-        val isValid = all.all(Validated<Long?, Int?>::isValid)
+        val isValid = all.all { it.isValid }
         val expected: Validated<Long?, Int?> =
           if (isValid) Valid(all.fold<Validated<Long?, Int?>, Int?>(0) { acc, validated ->
             Nullable.zip(
@@ -203,7 +204,7 @@ class ValidatedTest : UnitSpec() {
             ) { a, b -> a + b }
           })
           else Invalid(
-            all.filterIsInstance<Invalid<Long?>>().map(Invalid<Long?>::value).combineAll(nullableLongSemigroup)
+            all.filterIsInstance<Invalid<Long?>>().map { it.value }.combineAll(nullableLongSemigroup)
           )
 
         res shouldBe expected
@@ -350,7 +351,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequence should yield consistent result with traverse" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
@@ -368,7 +369,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequenceOption should yield consistent result with traverseOption" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
@@ -386,7 +387,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "sequenceEither should yield consistent result with traverseEither" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid = Valid(a)
         val invalid = Invalid(b)
 
@@ -404,7 +405,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequence should yield consistent result with bitraverse" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
@@ -426,7 +427,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequenceOption should yield consistent result with bitraverseOption" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
@@ -446,7 +447,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "bisequenceEither should yield consistent result with bitraverseEither" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         val valid: Validated<String, String> = Valid(a)
         val invalid: Validated<String, String> = Invalid(b)
 
