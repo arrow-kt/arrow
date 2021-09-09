@@ -351,7 +351,7 @@ public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
     when (val res = f(item)) {
-      is Some -> res.value
+      is Some -> destination.add(res.value)
       is None -> return res
     }
   }
