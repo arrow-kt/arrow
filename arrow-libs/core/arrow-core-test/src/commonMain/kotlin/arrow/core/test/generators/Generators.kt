@@ -36,7 +36,6 @@ import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.jvm.JvmOverloads
 import kotlin.math.abs
 
 public fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
