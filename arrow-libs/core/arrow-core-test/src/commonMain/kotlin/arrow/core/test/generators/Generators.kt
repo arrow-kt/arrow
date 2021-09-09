@@ -34,6 +34,9 @@ import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
+import kotlin.Result.Companion.failure
+import kotlin.Result.Companion.success
+import kotlin.jvm.JvmOverloads
 import kotlin.math.abs
 
 public fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
@@ -53,6 +56,9 @@ public fun <A> Arb.Companion.functionToA(arb: Arb<A>): Arb<() -> A> =
 
 public fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
+
+public fun <A> Arb.Companion.result(arbA: Arb<A>): Arb<Result<A>> =
+  Arb.choice(arbA.map(::success), throwable().map(::failure))
 
 public fun Arb.Companion.doubleSmall(): Arb<Double> =
   Arb.numericDoubles(from = 0.0, to = 100.0)

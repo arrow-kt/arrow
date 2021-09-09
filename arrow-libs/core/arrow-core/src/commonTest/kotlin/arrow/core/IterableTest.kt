@@ -48,6 +48,40 @@ class IterableTest : UnitSpec() {
       }
     }
 
+    "traverseResult stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseResult { a ->
+        acc.add(a)
+        Result.success(a)
+      }
+      res shouldBe Result.success(acc)
+      res shouldBe Result.success((0..20_000).toList())
+    }
+
+    "traverseResult short-circuit" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseResult {
+          if (it % 2 == 0) {
+            acc.add(it)
+            Result.success(it)
+          } else Result.failure(RuntimeException())
+        }
+        acc shouldBe ints.takeWhile { it % 2 == 0 }
+        evens.fold(
+          { it shouldBe ints },
+          { }
+        )
+      }
+    }
+
+    "sequenceResult should be consistent with traverseResult" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        ints.map { Result.success(it) }.sequenceResult() shouldBe ints.traverseResult { Result.success(it) }
+      }
+    }
+
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
