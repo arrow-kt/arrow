@@ -293,23 +293,29 @@ public inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B
     else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
   }
 
-public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  map { a ->
-    when (val res = f(a)) {
-      is Right -> res.value
-      is Left -> return@traverseEither res
+public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    when (val res = f(item)) {
+      is Right -> destination.add(res.value)
+      is Left -> return res
     }
-  }.right()
+  }
+  return destination.right()
+}
 
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
-public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
-  map { a ->
-    f(a).fold(::identity) { throwable ->
+public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    f(item).fold(::identity) { throwable ->
       return@traverseResult Result.failure(throwable)
     }
-  }.let(::success)
+  }
+  return success(destination)
+}
 
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   traverseResult(::identity)
@@ -341,13 +347,16 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
-public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  map { a ->
-    when (val res = f(a)) {
+public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    when (val res = f(item)) {
       is Some -> res.value
-      is None -> return@traverseOption res
+      is None -> return res
     }
-  }.some()
+  }
+  return destination.some()
+}
 
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   this.traverseOption { it }
