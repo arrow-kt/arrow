@@ -103,8 +103,8 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
      */
     public operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T): PLens<S, T, A, B> =
       object : PLens<S, T, A, B> {
-        override fun get(s: S): A = get(s)
-        override fun set(s: S, b: B): T = set(s, b)
+        override fun get(source: S): A = get(source)
+        override fun set(source: S, focus: B): T = set(source, focus)
       }
 
     /**

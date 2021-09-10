@@ -3,14 +3,13 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.longSmall
-import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
@@ -113,13 +112,13 @@ class MapKTest : UnitSpec() {
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
-      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         aligned.size shouldBe (a.keys + b.keys).size
       }
 
       // aligned map contains Both for all entries existing in a and b
-      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).forEach {
           aligned[it]?.isBoth shouldBe true
@@ -127,7 +126,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Left for all entries existing only in a
-      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (a.keys - b.keys).forEach { key ->
           aligned[key]?.isLeft shouldBe true
@@ -135,7 +134,7 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Right for all entries existing only in b
-      checkAll(Arb.map(Arb.long(), Arb.bool()), Arb.map(Arb.long(), Arb.bool())) { a, b ->
+      checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (b.keys - a.keys).forEach { key ->
           aligned[key]?.isRight shouldBe true

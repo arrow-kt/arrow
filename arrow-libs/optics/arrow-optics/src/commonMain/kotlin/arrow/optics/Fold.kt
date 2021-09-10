@@ -62,6 +62,7 @@ public interface Fold<S, A> {
   /**
    * Get the first target or null
    */
+  @Suppress("UNCHECKED_CAST")
   public fun firstOrNull(source: S): A? {
     val fold = ::fold as (Monoid<Any?>, S) -> Any?
     val res = fold(object : Monoid<Any?> {
@@ -75,6 +76,7 @@ public interface Fold<S, A> {
   /**
    * Get the last target or null
    */
+  @Suppress("UNCHECKED_CAST")
   public fun lastOrNull(source: S): A? {
     val fold = ::fold as (Monoid<Any?>, S) -> Any?
     val res = fold(object : Monoid<Any?> {

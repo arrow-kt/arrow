@@ -6,6 +6,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.Result.Companion.success
 import kotlin.collections.foldRight as _foldRight
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
@@ -293,24 +294,37 @@ public inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B
   }
 
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    when (val res = f(item)) {
+      is Right -> destination.add(res.value)
+      is Left -> return res
     }
   }
-  return acc.right()
+  return destination.right()
 }
 
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
 
+public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    f(item).fold(destination::add) { throwable ->
+      return@traverseResult Result.failure(throwable)
+    }
+  }
+  return success(destination)
+}
+
+public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
+  traverseResult(::identity)
+
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> = semigroup.run {
-  fold(Valid(mutableListOf<B>()) as Validated<E, MutableList<B>>) { acc, a ->
+  fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
     when (val res = f(a)) {
       is Validated.Valid -> when (acc) {
         is Valid -> acc.also { it.value.add(res.value) }
@@ -334,21 +348,21 @@ public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverseOption res
+  val destination = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this) {
+    when (val res = f(item)) {
+      is Some -> destination.add(res.value)
+      is None -> return res
     }
   }
-  return acc.some()
+  return destination.some()
 }
 
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   this.traverseOption { it }
 
 public fun <A> Iterable<A>.void(): List<Unit> =
-  map { Unit }
+  map { }
 
 @Deprecated(FoldRightDeprecation)
 public fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
@@ -791,17 +805,13 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
  * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
  */
 public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
-  val list = mutableListOf<T>()
+  var value: Any? = EmptyValue
   for (element in this) {
     if (predicate(element)) {
-      if (list.isEmpty()) {
-        list.add(element)
-      } else {
-        list[0] = element
-      }
+      value = element
     }
   }
-  return list.firstOrNone()
+  return if (value === EmptyValue) None else Some(EmptyValue.unbox(value))
 }
 
 /**

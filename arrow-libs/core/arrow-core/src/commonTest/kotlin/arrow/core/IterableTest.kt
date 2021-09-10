@@ -6,7 +6,7 @@ import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlin.math.max
@@ -45,6 +45,40 @@ class IterableTest : UnitSpec() {
     "sequenceEither should be consistent with traverseEither" {
       checkAll(Arb.list(Arb.int())) { ints ->
         ints.map { it.right() }.sequenceEither() shouldBe ints.traverseEither { it.right() }
+      }
+    }
+
+    "traverseResult stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_000).traverseResult { a ->
+        acc.add(a)
+        Result.success(a)
+      }
+      res shouldBe Result.success(acc)
+      res shouldBe Result.success((0..20_000).toList())
+    }
+
+    "traverseResult short-circuit" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseResult {
+          if (it % 2 == 0) {
+            acc.add(it)
+            Result.success(it)
+          } else Result.failure(RuntimeException())
+        }
+        acc shouldBe ints.takeWhile { it % 2 == 0 }
+        evens.fold(
+          { it shouldBe ints },
+          { }
+        )
+      }
+    }
+
+    "sequenceResult should be consistent with traverseResult" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        ints.map { Result.success(it) }.sequenceResult() shouldBe ints.traverseResult { Result.success(it) }
       }
     }
 
@@ -274,17 +308,17 @@ class IterableTest : UnitSpec() {
     }
 
     "can align lists with different lengths" {
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).size shouldBe max(a.size, b.size)
       }
 
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).take(min(a.size, b.size)).forEach {
           it.isBoth shouldBe true
         }
       }
 
-      checkAll(Arb.list(Arb.bool()), Arb.list(Arb.bool())) { a, b ->
+      checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).drop(min(a.size, b.size)).forEach {
           if (a.size < b.size) {
             it.isRight shouldBe true

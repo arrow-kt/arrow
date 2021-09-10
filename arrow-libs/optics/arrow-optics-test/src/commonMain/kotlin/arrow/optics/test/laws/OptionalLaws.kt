@@ -45,7 +45,7 @@ public object OptionalLaws {
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen) { optional, a ->
+    checkAll(100, optionalGen, aGen) { optional, a ->
       optional.run {
         getOrModify(a).fold(::identity) { set(a, it) }
           .equalUnderTheLaw(a, eq)
@@ -58,7 +58,7 @@ public object OptionalLaws {
     bGen: Arb<B>,
     eq: (B?, B?) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen, bGen) { optional, a, b ->
+    checkAll(100, optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         getOrNull(set(a, b))
           .equalUnderTheLaw(getOrNull(a)?.let { b }) { a, b -> eq(a, b) }
@@ -71,7 +71,7 @@ public object OptionalLaws {
     bGen: Arb<B>,
     eq: (A, A) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen, bGen) { optional, a, b ->
+    checkAll(100, optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         set(set(a, b), b)
           .equalUnderTheLaw(set(a, b), eq)
@@ -83,7 +83,7 @@ public object OptionalLaws {
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen) { optional, a ->
+    checkAll(100, optionalGen, aGen) { optional, a ->
       optional.run {
         modify(a, ::identity)
           .equalUnderTheLaw(a, eq)
@@ -96,7 +96,7 @@ public object OptionalLaws {
     funcGen: Arb<(B) -> B>,
     eq: (A, A) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen, funcGen, funcGen) { optional, a, f, g ->
+    checkAll(100, optionalGen, aGen, funcGen, funcGen) { optional, a, f, g ->
       optional.run {
         modify(modify(a, f), g)
           .equalUnderTheLaw(modify(a, g compose f), eq)
@@ -109,7 +109,7 @@ public object OptionalLaws {
     bGen: Arb<B>,
     eq: (A, A) -> Boolean
   ): PropertyContext =
-    checkAll(optionalGen, aGen, bGen) { optional, a, b ->
+    checkAll(100, optionalGen, aGen, bGen) { optional, a, b ->
       optional.run {
         set(a, b)
           .equalUnderTheLaw(modify(a) { b }, eq)

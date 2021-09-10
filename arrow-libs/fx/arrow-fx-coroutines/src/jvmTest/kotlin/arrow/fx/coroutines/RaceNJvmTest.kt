@@ -56,7 +56,7 @@ class RaceNJvmTest : ArrowFxSpec(
 
     "first racer out of 2 always wins on a single thread" {
       single.use { ctx ->
-        raceN(ctx, threadName, threadName)
+        raceN(ctx, { threadName() }, { threadName() })
       }.swap().orNull() shouldStartWith "single"
     }
 
@@ -119,7 +119,7 @@ class RaceNJvmTest : ArrowFxSpec(
 
     "first racer out of 3 always wins on a single thread" {
       (single.use { ctx ->
-        raceN(ctx, threadName, threadName, threadName)
+        raceN(ctx, { threadName() }, { threadName() }, { threadName() })
       } as? Race3.First)?.winner shouldStartWith "single"
     }
   }

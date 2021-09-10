@@ -7,9 +7,9 @@ plugins {
 apply from: "../$SUB_PROJECT"
 
 dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+    implementation "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
-    compileOnly project(":arrow-annotations")
-    compileOnly project(":arrow-core")
+    implementation project(":arrow-annotations")
+    implementation project(":arrow-core")
 }

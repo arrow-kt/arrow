@@ -1,0 +1,1694 @@
+public final class arrow/common/messager/MessagerExtensionsKt {
+	public static final fun log (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;)V
+	public static synthetic fun log$default (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;ILjava/lang/Object;)V
+	public static final fun logE (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;)V
+	public static synthetic fun logE$default (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;ILjava/lang/Object;)V
+	public static final fun logMW (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;)V
+	public static synthetic fun logMW$default (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;ILjava/lang/Object;)V
+	public static final fun logW (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;)V
+	public static synthetic fun logW$default (Lme/eugeniomarletti/kotlin/processing/KotlinProcessingEnvironment;Ljava/lang/CharSequence;Ljavax/lang/model/element/Element;Ljavax/lang/model/element/AnnotationMirror;Ljavax/lang/model/element/AnnotationValue;ILjava/lang/Object;)V
+}
+
+public abstract class arrow/common/utils/AbstractProcessor : me/eugeniomarletti/kotlin/processing/KotlinAbstractProcessor, arrow/common/utils/ProcessorUtils, arrow/meta/encoder/jvm/KotlinMetatadataEncoder {
+	public fun <init> ()V
+	public fun asClassOrPackageDataWrapper (Lme/eugeniomarletti/kotlin/metadata/KotlinMetadata;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public fun asModifier (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public fun asModifier (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Visibility;)Larrow/meta/ast/Modifier;
+	public fun asTypeName (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
+	public fun declaredTypeClassInterfaces (Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;)Ljava/util/List;
+	public fun extractFullName (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public fun getClassData (Ljavax/lang/model/element/Element;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public fun getClassOrPackageDataWrapper (Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public fun getConstructorParamNames (Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public fun getConstructorTypesNames (Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public fun getDescriptor (Ljavax/lang/model/type/ArrayType;)Ljava/lang/String;
+	public fun getDescriptor (Ljavax/lang/model/type/ExecutableType;)Ljava/lang/String;
+	public fun getDescriptor (Ljavax/lang/model/type/TypeMirror;)Ljava/lang/String;
+	public fun getDescriptor (Ljavax/lang/model/type/TypeVariable;)Ljava/lang/String;
+	public fun getDescriptor (Ljavax/lang/model/type/WildcardType;)Ljava/lang/String;
+	public fun getFunction (Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public fun getFunctionOrNull (Ljavax/lang/model/element/ExecutableElement;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Ljava/util/List;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public fun getFunctionOrNull (Lme/eugeniomarletti/kotlin/metadata/ClassData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public fun getFunctionOrNull (Lme/eugeniomarletti/kotlin/metadata/PackageData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public fun getHasNoCompanion (Ljavax/lang/model/element/Element;)Z
+	public fun getJvmMethodSignature (Ljavax/lang/model/element/ExecutableElement;)Ljava/lang/String;
+	public final fun kDoc (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public fun modifiersFromFlags (I)Ljava/util/List;
+	public fun nameOf (Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
+	protected abstract fun onProcess (Ljava/util/Set;Ljavax/annotation/processing/RoundEnvironment;)V
+	public fun overrides (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Z
+	public final fun process (Ljava/util/Set;Ljavax/annotation/processing/RoundEnvironment;)Z
+	public fun supertypes (Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
+	public fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter$Variance;)Larrow/meta/ast/Modifier;
+	public fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName$TypeVariable;
+	public fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/Parameter;
+}
+
+public final class arrow/common/utils/AbstractProcessorKt {
+	public static final fun writeSafe (Ljavax/annotation/processing/Filer;Ljava/lang/CharSequence;Ljava/lang/CharSequence;Ljava/lang/CharSequence;Lkotlin/jvm/functions/Function1;[Ljavax/lang/model/element/Element;)V
+	public static synthetic fun writeSafe$default (Ljavax/annotation/processing/Filer;Ljava/lang/CharSequence;Ljava/lang/CharSequence;Ljava/lang/CharSequence;Lkotlin/jvm/functions/Function1;[Ljavax/lang/model/element/Element;ILjava/lang/Object;)V
+	public static final fun writeSafeTo (Lcom/squareup/kotlinpoet/FileSpec;Ljavax/annotation/processing/Filer;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun writeSafeTo$default (Lcom/squareup/kotlinpoet/FileSpec;Ljavax/annotation/processing/Filer;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public abstract class arrow/common/utils/ClassOrPackageDataWrapper {
+	public abstract fun getConstructorList ()Ljava/util/List;
+	public abstract fun getFunctionList ()Ljava/util/List;
+	public abstract fun getNameResolver ()Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;
+	public abstract fun getPackage ()Ljava/lang/String;
+	public abstract fun getPropertyList ()Ljava/util/List;
+	public abstract fun getTypeParameter (I)Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;
+	public abstract fun getTypeParameters ()Ljava/util/List;
+}
+
+public final class arrow/common/utils/ClassOrPackageDataWrapper$Class : arrow/common/utils/ClassOrPackageDataWrapper {
+	public fun <init> (Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Class;Ljava/lang/String;)V
+	public final fun getClassProto ()Lorg/jetbrains/kotlin/metadata/ProtoBuf$Class;
+	public fun getConstructorList ()Ljava/util/List;
+	public fun getFunctionList ()Ljava/util/List;
+	public fun getNameResolver ()Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;
+	public fun getPackage ()Ljava/lang/String;
+	public fun getPropertyList ()Ljava/util/List;
+	public fun getTypeParameter (I)Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;
+	public fun getTypeParameters ()Ljava/util/List;
+}
+
+public final class arrow/common/utils/ClassOrPackageDataWrapper$Package : arrow/common/utils/ClassOrPackageDataWrapper {
+	public fun <init> (Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Package;Ljava/lang/String;)V
+	public fun getConstructorList ()Ljava/util/List;
+	public fun getFunctionList ()Ljava/util/List;
+	public fun getNameResolver ()Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;
+	public fun getPackage ()Ljava/lang/String;
+	public final fun getPackageProto ()Lorg/jetbrains/kotlin/metadata/ProtoBuf$Package;
+	public fun getPropertyList ()Ljava/util/List;
+	public fun getTypeParameter (I)Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;
+	public fun getTypeParameters ()Ljava/util/List;
+}
+
+public final class arrow/common/utils/ClassOrPackageDataWrapperKt {
+	public static final fun asClassOrPackageDataWrapper (Lme/eugeniomarletti/kotlin/metadata/ClassData;Ljava/lang/String;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static final fun asClassOrPackageDataWrapper (Lme/eugeniomarletti/kotlin/metadata/PackageData;Ljava/lang/String;)Larrow/common/utils/ClassOrPackageDataWrapper$Package;
+}
+
+public final class arrow/common/utils/KnownException : java/lang/RuntimeException {
+	public fun <init> (Ljava/lang/String;Ljavax/lang/model/element/Element;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljavax/lang/model/element/Element;
+	public final fun getElement ()Ljavax/lang/model/element/Element;
+	public fun getMessage ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/common/utils/ProcessorUtils : me/eugeniomarletti/kotlin/metadata/KotlinMetadataUtils {
+	public abstract fun asClassOrPackageDataWrapper (Lme/eugeniomarletti/kotlin/metadata/KotlinMetadata;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public abstract fun declaredTypeClassInterfaces (Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;)Ljava/util/List;
+	public abstract fun getClassData (Ljavax/lang/model/element/Element;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public abstract fun getClassOrPackageDataWrapper (Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public abstract fun getConstructorParamNames (Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public abstract fun getConstructorTypesNames (Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public abstract fun getFunction (Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public abstract fun getHasNoCompanion (Ljavax/lang/model/element/Element;)Z
+	public abstract fun overrides (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Z
+}
+
+public final class arrow/common/utils/ProcessorUtils$DefaultImpls {
+	public static fun asClassOrPackageDataWrapper (Larrow/common/utils/ProcessorUtils;Lme/eugeniomarletti/kotlin/metadata/KotlinMetadata;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun declaredTypeClassInterfaces (Larrow/common/utils/ProcessorUtils;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;)Ljava/util/List;
+	public static fun getClassData (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/Element;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static fun getClassOrPackageDataWrapper (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun getConstructorParamNames (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getConstructorTypesNames (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getDescriptor (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/type/ArrayType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/type/ExecutableType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/type/TypeMirror;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/type/TypeVariable;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/type/WildcardType;)Ljava/lang/String;
+	public static fun getElementUtils (Larrow/common/utils/ProcessorUtils;)Ljavax/lang/model/util/Elements;
+	public static fun getFiler (Larrow/common/utils/ProcessorUtils;)Ljavax/annotation/processing/Filer;
+	public static fun getFunction (Larrow/common/utils/ProcessorUtils;Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/ExecutableElement;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Ljava/util/List;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/common/utils/ProcessorUtils;Lme/eugeniomarletti/kotlin/metadata/ClassData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/common/utils/ProcessorUtils;Lme/eugeniomarletti/kotlin/metadata/PackageData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getHasNoCompanion (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/Element;)Z
+	public static fun getJvmMethodSignature (Larrow/common/utils/ProcessorUtils;Ljavax/lang/model/element/ExecutableElement;)Ljava/lang/String;
+	public static fun getLocale (Larrow/common/utils/ProcessorUtils;)Ljava/util/Locale;
+	public static fun getMessager (Larrow/common/utils/ProcessorUtils;)Ljavax/annotation/processing/Messager;
+	public static fun getOptions (Larrow/common/utils/ProcessorUtils;)Ljava/util/Map;
+	public static fun getSourceVersion (Larrow/common/utils/ProcessorUtils;)Ljavax/lang/model/SourceVersion;
+	public static fun getTypeUtils (Larrow/common/utils/ProcessorUtils;)Ljavax/lang/model/util/Types;
+	public static fun overrides (Larrow/common/utils/ProcessorUtils;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Z
+}
+
+public final class arrow/common/utils/ProcessorUtilsKt {
+	public static final fun extractFullName (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public static synthetic fun extractFullName$default (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;ZILjava/lang/Object;)Ljava/lang/String;
+	public static final fun getFullName (Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Ljava/lang/String;
+	public static final fun getParameter (Larrow/common/utils/ClassOrPackageDataWrapper;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Ljavax/lang/model/element/VariableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;
+	public static final fun getPropertyOrNull (Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Property;
+	public static final fun getSimpleName (Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Ljava/lang/String;
+	public static final fun isCompanionOrObject (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Class$Kind;)Z
+	public static final fun isSealed (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Class;)Z
+	public static final fun knownError (Ljava/lang/String;Ljavax/lang/model/element/Element;)Ljava/lang/Void;
+	public static synthetic fun knownError$default (Ljava/lang/String;Ljavax/lang/model/element/Element;ILjava/lang/Object;)Ljava/lang/Void;
+	public static final fun recurseFilesUpwards (Ljava/util/Set;)Ljava/io/File;
+	public static final fun recurseFilesUpwards (Ljava/util/Set;Ljava/io/File;)Ljava/io/File;
+	public static final fun removeBackticks (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun toCamelCase (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun typeConstraints (Larrow/common/utils/ClassOrPackageDataWrapper;)Ljava/lang/String;
+}
+
+public abstract class arrow/meta/Either {
+	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/meta/Either;
+}
+
+public final class arrow/meta/Either$Left : arrow/meta/Either {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/meta/Either$Left;
+	public static synthetic fun copy$default (Larrow/meta/Either$Left;Ljava/lang/Object;ILjava/lang/Object;)Larrow/meta/Either$Left;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getA ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/Either$Right : arrow/meta/Either {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/meta/Either$Right;
+	public static synthetic fun copy$default (Larrow/meta/Either$Right;Ljava/lang/Object;ILjava/lang/Object;)Larrow/meta/Either$Right;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getB ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/PreludeKt {
+	public static final fun flatMap (Larrow/meta/Either;Lkotlin/jvm/functions/Function1;)Larrow/meta/Either;
+}
+
+public final class arrow/meta/ast/Annotation : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Annotation$Companion;
+	public fun <init> (Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/UseSiteTarget;)V
+	public final fun component1 ()Larrow/meta/ast/TypeName;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Larrow/meta/ast/UseSiteTarget;
+	public final fun copy (Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/UseSiteTarget;)Larrow/meta/ast/Annotation;
+	public static synthetic fun copy$default (Larrow/meta/ast/Annotation;Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/UseSiteTarget;ILjava/lang/Object;)Larrow/meta/ast/Annotation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMembers ()Ljava/util/List;
+	public final fun getType ()Larrow/meta/ast/TypeName;
+	public final fun getUseSiteTarget ()Larrow/meta/ast/UseSiteTarget;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Annotation$Companion {
+}
+
+public final class arrow/meta/ast/Code {
+	public static final field Companion Larrow/meta/ast/Code$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Larrow/meta/ast/Code;
+	public static synthetic fun copy$default (Larrow/meta/ast/Code;Ljava/lang/String;ILjava/lang/Object;)Larrow/meta/ast/Code;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Code$Companion {
+	public final fun getEmpty ()Larrow/meta/ast/Code;
+}
+
+public final class arrow/meta/ast/Func : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Func$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/meta/ast/Code;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Larrow/meta/ast/Code;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/meta/ast/Code;
+	public final fun component3 ()Larrow/meta/ast/TypeName;
+	public final fun component4 ()Larrow/meta/ast/TypeName;
+	public final fun component5 ()Larrow/meta/ast/Code;
+	public final fun component6 ()Ljava/util/List;
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Ljava/util/List;
+	public final fun component9 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Larrow/meta/ast/Code;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)Larrow/meta/ast/Func;
+	public static synthetic fun copy$default (Larrow/meta/ast/Func;Ljava/lang/String;Larrow/meta/ast/Code;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/String;ILjava/lang/Object;)Larrow/meta/ast/Func;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getBody ()Larrow/meta/ast/Code;
+	public final fun getJvmMethodSignature ()Ljava/lang/String;
+	public final fun getKdoc ()Larrow/meta/ast/Code;
+	public final fun getModifiers ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getParameters ()Ljava/util/List;
+	public final fun getReceiverType ()Larrow/meta/ast/TypeName;
+	public final fun getReturnType ()Larrow/meta/ast/TypeName;
+	public final fun getTypeVariables ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Func$Companion {
+}
+
+public final class arrow/meta/ast/Import : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Import$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/meta/ast/Import;
+	public static synthetic fun copy$default (Larrow/meta/ast/Import;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/meta/ast/Import;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAlias ()Ljava/lang/String;
+	public final fun getQualifiedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Import$Companion {
+}
+
+public abstract class arrow/meta/ast/Modifier {
+	public static final field Companion Larrow/meta/ast/Modifier$Companion;
+}
+
+public final class arrow/meta/ast/Modifier$Abstract : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Abstract;
+}
+
+public final class arrow/meta/ast/Modifier$Actual : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Actual;
+}
+
+public final class arrow/meta/ast/Modifier$Annotation : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Annotation;
+}
+
+public final class arrow/meta/ast/Modifier$Companion {
+}
+
+public final class arrow/meta/ast/Modifier$CompanionObject : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$CompanionObject;
+}
+
+public final class arrow/meta/ast/Modifier$Const : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Const;
+}
+
+public final class arrow/meta/ast/Modifier$CrossInline : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$CrossInline;
+}
+
+public final class arrow/meta/ast/Modifier$Data : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Data;
+}
+
+public final class arrow/meta/ast/Modifier$Enum : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Enum;
+}
+
+public final class arrow/meta/ast/Modifier$Expect : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Expect;
+}
+
+public final class arrow/meta/ast/Modifier$External : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$External;
+}
+
+public final class arrow/meta/ast/Modifier$Final : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Final;
+}
+
+public final class arrow/meta/ast/Modifier$InVariance : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$InVariance;
+}
+
+public final class arrow/meta/ast/Modifier$Infix : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Infix;
+}
+
+public final class arrow/meta/ast/Modifier$Inline : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Inline;
+}
+
+public final class arrow/meta/ast/Modifier$Inner : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Inner;
+}
+
+public final class arrow/meta/ast/Modifier$Internal : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Internal;
+}
+
+public final class arrow/meta/ast/Modifier$LateInit : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$LateInit;
+}
+
+public final class arrow/meta/ast/Modifier$NoInline : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$NoInline;
+}
+
+public final class arrow/meta/ast/Modifier$Open : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Open;
+}
+
+public final class arrow/meta/ast/Modifier$Operator : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Operator;
+}
+
+public final class arrow/meta/ast/Modifier$OutVariance : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$OutVariance;
+}
+
+public final class arrow/meta/ast/Modifier$Override : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Override;
+}
+
+public final class arrow/meta/ast/Modifier$Private : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Private;
+}
+
+public final class arrow/meta/ast/Modifier$Protected : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Protected;
+}
+
+public final class arrow/meta/ast/Modifier$Public : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Public;
+}
+
+public final class arrow/meta/ast/Modifier$Reified : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Reified;
+}
+
+public final class arrow/meta/ast/Modifier$Sealed : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Sealed;
+}
+
+public final class arrow/meta/ast/Modifier$Suspend : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Suspend;
+}
+
+public final class arrow/meta/ast/Modifier$Tailrec : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$Tailrec;
+}
+
+public final class arrow/meta/ast/Modifier$VarArg : arrow/meta/ast/Modifier {
+	public static final field INSTANCE Larrow/meta/ast/Modifier$VarArg;
+}
+
+public final class arrow/meta/ast/PackageName : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/PackageName$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Larrow/meta/ast/PackageName;
+	public static synthetic fun copy$default (Larrow/meta/ast/PackageName;Ljava/lang/String;ILjava/lang/Object;)Larrow/meta/ast/PackageName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/PackageName$Companion {
+}
+
+public final class arrow/meta/ast/Parameter : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Parameter$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun component3 ()Larrow/meta/ast/Code;
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;)Larrow/meta/ast/Parameter;
+	public static synthetic fun copy$default (Larrow/meta/ast/Parameter;Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Larrow/meta/ast/Parameter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getDefaultValue ()Larrow/meta/ast/Code;
+	public final fun getModifiers ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getType ()Larrow/meta/ast/TypeName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Parameter$Companion {
+}
+
+public final class arrow/meta/ast/Property : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Property$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;ZLarrow/meta/ast/Code;Larrow/meta/ast/Code;ZLarrow/meta/ast/Func;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;ZLarrow/meta/ast/Code;Larrow/meta/ast/Code;ZLarrow/meta/ast/Func;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/util/List;
+	public final fun component13 ()Ljava/util/List;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun component3 ()Z
+	public final fun component4 ()Larrow/meta/ast/Code;
+	public final fun component5 ()Larrow/meta/ast/Code;
+	public final fun component6 ()Z
+	public final fun component7 ()Larrow/meta/ast/Func;
+	public final fun component8 ()Larrow/meta/ast/Func;
+	public final fun component9 ()Larrow/meta/ast/TypeName;
+	public final fun copy (Ljava/lang/String;Larrow/meta/ast/TypeName;ZLarrow/meta/ast/Code;Larrow/meta/ast/Code;ZLarrow/meta/ast/Func;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Larrow/meta/ast/Property;
+	public static synthetic fun copy$default (Larrow/meta/ast/Property;Ljava/lang/String;Larrow/meta/ast/TypeName;ZLarrow/meta/ast/Code;Larrow/meta/ast/Code;ZLarrow/meta/ast/Func;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Larrow/meta/ast/Property;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getDelegated ()Z
+	public final fun getGetter ()Larrow/meta/ast/Func;
+	public final fun getInitializer ()Larrow/meta/ast/Code;
+	public final fun getJvmFieldSignature ()Ljava/lang/String;
+	public final fun getJvmPropertySignature ()Ljava/lang/String;
+	public final fun getKdoc ()Larrow/meta/ast/Code;
+	public final fun getModifiers ()Ljava/util/List;
+	public final fun getMutable ()Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getReceiverType ()Larrow/meta/ast/TypeName;
+	public final fun getSetter ()Larrow/meta/ast/Func;
+	public final fun getType ()Larrow/meta/ast/TypeName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Property$Companion {
+}
+
+public abstract class arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Tree$Companion;
+}
+
+public final class arrow/meta/ast/Tree$Companion {
+}
+
+public final class arrow/meta/ast/Type : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/Type$Companion;
+	public fun <init> (Larrow/meta/ast/PackageName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Type$Shape;Larrow/meta/ast/Code;Ljava/util/List;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Larrow/meta/ast/PackageName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Type$Shape;Larrow/meta/ast/Code;Ljava/util/List;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Larrow/meta/ast/PackageName;
+	public final fun component10 ()Ljava/util/Map;
+	public final fun component11 ()Ljava/util/List;
+	public final fun component12 ()Ljava/util/List;
+	public final fun component13 ()Ljava/util/List;
+	public final fun component14 ()Ljava/util/List;
+	public final fun component15 ()Ljava/util/List;
+	public final fun component16 ()Ljava/util/List;
+	public final fun component17 ()Ljava/util/List;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun component3 ()Larrow/meta/ast/Type$Shape;
+	public final fun component4 ()Larrow/meta/ast/Code;
+	public final fun component5 ()Ljava/util/List;
+	public final fun component6 ()Larrow/meta/ast/Func;
+	public final fun component7 ()Larrow/meta/ast/TypeName;
+	public final fun component8 ()Larrow/meta/ast/Code;
+	public final fun component9 ()Ljava/util/List;
+	public final fun copy (Larrow/meta/ast/PackageName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Type$Shape;Larrow/meta/ast/Code;Ljava/util/List;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)Larrow/meta/ast/Type;
+	public static synthetic fun copy$default (Larrow/meta/ast/Type;Larrow/meta/ast/PackageName;Larrow/meta/ast/TypeName;Larrow/meta/ast/Type$Shape;Larrow/meta/ast/Code;Ljava/util/List;Larrow/meta/ast/Func;Larrow/meta/ast/TypeName;Larrow/meta/ast/Code;Ljava/util/List;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Larrow/meta/ast/Type;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllFunctions ()Ljava/util/List;
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getDeclaredFunctions ()Ljava/util/List;
+	public final fun getEnumConstants ()Ljava/util/Map;
+	public final fun getInitializer ()Larrow/meta/ast/Code;
+	public final fun getKdoc ()Larrow/meta/ast/Code;
+	public final fun getKind ()Larrow/meta/ast/Type$Shape;
+	public final fun getModifiers ()Ljava/util/List;
+	public final fun getName ()Larrow/meta/ast/TypeName;
+	public final fun getPackageName ()Larrow/meta/ast/PackageName;
+	public final fun getPrimaryConstructor ()Larrow/meta/ast/Func;
+	public final fun getProperties ()Ljava/util/List;
+	public final fun getSuperInterfaces ()Ljava/util/List;
+	public final fun getSuperclass ()Larrow/meta/ast/TypeName;
+	public final fun getSuperclassConstructorParameters ()Ljava/util/List;
+	public final fun getTypeVariables ()Ljava/util/List;
+	public final fun getTypes ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/Type$Companion {
+}
+
+public abstract class arrow/meta/ast/Type$Shape {
+	public static final field Companion Larrow/meta/ast/Type$Shape$Companion;
+}
+
+public final class arrow/meta/ast/Type$Shape$Class : arrow/meta/ast/Type$Shape {
+	public static final field INSTANCE Larrow/meta/ast/Type$Shape$Class;
+}
+
+public final class arrow/meta/ast/Type$Shape$Companion {
+}
+
+public final class arrow/meta/ast/Type$Shape$Interface : arrow/meta/ast/Type$Shape {
+	public static final field INSTANCE Larrow/meta/ast/Type$Shape$Interface;
+}
+
+public final class arrow/meta/ast/Type$Shape$Object : arrow/meta/ast/Type$Shape {
+	public static final field INSTANCE Larrow/meta/ast/Type$Shape$Object;
+}
+
+public final class arrow/meta/ast/TypeAlias : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/TypeAlias$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun copy (Ljava/lang/String;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeAlias;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeAlias;Ljava/lang/String;Larrow/meta/ast/TypeName;ILjava/lang/Object;)Larrow/meta/ast/TypeAlias;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getValue ()Larrow/meta/ast/TypeName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeAlias$Companion {
+}
+
+public abstract class arrow/meta/ast/TypeName : arrow/meta/ast/Tree {
+	public static final field Companion Larrow/meta/ast/TypeName$Companion;
+	public abstract fun getRawName ()Ljava/lang/String;
+	public abstract fun getSimpleName ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$Classy : arrow/meta/ast/TypeName {
+	public static final field Companion Larrow/meta/ast/TypeName$Classy$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Larrow/meta/ast/PackageName;ZLjava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Larrow/meta/ast/PackageName;ZLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun companion ()Larrow/meta/ast/TypeName$Classy;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Larrow/meta/ast/PackageName;
+	public final fun component4 ()Z
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Larrow/meta/ast/PackageName;ZLjava/util/List;)Larrow/meta/ast/TypeName$Classy;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeName$Classy;Ljava/lang/String;Ljava/lang/String;Larrow/meta/ast/PackageName;ZLjava/util/List;ILjava/lang/Object;)Larrow/meta/ast/TypeName$Classy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getFqName ()Ljava/lang/String;
+	public final fun getNullable ()Z
+	public final fun getPckg ()Larrow/meta/ast/PackageName;
+	public fun getRawName ()Ljava/lang/String;
+	public fun getSimpleName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$Classy$Companion {
+	public final fun from (Ljava/lang/String;Ljava/lang/String;)Larrow/meta/ast/TypeName$Classy;
+}
+
+public final class arrow/meta/ast/TypeName$Companion {
+	public final fun getAnyNullable ()Larrow/meta/ast/TypeName;
+	public final fun getUnit ()Larrow/meta/ast/TypeName;
+}
+
+public final class arrow/meta/ast/TypeName$FunctionLiteral : arrow/meta/ast/TypeName {
+	public fun <init> (Ljava/util/List;Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/TypeName;)V
+	public synthetic fun <init> (Ljava/util/List;Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/TypeName;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Larrow/meta/ast/TypeName;
+	public final fun copy (Ljava/util/List;Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeName$FunctionLiteral;Ljava/util/List;Larrow/meta/ast/TypeName;Ljava/util/List;Larrow/meta/ast/TypeName;ILjava/lang/Object;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModifiers ()Ljava/util/List;
+	public final fun getParameters ()Ljava/util/List;
+	public fun getRawName ()Ljava/lang/String;
+	public final fun getReceiverType ()Larrow/meta/ast/TypeName;
+	public final fun getReturnType ()Larrow/meta/ast/TypeName;
+	public fun getSimpleName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$ParameterizedType : arrow/meta/ast/TypeName {
+	public static final field Companion Larrow/meta/ast/TypeName$ParameterizedType$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName$Classy;Ljava/util/List;ZLjava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName$Classy;Ljava/util/List;ZLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/meta/ast/TypeName;
+	public final fun component3 ()Larrow/meta/ast/TypeName$Classy;
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Z
+	public final fun component6 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName$Classy;Ljava/util/List;ZLjava/util/List;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeName$ParameterizedType;Ljava/lang/String;Larrow/meta/ast/TypeName;Larrow/meta/ast/TypeName$Classy;Ljava/util/List;ZLjava/util/List;ILjava/lang/Object;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getEnclosingType ()Larrow/meta/ast/TypeName;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNullable ()Z
+	public fun getRawName ()Ljava/lang/String;
+	public final fun getRawType ()Larrow/meta/ast/TypeName$Classy;
+	public fun getSimpleName ()Ljava/lang/String;
+	public final fun getTypeArguments ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$ParameterizedType$Companion {
+}
+
+public final class arrow/meta/ast/TypeName$TypeVariable : arrow/meta/ast/TypeName {
+	public static final field Companion Larrow/meta/ast/TypeName$TypeVariable$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Larrow/meta/ast/Modifier;ZZLjava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Larrow/meta/ast/Modifier;ZZLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Larrow/meta/ast/Modifier;
+	public final fun component4 ()Z
+	public final fun component5 ()Z
+	public final fun component6 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Larrow/meta/ast/Modifier;ZZLjava/util/List;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeName$TypeVariable;Ljava/lang/String;Ljava/util/List;Larrow/meta/ast/Modifier;ZZLjava/util/List;ILjava/lang/Object;)Larrow/meta/ast/TypeName$TypeVariable;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getBounds ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNullable ()Z
+	public fun getRawName ()Ljava/lang/String;
+	public final fun getReified ()Z
+	public fun getSimpleName ()Ljava/lang/String;
+	public final fun getVariance ()Larrow/meta/ast/Modifier;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$TypeVariable$Companion {
+}
+
+public final class arrow/meta/ast/TypeName$WildcardType : arrow/meta/ast/TypeName {
+	public static final field Companion Larrow/meta/ast/TypeName$WildcardType$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLjava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Z
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLjava/util/List;)Larrow/meta/ast/TypeName$WildcardType;
+	public static synthetic fun copy$default (Larrow/meta/ast/TypeName$WildcardType;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ZLjava/util/List;ILjava/lang/Object;)Larrow/meta/ast/TypeName$WildcardType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAnnotations ()Ljava/util/List;
+	public final fun getLowerBounds ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNullable ()Z
+	public fun getRawName ()Ljava/lang/String;
+	public fun getSimpleName ()Ljava/lang/String;
+	public final fun getUpperBounds ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/ast/TypeName$WildcardType$Companion {
+}
+
+public abstract class arrow/meta/ast/UseSiteTarget {
+	public static final field Companion Larrow/meta/ast/UseSiteTarget$Companion;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Companion {
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Delegate : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Delegate;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Field : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Field;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$File : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$File;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Get : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Get;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Param : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Param;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Property : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Property;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Receiver : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Receiver;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$Set : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$Set;
+}
+
+public final class arrow/meta/ast/UseSiteTarget$SetParam : arrow/meta/ast/UseSiteTarget {
+	public static final field INSTANCE Larrow/meta/ast/UseSiteTarget$SetParam;
+}
+
+public abstract interface class arrow/meta/decoder/MetaDecoder {
+	public abstract fun decode (Larrow/meta/ast/Tree;)Larrow/meta/ast/Code;
+}
+
+public abstract interface class arrow/meta/decoder/TypeDecoder : arrow/meta/decoder/MetaDecoder {
+	public abstract fun code (Ljava/lang/Iterable;Lkotlin/Unit;)Larrow/meta/ast/Code;
+	public abstract fun code (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/meta/ast/Code;
+	public abstract fun codeNames (Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public abstract fun decode (Larrow/meta/ast/Type;)Larrow/meta/ast/Code;
+	public abstract fun empty (Lcom/squareup/kotlinpoet/CodeBlock$Companion;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public abstract fun invoke (Larrow/meta/ast/Code$Companion;Lkotlin/jvm/functions/Function0;)Larrow/meta/ast/Code;
+	public abstract fun joinToCode (Ljava/util/List;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public abstract fun lyrics (Larrow/meta/ast/Annotation;)Lcom/squareup/kotlinpoet/AnnotationSpec;
+	public abstract fun lyrics (Larrow/meta/ast/Code;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public abstract fun lyrics (Larrow/meta/ast/Func;)Lcom/squareup/kotlinpoet/FunSpec;
+	public abstract fun lyrics (Larrow/meta/ast/Modifier;)Lcom/squareup/kotlinpoet/KModifier;
+	public abstract fun lyrics (Larrow/meta/ast/Parameter;)Lcom/squareup/kotlinpoet/ParameterSpec;
+	public abstract fun lyrics (Larrow/meta/ast/Property;)Lcom/squareup/kotlinpoet/PropertySpec;
+	public abstract fun lyrics (Larrow/meta/ast/Type;)Lcom/squareup/kotlinpoet/TypeSpec;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName$Classy;)Lcom/squareup/kotlinpoet/ClassName;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName$FunctionLiteral;)Lcom/squareup/kotlinpoet/TypeName;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName$ParameterizedType;)Lcom/squareup/kotlinpoet/TypeName;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName$TypeVariable;)Lcom/squareup/kotlinpoet/TypeVariableName;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName$WildcardType;)Lcom/squareup/kotlinpoet/TypeName;
+	public abstract fun lyrics (Larrow/meta/ast/TypeName;)Lcom/squareup/kotlinpoet/TypeName;
+	public abstract fun lyrics (Larrow/meta/ast/UseSiteTarget;)Lcom/squareup/kotlinpoet/AnnotationSpec$UseSiteTarget;
+	public abstract fun unaryPlus (Larrow/meta/ast/TypeName;)Larrow/meta/ast/Code;
+	public abstract fun unaryPlus (Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public abstract fun unaryPlus (Ljava/lang/String;)Larrow/meta/ast/Code;
+	public abstract fun unaryPlus (Ljava/util/List;)Larrow/meta/ast/Code;
+}
+
+public final class arrow/meta/decoder/TypeDecoder$DefaultImpls {
+	public static fun code (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;Lkotlin/Unit;)Larrow/meta/ast/Code;
+	public static fun code (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/meta/ast/Code;
+	public static synthetic fun code$default (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;Lkotlin/Unit;ILjava/lang/Object;)Larrow/meta/ast/Code;
+	public static synthetic fun code$default (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/meta/ast/Code;
+	public static fun codeNames (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public static fun decode (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Type;)Larrow/meta/ast/Code;
+	public static fun empty (Larrow/meta/decoder/TypeDecoder;Lcom/squareup/kotlinpoet/CodeBlock$Companion;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public static fun invoke (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Code$Companion;Lkotlin/jvm/functions/Function0;)Larrow/meta/ast/Code;
+	public static fun joinToCode (Larrow/meta/decoder/TypeDecoder;Ljava/util/List;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Annotation;)Lcom/squareup/kotlinpoet/AnnotationSpec;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Code;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Func;)Lcom/squareup/kotlinpoet/FunSpec;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Modifier;)Lcom/squareup/kotlinpoet/KModifier;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Parameter;)Lcom/squareup/kotlinpoet/ParameterSpec;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Property;)Lcom/squareup/kotlinpoet/PropertySpec;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/Type;)Lcom/squareup/kotlinpoet/TypeSpec;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName$Classy;)Lcom/squareup/kotlinpoet/ClassName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName$FunctionLiteral;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName$ParameterizedType;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName$TypeVariable;)Lcom/squareup/kotlinpoet/TypeVariableName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName$WildcardType;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/UseSiteTarget;)Lcom/squareup/kotlinpoet/AnnotationSpec$UseSiteTarget;
+	public static fun unaryPlus (Larrow/meta/decoder/TypeDecoder;Larrow/meta/ast/TypeName;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/decoder/TypeDecoder;Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/decoder/TypeDecoder;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/decoder/TypeDecoder;Ljava/util/List;)Larrow/meta/ast/Code;
+}
+
+public abstract interface class arrow/meta/encoder/MetaApi {
+	public abstract fun DeprecatedAnnotation (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Larrow/meta/ast/Annotation;
+	public abstract fun JvmName (Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public abstract fun PublishedApi ()Larrow/meta/ast/Annotation;
+	public abstract fun SuppressAnnotation ([Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public abstract fun addExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun asPlatform (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun containsModifier (Larrow/meta/ast/Func;Larrow/meta/ast/Modifier;)Z
+	public abstract fun countDummyArgs (Larrow/meta/ast/Func;)I
+	public abstract fun defaultDummyArgValue (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun defaultDummyArgValues (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKind (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun downKindParameters (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKindReceiver (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKindReturnType (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun getKinded (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$Classy;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$FunctionLiteral;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$ParameterizedType;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$TypeVariable;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$WildcardType;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName;)Ljava/util/List;
+	public abstract fun getProjectedCompanion (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun getRequiredAbstractFunctions (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public abstract fun getRequiredParameters (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public abstract fun getTODO (Larrow/meta/ast/Code$Companion;)Larrow/meta/ast/Code;
+	public abstract fun getType (Larrow/meta/ast/TypeName;)Larrow/meta/ast/Type;
+	public abstract fun prependExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun removeConstrains (Larrow/meta/ast/Func;Ljava/util/Set;)Larrow/meta/ast/Func;
+	public abstract fun removeConstrains (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun removeDummyArgs (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun typeNameOf (Larrow/meta/ast/TypeName$Companion;Lkotlin/reflect/KClass;)Larrow/meta/ast/TypeName;
+	public abstract fun widenTypeArgs (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+}
+
+public final class arrow/meta/encoder/MetaApi$DefaultImpls {
+	public static synthetic fun removeConstrains$default (Larrow/meta/encoder/MetaApi;Larrow/meta/ast/Func;Ljava/util/Set;ILjava/lang/Object;)Larrow/meta/ast/Func;
+}
+
+public final class arrow/meta/encoder/MetaApiKt {
+	public static final fun getKotlinReservedKeywords ()Ljava/util/Set;
+}
+
+public final class arrow/meta/encoder/TypeClassInstance {
+	public fun <init> (Larrow/meta/ast/Type;Larrow/meta/ast/Type;Larrow/meta/ast/Type;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/TypeName;)V
+	public final fun component1 ()Larrow/meta/ast/Type;
+	public final fun component2 ()Larrow/meta/ast/Type;
+	public final fun component3 ()Larrow/meta/ast/Type;
+	public final fun component4 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component5 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component6 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component7 ()Larrow/meta/ast/TypeName;
+	public final fun copy (Larrow/meta/ast/Type;Larrow/meta/ast/Type;Larrow/meta/ast/Type;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/TypeName;)Larrow/meta/encoder/TypeClassInstance;
+	public static synthetic fun copy$default (Larrow/meta/encoder/TypeClassInstance;Larrow/meta/ast/Type;Larrow/meta/ast/Type;Larrow/meta/ast/Type;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/TypeName;ILjava/lang/Object;)Larrow/meta/encoder/TypeClassInstance;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataType ()Larrow/meta/ast/Type;
+	public final fun getDataTypeTypeElement ()Ljavax/lang/model/element/TypeElement;
+	public final fun getInstance ()Larrow/meta/ast/Type;
+	public final fun getInstanceTypeElement ()Ljavax/lang/model/element/TypeElement;
+	public final fun getProjectedCompanion ()Larrow/meta/ast/TypeName;
+	public final fun getTypeClass ()Larrow/meta/ast/Type;
+	public final fun getTypeClassTypeElement ()Ljavax/lang/model/element/TypeElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/encoder/jvm/DownKindReduction {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Larrow/meta/encoder/jvm/DownKindReduction;
+	public static synthetic fun copy$default (Larrow/meta/encoder/jvm/DownKindReduction;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Larrow/meta/encoder/jvm/DownKindReduction;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdditionalTypeArgs ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getPckg ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class arrow/meta/encoder/jvm/EncodingError {
+}
+
+public final class arrow/meta/encoder/jvm/EncodingError$UnsupportedElementType : arrow/meta/encoder/jvm/EncodingError {
+	public fun <init> (Ljava/lang/String;Ljavax/lang/model/element/Element;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljavax/lang/model/element/Element;
+	public final fun copy (Ljava/lang/String;Ljavax/lang/model/element/Element;)Larrow/meta/encoder/jvm/EncodingError$UnsupportedElementType;
+	public static synthetic fun copy$default (Larrow/meta/encoder/jvm/EncodingError$UnsupportedElementType;Ljava/lang/String;Ljavax/lang/model/element/Element;ILjava/lang/Object;)Larrow/meta/encoder/jvm/EncodingError$UnsupportedElementType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getElement ()Ljavax/lang/model/element/Element;
+	public final fun getMsg ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/meta/encoder/jvm/JvmMetaApi : arrow/common/utils/ProcessorUtils, arrow/meta/decoder/TypeDecoder, arrow/meta/encoder/MetaApi, arrow/meta/encoder/jvm/TypeElementEncoder {
+	public abstract fun DeprecatedAnnotation (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Larrow/meta/ast/Annotation;
+	public abstract fun JvmName (Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public abstract fun PublishedApi ()Larrow/meta/ast/Annotation;
+	public abstract fun SuppressAnnotation ([Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public abstract fun addExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public abstract fun asKotlin (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun asPlatform (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun containsModifier (Larrow/meta/ast/Func;Larrow/meta/ast/Modifier;)Z
+	public abstract fun countDummyArgs (Larrow/meta/ast/Func;)I
+	public abstract fun defaultDummyArgValue (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun defaultDummyArgValues (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKind (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun downKindParameters (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKindReceiver (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun downKindReturnType (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName;
+	public abstract fun getDownKind (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun getKindWrapper (Larrow/meta/ast/Type;)Lkotlin/Pair;
+	public abstract fun getKinded (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$Classy;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$FunctionLiteral;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$ParameterizedType;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$TypeVariable;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName$WildcardType;)Ljava/util/List;
+	public abstract fun getNestedTypeVariables (Larrow/meta/ast/TypeName;)Ljava/util/List;
+	public abstract fun getProjectedCompanion (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun getRequiredAbstractFunctions (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public abstract fun getRequiredParameters (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public abstract fun getTODO (Larrow/meta/ast/Code$Companion;)Larrow/meta/ast/Code;
+	public abstract fun getType (Larrow/meta/ast/TypeName;)Larrow/meta/ast/Type;
+	public abstract fun getTypeNameDownKind ()Lkotlin/jvm/functions/Function1;
+	public abstract fun metaApi ()Larrow/meta/encoder/MetaApi;
+	public abstract fun prependExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun removeConstrains (Larrow/meta/ast/Func;Ljava/util/Set;)Larrow/meta/ast/Func;
+	public abstract fun removeConstrains (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public abstract fun removeConstrains (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun removeDummyArgs (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public abstract fun typeClassInstance (Ljavax/lang/model/element/TypeElement;)Larrow/meta/encoder/TypeClassInstance;
+	public abstract fun typeNameDownKindImpl (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun typeNameOf (Larrow/meta/ast/TypeName$Companion;Lkotlin/reflect/KClass;)Larrow/meta/ast/TypeName;
+	public abstract fun widenTypeArgs (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun wrap (Larrow/meta/ast/Func;Lkotlin/Pair;)Larrow/meta/ast/Func;
+	public abstract fun wrap (Larrow/meta/ast/TypeName$Classy;Lkotlin/Pair;)Larrow/meta/ast/TypeName$Classy;
+	public abstract fun wrap (Larrow/meta/ast/TypeName$FunctionLiteral;Lkotlin/Pair;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public abstract fun wrap (Larrow/meta/ast/TypeName$ParameterizedType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun wrap (Larrow/meta/ast/TypeName$TypeVariable;Lkotlin/Pair;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun wrap (Larrow/meta/ast/TypeName$WildcardType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$WildcardType;
+	public abstract fun wrap (Larrow/meta/ast/TypeName;Lkotlin/Pair;)Larrow/meta/ast/TypeName;
+}
+
+public final class arrow/meta/encoder/jvm/JvmMetaApi$DefaultImpls {
+	public static fun DeprecatedAnnotation (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Larrow/meta/ast/Annotation;
+	public static fun JvmName (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public static fun PublishedApi (Larrow/meta/encoder/jvm/JvmMetaApi;)Larrow/meta/ast/Annotation;
+	public static fun SuppressAnnotation (Larrow/meta/encoder/jvm/JvmMetaApi;[Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public static fun addExtraDummyArg (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun allFunctions (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun annotations (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun asClassOrPackageDataWrapper (Larrow/meta/encoder/jvm/JvmMetaApi;Lme/eugeniomarletti/kotlin/metadata/KotlinMetadata;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun asConstructor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/ExecutableElement;Ljavax/lang/model/element/TypeElement;)Lkotlin/Pair;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public static fun asKotlin (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun asMetaType (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/Type;
+	public static fun asModifier (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun asModifier (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Visibility;)Larrow/meta/ast/Modifier;
+	public static fun asPlatform (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public static fun asTypeName (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/TypeName;
+	public static fun asTypeName (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
+	public static fun code (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/Iterable;Lkotlin/Unit;)Larrow/meta/ast/Code;
+	public static fun code (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/meta/ast/Code;
+	public static fun codeNames (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public static fun containsModifier (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;Larrow/meta/ast/Modifier;)Z
+	public static fun continuationType (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun countDummyArgs (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)I
+	public static fun declaredFunctions (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun declaredTypeClassInterfaces (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;)Ljava/util/List;
+	public static fun decode (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Type;)Larrow/meta/ast/Code;
+	public static fun defaultDummyArgValue (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public static fun defaultDummyArgValues (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun downKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public static fun downKindParameters (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun downKindReceiver (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun downKindReturnType (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun empty (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/CodeBlock$Companion;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public static fun extractFullName (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public static fun fixLiterals (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Larrow/meta/ast/Func;
+	public static fun getClassData (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static fun getClassOrPackageDataWrapper (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun getConstructorParamNames (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getConstructorTypesNames (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/type/ArrayType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/type/ExecutableType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/type/TypeMirror;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/type/TypeVariable;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/type/WildcardType;)Ljava/lang/String;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName;
+	public static fun getDownKind (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun getElementUtils (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljavax/lang/model/util/Elements;
+	public static fun getFiler (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljavax/annotation/processing/Filer;
+	public static fun getFunction (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/ExecutableElement;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Ljava/util/List;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/JvmMetaApi;Lme/eugeniomarletti/kotlin/metadata/ClassData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/JvmMetaApi;Lme/eugeniomarletti/kotlin/metadata/PackageData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getHasNoCompanion (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Z
+	public static fun getJvmMethodSignature (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/ExecutableElement;)Ljava/lang/String;
+	public static fun getKindWrapper (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Type;)Lkotlin/Pair;
+	public static fun getKinded (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun getLocale (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljava/util/Locale;
+	public static fun getMessager (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljavax/annotation/processing/Messager;
+	public static fun getMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Ljava/util/List;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;)Ljava/util/List;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Ljava/util/List;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;)Ljava/util/List;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;)Ljava/util/List;
+	public static fun getNestedTypeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Ljava/util/List;
+	public static fun getOptions (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljava/util/Map;
+	public static fun getProjectedCompanion (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun getRequiredAbstractFunctions (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public static fun getRequiredParameters (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public static fun getSourceVersion (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljavax/lang/model/SourceVersion;
+	public static fun getTODO (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Code$Companion;)Larrow/meta/ast/Code;
+	public static fun getType (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/Type;
+	public static fun getTypeElement (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/String;Ljavax/lang/model/util/Elements;)Ljavax/lang/model/element/TypeElement;
+	public static fun getTypeUtils (Larrow/meta/encoder/jvm/JvmMetaApi;)Ljavax/lang/model/util/Types;
+	public static fun invoke (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Code$Companion;Lkotlin/jvm/functions/Function0;)Larrow/meta/ast/Code;
+	public static fun isContinuation (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun isContinuationType (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun isMonadContinuation (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun joinToCode (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/util/List;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Annotation;)Lcom/squareup/kotlinpoet/AnnotationSpec;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Code;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Lcom/squareup/kotlinpoet/FunSpec;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Modifier;)Lcom/squareup/kotlinpoet/KModifier;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Parameter;)Lcom/squareup/kotlinpoet/ParameterSpec;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Property;)Lcom/squareup/kotlinpoet/PropertySpec;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Type;)Lcom/squareup/kotlinpoet/TypeSpec;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Lcom/squareup/kotlinpoet/ClassName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;)Lcom/squareup/kotlinpoet/TypeVariableName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Lcom/squareup/kotlinpoet/TypeName;
+	public static fun lyrics (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/UseSiteTarget;)Lcom/squareup/kotlinpoet/AnnotationSpec$UseSiteTarget;
+	public static fun metaApi (Larrow/meta/encoder/jvm/JvmMetaApi;)Larrow/meta/encoder/MetaApi;
+	public static fun modifiers (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun modifiersFromFlags (Larrow/meta/encoder/jvm/JvmMetaApi;I)Ljava/util/List;
+	public static fun nameOf (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
+	public static fun overrides (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Z
+	public static fun packageName (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun prependExtraDummyArg (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun properties (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;Ljava/util/Set;)Larrow/meta/ast/Func;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public static fun removeConstrains (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun removeDummyArgs (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public static fun sealedSubClassNames (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun superInterfaces (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun supertypes (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/AnnotationSpec;)Larrow/meta/ast/Annotation;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/FunSpec;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/TypeVariableName;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter$Variance;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun toMeta (Larrow/meta/encoder/jvm/JvmMetaApi;Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/Parameter;
+	public static fun tree (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun type (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun typeClassInstance (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Larrow/meta/encoder/TypeClassInstance;
+	public static fun typeNameDownKindImpl (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun typeNameOf (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Companion;Lkotlin/reflect/KClass;)Larrow/meta/ast/TypeName;
+	public static fun typeNameToMetaImpl (Larrow/meta/encoder/jvm/JvmMetaApi;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun typeVariables (Larrow/meta/encoder/jvm/JvmMetaApi;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun unaryPlus (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public static fun unaryPlus (Larrow/meta/encoder/jvm/JvmMetaApi;Ljava/util/List;)Larrow/meta/ast/Code;
+	public static fun widenTypeArgs (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;Lkotlin/Pair;)Larrow/meta/ast/Func;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$Classy;Lkotlin/Pair;)Larrow/meta/ast/TypeName$Classy;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$FunctionLiteral;Lkotlin/Pair;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$ParameterizedType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$TypeVariable;Lkotlin/Pair;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName$WildcardType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$WildcardType;
+	public static fun wrap (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/TypeName;Lkotlin/Pair;)Larrow/meta/ast/TypeName;
+	public static synthetic fun wrap$default (Larrow/meta/encoder/jvm/JvmMetaApi;Larrow/meta/ast/Func;Lkotlin/Pair;ILjava/lang/Object;)Larrow/meta/ast/Func;
+}
+
+public abstract interface class arrow/meta/encoder/jvm/KotlinMetatadataEncoder {
+	public abstract fun asModifier (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public abstract fun asModifier (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Visibility;)Larrow/meta/ast/Modifier;
+	public abstract fun asTypeName (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
+	public abstract fun extractFullName (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public abstract fun modifiersFromFlags (I)Ljava/util/List;
+	public abstract fun nameOf (Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
+	public abstract fun supertypes (Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
+	public abstract fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public abstract fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public abstract fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter$Variance;)Larrow/meta/ast/Modifier;
+	public abstract fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun toMeta (Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/Parameter;
+}
+
+public final class arrow/meta/encoder/jvm/KotlinMetatadataEncoder$DefaultImpls {
+	public static fun asModifier (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun asModifier (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Visibility;)Larrow/meta/ast/Modifier;
+	public static fun asTypeName (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
+	public static fun extractFullName (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public static synthetic fun extractFullName$default (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;ZILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun extractFullName$default (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Lkotlin/jvm/functions/Function1;ZLjava/lang/Throwable;ILjava/lang/Object;)Ljava/lang/String;
+	public static fun modifiersFromFlags (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;I)Ljava/util/List;
+	public static fun nameOf (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
+	public static fun supertypes (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter$Variance;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinMetatadataEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/Parameter;
+}
+
+public abstract interface class arrow/meta/encoder/jvm/KotlinPoetEncoder {
+	public abstract fun getTypeNameToMeta ()Lkotlin/jvm/functions/Function1;
+	public abstract fun kotlinMetadataUtils ()Lme/eugeniomarletti/kotlin/metadata/KotlinMetadataUtils;
+	public abstract fun metaApi ()Larrow/meta/encoder/MetaApi;
+	public abstract fun toMeta (Lcom/squareup/kotlinpoet/AnnotationSpec;)Larrow/meta/ast/Annotation;
+	public abstract fun toMeta (Lcom/squareup/kotlinpoet/FunSpec;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public abstract fun toMeta (Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public abstract fun toMeta (Lcom/squareup/kotlinpoet/TypeVariableName;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun typeNameToMetaImpl (Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+}
+
+public final class arrow/meta/encoder/jvm/KotlinPoetEncoder$DefaultImpls {
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinPoetEncoder;Lcom/squareup/kotlinpoet/AnnotationSpec;)Larrow/meta/ast/Annotation;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinPoetEncoder;Lcom/squareup/kotlinpoet/FunSpec;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinPoetEncoder;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun toMeta (Larrow/meta/encoder/jvm/KotlinPoetEncoder;Lcom/squareup/kotlinpoet/TypeVariableName;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun typeNameToMetaImpl (Larrow/meta/encoder/jvm/KotlinPoetEncoder;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+}
+
+public final class arrow/meta/encoder/jvm/StringTypeExtensionsKt {
+	public static final fun asKotlin (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun asPlatform (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun downKParts (Ljava/lang/String;)Ljava/util/List;
+	public static final fun quote (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public abstract interface class arrow/meta/encoder/jvm/TypeElementEncoder : arrow/common/utils/ProcessorUtils, arrow/meta/encoder/jvm/KotlinMetatadataEncoder, arrow/meta/encoder/jvm/KotlinPoetEncoder {
+	public abstract fun allFunctions (Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun annotations (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun asConstructor (Ljavax/lang/model/element/ExecutableElement;Ljavax/lang/model/element/TypeElement;)Lkotlin/Pair;
+	public abstract fun asMetaType (Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/Type;
+	public abstract fun asTypeName (Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/TypeName;
+	public abstract fun continuationType (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public abstract fun declaredFunctions (Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun fixLiterals (Larrow/meta/ast/Func;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Larrow/meta/ast/Func;
+	public abstract fun getMeta (Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public abstract fun getTypeElement (Ljava/lang/String;Ljavax/lang/model/util/Elements;)Ljavax/lang/model/element/TypeElement;
+	public abstract fun getTypeElementToMeta ()Lkotlin/jvm/functions/Function1;
+	public abstract fun isContinuation (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public abstract fun isContinuationType (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public abstract fun isMonadContinuation (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public abstract fun kDoc (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public abstract fun modifiers (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun packageName (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public abstract fun processorUtils ()Larrow/common/utils/ProcessorUtils;
+	public abstract fun properties (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun sealedSubClassNames (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun superInterfaces (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public abstract fun tree (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public abstract fun type (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public abstract fun typeVariables (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+}
+
+public final class arrow/meta/encoder/jvm/TypeElementEncoder$DefaultImpls {
+	public static fun allFunctions (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun annotations (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun asClassOrPackageDataWrapper (Larrow/meta/encoder/jvm/TypeElementEncoder;Lme/eugeniomarletti/kotlin/metadata/KotlinMetadata;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun asConstructor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/ExecutableElement;Ljavax/lang/model/element/TypeElement;)Lkotlin/Pair;
+	public static fun asMetaType (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/Type;
+	public static fun asModifier (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun asModifier (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Visibility;)Larrow/meta/ast/Modifier;
+	public static fun asTypeName (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/TypeName;
+	public static fun asTypeName (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName;
+	public static fun continuationType (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public static fun declaredFunctions (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun declaredTypeClassInterfaces (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;)Ljava/util/List;
+	public static fun extractFullName (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Type;Larrow/common/utils/ClassOrPackageDataWrapper;Z)Ljava/lang/String;
+	public static fun fixLiterals (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/meta/ast/Func;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Larrow/meta/ast/Func;
+	public static fun getClassData (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static fun getClassOrPackageDataWrapper (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper;
+	public static fun getConstructorParamNames (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getConstructorTypesNames (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Ljava/util/List;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/type/ArrayType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/type/ExecutableType;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/type/TypeMirror;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/type/TypeVariable;)Ljava/lang/String;
+	public static fun getDescriptor (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/type/WildcardType;)Ljava/lang/String;
+	public static fun getElementUtils (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljavax/lang/model/util/Elements;
+	public static fun getFiler (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljavax/annotation/processing/Filer;
+	public static fun getFunction (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/common/utils/ClassOrPackageDataWrapper;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/ExecutableElement;Lorg/jetbrains/kotlin/metadata/deserialization/NameResolver;Ljava/util/List;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/TypeElementEncoder;Lme/eugeniomarletti/kotlin/metadata/ClassData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getFunctionOrNull (Larrow/meta/encoder/jvm/TypeElementEncoder;Lme/eugeniomarletti/kotlin/metadata/PackageData;Ljavax/lang/model/element/ExecutableElement;)Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;
+	public static fun getHasNoCompanion (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Z
+	public static fun getJvmMethodSignature (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/ExecutableElement;)Ljava/lang/String;
+	public static fun getLocale (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljava/util/Locale;
+	public static fun getMessager (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljavax/annotation/processing/Messager;
+	public static fun getMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public static fun getOptions (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljava/util/Map;
+	public static fun getSourceVersion (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljavax/lang/model/SourceVersion;
+	public static fun getTypeElement (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljava/lang/String;Ljavax/lang/model/util/Elements;)Ljavax/lang/model/element/TypeElement;
+	public static fun getTypeUtils (Larrow/meta/encoder/jvm/TypeElementEncoder;)Ljavax/lang/model/util/Types;
+	public static fun isContinuation (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun isContinuationType (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun isMonadContinuation (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public static fun modifiers (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun modifiersFromFlags (Larrow/meta/encoder/jvm/TypeElementEncoder;I)Ljava/util/List;
+	public static fun nameOf (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;I)Ljava/lang/String;
+	public static fun overrides (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Z
+	public static fun packageName (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun properties (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun sealedSubClassNames (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun superInterfaces (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public static fun supertypes (Larrow/meta/encoder/jvm/TypeElementEncoder;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/deserialization/TypeTable;Larrow/common/utils/ProcessorUtils;Ljava/util/List;)Ljava/util/List;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lcom/squareup/kotlinpoet/AnnotationSpec;)Larrow/meta/ast/Annotation;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lcom/squareup/kotlinpoet/FunSpec;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lcom/squareup/kotlinpoet/TypeVariableName;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Modality;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter$Variance;)Larrow/meta/ast/Modifier;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$TypeParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/TypeName$TypeVariable;
+	public static fun toMeta (Larrow/meta/encoder/jvm/TypeElementEncoder;Lorg/jetbrains/kotlin/metadata/ProtoBuf$ValueParameter;Larrow/common/utils/ClassOrPackageDataWrapper$Class;)Larrow/meta/ast/Parameter;
+	public static fun tree (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun type (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public static fun typeNameToMetaImpl (Larrow/meta/encoder/jvm/TypeElementEncoder;Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public static fun typeVariables (Larrow/meta/encoder/jvm/TypeElementEncoder;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+}
+
+public final class arrow/meta/internal/MemoizationKt {
+	public static final fun memoize (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/meta/internal/Platform {
+	public static final field INSTANCE Larrow/meta/internal/Platform;
+	public final fun newConcurrentMap ()Larrow/meta/internal/Platform$ConcurrentMap;
+}
+
+public abstract interface class arrow/meta/internal/Platform$ConcurrentMap : java/util/Map, kotlin/jvm/internal/markers/KMutableMap {
+	public abstract fun putSafely (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract class arrow/meta/processor/MetaProcessor : arrow/common/utils/AbstractProcessor, arrow/meta/encoder/jvm/JvmMetaApi {
+	public fun <init> (Lkotlin/reflect/KClass;)V
+	public fun DeprecatedAnnotation (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Larrow/meta/ast/Annotation;
+	public fun JvmName (Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public fun PublishedApi ()Larrow/meta/ast/Annotation;
+	public fun SuppressAnnotation ([Ljava/lang/String;)Larrow/meta/ast/Annotation;
+	public fun addExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun allFunctions (Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun annotations (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun asConstructor (Ljavax/lang/model/element/ExecutableElement;Ljavax/lang/model/element/TypeElement;)Lkotlin/Pair;
+	public fun asKotlin (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public fun asKotlin (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public fun asKotlin (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public fun asKotlin (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public fun asKotlin (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public fun asKotlin (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun asMetaType (Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/Type;
+	public fun asPlatform (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public fun asTypeName (Ljavax/lang/model/element/TypeElement;)Larrow/meta/ast/TypeName;
+	public fun code (Ljava/lang/Iterable;Lkotlin/Unit;)Larrow/meta/ast/Code;
+	public fun code (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/meta/ast/Code;
+	public fun codeNames (Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public fun containsModifier (Larrow/meta/ast/Func;Larrow/meta/ast/Modifier;)Z
+	public fun continuationType (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public fun countDummyArgs (Larrow/meta/ast/Func;)I
+	public fun declaredFunctions (Ljavax/lang/model/element/TypeElement;Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public synthetic fun decode (Larrow/meta/ast/Tree;)Larrow/meta/ast/Code;
+	public fun decode (Larrow/meta/ast/Type;)Larrow/meta/ast/Code;
+	public fun defaultDummyArgValue (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public fun defaultDummyArgValues (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun downKind (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public fun downKindParameters (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun downKindReceiver (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun downKindReturnType (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun empty (Lcom/squareup/kotlinpoet/CodeBlock$Companion;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public fun fixLiterals (Larrow/meta/ast/Func;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Lorg/jetbrains/kotlin/metadata/ProtoBuf$Function;)Larrow/meta/ast/Func;
+	public fun getDownKind (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName;
+	public fun getDownKind (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public synthetic fun getDownKind (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName;
+	public fun getDownKind (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public synthetic fun getDownKind (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName;
+	public fun getDownKind (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName;
+	public fun getDownKind (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName;
+	public fun getDownKind (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun getKindWrapper (Larrow/meta/ast/Type;)Lkotlin/Pair;
+	public fun getKinded (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public fun getMeta (Ljavax/lang/model/element/TypeElement;)Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName$Classy;)Ljava/util/List;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName$FunctionLiteral;)Ljava/util/List;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName$ParameterizedType;)Ljava/util/List;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName$TypeVariable;)Ljava/util/List;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName$WildcardType;)Ljava/util/List;
+	public fun getNestedTypeVariables (Larrow/meta/ast/TypeName;)Ljava/util/List;
+	public fun getProjectedCompanion (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun getRequiredAbstractFunctions (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public fun getRequiredParameters (Larrow/meta/encoder/TypeClassInstance;)Ljava/util/List;
+	public fun getSupportedAnnotationTypes ()Ljava/util/Set;
+	public fun getSupportedSourceVersion ()Ljavax/lang/model/SourceVersion;
+	public fun getTODO (Larrow/meta/ast/Code$Companion;)Larrow/meta/ast/Code;
+	public fun getType (Larrow/meta/ast/TypeName;)Larrow/meta/ast/Type;
+	public fun getTypeElement (Ljava/lang/String;Ljavax/lang/model/util/Elements;)Ljavax/lang/model/element/TypeElement;
+	public fun getTypeElementToMeta ()Lkotlin/jvm/functions/Function1;
+	public fun getTypeNameDownKind ()Lkotlin/jvm/functions/Function1;
+	public fun getTypeNameToMeta ()Lkotlin/jvm/functions/Function1;
+	public fun invoke (Larrow/meta/ast/Code$Companion;Lkotlin/jvm/functions/Function0;)Larrow/meta/ast/Code;
+	public fun isContinuation (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public fun isContinuationType (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public fun isMonadContinuation (Larrow/meta/ast/TypeName$ParameterizedType;)Z
+	public fun joinToCode (Ljava/util/List;Ljava/lang/String;)Larrow/meta/ast/Code;
+	public fun kotlinMetadataUtils ()Lme/eugeniomarletti/kotlin/metadata/KotlinMetadataUtils;
+	public fun lyrics (Larrow/meta/ast/Annotation;)Lcom/squareup/kotlinpoet/AnnotationSpec;
+	public fun lyrics (Larrow/meta/ast/Code;)Lcom/squareup/kotlinpoet/CodeBlock;
+	public fun lyrics (Larrow/meta/ast/Func;)Lcom/squareup/kotlinpoet/FunSpec;
+	public fun lyrics (Larrow/meta/ast/Modifier;)Lcom/squareup/kotlinpoet/KModifier;
+	public fun lyrics (Larrow/meta/ast/Parameter;)Lcom/squareup/kotlinpoet/ParameterSpec;
+	public fun lyrics (Larrow/meta/ast/Property;)Lcom/squareup/kotlinpoet/PropertySpec;
+	public fun lyrics (Larrow/meta/ast/Type;)Lcom/squareup/kotlinpoet/TypeSpec;
+	public fun lyrics (Larrow/meta/ast/TypeName$Classy;)Lcom/squareup/kotlinpoet/ClassName;
+	public fun lyrics (Larrow/meta/ast/TypeName$FunctionLiteral;)Lcom/squareup/kotlinpoet/TypeName;
+	public fun lyrics (Larrow/meta/ast/TypeName$ParameterizedType;)Lcom/squareup/kotlinpoet/TypeName;
+	public fun lyrics (Larrow/meta/ast/TypeName$TypeVariable;)Lcom/squareup/kotlinpoet/TypeVariableName;
+	public fun lyrics (Larrow/meta/ast/TypeName$WildcardType;)Lcom/squareup/kotlinpoet/TypeName;
+	public fun lyrics (Larrow/meta/ast/TypeName;)Lcom/squareup/kotlinpoet/TypeName;
+	public fun lyrics (Larrow/meta/ast/UseSiteTarget;)Lcom/squareup/kotlinpoet/AnnotationSpec$UseSiteTarget;
+	public fun metaApi ()Larrow/meta/encoder/MetaApi;
+	public fun modifiers (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	protected fun onProcess (Ljava/util/Set;Ljavax/annotation/processing/RoundEnvironment;)V
+	public fun packageName (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public fun prependExtraDummyArg (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun processorUtils ()Larrow/common/utils/ProcessorUtils;
+	public fun properties (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun removeConstrains (Larrow/meta/ast/Func;Ljava/util/Set;)Larrow/meta/ast/Func;
+	public fun removeConstrains (Larrow/meta/ast/Parameter;)Larrow/meta/ast/Parameter;
+	public fun removeConstrains (Larrow/meta/ast/TypeName$Classy;)Larrow/meta/ast/TypeName$Classy;
+	public fun removeConstrains (Larrow/meta/ast/TypeName$FunctionLiteral;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public fun removeConstrains (Larrow/meta/ast/TypeName$ParameterizedType;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public fun removeConstrains (Larrow/meta/ast/TypeName$TypeVariable;)Larrow/meta/ast/TypeName$TypeVariable;
+	public fun removeConstrains (Larrow/meta/ast/TypeName$WildcardType;)Larrow/meta/ast/TypeName$WildcardType;
+	public fun removeConstrains (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun removeDummyArgs (Larrow/meta/ast/Func;)Larrow/meta/ast/Func;
+	public fun sealedSubClassNames (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun superInterfaces (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun toMeta (Lcom/squareup/kotlinpoet/AnnotationSpec;)Larrow/meta/ast/Annotation;
+	public fun toMeta (Lcom/squareup/kotlinpoet/FunSpec;Ljavax/lang/model/element/ExecutableElement;)Larrow/meta/ast/Func;
+	public fun toMeta (Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public fun toMeta (Lcom/squareup/kotlinpoet/TypeVariableName;)Larrow/meta/ast/TypeName$TypeVariable;
+	public abstract fun transform (Larrow/meta/processor/MetaProcessor$AnnotatedElement;)Ljava/util/List;
+	public fun tree (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public fun type (Ljavax/lang/model/element/Element;)Larrow/meta/Either;
+	public fun typeClassInstance (Ljavax/lang/model/element/TypeElement;)Larrow/meta/encoder/TypeClassInstance;
+	public fun typeNameDownKindImpl (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun typeNameOf (Larrow/meta/ast/TypeName$Companion;Lkotlin/reflect/KClass;)Larrow/meta/ast/TypeName;
+	public fun typeNameToMetaImpl (Lcom/squareup/kotlinpoet/TypeName;)Larrow/meta/ast/TypeName;
+	public fun typeVariables (Ljavax/lang/model/element/TypeElement;)Ljava/util/List;
+	public fun unaryPlus (Larrow/meta/ast/TypeName;)Larrow/meta/ast/Code;
+	public fun unaryPlus (Ljava/lang/Iterable;)Larrow/meta/ast/Code;
+	public fun unaryPlus (Ljava/lang/String;)Larrow/meta/ast/Code;
+	public fun unaryPlus (Ljava/util/List;)Larrow/meta/ast/Code;
+	public fun widenTypeArgs (Larrow/meta/ast/TypeName;)Larrow/meta/ast/TypeName;
+	public fun wrap (Larrow/meta/ast/Func;Lkotlin/Pair;)Larrow/meta/ast/Func;
+	public fun wrap (Larrow/meta/ast/TypeName$Classy;Lkotlin/Pair;)Larrow/meta/ast/TypeName$Classy;
+	public fun wrap (Larrow/meta/ast/TypeName$FunctionLiteral;Lkotlin/Pair;)Larrow/meta/ast/TypeName$FunctionLiteral;
+	public fun wrap (Larrow/meta/ast/TypeName$ParameterizedType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$ParameterizedType;
+	public fun wrap (Larrow/meta/ast/TypeName$TypeVariable;Lkotlin/Pair;)Larrow/meta/ast/TypeName$TypeVariable;
+	public fun wrap (Larrow/meta/ast/TypeName$WildcardType;Lkotlin/Pair;)Larrow/meta/ast/TypeName$WildcardType;
+	public fun wrap (Larrow/meta/ast/TypeName;Lkotlin/Pair;)Larrow/meta/ast/TypeName;
+}
+
+public abstract class arrow/meta/processor/MetaProcessor$AnnotatedElement {
+}
+
+public final class arrow/meta/processor/MetaProcessor$AnnotatedElement$Class : arrow/meta/processor/MetaProcessor$AnnotatedElement {
+	public fun <init> (Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;)V
+	public final fun component1 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component2 ()Larrow/meta/ast/Type;
+	public final fun copy (Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;)Larrow/meta/processor/MetaProcessor$AnnotatedElement$Class;
+	public static synthetic fun copy$default (Larrow/meta/processor/MetaProcessor$AnnotatedElement$Class;Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;ILjava/lang/Object;)Larrow/meta/processor/MetaProcessor$AnnotatedElement$Class;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getType ()Larrow/meta/ast/Type;
+	public final fun getTypeElement ()Ljavax/lang/model/element/TypeElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/meta/processor/MetaProcessor$AnnotatedElement$Interface : arrow/meta/processor/MetaProcessor$AnnotatedElement {
+	public fun <init> (Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;)V
+	public final fun component1 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component2 ()Larrow/meta/ast/Type;
+	public final fun copy (Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;)Larrow/meta/processor/MetaProcessor$AnnotatedElement$Interface;
+	public static synthetic fun copy$default (Larrow/meta/processor/MetaProcessor$AnnotatedElement$Interface;Ljavax/lang/model/element/TypeElement;Larrow/meta/ast/Type;ILjava/lang/Object;)Larrow/meta/processor/MetaProcessor$AnnotatedElement$Interface;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getType ()Larrow/meta/ast/Type;
+	public final fun getTypeElement ()Ljavax/lang/model/element/TypeElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/AnnotatedDomainKt {
+	public static final field Every Ljava/lang/String;
+	public static final field Fold Ljava/lang/String;
+	public static final field Getter Ljava/lang/String;
+	public static final field Iso Ljava/lang/String;
+	public static final field Lens Ljava/lang/String;
+	public static final field Optional Ljava/lang/String;
+	public static final field Pair Ljava/lang/String;
+	public static final field Prism Ljava/lang/String;
+	public static final field Setter Ljava/lang/String;
+	public static final field Traversal Ljava/lang/String;
+	public static final field Triple Ljava/lang/String;
+	public static final field Tuple Ljava/lang/String;
+	public static final fun asFileText (Larrow/optics/Snippet;)Ljava/lang/String;
+}
+
+public final class arrow/optics/AnnotatedElement {
+	public fun <init> (Ljavax/lang/model/element/TypeElement;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljava/util/List;)V
+	public final fun component1 ()Ljavax/lang/model/element/TypeElement;
+	public final fun component2 ()Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljavax/lang/model/element/TypeElement;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljava/util/List;)Larrow/optics/AnnotatedElement;
+	public static synthetic fun copy$default (Larrow/optics/AnnotatedElement;Ljavax/lang/model/element/TypeElement;Larrow/common/utils/ClassOrPackageDataWrapper$Class;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/AnnotatedElement;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClassData ()Larrow/common/utils/ClassOrPackageDataWrapper$Class;
+	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getSourceClassName ()Ljava/lang/String;
+	public final fun getSourceName ()Ljava/lang/String;
+	public final fun getTargets ()Ljava/util/List;
+	public final fun getType ()Ljavax/lang/model/element/TypeElement;
+	public fun hashCode ()I
+	public final fun plus (Larrow/optics/Snippet;Larrow/optics/Snippet;)Larrow/optics/Snippet;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/AnnotationInfoKt {
+	public static final fun getOpticsAnnotationClass ()Ljava/lang/Class;
+	public static final fun getOpticsAnnotationKClass ()Lkotlin/reflect/KClass;
+}
+
+public final class arrow/optics/DslSnippetGeneratorKt {
+	public static final fun generateLensDsl (Larrow/optics/AnnotatedElement;Larrow/optics/Target$DataClassDsl;)Larrow/optics/Snippet;
+	public static final fun generateOptionalDsl (Larrow/optics/AnnotatedElement;Larrow/optics/Target$DataClassDsl;)Larrow/optics/Snippet;
+	public static final fun generatePrismDsl (Larrow/optics/AnnotatedElement;Larrow/optics/Target$SealedClassDsl;)Larrow/optics/Snippet;
+}
+
+public abstract class arrow/optics/Focus {
+	public static final field Companion Larrow/optics/Focus$Companion;
+	public abstract fun getClassName ()Ljava/lang/String;
+	public abstract fun getParamName ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Focus$Companion {
+	public final fun invoke (Ljava/lang/String;Ljava/lang/String;)Larrow/optics/Focus;
+}
+
+public final class arrow/optics/Focus$NonNull : arrow/optics/Focus {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/optics/Focus$NonNull;
+	public static synthetic fun copy$default (Larrow/optics/Focus$NonNull;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/optics/Focus$NonNull;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getClassName ()Ljava/lang/String;
+	public fun getParamName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Focus$Nullable : arrow/optics/Focus {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/optics/Focus$Nullable;
+	public static synthetic fun copy$default (Larrow/optics/Focus$Nullable;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/optics/Focus$Nullable;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getClassName ()Ljava/lang/String;
+	public final fun getNonNullClassName ()Ljava/lang/String;
+	public fun getParamName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Focus$Option : arrow/optics/Focus {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/optics/Focus$Option;
+	public static synthetic fun copy$default (Larrow/optics/Focus$Option;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/optics/Focus$Option;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getClassName ()Ljava/lang/String;
+	public final fun getNestedClassName ()Ljava/lang/String;
+	public fun getParamName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/IsosFileGeneratorKt {
+	public static final fun generateIsos (Larrow/optics/AnnotatedElement;Larrow/optics/Target$Iso;)Larrow/optics/Snippet;
+	public static final fun getTargetNames (Larrow/optics/Target;)Ljava/util/List;
+}
+
+public final class arrow/optics/LensesFileGeneratorKt {
+	public static final fun generateLenses (Larrow/optics/AnnotatedElement;Larrow/optics/Target$Lens;)Larrow/optics/Snippet;
+	public static final fun lensParamName (Larrow/optics/Focus;)Ljava/lang/String;
+}
+
+public final class arrow/optics/OpticErrorsKt {
+	public static final fun getDslErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getIsoErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getIsoTooBigErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getLensErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getOptionalErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getOtherClassTypeErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+	public static final fun getPrismErrorMessage (Ljavax/lang/model/element/Element;)Ljava/lang/String;
+}
+
+public final class arrow/optics/OpticsProcessor : arrow/common/utils/AbstractProcessor {
+	public fun <init> ()V
+	public fun getSupportedAnnotationTypes ()Ljava/util/Set;
+	public fun getSupportedSourceVersion ()Ljavax/lang/model/SourceVersion;
+}
+
+public final class arrow/optics/OptionalFileGeneratorKt {
+	public static final fun generateOptionals (Larrow/optics/AnnotatedElement;Larrow/optics/Target$Optional;)Larrow/optics/Snippet;
+}
+
+public final class arrow/optics/PrismsFileGeneratorKt {
+	public static final fun generatePrisms (Larrow/optics/AnnotatedElement;Larrow/optics/Target$Prism;)Larrow/optics/Snippet;
+}
+
+public final class arrow/optics/Snippet {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/Set;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ljava/lang/String;)Larrow/optics/Snippet;
+	public static synthetic fun copy$default (Larrow/optics/Snippet;Ljava/lang/String;Ljava/lang/String;Ljava/util/Set;Ljava/lang/String;ILjava/lang/Object;)Larrow/optics/Snippet;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContent ()Ljava/lang/String;
+	public final fun getFqName ()Ljava/lang/String;
+	public final fun getImports ()Ljava/util/Set;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getPackage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class arrow/optics/Target {
+	public abstract fun getFoci ()Ljava/util/List;
+}
+
+public final class arrow/optics/Target$DataClassDsl : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$DataClassDsl;
+	public static synthetic fun copy$default (Larrow/optics/Target$DataClassDsl;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$DataClassDsl;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Target$Iso : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$Iso;
+	public static synthetic fun copy$default (Larrow/optics/Target$Iso;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$Iso;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Target$Lens : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$Lens;
+	public static synthetic fun copy$default (Larrow/optics/Target$Lens;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$Lens;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Target$Optional : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$Optional;
+	public static synthetic fun copy$default (Larrow/optics/Target$Optional;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$Optional;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Target$Prism : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$Prism;
+	public static synthetic fun copy$default (Larrow/optics/Target$Prism;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$Prism;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Target$SealedClassDsl : arrow/optics/Target {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Target$SealedClassDsl;
+	public static synthetic fun copy$default (Larrow/optics/Target$SealedClassDsl;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Target$SealedClassDsl;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFoci ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

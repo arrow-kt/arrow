@@ -12,7 +12,7 @@ import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
@@ -48,7 +48,7 @@ class OptionTest : UnitSpec() {
     )
 
     "ensure null in option computation" {
-      checkAll(Arb.bool(), Arb.int()) { predicate, i ->
+      checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
         option {
           ensure(predicate)
           i
@@ -103,7 +103,7 @@ class OptionTest : UnitSpec() {
     }
 
     "fromNullable should work for both null and non-null values of nullable types" {
-      checkAll { a: Int? ->
+      checkAll(Arb.int().orNull()) { a: Int? ->
         // This seems to be generating only non-null values, so it is complemented by the next test
         val o: Option<Int> = Option.fromNullable(a)
         if (a == null) o shouldBe None else o shouldBe Some(a)
@@ -131,7 +131,7 @@ class OptionTest : UnitSpec() {
     }
 
     "zip" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         val op: Option<Int> = a.some()
         some.zip(op) { a, b -> a + b } shouldBe Some("kotlin$a")
         none.zip(op) { a, b -> a + b } shouldBe None

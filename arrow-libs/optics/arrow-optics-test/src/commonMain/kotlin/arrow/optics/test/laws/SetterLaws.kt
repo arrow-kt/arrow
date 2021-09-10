@@ -25,22 +25,22 @@ public object SetterLaws {
   )
 
   public suspend fun <A, B> Setter<A, B>.setIdempotent(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen, bGen) { a, b ->
+    checkAll(100, aGen, bGen) { a, b ->
       set(set(a, b), b).equalUnderTheLaw(set(a, b), eq)
     }
 
   public suspend fun <A, B> Setter<A, B>.modifyIdentity(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen) { a ->
+    checkAll(100, aGen) { a ->
       modify(a, ::identity).equalUnderTheLaw(a, eq)
     }
 
   public suspend fun <A, B> Setter<A, B>.composeModify(aGen: Arb<A>, eq: (A, A) -> Boolean, funcGen: Arb<(B) -> B>): PropertyContext =
-    checkAll(aGen, funcGen, funcGen) { a, f, g ->
+    checkAll(100, aGen, funcGen, funcGen) { a, f, g ->
       modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
     }
 
   public suspend fun <A, B> Setter<A, B>.consistentSetModify(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
-    checkAll(aGen, bGen) { a, b ->
+    checkAll(100, aGen, bGen) { a, b ->
       modify(a) { b }.equalUnderTheLaw(set(a, b), eq)
     }
 }

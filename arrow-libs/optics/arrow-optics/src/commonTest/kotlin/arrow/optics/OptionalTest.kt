@@ -12,13 +12,11 @@ import arrow.typeclasses.Monoid
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 
 class OptionalTest : UnitSpec() {
 
@@ -38,9 +36,9 @@ class OptionalTest : UnitSpec() {
       "Optional first head - ",
       OptionalLaws.laws(
         optional = Optional.listHead<Int>().first(),
-        aGen = Arb.pair(Arb.list(Arb.int()), Arb.bool()),
-        bGen = Arb.pair(Arb.int(), Arb.bool()),
-        funcGen = Arb.functionAToB(Arb.pair(Arb.int(), Arb.bool())),
+        aGen = Arb.pair(Arb.list(Arb.int()), Arb.boolean()),
+        bGen = Arb.pair(Arb.int(), Arb.boolean()),
+        funcGen = Arb.functionAToB(Arb.pair(Arb.int(), Arb.boolean())),
       )
     )
 
@@ -48,16 +46,16 @@ class OptionalTest : UnitSpec() {
       "Optional second head - ",
       OptionalLaws.laws(
         optional = Optional.listHead<Int>().second(),
-        aGen = Arb.pair(Arb.bool(), Arb.list(Arb.int())),
-        bGen = Arb.pair(Arb.bool(), Arb.int()),
-        funcGen = Arb.functionAToB(Arb.pair(Arb.bool(), Arb.int())),
+        aGen = Arb.pair(Arb.boolean(), Arb.list(Arb.int())),
+        bGen = Arb.pair(Arb.boolean(), Arb.int()),
+        funcGen = Arb.functionAToB(Arb.pair(Arb.boolean(), Arb.int())),
       )
     )
 
     "asSetter should set absent optional" {
-      checkAll(genIncompleteUser, genToken) { user, token ->
-        val updatedUser = incompleteUserTokenOptional.set(user, token)
-        incompleteUserTokenOptional.getOrNull(updatedUser).shouldNotBeNull()
+      checkAll(Arb.incompleteUser(), Arb.token()) { user, token ->
+        val updatedUser = Optional.incompleteUserToken().set(user, token)
+        Optional.incompleteUserToken().getOrNull(updatedUser).shouldNotBeNull()
       }
     }
 
@@ -146,26 +144,26 @@ class OptionalTest : UnitSpec() {
     }
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
-      checkAll(Arb.list(Arb.int()), Arb.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
         Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
           ?: false shouldBe (predicate && list.isNotEmpty())
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      checkAll(Arb.list(Arb.int().orNull()), Arb.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int().orNull()), Arb.boolean()) { list, predicate ->
         Optional.listHead<Int?>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
       }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      checkAll(Arb.list(Arb.int()), Arb.bool()) { list, predicate ->
+      checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
         Optional.listHead<Int>().all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
       }
     }
 
     "Joining two optionals together with same target should yield same result" {
-      val joinedOptional = Optional.listHead<Int>().choice(defaultHead)
+      val joinedOptional = Optional.listHead<Int>().choice(Optional.defaultHead())
 
       checkAll(Arb.int()) { int ->
         joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))

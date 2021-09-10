@@ -19,6 +19,7 @@ import arrow.typeclasses.Monoid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
@@ -54,13 +55,13 @@ class EitherTest : UnitSpec() {
     )
 
     "isLeft should return true if Left and false if Right" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Left(a).isLeft() && !Right(a).isLeft()
       }
     }
 
     "isRight should return false if Left and true if Right" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         !Left(a).isRight() && Right(a).isRight()
       }
     }
@@ -135,7 +136,7 @@ class EitherTest : UnitSpec() {
     }
 
     "fromNullable should lift value as a Right if it is not null" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Either.fromNullable(a) shouldBe Right(a)
       }
     }
@@ -149,7 +150,7 @@ class EitherTest : UnitSpec() {
     }
 
     "combine two rights should return a right of the combine of the inners" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         Monoid.string().run { Right(a.combine(b)) } shouldBe Right(a).combine(
           Monoid.string(),
           Monoid.string(),
@@ -159,45 +160,45 @@ class EitherTest : UnitSpec() {
     }
 
     "combine two lefts should return a left of the combine of the inners" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         Monoid.string().run { Left(a.combine(b)) } shouldBe Left(a).combine(Monoid.string(), Monoid.string(), Left(b))
       }
     }
 
     "combine a right and a left should return left" {
-      checkAll { a: String, b: String ->
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
         Left(a) shouldBe Left(a).combine(Monoid.string(), Monoid.string(), Right(b))
         Left(a) shouldBe Right(b).combine(Monoid.string(), Monoid.string(), Left(a))
       }
     }
 
     "getOrElse should return value" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         Right(a).getOrElse { b } shouldBe a
         Left(a).getOrElse { b } shouldBe b
       }
     }
 
     "orNull should return value" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Right(a).orNull() shouldBe a
       }
     }
 
     "orNone should return Some(value)" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Right(a).orNone() shouldBe Some(a)
       }
     }
 
     "orNone should return None when left" {
-      checkAll { a: String ->
+      checkAll(Arb.string()) { a: String ->
         Left(a).orNone() shouldBe None
       }
     }
 
     "getOrHandle should return value" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         Right(a).getOrHandle { b } shouldBe a
         Left(a).getOrHandle { it + b } shouldBe a + b
       }
@@ -226,7 +227,7 @@ class EitherTest : UnitSpec() {
     }
 
     "leftIfNull should return Left if Right value is null of if Either is Left" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         Right(a).leftIfNull { b } shouldBe Right(a)
         Right(null).leftIfNull { b } shouldBe Left(b)
         Left(a).leftIfNull { b } shouldBe Left(a)
@@ -245,28 +246,28 @@ class EitherTest : UnitSpec() {
     }
 
     "rightIfNotNull should return Left if value is null or Right of value when not null" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         null.rightIfNotNull { b } shouldBe Left(b)
         a.rightIfNotNull { b } shouldBe Right(a)
       }
     }
 
     "rightIfNull should return Left if value is not null or Right of value when null" {
-      checkAll { a: Int, b: Int ->
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
         a.rightIfNull { b } shouldBe Left(b)
         null.rightIfNull { b } shouldBe Right(null)
       }
     }
 
     "swap should interchange values" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         Left(a).swap() shouldBe Right(a)
         Right(a).swap() shouldBe Left(a)
       }
     }
 
     "orNull should convert" {
-      checkAll { a: Int ->
+      checkAll(Arb.int()) { a: Int ->
         val left: Either<Int, Int> = Left(a)
 
         Right(a).orNull() shouldBe a
@@ -358,14 +359,14 @@ class EitherTest : UnitSpec() {
     }
 
     "conditionally should create right instance only if test is true" {
-      checkAll { t: Boolean, i: Int, s: String ->
+      checkAll(Arb.boolean(), Arb.int(), Arb.string()) { t: Boolean, i: Int, s: String ->
         val expected = if (t) Right(i) else Left(s)
         Either.conditionally(t, { s }, { i }) shouldBe expected
       }
     }
 
     "handleErrorWith should handle left instance otherwise return Right" {
-      checkAll { a: Int, b: String ->
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Left(a).handleErrorWith { Right(b) } shouldBe Right(b)
         Right(a).handleErrorWith { Right(b) } shouldBe Right(a)
         Left(a).handleErrorWith { Left(b) } shouldBe Left(b)

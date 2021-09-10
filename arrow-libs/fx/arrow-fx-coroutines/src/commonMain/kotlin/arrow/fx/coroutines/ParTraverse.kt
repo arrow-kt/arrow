@@ -16,13 +16,24 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
+  parSequenceN(Dispatchers.Default, n)
+
 /**
  * Sequences all tasks in [n] parallel processes on [Dispatchers.Default] and return the result.
  *
  * Cancelling this operation cancels all running tasks
  */
-public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
+@JvmName("parSequenceNScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(n: Int): List<A> =
   parSequenceN(Dispatchers.Default, n)
+
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
+  val s = Semaphore(n)
+  return parTraverse(ctx) {
+    s.withPermit { it.invoke() }
+  }
+}
 
 /**
  * Sequences all tasks in [n] parallel processes and return the result.
@@ -33,12 +44,16 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
  *
  * Cancelling this operation cancels all running tasks
  */
-public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
+@JvmName("parSequenceNScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
   val s = Semaphore(n)
   return parTraverse(ctx) {
-    s.withPermit { it.invoke() }
+    s.withPermit { it.invoke(this) }
   }
 }
+
+public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
+  parSequence(Dispatchers.Default)
 
 /**
  * Sequences all tasks in parallel on [Dispatchers.Default] and return the result
@@ -63,8 +78,12 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineCont
  * }
  * ```
  */
-public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
+@JvmName("parSequenceScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
   parSequence(Dispatchers.Default)
+
+public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
+  parTraverse(ctx) { it.invoke() }
 
 /**
  * Sequences all tasks in parallel and return the result
@@ -94,14 +113,15 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  * }
  * ```
  */
-public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
-  parTraverse(ctx) { it.invoke() }
+@JvmName("parSequenceScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
+  parTraverse(ctx) { it.invoke(this) }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B): List<B> =
+public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend CoroutineScope.(A) -> B): List<B> =
   parTraverseN(Dispatchers.Default, n, f)
 
 /**
@@ -116,7 +136,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B):
 public suspend fun <A, B> Iterable<A>.parTraverseN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
-  f: suspend (A) -> B
+  f: suspend CoroutineScope.(A) -> B
 ): List<B> {
   val s = Semaphore(n)
   return parTraverse(ctx) { a ->
@@ -145,7 +165,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  * }
  * ```
  */
-public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
+public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) -> B): List<B> =
   parTraverse(Dispatchers.Default, f)
 
 /**
@@ -177,7 +197,7 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> 
  */
 public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  f: suspend (A) -> B
+  f: suspend CoroutineScope.(A) -> B
 ): List<B> = coroutineScope {
-  map { async(ctx) { f.invoke(it) } }.awaitAll()
+  map { async(ctx) { f.invoke(this, it) } }.awaitAll()
 }

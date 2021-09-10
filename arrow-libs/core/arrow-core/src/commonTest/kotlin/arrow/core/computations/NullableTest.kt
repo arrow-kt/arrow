@@ -4,7 +4,7 @@ import arrow.core.Some
 import arrow.core.test.UnitSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
@@ -78,7 +78,7 @@ class NullableTest : UnitSpec() {
       } shouldBe null
     }
     "ensure null in nullable computation" {
-      checkAll(Arb.bool(), Arb.int()) { predicate, i ->
+      checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
         nullable {
           ensure(predicate)
           i

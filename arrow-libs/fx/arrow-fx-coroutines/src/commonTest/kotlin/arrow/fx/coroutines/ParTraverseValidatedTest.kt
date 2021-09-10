@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Validated
-import arrow.core.identity
 import arrow.core.invalidNel
 import arrow.core.sequenceValidated
 import arrow.core.validNel
@@ -61,7 +60,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
 
     "parTraverseValidated identity is identity" {
       checkAll(Arb.list(Arb.validatedNel(Arb.int(), Arb.int()))) { l ->
-        val res: Validated<NonEmptyList<Int>, List<Int>> = l.parTraverseValidated(Semigroup.nonEmptyList(), ::identity)
+        val res: Validated<NonEmptyList<Int>, List<Int>> = l.parTraverseValidated(Semigroup.nonEmptyList()) { it }
         res shouldBe l.sequenceValidated(Semigroup.nonEmptyList())
       }
     }

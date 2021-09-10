@@ -36,12 +36,12 @@ public fun interface FilterIndex<S, I, A> {
     public fun <A> list(): FilterIndex<List<A>, Int, A> =
       FilterIndex { p ->
         object : Every<List<A>, A> {
-          override fun <R> foldMap(M: Monoid<R>, s: List<A>, map: (A) -> R): R = M.run {
-            s.foldIndexed(empty()) { index, acc, a -> if (p(index)) acc.combine(map(a)) else acc }
+          override fun <R> foldMap(M: Monoid<R>, source: List<A>, map: (A) -> R): R = M.run {
+            source.foldIndexed(empty()) { index, acc, a -> if (p(index)) acc.combine(map(a)) else acc }
           }
 
-          override fun modify(s: List<A>, map: (focus: A) -> A): List<A> =
-            s.mapIndexed { index, a -> if (p(index)) map(a) else a }
+          override fun modify(source: List<A>, map: (focus: A) -> A): List<A> =
+            source.mapIndexed { index, a -> if (p(index)) map(a) else a }
         }
       }
 

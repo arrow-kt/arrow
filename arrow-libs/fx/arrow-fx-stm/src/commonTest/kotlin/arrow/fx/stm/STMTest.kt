@@ -11,7 +11,7 @@ import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.ints.shouldBeInRange
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -129,7 +129,7 @@ class STMTest : ArrowFxSpec(
       } shouldBeExactly 10
     }
     "retry + orElse: associativity" {
-      checkAll(Arb.bool(), Arb.bool(), Arb.bool()) { b1: Boolean, b2: Boolean, b3: Boolean ->
+      checkAll(Arb.boolean(), Arb.boolean(), Arb.boolean()) { b1: Boolean, b2: Boolean, b3: Boolean ->
         if ((b1 || b2 || b3).not()) {
           shouldThrow<BlockedIndefinitely> {
             atomically {
