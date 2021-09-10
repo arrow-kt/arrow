@@ -38,3 +38,7 @@ task buildDoc {
 }
 
 runValidation.mustRunAfter generateDoc
+
+apiValidation {
+    ignoredProjects += ["jekyll"]
+}
