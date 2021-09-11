@@ -12,7 +12,9 @@ on:
 
 jobs:
   publish-arrow-stack:
-
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
       SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
@@ -20,7 +22,7 @@ jobs:
       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
       ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
 
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: arrow-stack
