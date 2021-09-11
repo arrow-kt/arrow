@@ -18,7 +18,9 @@ repositories {
     google()
 }
 
-apply plugin: "com.android.library"
+plugin {
+    id "com.android.library"
+}
 
 kotlin {
     explicitApi()
