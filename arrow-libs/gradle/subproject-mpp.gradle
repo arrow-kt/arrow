@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-repositories {
-    google()
-}
-
-plugin {
-    id "com.android.library"
-}
-
 kotlin {
     explicitApi()
     jvm {
         withJava()
     }
 
-    android {
-        publishAllLibraryVariants()
-    }
     androidNativeArm32 {
         publishAllLibraryVariants()
     }
