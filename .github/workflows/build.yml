@@ -51,7 +51,7 @@ jobs:
       - name: "Validate documentation"
         working-directory: arrow-site
         run: ./gradlew runAnk
-  js_and_wasm:
+  js:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -73,14 +73,9 @@ jobs:
           restore-keys: |
             js-step-gradle-
 
-      - name: Setup Wasm-pack
-        uses: jetli/wasm-pack-action@v0.3.0
-        with:
-          version: 'latest'
-
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jsTest wasm32Test
+        run: ./gradlew jsTest
 
       - name: "Prepare test reports"
         if: ${{ always() }}

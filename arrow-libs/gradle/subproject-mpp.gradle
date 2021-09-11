@@ -20,7 +20,7 @@ kotlin {
     withJava()
   }
 
-  /*androidNativeArm32 {
+  androidNativeArm32 {
     publishAllLibraryVariants()
   }
   androidNativeArm64 {
@@ -31,7 +31,7 @@ kotlin {
   }
   androidNativeX86 {
     publishAllLibraryVariants()
-  }*/
+  }
 
   js(IR) {
     browser()
@@ -126,10 +126,10 @@ kotlin {
     nativeTest {
       dependsOn(commonTest)
 
-      /*androidNativeArm32Test.dependsOn(it)
+      androidNativeArm32Test.dependsOn(it)
       androidNativeArm64Testt.dependsOn(it)
       androidNativeX64Test.dependsOn(it)
-      androidNativeX86Test.dependsOn(it)*/
+      androidNativeX86Test.dependsOn(it)
 
       macosX64Test.dependsOn(it)
       macosArm64Test.dependsOn(it)
