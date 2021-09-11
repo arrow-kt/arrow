@@ -20,19 +20,6 @@ kotlin {
     withJava()
   }
 
-  androidNativeArm32 {
-    publishAllLibraryVariants()
-  }
-  androidNativeArm64 {
-    publishAllLibraryVariants()
-  }
-  androidNativeX64 {
-    publishAllLibraryVariants()
-  }
-  androidNativeX86 {
-    publishAllLibraryVariants()
-  }
-
   js(IR) {
     browser()
     nodejs()
@@ -91,11 +78,6 @@ kotlin {
     nativeMain {
       dependsOn(commonMain)
 
-      /*androidNativeArm32Main.dependsOn(it)
-      androidNativeArm64Main.dependsOn(it)
-      androidNativeX64Main.dependsOn(it)
-      androidNativeX86Main.dependsOn(it)*/
-
       macosX64Main.dependsOn(it)
       macosArm64Main.dependsOn(it)
 
@@ -125,11 +107,6 @@ kotlin {
     }
     nativeTest {
       dependsOn(commonTest)
-
-      androidNativeArm32Test.dependsOn(it)
-      androidNativeArm64Testt.dependsOn(it)
-      androidNativeX64Test.dependsOn(it)
-      androidNativeX86Test.dependsOn(it)
 
       macosX64Test.dependsOn(it)
       macosArm64Test.dependsOn(it)
