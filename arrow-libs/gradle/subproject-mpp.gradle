@@ -15,184 +15,175 @@
  */
 
 kotlin {
-    explicitApi()
-    jvm {
-        withJava()
+  explicitApi()
+  jvm {
+    withJava()
+  }
+
+  /*androidNativeArm32 {
+    publishAllLibraryVariants()
+  }
+  androidNativeArm64 {
+    publishAllLibraryVariants()
+  }
+  androidNativeX64 {
+    publishAllLibraryVariants()
+  }
+  androidNativeX86 {
+    publishAllLibraryVariants()
+  }*/
+
+  js(IR) {
+    browser()
+    nodejs()
+  }
+  linuxX64()
+  linuxArm64()
+  linuxArm32Hfp()
+  linuxMipsel32()
+  linuxMips32()
+  mingwX64()
+  mingwX86()
+  macosX64()
+  macosArm64()
+  tvosArm64()
+  tvosX64()
+  tvosSimulatorArm64()
+  watchosArm32()
+  watchosArm64()
+  watchosX86()
+  watchosX64()
+  watchosSimulatorArm64()
+  iosX64()
+  iosArm64()
+  iosArm32()
+  iosSimulatorArm64()
+
+  targets.all {
+    compilations.all {
+      kotlinOptions {
+        verbose = true
+      }
     }
+  }
 
-    androidNativeArm32 {
-        publishAllLibraryVariants()
+  sourceSets {
+    commonMain {
+      dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+      }
     }
-    androidNativeArm64 {
-        publishAllLibraryVariants()
+    jvmMain {
+      dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+      }
     }
-    androidNativeX64 {
-        publishAllLibraryVariants()
+    jvmTest {
+      dependencies {
+        runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
+      }
     }
-    androidNativeX86 {
-        publishAllLibraryVariants()
+    jsMain {
+      dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
+      }
     }
+    nativeMain {
+      dependsOn(commonMain)
 
-    js(IR) {
-        browser()
-        nodejs()
+      /*androidNativeArm32Main.dependsOn(it)
+      androidNativeArm64Main.dependsOn(it)
+      androidNativeX64Main.dependsOn(it)
+      androidNativeX86Main.dependsOn(it)*/
+
+      macosX64Main.dependsOn(it)
+      macosArm64Main.dependsOn(it)
+
+      mingwX64Main.dependsOn(it)
+      mingwX86Main.dependsOn(it)
+
+      linuxX64Main.dependsOn(it)
+      linuxArm64Main.dependsOn(it)
+      linuxArm32HfpMain.dependsOn(it)
+      linuxMips32Main.dependsOn(it)
+      linuxMipsel32Main.dependsOn(it)
+
+      iosX64Main.dependsOn(it)
+      iosArm64Main.dependsOn(it)
+      iosArm32Main.dependsOn(it)
+      iosSimulatorArm64Main.dependsOn(it)
+
+      watchosX86Main.dependsOn(it)
+      watchosArm32Main.dependsOn(it)
+      watchosArm64Main.dependsOn(it)
+      watchosX64Main.dependsOn(it)
+      watchosSimulatorArm64Main.dependsOn(it)
+
+      tvosArm64Main.dependsOn(it)
+      tvosX64Main.dependsOn(it)
+      tvosSimulatorArm64Main.dependsOn(it)
     }
-    linuxX64()
-    linuxArm64()
-    linuxArm32Hfp()
-    linuxMipsel32()
-    linuxMips32()
+    nativeTest {
+      dependsOn(commonTest)
 
-    mingwX64()
-    mingwX86()
+      /*androidNativeArm32Test.dependsOn(it)
+      androidNativeArm64Testt.dependsOn(it)
+      androidNativeX64Test.dependsOn(it)
+      androidNativeX86Test.dependsOn(it)*/
 
-    macosX64()
-    macosArm64()
+      macosX64Test.dependsOn(it)
+      macosArm64Test.dependsOn(it)
 
-    tvosArm64()
-    tvosX64()
-    tvosSimulatorArm64()
+      mingwX64Test.dependsOn(it)
+      mingwX86Test.dependsOn(it)
 
-    watchosArm32()
-    watchosArm64()
-    watchosX86()
-    watchosX64()
-    watchosSimulatorArm64()
+      linuxX64Test.dependsOn(it)
+      linuxArm64Test.dependsOn(it)
+      linuxArm32HfpTest.dependsOn(it)
+      linuxMips32Test.dependsOn(it)
+      linuxMipsel32Test.dependsOn(it)
 
-    iosX64()
-    iosArm64()
-    iosArm32()
-    iosSimulatorArm64()
+      iosX64Test.dependsOn(it)
+      iosArm64Test.dependsOn(it)
+      iosArm32Test.dependsOn(it)
+      iosSimulatorArm64Test.dependsOn(it)
 
-    wasm32()
+      watchosX86Test.dependsOn(it)
+      watchosArm32Test.dependsOn(it)
+      watchosArm64Test.dependsOn(it)
+      watchosX64Test.dependsOn(it)
+      watchosSimulatorArm64Test.dependsOn(it)
 
-    targets.all {
-        compilations.all {
-            kotlinOptions {
-                verbose = true
-            }
-        }
+      tvosArm64Test.dependsOn(it)
+      tvosX64Test.dependsOn(it)
+      tvosSimulatorArm64Test.dependsOn(it)
     }
-
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
-            }
-        }
-        jvmMain {
-            dependencies {
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-            }
-        }
-        jvmTest {
-            dependencies {
-                runtimeOnly "io.kotest:kotest-runner-junit5:$KOTEST_VERSION"
-            }
-        }
-        jsMain {
-            dependencies {
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$KOTLIN_VERSION"
-            }
-        }
-        nativeMain {
-            dependsOn(commonMain)
-
-            androidNativeArm32Main.dependsOn(it)
-            androidNativeArm64Main.dependsOn(it)
-            androidNativeX64Main.dependsOn(it)
-            androidNativeX86Main.dependsOn(it)
-
-            macosX64Main.dependsOn(it)
-            macosArm64Main.dependsOn(it)
-
-            mingwX64Main.dependsOn(it)
-            mingwX86Main.dependsOn(it)
-
-            linuxX64Main.dependsOn(it)
-            linuxArm64Main.dependsOn(it)
-            linuxArm32HfpMain.dependsOn(it)
-            linuxMips32Main.dependsOn(it)
-            linuxMipsel32Main.dependsOn(it)
-
-            iosX64Main.dependsOn(it)
-            iosArm64Main.dependsOn(it)
-            iosArm32Main.dependsOn(it)
-            iosSimulatorArm64Main.dependsOn(it)
-
-            watchosX86Main.dependsOn(it)
-            watchosArm32Main.dependsOn(it)
-            watchosArm64Main.dependsOn(it)
-            watchosX64Main.dependsOn(it)
-            watchosSimulatorArm64Main.dependsOn(it)
-
-            tvosMain.dependsOn(it)
-            tvosSimulatorArm64Main.dependsOn(it)
-
-            wasm32Main.dependsOn(it)
-        }
-        nativeTest {
-            dependsOn(commonTest)
-
-            androidNativeArm32Test.dependsOn(it)
-            androidNativeArm64Testt.dependsOn(it)
-            androidNativeX64Test.dependsOn(it)
-            androidNativeX86Test.dependsOn(it)
-
-            macosX64Test.dependsOn(it)
-            macosArm64Test.dependsOn(it)
-
-            mingwX64Test.dependsOn(it)
-            mingwX86Test.dependsOn(it)
-
-            linuxX64Test.dependsOn(it)
-            linuxArm64Test.dependsOn(it)
-            linuxArm32HfpTest.dependsOn(it)
-            linuxMips32Test.dependsOn(it)
-            linuxMipsel32Test.dependsOn(it)
-
-            iosX64Test.dependsOn(it)
-            iosArm64Test.dependsOn(it)
-            iosArm32Test.dependsOn(it)
-            iosSimulatorArm64Test.dependsOn(it)
-
-            watchosX86Test.dependsOn(it)
-            watchosArm32Test.dependsOn(it)
-            watchosArm64Test.dependsOn(it)
-            watchosX64Test.dependsOn(it)
-            watchosSimulatorArm64Test.dependsOn(it)
-
-            tvosTest.dependsOn(it)
-            tvosSimulatorArm64Test.dependsOn(it)
-
-            wasm32Main.dependsOn(it)
-        }
-    }
+  }
 }
 
 ktlint {
-    version = KTLINT_VERSION
+  version = KTLINT_VERSION
 }
 
 clean.doFirst {
-    delete "${projectDir}/docs/apidocs"
+  delete "${projectDir}/docs/apidocs"
 }
 
 group = GROUP
 archivesBaseName = POM_ARTIFACT_ID
 
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 tasks.withType(Test) {
-    maxParallelForks = Runtime.runtime.availableProcessors()
+  maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
 tasks.jvmTest {
-    useJUnitPlatform()
-    testLogging {
-        exceptionFormat 'full'
-        events "passed", "skipped", "failed", "standardOut", "standardError"
-    }
+  useJUnitPlatform()
+  testLogging {
+    exceptionFormat 'full'
+    events "passed", "skipped", "failed", "standardOut", "standardError"
+  }
 }
