@@ -51,7 +51,7 @@ jobs:
       - name: "Validate documentation"
         working-directory: arrow-site
         run: ./gradlew runAnk
-  js:
+  js_and_wasm:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -73,9 +73,14 @@ jobs:
           restore-keys: |
             js-step-gradle-
 
+      - name: Setup Wasm-pack
+        uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          version: 'latest'
+
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew jsTest
+        run: ./gradlew jsTest wasm32Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -115,7 +120,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew linuxX64Test jvmTest
+        run: ./gradlew linuxX64Test jvmTest linuxArm64Test linuxArm32HfpTest linuxMipsel32Test linuxMips32Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -155,7 +160,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew macosX64Test iosX64Test
+        run: ./gradlew macosX64Test iosX64Test macosArm64Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -195,7 +200,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew tvosX64Test watchosX64Test
+        run: ./gradlew tvosX64Test tvosArm64Test watchosX64Test watchosX86Test watchosArm32Test watchosArm64Test tvosSimulatorArm64Test watchosSimulatorArm64Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -235,4 +240,4 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew mingwX64Test
+        run: ./gradlew mingwX64Test mingwX86Test

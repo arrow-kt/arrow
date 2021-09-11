@@ -14,32 +14,62 @@
  * limitations under the License.
  */
 
+apply plugin: "com.android.library"
+
 kotlin {
     explicitApi()
     jvm {
-        // JVM target ignores Java sources and compiles only Kotlin source files.
-        // Fix:
         withJava()
     }
+
+    android {
+        publishAllLibraryVariants()
+    }
+    androidNativeArm32 {
+        publishAllLibraryVariants()
+    }
+    androidNativeArm64 {
+        publishAllLibraryVariants()
+    }
+    androidNativeX64 {
+        publishAllLibraryVariants()
+    }
+    androidNativeX86 {
+        publishAllLibraryVariants()
+    }
+
     js(IR) {
         browser()
         nodejs()
     }
     linuxX64()
+    linuxArm64()
+    linuxArm32Hfp()
+    linuxMipsel32()
+    linuxMips32()
 
     mingwX64()
+    mingwX86()
 
     macosX64()
-    tvos()
+    macosArm64()
+
+    tvosArm64()
+    tvosX64()
+    tvosSimulatorArm64()
 
     watchosArm32()
     watchosArm64()
     watchosX86()
     watchosX64()
+    watchosSimulatorArm64()
 
     iosX64()
     iosArm64()
     iosArm32()
+    iosSimulatorArm64()
+
+    wasm32()
 
     targets.all {
         compilations.all {
@@ -72,31 +102,75 @@ kotlin {
         }
         nativeMain {
             dependsOn(commonMain)
+
+            androidNativeArm32Main.dependsOn(it)
+            androidNativeArm64Main.dependsOn(it)
+            androidNativeX64Main.dependsOn(it)
+            androidNativeX86Main.dependsOn(it)
+
             macosX64Main.dependsOn(it)
+            macosArm64Main.dependsOn(it)
+
             mingwX64Main.dependsOn(it)
+            mingwX86Main.dependsOn(it)
+
             linuxX64Main.dependsOn(it)
+            linuxArm64Main.dependsOn(it)
+            linuxArm32HfpMain.dependsOn(it)
+            linuxMips32Main.dependsOn(it)
+            linuxMipsel32Main.dependsOn(it)
+
             iosX64Main.dependsOn(it)
             iosArm64Main.dependsOn(it)
             iosArm32Main.dependsOn(it)
+            iosSimulatorArm64Main.dependsOn(it)
+
             watchosX86Main.dependsOn(it)
             watchosArm32Main.dependsOn(it)
             watchosArm64Main.dependsOn(it)
             watchosX64Main.dependsOn(it)
+            watchosSimulatorArm64Main.dependsOn(it)
+
             tvosMain.dependsOn(it)
+            tvosSimulatorArm64Main.dependsOn(it)
+
+            wasm32Main.dependsOn(it)
         }
         nativeTest {
             dependsOn(commonTest)
+
+            androidNativeArm32Test.dependsOn(it)
+            androidNativeArm64Testt.dependsOn(it)
+            androidNativeX64Test.dependsOn(it)
+            androidNativeX86Test.dependsOn(it)
+
             macosX64Test.dependsOn(it)
+            macosArm64Test.dependsOn(it)
+
             mingwX64Test.dependsOn(it)
+            mingwX86Test.dependsOn(it)
+
             linuxX64Test.dependsOn(it)
+            linuxArm64Test.dependsOn(it)
+            linuxArm32HfpTest.dependsOn(it)
+            linuxMips32Test.dependsOn(it)
+            linuxMipsel32Test.dependsOn(it)
+
             iosX64Test.dependsOn(it)
             iosArm64Test.dependsOn(it)
             iosArm32Test.dependsOn(it)
+            iosSimulatorArm64Test.dependsOn(it)
+
             watchosX86Test.dependsOn(it)
             watchosArm32Test.dependsOn(it)
             watchosArm64Test.dependsOn(it)
             watchosX64Test.dependsOn(it)
+            watchosSimulatorArm64Test.dependsOn(it)
+
             tvosTest.dependsOn(it)
+            tvosSimulatorArm64Test.dependsOn(it)
+
+            wasm32Main.dependsOn(it)
         }
     }
 }
