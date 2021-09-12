@@ -19,7 +19,7 @@ env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  publish_js:
+  publish_js_commons:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -70,7 +70,12 @@ jobs:
 
       - name: Publish LinuxX64
         working-directory: arrow-libs
-        run: ./gradlew publishLinuxX64PublicationToDeployRepository
+        run: ./gradlew publishLinuxX64PublicationToDeployRepository publishJvmPublicationToDeployRepository
+
+      - name: Publish Jvm
+        working-directory: arrow-libs
+        run: ./gradlew publishJvmPublicationToDeployRepository
+
   macos_and_ios:
     runs-on: macos-latest
     timeout-minutes: 20
@@ -128,6 +133,22 @@ jobs:
       - name: Publish tvos X64
         working-directory: arrow-libs
         run: ./gradlew publishTvosX64PublicationToDeployRepository
+
+      - name: Publish tvosSimulatorArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosSimulatorArm64PublicationToDeployRepository
+
+      - name: Publish watchosX64
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosX64PublicationToDeployRepository
+
+      - name: Publish watchosX86
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosX86PublicationToDeployRepository
+
+      - name: Publish watchosArm32
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosArm32PublicationToDeployRepository
 
   windows:
     runs-on: windows-latest
