@@ -1,0 +1,155 @@
+name: "Publish Mpp libs"
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+    paths:
+      - 'arrow-libs/**'
+      - '.github/**'
+
+env:
+  BASEDIR: ${{github.workspace}}/arrow-libs
+  JAVA_OPTS: -Xms512m -Xmx1024m
+  SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+  SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+
+jobs:
+  publish_js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+          key: js-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            js-step-gradle-
+
+      - name: Publish commons
+        working-directory: arrow-libs
+        run: ./gradlew publishKotlinMultiplatformPublicationToDeployRepository
+      - name: Publish js
+        working-directory: arrow-libs
+        run: ./gradlew publishJsPublicationToDeployRepository
+  publish_linux_and_jvm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            linux-step-gradle-
+
+      - name: Publish LinuxX64
+        working-directory: arrow-libs
+        run: ./gradlew publishLinuxX64PublicationToDeployRepository
+  macos_and_ios:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            mac-step-gradle-
+
+      - name: Publish macos X64
+        working-directory: arrow-libs
+        run: ./gradlew publishMacosX64PublicationToDeployRepository
+
+      - name: Publish macos Arm64
+        working-directory: arrow-libs
+        run: ./gradlew publishMacosArm64PublicationToDeployRepository
+
+  tvos_and_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: tv-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            tv-step-gradle-
+
+      - name: Publish tvos Arm64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosArm64PublicationToDeployRepository
+
+      - name: Publish tvos X64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosX64PublicationToDeployRepository
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Publish MingwX64
+        working-directory: arrow-libs
+        run: ./gradlew publishMingwX64PublicationToDeployRepository

@@ -49,19 +49,6 @@ kotlin {
         }
     }
 
-    def publicationsFromMainHost =
-      [jvm(), js(), linuxX64()].collect { it.name } + "kotlinMultiplatform"
-
-    publishing {
-        publications {
-            matching { it.name in publicationsFromMainHost }.all { targetPublication ->
-                tasks.withType(AbstractPublishToMaven)
-                  .matching { it.publication == targetPublication }
-                  .configureEach { onlyIf { findProperty("isMainHost") == "true" } }
-            }
-        }
-    }
-
     sourceSets {
         commonMain {
             dependencies {
