@@ -1,71 +1,387 @@
-name: "Publish libraries"
+name: "Publish all libs, Arrow-stack and Docs"
 
 on:
   push:
     branches:
-    - main
-    - release/**
+      - main
+      - release/**
     paths:
-    - 'arrow-libs/**'
-    - '.github/**'
+      - 'arrow-libs/**'
+      - '.github/**'
+
+env:
+  BASEDIR: ${{github.workspace}}/arrow-libs
+  JAVA_OPTS: -Xms512m -Xmx1024m
+  SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+  SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  publish:
+  publish_js_commons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+          key: js-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            js-step-gradle-
+
+      - name: Publish commons
+        working-directory: arrow-libs
+        run: ./gradlew publishKotlinMultiplatformPublicationToDeployRepository
+      - name: Publish js
+        working-directory: arrow-libs
+        run: ./gradlew publishJsPublicationToDeployRepository
+  publish_linux_and_jvm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            linux-step-gradle-
+
+      - name: Publish LinuxX64
+        working-directory: arrow-libs
+        run: ./gradlew publishLinuxX64PublicationToDeployRepository
+
+      - name: Publish Jvm
+        working-directory: arrow-libs
+        run: ./gradlew publishJvmPublicationToDeployRepository
+
+  publish_macos_and_ios:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            mac-step-gradle-
+
+      - name: Publish macos X64
+        working-directory: arrow-libs
+        run: ./gradlew publishMacosX64PublicationToDeployRepository
+
+      - name: Publish macos Arm64
+        working-directory: arrow-libs
+        run: ./gradlew publishMacosArm64PublicationToDeployRepository
+
+      - name: Publish iosX64
+        working-directory: arrow-libs
+        run: ./gradlew publishIosX64PublicationToDeployRepository
+
+      - name: Publish iosArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishIosArm64PublicationToDeployRepository
+
+      - name: Publish iosArm32
+        working-directory: arrow-libs
+        run: ./gradlew publishIosArm32PublicationToDeployRepository
+
+  publish_tvos_and_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: tv-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            tv-step-gradle-
+
+      - name: Publish tvos Arm64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosArm64PublicationToDeployRepository
+
+      - name: Publish tvos X64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosX64PublicationToDeployRepository
+
+      - name: Publish tvosSimulatorArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishTvosSimulatorArm64PublicationToDeployRepository
+
+      - name: Publish watchosX64
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosX64PublicationToDeployRepository
+
+      - name: Publish watchosX86
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosX86PublicationToDeployRepository
+
+      - name: Publish watchosArm32
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosArm32PublicationToDeployRepository
+
+      - name: Publish watchosArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosArm64PublicationToDeployRepository
+
+  publish_windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Publish MingwX64
+        working-directory: arrow-libs
+        run: ./gradlew publishMingwX64PublicationToDeployRepository
+  publish-arrow-stack:
     env:
       BASEDIR: ${{github.workspace}}/arrow-libs
-      JAVA_OPTS: -Xms512m -Xmx1024m
       SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
       SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
       ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
 
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: arrow-stack
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
 
-    - name: "Setup"
-      run: brew install grep
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-    - name: "Set env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+      - name: "Setup"
+        run: brew install grep
 
-    - name: "Show env"
-      run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
 
-    - name: "Publish"
-      working-directory: arrow-libs
-      run: |
-        ./gradlew publish
-        echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
-    - name: "Create tag"
-      if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-      run: |
-        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow.git
-        git config --global user.email "arrow-kt@users.noreply.github.com"
-        git config --global user.name "arrow-kt"
-        git tag -a $RELEASE_VERSION -m "Release $RELEASE_VERSION"
-        git push origin $RELEASE_VERSION
+      - name: "Publish"
+        run: |
+          ./gradlew publish
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
 
-    - name: "Create release notes"
-      if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-      run: ${GITHUB_WORKSPACE}/.github/scripts/create-release-notes.sh
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
 
-    - name: Prepare environment to create the issue
-      if: failure()
-      id: create-issue
-      run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
 
-    - name: Create an issue whether failure
-      if: failure()
-      uses: actions/github-script@v4
-      with:
-        github-token: ${{github.token}}
-        script: |
-           await github.issues.create({...context.repo,
-            title: "[PUBLISH] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-            body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
+  publish_doc:
+
+    env:
+      BASEDIR: ${{github.workspace}}/arrow-libs
+      JAVA_OPTS: -Xms512m -Xmx1024m
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      AWS_DEFAULT_REGION: eu-west-1
+      JEKYLL_ENV: production
+
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "Setup"
+        run: brew install grep
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
+      - name: "Prepare environment"
+        working-directory: arrow-site
+        run: |
+          mkdir $BASEDIR/logs
+          brew install tree
+          bundle install --gemfile Gemfile --path vendor/bundle
+
+      - name: "Assemble"
+        working-directory: arrow-libs
+        run: |
+          echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
+          ./gradlew assemble
+
+      - name: "Create API doc"
+        working-directory: arrow-libs
+        run: ./gradlew dokkaJekyll
+
+      - name: "Validate documentation"
+        working-directory: arrow-site
+        run: ./gradlew runAnk
+
+      - name: "Landing page: build"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          bundle exec jekyll build -b docs -s build/site
+          tree _site > $BASEDIR/logs/content.log
+
+      - name: "Landing page: publish"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
+          ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+
+      - name: "Remove index for versions"
+        working-directory: arrow-site
+        run: rm -f build/site/index.md
+
+      - name: "Latest release: build (docs/)"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          bundle exec jekyll build -b docs -s build/site
+          tree _site > $BASEDIR/logs/content_docs.log
+
+      - name: "Latest release: publish (docs/)"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
+          ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
+
+      - name: "Latest release: build release directory (docs/<major.minor>)"
+        if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+        working-directory: arrow-site
+        run: |
+          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
+          bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
+          tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+
+      - name: "Latest release: publish release directory (docs/<major.minor>)"
+        if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+        working-directory: arrow-site
+        run: |
+          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
+          echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
+          if [ "${SHORT_VERSION}" != "" ]; then
+            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
+          else
+            exit 1
+          fi
+
+      - name: "Next version: build (/docs/next)"
+        if: ${{ github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          bundle exec jekyll build -b docs/next -s build/site
+          tree _site > $BASEDIR/logs/content_docs-next.log
+
+      - name: "Next version: publish (/docs/next)"
+        if: ${{ github.ref == 'refs/heads/main' }}
+        working-directory: arrow-site
+        run: |
+          echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+
+      - name: "Site: publish sitemap.xml"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        run: |
+          ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
+          aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
+
+      - name: CloudFront cache invalidation
+        run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+
+      - name: List S3
+        run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: logs
+          path: arrow-libs/logs
+
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH DOC] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
