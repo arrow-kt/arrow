@@ -70,7 +70,7 @@ jobs:
 
       - name: Publish LinuxX64
         working-directory: arrow-libs
-        run: ./gradlew publishLinuxX64PublicationToDeployRepository publishJvmPublicationToDeployRepository
+        run: ./gradlew publishLinuxX64PublicationToDeployRepository
 
       - name: Publish Jvm
         working-directory: arrow-libs
