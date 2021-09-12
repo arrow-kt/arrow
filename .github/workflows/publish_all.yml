@@ -76,7 +76,7 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishJvmPublicationToDeployRepository
 
-  macos_and_ios:
+  publish_macos_and_ios:
     runs-on: macos-latest
     timeout-minutes: 20
 
@@ -105,7 +105,19 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishMacosArm64PublicationToDeployRepository
 
-  tvos_and_watchos:
+      - name: Publish iosX64
+        working-directory: arrow-libs
+        run: ./gradlew publishIosX64PublicationToDeployRepository
+
+      - name: Publish iosArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishIosArm64PublicationToDeployRepository
+
+      - name: Publish iosArm32
+        working-directory: arrow-libs
+        run: ./gradlew publishIosArm32PublicationToDeployRepository
+
+  publish_tvos_and_watchos:
     runs-on: macos-latest
     timeout-minutes: 20
 
@@ -150,7 +162,11 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishWatchosArm32PublicationToDeployRepository
 
-  windows:
+      - name: Publish watchosArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosArm64PublicationToDeployRepository
+
+  publish_windows:
     runs-on: windows-latest
     timeout-minutes: 20
 
