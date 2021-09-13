@@ -191,12 +191,6 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishMingwX64PublicationToDeployRepository
   publish-arrow-stack:
-    env:
-      BASEDIR: ${{github.workspace}}/arrow-libs
-      SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
-      SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
-      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
-      ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
 
     runs-on: macos-latest
     defaults:
@@ -241,7 +235,6 @@ jobs:
   publish_doc:
 
     env:
-      BASEDIR: ${{github.workspace}}/arrow-libs
       JAVA_OPTS: -Xms512m -Xmx1024m
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
