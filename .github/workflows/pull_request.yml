@@ -239,7 +239,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew watchosX64Test watchosX86Test watchosSimulatorArm64Test watchosArm32TestBinaries watchosArm32TestKlibrary watchosArm64TestBinaries watchosArm64TestKlibrary
+        run: ./gradlew watchosX64Test watchosX86Test watchosSimulatorArm64Test watchosArm32TestBinaries watchosArm32TestKlibrary
 
       - name: "Prepare test reports"
         if: ${{ always() }}
