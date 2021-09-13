@@ -170,9 +170,9 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishWatchosArm64PublicationToMavenRepository
 
-      - name: Publish watchosSimulatorArm64
-        working-directory: arrow-libs
-        run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
+      #- name: Publish watchosSimulatorArm64
+      #  working-directory: arrow-libs
+      #  run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
 
 
   publish_windows:
