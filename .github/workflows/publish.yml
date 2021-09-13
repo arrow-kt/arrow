@@ -121,7 +121,7 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
 
-  publish_tvos_and_watchos:
+  publish_tvos:
     runs-on: macos-latest
     timeout-minutes: 20
 
@@ -154,6 +154,27 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
 
+  publish_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            watchos-step-gradle-
+
       - name: Publish watchosX64
         working-directory: arrow-libs
         run: ./gradlew publishWatchosX64PublicationToMavenRepository
@@ -173,7 +194,6 @@ jobs:
       - name: Publish watchosSimulatorArm64
         working-directory: arrow-libs
         run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
-
 
   publish_windows:
     runs-on: windows-latest
@@ -199,8 +219,8 @@ jobs:
       - name: Publish MingwX64
         working-directory: arrow-libs
         run: ./gradlew publishMingwX64PublicationToMavenRepository
-  publish-arrow-stack:
 
+  publish-arrow-stack:
     runs-on: macos-latest
     defaults:
       run:
