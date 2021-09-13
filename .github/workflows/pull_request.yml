@@ -259,8 +259,9 @@ jobs:
 
   experimental_watchos:
     runs-on: macos-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
     continue-on-error: true
+    needs: watchos
 
     steps:
       - uses: actions/checkout@v2
