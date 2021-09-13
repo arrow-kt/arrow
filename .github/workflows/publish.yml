@@ -43,10 +43,10 @@ jobs:
 
       - name: Publish commons
         working-directory: arrow-libs
-        run: ./gradlew publishKotlinMultiplatformPublicationToDeployRepository
+        run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
       - name: Publish js
         working-directory: arrow-libs
-        run: ./gradlew publishJsPublicationToDeployRepository
+        run: ./gradlew publishJsPublicationToMavenRepository
   publish_linux_and_jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -70,11 +70,11 @@ jobs:
 
       - name: Publish LinuxX64
         working-directory: arrow-libs
-        run: ./gradlew publishLinuxX64PublicationToDeployRepository
+        run: ./gradlew publishLinuxX64PublicationToMavenRepository
 
       - name: Publish Jvm
         working-directory: arrow-libs
-        run: ./gradlew publishJvmPublicationToDeployRepository
+        run: ./gradlew publishJvmPublicationToMavenRepository
 
   publish_macos_and_ios:
     runs-on: macos-latest
@@ -99,23 +99,23 @@ jobs:
 
       - name: Publish macos X64
         working-directory: arrow-libs
-        run: ./gradlew publishMacosX64PublicationToDeployRepository
+        run: ./gradlew publishMacosX64PublicationToMavenRepository
 
       - name: Publish macos Arm64
         working-directory: arrow-libs
-        run: ./gradlew publishMacosArm64PublicationToDeployRepository
+        run: ./gradlew publishMacosArm64PublicationToMavenRepository
 
       - name: Publish iosX64
         working-directory: arrow-libs
-        run: ./gradlew publishIosX64PublicationToDeployRepository
+        run: ./gradlew publishIosX64PublicationToMavenRepository
 
       - name: Publish iosArm64
         working-directory: arrow-libs
-        run: ./gradlew publishIosArm64PublicationToDeployRepository
+        run: ./gradlew publishIosArm64PublicationToMavenRepository
 
       - name: Publish iosArm32
         working-directory: arrow-libs
-        run: ./gradlew publishIosArm32PublicationToDeployRepository
+        run: ./gradlew publishIosArm32PublicationToMavenRepository
 
   publish_tvos_and_watchos:
     runs-on: macos-latest
@@ -140,31 +140,31 @@ jobs:
 
       - name: Publish tvos Arm64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosArm64PublicationToDeployRepository
+        run: ./gradlew publishTvosArm64PublicationToMavenRepository
 
       - name: Publish tvos X64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosX64PublicationToDeployRepository
+        run: ./gradlew publishTvosX64PublicationToMavenRepository
 
       - name: Publish tvosSimulatorArm64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosSimulatorArm64PublicationToDeployRepository
+        run: ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
 
       - name: Publish watchosX64
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosX64PublicationToDeployRepository
+        run: ./gradlew publishWatchosX64PublicationToMavenRepository
 
       - name: Publish watchosX86
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosX86PublicationToDeployRepository
+        run: ./gradlew publishWatchosX86PublicationToMavenRepository
 
       - name: Publish watchosArm32
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosArm32PublicationToDeployRepository
+        run: ./gradlew publishWatchosArm32PublicationToMavenRepository
 
       - name: Publish watchosArm64
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosArm64PublicationToDeployRepository
+        run: ./gradlew publishWatchosArm64PublicationToMavenRepository
 
   publish_windows:
     runs-on: windows-latest
@@ -189,7 +189,7 @@ jobs:
 
       - name: Publish MingwX64
         working-directory: arrow-libs
-        run: ./gradlew publishMingwX64PublicationToDeployRepository
+        run: ./gradlew publishMingwX64PublicationToMavenRepository
   publish-arrow-stack:
 
     runs-on: macos-latest
