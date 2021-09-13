@@ -30,16 +30,21 @@ kotlin {
     mingwX64()
 
     macosX64()
+    macosArm64()
+
     tvos()
+    tvosSimulatorArm64()
 
     watchosArm32()
     watchosArm64()
     watchosX86()
     watchosX64()
+    watchosSimulatorArm64()
 
     iosX64()
     iosArm64()
     iosArm32()
+    iosSimulatorArm64()
 
     targets.all {
         compilations.all {
@@ -73,30 +78,38 @@ kotlin {
         nativeMain {
             dependsOn(commonMain)
             macosX64Main.dependsOn(it)
+            macosArm64Main.dependsOn(it)
             mingwX64Main.dependsOn(it)
             linuxX64Main.dependsOn(it)
             iosX64Main.dependsOn(it)
             iosArm64Main.dependsOn(it)
             iosArm32Main.dependsOn(it)
+            iosSimulatorArm64Main.dependsOn(it)
             watchosX86Main.dependsOn(it)
             watchosArm32Main.dependsOn(it)
             watchosArm64Main.dependsOn(it)
             watchosX64Main.dependsOn(it)
+            watchosSimulatorArm64Main.dependsOn(it)
             tvosMain.dependsOn(it)
+            tvosSimulatorArm64Main.dependsOn(it)
         }
         nativeTest {
             dependsOn(commonTest)
             macosX64Test.dependsOn(it)
+            macosArm64Test.dependsOn(it)
             mingwX64Test.dependsOn(it)
             linuxX64Test.dependsOn(it)
             iosX64Test.dependsOn(it)
             iosArm64Test.dependsOn(it)
             iosArm32Test.dependsOn(it)
+            iosSimulatorArm64Test.dependsOn(it)
             watchosX86Test.dependsOn(it)
             watchosArm32Test.dependsOn(it)
             watchosArm64Test.dependsOn(it)
             watchosX64Test.dependsOn(it)
+            watchosSimulatorArm64Test.dependsOn(it)
             tvosTest.dependsOn(it)
+            tvosSimulatorArm64Test.dependsOn(it)
         }
     }
 }

@@ -117,6 +117,10 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishIosArm32PublicationToMavenRepository
 
+      - name: Publish iosSimulatorArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
+
   publish_tvos_and_watchos:
     runs-on: macos-latest
     timeout-minutes: 20
@@ -165,6 +169,11 @@ jobs:
       - name: Publish watchosArm64
         working-directory: arrow-libs
         run: ./gradlew publishWatchosArm64PublicationToMavenRepository
+
+      - name: Publish watchosSimulatorArm64
+        working-directory: arrow-libs
+        run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
+
 
   publish_windows:
     runs-on: windows-latest
