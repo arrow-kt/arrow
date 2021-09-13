@@ -191,33 +191,6 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
 
-  publish_experimental_watchos:
-    runs-on: macos-latest
-    timeout-minutes: 20
-    needs: experimental_watchos
-    if: ${{ needs.experimental_watchos.success() }}
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: experimeental-watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            experimental-watchos-step-gradle-
-
-      - name: Publish watchosArm64
-        working-directory: arrow-libs
-        run: ./gradlew publishWatchosArm64PublicationToMavenRepository
-
   publish_windows:
     runs-on: windows-latest
     timeout-minutes: 20
