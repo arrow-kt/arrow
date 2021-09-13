@@ -157,7 +157,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew macosX64Test iosX64Test macosArm64Test iosArm64TestKlibrary iosArm64TestKlibrary iosArm32TestBinaries iosArm32TestKlibrary iosSimulatorArm64Test
+        run: ./gradlew macosX64Test iosX64Test macosArm64Test iosSimulatorArm64Test iosArm64TestBinaries iosArm64TestKlibrary iosArm32TestBinaries iosArm32TestKlibrary
 
       - name: "Prepare test reports"
         if: ${{ always() }}
