@@ -564,10 +564,7 @@ public final class arrow/core/IterableKt {
 	public static final fun crosswalk (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun crosswalkMap (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun crosswalkNull (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public static final fun elementAtOrNone (Ljava/lang/Iterable;I)Larrow/core/Option;
 	public static final fun filterOption (Ljava/lang/Iterable;)Ljava/util/List;
-	public static final fun firstOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
-	public static final fun firstOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun flattenOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
@@ -576,8 +573,6 @@ public final class arrow/core/IterableKt {
 	public static final fun foldRight (Ljava/util/List;Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun ifThen (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Iterable;
 	public static final fun interleave (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
-	public static final fun lastOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
-	public static final fun lastOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun leftPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun leftPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
@@ -598,8 +593,6 @@ public final class arrow/core/IterableKt {
 	public static final fun sequenceResult (Ljava/lang/Iterable;)Ljava/lang/Object;
 	public static final fun sequenceValidated (Ljava/lang/Iterable;)Larrow/core/Validated;
 	public static final fun sequenceValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
-	public static final fun singleOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
-	public static final fun singleOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun split (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun tail (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun traverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -837,11 +830,16 @@ public final class arrow/core/OptionKt {
 	public static final fun combineAll (Larrow/core/Option;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Larrow/core/Option;
 	public static final fun compareTo (Larrow/core/Option;Larrow/core/Option;)I
+	public static final fun elementAtOrNone (Ljava/lang/Iterable;I)Larrow/core/Option;
 	public static final fun ensure (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun firstOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun firstOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun getOrElse (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun handleError (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun handleErrorWith (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun lastOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun lastOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun maybe (ZLkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public static final fun none ()Larrow/core/Option;
 	public static final fun or (Larrow/core/Option;Larrow/core/Option;)Larrow/core/Option;
@@ -856,6 +854,8 @@ public final class arrow/core/OptionKt {
 	public static final fun sequence (Larrow/core/Option;)Ljava/util/List;
 	public static final fun sequenceEither (Larrow/core/Option;)Larrow/core/Either;
 	public static final fun sequenceValidated (Larrow/core/Option;)Larrow/core/Validated;
+	public static final fun singleOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun singleOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun some (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun toMap (Larrow/core/Option;)Ljava/util/Map;
 	public static final fun toOption (Ljava/lang/Object;)Larrow/core/Option;
