@@ -96,8 +96,6 @@ jobs:
 
       - name: "Install grep"
         run: brew install grep
-      - name: "Set GNU grep as grep"
-        run: PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -164,8 +162,6 @@ jobs:
 
       - name: "Install grep"
         run: brew install grep
-      - name: "Set GNU grep as grep"
-        run: PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -298,6 +294,7 @@ jobs:
 
       - name: "Setup"
         run: brew install grep
+
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
 
