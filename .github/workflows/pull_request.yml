@@ -134,7 +134,7 @@ jobs:
           name: test-reports
           path: test-reports
 
-  watchos:
+  tv_and_watchos:
     runs-on: macos-latest
     timeout-minutes: 30
 
