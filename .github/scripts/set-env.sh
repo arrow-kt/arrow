@@ -2,8 +2,8 @@
  
 set -ex
 
-echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+# echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+# echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
 
 NEW_RELEASE_VERSION_EXISTS=0
 if [ "$GITHUB_REF" == "refs/heads/main" ]; then
