@@ -19,35 +19,7 @@ env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  publish_js_commons:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.gradle/yarn
-            ~/.gradle/nodejs
-          key: js-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            js-step-gradle-
-
-      - name: Publish commons
-        working-directory: arrow-libs
-        run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
-      - name: Publish js
-        working-directory: arrow-libs
-        run: ./gradlew publishJsPublicationToMavenRepository
-  publish_linux_and_jvm:
+  publish_linux_jvm_js_and_commons:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -68,6 +40,10 @@ jobs:
           restore-keys: |
             linux-step-gradle-
 
+      - name: Publish commons
+        working-directory: arrow-libs
+        run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
+
       - name: Publish LinuxX64
         working-directory: arrow-libs
         run: ./gradlew publishLinuxX64PublicationToMavenRepository
@@ -75,6 +51,10 @@ jobs:
       - name: Publish Jvm
         working-directory: arrow-libs
         run: ./gradlew publishJvmPublicationToMavenRepository
+
+      - name: Publish Js
+        working-directory: arrow-libs
+        run: ./gradlew publishJsPublicationToMavenRepository
 
   publish_macos_and_ios:
     runs-on: macos-latest
@@ -121,9 +101,9 @@ jobs:
         working-directory: arrow-libs
         run: ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
 
-  publish_tvos:
+  publish_tvos_and_watchos:
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v2
@@ -138,9 +118,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.konan
-          key: tv-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: tv-watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            tv-step-gradle-
+            tv-watchos-step-gradle-
 
       - name: Publish tvos Arm64
         working-directory: arrow-libs
@@ -153,27 +133,6 @@ jobs:
       - name: Publish tvosSimulatorArm64
         working-directory: arrow-libs
         run: ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
-
-  publish_watchos:
-    runs-on: macos-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            watchos-step-gradle-
 
       - name: Publish watchosX64
         working-directory: arrow-libs
