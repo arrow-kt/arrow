@@ -111,7 +111,7 @@ jobs:
 
       - name: "Install grep"
         run: |
-          brew install grep --with-default-names
+          brew install grep
           PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
@@ -194,7 +194,7 @@ jobs:
 
       - name: "Install grep"
         run: |
-          brew install grep --with-default-names
+          brew install grep
           PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
