@@ -244,7 +244,7 @@ jobs:
         working-directory: arrow-libs
         run: |
           ./gradlew publishMingwX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
+          echo "$(cat gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
   publish-arrow-stack:
     runs-on: ubuntu-latest
