@@ -40,6 +40,9 @@ jobs:
           restore-keys: |
             linux-step-gradle-
 
+      - name: Install grep
+        run: sudo apt-get install grep
+
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
 
@@ -105,6 +108,9 @@ jobs:
           key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             mac-step-gradle-
+
+      - name: "Install grep"
+        run: brew install grep
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -183,6 +189,9 @@ jobs:
           key: tv-watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             tv-watchos-step-gradle-
+
+      - name: "Install grep"
+        run: brew install grep
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -270,9 +279,11 @@ jobs:
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+        shell: bash
 
       - name: "Show env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+        shell: bash
 
       - name: Publish MingwX64
         working-directory: arrow-libs
@@ -280,6 +291,46 @@ jobs:
           ./gradlew publishMingwX64PublicationToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
+
+  publish-arrow-stack:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: arrow-stack
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "Install grep"
+        run: brew install grep
+
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
+      - name: "Publish"
+        run: |
+          ./gradlew publish
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
       - name: Prepare environment to create the issue
         if: failure()
         id: create-issue
