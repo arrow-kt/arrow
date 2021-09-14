@@ -73,21 +73,6 @@ jobs:
           ./gradlew publishJsPublicationToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JS deployed!"
 
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
-
   publish_macos_and_ios:
     runs-on: macos-latest
     timeout-minutes: 40
@@ -110,9 +95,9 @@ jobs:
             mac-step-gradle-
 
       - name: "Install grep"
-        run: |
-          brew install grep
-          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+        run: brew install grep
+      - name: "Set GNU grep as grep"
+        run: PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -156,21 +141,6 @@ jobs:
           ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) iosSimulatorArm64 deployed!"
 
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
-
   publish_tvos_and_watchos:
     runs-on: macos-latest
     timeout-minutes: 40
@@ -193,9 +163,9 @@ jobs:
             tv-watchos-step-gradle-
 
       - name: "Install grep"
-        run: |
-          brew install grep
-          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+        run: brew install grep
+      - name: "Set GNU grep as grep"
+        run: PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -245,21 +215,6 @@ jobs:
           ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosSimulatorArm64 deployed!"
 
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
-
   publish_windows:
     runs-on: windows-latest
     timeout-minutes: 20
@@ -295,21 +250,6 @@ jobs:
           ./gradlew publishMingwX64PublicationToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
-
   publish-arrow-stack:
     runs-on: macos-latest
     defaults:
@@ -335,23 +275,8 @@ jobs:
         run: |
           ./gradlew publish
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
 
   publish_doc:
-
     env:
       JAVA_OPTS: -Xms512m -Xmx1024m
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -481,18 +406,3 @@ jobs:
         with:
           name: logs
           path: arrow-libs/logs
-
-      - name: Prepare environment to create the issue
-        if: failure()
-        id: create-issue
-        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-
-      - name: Create an issue whether failure
-        if: failure()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{github.token}}
-          script: |
-            await github.issues.create({...context.repo,
-             title: "[PUBLISH DOC] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
-             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
