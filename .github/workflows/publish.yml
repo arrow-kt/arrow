@@ -232,9 +232,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: "Install grep"
-        run: choco install grep
-
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
         shell: bash
