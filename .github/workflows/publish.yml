@@ -40,25 +40,54 @@ jobs:
           restore-keys: |
             linux-step-gradle-
 
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
       - name: Publish commons
         working-directory: arrow-libs
-        run: ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
+        run: |
+          ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) Commons deployed!"
 
       - name: Publish LinuxX64
         working-directory: arrow-libs
-        run: ./gradlew publishLinuxX64PublicationToMavenRepository
+        run: |
+          ./gradlew publishLinuxX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) LinuxX64 deployed!"
 
       - name: Publish Jvm
         working-directory: arrow-libs
-        run: ./gradlew publishJvmPublicationToMavenRepository
+        run: |
+          ./gradlew publishJvmPublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JVM deployed!"
 
       - name: Publish Js
         working-directory: arrow-libs
-        run: ./gradlew publishJsPublicationToMavenRepository
+        run: |
+          ./gradlew publishJsPublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JS deployed!"
+
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
 
   publish_macos_and_ios:
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v2
@@ -77,33 +106,66 @@ jobs:
           restore-keys: |
             mac-step-gradle-
 
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
       - name: Publish macos X64
         working-directory: arrow-libs
-        run: ./gradlew publishMacosX64PublicationToMavenRepository
+        run: |
+          ./gradlew publishMacosX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MacOs X64 deployed!"
 
       - name: Publish macos Arm64
         working-directory: arrow-libs
-        run: ./gradlew publishMacosArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishMacosArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MacOs Arm64 deployed!"
 
       - name: Publish iosX64
         working-directory: arrow-libs
-        run: ./gradlew publishIosX64PublicationToMavenRepository
+        run: |
+          ./gradlew publishIosX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios X64 deployed!"
 
       - name: Publish iosArm64
         working-directory: arrow-libs
-        run: ./gradlew publishIosArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishIosArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios Arm64 deployed!"
 
       - name: Publish iosArm32
         working-directory: arrow-libs
-        run: ./gradlew publishIosArm32PublicationToMavenRepository
+        run: |
+          ./gradlew publishIosArm32PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios Arm32 deployed!"
 
       - name: Publish iosSimulatorArm64
         working-directory: arrow-libs
-        run: ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) iosSimulatorArm64 deployed!"
+
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
 
   publish_tvos_and_watchos:
     runs-on: macos-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v2
@@ -122,33 +184,68 @@ jobs:
           restore-keys: |
             tv-watchos-step-gradle-
 
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
       - name: Publish tvos Arm64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishTvosArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosArm64 deployed!"
 
       - name: Publish tvos X64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosX64PublicationToMavenRepository
+        run: |
+          ./gradlew publishTvosX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosX64 deployed!"
 
       - name: Publish tvosSimulatorArm64
         working-directory: arrow-libs
-        run: ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosSimulatorArm64 deployed!"
 
       - name: Publish watchosX64
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosX64PublicationToMavenRepository
+        run: |
+          ./gradlew publishWatchosX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosX64 deployed!"
 
       - name: Publish watchosX86
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosX86PublicationToMavenRepository
+        run: |
+          ./gradlew publishWatchosX86PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosX86 deployed!"
 
       - name: Publish watchosArm32
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosArm32PublicationToMavenRepository
+        run: |
+          ./gradlew publishWatchosArm32PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosArm32 deployed!"
 
       - name: Publish watchosSimulatorArm64
         working-directory: arrow-libs
-        run: ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
+        run: |
+          ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosSimulatorArm64 deployed!"
+
+      - name: Prepare environment to create the issue
+        if: failure()
+        id: create-issue
+        run: echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
+
+      - name: Create an issue whether failure
+        if: failure()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{github.token}}
+          script: |
+            await github.issues.create({...context.repo,
+             title: "[PUBLISH STACK] Error when merging '${{ steps.create-issue.outputs.title }}' on main branch",
+             body: "Please, check https://github.com/arrow-kt/arrow/actions/runs/${{ github.run_id }}"});
 
   publish_windows:
     runs-on: windows-latest
@@ -171,32 +268,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Publish MingwX64
-        working-directory: arrow-libs
-        run: ./gradlew publishMingwX64PublicationToMavenRepository
-
-  publish-arrow-stack:
-    runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: arrow-stack
-
-    steps:
-
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
 
       - name: "Show env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
-      - name: "Publish"
+      - name: Publish MingwX64
+        working-directory: arrow-libs
         run: |
-          ./gradlew publish
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
+          ./gradlew publishMingwX64PublicationToMavenRepository
+          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
       - name: Prepare environment to create the issue
         if: failure()
