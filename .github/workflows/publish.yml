@@ -110,7 +110,9 @@ jobs:
             mac-step-gradle-
 
       - name: "Install grep"
-        run: brew install grep
+        run: |
+          brew install grep --with-default-names
+          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
@@ -191,7 +193,9 @@ jobs:
             tv-watchos-step-gradle-
 
       - name: "Install grep"
-        run: brew install grep
+        run: |
+          brew install grep --with-default-names
+          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
