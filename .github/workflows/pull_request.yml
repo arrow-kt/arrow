@@ -177,7 +177,7 @@ jobs:
 
   tvos:
     runs-on: macos-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v2
