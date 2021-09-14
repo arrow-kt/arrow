@@ -228,9 +228,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Setup"
-        run: brew install grep
-
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
 
