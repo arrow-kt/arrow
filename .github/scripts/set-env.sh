@@ -10,6 +10,7 @@ if [ "$GITHUB_REF" == "refs/heads/main" ]; then
     if [[ $OSTYPE == 'darwin'* ]]; then
       LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | ggrep -oP '<latest>\K[^<]*')
     else
+      export LC_ALL=en_US.utf8;
       LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | grep -oP '<latest>\K[^<]*')
     fi
 
