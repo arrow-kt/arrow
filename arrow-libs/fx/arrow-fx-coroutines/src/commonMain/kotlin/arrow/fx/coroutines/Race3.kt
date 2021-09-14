@@ -36,9 +36,9 @@ public sealed class Race3<out A, out B, out C> {
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
 public suspend inline fun <A, B, C> raceN(
-  crossinline fa: suspend CoroutineScope.() -> A,
-  crossinline fb: suspend CoroutineScope.() -> B,
-  crossinline fc: suspend CoroutineScope.() -> C
+  crossinline fa: suspend () -> A,
+  crossinline fb: suspend () -> B,
+  crossinline fc: suspend () -> C
 ): Race3<A, B, C> = raceN(Dispatchers.Default, fa, fb, fc)
 
 /**
@@ -54,9 +54,9 @@ public suspend inline fun <A, B, C> raceN(
  */
 public suspend inline fun <A, B, C> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  crossinline fa: suspend CoroutineScope.() -> A,
-  crossinline fb: suspend CoroutineScope.() -> B,
-  crossinline fc: suspend CoroutineScope.() -> C
+  crossinline fa: suspend () -> A,
+  crossinline fb: suspend () -> B,
+  crossinline fc: suspend () -> C
 ): Race3<A, B, C> =
   coroutineScope {
     val a = async(ctx) { fa() }

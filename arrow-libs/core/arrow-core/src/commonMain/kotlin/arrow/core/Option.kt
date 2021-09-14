@@ -662,10 +662,7 @@ public sealed class Option<out A> {
 
   @Deprecated(
     "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-    ReplaceWith(
-      "ff.fix().flatMap { this.fix().map(it) }",
-      "arrow.core.fix"
-    )
+    ReplaceWith("ff.flatMap { map(it) }")
   )
   public fun <B> ap(ff: Option<(A) -> B>): Option<B> =
     ff.flatMap { this.map(it) }
@@ -1059,3 +1056,123 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
     other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
   }
 )
+
+/**
+ * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
+ */
+public fun <T> Iterable<T>.firstOrNone(): Option<T> =
+  when (this) {
+    is Collection -> if (!isEmpty()) {
+      Some(first())
+    } else {
+      None
+    }
+    else -> {
+      iterator().nextOrNone()
+    }
+  }
+
+private fun <T> Iterator<T>.nextOrNone(): Option<T> =
+  if (hasNext()) {
+    Some(next())
+  } else {
+    None
+  }
+
+/**
+ * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
+ */
+public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
+  for (element in this) {
+    if (predicate(element)) {
+      return Some(element)
+    }
+  }
+  return None
+}
+
+/**
+ * Returns single element as [Some(element)][Some], or [None] if the iterable is empty or has more than one element.
+ */
+public fun <T> Iterable<T>.singleOrNone(): Option<T> =
+  when (this) {
+    is Collection -> when (size) {
+      1 -> firstOrNone()
+      else -> None
+    }
+    else -> {
+      iterator().run { nextOrNone().filter { !hasNext() } }
+    }
+  }
+
+/**
+ * Returns the single element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
+ */
+public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
+  val list = mutableListOf<T>()
+  for (element in this) {
+    if (predicate(element)) {
+      if (list.isNotEmpty()) {
+        return None
+      }
+      list.add(element)
+    }
+  }
+  return list.firstOrNone()
+}
+
+/**
+ * Returns the last element as [Some(element)][Some], or [None] if the iterable is empty.
+ */
+public fun <T> Iterable<T>.lastOrNone(): Option<T> =
+  when (this) {
+    is Collection -> if (!isEmpty()) {
+      Some(last())
+    } else {
+      None
+    }
+    else -> iterator().run {
+      if (hasNext()) {
+        var last: T
+        do last = next() while (hasNext())
+        Some(last)
+      } else {
+        None
+      }
+    }
+  }
+
+/**
+ * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
+ */
+public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
+  var value: Any? = EmptyValue
+  for (element in this) {
+    if (predicate(element)) {
+      value = element
+    }
+  }
+  return if (value === EmptyValue) None else Some(EmptyValue.unbox(value))
+}
+
+/**
+ * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this iterable.
+ */
+public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
+  when {
+    index < 0 -> None
+    this is Collection -> when (index) {
+      in indices -> Some(elementAt(index))
+      else -> None
+    }
+    else -> iterator().skip(index).nextOrNone()
+  }
+
+private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
+  when {
+    count > 0 && hasNext() -> {
+      next()
+      skip(count - 1)
+    }
+    else -> this
+  }

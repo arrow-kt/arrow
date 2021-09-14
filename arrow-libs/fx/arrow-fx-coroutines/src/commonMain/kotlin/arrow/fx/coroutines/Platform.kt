@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.NonEmptyList
+import arrow.core.nonFatalOrThrow as coreNonFatalOrThrow
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
 import kotlin.jvm.JvmName
@@ -155,3 +156,7 @@ public class AtomicIntW(a: Int) {
 
   override fun toString(): String = value.toString()
 }
+
+@Deprecated("Use Arrow Core instead", ReplaceWith("this.nonFatalOrThrow()", "arrow.core.nonFatalOrThrow"))
+public fun Throwable.nonFatalOrThrow(): Throwable =
+  coreNonFatalOrThrow()
