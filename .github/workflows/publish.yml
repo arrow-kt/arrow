@@ -251,7 +251,8 @@ jobs:
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
   publish-arrow-stack:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: arrow-stack
@@ -262,8 +263,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Install grep"
-        run: brew install grep
+      - name: Install grep
+        run: sudo apt-get install grep
 
       - name: "Set env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh

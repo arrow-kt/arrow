@@ -7,7 +7,7 @@ set -ex
 
 NEW_RELEASE_VERSION_EXISTS=0
 if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-    LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | grep -oP '<latest>\K[^<]*')
+    LATEST_PUBLISHED_VERSION=$(curl -N -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | grep -oP '<latest>\K[^<]*')
     if [ "$LATEST_PUBLISHED_VERSION" == "" ]; then exit 1; fi
     RELEASE_VERSION=$(grep LATEST_VERSION $BASEDIR/gradle.properties | cut -d= -f2)
     if [ "$LATEST_PUBLISHED_VERSION" != "$RELEASE_VERSION" ]; then NEW_RELEASE_VERSION_EXISTS=1; fi
