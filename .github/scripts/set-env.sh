@@ -12,7 +12,7 @@ if [ "$GITHUB_REF" == "refs/heads/windows_build" ]; then
     if [[ $OSTYPE == 'darwin'* ]]; then
       LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | ggrep -oP '<latest>\K[^<]*')
     else
-      LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | grep -oP '<latest>\K[^<]*')
+      LATEST_PUBLISHED_VERSION=$(curl -vL https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | grep -oP '<latest>\K[^<]*')
     fi
 
     if [ "$LATEST_PUBLISHED_VERSION" == "" ]; then exit 1; fi
