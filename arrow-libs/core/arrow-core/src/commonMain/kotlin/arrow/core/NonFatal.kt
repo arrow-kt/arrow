@@ -28,10 +28,10 @@ import kotlin.coroutines.cancellation.CancellationException
  *   val nonFatal: Either<Throwable, String> =
  *   //sampleStart
  *   try {
- *      Right(unsafeFunction(1))
+ *      Either.Right(unsafeFunction(1))
  *   } catch (t: Throwable) {
  *     if (NonFatal(t)) {
- *         Left(t)
+ *         Either.Left(t)
  *     } else {
  *         throw t
  *     }

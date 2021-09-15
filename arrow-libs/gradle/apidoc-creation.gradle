@@ -16,26 +16,71 @@
 
 apply plugin: "org.jetbrains.dokka"
 
-dokkaJekyll {
-    enabled = file("README.md").exists()
+dokkaGfm {
     outputDirectory = file("${rootDir}/../arrow-site/docs/apidocs")
     dokkaSourceSets {
-        main {
-            includes.from(files("README.md"))
-            reportUndocumented.set(false)
-            // Specifies the location of the project source code on the Web.
-            // If provided, Dokka generates "source" links for each declaration.
-            // Repeat for multiple mappings
-            sourceLink {
-                // Source directory
-                localDirectory.set(file("src/commonMain/kotlin"))
-
-                // URL showing where the source code can be accessed through the web browser
-                remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/main/kotlin')}").toURL())
-
-                // Suffix which is used to append the line number to the URL. Use #L for GitHub
-                remoteLineSuffix.set("#L")
+        if (file("src/commonMain/kotlin").exists()) {
+            commonMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                sourceLink {
+                    localDirectory.set(file("src/commonMain/kotlin"))
+                    remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/commonMain/kotlin')}").toURL())
+                    remoteLineSuffix.set("#L")
+                }
+            }
+        } else if(file("src/main/kotlin").exists()) {
+            main {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                sourceLink {
+                    localDirectory.set(file("src/main/kotlin"))
+                    remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/main/kotlin')}").toURL())
+                    remoteLineSuffix.set("#L")
+                }
+            }
+        }
+        if(file("src/jvmMain/kotlin").exists()) {
+            jvmMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                sourceLink {
+                    localDirectory.set(file("src/jvmMain/kotlin"))
+                    remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/jvmMain/kotlin')}").toURL())
+                    remoteLineSuffix.set("#L")
+                }
+            }
+        }
+        if(file("src/jsMain/kotlin").exists()) {
+            jsMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                sourceLink {
+                    localDirectory.set(file("src/jsMain/kotlin"))
+                    remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/jsMain/kotlin')}").toURL())
+                    remoteLineSuffix.set("#L")
+                }
             }
         }
     }
+}
+
+dependencies {
+    dokkaGfmPlugin(project(":jekyll"))
 }

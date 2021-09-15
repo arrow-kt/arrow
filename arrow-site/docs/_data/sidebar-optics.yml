@@ -1,5 +1,8 @@
 options:
   - title: Quick Start
+    url: /optics/
+
+  - title: DSL
     url: /optics/dsl/
 
   - title: Types
@@ -51,5 +54,5 @@ options:
   - title: Media
     url: https://media.arrow-kt.io/tags/optics/
 
-  - title: Docs
-    url: /apidocs/arrow-optics/
+  - title: Api Docs
+    url: /apidocs/arrow-optics/arrow.optics

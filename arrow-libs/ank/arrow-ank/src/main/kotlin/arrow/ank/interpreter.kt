@@ -146,12 +146,12 @@ public val interpreter: AnkOps = object : AnkOps {
       snippets.second.mapIndexed { i, snip ->
         val result = try {
           if (snip.isPlaygroundExtension) ""
-          else engineCache.getOrElse(snip.lang) {
+          else engineCache.getOrElse(snip.lang.trim { it == '`' }) {
             throw CompilationException(
               path = snippets.first,
               snippet = snip,
               underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
-              msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.first} ]")
+              msg = colored(ANSI_RED, "ΛNK compilation failed - No engine configured for `${snip.lang}` [ ${snippets.first} ]")
             )
           }.eval(snip.code)
         } catch (e: Exception) {

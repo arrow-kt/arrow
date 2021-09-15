@@ -12,7 +12,7 @@ The resulting expressions enjoy the same syntax that most OOP and Java programme
 
 This page discuss the semantics of parallel operations in Arrow Fx, which follows the system of Structured Concurrency.
 
-You can find all functions in the API docs [here](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/index.html#functions), and all the parallel traverse extensions can be find on [`Iterable`](/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/kotlin.collections.-iterable/index.html).
+You can find all functions and extension functions for Kotlin's Std in the API docs [here](/docs/apidocs/arrow-fx-coroutines/arrow.fx.coroutines/index.html#functions).
 
 ## Parallelization & Concurrency
 

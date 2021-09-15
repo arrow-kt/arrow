@@ -8,15 +8,23 @@ permalink: /optics/dsl/
 
 
 Arrow offers an Optics DSL to compose different Optics while improving ease of use and readability.
-To avoid boilerplate, Arrow will generate this property-like DSL using `@optics` annotation.
+To avoid boilerplate, Arrow will generate this property-like DSL using `@optics` annotation. For Arrow Optics to generate the DSL all the annotated classes should declare a `companion object` where the optics properties will be projected as extensions.
 
 ```kotlin
 package com.example.domain
 
-@optics data class Street(val number: Int, val name: String)
-@optics data class Address(val city: String, val street: Street)
-@optics data class Company(val name: String, val address: Address)
-@optics data class Employee(val name: String, val company: Company?)
+@optics data class Street(val number: Int, val name: String) {
+  companion object
+}
+@optics data class Address(val city: String, val street: Street) {
+  companion object
+}
+@optics data class Company(val name: String, val address: Address) {
+  companion object
+}
+@optics data class Employee(val name: String, val company: Company?) {
+  companion object
+}
 ```
 
 The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class.
@@ -37,10 +45,18 @@ Arrow can also generate DSL for a `sealed class`, which can help reduce boilerpl
 ```kotlin
 package com.example.domain
 
-@optics sealed class NetworkResult
-@optics data class Success(val content: String): NetworkResult()
-@optics sealed class NetworkError : NetworkResult()
-@optics data class HttpError(val message: String): NetworkError()
+@optics sealed class NetworkResult {
+  companion object
+}
+@optics data class Success(val content: String): NetworkResult() {
+  companion object
+}
+@optics sealed class NetworkError : NetworkResult() {
+  companion object
+}
+@optics data class HttpError(val message: String): NetworkError() {
+  companion object
+}
 object TimeoutError: NetworkError()
 ```
 
@@ -69,7 +85,9 @@ The DSL also has special support for [Every]({{ '/optics/every' | relative_url }
 `Every` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
 
 ```kotlin
-@optics data class Employees(val employees: List<Employee>)
+@optics data class Employees(val employees: List<Employee>) {
+  companion object
+}
 ```
 
 ```kotlin:ank
@@ -94,7 +112,9 @@ Every.list<Employee>().run {
 `At` can be used to focus in `A` at a given index `I` for a given structure `S`.
 
 ```kotlin
-@optics data class Db(val content: Map<Int, String>)
+@optics data class Db(val content: Map<Int, String>) {
+  companion object
+}
 ```
 
 Here we focus into the value of a given key in `MapK`.

@@ -9,6 +9,12 @@
     </div>
     <ul class="menu-doc-search">
       <li>
+        <a class="menu-links" href="https://www.47deg.com/" title="47 Degrees">
+          <span>Sponsored by</span>
+          <img src="{{ '/img/docs/47deg-header-doc.svg' | relative_url }}" title="47 Degrees" alt="47 Degrees">
+        </a>
+      </li>
+      <li>
         <a class="menu-links" href="{{ site.github_repo }}" title="Github">Github</a>
       </li>
       <li>
@@ -19,6 +25,11 @@
     </ul>
   </div>
   <div class="doc-content">
+    {% unless page.path contains 'apidocs' %}
+    <div class="content-edit-page">
+      <a href="https://github.com/arrow-kt/arrow/edit/main/arrow-site/docs/{{ page.path }}"><i class="fab fa-github"></i> <span>Edit Page</span></a>
+    </div>
+    {% endunless %}
     {% if page.video %}
     {% include _media-wrapper.html id=page.video %}
     {% endif %}

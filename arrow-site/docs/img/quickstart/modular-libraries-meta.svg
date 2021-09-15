@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="219px" height="236px" viewBox="0 0 219 236" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>modular-libraries-meta</title>
+    <defs>
+        <linearGradient x1="50%" y1="9.97548529%" x2="50%" y2="99.7788235%" id="linearGradient-1">
+            <stop stop-color="#CE1010" offset="0%"></stop>
+            <stop stop-color="#9D1212" offset="99.9182%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="9.63032353%" x2="50%" y2="99.7141176%" id="linearGradient-2">
+            <stop stop-color="#F63F18" offset="0%"></stop>
+            <stop stop-color="#950F0F" offset="99.9367%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="-7.62485774%" x2="50%" y2="76.0622893%" id="linearGradient-3">
+            <stop stop-color="#132532" offset="0%"></stop>
+            <stop stop-color="#132532" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="91.6085294%" id="linearGradient-4">
+            <stop stop-color="#E5E5E5" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="logo-copy" transform="translate(1.000000, 1.000000)">
+            <g id="logo-pattern" opacity="0.16" stroke="#273244">
+                <ellipse id="path" cx="108.095594" cy="123.341772" rx="92.4342013" ry="92.9957806"></ellipse>
+                <rect id="path" x="31.3116282" y="46.0084388" width="153.567932" height="153.687764"></rect>
+                <polygon id="path" transform="translate(108.584664, 123.180952) rotate(-315.000000) translate(-108.584664, -123.180952) " points="31.8037118 46.4 185.238638 46.5269785 185.365617 199.961905 31.9306903 199.834926"></polygon>
+                <line x1="139.608604" y1="0.276190476" x2="21.8067614" y2="231.765617" id="Line-2" stroke-linecap="square"></line>
+                <line x1="196.340707" y1="0.276190476" x2="78.5388637" y2="231.765617" id="Line-2-Copy" stroke-linecap="square" transform="translate(137.439785, 116.000000) scale(-1, 1) translate(-137.439785, -116.000000) "></line>
+                <line x1="107.789297" y1="161.749575" x2="178.816125" y2="200.34632" id="Path-6"></line>
+                <line x1="37.3618331" y1="161.749575" x2="108.041972" y2="200.34632" id="Path-6-Copy" transform="translate(72.882565, 181.097046) scale(-1, 1) translate(-72.882565, -181.097046) "></line>
+            </g>
+            <g id="logo" transform="translate(37.084664, 58.000000)">
+                <polygon id="path" fill="url(#linearGradient-1)" points="72 0 0 144.276931 74.7525176 106.892657"></polygon>
+                <polygon id="path" fill="url(#linearGradient-2)" points="72 0 144 144.276931 72 108.207698"></polygon>
+                <polygon id="path" fill-opacity="0.7" fill="url(#linearGradient-3)" points="0 144.276931 72.0044471 108.207698 144 144.276931 72 177"></polygon>
+                <polygon id="path" fill="#FFFFFF" points="72.1192235 72.1384656 36 144.276931 73.4999294 125.584794"></polygon>
+                <polygon id="path" fill="url(#linearGradient-4)" points="72 72.1384656 108 144.276931 72 126.242315"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
