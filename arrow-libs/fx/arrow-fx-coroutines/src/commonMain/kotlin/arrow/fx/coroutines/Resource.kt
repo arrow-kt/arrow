@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.TailRecMDeprecation
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -545,6 +546,7 @@ public sealed class Resource<out A> {
       Resource.Defer(f)
 
     @Suppress("UNCHECKED_CAST")
+    @Deprecated(TailRecMDeprecation)
     public fun <A, B> tailRecM(a: A, f: (A) -> Resource<Either<A, B>>): Resource<B> {
       fun loop(r: Resource<Either<A, B>>): Resource<B> = when (r) {
         is Bind<*, *> -> Bind(
