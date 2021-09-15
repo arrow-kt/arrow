@@ -1,8 +1,3 @@
-public final class arrow/ExtensionKt {
-	public static final fun getGiven ()Ljava/lang/Void;
-	public static final fun given ()Ljava/lang/Object;
-}
-
 public final class arrow/optics/OpticsTarget : java/lang/Enum {
 	public static final field DSL Larrow/optics/OpticsTarget;
 	public static final field ISO Larrow/optics/OpticsTarget;

@@ -602,7 +602,7 @@ public fun <A> resource(acquire: suspend () -> A): Use<A> = Use(acquire)
  * Composes a [release] action to a [Resource.use] action creating a [Resource].
  */
 public infix fun <A> Use<A>.release(release: suspend (A) -> Unit): Resource<A> =
-  Resource(acquire, release)
+  Resource(acquire) { a, _ -> release(a) }
 
 /**
  * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
