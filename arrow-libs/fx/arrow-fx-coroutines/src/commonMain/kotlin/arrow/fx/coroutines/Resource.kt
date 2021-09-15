@@ -1,7 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.core.Either
-import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException

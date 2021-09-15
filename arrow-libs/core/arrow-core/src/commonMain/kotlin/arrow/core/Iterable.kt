@@ -7,7 +7,6 @@ import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
-import kotlin.collections.foldRight as _foldRight
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
