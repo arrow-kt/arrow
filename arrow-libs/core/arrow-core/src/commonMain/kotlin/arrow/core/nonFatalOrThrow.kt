@@ -21,9 +21,9 @@ package arrow.core
  *   val nonFatal: Either<Throwable, String> =
  *   //sampleStart
  *   try {
- *      Right(unsafeFunction(1))
+ *      Either.Right(unsafeFunction(1))
  *   } catch (t: Throwable) {
- *       Left(t.nonFatalOrThrow())
+ *       Either.Left(t.nonFatalOrThrow())
  *   }
  *   //sampleEnd
  *   println(nonFatal)

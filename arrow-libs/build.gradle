@@ -22,7 +22,7 @@ plugins {
 apply from: "gradle/$ROOT_PROJECT"
 
 task generateDoc(type: Exec) {
-  commandLine "sh", "gradlew", "dokkaJekyll"
+  commandLine "sh", "gradlew", "dokkaGfm"
 }
 
 task runValidation(type: Exec) {
@@ -38,3 +38,7 @@ task buildDoc {
 }
 
 runValidation.mustRunAfter generateDoc
+
+apiValidation {
+    ignoredProjects += ["jekyll"]
+}

@@ -8,6 +8,8 @@ const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 const siteNav = document.getElementById('site-nav');
 const navBrandWhite = document.getElementById('nav-brand-white');
 const navBrandDark = document.getElementById('nav-brand-dark');
+const footerBrandWhite = document.getElementById('footer-47-white');
+const footerBrandDark = document.getElementById('footer-47-dark');
 const navLinks = siteNav.querySelectorAll('a');
 const arrayNavLinks = Array.from(navLinks);
 const navMenuLinks = document.querySelectorAll('.nav-menu-item a');
@@ -144,6 +146,8 @@ function commonHoverStyle(id) {
   animateCodeCSS(arrayHomeCodeBlock, 'fadeInDown', id);
   navBrandDark.style.opacity = 0;
   navBrandWhite.style.opacity = 1;
+  footerBrandDark.style.opacity = 0;
+  footerBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
   siteNav.classList.remove('core', 'fx', 'meta', 'optics');
   arrayCategoryIconDark.map(obj => obj.style.opacity = 0);
@@ -215,6 +219,8 @@ function resetHovers() {
     body.style.background = "#F5F7F8 url('img/home/lines-header-bg.svg') repeat-x";
     navBrandWhite.style.opacity = 0;
     navBrandDark.style.opacity = 1;
+    footerBrandWhite.style.opacity = 0;
+    footerBrandDark.style.opacity = 1;
     headerText.style.opacity = 1;
     arrayCategoryIconDark.map(el => el.style.opacity = 1);
     arrayCategoryIconWhite.map(el => el.style.opacity = 0);

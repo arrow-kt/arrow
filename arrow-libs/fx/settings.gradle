@@ -19,3 +19,6 @@ project(":arrow-core-test").projectDir = file("../core/arrow-core-test")
 project(":arrow-annotations").projectDir = file("../core/arrow-annotations")
 project(":arrow-continuations").projectDir = file("../core/arrow-continuations")
 project(":arrow-core-retrofit").projectDir = file("../core/arrow-core-retrofit")
+
+include 'jekyll'
+project(":jekyll").projectDir = file("dokka/jekyll")

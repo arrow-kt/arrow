@@ -24,3 +24,6 @@ include 'arrow-fx-coroutines-test'
 
 project(":arrow-fx-coroutines").projectDir = file("../fx/arrow-fx-coroutines")
 project(":arrow-fx-coroutines-test").projectDir = file("../fx/arrow-fx-coroutines-test")
+
+include 'jekyll'
+project(":jekyll").projectDir = file("dokka/jekyll")

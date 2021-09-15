@@ -109,6 +109,8 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * concurrently runs, "prefetching", the next element. i.e.
  *
  *  ```kotlin:ank:playground
+ *  import arrow.fx.coroutines.*
+ *
  *  suspend fun main(): Unit {
  *  //sampleStart
  *  val source = flowOf(1, 2, 3, 4)

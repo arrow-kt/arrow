@@ -87,7 +87,7 @@ import kotlin.time.ExperimentalTime
  * import kotlinx.coroutines.delay
  *
  * @ExperimentalTime
- * public suspend fun main(): Unit {
+ * suspend fun main(): Unit {
  *   suspend fun apiCall(): Unit {
  *     println("apiCall . . .")
  *     throw RuntimeException("Overloaded service")

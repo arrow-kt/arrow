@@ -71,6 +71,7 @@ import kotlin.jvm.JvmStatic
  *  println(left)
  * }
  * ```
+ *
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
  *
  * Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
@@ -1196,25 +1197,21 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *
  * Example:
  *
- * {: data-executable='true'}
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.core.*
- * import arrow.core.Either.Right
  *
- * Right(12).filterOrOther({ it > 10 }, { -1 })
- * ```
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   Either.Right(7).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
+ *     .let(::println) // Either.Left(Value '7' is not equal to 10")
  *
- * {: data-executable='true'}
- * ```kotlin:ank
- * Right(7).filterOrOther({ it > 10 }, { "Value '$it' not greater than 10" })
- * ```
+ *   Either.Right(10).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
+ *     .let(::println) // Either.Right(10)
  *
- * {: data-executable='true'}
- * ```kotlin:ank
- * import arrow.core.Either.Left
- *
- * val left: Either<Int, Int> = Left(12)
- * left.filterOrOther({ it > 10 }, { -1 })
+ *   Either.Left(12).filterOrOther({ str: String -> str.contains("impossible") }, { -1 })
+ *     .let(::println) // Either.Left(12)
+ *   //sampleEnd
+ * }
  * ```
  */
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =

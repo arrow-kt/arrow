@@ -54,3 +54,7 @@ task buildSite {
 }
 
 generateSite.mustRunAfter generateAndValidateDoc
+
+clean.doFirst {
+    delete "${projectDir}/docs/apidocs"
+}

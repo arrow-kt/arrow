@@ -64,9 +64,16 @@
 
 }
 
+
 html {
     box-sizing: border-box;
     font-size: $base-font-size;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 *,

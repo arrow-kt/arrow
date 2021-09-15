@@ -2,23 +2,7 @@ options:
   - title: Quick Start
     url: /core/
 
-  - title: Tutorials
-
-    nested_options:
-
-      - title: Error Handling
-        url: /patterns/error_handling/
-
-      - title: The Monad Tutorial
-        url: /patterns/monads/
-
-      - title: Monad Comprehensions
-        url: /patterns/monad_comprehensions/
-
-      - title: Coroutines & Computation blocks
-        url: /fx/coroutines/
-
-  - title: Types
+  - title: Extensions and data types
 
     nested_options:
 
@@ -28,23 +12,11 @@ options:
       - title: Validated
         url: /apidocs/arrow-core/arrow.core/-validated/
 
-      - title: Iterable
-        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-iterable/
-
       - title: Option
         url: /apidocs/arrow-core/arrow.core/-option/
 
-      - title: List
-        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-list/
-
       - title: NonEmptyList
-        url: /arrow/core/nonemptylist/
-
-      - title: Sequence
-        url: /apidocs/arrow-core/arrow.core/kotlin.sequences.-sequence/
-
-      - title: Map
-        url: /apidocs/arrow-core/arrow.core/kotlin.collections.-map/
+        url: /apidocs/arrow-core/arrow.core/-non-empty-list/
 
       - title: Ior
         url: /apidocs/arrow-core/arrow.core/-ior/
@@ -61,11 +33,30 @@ options:
       - title: Semiring
         url: /apidocs/arrow-core/arrow.typeclasses/-semiring/
 
+      - title: Extensions
+        url: /apidocs/arrow-core/arrow.core/index.html#functions
+
+  - title: Tutorials
+
+    nested_options:
+
+      - title: Error Handling
+        url: /patterns/error_handling/
+
+      - title: The Monad Tutorial
+        url: /patterns/monads/
+
+      - title: Monad Comprehensions
+        url: /patterns/monad_comprehensions/
+
+      - title: Coroutines & Computation blocks
+        url: /fx/coroutines/
+
   - title: Media
     url: https://media.arrow-kt.io/tags/core/
 
-  - title: Docs
-    url: /apidocs/arrow-core/
+  - title: Api Docs
+    url: /apidocs/arrow-core/arrow.core
 
   - title: License
     url: https://github.com/arrow-kt/arrow/blob/main/LICENSE
