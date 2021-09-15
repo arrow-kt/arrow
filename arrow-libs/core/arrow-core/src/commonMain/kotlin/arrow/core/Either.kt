@@ -769,23 +769,12 @@ public sealed class Either<out A, out B> {
       is Left -> initial
     }
 
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    when (this) {
-      is Right -> Eval.defer { rightOperation(value, initial) }
-      is Left -> initial
-    }
-
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
-
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fold({ f(it, c) }, { g(it, c) })
 
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C = MN.run {
     bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
@@ -1003,19 +992,6 @@ public sealed class Either<out A, out B> {
 
     @JvmStatic
     public fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
-
-    @Deprecated(TailRecMDeprecation)
-    public tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Either<L, Either<A, B>>): Either<L, B> {
-      return when (val ev = f(a)) {
-        is Left -> Left(ev.value)
-        is Right -> {
-          when (val b = ev.value) {
-            is Left -> tailRecM(b.value, f)
-            is Right -> Right(b.value)
-          }
-        }
-      }
-    }
 
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions

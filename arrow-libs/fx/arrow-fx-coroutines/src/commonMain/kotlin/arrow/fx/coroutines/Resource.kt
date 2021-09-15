@@ -169,10 +169,6 @@ public sealed class Resource<out A> {
   public suspend infix fun <B> use(f: suspend (A) -> B): B =
     useLoop(this as Resource<Any?>, f as suspend (Any?) -> Any?, emptyList()) as B
 
-  @Deprecated("Here for binary compat reasons", level = DeprecationLevel.HIDDEN)
-  public fun <B> map(f: (A) -> B): Resource<B> =
-    flatMap { a -> Resource({ f(a) }) { _, _ -> } }
-
   public fun <B> map(f: suspend (A) -> B): Resource<B> =
     flatMap { a -> Resource({ f(a) }) { _, _ -> } }
 
@@ -525,17 +521,6 @@ public sealed class Resource<out A> {
     ): Resource<A> = Allocate(acquire, release)
 
     /**
-     * Construct a [Resource] from a allocating function [acquire] and a release function [release].
-     *
-     * @see [use] For a version that provides an [ExitCase] to [release]
-     */
-    @Deprecated("Conflicts with other invoke constructor", ReplaceWith("Resource(acquire) { a, _ -> release(a) }"))
-    public operator fun <A> invoke(
-      acquire: suspend () -> A,
-      release: suspend (A) -> Unit
-    ): Resource<A> = invoke(acquire, { r, _ -> release(r) })
-
-    /**
      * Create a [Resource] from a pure value [A].
      */
     public fun <A> just(r: A): Resource<A> =
@@ -543,29 +528,6 @@ public sealed class Resource<out A> {
 
     public fun <A> defer(f: suspend () -> Resource<A>): Resource<A> =
       Resource.Defer(f)
-
-    @Suppress("UNCHECKED_CAST")
-    public fun <A, B> tailRecM(a: A, f: (A) -> Resource<Either<A, B>>): Resource<B> {
-      fun loop(r: Resource<Either<A, B>>): Resource<B> = when (r) {
-        is Bind<*, *> -> Bind(
-          r.source as Resource<A>,
-          (r.f as (A) -> Resource<Either<A, B>>).andThen(::loop)
-        )
-        is Allocate -> Defer {
-          val res = r.acquire.invoke()
-          when (res) {
-            is Either.Left -> {
-              r.release(res, ExitCase.Completed)
-              tailRecM(res.value, f)
-            }
-            is Either.Right -> Allocate({ res.value }, { _, ec -> r.release(res, ec) })
-          }
-        }
-        is Defer -> Defer { loop(r.resource.invoke()) }
-      }
-
-      return loop(f(a))
-    }
   }
 
   private suspend fun continueLoop(

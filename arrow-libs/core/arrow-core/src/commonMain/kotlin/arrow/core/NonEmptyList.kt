@@ -180,10 +180,6 @@ public class NonEmptyList<out A>(
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     this.tail.fold(f(b, this.head), f)
 
-  @Deprecated(FoldRightDeprecation)
-  public fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    all.foldRight(lb, f)
-
   public fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()
     tailrec fun consume(list: List<A>): List<B> =
@@ -259,13 +255,6 @@ public class NonEmptyList<out A>(
         }
         is Either.Left -> go(buf, f, f(head.value) + v.tail)
       }
-    }
-
-    @Deprecated(TailRecMDeprecation)
-    public fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyList<Either<A, B>>): NonEmptyList<B> {
-      val buf = ArrayList<B>()
-      go(buf, f, f(a))
-      return fromListUnsafe(buf)
     }
   }
 

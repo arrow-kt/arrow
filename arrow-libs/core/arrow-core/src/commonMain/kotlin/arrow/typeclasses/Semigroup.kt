@@ -43,11 +43,6 @@ public interface Semigroup<A> {
     public fun byte(): Semigroup<Byte> = Monoid.byte()
 
     @JvmStatic
-    @JvmName("Double")
-    @Deprecated(DoubleInstanceDeprecation)
-    public fun double(): Semigroup<Double> = Monoid.double()
-
-    @JvmStatic
     @JvmName("Integer")
     public fun int(): Semigroup<Int> = Monoid.int()
 
@@ -58,11 +53,6 @@ public interface Semigroup<A> {
     @JvmStatic
     @JvmName("Short")
     public fun short(): Semigroup<Short> = Monoid.short()
-
-    @JvmStatic
-    @JvmName("Float")
-    @Deprecated(FloatInstanceDeprecation)
-    public fun float(): Semigroup<Float> = Monoid.float()
 
     @JvmStatic
     public fun <A, B> either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =

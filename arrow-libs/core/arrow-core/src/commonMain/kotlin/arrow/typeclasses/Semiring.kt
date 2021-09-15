@@ -128,11 +128,6 @@ public interface Semiring<A> {
 
   public companion object {
     @JvmStatic
-    @JvmName("Float")
-    @Deprecated(FloatInstanceDeprecation)
-    public fun float(): Semiring<Float> = FloatSemiring
-
-    @JvmStatic
     @JvmName("Short")
     public fun short(): Semiring<Short> = ShortSemiring
 
@@ -143,11 +138,6 @@ public interface Semiring<A> {
     @JvmStatic
     @JvmName("Integer")
     public fun int(): Semiring<Int> = IntSemiring
-
-    @JvmStatic
-    @JvmName("Double")
-    @Deprecated(DoubleInstanceDeprecation)
-    public fun double(): Semiring<Double> = DoubleSemiring
 
     @JvmStatic
     @JvmName("Byte")

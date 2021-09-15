@@ -573,14 +573,6 @@ public sealed class Validated<out E, out A> {
   ): B =
     fold({ fe(c, it) }, { fa(c, it) })
 
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <B> bifoldRight(
-    c: Eval<B>,
-    fe: (E, Eval<B>) -> Eval<B>,
-    fa: (A, Eval<B>) -> Eval<B>
-  ): Eval<B> =
-    fold({ fe(it, c) }, { fa(it, c) })
-
   public inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B): B = MN.run {
     bifoldLeft(MN.empty(), { c, b -> c.combine(g(b)) }) { c, a -> c.combine(f(a)) }
   }
@@ -751,13 +743,6 @@ public sealed class Validated<out E, out A> {
    */
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     fold({ b }, { f(b, it) })
-
-  @Deprecated(FoldRightDeprecation)
-  public fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    when (this) {
-      is Valid -> Eval.defer { f(this.value, lb) }
-      is Invalid -> lb
-    }
 
   public fun swap(): Validated<A, E> =
     fold(::Valid, ::Invalid)
