@@ -275,8 +275,8 @@ jobs:
 
   publish_doc:
     env:
-      JAVA_OPTS: -Xms1g -Xmx3g
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+      JAVA_OPTS: -Xms2g -Xmx4g
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -XX:MaxPermSize=4096m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
@@ -317,7 +317,7 @@ jobs:
 
       - name: "Create API doc"
         working-directory: arrow-libs
-        run: ./gradlew dokkaGfm
+        run: ./gradlew  --no-parallel dokkaGfm
 
       - name: "Validate documentation"
         working-directory: arrow-site
