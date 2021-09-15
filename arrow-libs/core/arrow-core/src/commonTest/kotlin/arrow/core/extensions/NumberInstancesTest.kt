@@ -10,10 +10,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.numericDoubles
-import io.kotest.property.arbitrary.numericFloats
 import io.kotest.property.arbitrary.short
-import io.kotest.property.checkAll
 
 class NumberInstancesTest : UnitSpec() {
 
