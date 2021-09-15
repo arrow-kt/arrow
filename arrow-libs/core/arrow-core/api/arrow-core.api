@@ -4,17 +4,9 @@ public final class arrow/core/ArrowCoreInternalException : java/lang/RuntimeExce
 }
 
 public final class arrow/core/ComparisonKt {
-	public static final field DoubleInstanceDeprecation Ljava/lang/String;
-	public static final field FloatInstanceDeprecation Ljava/lang/String;
 	public static final fun sort (BB)Lkotlin/Pair;
 	public static final fun sort (BBB)Lkotlin/Triple;
 	public static final fun sort (B[B)Ljava/util/List;
-	public static final fun sort (DD)Lkotlin/Pair;
-	public static final fun sort (DDD)Lkotlin/Triple;
-	public static final fun sort (D[D)Ljava/util/List;
-	public static final fun sort (FF)Lkotlin/Pair;
-	public static final fun sort (FFF)Lkotlin/Triple;
-	public static final fun sort (F[F)Ljava/util/List;
 	public static final fun sort (II)Lkotlin/Pair;
 	public static final fun sort (III)Lkotlin/Triple;
 	public static final fun sort (I[I)Ljava/util/List;
@@ -62,7 +54,6 @@ public final class arrow/core/Const {
 }
 
 public final class arrow/core/Const$Companion {
-	public final fun just (Ljava/lang/Object;)Larrow/core/Const;
 }
 
 public final class arrow/core/ConstKt {
@@ -163,7 +154,6 @@ public abstract class arrow/core/Either {
 	public final fun all (Lkotlin/jvm/functions/Function1;)Z
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun bifoldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
@@ -174,7 +164,6 @@ public abstract class arrow/core/Either {
 	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun foldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Either;
 	public final fun isEmpty ()Z
 	public final fun isLeft ()Z
@@ -209,7 +198,6 @@ public final class arrow/core/Either$Companion {
 	public final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun resolve (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun tryCatchAndFlatten (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
@@ -420,7 +408,6 @@ public abstract class arrow/core/Ior {
 	public final fun bicrosswalkNull (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun bifoldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun bitraverseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -435,7 +422,6 @@ public abstract class arrow/core/Ior {
 	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun foldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun fromNullables (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
 	public abstract fun isBoth ()Z
 	public final fun isEmpty ()Z
@@ -572,8 +558,6 @@ public final class arrow/core/IterableKt {
 	public static final fun flattenOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun foldMap (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun foldRight (Ljava/lang/Iterable;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun foldRight (Ljava/util/List;Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun ifThen (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Iterable;
 	public static final fun interleave (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun lastOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
@@ -584,7 +568,6 @@ public final class arrow/core/IterableKt {
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun prependTo (Ljava/lang/Object;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun reduceOrNull (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun reduceRightEvalOrNull (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun reduceRightNull (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun replicate (Ljava/lang/Iterable;I)Ljava/util/List;
 	public static final fun replicate (Ljava/lang/Iterable;ILarrow/typeclasses/Monoid;)Ljava/util/List;
@@ -636,7 +619,6 @@ public final class arrow/core/MapKt {
 	public static final fun filterOption (Ljava/util/Map;)Ljava/util/Map;
 	public static final fun flatMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun foldLeft (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun foldRight (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun getOrNone (Ljava/util/Map;Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
@@ -684,7 +666,6 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 	public final fun extract ()Ljava/lang/Object;
 	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptyList;
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public final fun foldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun fromList (Ljava/util/List;)Larrow/core/Option;
 	public static final fun fromListUnsafe (Ljava/util/List;)Larrow/core/NonEmptyList;
 	public fun get (I)Ljava/lang/Object;
@@ -717,7 +698,6 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 public final class arrow/core/NonEmptyList$Companion {
 	public final fun fromList (Ljava/util/List;)Larrow/core/Option;
 	public final fun fromListUnsafe (Ljava/util/List;)Larrow/core/NonEmptyList;
-	public final fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptyList;
 }
 
 public final class arrow/core/NonEmptyListKt {
@@ -769,7 +749,6 @@ public abstract class arrow/core/Option {
 	public final fun align (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun all (Lkotlin/jvm/functions/Function1;)Z
 	public final fun and (Larrow/core/Option;)Larrow/core/Option;
-	public final fun ap (Larrow/core/Option;)Larrow/core/Option;
 	public final fun crosswalk (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun crosswalkMap (Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public final fun crosswalkNull (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
@@ -781,7 +760,6 @@ public abstract class arrow/core/Option {
 	public final fun fold (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun foldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun invoke (Ljava/lang/Object;)Larrow/core/Option;
 	public final fun isDefined ()Z
@@ -809,7 +787,6 @@ public abstract class arrow/core/Option {
 	public final fun traverseValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public static final fun tryCatchOrNone (Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
-	public static final fun tryCatchOrSideEffect (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public final fun void ()Larrow/core/Option;
 	public final fun zip (Larrow/core/Option;)Larrow/core/Option;
 	public final fun zip (Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Larrow/core/Option;Lkotlin/jvm/functions/Function10;)Larrow/core/Option;
@@ -829,7 +806,6 @@ public final class arrow/core/Option$Companion {
 	public final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public final fun tryCatchOrNone (Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
-	public final fun tryCatchOrSideEffect (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 }
 
 public final class arrow/core/OptionKt {
@@ -1379,8 +1355,6 @@ public final class arrow/core/Partials {
 }
 
 public final class arrow/core/PredefKt {
-	public static final field FoldRightDeprecation Ljava/lang/String;
-	public static final field TailRecMDeprecation Ljava/lang/String;
 	public static final fun emptyCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static final fun identity (Ljava/lang/Object;)Ljava/lang/Object;
 }
@@ -1412,7 +1386,6 @@ public final class arrow/core/SequenceKt {
 	public static final fun flatten (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun fold (Lkotlin/sequences/Sequence;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun foldMap (Lkotlin/sequences/Sequence;Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun foldRight (Lkotlin/sequences/Sequence;Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun ifThen (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
 	public static final fun interleave (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun leftPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
@@ -1421,7 +1394,6 @@ public final class arrow/core/SequenceKt {
 	public static final fun once (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun padZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun padZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
-	public static final fun reduceRightEvalOrNull (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun replicate (Lkotlin/sequences/Sequence;I)Lkotlin/sequences/Sequence;
 	public static final fun replicate (Lkotlin/sequences/Sequence;ILarrow/typeclasses/Monoid;)Lkotlin/sequences/Sequence;
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
@@ -1475,7 +1447,6 @@ public final class arrow/core/Some$Companion {
 
 public final class arrow/core/SortedMapKKt {
 	public static final fun foldLeft (Ljava/util/SortedMap;Ljava/util/SortedMap;Lkotlin/jvm/functions/Function2;)Ljava/util/SortedMap;
-	public static final fun foldRight (Ljava/util/SortedMap;Ljava/util/SortedMap;Lkotlin/jvm/functions/Function2;)Ljava/util/SortedMap;
 }
 
 public final class arrow/core/StringKt {
@@ -2268,7 +2239,6 @@ public abstract class arrow/core/Validated {
 	public final fun all (Lkotlin/jvm/functions/Function1;)Z
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun bifoldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun bitraverseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -2279,7 +2249,6 @@ public abstract class arrow/core/Validated {
 	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun foldRight (Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun fromEither (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun fromNullable (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
 	public static final fun fromOption (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
@@ -2445,13 +2414,11 @@ public final class arrow/core/computations/NullableKt {
 
 public abstract interface class arrow/core/computations/OptionEffect : arrow/continuations/Effect {
 	public abstract fun bind (Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/OptionEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/OptionEffect;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/computations/OptionEffect;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/OptionEffect;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2490,7 +2457,6 @@ public abstract interface class arrow/core/computations/RestrictedOptionEffect :
 
 public final class arrow/core/computations/RestrictedOptionEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/RestrictedOptionEffect;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/computations/RestrictedOptionEffect;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/RestrictedOptionEffect;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2534,8 +2500,6 @@ public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Sem
 	public static final field Companion Larrow/typeclasses/Monoid$Companion;
 	public static fun Boolean ()Larrow/typeclasses/Monoid;
 	public static fun Byte ()Larrow/typeclasses/Monoid;
-	public static fun Double ()Larrow/typeclasses/Monoid;
-	public static fun Float ()Larrow/typeclasses/Monoid;
 	public static fun Integer ()Larrow/typeclasses/Monoid;
 	public static fun Long ()Larrow/typeclasses/Monoid;
 	public static fun Short ()Larrow/typeclasses/Monoid;
@@ -2557,8 +2521,6 @@ public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Sem
 public final class arrow/typeclasses/Monoid$Companion {
 	public final fun Boolean ()Larrow/typeclasses/Monoid;
 	public final fun Byte ()Larrow/typeclasses/Monoid;
-	public final fun Double ()Larrow/typeclasses/Monoid;
-	public final fun Float ()Larrow/typeclasses/Monoid;
 	public final fun Integer ()Larrow/typeclasses/Monoid;
 	public final fun Long ()Larrow/typeclasses/Monoid;
 	public final fun Short ()Larrow/typeclasses/Monoid;
@@ -2585,8 +2547,6 @@ public abstract interface class arrow/typeclasses/Semigroup {
 	public static final field Companion Larrow/typeclasses/Semigroup$Companion;
 	public static fun Boolean ()Larrow/typeclasses/Semigroup;
 	public static fun Byte ()Larrow/typeclasses/Semigroup;
-	public static fun Double ()Larrow/typeclasses/Semigroup;
-	public static fun Float ()Larrow/typeclasses/Semigroup;
 	public static fun Integer ()Larrow/typeclasses/Semigroup;
 	public static fun Long ()Larrow/typeclasses/Semigroup;
 	public static fun Short ()Larrow/typeclasses/Semigroup;
@@ -2610,8 +2570,6 @@ public abstract interface class arrow/typeclasses/Semigroup {
 public final class arrow/typeclasses/Semigroup$Companion {
 	public final fun Boolean ()Larrow/typeclasses/Semigroup;
 	public final fun Byte ()Larrow/typeclasses/Semigroup;
-	public final fun Double ()Larrow/typeclasses/Semigroup;
-	public final fun Float ()Larrow/typeclasses/Semigroup;
 	public final fun Integer ()Larrow/typeclasses/Semigroup;
 	public final fun Long ()Larrow/typeclasses/Semigroup;
 	public final fun Short ()Larrow/typeclasses/Semigroup;
@@ -2647,8 +2605,6 @@ public final class arrow/typeclasses/Semigroup$DefaultImpls {
 public abstract interface class arrow/typeclasses/Semiring {
 	public static final field Companion Larrow/typeclasses/Semiring$Companion;
 	public static fun Byte ()Larrow/typeclasses/Semiring;
-	public static fun Double ()Larrow/typeclasses/Semiring;
-	public static fun Float ()Larrow/typeclasses/Semiring;
 	public static fun Integer ()Larrow/typeclasses/Semiring;
 	public static fun Long ()Larrow/typeclasses/Semiring;
 	public static fun Short ()Larrow/typeclasses/Semiring;
@@ -2664,8 +2620,6 @@ public abstract interface class arrow/typeclasses/Semiring {
 
 public final class arrow/typeclasses/Semiring$Companion {
 	public final fun Byte ()Larrow/typeclasses/Semiring;
-	public final fun Double ()Larrow/typeclasses/Semiring;
-	public final fun Float ()Larrow/typeclasses/Semiring;
 	public final fun Integer ()Larrow/typeclasses/Semiring;
 	public final fun Long ()Larrow/typeclasses/Semiring;
 	public final fun Short ()Larrow/typeclasses/Semiring;

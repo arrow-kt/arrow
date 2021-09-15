@@ -8,15 +8,7 @@ public data class Const<A, out T>(private val value: A) {
   public fun <U> retag(): Const<A, U> =
     this as Const<A, U>
 
-  public companion object {
-
-    @Deprecated(
-      "This constructor is duplicated with Const. Use Const instead.",
-      ReplaceWith("Const(a)", "arrow.core.Const")
-    )
-    public fun <A, T> just(a: A): Const<A, T> =
-      Const(a)
-  }
+  public companion object {}
 
   public fun value(): A =
     value

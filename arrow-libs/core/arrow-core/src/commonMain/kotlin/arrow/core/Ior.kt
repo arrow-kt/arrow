@@ -148,20 +148,12 @@ public sealed class Ior<out A, out B> {
   public inline fun <C> foldLeft(c: C, f: (C, B) -> C): C =
     fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
 
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <C> foldRight(lc: Eval<C>, crossinline f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fold({ lc }, { Eval.defer { f(it, lc) } }, { _, b -> Eval.defer { f(b, lc) } })
-
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
-
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
 
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C = MN.run {
     bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })

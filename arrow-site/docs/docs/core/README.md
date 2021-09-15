@@ -111,7 +111,7 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-core:0.13.2")
+    implementation("io.arrow-kt:arrow-core:1.0.0")
 }
 ```
 
@@ -121,7 +121,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:0.13.2"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.0.0"))
 
     implementation("io.arrow-kt:arrow-core")
     ...
@@ -130,7 +130,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
 
 ```
 allprojects {
@@ -165,7 +165,7 @@ Add the dependencies into the project's `build.gradle`:
 ##### Arrow Core
 
 ```groovy
-def arrow_version = "0.13.2"
+def arrow_version = "1.0.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
@@ -176,7 +176,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "0.13.2"
+def arrow_version = "1.0.0"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -187,7 +187,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
 
 ```groovy
 allprojects {
@@ -213,7 +213,7 @@ Add to your pom.xml file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>0.13.2</arrow.version>
+    <arrow.version>1.0.0</arrow.version>
 </properties>
 ```
 
@@ -250,7 +250,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
 
 ```xml
 <repository>

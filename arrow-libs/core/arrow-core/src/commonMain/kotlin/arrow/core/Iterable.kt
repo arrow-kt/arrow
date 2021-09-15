@@ -7,7 +7,6 @@ import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
-import kotlin.collections.foldRight as _foldRight
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -283,16 +282,6 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated(
-  "Iterable.foldRight is being deprecated because its functionality differs from other foldRight definitions within arrow. Use the stdlib foldRight instead",
-  replaceWith = ReplaceWith("foldRight(initial) { acc, b -> operation(b, acc) }")
-)
-public inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
-  when (this) {
-    is List -> _foldRight(initial, operation)
-    else -> reversed().fold(initial) { acc, a -> operation(a, acc) }
-  }
-
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
@@ -364,36 +353,12 @@ public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
 
-@Deprecated(FoldRightDeprecation)
-public fun <A, B> List<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-  fun loop(fa_p: List<A>): Eval<B> = when {
-    fa_p.isEmpty() -> lb
-    else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1)) })
-  }
-
-  return Eval.defer { loop(this) }
-}
-
 public fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
   val iterator = this.iterator()
   if (!iterator.hasNext()) return null
   var accumulator: B = initial(iterator.next())
   while (iterator.hasNext()) {
     accumulator = operation(accumulator, iterator.next())
-  }
-  return accumulator
-}
-
-@Deprecated(FoldRightDeprecation)
-public inline fun <A, B> List<A>.reduceRightEvalOrNull(
-  initial: (A) -> B,
-  operation: (A, acc: Eval<B>) -> Eval<B>
-): Eval<B?> {
-  val iterator = listIterator(size)
-  if (!iterator.hasPrevious()) return Eval.now(null)
-  var accumulator: Eval<B> = Eval.now(initial(iterator.previous()))
-  while (iterator.hasPrevious()) {
-    accumulator = operation(iterator.previous(), accumulator)
   }
   return accumulator
 }

@@ -59,10 +59,6 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
 public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
   Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
 
-@Deprecated("Typo in the function name, use fromCloseable instead.", ReplaceWith("Resource.fromCloseable(f)"))
-public fun <A : Closeable> Resource.Companion.fromClosable(f: suspend () -> A): Resource<A> =
-  fromCloseable(f)
-
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *

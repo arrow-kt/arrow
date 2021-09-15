@@ -338,20 +338,6 @@ public sealed class Option<out A> {
     public operator fun <A> invoke(a: A): Option<A> = Some(a)
 
     @JvmStatic
-    @JvmName("tryCatchOrSideEffect")
-    @Deprecated(
-      "Side-effecting recover which loses Throwable is no longer supported",
-      ReplaceWith("Option.catch({ recover(it); None }, f)")
-    )
-    public inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
-      try {
-        Some(f())
-      } catch (t: Throwable) {
-        recover(t.nonFatalOrThrow())
-        None
-      }
-
-    @JvmStatic
     @JvmName("tryCatchOrNone")
     /**
      * Ignores exceptions and returns None if one is thrown
@@ -660,16 +646,6 @@ public sealed class Option<out A> {
   public inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
-  @Deprecated(
-    "ap is deprecated alongside the Apply typeclass, since it's a low-level operator specific for generically deriving Apply combinators.",
-    ReplaceWith(
-      "ff.fix().flatMap { this.fix().map(it) }",
-      "arrow.core.fix"
-    )
-  )
-  public fun <B> ap(ff: Option<(A) -> B>): Option<B> =
-    ff.flatMap { this.map(it) }
-
   public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
       is None -> this
@@ -751,13 +727,6 @@ public sealed class Option<out A> {
   public inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
     when (this) {
       is Some -> operation(initial, value)
-      is None -> initial
-    }
-
-  @Deprecated(FoldRightDeprecation)
-  public inline fun <B> foldRight(initial: Eval<B>, crossinline operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    when (this) {
-      is Some -> Eval.defer { operation(value, initial) }
       is None -> initial
     }
 

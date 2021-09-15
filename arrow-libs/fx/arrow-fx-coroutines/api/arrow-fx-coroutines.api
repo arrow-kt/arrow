@@ -344,7 +344,6 @@ public abstract class arrow/fx/coroutines/Resource {
 	public static final field Companion Larrow/fx/coroutines/Resource$Companion;
 	public final fun ap (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
 	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public final synthetic fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public final fun map (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun parZip (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun parZip (Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
@@ -377,10 +376,8 @@ public final class arrow/fx/coroutines/Resource$Bind : arrow/fx/coroutines/Resou
 
 public final class arrow/fx/coroutines/Resource$Companion {
 	public final fun defer (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun just (Ljava/lang/Object;)Larrow/fx/coroutines/Resource;
-	public final fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 }
 
 public final class arrow/fx/coroutines/Resource$Defer : arrow/fx/coroutines/Resource {
@@ -390,7 +387,6 @@ public final class arrow/fx/coroutines/Resource$Defer : arrow/fx/coroutines/Reso
 
 public final class arrow/fx/coroutines/ResourceExtensionsKt {
 	public static final fun fromAutoCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
-	public static final fun fromClosable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun fromCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun fromExecutor (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun singleThreadContext (Larrow/fx/coroutines/Resource$Companion;Ljava/lang/String;)Larrow/fx/coroutines/Resource;

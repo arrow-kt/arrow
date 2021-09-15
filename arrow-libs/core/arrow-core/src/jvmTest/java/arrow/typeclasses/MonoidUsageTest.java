@@ -14,8 +14,6 @@ public class MonoidUsageTest {
 
     public void testUsage() {
         Monoid<Byte> aByte = Monoid.Byte();
-        Monoid<Double> aDouble = Monoid.Double();
-        Monoid<Float> aFloat = Monoid.Float();
         Monoid<Short> aShort = Monoid.Short();
         Monoid<Boolean> bool = Monoid.Boolean();
         Monoid<Integer> integer = Monoid.Integer();

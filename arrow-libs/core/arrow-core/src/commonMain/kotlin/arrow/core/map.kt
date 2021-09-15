@@ -431,10 +431,6 @@ public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
 
-@Deprecated("Map<K, A>.foldRight is being deprecated because its functionality differs from other definitions of foldRight within arrow.")
-public inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
-  this.entries.reversed().fold(b) { x, y: Map.Entry<K, A> -> f(y, x) }
-
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
   this.forEach { result = f(result, it) }

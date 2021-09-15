@@ -9,10 +9,6 @@ import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
 public fun interface OptionEffect<A> : Effect<Option<A>> {
-  @Deprecated("Conflicts with other bind syntax from outer scopes, use ensureNotNull instead.", ReplaceWith("ensureNotNull(this)"))
-  public suspend fun <B> B?.bind(): B =
-    this ?: control().shift(None)
-
   public suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, ::identity)
 

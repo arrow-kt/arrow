@@ -10,10 +10,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.numericDoubles
-import io.kotest.property.arbitrary.numericFloats
 import io.kotest.property.arbitrary.short
-import io.kotest.property.checkAll
 
 class NumberInstancesTest : UnitSpec() {
 
@@ -38,24 +35,6 @@ class NumberInstancesTest : UnitSpec() {
     "should semigroup with the instance passed - int" {
       checkAll(Arb.int()) { value: Int ->
         val seen = Monoid.int().run { value.combine(value) }
-        val expected = value + value
-
-        expected shouldBe seen
-      }
-    }
-
-    "should semigroup with the instance passed - float" {
-      checkAll(Arb.numericFloats()) { value: Float ->
-        val seen = Monoid.float().run { value.combine(value) }
-        val expected = value + value
-
-        expected shouldBe seen
-      }
-    }
-
-    "should semigroup with the instance passed - double" {
-      checkAll(Arb.numericDoubles()) { value: Double ->
-        val seen = Monoid.double().run { value.combine(value) }
         val expected = value + value
 
         expected shouldBe seen

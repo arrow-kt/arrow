@@ -42,11 +42,6 @@ public interface Monoid<A> : Semigroup<A> {
     public fun byte(): Monoid<Byte> = ByteMonoid
 
     @JvmStatic
-    @JvmName("Double")
-    @Deprecated(DoubleInstanceDeprecation)
-    public fun double(): Monoid<Double> = DoubleMonoid
-
-    @JvmStatic
     @JvmName("Integer")
     public fun int(): Monoid<Int> = IntMonoid
 
@@ -57,11 +52,6 @@ public interface Monoid<A> : Semigroup<A> {
     @JvmStatic
     @JvmName("Short")
     public fun short(): Monoid<Short> = ShortMonoid
-
-    @JvmStatic
-    @JvmName("Float")
-    @Deprecated(FloatInstanceDeprecation)
-    public fun float(): Monoid<Float> = FloatMonoid
 
     @JvmStatic
     public fun <A> list(): Monoid<List<A>> = ListMonoid as Monoid<List<A>>

@@ -347,13 +347,6 @@ public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   }
 }
 
-@Deprecated(FoldRightDeprecation)
-public fun <A, B> Sequence<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-  fun Iterator<A>.loop(): Eval<B> =
-    if (hasNext()) f(next(), Eval.defer { loop() }) else lb
-  return Eval.defer { this.iterator().loop() }
-}
-
 /**
  * Logical conditional. The equivalent of Prolog's soft-cut.
  * If its first argument succeeds at all, then the results will be
@@ -512,13 +505,6 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
  */
 public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
   padZip(other).map { fa(it.first, it.second) }
-
-@Deprecated(FoldRightDeprecation)
-public fun <A, B> Sequence<A>.reduceRightEvalOrNull(
-  initial: (A) -> B,
-  operation: (A, acc: Eval<B>) -> Eval<B>
-): Eval<B?> =
-  toList().reduceRightEvalOrNull(initial, operation)
 
 public fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
   if (n <= 0) emptySequence()
