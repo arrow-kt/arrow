@@ -37,14 +37,14 @@ If you're not familiar yet with Coroutines in Kotlin, it's recommended to first 
 
 ```groovy
 dependencies {
-  implementation "io.arrow-kt:arrow-fx-coroutines:0.13.2"
-  implementation "io.arrow-kt:arrow-fx-stm:0.13.2"
+  implementation "io.arrow-kt:arrow-fx-coroutines:1.0.0"
+  implementation "io.arrow-kt:arrow-fx-stm:1.0.0"
 }
 ```
 
 ### Snapshot version
 
-If you want to try the latest features, replace `0.13.2` with `1.0.0-SNAPSHOT` and add this repository:
+If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this repository:
 
 ```groovy
 allprojects {
@@ -72,7 +72,7 @@ Add the dependencies that you want to use:
 <dependency>
     <groupId>io.arrow-kt</groupId>
     <artifactId>arrow-core</artifactId>
-    <version>0.13.2</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
