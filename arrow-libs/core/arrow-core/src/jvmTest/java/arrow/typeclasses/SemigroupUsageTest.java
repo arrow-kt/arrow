@@ -25,8 +25,6 @@ public class SemigroupUsageTest {
         Semigroup<Pair<Boolean, Integer>> pair = Semigroup.pair(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<Const<Integer, Object>> constant = Semigroup.constant(Semigroup.Integer());
         Semigroup<Byte> aByte = Semigroup.Byte();
-        Semigroup<Double> aDouble = Semigroup.Double();
-        Semigroup<Float> aFloat = Semigroup.Float();
         Semigroup<Short> aShort = Semigroup.Short();
     }
 }

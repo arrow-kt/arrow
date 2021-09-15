@@ -44,24 +44,6 @@ class NumberInstancesTest : UnitSpec() {
       }
     }
 
-    "should semigroup with the instance passed - float" {
-      checkAll(Arb.numericFloats()) { value: Float ->
-        val seen = Monoid.float().run { value.combine(value) }
-        val expected = value + value
-
-        expected shouldBe seen
-      }
-    }
-
-    "should semigroup with the instance passed - double" {
-      checkAll(Arb.numericDoubles()) { value: Double ->
-        val seen = Monoid.double().run { value.combine(value) }
-        val expected = value + value
-
-        expected shouldBe seen
-      }
-    }
-
     "should semigroup with the instance passed - long" {
       checkAll(Arb.long()) { value: Long ->
         val seen = Monoid.long().run { value.combine(value) }
