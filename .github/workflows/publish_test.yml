@@ -18,60 +18,7 @@ env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  publish_linux_jvm_js_and_commons:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            linux-step-gradle-
-
-      - name: Install grep
-        run: sudo apt-get install grep
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: Publish commons
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) Commons deployed!"
-
-      - name: Publish LinuxX64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishLinuxX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) LinuxX64 deployed!"
-
-      - name: Publish Jvm
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishJvmPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JVM deployed!"
-
-      - name: Publish Js
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishJsPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JS deployed!"
-
+  
   publish_macos_and_linux:
     runs-on: macos-latest
     timeout-minutes: 40
