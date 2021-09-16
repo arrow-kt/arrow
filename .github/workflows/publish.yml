@@ -19,9 +19,9 @@ env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  publish_linux_jvm_js_and_commons:
+  publish_all:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v2
@@ -49,202 +49,8 @@ jobs:
       - name: "Show env"
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
-      - name: Publish commons
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishKotlinMultiplatformPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) Commons deployed!"
-
-      - name: Publish LinuxX64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishLinuxX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) LinuxX64 deployed!"
-
-      - name: Publish Jvm
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishJvmPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JVM deployed!"
-
-      - name: Publish Js
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishJsPublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) JS deployed!"
-
-  publish_macos_and_ios:
-    runs-on: macos-latest
-    timeout-minutes: 40
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            mac-step-gradle-
-
-      - name: "Install grep"
-        run: brew install grep
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: Publish macos X64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishMacosX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MacOs X64 deployed!"
-
-      - name: Publish macos Arm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishMacosArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MacOs Arm64 deployed!"
-
-      - name: Publish iosX64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishIosX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios X64 deployed!"
-
-      - name: Publish iosArm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishIosArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios Arm64 deployed!"
-
-      - name: Publish iosArm32
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishIosArm32PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) ios Arm32 deployed!"
-
-      - name: Publish iosSimulatorArm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishIosSimulatorArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) iosSimulatorArm64 deployed!"
-
-  publish_tvos_and_watchos:
-    runs-on: macos-latest
-    timeout-minutes: 40
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: tv-watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            tv-watchos-step-gradle-
-
-      - name: "Install grep"
-        run: brew install grep
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: Publish tvos Arm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishTvosArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosArm64 deployed!"
-
-      - name: Publish tvos X64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishTvosX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosX64 deployed!"
-
-      - name: Publish tvosSimulatorArm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishTvosSimulatorArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) tvosSimulatorArm64 deployed!"
-
-      - name: Publish watchosX64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishWatchosX64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosX64 deployed!"
-
-      - name: Publish watchosX86
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishWatchosX86PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosX86 deployed!"
-
-      - name: Publish watchosArm32
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishWatchosArm32PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosArm32 deployed!"
-
-      - name: Publish watchosSimulatorArm64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishWatchosSimulatorArm64PublicationToMavenRepository
-          echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) watchosSimulatorArm64 deployed!"
-
-  publish_windows:
-    runs-on: windows-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-        shell: bash
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-        shell: bash
-
-      - name: Publish MingwX64
-        working-directory: arrow-libs
-        run: |
-          ./gradlew publishMingwX64PublicationToMavenRepository
-          echo "$(cat gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
+      - name: Publish
+        run: ./gradlew publishAllPublicationsToMavenRepository
 
   publish-arrow-stack:
     runs-on: ubuntu-latest
@@ -270,7 +76,7 @@ jobs:
 
       - name: "Publish"
         run: |
-          ./gradlew publish
+          ./gradlew publishAllPublicationsToMavenRepository
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) deployed!"
 
   publish_doc:
