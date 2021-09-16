@@ -1,12 +1,12 @@
 #!/bin/bash
- 
+
 set -ex
 
 # echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
 # echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
 
 NEW_RELEASE_VERSION_EXISTS=0
-if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+if [ "$GITHUB_REF" == "refs/heads/testing-publish-process" ]; then
     if [[ $OSTYPE == 'darwin'* ]]; then
       LATEST_PUBLISHED_VERSION=$(curl -L https://repo1.maven.org/maven2/io/arrow-kt/arrow-core/maven-metadata.xml | ggrep -oP '<latest>\K[^<]*')
     else
