@@ -23,10 +23,30 @@ task javadocJar(type: Jar) {
 
 afterEvaluate {
     publishing {
+        def variantName = "${project.name}"
         publications.all {
             version = VERSION_NAME
 
             artifact javadocJar
+
+            def type = it.name
+            logger.error("Configuring $type")
+            switch (type) {
+                case 'kotlinMultiplatform':
+                    // With Kotlin 1.4.0, the root module ID has no suffix, but for compatibility with
+                    // the consumers who can't read Gradle module metadata, we publish the JVM artifacts in it
+                    it.artifactId = variantName
+                    apply from: "$rootDir/gradle/publish-mpp-root-module-in-platform.gradle"
+                    publishPlatformArtifactsInRootModule(publications["jvm"])
+                    logger.error("after publishPlatformArtifactsInRootModule")
+                    break
+                case 'metadata':
+                case 'jvm':
+                case 'js':
+                    it.artifactId = "$variantName-$type"
+                    break
+            }
+            logger.error("Artifact id = ${it.artifactId}")
 
             pom {
                 name = POM_NAME
