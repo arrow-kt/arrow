@@ -1,16 +1,9 @@
 package arrow.fx.coroutines
 
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.getAndUpdate
-import kotlinx.atomicfu.updateAndGet
+import arrow.continuations.generic.AtomicRef
 
 /**
- * An [Atomic] with a initial value of [A],
- * this is a wrapper around [`Atomic Fu`](https://github.com/Kotlin/kotlinx.atomicfu).
- *
- * Atomic FU is a compiler plugin that allows us to write `atomic` properties inside a class,
- * and uses the most performant implementation for every platform.
+ * An [Atomic] with an initial value of [A].
  *
  * [Atomic] wraps `atomic`, so that you can also use it on a top-level function or pass it around.
  * In other languages this data type is also now as `Ref`, `IORef` or Concurrent safe Reference.
@@ -207,32 +200,42 @@ public interface Atomic<A> {
 
 private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
 
-  private val ar: AtomicRef<A> = atomic(a)
+  private val ar = AtomicRef(a)
 
   public override suspend fun get(): A =
-    ar.value
+    ar.get()
 
   public override suspend fun set(a: A): Unit {
-    ar.value = a
+    ar.set(a)
   }
 
   public override suspend fun getAndSet(a: A): A =
     ar.getAndSet(a)
 
   public override suspend fun setAndGet(a: A): A {
-    ar.value = a
+    ar.set(a)
     return a
   }
 
-  public override suspend fun getAndUpdate(f: (A) -> A): A =
-    ar.getAndUpdate(f)
+  public override suspend fun getAndUpdate(f: (A) -> A): A {
+    while (true) {
+      val cur = get()
+      val upd = f(cur)
+      if (ar.compareAndSet(cur, upd)) return cur
+    }
+  }
 
-  public override suspend fun updateAndGet(f: (A) -> A): A =
-    ar.updateAndGet(f)
+  public override suspend fun updateAndGet(f: (A) -> A): A {
+    while (true) {
+      val cur = ar.get()
+      val upd = f(cur)
+      if (ar.compareAndSet(cur, upd)) return upd
+    }
+  }
 
   public override suspend fun access(): Pair<A, suspend (A) -> Boolean> {
-    val snapshot = ar.value
-    val hasBeenCalled = AtomicBooleanW(false)
+    val snapshot = ar.get()
+    val hasBeenCalled = AtomicRef(false)
     val setter: suspend (A) -> Boolean = { a: A ->
       hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a)
     }
@@ -244,7 +247,7 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
     tryModify { a -> Pair(f(a), Unit) } != null
 
   public override suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B? {
-    val a = ar.value
+    val a = ar.get()
     val (u, b) = f(a)
     return if (ar.compareAndSet(a, u)) b
     else null
@@ -255,7 +258,7 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
 
   public override suspend fun <B> modify(f: (A) -> Pair<A, B>): B {
     tailrec fun go(): B {
-      val a = ar.value
+      val a = ar.get()
       val (u, b) = f(a)
       return if (!ar.compareAndSet(a, u)) go() else b
     }
@@ -265,7 +268,7 @@ private class DefaultAtomic<A>(a: A) : arrow.fx.coroutines.Atomic<A> {
 
   public override suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B> {
     tailrec fun go(): Pair<A, B> {
-      val a = ar.value
+      val a = ar.get()
       val res = f(a)
       return if (!ar.compareAndSet(a, res.first)) go() else res
     }
@@ -340,7 +343,7 @@ private class LensAtomic<A, B>(
     val snapshotB = lensGet(snapshotA)
 
     val setter: suspend (B) -> Boolean = { b: B ->
-      val hasBeenCalled = AtomicBooleanW(false)
+      val hasBeenCalled = AtomicRef(false)
 
       suspend {
         val called = hasBeenCalled.compareAndSet(false, true)

@@ -2,8 +2,8 @@
 
 package arrow.core
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.loop
+import arrow.continuations.generic.AtomicRef
+import arrow.continuations.generic.loop
 import kotlin.jvm.JvmName
 
 /**
@@ -112,9 +112,9 @@ private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
 }
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
-  private val cache = atomic(emptyMap<K, R>())
+  private val cache = AtomicRef(emptyMap<K, R>())
   operator fun invoke(k: K): R {
-    val cached = cache.value[k]
+    val cached = cache.get()[k]
     // No cached value found, compute one
     return if (cached == null) {
       val b = k(f)

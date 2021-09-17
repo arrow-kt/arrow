@@ -1,8 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.NonEmptyList
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.updateAndGet
 import kotlin.jvm.JvmName
 
 internal const val ArrowExceptionMessage =
@@ -82,76 +80,4 @@ public object Platform {
 
   public fun composeErrors(all: NonEmptyList<Throwable>): Throwable =
       composeErrors(all.head, all.tail)
-}
-
-public class AtomicRefW<A>(a: A) {
-  private val atomicRef = atomic(a)
-
-  public var value: A
-    set(a) {
-      atomicRef.value = a
-    }
-    get() = atomicRef.value
-
-  public fun getAndSet(a: A): A = atomicRef.getAndSet(a)
-
-  public fun updateAndGet(function: (A) -> A): A = atomicRef.updateAndGet(function)
-
-  public fun compareAndSet(expect: A, update: A): Boolean = atomicRef.compareAndSet(expect, update)
-
-  public fun lazySet(a: A): Unit = atomicRef.lazySet(a)
-
-  override fun toString(): String = value.toString()
-}
-
-public class AtomicBooleanW(a: Boolean) {
-  private val ref = atomic(a)
-
-  public var value: Boolean
-    set(a) {
-      ref.value = a
-    }
-    get() = ref.value
-
-  public fun getAndSet(a: Boolean): Boolean = ref.getAndSet(a)
-
-  public fun updateAndGet(function: (Boolean) -> Boolean): Boolean = ref.updateAndGet(function)
-
-  public fun compareAndSet(expect: Boolean, update: Boolean): Boolean = ref.compareAndSet(expect, update)
-
-  public fun lazySet(a: Boolean): Unit = ref.lazySet(a)
-
-  override fun toString(): String = value.toString()
-}
-
-public class AtomicIntW(a: Int) {
-  private val atomicRef = atomic(a)
-
-  public var value: Int
-    set(a) {
-      atomicRef.value = a
-    }
-    get() = atomicRef.value
-
-  public fun getAndSet(a: Int): Int = atomicRef.getAndSet(a)
-
-  public fun getAndAdd(delta: Int): Int = atomicRef.getAndAdd(delta)
-
-  public fun addAndGet(delta: Int): Int = atomicRef.addAndGet(delta)
-
-  public fun getAndIncrement(): Int = atomicRef.getAndIncrement()
-
-  public fun getAndDecrement(): Int = atomicRef.getAndDecrement()
-
-  public fun incrementAndGet(): Int = atomicRef.incrementAndGet()
-
-  public fun decrementAndGet(): Int = atomicRef.decrementAndGet()
-
-  public fun updateAndGet(function: (Int) -> Int): Int = atomicRef.updateAndGet(function)
-
-  public fun compareAndSet(expect: Int, update: Int): Boolean = atomicRef.compareAndSet(expect, update)
-
-  public fun lazySet(a: Int): Unit = atomicRef.lazySet(a)
-
-  override fun toString(): String = value.toString()
 }
