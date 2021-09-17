@@ -1,9 +1,10 @@
 package arrow.fx.coroutines
 
+import arrow.continuations.generic.AtomicRef
+import arrow.continuations.generic.getAndUpdate
+import arrow.continuations.generic.updateAndGet
 import arrow.core.NonEmptyList
 import arrow.core.nonFatalOrThrow as coreNonFatalOrThrow
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.updateAndGet
 import kotlin.jvm.JvmName
 
 internal const val ArrowExceptionMessage =
@@ -82,17 +83,21 @@ public object Platform {
     }
 
   public fun composeErrors(all: NonEmptyList<Throwable>): Throwable =
-      composeErrors(all.head, all.tail)
+    composeErrors(all.head, all.tail)
 }
 
+public const val AtomicFuWrapperDeprecation: String =
+  "Atomic FU is not yet stable to be used for MPP libaries. Use AtomicRef instead from Arrow Continuations instead."
+
+@Deprecated(AtomicFuWrapperDeprecation)
 public class AtomicRefW<A>(a: A) {
-  private val atomicRef = atomic(a)
+  private val atomicRef = AtomicRef(a)
 
   public var value: A
     set(a) {
-      atomicRef.value = a
+      atomicRef.set(a)
     }
-    get() = atomicRef.value
+    get() = atomicRef.get()
 
   public fun getAndSet(a: A): A = atomicRef.getAndSet(a)
 
@@ -100,19 +105,22 @@ public class AtomicRefW<A>(a: A) {
 
   public fun compareAndSet(expect: A, update: A): Boolean = atomicRef.compareAndSet(expect, update)
 
-  public fun lazySet(a: A): Unit = atomicRef.lazySet(a)
+  public fun lazySet(a: A): Unit {
+    atomicRef.set(a)
+  }
 
   override fun toString(): String = value.toString()
 }
 
+@Deprecated(AtomicFuWrapperDeprecation)
 public class AtomicBooleanW(a: Boolean) {
-  private val ref = atomic(a)
+  private val ref = AtomicRef(a)
 
   public var value: Boolean
     set(a) {
-      ref.value = a
+      ref.set(a)
     }
-    get() = ref.value
+    get() = ref.get()
 
   public fun getAndSet(a: Boolean): Boolean = ref.getAndSet(a)
 
@@ -120,39 +128,50 @@ public class AtomicBooleanW(a: Boolean) {
 
   public fun compareAndSet(expect: Boolean, update: Boolean): Boolean = ref.compareAndSet(expect, update)
 
-  public fun lazySet(a: Boolean): Unit = ref.lazySet(a)
+  public fun lazySet(a: Boolean): Unit {
+    ref.set(a)
+  }
 
   override fun toString(): String = value.toString()
 }
 
+@Deprecated(AtomicFuWrapperDeprecation)
 public class AtomicIntW(a: Int) {
-  private val atomicRef = atomic(a)
+  private val atomicRef = AtomicRef(a)
 
   public var value: Int
     set(a) {
-      atomicRef.value = a
+      atomicRef.set(a)
     }
-    get() = atomicRef.value
+    get() = atomicRef.get()
 
   public fun getAndSet(a: Int): Int = atomicRef.getAndSet(a)
 
-  public fun getAndAdd(delta: Int): Int = atomicRef.getAndAdd(delta)
+  public fun getAndAdd(delta: Int): Int =
+    atomicRef.getAndUpdate { it + delta }
 
-  public fun addAndGet(delta: Int): Int = atomicRef.addAndGet(delta)
+  public fun addAndGet(delta: Int): Int =
+    atomicRef.updateAndGet { it + delta }
 
-  public fun getAndIncrement(): Int = atomicRef.getAndIncrement()
+  public fun getAndIncrement(): Int =
+    atomicRef.getAndUpdate(Int::inc)
 
-  public fun getAndDecrement(): Int = atomicRef.getAndDecrement()
+  public fun getAndDecrement(): Int =
+    atomicRef.getAndUpdate(Int::dec)
 
-  public fun incrementAndGet(): Int = atomicRef.incrementAndGet()
+  public fun incrementAndGet(): Int =
+    atomicRef.updateAndGet(Int::inc)
 
-  public fun decrementAndGet(): Int = atomicRef.decrementAndGet()
+  public fun decrementAndGet(): Int =
+    atomicRef.updateAndGet(Int::dec)
 
   public fun updateAndGet(function: (Int) -> Int): Int = atomicRef.updateAndGet(function)
 
   public fun compareAndSet(expect: Int, update: Int): Boolean = atomicRef.compareAndSet(expect, update)
 
-  public fun lazySet(a: Int): Unit = atomicRef.lazySet(a)
+  public fun lazySet(a: Int): Unit {
+    atomicRef.set(a)
+  }
 
   override fun toString(): String = value.toString()
 }

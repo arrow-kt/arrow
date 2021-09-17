@@ -8,7 +8,6 @@ apply from: "$TEST_COVERAGE"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION_MPP"
 apply from: "$ANIMALSNIFFER_MPP"
-apply plugin: 'kotlinx-atomicfu'
 apply plugin: 'io.kotest.multiplatform'
 
 kotlin {
