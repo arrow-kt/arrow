@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
@@ -124,7 +125,7 @@ import kotlin.time.ExperimentalTime
  */
 public class CircuitBreaker
 private constructor(
-  private val state: AtomicRefW<State>,
+  private val state: AtomicRef<State>,
   private val maxFailures: Int,
   private val resetTimeout: Double,
   private val exponentialBackoffFactor: Double,
@@ -137,7 +138,7 @@ private constructor(
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
-  public suspend fun state(): State = state.value
+  public suspend fun state(): State = state.get()
 
   /**
    * Awaits for this `CircuitBreaker` to be [CircuitBreaker.State.Closed].
@@ -148,7 +149,7 @@ private constructor(
    * state again.
    */
   public suspend fun awaitClose(): Unit =
-    when (val curr = state.value) {
+    when (val curr = state.get()) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
       is State.HalfOpen -> curr.awaitClose.await()
@@ -172,7 +173,7 @@ private constructor(
    * If an exception in [fa] occurs it will be rethrown
    */
   public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
-    when (val curr = state.value) {
+    when (val curr = state.get()) {
       is Closed -> {
         val attempt = try {
           Either.Right(fa.invoke())
@@ -214,7 +215,7 @@ private constructor(
    * triggering the `Open` state if necessary.
    */
   private tailrec suspend fun <A> markOrResetFailures(result: Either<Throwable, A>): A =
-    when (val curr = state.value) {
+    when (val curr = state.get()) {
       is Closed -> {
         when (result) {
           is Either.Right -> {
@@ -277,13 +278,13 @@ private constructor(
           is ExitCase.Cancelled -> {
             // We need to return to Open state
             // otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-            state.value = Open(lastStartedAt, resetTimeout, awaitClose)
+            state.set(Open(lastStartedAt, resetTimeout, awaitClose))
             onOpen.invoke()
           }
           ExitCase.Completed -> {
             // While in HalfOpen only a reset attempt is allowed to update
             // the state, so setting this directly is safe
-            state.value = Closed(0)
+            state.set(Closed(0))
             awaitClose.complete(Unit)
             onClosed.invoke()
           }
@@ -294,7 +295,7 @@ private constructor(
               if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
               else value
             val ts = timeInMillis()
-            state.value = Open(ts, nextTimeout, awaitClose)
+            state.set(Open(ts, nextTimeout, awaitClose))
             onOpen.invoke()
           }
         }
@@ -558,7 +559,7 @@ private constructor(
       onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
       CircuitBreaker(
-        state = AtomicRefW(Closed(0)),
+        state = AtomicRef(Closed(0)),
         maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
         resetTimeout = requireNotNull(resetTimeoutNanos.takeIf { it > 0 }) { "resetTimeoutNanos expected to be higher than 0" },
         exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },

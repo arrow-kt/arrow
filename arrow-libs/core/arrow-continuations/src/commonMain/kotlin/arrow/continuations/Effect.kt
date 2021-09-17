@@ -21,3 +21,6 @@ public fun interface Effect<F> {
       Reset.restricted { just(f(eff(this))) }
   }
 }
+
+
+
