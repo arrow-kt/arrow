@@ -102,7 +102,7 @@ jobs:
       - name: Publish macos
         working-directory: arrow-libs
         run: |
-          ./gradlew publishToMavenRepository
+          ./gradlew publish
           echo "$(cat $BASEDIR/gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MacOs deployed!"
 
 #      - name: Publish macos Arm64
@@ -239,7 +239,7 @@ jobs:
       - name: Publish Windows
         working-directory: arrow-libs
         run: |
-          ./gradlew publishToMavenRepository
+          ./gradlew publish
           echo "$(cat gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
   publish-arrow-stack:
