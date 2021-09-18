@@ -10,7 +10,7 @@ env:
 jobs:
   ktlint_dokka_ank:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
 
       - name: "Create API doc"
         working-directory: arrow-libs
-        run: ./gradlew dokkaJekyll
+        run: ./gradlew dokkaGfm
 
       - name: "Validate documentation"
         working-directory: arrow-site
