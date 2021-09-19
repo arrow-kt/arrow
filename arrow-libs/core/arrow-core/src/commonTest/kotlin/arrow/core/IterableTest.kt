@@ -3,6 +3,9 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
 import arrow.typeclasses.Semigroup
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
@@ -120,6 +123,59 @@ class IterableTest : UnitSpec() {
       }
     }
 
+    "traverseNullable is stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int?>()
+      val res = (0..20_000).traverseNullable { a ->
+        acc.add(a)
+        a
+      }
+      res.shouldNotBeNull() shouldBe acc
+      res.shouldNotBeNull() shouldBe (0..20_000).toList()
+    }
+
+    "traverseNullable short-circuits" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        val acc = mutableListOf<Int>()
+        val evens = ints.traverseNullable {
+          if (it % 2 == 0) {
+            acc.add(it)
+            it
+          } else {
+            null
+          }
+        }
+
+        val expected = ints.takeWhile { it % 2 == 0 }
+        acc shouldBe expected
+
+        if (ints.any { it % 2 != 0 }) {
+          evens.shouldBeNull()
+        } else {
+          evens.shouldNotBeNull() shouldContainExactly expected
+        }
+      }
+    }
+
+    "sequenceNullable yields some when all entries in the list are not null" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        val evens = ints.map { if (it % 2 == 0) it else null }.sequenceNullable()
+
+        val expected = ints.takeWhile { it % 2 == 0 }
+        if (ints.any { it % 2 != 0 }) {
+          evens.shouldBeNull()
+        } else {
+          evens.shouldNotBeNull() shouldContainExactly ints.takeWhile { it % 2 == 0 }
+        }
+      }
+    }
+
+    "sequenceNullable should be consistent with traversNullable" {
+      checkAll(Arb.list(Arb.int())) { ints ->
+        ints.map { it as Int? }.sequenceNullable() shouldBe ints.traverseNullable { it as Int? }
+      }
+    }
+
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -133,8 +189,9 @@ class IterableTest : UnitSpec() {
 
     "traverseValidated acumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
-          .sequenceValidated()
+        val res: ValidatedNel<Int, List<Int>> =
+          ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
+            .sequenceValidated()
 
         val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
           .fold({ Valid(ints.filter { it % 2 == 0 }) }, { Invalid(it) })

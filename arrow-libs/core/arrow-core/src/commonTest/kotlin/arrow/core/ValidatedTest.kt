@@ -7,6 +7,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.core.test.generators.validated
 import io.kotest.assertions.fail
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
@@ -374,7 +375,27 @@ class ValidatedTest : UnitSpec() {
         val invalid = Invalid(b)
 
         valid.traverseOption { Some(it) } shouldBe valid.map { Some(it) }.sequenceOption()
-          invalid.traverseOption { Some(it) } shouldBe invalid.map { Some(it) }.sequenceOption()
+        invalid.traverseOption { Some(it) } shouldBe invalid.map { Some(it) }.sequenceOption()
+      }
+    }
+
+    "traverseNullable should yield non-null object when validated is valid" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.traverseNullable<String?> { it } shouldBe Valid("Who")
+      valid.traverseNullable<String?> { null }.shouldBeNull()
+      invalid.traverseNullable<String?> { it }.shouldBeNull()
+    }
+
+    "sequenceNullable should yield consistent result with traverseNullable" {
+      checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
+        val valid = Valid(a)
+        val invalid = Invalid(b)
+
+        valid.traverseNullable<String?> { it } shouldBe valid.map<String?> { it }.sequenceNullable()
+        valid.traverseNullable<String?> { null } shouldBe valid.map<String?> { null }.sequenceNullable()
+        invalid.traverseNullable<String?> { it } shouldBe invalid.map<String?> { it }.sequenceNullable()
       }
     }
 
@@ -392,7 +413,7 @@ class ValidatedTest : UnitSpec() {
         val invalid = Invalid(b)
 
         valid.traverseEither { Right(it) } shouldBe valid.map { Right(it) }.sequenceEither()
-          invalid.traverseEither { Right(it) } shouldBe invalid.map { Right(it) }.sequenceEither()
+        invalid.traverseEither { Right(it) } shouldBe invalid.map { Right(it) }.sequenceEither()
       }
     }
 
@@ -435,6 +456,27 @@ class ValidatedTest : UnitSpec() {
           valid.bitraverseOption({ Some(it) }, { Some(it) })
         invalid.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
           invalid.bitraverseOption({ Some(it) }, { Some(it) })
+      }
+    }
+
+
+    "bitraverseNullable should wrap valid or invalid in a nullable" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.bitraverseNullable({ it }, { it }) shouldBe Valid("Who")
+      invalid.bitraverseNullable({ it }, { it }) shouldBe Invalid("Nope")
+    }
+
+    "bisequenceOption should yield consistent result with bitraverseOption" {
+      checkAll(Arb.string().orNull(), Arb.string().orNull()) { a: String?, b: String? ->
+        val valid: Validated<String?, String?> = Valid(a)
+        val invalid: Validated<String?, String?> = Invalid(b)
+
+        valid.bimap({ it }, { it }).bisequenceNullable() shouldBe
+          valid.bitraverseNullable({ it }, { it })
+        invalid.bimap({ it }, { it }).bisequenceNullable() shouldBe
+          invalid.bitraverseNullable({ it }, { it })
       }
     }
 

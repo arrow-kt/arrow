@@ -431,6 +431,16 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
     )
 
+  public inline fun <C, D> bitraverseNullable(
+    fa: (A) -> C?,
+    fb: (B) -> D?
+  ): Ior<C, D>? =
+    fold(
+      { a -> fa(a)?.let { Left(it) } },
+      { b -> fb(b)?.let { Right(it) } },
+      { a, b -> Nullable.zip(fa(a), fb(b)) { aa, c -> Both(aa, c) } }
+    )
+
   public inline fun <AA, C, D> bitraverseValidated(
     SA: Semigroup<AA>,
     fa: (A) -> Validated<AA, C>,
@@ -515,6 +525,13 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
+  public inline fun <C> traverseNullable(fa: (B) -> C?): Ior<A, C>? =
+    fold(
+      { a -> Left(a) },
+      { b -> fa(b)?.let { Right(it) } },
+      { a, b -> fa(b)?.let { Both(a, it) } }
+    )
+
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
     fold(
       { a -> Valid(Left(a)) },
@@ -561,6 +578,9 @@ public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<
 
 public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>> =
   bitraverseOption(::identity, ::identity)
+
+public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
+  bitraverseNullable(::identity, ::identity)
 
 public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
   bitraverseValidated(SA, ::identity, ::identity)
@@ -622,6 +642,9 @@ public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>>
 
 public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
   traverseOption(::identity)
+
+public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
+  traverseNullable(::identity)
 
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, Ior<A, C>> =
   traverseValidated(::identity)

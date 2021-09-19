@@ -221,6 +221,29 @@ class IorTest : UnitSpec() {
       }
     }
 
+    "traverseNullable should wrap ior in a nullable" {
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+        val iorL: Ior<Int, String> = a.leftIor()
+        val iorR: Ior<Int, String> = b.rightIor()
+        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+        iorL.traverseNullable { it } shouldBe Ior.Left(a)
+        iorR.traverseNullable { it } shouldBe Ior.Right(b)
+        iorBoth.traverseNullable { it } shouldBe Ior.Both(a, b)
+
+        iorL.traverseNullable { null } shouldBe Ior.Left(a)
+        iorR.traverseNullable { null } shouldBe null
+        iorBoth.traverseNullable { null } shouldBe null
+      }
+    }
+
+    "sequenceNullable should be consistent with traverseNullable" {
+      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+        ior.map<String?> { it }.sequenceNullable() shouldBe ior.traverseNullable { it }
+        ior.map<String?> { null }.sequenceNullable() shouldBe ior.traverseNullable { null }
+      }
+    }
+
     "traverseOption should wrap ior in an Option" {
       checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         val iorL: Ior<Int, String> = a.leftIor()

@@ -566,6 +566,12 @@ public sealed class Validated<out E, out A> {
       is Invalid -> None
     }
 
+  public inline fun <B> traverseNullable(fa: (A) -> B?): Validated<E, B>? =
+    when (this) {
+      is Valid -> fa(this.value)?.let { Valid(it) }
+      is Invalid -> null
+    }
+
   public inline fun <B> bifoldLeft(
     c: B,
     fe: (B, E) -> B,
@@ -591,6 +597,12 @@ public sealed class Validated<out E, out A> {
     fa: (A) -> Option<C>
   ): Option<Validated<B, C>> =
     fold({ fe(it).map(::Invalid) }, { fa(it).map(::Valid) })
+
+  public inline fun <B, C> bitraverseNullable(
+    fe: (E) -> B?,
+    fa: (A) -> C?
+  ): Validated<B, C>? =
+    fold({ fe(it)?.let(::Invalid) }, { fa(it)?.let(::Valid) })
 
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -1076,6 +1088,9 @@ public fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): E
 public fun <A, B> Validated<Option<A>, Option<B>>.bisequenceOption(): Option<Validated<A, B>> =
   bitraverseOption(::identity, ::identity)
 
+public fun <A, B> Validated<A?, B?>.bisequenceNullable(): Validated<A, B>? =
+  bitraverseNullable(::identity, ::identity)
+
 public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
@@ -1091,6 +1106,9 @@ public fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Vali
 
 public fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
   traverseOption(::identity)
+
+public fun <A, B> Validated<A, B?>.sequenceNullable(): Validated<A, B>? =
+  traverseNullable(::identity)
 
 public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
