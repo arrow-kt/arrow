@@ -1,11 +1,10 @@
 package arrow.fx.stm
 
+import arrow.continuations.generic.AtomicRef
+import arrow.continuations.generic.update
+import arrow.continuations.generic.updateAndGet
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
-import kotlinx.atomicfu.AtomicLong
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
 import kotlin.coroutines.resume
 
 /**
@@ -124,10 +123,10 @@ public class TVar<A> internal constructor(a: A) {
    * This is used to implement locking. Reading threads have to loop until the value is released by a
    *  transaction.
    */
-  private val ref: AtomicRef<Any?> = atomic(a as Any?)
+  private val ref = AtomicRef(a as Any?)
 
   internal val value
-    get() = ref.value
+    get() = ref.get()
 
   /**
    * Each TVar has a unique id which is used to get a total ordering of variables to ensure that locks
@@ -136,14 +135,14 @@ public class TVar<A> internal constructor(a: A) {
    * > The current implementation no longer waits on locks which means lock order is irrelevant. This is still used as
    *  a good hash value though.
    */
-  internal val id: Long = globalC.incrementAndGet()
+  internal val id: Long = globalC.updateAndGet(Long::inc)
 
   /**
    * A list of running transactions waiting for a change on this variable.
    * Changes are pushed to waiting transactions via [notify]
    */
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
-  private val waiting = atomic<List<STMTransaction<*>>>(emptyList())
+  private val waiting = AtomicRef<List<STMTransaction<*>>>(emptyList())
 
   override fun hashCode(): Int = id.hashCode()
 
@@ -163,7 +162,7 @@ public class TVar<A> internal constructor(a: A) {
    */
   internal fun readI(): A {
     while (true) {
-      ref.value.let {
+      ref.get().let {
         if (it !is STMFrame) return@readI it as A
       }
     }
@@ -247,4 +246,4 @@ public class TVar<A> internal constructor(a: A) {
   }
 }
 
-internal val globalC: AtomicLong = atomic(0L)
+internal val globalC: AtomicRef<Long> = AtomicRef(0L)

@@ -1,7 +1,5 @@
 package arrow.continuations.generic
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.loop
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -26,8 +24,8 @@ import kotlin.coroutines.suspendCoroutine
 internal open class MultiShotDelimContScope<R>(val f: suspend RestrictedScope<R>.() -> R) : RestrictedScope<R> {
 
   // TODO Since runs blocking these don't need to be atomic
-  private val resultVar = atomic<R?>(null)
-  private val nextShift = atomic<(suspend RestrictedScope<R>.() -> R)?>(null)
+  private val resultVar = AtomicRef<R?>(null)
+  private val nextShift = AtomicRef<(suspend RestrictedScope<R>.() -> R)?>(null)
 
   // TODO This can be append only and needs fast reversed access
   private val shiftFnContinuations = mutableListOf<Continuation<R>>()
@@ -50,7 +48,7 @@ internal open class MultiShotDelimContScope<R>(val f: suspend RestrictedScope<R>
     private val shiftFnContinuations: MutableList<Continuation<R>>
   ) : DelimitedContinuation<A, R> {
     // To make sure the continuation is only invoked once we put it in a nullable atomic and only access it through getAndSet
-    private val liveContinuation = atomic<Continuation<A>?>(liveContinuation)
+    private val liveContinuation = AtomicRef<Continuation<A>?>(liveContinuation)
     private val stackOffset = stack.size
 
     public override suspend fun invoke(a: A): R =
@@ -95,7 +93,7 @@ internal open class MultiShotDelimContScope<R>(val f: suspend RestrictedScope<R>
     f.startCoroutineUninterceptedOrReturn(
       this,
       Continuation(EmptyCoroutineContext) { result ->
-        resultVar.value = result.getOrThrow()
+        resultVar.set(result.getOrThrow())
       }
     ).let {
       if (it == COROUTINE_SUSPENDED) {
@@ -106,18 +104,18 @@ internal open class MultiShotDelimContScope<R>(val f: suspend RestrictedScope<R>
             nextShiftFn.startCoroutineUninterceptedOrReturn(
               this,
               Continuation(EmptyCoroutineContext) { result ->
-                resultVar.value = result.getOrThrow()
+                resultVar.set(result.getOrThrow())
               }
             ).let {
-              if (it != COROUTINE_SUSPENDED) resultVar.value = it as R
+              if (it != COROUTINE_SUSPENDED) resultVar.set(it as R)
             }
           } else return@let
         }
       } else return@invoke it as R
     }
-    require(resultVar.value != null)
-    for (c in shiftFnContinuations.asReversed()) c.resume(resultVar.value!!)
-    return resultVar.value!!
+    require(resultVar.get() != null)
+    for (c in shiftFnContinuations.asReversed()) c.resume(resultVar.get()!!)
+    return resultVar.get()!!
   }
 
   public companion object {

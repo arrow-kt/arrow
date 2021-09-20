@@ -1,7 +1,5 @@
 package arrow.continuations.generic
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.loop
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -23,7 +21,7 @@ internal open class SuspendMonadContinuation<R>(
    *  1 - SUSPENDED
    *  Any? (3) `resumeWith` always stores it upon UNDECIDED, and `getResult` can atomically get it.
    */
-  private val _decision = atomic<Any>(UNDECIDED)
+  private val _decision = AtomicRef<Any>(UNDECIDED)
   private val token: Token = Token()
 
   override val context: CoroutineContext = parent.context

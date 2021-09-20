@@ -1,8 +1,8 @@
 package arrow.fx.stm.internal
 
+import arrow.continuations.generic.AtomicRef
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 
@@ -163,7 +163,7 @@ public expect object RetryException : Throwable
  * Keeps the continuation that [TVar]'s use to resume this transaction.
  */
 internal class STMTransaction<A>(val f: STM.() -> A) {
-  private val cont = atomic<Continuation<Unit>?>(null)
+  private val cont = AtomicRef<Continuation<Unit>?>(null)
 
   /**
    * Any one resumptions is enough, because we enqueue on all read variables this might be called multiple times.
@@ -189,7 +189,7 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
 
         val registered = mutableListOf<TVar<Any?>>()
         suspendCancellableCoroutine<Unit> susp@{ k ->
-          cont.value = k
+          cont.set(k)
 
           frame.accessMap
             .forEach { (tv, entry) ->
