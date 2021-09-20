@@ -3,7 +3,11 @@ name: "Publish all libs, Arrow-stack and Docs"
 on:
   push:
     branches:
-      - release/1.0.0
+      - main
+      - release/**
+    paths:
+      - 'arrow-libs/**'
+      - '.github/**'
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
