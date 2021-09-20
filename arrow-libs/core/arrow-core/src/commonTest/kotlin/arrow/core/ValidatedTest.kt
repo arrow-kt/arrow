@@ -459,7 +459,6 @@ class ValidatedTest : UnitSpec() {
       }
     }
 
-
     "bitraverseNullable should wrap valid or invalid in a nullable" {
       val valid = Valid("Who")
       val invalid = Invalid("Nope")
