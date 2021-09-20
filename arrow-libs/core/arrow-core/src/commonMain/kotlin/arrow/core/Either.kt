@@ -916,6 +916,9 @@ public sealed class Either<out A, out B> {
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
     fold({ None }, { right -> fa(right).map { Right(it) } })
 
+  public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
+    fold({ null }, { right -> fa(right)?.let { Right(it) } })
+
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
       is Right -> fa(this.value).map { Right(it) }
@@ -927,6 +930,9 @@ public sealed class Either<out A, out B> {
 
   public inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
     fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
+
+  public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
+    fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
 
   public inline fun <AA, C, D> bitraverseValidated(
     fe: (A) -> Validated<AA, C>,
@@ -1535,6 +1541,9 @@ public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
 public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
   traverseOption(::identity)
 
+public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
+  traverseNullable(::identity)
+
 public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
   traverseValidated(::identity)
 
@@ -1543,6 +1552,9 @@ public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, 
 
 public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either<A, B>> =
   bitraverseOption(::identity, ::identity)
+
+public fun <A, B> Either<A?, B?>.bisequenceNullable(): Either<A, B>? =
+  bitraverseNullable(::identity, ::identity)
 
 public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)

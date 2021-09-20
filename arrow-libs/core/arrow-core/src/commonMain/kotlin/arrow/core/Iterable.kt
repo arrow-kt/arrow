@@ -350,6 +350,22 @@ public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   this.traverseOption { it }
 
+public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? {
+  val acc = mutableListOf<B>()
+  forEach { a ->
+    val res = f(a)
+    if (res != null) {
+      acc.add(res)
+    } else {
+      return res
+    }
+  }
+  return acc.toList()
+}
+
+public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
+  this.traverseNullable { it }
+
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
 

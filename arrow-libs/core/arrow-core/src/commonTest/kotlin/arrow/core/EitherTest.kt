@@ -472,6 +472,22 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "traverseNullable should return non-nullable if either is right" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.traverseNullable { it } shouldBe Right(1)
+      right.traverseNullable { null } shouldBe null
+      left.traverseNullable { it } shouldBe null
+    }
+
+    "sequenceNullable should be consistent with traverseNullable" {
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.map { it }.sequenceNullable() shouldBe either.traverseNullable { it }
+        either.map { null }.sequenceNullable() shouldBe null
+      }
+    }
+
     "traverseOption should return option if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
@@ -514,6 +530,24 @@ class EitherTest : UnitSpec() {
         either.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe either.bitraverse(
           { listOf(it) },
           { listOf(it) })
+      }
+    }
+
+    "bitraverseNullable should wrap either in a nullable" {
+      val right: Either<String, Int> = Right(1)
+      val left: Either<String, Int> = Left("foo")
+
+      right.bitraverseNullable({ it }, { it.toString() }) shouldBe Right("1")
+      left.bitraverseNullable({ it }, { it.toString() }) shouldBe Left("foo")
+
+      right.bitraverseNullable({ it }, { null }) shouldBe null
+      left.bitraverseNullable({ null }, { it.toString() }) shouldBe null
+    }
+
+    "bisequenceNullable should be consistent with bitraverseNullable" {
+      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+        either.bimap({ it }, { it }).bisequenceNullable() shouldBe
+          either.bitraverseNullable({ it }, { it })
       }
     }
 
