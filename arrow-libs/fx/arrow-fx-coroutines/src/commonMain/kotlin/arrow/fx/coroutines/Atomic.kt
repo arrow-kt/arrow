@@ -6,7 +6,7 @@ import arrow.continuations.generic.AtomicRef
  * An [Atomic] with an initial value of [A].
  *
  * [Atomic] wraps `atomic`, so that you can also use it on a top-level function or pass it around.
- * In other languages this data type is also now as `Ref`, `IORef` or Concurrent safe Reference.
+ * In other languages this data type is also known as `Ref`, `IORef` or Concurrent safe Reference.
  * So in case you don't need to pass around an atomic reference, or use it in top-level functions
  * it's advised to use `atomic` from Atomic Fu directly.
  *
