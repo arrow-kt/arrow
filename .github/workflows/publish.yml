@@ -21,7 +21,7 @@ env:
 jobs:
   publish_apple_linux_jvm_js:
     runs-on: macos-latest
-    timeout-minutes: 40
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v2
@@ -87,7 +87,7 @@ jobs:
       - name: Publish Windows
         working-directory: arrow-libs
         run: |
-          ./gradlew publishMingwX64PublicationToDeployRepository
+          ./gradlew publishMingwX64PublicationToMavenRepository
           echo "$(cat gradle.properties | grep VERSION_NAME | cut -d'=' -f2) MingwX64 deployed!"
 
   publish-arrow-stack:
