@@ -1,4 +1,3 @@
-import arrow.gradle.setupDokka
 import arrow.gradle.setupPublishing
 
 buildscript {
