@@ -4,4 +4,5 @@ plugins {
 }
 
 apply from: "$SUB_PROJECT_MPP"
+apply from: "$DOC_CREATION"
 apply from: "$ANIMALSNIFFER_MPP"

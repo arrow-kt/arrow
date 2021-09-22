@@ -15,7 +15,6 @@ plugins {
   id("org.jetbrains.kotlin.multiplatform") version "1.5.31" apply false
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.7.1"
 
-  id("documentation")
   id("org.jetbrains.dokka") version "1.5.0" apply false
 
   id("mpp-publish")
@@ -47,33 +46,6 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("jekyll")
-}
-
-val excludeDocs = setOf(
-  "arrow-ank-gradle",
-  "arrow-core-test",
-  "arrow-fx-coroutines-test",
-  "arrow-meta",
-  "arrow-optics-test",
-  "examples",
-  "jekyll",
-  "arrow-meta-test-models",
-)
-
-configure(
-  subprojects.filter { it.name !in excludeDocs }
-) {
-  apply(plugin = "org.jetbrains.dokka")
-
-  setupDokka(
-    outputDirectory = file("${rootDir}/../arrow-site/docs/apidocs"),
-    baseUrl = "https://github.com/arrow-kt/arrow/blob/main"
-  )
-
-  dependencies {
-    // Really Gradle !?
-    "dokkaGfmPlugin"(project(":jekyll"))
-  }
 }
 
 val excludeMppPublish = setOf(
