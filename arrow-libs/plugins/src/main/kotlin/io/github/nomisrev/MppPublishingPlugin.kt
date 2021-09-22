@@ -28,9 +28,15 @@ fun Project.setupPublishing(
   projectDesc: String,
   releaseRepo: java.net.URI,
   snapshotRepo: java.net.URI,
-  projectGitUrl: String = "$projectUrl.git",
-  key: String? = System.getenv("SIGNINGKEY"),
+  sonatypeUsername: String? = System.getenv("SONATYPE_USER"),
+  sonatypePassword: String? = System.getenv("SONATYPE_PWD"),
   pass: String? = System.getenv("SIGNINGPASSWORD"),
+  key: String? = System.getenv("SIGNINGKEY"),
+  licenseName: String = "The Apache Software License, Version 2.0",
+  licenseUrl: String = "https://www.apache.org/licenses/LICENSE-2.0.txt",
+  licenseDist: String = "repo",
+  scmConnection: String = "${projectUrl.replaceFirst("https://", "scm:git:git://")}.git",
+  scmDevConnection: String = "${projectUrl.replaceFirst("https://", "scm:git:ssh://")}.git",
 ) {
   afterEvaluate {
     extensions.getByType(PublishingExtension::class.java).apply {
@@ -38,15 +44,23 @@ fun Project.setupPublishing(
       mavenPublications.all {
         artifact(project.javadocJar())
         setupPom(
-          gitUrl = projectGitUrl,
           url = projectUrl,
           description = projectDesc,
           pomDevId = pomDevId,
-          pomDevName = pomDevName
+          pomDevName = pomDevName,
+          licenseName = licenseName,
+          licenseUrl = licenseUrl,
+          licenseDist = licenseDist,
+          scmConnection = scmConnection,
+          scmDevConnection = scmDevConnection
         )
       }
       repositories {
-        maven(if (version.toString().endsWith("SNAPSHOT")) snapshotRepo else releaseRepo)
+        maven(
+          if (version.toString().endsWith("SNAPSHOT")) snapshotRepo else releaseRepo,
+          sonatypeUsername,
+          sonatypePassword
+        )
       }
       Nullable.zip(key, pass) { key, pass -> signPublications(key, pass) }
     }
@@ -90,13 +104,15 @@ fun Project.javadocJar(): TaskProvider<Jar> {
 }
 
 fun MavenPublication.setupPom(
-  gitUrl: String,
   url: String,
   description: String,
   pomDevId: String,
   pomDevName: String,
-  licenseName: String = "The Apache Software License, Version 2.0",
-  licenseUrl: String = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+  licenseName: String,
+  licenseUrl: String,
+  licenseDist: String,
+  scmConnection: String,
+  scmDevConnection: String,
 ) {
   pom {
     if (!name.isPresent) {
@@ -108,6 +124,7 @@ fun MavenPublication.setupPom(
       license {
         name by licenseName
         this@license.url by licenseUrl
+        this@license.distribution by licenseDist
       }
     }
     developers {
@@ -117,21 +134,21 @@ fun MavenPublication.setupPom(
       }
     }
     scm {
-      connection by gitUrl
-      developerConnection by gitUrl
+      connection by scmConnection
+      developerConnection by scmDevConnection
       this@scm.url by url
     }
-    if (gitUrl.startsWith("https://github.com")) issueManagement {
+    if (url.startsWith("https://github.com")) issueManagement {
       system by "GitHub"
-      this@issueManagement.url by gitUrl.replace(".git", "/issues")
+      this@issueManagement.url by "$url/issues"
     }
   }
 }
 
 fun RepositoryHandler.maven(
   uri: java.net.URI,
-  sonatypeUsername: String? = System.getenv("SONATYPE_USER"),
-  sonatypePassword: String? = System.getenv("SONATYPE_PWD"),
+  sonatypeUsername: String?,
+  sonatypePassword: String?,
 ): MavenArtifactRepository = maven {
   name = "Maven"
   url = uri
