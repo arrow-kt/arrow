@@ -14,7 +14,6 @@ plugins {
   id("io.kotest.multiplatform") version "5.0.0.5" apply false
   id("org.jetbrains.kotlin.multiplatform") version "1.5.31" apply false
   id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.7.1"
-
   id("org.jetbrains.dokka") version "1.5.0" apply false
 
   id("mpp-publish")

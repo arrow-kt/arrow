@@ -78,6 +78,21 @@ dokkaGfm {
                 }
             }
         }
+        if(file("src/nativeMain/kotlin").exists()) {
+            nativeMain {
+                perPackageOption {
+                    matchingRegex.set(".*\\.internal.*") // will match all .internal packages and sub-packages
+                    suppress.set(true)
+                }
+                skipDeprecated.set(true)
+                reportUndocumented.set(false)
+                sourceLink {
+                    localDirectory.set(file("src/nativeMain/kotlin"))
+                    remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${relativeProjectPath('src/nativeMain/kotlin')}").toURL())
+                    remoteLineSuffix.set("#L")
+                }
+            }
+        }
     }
 }
 

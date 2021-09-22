@@ -19,7 +19,3 @@ plugins {
 }
 
 apply from: "$ROOT_PROJECT"
-
-task generateDoc(type: Exec) {
-  commandLine "sh", "gradlew", "dokkaGfm"
-}
