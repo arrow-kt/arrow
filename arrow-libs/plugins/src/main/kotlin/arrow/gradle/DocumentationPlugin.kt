@@ -1,4 +1,4 @@
-package io.github.nomisrev
+package arrow.gradle
 
 import java.io.File
 import org.gradle.api.NamedDomainObjectContainer

@@ -1,4 +1,4 @@
-package io.github.nomisrev
+package arrow.gradle
 
 import org.gradle.api.provider.Property
 

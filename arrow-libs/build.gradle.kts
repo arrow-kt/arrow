@@ -1,5 +1,5 @@
-import io.github.nomisrev.setupDokka
-import io.github.nomisrev.setupPublishing
+import arrow.gradle.setupDokka
+import arrow.gradle.setupPublishing
 
 buildscript {
   apply(from = "gradle/setup.gradle")
