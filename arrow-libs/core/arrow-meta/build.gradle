@@ -26,5 +26,5 @@ dependencies {
     testImplementation project(":arrow-meta:arrow-meta-test-models")
     testImplementation("junit:junit:$JUNIT_VERSION")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
-    testImplementation "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow
+    testImplementation("io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION") { exclude group: "io.arrow-kt" }
 }

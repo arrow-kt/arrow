@@ -31,10 +31,6 @@ compileTestKotlin {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-ktlint {
-    version = KTLINT_VERSION
-}
-
 clean.doFirst {
     delete "${projectDir}/../../../arrow-site/docs/apidocs"
 }

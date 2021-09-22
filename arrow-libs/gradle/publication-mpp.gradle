@@ -30,7 +30,7 @@ afterEvaluate {
             artifact javadocJar
 
             def type = it.name
-            logger.error("Configuring $type")
+//            logger.error("Configuring $type")
             switch (type) {
                 case 'kotlinMultiplatform':
                     // With Kotlin 1.4.0, the root module ID has no suffix, but for compatibility with
@@ -46,7 +46,7 @@ afterEvaluate {
                     it.artifactId = "$variantName-$type"
                     break
             }
-            logger.error("Artifact id = ${it.artifactId}")
+//            logger.error("Artifact id = ${it.artifactId}")
 
             pom {
                 name = POM_NAME
