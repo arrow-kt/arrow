@@ -62,46 +62,32 @@ fun Project.setupPublishing(
           sonatypePassword
         )
       }
-      Nullable.zip(key, pass) { key, pass -> signPublications(key, pass) }
+      if (key != null && pass != null) signPublications(key, pass)
     }
   }
-}
-
-object Nullable {
-  fun <A : Any, B : Any, C : Any> zip(a: A?, b: B?, f: (A, B) -> C?): C? =
-    a?.let { aa ->
-      b?.let { bb -> f(aa, bb) }
-    }
 }
 
 fun Project.signPublications(
   key: String,
   pass: String
 ) {
-  val publications = project
-    .extensions
-    .getByType(PublishingExtension::class.java)
-    .publications
-
-  project
-    .extensions
-    .getByType(SigningExtension::class.java)
-    .apply {
-      useInMemoryPgpKeys(key, pass)
-    }.sign(publications)
+  configure<SigningExtension> {
+    useInMemoryPgpKeys(key, pass)
+    sign(the<PublishingExtension>().publications)
+  }
 }
 
 /* We either try to find the existing javadocJar, or we register an empty javadocJar task */
-fun Project.javadocJar(): TaskProvider<Jar> {
-  val taskName = "javadocJar"
-  return try {
-    tasks.named(name = taskName)
-  } catch (e: UnknownTaskException) {
-    tasks.register(name = taskName) {
-      archiveClassifier by "javadoc"
-    }
+fun Project.javadocJar(): TaskProvider<Jar> =
+  tasks.findOrCreate("javadocJar") {
+    archiveClassifier by "javadoc"
   }
-}
+
+private inline fun <reified T : Task> TaskContainer.findOrCreate(
+  name: String,
+  noinline configuration: T.() -> Unit,
+): TaskProvider<T> = runCatching { named<T>(name = name) }
+  .getOrElse { register(name = name, configuration = configuration) }
 
 fun MavenPublication.setupPom(
   url: String,
