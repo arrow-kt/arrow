@@ -5,8 +5,8 @@ import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.test.generators.unit
 import arrow.core.test.laws.Law
+import io.kotest.core.names.TestName
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.core.test.createTestName
 import io.kotest.property.Arb
 import io.kotest.property.Gen
 import io.kotest.property.PropertyContext
@@ -59,14 +59,14 @@ public abstract class UnitSpec(
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
     .forEach { law: Law ->
-      registration().addTest(createTestName(law.name), xdisabled = false, law.test)
+      registration().addTest(TestName(law.name), xdisabled = false, law.test)
     }
 
   public fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
     .forEach { law: Law ->
-      registration().addTest(createTestName(prefix, law.name, true), xdisabled = false, law.test)
+      registration().addTest(TestName(prefix, law.name, true), xdisabled = false, law.test)
     }
 
   public suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
