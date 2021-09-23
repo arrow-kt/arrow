@@ -95,7 +95,7 @@ jobs:
 
   macos_and_ios:
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v2
@@ -136,7 +136,7 @@ jobs:
 
   tv_and_watchos:
     runs-on: macos-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v2
