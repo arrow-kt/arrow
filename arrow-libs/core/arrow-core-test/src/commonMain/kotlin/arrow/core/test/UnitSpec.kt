@@ -34,7 +34,7 @@ public abstract class UnitSpec(
     Arb.KList(gen, range)
 
   public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, depth: Int = maxDepth): Arb<NonEmptyList<A>> =
-    Arb.list(arb, 1..max(1, maxDepth)).filter(List<A>::isNotEmpty).map(NonEmptyList.Companion::fromListUnsafe)
+    Arb.list(arb, 1..max(1, depth)).filter(List<A>::isNotEmpty).map(NonEmptyList.Companion::fromListUnsafe)
 
   public fun <A> Arb.Companion.sequence(arbA: Arb<A>, range: IntRange = 0..maxDepth): Arb<Sequence<A>> =
     Arb.list(arbA, range).map { it.asSequence() }
