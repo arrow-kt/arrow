@@ -2,25 +2,30 @@ package arrow.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.UnknownTaskException
+import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 
 /**
  * An empty [Plugin] that exposes a set of utility functions to simplify setting up MPP publishing.
  */
+@Suppress("unused")
 class MppPublishingPlugin : Plugin<Project> {
   override fun apply(target: Project) {}
 }
 
+@Suppress("unused")
 fun Project.setupPublishing(
   pomDevId: String,
   pomDevName: String,
