@@ -16,6 +16,9 @@
 
 rootProject.name = "arrow-libs"
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("VERSION_CATALOGS")
+
 // Core
 include("arrow-core")
 include("arrow-core-test")
