@@ -498,5 +498,23 @@ class ValidatedTest : UnitSpec() {
           invalid.bitraverseEither({ it.left() }, { it.right() })
       }
     }
+
+    "andThen should return Valid(result) if f return Valid" {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        Valid(x).andThen { Valid(it + y) } shouldBe Valid(x + y)
+      }
+    }
+
+    "andThen should only run f on valid instances " {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        Invalid(x).andThen { Valid(y) } shouldBe Invalid(x)
+      }
+    }
+
+    "andThen should return Invalid(result) if f return Invalid " {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        Valid(x).andThen { Invalid(it + y) } shouldBe Invalid(x + y)
+      }
+    }
   }
 }

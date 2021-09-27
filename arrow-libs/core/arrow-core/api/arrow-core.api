@@ -2331,6 +2331,7 @@ public final class arrow/core/Validated$Valid$Companion {
 }
 
 public final class arrow/core/ValidatedKt {
+	public static final fun andThen (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun attempt (Larrow/core/Validated;)Larrow/core/Validated;
 	public static final fun bisequence (Larrow/core/Validated;)Ljava/util/List;
 	public static final fun bisequenceEither (Larrow/core/Validated;)Larrow/core/Either;
