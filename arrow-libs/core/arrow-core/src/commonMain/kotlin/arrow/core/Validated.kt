@@ -364,7 +364,71 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * ## Sequential Validation
  *
  * If you do want error accumulation, but occasionally run into places where sequential validation is needed,
- * then Validated provides a `withEither` method to allow you to temporarily turn a Validated
+ * then Validated provides a couple of methods that can be used.
+ *
+ * ### `andThen`
+ *
+ * The `andThen` method is similar to `flatMap`. In case of a valid instance it will pass the valid value into
+ * the supplied function that in turn returns a `Validated` instance
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Validated
+ * import arrow.core.computations.either
+ * import arrow.core.valid
+ * import arrow.core.invalid
+ *
+ * abstract class Read<A> {
+ *  abstract fun read(s: String): A?
+ *
+ *  companion object {
+ *
+ *   val stringRead: Read<String> =
+ *    object : Read<String>() {
+ *     override fun read(s: String): String? = s
+ *    }
+ *
+ *   val intRead: Read<Int> =
+ *    object : Read<Int>() {
+ *     override fun read(s: String): Int? =
+ *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
+ *    }
+ *  }
+ * }
+ *
+ * data class Config(val map: Map<String, String>) {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
+ *     val value = Validated.fromNullable(map[key]) {
+ *       ConfigError.MissingConfig(key)
+ *     }.bind()
+ *     val readVal = Validated.fromNullable(read.read(value)) {
+ *       ConfigError.ParseConfig(key)
+ *     }.bind()
+ *     readVal
+ *   }.toValidatedNel()
+ * }
+ *
+ * sealed class ConfigError {
+ *  data class MissingConfig(val field: String) : ConfigError()
+ *  data class ParseConfig(val field: String) : ConfigError()
+ * }
+ *
+ * //sampleStart
+ * val config = Config(mapOf("house_number" to "-42"))
+ *
+ * suspend fun main() {
+ *   val houseNumber = config.parse(Read.intRead, "house_number").andThen { number ->
+ *     if (number >= 0) Valid(0)
+ *     else Invalid(ConfigError.ParseConfig("house_number"))
+ * }
+ * //sampleEnd
+ *  println(houseNumber)
+ * }
+ *
+ * ```
+ *
+ * ### `withEither`
+ *
+ * The `withEither` method to allow you to temporarily turn a Validated
  * instance into an Either instance and apply it to a function.
  *
  * ```kotlin:ank:playground
@@ -1151,6 +1215,22 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
     },
     { Valid(it) }
   )
+
+/**
+ * Apply a function to a Valid value, returning a new Validation that may be valid or invalid
+ *
+ * Example:
+ * ```
+ * Valid(5).andThen { Valid(10) } // Result: Valid(10)
+ * Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
+ * Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
+ * ```
+ */
+public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
+  when (this) {
+    is Validated.Valid -> f(value)
+    is Validated.Invalid -> this
+  }
 
 /**
  * Return this if it is Valid, or else fall back to the given default.
