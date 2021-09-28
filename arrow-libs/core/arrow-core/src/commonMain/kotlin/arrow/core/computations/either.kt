@@ -18,11 +18,23 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
       is Either.Right -> value
       is Left -> control().shift(this@bind)
     }
+    
+  public suspend fun <A, B> Either<A, B>.bind(transform: (A) -> E): B =
+    when (this) {
+      is Either.Right -> value
+      is Left -> control().shift(this@bind.mapLeft(transform))
+    }
 
   public suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
       is Validated.Invalid -> control().shift(Left(value))
+    }
+  
+  public suspend fun <A, B> Validated<A, B>.bind(transform: (A) -> E): B =
+    when (this) {
+      is Validated.Valid -> value
+      is Validated.Invalid -> control().shift(Left(transform(value)))
     }
 
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
