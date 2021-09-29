@@ -5,4 +5,8 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.ISO])
-data class IsoWithoutCompanion(val field: String, val nullable: String?, val option: Option<String>)
+public data class IsoWithoutCompanion(
+  val field: String,
+  val nullable: String?,
+  val option: Option<String>
+)

@@ -4,7 +4,7 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.ISO])
-data class IsoXXL(
+public data class IsoXXL(
   val field1: String,
   val field2: String,
   val field3: String,
@@ -29,5 +29,5 @@ data class IsoXXL(
   val field22: String,
   val field23: String
 ) {
-  companion object
+  public companion object
 }

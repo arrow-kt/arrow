@@ -79,7 +79,7 @@ public class JekyllRenderer(context: DokkaContext) : CommonmarkRenderer(context)
   override val preprocessors: List<PageTransformer> =
     context.plugin<DokkaFenceWorkaround>().query { jekyllPreprocessors }
 
-  override fun StringBuilder.buildNewLine() {
+  public fun StringBuilder.buildNewLine() {
     append("\n")
   }
 

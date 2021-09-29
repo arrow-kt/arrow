@@ -4,7 +4,7 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.OPTIONAL])
-data class OptionalSecondaryConstructor(val field: String?) {
-  constructor(number: Int?) : this(number?.toString())
-  companion object
+public data class OptionalSecondaryConstructor(val field: String?) {
+  public constructor(number: Int?) : this(number?.toString())
+  public companion object
 }

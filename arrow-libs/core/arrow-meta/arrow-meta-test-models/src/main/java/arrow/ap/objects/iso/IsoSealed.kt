@@ -6,7 +6,11 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.ISO])
-sealed class IsoSealed(val field: String, val nullable: String?, val option: Option<String>) {
-  data class IsoSealed2(val a: String?) : IsoSealed("", null, None)
-  companion object
+public sealed class IsoSealed(
+  public val field: String,
+  public val nullable: String?,
+  public val option: Option<String>
+) {
+  public data class IsoSealed2(val a: String?) : IsoSealed("", null, None)
+  public companion object
 }

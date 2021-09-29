@@ -13,11 +13,34 @@
   the number of artifacts in a single task.
 
 */
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("VERSION_CATALOGS")
 
 rootProject.name = "arrow-libs"
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-enableFeaturePreview("VERSION_CATALOGS")
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    // TODO: REMOVE THIS ONE WHEN THEY ARE PUBLISHED TO MAVENCENTRAL
+    maven("https://oss.sonatype.org/content/repositories/snapshots/") {
+      content {
+        includeGroup("io.arrow-kt")
+        includeGroup("io.arrow-kt.arrow-gradle-config-jvm")
+        includeGroup("io.arrow-kt.arrow-gradle-config-multiplatform")
+        includeGroup("io.arrow-kt.arrow-gradle-config-nexus")
+        includeGroup("io.arrow-kt.arrow-gradle-config-publish-jvm")
+        includeGroup("io.arrow-kt.arrow-gradle-config-publish-multiplatform")
+      }
+    }
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+  }
+}
 
 // Core
 include("arrow-core")
