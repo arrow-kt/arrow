@@ -1,7 +1,7 @@
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id(libs.plugins.arrowGradleConfig.jvm.get().pluginId)
+  kotlin("jvm")
   id("org.jetbrains.kotlin.kapt")
 }
 
