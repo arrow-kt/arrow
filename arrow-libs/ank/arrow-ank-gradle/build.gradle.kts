@@ -34,10 +34,6 @@ gradlePlugin {
 }
 
 tasks.whenTaskAdded {
-
-}
-
-tasks.whenTaskAdded {
   if (name.matches(".*Plugin.*MavenPublication.*".toRegex())) {
     enabled = false
   }
