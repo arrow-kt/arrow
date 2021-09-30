@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
 }
 
-
 apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 

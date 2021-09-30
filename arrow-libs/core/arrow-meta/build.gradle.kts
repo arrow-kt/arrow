@@ -17,7 +17,7 @@ dependencies {
   implementation(libs.google.autoService)
   kapt(libs.google.autoService)
 
-  //To generate stubs for data classes
+  // To generate stubs for data classes
   kaptTest(libs.google.autoService)
   testImplementation(libs.google.compileTesting)
   testImplementation(fileTree("dir" to "./src/test/libs", "includes" to listOf("*.jar")))
