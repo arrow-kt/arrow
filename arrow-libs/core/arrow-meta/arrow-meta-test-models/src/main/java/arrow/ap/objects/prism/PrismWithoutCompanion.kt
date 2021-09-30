@@ -6,11 +6,7 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.PRISM])
-public sealed class PrismWithoutCompanion(
-  public val field: String,
-  public val nullable: String?,
-  public val option: Option<String>
-) {
-  public data class PrismSealed1(private val a: String?) : PrismWithoutCompanion("", a, None)
-  public data class PrismSealed2(private val b: String?) : PrismWithoutCompanion("", b, None)
+sealed class PrismWithoutCompanion(val field: String, val nullable: String?, val option: Option<String>) {
+  data class PrismSealed1(private val a: String?) : PrismWithoutCompanion("", a, None)
+  data class PrismSealed2(private val b: String?) : PrismWithoutCompanion("", b, None)
 }

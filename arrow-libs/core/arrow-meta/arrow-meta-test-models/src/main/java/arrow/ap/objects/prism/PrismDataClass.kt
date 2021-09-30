@@ -5,10 +5,6 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.PRISM])
-public data class PrismDataClass(
-  public val field: String,
-  public val nullable: String?,
-  public val option: Option<String>
-) {
-  public companion object
+data class PrismDataClass(val field: String, val nullable: String?, val option: Option<String>) {
+  companion object
 }

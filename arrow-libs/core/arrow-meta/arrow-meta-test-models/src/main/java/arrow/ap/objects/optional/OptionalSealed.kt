@@ -6,11 +6,7 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.OPTIONAL])
-public sealed class OptionalSealed(
-  public val field: String,
-  public val nullable: String?,
-  public val option: Option<String>
-) {
-  public data class Optional2(val a: String?) : OptionalSealed("", null, None)
-  public companion object
+sealed class OptionalSealed(val field: String, val nullable: String?, val option: Option<String>) {
+  data class Optional2(val a: String?) : OptionalSealed("", null, None)
+  companion object
 }

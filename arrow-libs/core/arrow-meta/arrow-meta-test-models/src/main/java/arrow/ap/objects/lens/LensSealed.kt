@@ -6,11 +6,7 @@ import arrow.optics.OpticsTarget
 import arrow.optics.optics
 
 @optics([OpticsTarget.LENS])
-public sealed class LensSealed(
-  public val field: String,
-  public val nullable: String?,
-  public val option: Option<String>
-) {
-  public data class Lens2(val a: String?) : LensSealed("", null, None)
-  public companion object
+sealed class LensSealed(val field: String, val nullable: String?, val option: Option<String>) {
+  data class Lens2(val a: String?) : LensSealed("", null, None)
+  companion object
 }
