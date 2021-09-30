@@ -417,7 +417,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *
  * suspend fun main() {
  *   val houseNumber = config.parse(Read.intRead, "house_number").andThen { number ->
- *     if (number >= 0) Valid(0)
+ *     if (number >= 0) Valid(number)
  *     else Invalid(ConfigError.ParseConfig("house_number"))
  * }
  * //sampleEnd
