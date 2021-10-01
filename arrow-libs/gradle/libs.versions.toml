@@ -1,6 +1,6 @@
 [versions]
 animalSniffer = "1.5.0"
-arrowGradleConfig = "0.0.1-SNAPSHOT"
+arrowGradleConfig = "0.1.0"
 autoService = "1.0-rc7"
 compileTesting = "0.18"
 coroutines = "1.5.2"
