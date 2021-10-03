@@ -20,3 +20,8 @@ plugins {
 configure("arrow-ank") {
     apply from: "$ROOT_PROJECT"
 }
+
+allprojects {
+    group = property("projects.group").toString()
+    version = property("projects.version").toString()
+}
