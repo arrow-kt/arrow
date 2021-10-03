@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
 }
 
+publishMultiplatform {
+    isDokkaEnabled = false
+}
+
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {

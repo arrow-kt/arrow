@@ -15,12 +15,12 @@ if [ "$GITHUB_REF" == "refs/heads/main" ]; then
     fi
 
     if [ "$LATEST_PUBLISHED_VERSION" == "" ]; then exit 1; fi
-    RELEASE_VERSION=$(grep projects.latestVersion $BASEDIR/gradle.properties | cut -d= -f2)
+    RELEASE_VERSION=$(grep "projects.latestVersion" $BASEDIR/gradle.properties | cut -d= -f2)
     if [ "$LATEST_PUBLISHED_VERSION" != "$RELEASE_VERSION" ]; then NEW_RELEASE_VERSION_EXISTS=1; fi
 else
     echo "Into release branch ..."
     BRANCH_VERSION=$(echo $GITHUB_REF | cut -d/ -f4)
-    RELEASE_VERSION=$(grep projects.latestVersion $BASEDIR/gradle.properties | cut -d= -f2)
+    RELEASE_VERSION=$(grep "projects.latestVersion" $BASEDIR/gradle.properties | cut -d= -f2)
     if [ "$BRANCH_VERSION" == "$RELEASE_VERSION" ]; then
         NEW_RELEASE_VERSION_EXISTS=1
     else

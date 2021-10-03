@@ -5,6 +5,10 @@ plugins {
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
+publishMultiplatform {
+  isDokkaEnabled = false
+}
+
 kotlin {
   sourceSets {
     commonMain {
