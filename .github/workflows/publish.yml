@@ -61,7 +61,7 @@ jobs:
       - name: Publish Apple, Linux, JVM & JS targets
         working-directory: arrow-libs
         run: |
-          ./gradlew publishToSonatype
+          ./gradlew publishToSonatype --stacktrace
           echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Apple, Linux, JVM & JS deployed!"
 
       - name: Stop Gradle daemons
@@ -99,7 +99,7 @@ jobs:
       - name: Publish Windows
         working-directory: arrow-libs
         run: |
-          ./gradlew publishToSonatype
+          ./gradlew publishToSonatype --stacktrace
           echo "$(cat gradle.properties | grep projects.version | cut -d'=' -f2) MingwX64 deployed!"
 
       - name: Stop Gradle daemons
