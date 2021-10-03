@@ -52,6 +52,9 @@ jobs:
         working-directory: arrow-site
         run: ./gradlew runAnk
 
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
   linux_jvm_and_js:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -93,7 +96,10 @@ jobs:
           name: test-reports
           path: test-reports
 
-  macos_and_ios:
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
+  apple:
     runs-on: macos-latest
     timeout-minutes: 20
 
@@ -116,7 +122,7 @@ jobs:
 
       - name: Build
         working-directory: arrow-libs
-        run: ./gradlew iosX64Test macosX64Test
+        run: ./gradlew iosX64Test macosX64Test tvosX64Test watchosX64Test
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -134,46 +140,8 @@ jobs:
           name: test-reports
           path: test-reports
 
-  tv_and_watchos:
-    runs-on: macos-latest
-    timeout-minutes: 30
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: tv-watchos-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            tv-watch-os-step-gradle-
-
-      - name: Build
-        working-directory: arrow-libs
-        run: ./gradlew tvosX64Test watchosX64Test
-
-      - name: "Prepare test reports"
-        if: ${{ always() }}
-        run: |
-          mkdir test-reports
-          for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
-            module=$(echo $report | cut -d/ -f3)
-            cp -r $report test-reports/$module
-          done
-
-      - name: "Make test reports available to download"
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v1
-        with:
-          name: test-reports
-          path: test-reports
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
 
   windows:
     runs-on: windows-latest
@@ -199,3 +167,6 @@ jobs:
       - name: Build
         working-directory: arrow-libs
         run: ./gradlew mingwX64Test
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop

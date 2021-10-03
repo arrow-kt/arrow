@@ -6,7 +6,7 @@ buildscript {
         apply from: "../arrow-libs/gradle/setup.gradle"
     }
     dependencies {
-        classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
+        classpath "io.arrow-kt:arrow-ank-gradle:${property("projects.version")}"
     }
 }
 
@@ -19,13 +19,13 @@ plugins {
 apply from: "../arrow-libs/gradle/main.gradle"
 
 dependencies {
-    implementation "io.arrow-kt:arrow-optics:$VERSION_NAME"
-    implementation "io.arrow-kt:arrow-core:$VERSION_NAME"
-    implementation "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
-    implementation "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
+    implementation "io.arrow-kt:arrow-optics:${property("projects.version")}"
+    implementation "io.arrow-kt:arrow-core:${property("projects.version")}"
+    implementation "io.arrow-kt:arrow-fx-coroutines:${property("projects.version")}"
+    implementation "io.arrow-kt:arrow-fx-stm:${property("projects.version")}"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
 
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kapt "io.arrow-kt:arrow-meta:${property("projects.version")}"
 }
 
 // Ank Plugin is not applied for every library to avoid adding runtime dependencies

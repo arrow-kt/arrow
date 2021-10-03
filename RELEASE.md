@@ -13,8 +13,8 @@ Prepare a pull request with these changes:
 
 1. Update versions in `arrow-libs/gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
 ```
-VERSION_NAME=0.11.0-SNAPSHOT
-LATEST_VERSION=0.10.5
+projects.version=0.11.0-SNAPSHOT
+projects.latestVersion=0.10.5
 ```
 2. Update versions in `README.md`
 3. Update versions in [the QuickStart section of the website](arrow-site/docs/docs/quickstart/README.md).
@@ -67,7 +67,7 @@ How to fix a `<major.minor.patch>` version in some of those contexts:
 4. Try the new `<major.minor.(patch + 1)-SNAPSHOT>` version.
 5. Create a pull request into `main` branch if the fix must be applied to the new versions as well.
 6. Create a pull request into `release/<major.minor.(patch + 1)>` branch to release the fix:
-    * Change just `LATEST_VERSION` in `arrow-libs/gradle.properties`.
+    * Change just `projects.latestVersion` in `arrow-libs/gradle.properties`.
     * Update the version in `README.md`.
     * Update the version in [the QuickStart section of the website](arrow-site/docs/docs/quickstart/README.md).
     * Update [the sidebar](arrow-site/docs/_data/doc-versions.yml).
