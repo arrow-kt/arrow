@@ -4,6 +4,10 @@ plugins {
   id("org.jetbrains.kotlin.kapt")
 }
 
+publishJVM {
+  isDokkaEnabled = false
+}
+
 dependencies {
   api(projects.arrowAnnotations)
   api(libs.arrow.kotlinMetadata)

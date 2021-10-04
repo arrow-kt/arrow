@@ -12,6 +12,11 @@ plugins {
     alias(libs.plugins.arrowGradleConfig.nexus)
 }
 
+allprojects {
+  group = property("projects.group").toString()
+  version = property("projects.version").toString()
+}
+
 tasks {
   val generateDoc by creating(Exec::class) {
     group = "documentation"
