@@ -949,8 +949,26 @@ public sealed class Either<out A, out B> {
   public inline fun all(predicate: (B) -> Boolean): Boolean =
     fold({ true }, predicate)
 
+  /**
+   * Returns `true` if [Left]
+   *
+   * Example:
+   * ```
+   * Left("foo").isEmpty()  // Result: true
+   * Right("foo").isEmpty() // Result: false
+   * ```
+   */
   public fun isEmpty(): Boolean = isLeft
 
+  /**
+   * Returns `true` if [Right]
+   *
+   * Example:
+   * ```
+   * Left("foo").isEmpty()  // Result: false
+   * Right("foo").isEmpty() // Result: true
+   * ```
+   */
   public fun isNotEmpty(): Boolean = isRight
 
   /**
