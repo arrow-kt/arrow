@@ -1114,8 +1114,8 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  *
  * Example:
  * ```
- * Right(12).getOrElse(17) // Result: 12
- * Left(12).getOrElse(17)  // Result: 17
+ * Right(12).getOrElse { 17 } // Result: 12
+ * Left(12).getOrElse { 17 }  // Result: 17
  * ```
  */
 public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
