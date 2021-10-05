@@ -74,7 +74,7 @@ import kotlin.jvm.JvmStatic
  *
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
  *
- * Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
+ * Since we only ever want the computation to continue in the case of [Right] (as captured by the right-bias nature),
  * we fix the left type parameter and leave the right one free.
  *
  * So, the map and flatMap methods are right-biased:
@@ -157,7 +157,7 @@ import kotlin.jvm.JvmStatic
  * //sampleEnd
  * ```
  *
- * These calls to `parse` return a `Left` and `Right` value
+ * These calls to `parse` return a [Left] and [Right] value
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -208,10 +208,10 @@ import kotlin.jvm.JvmStatic
  * ```
  *
  * In the following exercise, we pattern-match on every case in which the `Either` returned by `magic` can be in.
- * Note the `when` clause in the `Left` - the compiler will complain if we leave that out because it knows that,
- * given the type `Either[Exception, String]`, there can be inhabitants of `Left` that are not
+ * Note the `when` clause in the [Left] - the compiler will complain if we leave that out because it knows that,
+ * given the type `Either[Exception, String]`, there can be inhabitants of [Left] that are not
  * `NumberFormatException` or `IllegalArgumentException`. You should also notice that we are using
- * [SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing `Left` and `Right`
+ * [SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing [Left] and [Right]
  * values.
  *
  * ```kotlin:ank:playground
@@ -435,7 +435,7 @@ import kotlin.jvm.JvmStatic
  *
  * ## Syntax
  *
- * Either can also map over the `left` value with `mapLeft`, which is similar to map, but applies on left instances.
+ * Either can also map over the [Left] value with `mapLeft`, which is similar to map, but applies on left instances.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -561,7 +561,7 @@ import kotlin.jvm.JvmStatic
  * }
  * ```
  *
- * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
+ * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is [Left]
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -590,7 +590,7 @@ import kotlin.jvm.JvmStatic
  * ```
  *
  * The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
- * the value of `Left`. This can be useful when mapping to a single result type is required like `fold()`, but without
+ * the value of [Left]. This can be useful when mapping to a single result type is required like `fold()`, but without
  * the need to handle `Either.Right` case.
  *
  * As an example, we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
@@ -782,7 +782,7 @@ public sealed class Either<out A, out B> {
   }
 
   /**
-   * If this is a `Left`, then return the left value in `Right` or vice versa.
+   * If this is a [Left], then return the left value in [Right] or vice versa.
    *
    * Example:
    * ```
@@ -794,7 +794,7 @@ public sealed class Either<out A, out B> {
     fold({ Right(it) }, { Left(it) })
 
   /**
-   * The given function is applied if this is a `Right`.
+   * The given function is applied if this is a [Right].
    *
    * Example:
    * ```
@@ -806,7 +806,7 @@ public sealed class Either<out A, out B> {
     flatMap { Right(f(it)) }
 
   /**
-   * The given function is applied if this is a `Left`.
+   * The given function is applied if this is a [Left].
    *
    * Example:
    * ```
@@ -819,7 +819,7 @@ public sealed class Either<out A, out B> {
 
   /**
    * The given function is applied as a fire and forget effect
-   * if this is a `Left`.
+   * if this is a [Left].
    * When applied the result is ignored and the original
    * Either value is returned
    *
@@ -840,7 +840,7 @@ public sealed class Either<out A, out B> {
 
   /**
    * The given function is applied as a fire and forget effect
-   * if this is a `Right`.
+   * if this is a [Right].
    * When applied the result is ignored and the original
    * Either value is returned
    *
@@ -1003,14 +1003,14 @@ public sealed class Either<out A, out B> {
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
      * provided on second and third parameters. Second parameter represents function for creating
-     * an [Either.Left] in case of a false result of evaluation and third parameter will be used
-     * to create a [Either.Right] in case of a true result.
+     * an [Left] in case of a false result of evaluation and third parameter will be used
+     * to create a [Right] in case of a true result.
      *
      * @param test expression to evaluate and build an [Either]
-     * @param ifFalse function to create a [Either.Left] in case of false result of test
-     * @param ifTrue function to create a [Either.Right] in case of true result of test
+     * @param ifFalse function to create a [Left] in case of false result of test
+     * @param ifTrue function to create a [Right] in case of true result of test
      *
-     * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
+     * @return [Right] if evaluation succeed, [Left] otherwise
      */
     @JvmStatic
     public inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
@@ -1096,9 +1096,9 @@ public sealed class Either<out A, out B> {
 }
 
 /**
- * Binds the given function across [Either.Right].
+ * Binds the given function across [Right].
  *
- * @param f The function to bind across [Either.Right].
+ * @param f The function to bind across [Right].
  */
 public inline fun <A, B, C> Either<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   when (this) {
@@ -1110,7 +1110,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
 
 /**
- * Returns the value from this [Either.Right] or the given argument if this is a [Either.Left].
+ * Returns the value from this [Right] or the given argument if this is a [Left].
  *
  * Example:
  * ```
@@ -1122,7 +1122,7 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
 
 /**
- * Returns the value from this [Either.Right] or null if this is a [Either.Left].
+ * Returns the value from this [Right] or null if this is a [Left].
  *
  * Example:
  * ```
@@ -1134,8 +1134,8 @@ public fun <B> Either<*, B>.orNull(): B? =
   getOrElse { null }
 
 /**
- * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
- * the value of [Either.Left].
+ * Returns the value from this [Right] or allows clients to transform [Left] to [Right] while providing access to
+ * the value of [Left].
  *
  * Example:
  * ```
@@ -1147,13 +1147,13 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
 
 /**
- * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
+ * Returns [Right] with the existing value of [Right] if this is a [Right] and the given predicate
  * holds for the right value.<br>
  *
- * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not
+ * Returns `Left(default)` if this is a [Right] and the given predicate does not
  * hold for the right value.<br>
  *
- * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
+ * Returns [Left] with the existing value of [Left] if this is a [Left].<br>
  *
  * Example:
  * ```
@@ -1168,14 +1168,14 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
- * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
+ * Returns [Right] with the existing value of [Right] if this is a [Right] and the given
  * predicate holds for the right value.<br>
  *
- * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
+ * Returns `Left(default({right}))` if this is a [Right] and the given predicate does not
  * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
  * did not pass the filter<br>
  *
- * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
+ * Returns [Left] with the existing value of [Left] if this is a [Left].<br>
  *
  * Example:
  *
@@ -1203,7 +1203,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
   }
 
 /**
- * Returns the value from this [Either.Right] or [Either.Left].
+ * Returns the value from this [Right] or [Left].
  *
  * Example:
  * ```
@@ -1215,12 +1215,12 @@ public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
 
 /**
- * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
+ * Returns [Right] with the existing value of [Right] if this is an [Right] with a non-null value.
  * The returned Either.Right type is not nullable.
  *
- * Returns `Left(default())` if this is an [Either.Right] and the existing value is null
+ * Returns `Left(default())` if this is an [Right] and the existing value is null
  *
- * Returns [Either.Left] with the existing value of [Either.Left] if this is an [Either.Left].
+ * Returns [Left] with the existing value of [Left] if this is an [Left].
  *
  * Example:
  * ```
@@ -1234,7 +1234,7 @@ public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B
   flatMap { it.rightIfNotNull { default() } }
 
 /**
- * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
+ * Returns `true` if this is a [Right] and its value is equal to `elem` (as determined by `==`),
  * returns `false` otherwise.
  *
  * Example:
@@ -1261,8 +1261,8 @@ public fun <A> A.left(): Either<A, Nothing> = Left(this)
 public fun <A> A.right(): Either<Nothing, A> = Right(this)
 
 /**
- * Returns [Either.Right] if the value of type B is not null, otherwise the specified A value wrapped into an
- * [Either.Left].
+ * Returns [Right] if the value of type B is not null, otherwise the specified A value wrapped into an
+ * [Left].
  *
  * Example:
  * ```
@@ -1276,8 +1276,8 @@ public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = whe
 }
 
 /**
- * Returns [Either.Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
- * [Either.Left].
+ * Returns [Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
+ * [Left].
  */
 public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
   null -> Right(null)
