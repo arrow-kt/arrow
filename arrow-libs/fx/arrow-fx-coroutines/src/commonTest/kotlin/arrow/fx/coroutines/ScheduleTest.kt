@@ -7,10 +7,8 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.nanoseconds
-import kotlin.time.seconds
 
 @ExperimentalTime
 class ScheduleTest : ArrowFxSpec(
@@ -56,7 +54,8 @@ class ScheduleTest : ArrowFxSpec(
       val n = 500
       val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
 
-      res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
+      res.dropLast(1).map { Duration.nanoseconds(it.delayInNanos) } shouldBe res.dropLast(1)
+        .map { Duration.nanoseconds(0) }
       res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
 
       res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
@@ -113,7 +112,7 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "Schedule.never() times out" {
-      withTimeoutOrNull(10.milliseconds) {
+      withTimeoutOrNull(Duration.milliseconds(10)) {
         val a: Nothing = Schedule.never<Int>().repeat {
           1
         }
@@ -121,11 +120,11 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "Schedule.spaced()" {
-      val duration = 5.seconds
+      val duration = Duration.seconds(5)
       val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
 
       res.map { it.cont } shouldBe res.map { true }
-      res.map { it.delayInNanos.nanoseconds } shouldBe res.map { duration }
+      res.map { Duration.nanoseconds(it.delayInNanos) } shouldBe res.map { duration }
     }
 
     fun secondsToNanos(sec: Int): Double =
@@ -294,7 +293,9 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Un
 @ExperimentalTime
 private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>): Unit {
   require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
-  require(delayInNanos.nanoseconds == other.delayInNanos.nanoseconds) { "Decision#delay.nanoseconds: ${this.delayInNanos.nanoseconds} shouldBe ${other.delayInNanos.nanoseconds}" }
+  require(Duration.nanoseconds(delayInNanos) == Duration.nanoseconds(other.delayInNanos)) {
+    "Decision#delay.nanoseconds: ${Duration.nanoseconds(this.delayInNanos)} shouldBe ${Duration.nanoseconds(other.delayInNanos)}"
+  }
   if (cont) {
     val lh = finish.value()
     val rh = other.finish.value()

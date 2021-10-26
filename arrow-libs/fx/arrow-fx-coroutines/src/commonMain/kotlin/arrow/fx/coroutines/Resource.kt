@@ -177,6 +177,9 @@ public sealed class Resource<out A> {
   public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
     flatMap { res -> ff.map { it(res) } }
 
+  public fun <B> apSuspend(ff: Resource<suspend (A) -> B>): Resource<B> =
+    flatMap { res -> ff.map { it(res) } }
+
   /**
    * Create a resource value of [B] from a resource [A] by mapping [f].
    *
@@ -218,7 +221,7 @@ public sealed class Resource<out A> {
    * @see zip to combine independent resources together
    * @see parZip for combining independent resources in parallel
    */
-  public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
+  public fun <B> flatMap(f: suspend (A) -> Resource<B>): Resource<B> =
     Bind(this, f)
 
   public inline fun <B, C> zip(other: Resource<B>, crossinline combine: (A, B) -> C): Resource<C> =
@@ -480,7 +483,7 @@ public sealed class Resource<out A> {
       f(ar.first, br.first)
     }
 
-  public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
+  public class Bind<A, B>(public val source: Resource<A>, public val f: suspend (A) -> Resource<B>) : Resource<B>()
 
   public class Allocate<A>(
     public val acquire: suspend () -> A,
@@ -531,7 +534,7 @@ public sealed class Resource<out A> {
   private suspend fun continueLoop(
     current: Resource<Any?>,
     use: suspend (Any?) -> Any?,
-    stack: List<(Any?) -> Resource<Any?>>
+    stack: List<suspend (Any?) -> Resource<Any?>>
   ): Any? = useLoop(current, use, stack)
 
   // Interpreter that knows how to evaluate a Resource data structure
@@ -540,12 +543,12 @@ public sealed class Resource<out A> {
   private tailrec suspend fun useLoop(
     current: Resource<Any?>,
     use: suspend (Any?) -> Any?,
-    stack: List<(Any?) -> Resource<Any?>>
+    stack: List<suspend (Any?) -> Resource<Any?>>
   ): Any? =
     when (current) {
       is Defer -> useLoop(current.resource.invoke(), use, stack)
       is Bind<*, *> ->
-        useLoop(current.source as Resource<Any?>, use, listOf(current.f as (Any?) -> Resource<Any?>) + stack)
+        useLoop(current.source as Resource<Any?>, use, listOf(current.f as suspend (Any?) -> Resource<Any?>) + stack)
       is Allocate -> bracketCase(
         acquire = current.acquire,
         use = { a ->
@@ -695,12 +698,12 @@ public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
 @Suppress("UNCHECKED_CAST")
 private tailrec suspend fun useLoop(
   current: Resource<Any?>,
-  stack: List<(Any?) -> Resource<Any?>>
+  stack: List<suspend (Any?) -> Resource<Any?>>
 ): Pair<Any?, suspend (ExitCase) -> Unit> =
   when (current) {
     is Resource.Defer -> useLoop(current.resource.invoke(), stack)
     is Resource.Bind<*, *> ->
-      useLoop(current.source, listOf(current.f as (Any?) -> Resource<Any?>) + stack)
+      useLoop(current.source, listOf(current.f as suspend (Any?) -> Resource<Any?>) + stack)
     is Resource.Allocate -> loadResourceAndReleaseHandler(
       acquire = current.acquire,
       use = { a ->

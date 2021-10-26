@@ -304,7 +304,8 @@ public final class arrow/fx/coroutines/Race3Kt {
 public abstract class arrow/fx/coroutines/Resource {
 	public static final field Companion Larrow/fx/coroutines/Resource$Companion;
 	public final fun ap (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
-	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public final fun apSuspend (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
+	public final fun flatMap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun map (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun parZip (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun parZip (Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
@@ -330,8 +331,8 @@ public final class arrow/fx/coroutines/Resource$Allocate : arrow/fx/coroutines/R
 }
 
 public final class arrow/fx/coroutines/Resource$Bind : arrow/fx/coroutines/Resource {
-	public fun <init> (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function1;)V
-	public final fun getF ()Lkotlin/jvm/functions/Function1;
+	public fun <init> (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function2;)V
+	public final fun getF ()Lkotlin/jvm/functions/Function2;
 	public final fun getSource ()Larrow/fx/coroutines/Resource;
 }
 
