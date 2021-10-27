@@ -177,9 +177,6 @@ public sealed class Resource<out A> {
   public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
     flatMap { res -> ff.map { it(res) } }
 
-  public fun <B> apSuspend(ff: Resource<suspend (A) -> B>): Resource<B> =
-    flatMap { res -> ff.map { it(res) } }
-
   /**
    * Create a resource value of [B] from a resource [A] by mapping [f].
    *
