@@ -45,6 +45,7 @@ include("arrow-continuations")
 include("arrow-meta:arrow-meta-test-models")
 include("arrow-meta")
 include("arrow-core-retrofit")
+include("arrow-generics")
 
 project(":arrow-core").projectDir = file("core/arrow-core")
 project(":arrow-core-test").projectDir = file("core/arrow-core-test")
@@ -54,6 +55,7 @@ project(":arrow-meta:arrow-meta-test-models").projectDir =
   file("core/arrow-meta/arrow-meta-test-models")
 project(":arrow-meta").projectDir = file("core/arrow-meta")
 project(":arrow-core-retrofit").projectDir = file("core/arrow-core-retrofit")
+project(":arrow-generics").projectDir = file("core/arrow-generics")
 
 // Fx
 include("arrow-fx-coroutines")

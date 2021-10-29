@@ -1,0 +1,340 @@
+public abstract interface class arrow/generics/examples/Client {
+}
+
+public final class arrow/generics/examples/Company : arrow/generics/examples/Client {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Larrow/generics/examples/Company;
+	public static synthetic fun copy$default (Larrow/generics/examples/Company;Ljava/lang/String;ILjava/lang/Object;)Larrow/generics/examples/Company;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/examples/Leaf : arrow/generics/examples/Tree {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/generics/examples/Leaf;
+	public static synthetic fun copy$default (Larrow/generics/examples/Leaf;Ljava/lang/Object;ILjava/lang/Object;)Larrow/generics/examples/Leaf;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getX ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/examples/Node : arrow/generics/examples/Tree {
+	public fun <init> (Larrow/generics/examples/Tree;Larrow/generics/examples/Tree;)V
+	public final fun component1 ()Larrow/generics/examples/Tree;
+	public final fun component2 ()Larrow/generics/examples/Tree;
+	public final fun copy (Larrow/generics/examples/Tree;Larrow/generics/examples/Tree;)Larrow/generics/examples/Node;
+	public static synthetic fun copy$default (Larrow/generics/examples/Node;Larrow/generics/examples/Tree;Larrow/generics/examples/Tree;ILjava/lang/Object;)Larrow/generics/examples/Node;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLeft ()Larrow/generics/examples/Tree;
+	public final fun getRight ()Larrow/generics/examples/Tree;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/examples/Person : arrow/generics/examples/Client {
+	public fun <init> (Ljava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun copy (Ljava/lang/String;I)Larrow/generics/examples/Person;
+	public static synthetic fun copy$default (Larrow/generics/examples/Person;Ljava/lang/String;IILjava/lang/Object;)Larrow/generics/examples/Person;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAge ()I
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/examples/Tree {
+}
+
+public final class arrow/generics/recursive/And : arrow/generics/recursive/Product {
+	public fun <init> (Ljava/lang/String;Larrow/generics/recursive/Value;Larrow/generics/recursive/Product;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/generics/recursive/Value;
+	public final fun component3 ()Larrow/generics/recursive/Product;
+	public final fun copy (Ljava/lang/String;Larrow/generics/recursive/Value;Larrow/generics/recursive/Product;)Larrow/generics/recursive/And;
+	public static synthetic fun copy$default (Larrow/generics/recursive/And;Ljava/lang/String;Larrow/generics/recursive/Value;Larrow/generics/recursive/Product;ILjava/lang/Object;)Larrow/generics/recursive/And;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getRest ()Larrow/generics/recursive/Product;
+	public final fun getValue ()Larrow/generics/recursive/Value;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/recursive/EndD : arrow/generics/recursive/Product {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/generics/recursive/EndD;
+	public static synthetic fun copy$default (Larrow/generics/recursive/EndD;IILjava/lang/Object;)Larrow/generics/recursive/EndD;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getE ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/recursive/EndP : arrow/generics/recursive/ProductRepr {
+}
+
+public abstract interface class arrow/generics/recursive/EndS : arrow/generics/recursive/SumRepr {
+}
+
+public final class arrow/generics/recursive/Field : arrow/generics/recursive/Value {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/generics/recursive/Field;
+	public static synthetic fun copy$default (Larrow/generics/recursive/Field;Ljava/lang/Object;ILjava/lang/Object;)Larrow/generics/recursive/Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/recursive/FieldR : arrow/generics/recursive/ValueRepr {
+}
+
+public abstract interface class arrow/generics/recursive/Interpr {
+}
+
+public final class arrow/generics/recursive/Par : arrow/generics/recursive/Value {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/generics/recursive/Par;
+	public static synthetic fun copy$default (Larrow/generics/recursive/Par;Ljava/lang/Object;ILjava/lang/Object;)Larrow/generics/recursive/Par;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/recursive/ParR : arrow/generics/recursive/ValueRepr {
+}
+
+public abstract interface class arrow/generics/recursive/Product : arrow/generics/recursive/Interpr {
+}
+
+public abstract interface class arrow/generics/recursive/ProductRepr : arrow/generics/recursive/Repr {
+}
+
+public final class arrow/generics/recursive/Rec : arrow/generics/recursive/Value {
+	public fun <init> (Larrow/generics/recursive/Sum;)V
+	public final fun component1 ()Larrow/generics/recursive/Sum;
+	public final fun copy (Larrow/generics/recursive/Sum;)Larrow/generics/recursive/Rec;
+	public static synthetic fun copy$default (Larrow/generics/recursive/Rec;Larrow/generics/recursive/Sum;ILjava/lang/Object;)Larrow/generics/recursive/Rec;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Larrow/generics/recursive/Sum;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/recursive/RecR : arrow/generics/recursive/ValueRepr {
+}
+
+public abstract interface class arrow/generics/recursive/Repr {
+}
+
+public abstract interface class arrow/generics/recursive/Sum : arrow/generics/recursive/Interpr {
+}
+
+public abstract interface class arrow/generics/recursive/SumRepr : arrow/generics/recursive/Repr {
+}
+
+public final class arrow/generics/recursive/That : arrow/generics/recursive/Sum {
+	public fun <init> (Larrow/generics/recursive/Sum;)V
+	public final fun component1 ()Larrow/generics/recursive/Sum;
+	public final fun copy (Larrow/generics/recursive/Sum;)Larrow/generics/recursive/That;
+	public static synthetic fun copy$default (Larrow/generics/recursive/That;Larrow/generics/recursive/Sum;ILjava/lang/Object;)Larrow/generics/recursive/That;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNext ()Larrow/generics/recursive/Sum;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/recursive/This : arrow/generics/recursive/Sum {
+	public fun <init> (Ljava/lang/String;Larrow/generics/recursive/Product;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/generics/recursive/Product;
+	public final fun copy (Ljava/lang/String;Larrow/generics/recursive/Product;)Larrow/generics/recursive/This;
+	public static synthetic fun copy$default (Larrow/generics/recursive/This;Ljava/lang/String;Larrow/generics/recursive/Product;ILjava/lang/Object;)Larrow/generics/recursive/This;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChoice ()Ljava/lang/String;
+	public final fun getValue ()Larrow/generics/recursive/Product;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/recursive/TyP : arrow/generics/recursive/ProductRepr {
+}
+
+public abstract interface class arrow/generics/recursive/TyS : arrow/generics/recursive/SumRepr {
+}
+
+public abstract interface class arrow/generics/recursive/Value : arrow/generics/recursive/Interpr {
+}
+
+public abstract interface class arrow/generics/recursive/ValueRepr : arrow/generics/recursive/Repr {
+}
+
+public final class arrow/generics/recursive/examples/GMapKt {
+	public static final fun gmap (Larrow/generics/recursive/Sum;Lkotlin/jvm/functions/Function1;)Larrow/generics/recursive/Sum;
+}
+
+public final class arrow/generics/recursive/examples/TypesKt {
+	public static final fun fromGeneric (Larrow/generics/recursive/Sum;)Larrow/generics/examples/Tree;
+	public static final fun toGeneric (Larrow/generics/examples/Tree;)Larrow/generics/recursive/Sum;
+}
+
+public abstract interface class arrow/generics/shallow/Choice : arrow/generics/shallow/SumRepr {
+}
+
+public abstract interface class arrow/generics/shallow/End : arrow/generics/shallow/ProductRepr, arrow/generics/shallow/SumRepr {
+}
+
+public abstract interface class arrow/generics/shallow/Field : arrow/generics/shallow/ProductRepr {
+}
+
+public abstract interface class arrow/generics/shallow/ProductRepr : arrow/generics/shallow/Repr {
+}
+
+public abstract interface class arrow/generics/shallow/Repr {
+}
+
+public abstract interface class arrow/generics/shallow/SumRepr : arrow/generics/shallow/Repr {
+}
+
+public final class arrow/generics/shallow/data/And : arrow/generics/shallow/data/Product {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Object;Larrow/generics/shallow/data/Product;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun component3 ()Larrow/generics/shallow/data/Product;
+	public final fun copy (Ljava/lang/String;Ljava/lang/Object;Larrow/generics/shallow/data/Product;)Larrow/generics/shallow/data/And;
+	public static synthetic fun copy$default (Larrow/generics/shallow/data/And;Ljava/lang/String;Ljava/lang/Object;Larrow/generics/shallow/data/Product;ILjava/lang/Object;)Larrow/generics/shallow/data/And;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getRest ()Larrow/generics/shallow/data/Product;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/data/Done : arrow/generics/shallow/data/Product {
+	public static final field INSTANCE Larrow/generics/shallow/data/Done;
+}
+
+public abstract interface class arrow/generics/shallow/data/Generic {
+}
+
+public abstract interface class arrow/generics/shallow/data/Product : arrow/generics/shallow/data/Generic {
+}
+
+public abstract interface class arrow/generics/shallow/data/Sum : arrow/generics/shallow/data/Generic {
+}
+
+public final class arrow/generics/shallow/data/That : arrow/generics/shallow/data/Sum {
+	public fun <init> (Larrow/generics/shallow/data/Sum;)V
+	public final fun component1 ()Larrow/generics/shallow/data/Sum;
+	public final fun copy (Larrow/generics/shallow/data/Sum;)Larrow/generics/shallow/data/That;
+	public static synthetic fun copy$default (Larrow/generics/shallow/data/That;Larrow/generics/shallow/data/Sum;ILjava/lang/Object;)Larrow/generics/shallow/data/That;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNext ()Larrow/generics/shallow/data/Sum;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/data/This : arrow/generics/shallow/data/Sum {
+	public fun <init> (Ljava/lang/String;Larrow/generics/shallow/data/Product;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/generics/shallow/data/Product;
+	public final fun copy (Ljava/lang/String;Larrow/generics/shallow/data/Product;)Larrow/generics/shallow/data/This;
+	public static synthetic fun copy$default (Larrow/generics/shallow/data/This;Ljava/lang/String;Larrow/generics/shallow/data/Product;ILjava/lang/Object;)Larrow/generics/shallow/data/This;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChoice ()Ljava/lang/String;
+	public final fun getValue ()Larrow/generics/shallow/data/Product;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/data/examples/FunctionsKt {
+	public static final fun geq (Larrow/generics/shallow/data/Generic;Larrow/generics/shallow/data/Generic;)Z
+	public static final fun gprintln (Larrow/generics/shallow/data/Generic;)V
+	public static final fun gstring (Larrow/generics/shallow/data/Generic;)Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/data/examples/TypesKt {
+	public static final fun toGeneric (Larrow/generics/examples/Client;)Larrow/generics/shallow/data/Generic;
+}
+
+public final class arrow/generics/shallow/schema/And : arrow/generics/shallow/schema/ProductSchema {
+	public fun <init> (Lkotlin/reflect/KCallable;Larrow/generics/shallow/schema/ProductSchema;)V
+	public final fun component1 ()Lkotlin/reflect/KCallable;
+	public final fun component2 ()Larrow/generics/shallow/schema/ProductSchema;
+	public final fun copy (Lkotlin/reflect/KCallable;Larrow/generics/shallow/schema/ProductSchema;)Larrow/generics/shallow/schema/And;
+	public static synthetic fun copy$default (Larrow/generics/shallow/schema/And;Lkotlin/reflect/KCallable;Larrow/generics/shallow/schema/ProductSchema;ILjava/lang/Object;)Larrow/generics/shallow/schema/And;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getField ()Lkotlin/reflect/KCallable;
+	public final fun getRest ()Larrow/generics/shallow/schema/ProductSchema;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/schema/Arg : arrow/generics/shallow/schema/ArgumentList {
+	public fun <init> (Ljava/lang/Object;Larrow/generics/shallow/schema/ArgumentList;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Larrow/generics/shallow/schema/ArgumentList;
+	public final fun copy (Ljava/lang/Object;Larrow/generics/shallow/schema/ArgumentList;)Larrow/generics/shallow/schema/Arg;
+	public static synthetic fun copy$default (Larrow/generics/shallow/schema/Arg;Ljava/lang/Object;Larrow/generics/shallow/schema/ArgumentList;ILjava/lang/Object;)Larrow/generics/shallow/schema/Arg;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRest ()Larrow/generics/shallow/schema/ArgumentList;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/shallow/schema/ArgumentList {
+}
+
+public final class arrow/generics/shallow/schema/Done : arrow/generics/shallow/schema/ArgumentList, arrow/generics/shallow/schema/ProductSchema, arrow/generics/shallow/schema/SumSchema {
+	public static final field INSTANCE Larrow/generics/shallow/schema/Done;
+}
+
+public final class arrow/generics/shallow/schema/Or : arrow/generics/shallow/schema/SumSchema {
+	public fun <init> (Lkotlin/reflect/KClass;Larrow/generics/shallow/schema/ProductSchema;Larrow/generics/shallow/schema/SumSchema;)V
+	public final fun component1 ()Lkotlin/reflect/KClass;
+	public final fun component2 ()Larrow/generics/shallow/schema/ProductSchema;
+	public final fun component3 ()Larrow/generics/shallow/schema/SumSchema;
+	public final fun copy (Lkotlin/reflect/KClass;Larrow/generics/shallow/schema/ProductSchema;Larrow/generics/shallow/schema/SumSchema;)Larrow/generics/shallow/schema/Or;
+	public static synthetic fun copy$default (Larrow/generics/shallow/schema/Or;Lkotlin/reflect/KClass;Larrow/generics/shallow/schema/ProductSchema;Larrow/generics/shallow/schema/SumSchema;ILjava/lang/Object;)Larrow/generics/shallow/schema/Or;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Larrow/generics/shallow/schema/ProductSchema;
+	public final fun getKlass ()Lkotlin/reflect/KClass;
+	public final fun getRest ()Larrow/generics/shallow/schema/SumSchema;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generics/shallow/schema/ProductSchema {
+}
+
+public final class arrow/generics/shallow/schema/SchemaKt {
+	public static final fun build (Larrow/generics/shallow/schema/Or;Larrow/generics/shallow/schema/ArgumentList;)Ljava/lang/Object;
+	public static final fun get (Larrow/generics/shallow/schema/And;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun introduce (Larrow/generics/shallow/schema/SumSchema;Ljava/lang/Object;)Larrow/generics/shallow/schema/Or;
+	public static final fun toList (Larrow/generics/shallow/schema/ArgumentList;)Ljava/util/List;
+}
+
+public abstract interface class arrow/generics/shallow/schema/SumSchema {
+}
+
+public final class arrow/generics/shallow/schema/examples/FunctionsKt {
+	public static final fun gshow (Larrow/generics/shallow/schema/SumSchema;Ljava/lang/Object;)Ljava/lang/String;
+}
+
+public final class arrow/generics/shallow/schema/examples/TypesKt {
+	public static final fun getClientSchema ()Larrow/generics/shallow/schema/SumSchema;
+}
+

@@ -9,6 +9,7 @@ include("arrow-core")
 include("arrow-core-test")
 include("arrow-continuations")
 include("arrow-core-retrofit")
+include("arrow-generics")
 
 include("jekyll")
 project(":jekyll").projectDir = file("dokka/jekyll")
