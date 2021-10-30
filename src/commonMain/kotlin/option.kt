@@ -4,11 +4,16 @@ import arrow.core.Some
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.jvm.JvmInline
 
-suspend fun <A> option(f: OptionEffect<A>.() -> A): Option<A> =
-  cont<None, A> { f(OptionEffect(this)) }.fold(::identity) { Some(it) }
+suspend fun <A> option(f: OptionEffect.() -> A): Option<A> =
+  cont<None, A> { f(OptionEffect(this)) }.toOption()
 
-class OptionEffect<A>(private val cont: ContEffect<None>) : ContEffect<None> by cont {
+suspend fun <A> Cont<None, A>.toOption(): Option<A> =
+  fold(::identity) { Some(it) }
+
+@JvmInline
+value class OptionEffect(private val cont: ContEffect<None>) : ContEffect<None> {
   suspend fun <B> Option<B>.bind(): B =
     when (this) {
       None -> shift(None)
@@ -17,6 +22,9 @@ class OptionEffect<A>(private val cont: ContEffect<None>) : ContEffect<None> by 
 
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else shift(None)
+
+  override suspend fun <B> shift(r: None): B =
+    cont.shift(r)
 }
 
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.

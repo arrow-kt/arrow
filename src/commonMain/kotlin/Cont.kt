@@ -21,6 +21,12 @@ public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
  */
 public interface Cont<R, A> {
   suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B
+
+  suspend fun toEither(): Either<R, A> =
+    fold({ Either.Left(it) }) { Either.Right(it) }
+
+  suspend fun toValidated(): Validated<R, A> =
+    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 }
 
 interface ContEffect<R> {
