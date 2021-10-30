@@ -11,7 +11,7 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.resumeWithException
 
-public fun <R, A> cont(f: suspend ContEffect<R, A>.() -> A): Cont<R, A> =
+public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
   Continuation(f)
 
 /**
@@ -23,7 +23,7 @@ public interface Cont<R, A> {
   suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B
 }
 
-interface ContEffect<R, A> {
+interface ContEffect<R> {
   public suspend fun <B> shift(r: R): B
 
   public suspend fun <B> Cont<R, B>.bind(): B =
@@ -51,7 +51,7 @@ interface ContEffect<R, A> {
 }
 
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
-public suspend fun <R, B : Any> ContEffect<R, B>.ensureNotNull(value: B?, shift: () -> R): B {
+public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
@@ -63,12 +63,12 @@ private class Token {
   override fun toString(): String = "Token(${hashCode().toUInt().toString(16)})"
 }
 
-private class Continuation<R, A>(private val f: suspend ContEffect<R, A>.() -> A) : Cont<R, A> {
+private class Continuation<R, A>(private val f: suspend ContEffect<R>.() -> A) : Cont<R, A> {
   override suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
       var token: Token? = null
       var shifted: B? = null
-      val effect = object : ContEffect<R, A> {
+      val effect = object : ContEffect<R> {
         // Shift away from this Continuation by intercepting it, and completing it.
         // The Continuation we grab here, is the same one from line 25 which is constructed on line 40
         // So this is a single continuation, completing it with it's final value means the remainder of the
