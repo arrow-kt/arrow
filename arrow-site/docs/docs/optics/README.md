@@ -1,5 +1,7 @@
 ---
-layout: quickstart-optics title: Optics permalink: /optics/
+layout: quickstart-optics
+title: Optics
+permalink: /optics/
 ---
 
 <div class="quick-snap" markdown="1">

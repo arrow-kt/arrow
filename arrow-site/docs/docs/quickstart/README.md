@@ -1,5 +1,7 @@
 ---
-layout: quickstart title: Quick Start permalink: /quickstart/
+layout: quickstart
+title: Quick Start
+permalink: /quickstart/
 ---
 
 <div class="quick-snap" markdown="1">

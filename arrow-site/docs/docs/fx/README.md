@@ -1,5 +1,6 @@
 ---
-layout: quickstart-fx title: Arrow Fx. Async and Concurrent Functional Programming for Kotlin
+layout: quickstart-fx
+title: Arrow Fx. Async and Concurrent Functional Programming for Kotlin
 permalink: /fx/
 ---
 

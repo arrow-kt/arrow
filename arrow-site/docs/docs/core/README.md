@@ -1,5 +1,7 @@
 ---
-layout: quickstart-core title: Core permalink: /core/
+layout: quickstart-core
+title: Core
+permalink: /core/
 ---
 
 <div class="quick-snap" markdown="1">
