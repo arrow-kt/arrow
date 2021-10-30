@@ -125,7 +125,6 @@ Make sure to have at least the latest version of JDK 1.8 installed. Add to your 
 following properties:
 
 ```xml
-
 <properties>
     <kotlin.version>1.5.31</kotlin.version>
     <arrow.version>1.0.1</arrow.version>
@@ -135,7 +134,6 @@ following properties:
 Add the dependencies that you want to use:
 
 ```xml
-
 <dependency>
     <groupId>io.arrow-kt</groupId>
     <artifactId>arrow-core</artifactId>
@@ -148,7 +146,6 @@ Add the dependencies that you want to use:
 For the Optics DSL, enable annotation processing using Kotlin plugin:
 
 ```xml
-
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
