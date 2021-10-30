@@ -1,3 +1,5 @@
+import arrow.continuations.generic.AtomicRef
+import arrow.continuations.generic.updateAndGet
 import arrow.core.Ior
 import arrow.core.identity
 import arrow.typeclasses.Semigroup
@@ -6,8 +8,9 @@ suspend fun <E, A> ior(semigroup: Semigroup<E>, f: suspend IorEffect<E>.() -> A)
   cont<E, Ior<E, A>> {
     val effect = IorEffect(semigroup, this)
     val res = f(effect)
-    if (effect.leftState === EmptyValue) Ior.Right(res)
-    else Ior.Both(EmptyValue.unbox(effect.leftState), res)
+    val state = effect.leftState.get()
+    if (state === EmptyValue) Ior.Right(res)
+    else Ior.Both(EmptyValue.unbox(state), res)
   }.fold({ Ior.Left(it) }, ::identity)
 
 class IorEffect<E>(
@@ -15,20 +18,20 @@ class IorEffect<E>(
   private val cont: ContEffect<E>
 ) : ContEffect<E>, Semigroup<E> by semigroup {
 
-  internal var leftState: Any? = EmptyValue
+  internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)
 
   private fun combine(other: E): E =
-    if (leftState === EmptyValue) {
-      leftState = other
-      other
-    } else EmptyValue.unbox<E>(leftState).combine(other)
+    leftState.updateAndGet { state ->
+      if (state === EmptyValue) other
+      else EmptyValue.unbox<E>(leftState).combine(other)
+    } as E
 
   suspend fun <B> Ior<E, B>.bind(): B =
     when (this) {
       is Ior.Left -> shift(value)
       is Ior.Right -> value
       is Ior.Both -> {
-        leftState = combine(leftValue)
+        combine(leftValue)
         rightValue
       }
     }

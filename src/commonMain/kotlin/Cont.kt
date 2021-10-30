@@ -91,6 +91,7 @@ private class Token {
 private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -> A) : Cont<R, A> {
   override suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
+      // TODO: Fix, and test concurrency
       var token: Token? = null
       var shifted: B? = null
       val effect = object : ContEffect<R> {
@@ -107,10 +108,7 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
         }
       }
 
-      suspend {
-        val a = f(effect)
-        g(a)
-      }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
+      suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
         res.fold(cont::resume) { throwable ->
           if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(shifted!!)
           else cont.resumeWith(res)
