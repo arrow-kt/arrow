@@ -75,7 +75,8 @@ s [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on Kotli
 <div class="setup" markdown="1">
 ## Setup
 
-{: .setup-subtitle} Configure Arrow for your project
+{: .setup-subtitle}
+Configure Arrow for your project
 <div class="setup-jdk-android" markdown="1">
 <div class="jdk-item" markdown="1">
 ![Jdk](/img/quickstart/jdk-logo.svg "jdk")

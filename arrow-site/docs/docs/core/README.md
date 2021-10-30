@@ -76,7 +76,8 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 <div class="setup" markdown="1">
 ## Setup
 
-{: .setup-subtitle} Configure Arrow for your project
+{: .setup-subtitle}
+Configure Arrow for your project
 <div class="setup-jdk-android" markdown="1">
 <div class="jdk-item" markdown="1">
 ![Jdk](/img/quickstart/jdk-logo.svg "jdk")
