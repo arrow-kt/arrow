@@ -1,7 +1,6 @@
 plugins {
     `java-platform`
     alias(libs.plugins.arrowGradleConfig.publishJavaPlatform)
-    alias(libs.plugins.arrowGradleConfig.nexus)
 }
 
 group = property("projects.group").toString()
