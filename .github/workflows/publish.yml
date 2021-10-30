@@ -104,32 +104,6 @@ jobs:
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
-  publish-arrow-stack:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install grep
-        run: sudo apt-get install grep
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: "Publish"
-        run: |
-          ./gradlew publishToSonatype
-          echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Arrow Stack deployed!"
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
   publish_doc:
     env:
       JAVA_OPTS: -Xms2g -Xmx4g
