@@ -71,6 +71,10 @@ include("arrow-optics-test")
 project(":arrow-optics").projectDir = file("optics/arrow-optics")
 project(":arrow-optics-test").projectDir = file("optics/arrow-optics-test")
 
+// Stack
+include(":arrow-stack")
+project(":arrow-stack").projectDir = file("stack")
+
 // Ank
 include("arrow-ank")
 include("arrow-ank-gradle")
