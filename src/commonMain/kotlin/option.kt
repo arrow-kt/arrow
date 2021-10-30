@@ -12,13 +12,13 @@ suspend fun <A> option(f: OptionEffect.() -> A): Option<A> =
 suspend fun <A> Cont<None, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }
 
+// Can be replaced by multiple receivers
+// context(ContEffect<None>)
+// fun <A> Option<A>.bind(): A = ...
 @JvmInline
 value class OptionEffect(private val cont: ContEffect<None>) : ContEffect<None> {
   suspend fun <B> Option<B>.bind(): B =
-    when (this) {
-      None -> shift(None)
-      is Some -> value
-    }
+    bind { None }
 
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else shift(None)
