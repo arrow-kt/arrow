@@ -18,12 +18,17 @@ permalink: /fx/
 
 # Arrow Fx. Typed FP for the masses
 
-Arrow Fx is a next-generation Typed FP Effects Library that makes tracked effectful programming first class in Kotlin built on top of Kotlin's suspend system and [KotlinX Coroutines](https://kotlinlang.org/docs/reference/coroutines/coroutines-guide.html)
-Arrow Fx is a functional companion to KotlinX Coroutines augmenting its api with well known functional operators making it easier to compose async and concurrent programs.
+Arrow Fx is a next-generation Typed FP Effects Library that makes tracked effectful programming
+first class in Kotlin built on top of Kotlin's suspend system
+and [KotlinX Coroutines](https://kotlinlang.org/docs/reference/coroutines/coroutines-guide.html)
+Arrow Fx is a functional companion to KotlinX Coroutines augmenting its api with well known
+functional operators making it easier to compose async and concurrent programs.
 
-The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
+The library brings purity, referential transparency, and direct imperative syntax to typed FP in
+Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
 
-If you're not familiar yet with Coroutines in Kotlin, it's recommended to first read Kotlin's [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on KotlinX Coroutines.
+If you're not familiar yet with Coroutines in Kotlin, it's recommended to first read Kotlin'
+s [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on KotlinX Coroutines.
 </div>
 
 <div class="quickstart-intro" markdown="1">
@@ -113,8 +118,8 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-fx-coroutines:1.0.0")
-    implementation("io.arrow-kt:arrow-fx-stm:1.0.0")
+    implementation("io.arrow-kt:arrow-fx-coroutines:1.0.1")
+    implementation("io.arrow-kt:arrow-fx-stm:1.0.1")
 }
 ```
 
@@ -124,7 +129,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.0.0"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.0.1"))
 
     implementation("io.arrow-kt:arrow-fx-coroutines")
     implementation("io.arrow-kt:arrow-fx-stm")
@@ -133,7 +138,8 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```
 allprojects {
@@ -165,7 +171,7 @@ allprojects {
 Add the dependencies into the project's `build.gradle`:
 
 ```groovy
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
     implementation "io.arrow-kt:arrow-fx-stm:$arrow_version"
@@ -177,7 +183,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -188,7 +194,8 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```groovy
 allprojects {
@@ -207,23 +214,24 @@ allprojects {
 
 #### Basic Setup
 
-Make sure to have at least the latest version of JDK 1.8 installed.
-Add to your pom.xml file the following properties:
+Make sure to have at least the latest version of JDK 1.8 installed. Add to your pom.xml file the
+following properties:
 
 ```xml
 <properties>
-    <kotlin.version>1.5.20</kotlin.version>
-    <arrow.version>1.0.0</arrow.version>
+    <kotlin.version>1.5.31</kotlin.version>
+    <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
 
 Add the dependencies that you want to use:
 
 ```xml
+
 <dependency>
-  <groupId>io.arrow-kt</groupId>
-  <artifactId>arrow-core</artifactId>
-  <version>${arrow.version}</version>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-core</artifactId>
+    <version>${arrow.version}</version>
 </dependency>
 ```
 
@@ -232,6 +240,7 @@ Add the dependencies that you want to use:
 For the Optics DSL, enable annotation processing using Kotlin plugin:
 
 ```xml
+
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
@@ -283,32 +292,34 @@ For the Optics DSL, enable annotation processing using Kotlin plugin:
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```xml
-  <dependencyManagement>
+
+<dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>io.arrow-kt</groupId>
-        <artifactId>arrow-stack</artifactId>
-        <version>${arrow.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-stack</artifactId>
+            <version>${arrow.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
-  <dependencies>
-    ...
-  </dependencies>
+</dependencyManagement><dependencies>
+...
+</dependencies>
 ```
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```xml
+
 <repository>
-  <snapshotss>
-    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    <updatePolicy>always</updatePolicy>
-  </snapshots>
+    <snapshotss>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        <updatePolicy>always</updatePolicy>
+    </snapshots>
 </repository>
 ```
 
@@ -320,8 +331,11 @@ If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` an
 <div class="quickstart-intro" markdown="1">
 ## Integrating with 3rd-party libraries
 
-Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
+Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model
+effectful async/concurrent computations as `suspend`.
 
-If you are interested in the Arrow Fx library, please contact us in the #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
+If you are interested in the Arrow Fx library, please contact us in the #Arrow channel on the
+official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and
+we'll help you along the way.
 </div>
 </div>

@@ -10,8 +10,10 @@
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
-Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces and abstractions across Kotlin libraries.
-For this, it includes the most popular data types such as `Option`, `Either`, `Validated` etc and functional operators such as `traverse` and computation blocks to empower users to write pure FP apps and libraries built atop higher order abstractions.
+Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces
+and abstractions across Kotlin libraries. For this, it includes the most popular data types such
+as `Option`, `Either`, `Validated` etc and functional operators such as `traverse` and computation
+blocks to empower users to write pure FP apps and libraries built atop higher order abstractions.
 
 Use the list below to learn more about Λrrow's main features.
 
@@ -24,13 +26,18 @@ Use the list below to learn more about Λrrow's main features.
 
 - [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
-If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo. 
+If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR
+to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo.
 
 ## Join Us
 
-Arrow is an inclusive community powered by awesome individuals like you. As an actively growing ecosystem, Arrow and its associated libraries and toolsets are in need of new contributors! We have issues suited for all levels, from entry to advanced, and our maintainers are happy to provide 1:1 mentoring. All are welcome in Arrow.
+Arrow is an inclusive community powered by awesome individuals like you. As an actively growing
+ecosystem, Arrow and its associated libraries and toolsets are in need of new contributors! We have
+issues suited for all levels, from entry to advanced, and our maintainers are happy to provide 1:1
+mentoring. All are welcome in Arrow.
 
-If you’re looking to contribute, have questions, or want to keep up-to-date about what’s happening, please follow us here and say hello!
+If you’re looking to contribute, have questions, or want to keep up-to-date about what’s happening,
+please follow us here and say hello!
 
 - [Arrow on Twitter](https://twitter.com/arrow_kt)
 - [#arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0)
@@ -45,7 +52,8 @@ Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 Make sure to have the latest version of JDK 1.8 (or higher) installed.
 
-JDK 16 doesn't currently work but will do once we upgrade to [Gradle 7.0](https://github.com/arrow-kt/arrow/issues/2442)
+JDK 16 doesn't currently work but will do once we upgrade
+to [Gradle 7.0](https://github.com/arrow-kt/arrow/issues/2442)
 
 ### Android
 
@@ -70,7 +78,7 @@ Add the dependencies into the project's `build.gradle`:
 ##### Λrrow Core
 
 ```groovy
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
@@ -81,17 +89,17 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    kapt "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
-##### Λrrow Core + Λrrow Fx 
+##### Λrrow Core + Λrrow Fx
 
 ```groovy
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
@@ -113,16 +121,18 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Basic Setup
 
-Make sure to have at least the latest version of JDK 1.8 installed.
-Add to your `pom.xml` file the following properties:
+Make sure to have at least the latest version of JDK 1.8 installed. Add to your `pom.xml` file the
+following properties:
+
 ```xml
 <properties>
-    <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>1.0.0</arrow.version>
+    <kotlin.version>1.5.31</kotlin.version>
+    <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
 
 Add the dependencies that you want to use:
+
 ```xml
 <dependency>
     <groupId>io.arrow-kt</groupId>
@@ -134,6 +144,7 @@ Add the dependencies that you want to use:
 #### Enabling kapt for the Optics DSL
 
 For the Optics DSL, enable annotation processing using Kotlin plugin:
+
 ```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -204,7 +215,8 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ## Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this repository:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+repository:
 
 ```groovy
 allprojects {

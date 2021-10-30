@@ -17,9 +17,13 @@ permalink: /optics/
 <div class="quickstart-intro" markdown="1">
 
 # Arrow Optics. Transforming and computing over immutable data models in Kotlin
-Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing, composing, and transforming deeply nested immutable data structures.
 
-Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism]({{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and traversing deep values in sealed and data classes models.s
+Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing,
+composing, and transforming deeply nested immutable data structures.
+
+Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism](
+{{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and
+traversing deep values in sealed and data classes models.s
 </div>
 
 <div class="quickstart-intro" markdown="1">
@@ -118,8 +122,8 @@ Add the dependencies into the project's `build.gradle.kts`:
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    implementation("io.arrow-kt:arrow-optics:1.0.0")
-    kapt("io.arrow-kt:arrow-meta:1.0.0")
+    implementation("io.arrow-kt:arrow-optics:1.0.1")
+    kapt("io.arrow-kt:arrow-meta:1.0.1")
 }
 ```
 
@@ -129,7 +133,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.0.0"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.0.1"))
 
     implementation("io.arrow-kt:arrow-core")
     implementation("io.arrow-kt:arrow-optics")
@@ -139,7 +143,8 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```
 allprojects {
@@ -174,7 +179,7 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
@@ -186,7 +191,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "1.0.0"
+def arrow_version = "1.0.1"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -198,7 +203,8 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```groovy
 allprojects {
@@ -218,23 +224,25 @@ allprojects {
 
 #### Basic Setup
 
-Make sure to have at least the latest version of JDK 1.8 installed.
-Add to your pom.xml file the following properties:
+Make sure to have at least the latest version of JDK 1.8 installed. Add to your pom.xml file the
+following properties:
 
 ```xml
+
 <properties>
-    <kotlin.version>1.4.0</kotlin.version>
-    <arrow.version>1.0.0</arrow.version>
+    <kotlin.version>1.5.31</kotlin.version>
+    <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
 
 Add the dependencies that you want to use:
 
 ```xml
+
 <dependency>
-  <groupId>io.arrow-kt</groupId>
-  <artifactId>arrow-core</artifactId>
-  <version>${arrow.version}</version>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-core</artifactId>
+    <version>${arrow.version}</version>
 </dependency>
 ```
 
@@ -243,6 +251,7 @@ Add the dependencies that you want to use:
 For the Optics DSL, enable annotation processing using Kotlin plugin:
 
 ```xml
+
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
@@ -294,32 +303,34 @@ For the Optics DSL, enable annotation processing using Kotlin plugin:
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```xml
-  <dependencyManagement>
+
+<dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>io.arrow-kt</groupId>
-        <artifactId>arrow-stack</artifactId>
-        <version>${arrow.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-stack</artifactId>
+            <version>${arrow.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
-  <dependencies>
-    ...
-  </dependencies>
+</dependencyManagement><dependencies>
+...
+</dependencies>
 ```
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.0` with `1.0.1-SNAPSHOT` and add this configuration:
+If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
+configuration:
 
 ```xml
+
 <repository>
-  <snapshotss>
-    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    <updatePolicy>always</updatePolicy>
-  </snapshots>
+    <snapshotss>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        <updatePolicy>always</updatePolicy>
+    </snapshots>
 </repository>
 ```
 
