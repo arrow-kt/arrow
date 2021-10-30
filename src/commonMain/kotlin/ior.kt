@@ -10,8 +10,11 @@ suspend fun <E, A> ior(semigroup: Semigroup<E>, f: suspend IorEffect<E>.() -> A)
     else Ior.Both(EmptyValue.unbox(effect.leftState), res)
   }.fold({ Ior.Left(it) }, ::identity)
 
-class IorEffect<E>(semigroup: Semigroup<E>, private val cont: ContEffect<E>) : ContEffect<E>,
-  Semigroup<E> by semigroup {
+class IorEffect<E>(
+  semigroup: Semigroup<E>,
+  private val cont: ContEffect<E>
+) : ContEffect<E>, Semigroup<E> by semigroup {
+
   internal var leftState: Any? = EmptyValue
 
   private fun combine(other: E): E =
