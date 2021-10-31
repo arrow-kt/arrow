@@ -25,7 +25,7 @@ dependencies {
   kaptTest(libs.google.autoService)
   testImplementation(libs.google.compileTesting)
   testImplementation(fileTree("dir" to "./src/test/libs", "includes" to listOf("*.jar")))
-  testImplementation(projects.arrowMeta.arrowMetaTestModels)
+  testImplementation(projects.arrowMetaTestModels)
   testImplementation(libs.jUnitJUnit)
   testRuntimeOnly(libs.jUnitVintageEngine)
   testImplementation(libs.kotlinTest.runnerJUnit4) { exclude(group = "io.arrow-kt") }

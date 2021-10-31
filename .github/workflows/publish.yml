@@ -58,7 +58,6 @@ jobs:
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
       - name: Publish Apple, Linux, JVM & JS targets
-        working-directory: arrow-libs
         run: |
           ./gradlew publishToSonatype
           echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Apple, Linux, JVM & JS deployed!"
@@ -96,7 +95,6 @@ jobs:
         shell: bash
 
       - name: Publish Windows
-        working-directory: arrow-libs
         run: |
           ./gradlew publishToSonatype
           echo "$(cat gradle.properties | grep projects.version | cut -d'=' -f2) MingwX64 deployed!"
@@ -134,61 +132,51 @@ jobs:
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
       - name: "Prepare environment"
-        working-directory: arrow-site
         run: |
           mkdir $BASEDIR/logs
           brew install tree
           bundle install --gemfile Gemfile --path vendor/bundle
 
       - name: "Assemble"
-        working-directory: arrow-libs
         run: |
           echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
           ./gradlew assemble
 
       - name: "Create API doc"
-        working-directory: arrow-libs
         run: ./gradlew  --no-parallel dokkaGfm
 
       - name: "Validate documentation"
-        working-directory: arrow-site
-        run: ./gradlew runAnk
+        run: ./gradlew arrow-site:runAnk
 
       - name: "Landing page: build"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           bundle exec jekyll build -b docs -s build/site
           tree _site > $BASEDIR/logs/content.log
 
       - name: "Landing page: publish"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
 
       - name: "Remove index for versions"
-        working-directory: arrow-site
         run: rm -f build/site/index.md
 
       - name: "Latest release: build (docs/)"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           bundle exec jekyll build -b docs -s build/site
           tree _site > $BASEDIR/logs/content_docs.log
 
       - name: "Latest release: publish (docs/)"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
 
       - name: "Latest release: build release directory (docs/<major.minor>)"
         if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-        working-directory: arrow-site
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
           bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
@@ -196,7 +184,6 @@ jobs:
 
       - name: "Latest release: publish release directory (docs/<major.minor>)"
         if: env.NEW_RELEASE_VERSION_EXISTS == '1'
-        working-directory: arrow-site
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
           echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
@@ -208,14 +195,12 @@ jobs:
 
       - name: "Next version: build (/docs/next)"
         if: ${{ github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           bundle exec jekyll build -b docs/next -s build/site
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: "Next version: publish (/docs/next)"
         if: ${{ github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
         run: |
           echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
           aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log

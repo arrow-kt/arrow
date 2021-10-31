@@ -1,0 +1,969 @@
+public final class arrow/generic/Account {
+	public static final field Companion Larrow/generic/Account$Companion;
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Larrow/generic/Account;
+	public static synthetic fun copy$default (Larrow/generic/Account;IIILjava/lang/Object;)Larrow/generic/Account;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAvailable ()I
+	public final fun getBalance ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/Account$Companion {
+}
+
+public final class arrow/generic/Car {
+	public static final field Companion Larrow/generic/Car$Companion;
+	public fun <init> (Larrow/generic/Speed;)V
+	public final fun component1 ()Larrow/generic/Speed;
+	public final fun copy (Larrow/generic/Speed;)Larrow/generic/Car;
+	public static synthetic fun copy$default (Larrow/generic/Car;Larrow/generic/Speed;ILjava/lang/Object;)Larrow/generic/Car;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSpeed ()Larrow/generic/Speed;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/Car$Companion {
+}
+
+public final class arrow/generic/CarAlreadyRegistered : arrow/generic/RegistrationError {
+	public static final field INSTANCE Larrow/generic/CarAlreadyRegistered;
+}
+
+public abstract class arrow/generic/CommonServerError {
+}
+
+public abstract interface class arrow/generic/Database {
+	public abstract fun insertRegistration (Larrow/generic/Registration;)V
+}
+
+public final class arrow/generic/Dealership {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Larrow/generic/Dealership;
+	public static synthetic fun copy$default (Larrow/generic/Dealership;Ljava/lang/String;ILjava/lang/Object;)Larrow/generic/Dealership;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/OverRequestLimit : arrow/generic/CommonServerError {
+	public static final field INSTANCE Larrow/generic/OverRequestLimit;
+}
+
+public final class arrow/generic/Registration {
+	public fun <init> (Larrow/generic/Car;)V
+	public final fun component1 ()Larrow/generic/Car;
+	public final fun copy (Larrow/generic/Car;)Larrow/generic/Registration;
+	public static synthetic fun copy$default (Larrow/generic/Registration;Larrow/generic/Car;ILjava/lang/Object;)Larrow/generic/Registration;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCar ()Larrow/generic/Car;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class arrow/generic/RegistrationError {
+}
+
+public final class arrow/generic/Salesperson {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Larrow/generic/Salesperson;
+	public static synthetic fun copy$default (Larrow/generic/Salesperson;Ljava/lang/String;ILjava/lang/Object;)Larrow/generic/Salesperson;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/ServerError : arrow/generic/CommonServerError {
+	public static final field INSTANCE Larrow/generic/ServerError;
+}
+
+public final class arrow/generic/Speed {
+	public static final field Companion Larrow/generic/Speed$Companion;
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/generic/Speed;
+	public static synthetic fun copy$default (Larrow/generic/Speed;IILjava/lang/Object;)Larrow/generic/Speed;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKmh ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/Speed$Companion {
+}
+
+public final class arrow/generic/StolenCar : arrow/generic/RegistrationError {
+	public static final field INSTANCE Larrow/generic/StolenCar;
+}
+
+public final class arrow/generic/SuccessfullyRegistered {
+	public fun <init> (Larrow/generic/Registration;)V
+	public final fun component1 ()Larrow/generic/Registration;
+	public final fun copy (Larrow/generic/Registration;)Larrow/generic/SuccessfullyRegistered;
+	public static synthetic fun copy$default (Larrow/generic/SuccessfullyRegistered;Larrow/generic/Registration;ILjava/lang/Object;)Larrow/generic/SuccessfullyRegistered;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRegistration ()Larrow/generic/Registration;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/UserUnauthorized : arrow/generic/CommonServerError {
+	public static final field INSTANCE Larrow/generic/UserUnauthorized;
+}
+
+public final class arrow/optics/Account {
+	public static final field Companion Larrow/optics/Account$Companion;
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Larrow/optics/Account;
+	public static synthetic fun copy$default (Larrow/optics/Account;IIILjava/lang/Object;)Larrow/optics/Account;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAvailable ()I
+	public final fun getBalance ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Account$Companion {
+}
+
+public final class arrow/optics/AccountKt {
+	public static final fun getAvailable (Larrow/optics/Account$Companion;)Larrow/optics/PLens;
+	public static final fun getAvailable (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAvailable (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getAvailable (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAvailable (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getAvailable (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getAvailable (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAvailable (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAvailable (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAvailable (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getBalance (Larrow/optics/Account$Companion;)Larrow/optics/PLens;
+	public static final fun getBalance (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getBalance (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getBalance (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getBalance (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getBalance (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getBalance (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getBalance (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getBalance (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getBalance (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/Account$Companion;)Larrow/optics/PIso;
+}
+
+public final class arrow/optics/Address {
+	public static final field Companion Larrow/optics/Address$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/optics/Street;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/optics/Street;
+	public final fun copy (Ljava/lang/String;Larrow/optics/Street;)Larrow/optics/Address;
+	public static synthetic fun copy$default (Larrow/optics/Address;Ljava/lang/String;Larrow/optics/Street;ILjava/lang/Object;)Larrow/optics/Address;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCity ()Ljava/lang/String;
+	public final fun getStreet ()Larrow/optics/Street;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Address$Companion {
+}
+
+public final class arrow/optics/AddressKt {
+	public static final fun getCity (Larrow/optics/Address$Companion;)Larrow/optics/PLens;
+	public static final fun getCity (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getCity (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getCity (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getCity (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getCity (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getCity (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getCity (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getCity (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getCity (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/Address$Companion;)Larrow/optics/PIso;
+	public static final fun getStreet (Larrow/optics/Address$Companion;)Larrow/optics/PLens;
+	public static final fun getStreet (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getStreet (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getStreet (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getStreet (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getStreet (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getStreet (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getStreet (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getStreet (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getStreet (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/Company {
+	public static final field Companion Larrow/optics/Company$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/optics/Address;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/optics/Address;
+	public final fun copy (Ljava/lang/String;Larrow/optics/Address;)Larrow/optics/Company;
+	public static synthetic fun copy$default (Larrow/optics/Company;Ljava/lang/String;Larrow/optics/Address;ILjava/lang/Object;)Larrow/optics/Company;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()Larrow/optics/Address;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Company$Companion {
+}
+
+public final class arrow/optics/CompanyKt {
+	public static final fun getAddress (Larrow/optics/Company$Companion;)Larrow/optics/PLens;
+	public static final fun getAddress (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAddress (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getAddress (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAddress (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getAddress (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getAddress (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAddress (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/Company$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Company$Companion;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/Employee {
+	public static final field Companion Larrow/optics/Employee$Companion;
+	public fun <init> (Ljava/lang/String;Larrow/optics/Company;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Larrow/optics/Company;
+	public final fun copy (Ljava/lang/String;Larrow/optics/Company;)Larrow/optics/Employee;
+	public static synthetic fun copy$default (Larrow/optics/Employee;Ljava/lang/String;Larrow/optics/Company;ILjava/lang/Object;)Larrow/optics/Employee;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompany ()Larrow/optics/Company;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Employee$Companion {
+}
+
+public final class arrow/optics/EmployeeKt {
+	public static final fun getCompany (Larrow/optics/Employee$Companion;)Larrow/optics/PLens;
+	public static final fun getCompany (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getCompany (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getCompany (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getCompany (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getCompany (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getCompany (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getCompany (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/Employee$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Employee$Companion;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/Employees {
+	public static final field Companion Larrow/optics/Employees$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Larrow/optics/Employees;
+	public static synthetic fun copy$default (Larrow/optics/Employees;Ljava/util/List;ILjava/lang/Object;)Larrow/optics/Employees;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEmployees ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Employees$Companion {
+}
+
+public final class arrow/optics/EmployeesKt {
+	public static final fun getEmployees (Larrow/optics/Employees$Companion;)Larrow/optics/PLens;
+	public static final fun getEmployees (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getEmployees (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getEmployees (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getEmployees (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getEmployees (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getEmployees (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getEmployees (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getEmployees (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getEmployees (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/Employees$Companion;)Larrow/optics/PIso;
+}
+
+public final class arrow/optics/HealthPack {
+	public static final field Companion Larrow/optics/HealthPack$Companion;
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/optics/HealthPack;
+	public static synthetic fun copy$default (Larrow/optics/HealthPack;IILjava/lang/Object;)Larrow/optics/HealthPack;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAmountLeft ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/HealthPack$Companion {
+}
+
+public final class arrow/optics/HealthPackKt {
+	public static final fun getAmountLeft (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAmountLeft (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getAmountLeft (Larrow/optics/HealthPack$Companion;)Larrow/optics/PLens;
+	public static final fun getAmountLeft (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAmountLeft (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getAmountLeft (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getAmountLeft (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAmountLeft (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAmountLeft (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAmountLeft (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getIso (Larrow/optics/HealthPack$Companion;)Larrow/optics/PIso;
+}
+
+public final class arrow/optics/Inventory {
+	public static final field Companion Larrow/optics/Inventory$Companion;
+	public fun <init> (Larrow/core/Either;)V
+	public final fun component1 ()Larrow/core/Either;
+	public final fun copy (Larrow/core/Either;)Larrow/optics/Inventory;
+	public static synthetic fun copy$default (Larrow/optics/Inventory;Larrow/core/Either;ILjava/lang/Object;)Larrow/optics/Inventory;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getItem ()Larrow/core/Either;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Inventory$Companion {
+}
+
+public final class arrow/optics/InventoryKt {
+	public static final fun getIso (Larrow/optics/Inventory$Companion;)Larrow/optics/PIso;
+	public static final fun getItem (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getItem (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getItem (Larrow/optics/Inventory$Companion;)Larrow/optics/PLens;
+	public static final fun getItem (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getItem (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getItem (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getItem (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getItem (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getItem (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getItem (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/OutOfPacks {
+	public static final field INSTANCE Larrow/optics/OutOfPacks;
+}
+
+public final class arrow/optics/Person {
+	public static final field Companion Larrow/optics/Person$Companion;
+	public fun <init> (Ljava/lang/Integer;Larrow/core/Option;)V
+	public final fun component1 ()Ljava/lang/Integer;
+	public final fun component2 ()Larrow/core/Option;
+	public final fun copy (Ljava/lang/Integer;Larrow/core/Option;)Larrow/optics/Person;
+	public static synthetic fun copy$default (Larrow/optics/Person;Ljava/lang/Integer;Larrow/core/Option;ILjava/lang/Object;)Larrow/optics/Person;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()Larrow/core/Option;
+	public final fun getAge ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Person$Companion {
+}
+
+public final class arrow/optics/PersonKt {
+	public static final fun getAddress (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAddress (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAddress (Larrow/optics/PIso;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAddress (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getAddress (Larrow/optics/Person$Companion;)Larrow/optics/POptional;
+	public static final fun getAge (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAge (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAge (Larrow/optics/PIso;)Larrow/optics/POptional;
+	public static final fun getAge (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getAge (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAge (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAge (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAge (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getAge (Larrow/optics/Person$Companion;)Larrow/optics/POptional;
+	public static final fun getIso (Larrow/optics/Person$Companion;)Larrow/optics/PIso;
+	public static final fun getNullableAge (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getNullableAge (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getNullableAge (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getNullableAge (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getNullableAge (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getNullableAge (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getNullableAge (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getNullableAge (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getNullableAge (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getNullableAge (Larrow/optics/Person$Companion;)Larrow/optics/PLens;
+	public static final fun getOptionAddress (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getOptionAddress (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getOptionAddress (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getOptionAddress (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getOptionAddress (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getOptionAddress (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getOptionAddress (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getOptionAddress (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getOptionAddress (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getOptionAddress (Larrow/optics/Person$Companion;)Larrow/optics/PLens;
+}
+
+public final class arrow/optics/Pos {
+	public static final field Companion Larrow/optics/Pos$Companion;
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Larrow/optics/Pos;
+	public static synthetic fun copy$default (Larrow/optics/Pos;IIILjava/lang/Object;)Larrow/optics/Pos;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getX ()I
+	public final fun getY ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Pos$Companion {
+}
+
+public final class arrow/optics/PosKt {
+	public static final fun getIso (Larrow/optics/Pos$Companion;)Larrow/optics/PIso;
+	public static final fun getX (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getX (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getX (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getX (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getX (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getX (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getX (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getX (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getX (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getX (Larrow/optics/Pos$Companion;)Larrow/optics/PLens;
+	public static final fun getY (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getY (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getY (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getY (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getY (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getY (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getY (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getY (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getY (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getY (Larrow/optics/Pos$Companion;)Larrow/optics/PLens;
+}
+
+public abstract class arrow/optics/Shape {
+	public static final field Companion Larrow/optics/Shape$Companion;
+}
+
+public final class arrow/optics/Shape$Circle : arrow/optics/Shape {
+	public static final field Companion Larrow/optics/Shape$Circle$Companion;
+	public fun <init> (D)V
+	public final fun component1 ()D
+	public final fun copy (D)Larrow/optics/Shape$Circle;
+	public static synthetic fun copy$default (Larrow/optics/Shape$Circle;DILjava/lang/Object;)Larrow/optics/Shape$Circle;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRadius ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Shape$Circle$Companion {
+}
+
+public final class arrow/optics/Shape$Companion {
+}
+
+public final class arrow/optics/Shape$Rectangle : arrow/optics/Shape {
+	public static final field Companion Larrow/optics/Shape$Rectangle$Companion;
+	public fun <init> (DD)V
+	public final fun component1 ()D
+	public final fun component2 ()D
+	public final fun copy (DD)Larrow/optics/Shape$Rectangle;
+	public static synthetic fun copy$default (Larrow/optics/Shape$Rectangle;DDILjava/lang/Object;)Larrow/optics/Shape$Rectangle;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeight ()D
+	public final fun getWidth ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Shape$Rectangle$Companion {
+}
+
+public final class arrow/optics/ShapeKt {
+	public static final fun getCircle (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getCircle (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getCircle (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getCircle (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getCircle (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getCircle (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getCircle (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getCircle (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getCircle (Larrow/optics/Shape$Companion;)Larrow/optics/PPrism;
+	public static final fun getRectangle (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getRectangle (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getRectangle (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getRectangle (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getRectangle (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getRectangle (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getRectangle (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getRectangle (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getRectangle (Larrow/optics/Shape$Companion;)Larrow/optics/PPrism;
+}
+
+public final class arrow/optics/Shape_CircleKt {
+	public static final fun getIso (Larrow/optics/Shape$Circle$Companion;)Larrow/optics/PIso;
+	public static final fun getRadius (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getRadius (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getRadius (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getRadius (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getRadius (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getRadius (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getRadius (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getRadius (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getRadius (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getRadius (Larrow/optics/Shape$Circle$Companion;)Larrow/optics/PLens;
+}
+
+public final class arrow/optics/Shape_RectangleKt {
+	public static final fun getHeight (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getHeight (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getHeight (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getHeight (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getHeight (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getHeight (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getHeight (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getHeight (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getHeight (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getHeight (Larrow/optics/Shape$Rectangle$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Larrow/optics/Shape$Rectangle$Companion;)Larrow/optics/PIso;
+	public static final fun getWidth (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getWidth (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getWidth (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getWidth (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getWidth (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getWidth (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getWidth (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getWidth (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getWidth (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getWidth (Larrow/optics/Shape$Rectangle$Companion;)Larrow/optics/PLens;
+}
+
+public final class arrow/optics/Street {
+	public static final field Companion Larrow/optics/Street$Companion;
+	public fun <init> (ILjava/lang/String;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (ILjava/lang/String;)Larrow/optics/Street;
+	public static synthetic fun copy$default (Larrow/optics/Street;ILjava/lang/String;ILjava/lang/Object;)Larrow/optics/Street;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNumber ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/Street$Companion {
+}
+
+public final class arrow/optics/StreetKt {
+	public static final fun getIso (Larrow/optics/Street$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getName (Larrow/optics/Street$Companion;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getNumber (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getNumber (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getNumber (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getNumber (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getNumber (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getNumber (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getNumber (Larrow/optics/Street$Companion;)Larrow/optics/PLens;
+}
+
+public final class arrow/reflect/ExtensionsHelperKt {
+	public static final fun docsMarkdownLink (Lkotlin/reflect/KClass;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static final fun toKebabCase (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class com/example/domain/Address {
+	public static final field Companion Lcom/example/domain/Address$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/example/domain/Street;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/example/domain/Street;
+	public final fun copy (Ljava/lang/String;Lcom/example/domain/Street;)Lcom/example/domain/Address;
+	public static synthetic fun copy$default (Lcom/example/domain/Address;Ljava/lang/String;Lcom/example/domain/Street;ILjava/lang/Object;)Lcom/example/domain/Address;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCity ()Ljava/lang/String;
+	public final fun getStreet ()Lcom/example/domain/Street;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Address$Companion {
+}
+
+public final class com/example/domain/AddressKt {
+	public static final fun getCity (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getCity (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getCity (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getCity (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getCity (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getCity (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getCity (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getCity (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getCity (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getCity (Lcom/example/domain/Address$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Lcom/example/domain/Address$Companion;)Larrow/optics/PIso;
+	public static final fun getStreet (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getStreet (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getStreet (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getStreet (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getStreet (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getStreet (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getStreet (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getStreet (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getStreet (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getStreet (Lcom/example/domain/Address$Companion;)Larrow/optics/PLens;
+}
+
+public final class com/example/domain/Company {
+	public static final field Companion Lcom/example/domain/Company$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/example/domain/Address;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/example/domain/Address;
+	public final fun copy (Ljava/lang/String;Lcom/example/domain/Address;)Lcom/example/domain/Company;
+	public static synthetic fun copy$default (Lcom/example/domain/Company;Ljava/lang/String;Lcom/example/domain/Address;ILjava/lang/Object;)Lcom/example/domain/Company;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAddress ()Lcom/example/domain/Address;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Company$Companion {
+}
+
+public final class com/example/domain/CompanyKt {
+	public static final fun getAddress (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getAddress (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getAddress (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getAddress (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getAddress (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getAddress (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getAddress (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getAddress (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getAddress (Lcom/example/domain/Company$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Lcom/example/domain/Company$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getName (Lcom/example/domain/Company$Companion;)Larrow/optics/PLens;
+}
+
+public final class com/example/domain/Db {
+	public static final field Companion Lcom/example/domain/Db$Companion;
+	public fun <init> (Ljava/util/Map;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/Map;)Lcom/example/domain/Db;
+	public static synthetic fun copy$default (Lcom/example/domain/Db;Ljava/util/Map;ILjava/lang/Object;)Lcom/example/domain/Db;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContent ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Db$Companion {
+}
+
+public final class com/example/domain/DbKt {
+	public static final fun getContent (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getContent (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getContent (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getContent (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getContent (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getContent (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getContent (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getContent (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getContent (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getContent (Lcom/example/domain/Db$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Lcom/example/domain/Db$Companion;)Larrow/optics/PIso;
+}
+
+public final class com/example/domain/Employee {
+	public static final field Companion Lcom/example/domain/Employee$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/example/domain/Company;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/example/domain/Company;
+	public final fun copy (Ljava/lang/String;Lcom/example/domain/Company;)Lcom/example/domain/Employee;
+	public static synthetic fun copy$default (Lcom/example/domain/Employee;Ljava/lang/String;Lcom/example/domain/Company;ILjava/lang/Object;)Lcom/example/domain/Employee;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompany ()Lcom/example/domain/Company;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Employee$Companion {
+}
+
+public final class com/example/domain/EmployeeKt {
+	public static final fun getCompany (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getCompany (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getCompany (Larrow/optics/PIso;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getCompany (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getCompany (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getCompany (Lcom/example/domain/Employee$Companion;)Larrow/optics/POptional;
+	public static final fun getIso (Lcom/example/domain/Employee$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getName (Lcom/example/domain/Employee$Companion;)Larrow/optics/PLens;
+	public static final fun getNullableCompany (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getNullableCompany (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getNullableCompany (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getNullableCompany (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getNullableCompany (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getNullableCompany (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getNullableCompany (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getNullableCompany (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getNullableCompany (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getNullableCompany (Lcom/example/domain/Employee$Companion;)Larrow/optics/PLens;
+}
+
+public final class com/example/domain/Employees {
+	public static final field Companion Lcom/example/domain/Employees$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lcom/example/domain/Employees;
+	public static synthetic fun copy$default (Lcom/example/domain/Employees;Ljava/util/List;ILjava/lang/Object;)Lcom/example/domain/Employees;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEmployees ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Employees$Companion {
+}
+
+public final class com/example/domain/EmployeesKt {
+	public static final fun getEmployees (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getEmployees (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getEmployees (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getEmployees (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getEmployees (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getEmployees (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getEmployees (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getEmployees (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getEmployees (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getEmployees (Lcom/example/domain/Employees$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Lcom/example/domain/Employees$Companion;)Larrow/optics/PIso;
+}
+
+public final class com/example/domain/HttpError : com/example/domain/NetworkError {
+	public static final field Companion Lcom/example/domain/HttpError$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/example/domain/HttpError;
+	public static synthetic fun copy$default (Lcom/example/domain/HttpError;Ljava/lang/String;ILjava/lang/Object;)Lcom/example/domain/HttpError;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMessage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/HttpError$Companion {
+}
+
+public final class com/example/domain/HttpErrorKt {
+	public static final fun getIso (Lcom/example/domain/HttpError$Companion;)Larrow/optics/PIso;
+	public static final fun getMessage (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getMessage (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getMessage (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getMessage (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getMessage (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getMessage (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getMessage (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getMessage (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getMessage (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getMessage (Lcom/example/domain/HttpError$Companion;)Larrow/optics/PLens;
+}
+
+public abstract class com/example/domain/NetworkError : com/example/domain/NetworkResult {
+	public static final field Companion Lcom/example/domain/NetworkError$Companion;
+}
+
+public final class com/example/domain/NetworkError$Companion {
+}
+
+public final class com/example/domain/NetworkErrorKt {
+	public static final fun getHttpError (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getHttpError (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getHttpError (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getHttpError (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getHttpError (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getHttpError (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getHttpError (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getHttpError (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getHttpError (Lcom/example/domain/NetworkError$Companion;)Larrow/optics/PPrism;
+	public static final fun getTimeoutError (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getTimeoutError (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getTimeoutError (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getTimeoutError (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getTimeoutError (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getTimeoutError (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getTimeoutError (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getTimeoutError (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getTimeoutError (Lcom/example/domain/NetworkError$Companion;)Larrow/optics/PPrism;
+}
+
+public abstract class com/example/domain/NetworkResult {
+	public static final field Companion Lcom/example/domain/NetworkResult$Companion;
+}
+
+public final class com/example/domain/NetworkResult$Companion {
+}
+
+public final class com/example/domain/NetworkResultKt {
+	public static final fun getNetworkError (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getNetworkError (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getNetworkError (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getNetworkError (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getNetworkError (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getNetworkError (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getNetworkError (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getNetworkError (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getNetworkError (Lcom/example/domain/NetworkResult$Companion;)Larrow/optics/PPrism;
+	public static final fun getSuccess (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getSuccess (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getSuccess (Larrow/optics/PIso;)Larrow/optics/PPrism;
+	public static final fun getSuccess (Larrow/optics/PLens;)Larrow/optics/POptional;
+	public static final fun getSuccess (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getSuccess (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getSuccess (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getSuccess (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getSuccess (Lcom/example/domain/NetworkResult$Companion;)Larrow/optics/PPrism;
+}
+
+public final class com/example/domain/Street {
+	public static final field Companion Lcom/example/domain/Street$Companion;
+	public fun <init> (ILjava/lang/String;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (ILjava/lang/String;)Lcom/example/domain/Street;
+	public static synthetic fun copy$default (Lcom/example/domain/Street;ILjava/lang/String;ILjava/lang/Object;)Lcom/example/domain/Street;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getNumber ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Street$Companion {
+}
+
+public final class com/example/domain/StreetKt {
+	public static final fun getIso (Lcom/example/domain/Street$Companion;)Larrow/optics/PIso;
+	public static final fun getName (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getName (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getName (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getName (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getName (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getName (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getName (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getName (Lcom/example/domain/Street$Companion;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getNumber (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getNumber (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getNumber (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getNumber (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getNumber (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getNumber (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getNumber (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getNumber (Lcom/example/domain/Street$Companion;)Larrow/optics/PLens;
+}
+
+public final class com/example/domain/Success : com/example/domain/NetworkResult {
+	public static final field Companion Lcom/example/domain/Success$Companion;
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lcom/example/domain/Success;
+	public static synthetic fun copy$default (Lcom/example/domain/Success;Ljava/lang/String;ILjava/lang/Object;)Lcom/example/domain/Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContent ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/example/domain/Success$Companion {
+}
+
+public final class com/example/domain/SuccessKt {
+	public static final fun getContent (Larrow/optics/Fold;)Larrow/optics/Fold;
+	public static final fun getContent (Larrow/optics/Getter;)Larrow/optics/Getter;
+	public static final fun getContent (Larrow/optics/PEvery;)Larrow/optics/PEvery;
+	public static final fun getContent (Larrow/optics/PIso;)Larrow/optics/PLens;
+	public static final fun getContent (Larrow/optics/PLens;)Larrow/optics/PLens;
+	public static final fun getContent (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getContent (Larrow/optics/PPrism;)Larrow/optics/POptional;
+	public static final fun getContent (Larrow/optics/PSetter;)Larrow/optics/PSetter;
+	public static final fun getContent (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getContent (Lcom/example/domain/Success$Companion;)Larrow/optics/PLens;
+	public static final fun getIso (Lcom/example/domain/Success$Companion;)Larrow/optics/PIso;
+}
+
+public final class com/example/domain/TimeoutError : com/example/domain/NetworkError {
+	public static final field INSTANCE Lcom/example/domain/TimeoutError;
+}
+

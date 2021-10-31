@@ -17,7 +17,7 @@
 apply plugin: "org.jetbrains.dokka"
 
 dokkaGfm {
-    outputDirectory = file("${rootDir}/../arrow-site/docs/apidocs")
+    outputDirectory = file("${rootDir}/arrow-site/docs/apidocs")
     dokkaSourceSets {
         if (file("src/commonMain/kotlin").exists()) {
             commonMain {
