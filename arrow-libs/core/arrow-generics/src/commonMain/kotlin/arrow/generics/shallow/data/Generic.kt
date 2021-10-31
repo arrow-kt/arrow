@@ -1,6 +1,11 @@
 package arrow.generics.shallow.data
 
-import arrow.generics.shallow.* // ktlint-disable no-wildcard-imports
+import arrow.generics.shallow.Choice
+import arrow.generics.shallow.End
+import arrow.generics.shallow.Field
+import arrow.generics.shallow.ProductRepr
+import arrow.generics.shallow.Repr
+import arrow.generics.shallow.SumRepr
 
 // these are the "interpretations" of generic representations
 public sealed interface Generic<out A : Repr>

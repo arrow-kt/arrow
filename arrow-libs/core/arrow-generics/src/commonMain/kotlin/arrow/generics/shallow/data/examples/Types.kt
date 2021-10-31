@@ -1,8 +1,17 @@
 package arrow.generics.shallow.data.examples
 
-import arrow.generics.examples.* // ktlint-disable no-wildcard-imports
-import arrow.generics.shallow.* // ktlint-disable no-wildcard-imports
-import arrow.generics.shallow.data.* // ktlint-disable no-wildcard-imports
+import arrow.generics.examples.Client
+import arrow.generics.examples.Company
+import arrow.generics.examples.Person
+import arrow.generics.examples.Tree
+import arrow.generics.shallow.data.And
+import arrow.generics.shallow.Choice
+import arrow.generics.shallow.End
+import arrow.generics.shallow.Field
+import arrow.generics.shallow.data.Done
+import arrow.generics.shallow.data.Generic
+import arrow.generics.shallow.data.That
+import arrow.generics.shallow.data.This
 
 // this is the representation type
 // this follows the "sum of products" approach

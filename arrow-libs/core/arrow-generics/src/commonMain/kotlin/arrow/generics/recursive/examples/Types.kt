@@ -40,3 +40,4 @@ public fun <A> Generic<TreeRepr, A>.fromGeneric(): Tree<A> = when (this) {
     else -> throw IllegalStateException()
   }
 }
+

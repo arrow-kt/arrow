@@ -1,7 +1,12 @@
 package arrow.generics.shallow.data.examples
 
-import arrow.generics.shallow.* // ktlint-disable no-wildcard-imports
-import arrow.generics.shallow.data.* // ktlint-disable no-wildcard-imports
+import arrow.generics.shallow.End
+import arrow.generics.shallow.Repr
+import arrow.generics.shallow.data.And
+import arrow.generics.shallow.data.Done
+import arrow.generics.shallow.data.Generic
+import arrow.generics.shallow.data.That
+import arrow.generics.shallow.data.This
 
 // this is the cool part! this is how we define a generic function
 // simply pattern match over the generic interpretations
