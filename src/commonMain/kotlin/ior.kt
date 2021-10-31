@@ -3,14 +3,15 @@ import arrow.continuations.generic.updateAndGet
 import arrow.core.Ior
 import arrow.core.identity
 import arrow.typeclasses.Semigroup
+import internal.EmptyValue
 
 suspend fun <E, A> ior(semigroup: Semigroup<E>, f: suspend IorEffect<E>.() -> A): Ior<E, A> =
   cont<E, Ior<E, A>> {
     val effect = IorEffect(semigroup, this)
     val res = f(effect)
-    val state = effect.leftState.get()
-    if (state === EmptyValue) Ior.Right(res)
-    else Ior.Both(EmptyValue.unbox(state), res)
+    val leftState = effect.leftState.get()
+    if (leftState === EmptyValue) Ior.Right(res)
+    else Ior.Both(EmptyValue.unbox(leftState), res)
   }.fold({ Ior.Left(it) }, ::identity)
 
 class IorEffect<E>(
@@ -23,7 +24,7 @@ class IorEffect<E>(
   private fun combine(other: E): E =
     leftState.updateAndGet { state ->
       if (state === EmptyValue) other
-      else EmptyValue.unbox<E>(leftState).combine(other)
+      else EmptyValue.unbox<E>(state).combine(other)
     } as E
 
   suspend fun <B> Ior<E, B>.bind(): B =

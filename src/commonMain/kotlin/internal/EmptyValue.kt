@@ -1,3 +1,4 @@
+package internal
 
 @PublishedApi
 internal object EmptyValue {

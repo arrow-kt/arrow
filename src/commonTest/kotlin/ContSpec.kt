@@ -4,6 +4,7 @@ import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -24,6 +25,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
@@ -32,6 +35,9 @@ class ContSpec : StringSpec({
 
   suspend fun <A> Cont<Nothing, A>.value(): A =
     fold(::identity, ::identity)
+
+  suspend fun Cont<*, *>.runCont(): Unit =
+    fold({ }, { })
 
   "immediate values" {
     cont<Nothing, Int> {
@@ -62,7 +68,7 @@ class ContSpec : StringSpec({
     Either.catch {
       cont<Nothing, Nothing> {
         throw e
-      }.value()
+      }.runCont()
     } shouldBe Either.Left(e)
   }
 
@@ -71,20 +77,20 @@ class ContSpec : StringSpec({
     Either.catch {
       cont<Nothing, Nothing> {
         e.suspend()
-      }.value()
+      }.runCont()
     } shouldBe Either.Left(e)
   }
 
   "Can short-circuit immediately from nested blocks" {
     cont<String, Int> {
-      cont<Nothing, Long> { shift("test") }.value()
+      cont<Nothing, Long> { shift("test") }.runCont()
       fail("Should never reach this point")
     }.fold(::identity, ::identity) shouldBe "test"
   }
 
   "Can short-circuit suspended from nested blocks" {
     cont<String, Int> {
-      cont<Nothing, Long> { shift("test".suspend()) }.value()
+      cont<Nothing, Long> { shift("test".suspend()) }.runCont()
       fail("Should never reach this point")
     }.fold(::identity, ::identity) shouldBe "test"
   }
@@ -94,7 +100,7 @@ class ContSpec : StringSpec({
       cont<Nothing, Long> {
         1L.suspend()
         shift("test".suspend())
-      }.value()
+      }.runCont()
       fail("Should never reach this point")
     }.fold(::identity, ::identity) shouldBe "test"
   }
@@ -149,7 +155,20 @@ class ContSpec : StringSpec({
     val parentCtx = currentContext()
     cont<Nothing, Unit> {
       currentContext() shouldBe parentCtx
-    }.value()
+    }.runCont()
+  }
+
+  "Concurrent shift" {
+    checkAll(Arb.int(), Arb.int()) { a, b ->
+      cont<Int, String> {
+        coroutineScope {
+          val fa = async<Nothing> { shift(a) }
+          val fb = async<Nothing> { shift(b) }
+          fa.await()
+          fb.await()
+        }
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+    }
   }
 })
 
