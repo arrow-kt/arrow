@@ -14,8 +14,6 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.resumeWithException
 import kotlin.jvm.JvmInline
 
 public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
@@ -160,19 +158,21 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
           // TODO if a concurrent coroutine called shift, do we also complete with `ShiftCancellationException`?
           //      NOTE: This _should_ only possible if coroutines are already coupled to each-other with structured concurrency
           //      So re-emitting CancellationException might not be needed ??
+          //      Related test: https://github.com/nomisRev/Continuation/blob/main/src/commonTest/kotlin/ContSpec.kt#L161
           shifted.update { f(r) }
-          return suspendCoroutineUninterceptedOrReturn { contB ->
-            contB.resumeWithException(ShiftCancellationException(token))
-            COROUTINE_SUSPENDED
-          }
+          throw ShiftCancellationException(token)
         }
       }
 
-      suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
-        res.fold(cont::resume) { throwable ->
-          if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(shifted.value())
-          else cont.resumeWith(res)
-        }
-      })
+      try {
+        suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
+          res.fold(cont::resume) { throwable ->
+            if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(shifted.value())
+            else cont.resumeWith(res)
+          }
+        })
+      } catch (e: ShiftCancellationException) {
+        if (token == e.token) shifted.value() else throw e
+      }
     }
 }
