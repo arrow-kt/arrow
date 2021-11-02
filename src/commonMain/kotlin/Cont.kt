@@ -35,6 +35,9 @@ public interface Cont<R, A> {
   suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
+  fun attempt(): Cont<R, Result<A>> =
+    cont { runCatching { bind() } }
+
   fun <B> map(f: suspend (A) -> B): Cont<R, B> =
     cont { fold(this::shift, f) }
 
