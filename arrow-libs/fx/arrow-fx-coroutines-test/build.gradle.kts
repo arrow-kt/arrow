@@ -7,7 +7,6 @@ publishMultiplatform {
     isDokkaEnabled = false
 }
 
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {

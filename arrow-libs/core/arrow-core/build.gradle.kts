@@ -5,7 +5,6 @@ plugins {
 
 apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {

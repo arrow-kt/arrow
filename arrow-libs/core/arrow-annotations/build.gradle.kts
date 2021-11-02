@@ -28,5 +28,4 @@ kotlin {
   }
 }
 
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))

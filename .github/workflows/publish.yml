@@ -143,7 +143,7 @@ jobs:
           ./gradlew assemble
 
       - name: "Create API doc"
-        run: ./gradlew  --no-parallel dokkaGfm
+        run: ./gradlew  --no-parallel dokkaJekyll
 
       - name: "Validate documentation"
         run: ./gradlew arrow-site:runAnk

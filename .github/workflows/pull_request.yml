@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: "Create API doc"
-        run: ./gradlew dokkaGfm
+        run: ./gradlew dokkaJekyll
 
       - name: "Validate documentation"
         run: ./gradlew arrow-site:runAnk

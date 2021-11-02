@@ -1,11 +1,11 @@
 [versions]
 animalSniffer = "1.5.0"
 arrow = "1.0.0"
-arrowGradleConfig = "0.4.1"
+arrowGradleConfig = "0.5.0"
 autoService = "1.0-rc7"
 compileTesting = "0.18"
 coroutines = "1.5.2"
-dokka = "1.5.30"
+dokka = "1.5.31"
 jUnit = "4.12"
 jUnitVintage = "5.5.2"
 kotest = "5.0.0.M2"
@@ -18,7 +18,7 @@ mockWebServer = "3.13.1"
 retrofit = "2.8.1"
 
 [libraries]
-arrow-ankGradle = { module = "io.arrow-kt:arrow-ank-gradle", version.ref = "arrow" }
+arrow-ankDokkaPluginx = { module = "io.arrow-kt:arrow-ank-dokka-plugin", version.ref = "arrowGradleConfig" }
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
