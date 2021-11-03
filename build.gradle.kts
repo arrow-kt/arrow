@@ -28,9 +28,17 @@ tasks {
 configure(subprojects - project(":arrow-site")) {
     apply(plugin = "org.jetbrains.dokka")
 
+    val ank: Configuration by configurations.creating
+
+    dependencies {
+      dokkaGfmPlugin("io.arrow-kt:arrow-ank-dokka-plugin:0.5.2-alpha.1")
+      ank(project(this@configure.path))
+    }
+
     tasks.named<DokkaTask>("dokkaGfm") {
         outputDirectory.set(file("$rootDir/arrow-site/docs/apidocs"))
 
+        dependsOn("assemble")
         dokkaSourceSets {
             val arrowMetaBlobMain = "https://github.com/arrow-kt/arrow-meta/blob/main"
 
@@ -48,13 +56,9 @@ configure(subprojects - project(":arrow-site")) {
                                 remoteLineSuffix.set("#L")
                             }
                         }
-              val project = this@configure
-              classpath.from(file("build/libs/${project.name}-${project.version}.jar"))
+              classpath.from(ank.files)
             }
         }
     }
 
-  dependencies {
-    dokkaGfmPlugin("io.arrow-kt:arrow-ank-dokka-plugin:0.5.1")
-  }
 }

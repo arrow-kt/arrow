@@ -53,7 +53,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  *     val x: Int? = 1
  *     ensureNotNull(x)
  *     println(x)
- *     ensureNotNull(null)
+ *     ensureNotNull<Int>(null)
  *   }
  * //sampleEnd
  *   .let(::println)
