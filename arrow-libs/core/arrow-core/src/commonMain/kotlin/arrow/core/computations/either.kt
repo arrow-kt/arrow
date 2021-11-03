@@ -73,7 +73,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  *     val x: Int? = 1
  *     ensureNotNull(x) { "passes" }
  *     println(x)
- *     ensureNotNull<Int>(null) { "failed" }
+ *     ensureNotNull<String, Int>(null) { "failed" }
  *   }
  * //sampleEnd
  *   .let(::println)
