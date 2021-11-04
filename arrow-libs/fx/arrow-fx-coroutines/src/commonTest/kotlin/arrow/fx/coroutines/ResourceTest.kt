@@ -1,14 +1,15 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.left
 import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
@@ -106,6 +107,117 @@ class ResourceTest : ArrowFxSpec(
         val mutable = mutableListOf<Int>()
         list.traverseResource { mutable.add(it); Resource.just(Unit) }
         mutable.toList() shouldBe list
+      }
+    }
+
+    "Resource can close from either" {
+      val exit = CompletableDeferred<ExitCase>()
+      arrow.core.computations.either<String, Int> {
+        arrow.fx.coroutines.computations.resource<Int> {
+          Resource({ 1 }) { _, ex -> exit.complete(ex) }.bind()
+          "error".left().bind()
+          1
+        }.use { it }
+      } shouldBe "error".left()
+      // Should be ExitCase.Cancelled but still Failure due to ShortCircuit
+      // Cont<R, A> will fix this issue by properly shifting and cancelling
+      exit.await().shouldBeTypeOf<ExitCase.Failure>()
+    }
+
+    val depth: Int = 100
+
+    class CheckableAutoClose {
+      var started = true
+      fun close() {
+        started = false
+      }
+    }
+
+    fun closeable(): Resource<CheckableAutoClose> =
+      Resource({ CheckableAutoClose() }) { a, _ -> a.close() }
+
+    "parZip - success" {
+      val all = (1..depth).traverseResource { closeable() }.parZip(
+        (1..depth).traverseResource { closeable() }
+      ) { a, b -> a + b }.use { all ->
+        all.also { all.forEach { it.started shouldBe true } }
+      }
+      all.forEach { it.started shouldBe false }
+    }
+
+    fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
+      val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
+      val res = promises.fold(Resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
+        acc.flatMap { ii: Int ->
+          Resource({ ii + i }) { _, _ ->
+            promise.complete(i)
+          }
+        }
+      }
+      return Pair(promises.map { it.second }, res)
+    }
+
+    "parZip - deep finalizers are called when final one blows" {
+      io.kotest.property.checkAll(3, Arb.int(10..100)) {
+        val (promises, resource) = generate()
+        assertThrowable {
+          resource.flatMap {
+            Resource({ throw RuntimeException() }) { _, _ -> }
+          }.parZip(Resource({ }) { _, _ -> }) { _, _ -> }
+            .use { fail("It should never reach here") }
+        }.shouldBeTypeOf<RuntimeException>()
+
+        (1..depth).zip(promises) { i, promise ->
+          println(promise.isCompleted)
+          promise.await() shouldBe i
+        }
+      }
+    }
+
+    "parZip - deep finalizers are called when final one cancels" {
+      io.kotest.property.checkAll(3, Arb.int(10..100)) {
+        val cancel = CancellationException(null, null)
+        val (promises, resource) = generate()
+        assertThrowable {
+          resource.flatMap {
+            Resource({ throw cancel }) { _, _ -> }
+          }.parZip(Resource({ }) { _, _ -> }) { _, _ -> }
+            .use { fail("It should never reach here") }
+        }.shouldBeTypeOf<CancellationException>()
+
+        (1..depth).zip(promises) { i, promise ->
+          println(promise.isCompleted)
+          promise.await() shouldBe i
+        }
+      }
+    }
+
+    // Test multiple release triggers on acquire fail.
+    "parZip - Deep finalizers get called on left or right cancellation" {
+      checkAll(Arb.bool()) { isLeft ->
+        val cancel = CancellationException(null, null)
+        val (promises, resource) = generate()
+        val latch = CompletableDeferred<Int>()
+        assertThrowable {
+          val res = if (isLeft) Resource({
+            latch.await() shouldBe (1..depth).sum()
+            throw cancel
+          }) { _, _ -> }.parZip(resource.flatMap {
+            Resource({ latch.complete(it) }) { _, _ -> }
+          }) { _, _ -> }
+          else resource.flatMap {
+            Resource({ latch.complete(it) }) { _, _ -> }
+          }.parZip(Resource({
+            latch.await() shouldBe (1..depth).sum()
+            throw cancel
+          }) { _, _ -> }) { _, _ -> }
+
+          res.use { fail("It should never reach here") }
+        }.shouldBeTypeOf<CancellationException>()
+
+        (1..depth).zip(promises) { i, promise ->
+          promise.await() shouldBe i
+        }
       }
     }
 
