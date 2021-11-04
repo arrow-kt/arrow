@@ -243,10 +243,14 @@ class ResourceTest : ArrowFxSpec(
       checkAll(Arb.int()) { i ->
         val cancel = CancellationException(null, null)
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
+        val started = CompletableDeferred<Unit>()
 
         assertThrowable {
-          Resource({ throw cancel }) { _, _ -> }
-            .parZip(Resource({ i }, { ii, ex ->
+          Resource({
+            started.await()
+            throw cancel
+          }) { _, _ -> }
+            .parZip(Resource({ started.complete(Unit); i }, { ii, ex ->
               released.complete(ii to ex)
             })) { _, _ -> }
             .use { fail("It should never reach here") }
@@ -279,11 +283,14 @@ class ResourceTest : ArrowFxSpec(
     "parZip - Left error on acquire" {
       checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
-
+        val started = CompletableDeferred<Unit>()
         assertThrowable {
-          Resource({ throw throwable }) { _, _ -> }
+          Resource({
+            started.await()
+            throw throwable
+          }) { _, _ -> }
             .parZip(
-              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+              Resource({ started.complete(Unit); i }, { ii, ex -> released.complete(ii to ex) })
             ) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
