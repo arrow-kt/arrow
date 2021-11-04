@@ -5,8 +5,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 
-
-
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
  *  need to be acquired and later released in reverse order.
