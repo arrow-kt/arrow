@@ -1,15 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.identity
-import arrow.core.nonFatalOrThrow
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Deferred
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.async
-import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
+
+
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
@@ -442,42 +438,14 @@ public sealed class Resource<out A> {
    * }
    * //sampleEnd
    * ```
-   *
-   *
    */
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
     fb: Resource<B>,
     f: suspend (A, B) -> C
   ): Resource<C> =
-    Resource({
-      supervisorScope {
-        val faa = async(ctx) { allocate() }
-        val fbb = async(ctx) { fb.allocate() }
-        val a = awaitOrCancelOther(faa, fbb)
-        val b = awaitOrCancelOther(fbb, faa)
-        Pair(a, b)
-      }
-    }, { (ar, br), ex ->
-      val (_, releaseA) = ar
-      val (_, releaseB) = br
-      supervisorScope {
-        val faa = async(ctx) { releaseA(ex) }
-        val fbb = async(ctx) { releaseB(ex) }
-        try {
-          faa.await()
-        } catch (errorA: Throwable) {
-          try {
-            fbb.await()
-          } catch (errorB: Throwable) {
-            throw Platform.composeErrors(errorA, errorB)
-          }
-          throw errorA
-        }
-        fbb.await()
-      }
-    }).map { (ar, br) ->
-      f(ar.first, br.first)
+    arrow.fx.coroutines.computations.resource {
+      parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
     }
 
   public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
@@ -589,24 +557,38 @@ public sealed class Resource<out A> {
  * }
  * ```
  */
+@Deprecated("Use the resource computation DSL instead")
 public inline class Use<A>(internal val acquire: suspend () -> A)
 
 /**
  * Marks an [acquire] operation as the [Resource.use] step of a [Resource].
  */
+@Deprecated("Use the resource computation DSL instead", ReplaceWith("resource(acquire)", "arrow.fx.coroutines.computation.resource"))
 public fun <A> resource(acquire: suspend () -> A): Use<A> = Use(acquire)
 
-/**
- * Composes a [release] action to a [Resource.use] action creating a [Resource].
- */
+@Deprecated("Use the resource computation DSL instead")
 public infix fun <A> Use<A>.release(release: suspend (A) -> Unit): Resource<A> =
   Resource(acquire) { a, _ -> release(a) }
 
 /**
- * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
+ * Composes a [release] action to a [Resource.use] action creating a [Resource].
  */
+public infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): Resource<A> =
+  flatMap { a ->
+    Resource({ a }, { _, _ -> release(a) })
+  }
+
+@Deprecated("Use the resource computation DSL instead")
 public infix fun <A> Use<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
   Resource(acquire, release)
+
+/**
+ * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
+ */
+public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
+  flatMap { a ->
+    Resource({ a }, { _, ex -> release(a, ex) })
+  }
 
 /**
  * Traverse this [Iterable] and collects the resulting `Resource<B>` of [f] into a `Resource<List<B>>`.
@@ -689,78 +671,3 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
   traverseResource(::identity)
-
-// Interpreter that knows how to evaluate a Resource data structure
-// Maintains its own stack for dealing with Bind chains
-@Suppress("UNCHECKED_CAST")
-private tailrec suspend fun useLoop(
-  current: Resource<Any?>,
-  stack: List<(Any?) -> Resource<Any?>>
-): Pair<Any?, suspend (ExitCase) -> Unit> =
-  when (current) {
-    is Resource.Defer -> useLoop(current.resource.invoke(), stack)
-    is Resource.Bind<*, *> ->
-      useLoop(current.source, listOf(current.f as (Any?) -> Resource<Any?>) + stack)
-    is Resource.Allocate -> loadResourceAndReleaseHandler(
-      acquire = current.acquire,
-      use = { a ->
-        when {
-          stack.isEmpty() -> Pair(a) { ex -> current.release(a, ex) }
-          else -> useLoop(stack.first()(a), stack.drop(1))
-        }
-      },
-      release = { _, _ -> /*a, exitCase -> current.release(a, exitCase)*/ }
-    )
-  }
-
-private suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Unit> =
-  useLoop(this, emptyList()) as Pair<A, suspend (ExitCase) -> Unit>
-
-private suspend inline fun loadResourceAndReleaseHandler(
-  crossinline acquire: suspend () -> Any?,
-  crossinline use: suspend (Any?) -> Pair<Any?, suspend (ExitCase) -> Unit>,
-  crossinline release: suspend (Any?, ExitCase) -> Unit
-): Pair<Any?, suspend (ExitCase) -> Unit> {
-  val acquired = withContext(NonCancellable) {
-    acquire()
-  }
-
-  return try { // Successfully loaded resource, pass it and its release f down
-    val (b, _release) = use(acquired)
-    Pair(b) { ex -> _release(ex); release(acquired, ex) }
-  } catch (e: CancellationException) { // Release when cancelled
-    runReleaseAndRethrow(e) { release(acquired, ExitCase.Cancelled(e)) }
-  } catch (t: Throwable) { // Release when failed to load resource
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { release(acquired, ExitCase.Failure(t.nonFatalOrThrow())) }
-  }
-}
-
-private suspend fun <A, B> awaitOrCancelOther(
-  fa: Deferred<Pair<A, suspend (ExitCase) -> Unit>>,
-  fb: Deferred<Pair<B, suspend (ExitCase) -> Unit>>
-): Pair<A, suspend (ExitCase) -> Unit> =
-  try {
-    fa.await()
-  } catch (e: Throwable) {
-    if (e is CancellationException) awaitAndAddSuppressed(fb, e, ExitCase.Cancelled(e))
-    else awaitAndAddSuppressed(fb, e, ExitCase.Failure(e))
-  }
-
-private suspend fun awaitAndAddSuppressed(
-  fb: Deferred<Pair<*, suspend (ExitCase) -> Unit>>,
-  e: Throwable,
-  exitCase: ExitCase
-): Nothing {
-  val cancellationException = try {
-    if (fb.isCancelled && fb.isCompleted) fb.getCompletionExceptionOrNull()
-    else fb.await().second.invoke(exitCase).let { null }
-  } catch (e2: Throwable) {
-    throw e.apply { addSuppressed(e2) }
-  }
-
-  val exception = cancellationException?.let {
-    e.apply { addSuppressed(it) }
-  } ?: e
-
-  throw exception
-}
