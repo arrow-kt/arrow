@@ -91,7 +91,7 @@ jobs:
 
       - name: "Make test reports available to download"
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: test-reports
           path: test-reports
@@ -135,7 +135,7 @@ jobs:
 
       - name: "Make test reports available to download"
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: test-reports
           path: test-reports

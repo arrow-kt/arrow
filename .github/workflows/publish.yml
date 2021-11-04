@@ -232,7 +232,7 @@ jobs:
       - name: List S3
         run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: logs
           path: arrow-libs/logs
