@@ -75,16 +75,22 @@ private tailrec suspend fun useLoop(
     is Resource.Bind<*, *> ->
       useLoop(current.source, listOf(current.f as (Any?) -> Resource<Any?>) + stack, finalizers, handle)
     is Resource.Allocate -> loadResourceAndReleaseHandler(
-      acquire = current.acquire,
-      use = { a ->
-        when {
-          stack.isEmpty() -> Pair<Any?, suspend (ExitCase) -> Unit>(a) { ex ->
-            finalizers.cancelAll(ex) {
-              current.release(a, ex)
-            }
-          }.also(handle)
-          else -> useLoop(stack.first()(a), stack.drop(1), finalizers + { ex -> current.release(a, ex) }, handle)
+      acquire = {
+        current.acquire().let { a ->
+          if (stack.isEmpty()) {
+            Pair<Any?, suspend (ExitCase) -> Unit>(a) { ex ->
+              finalizers.cancelAll(ex) {
+                current.release(a, ex)
+              }
+            }.also(handle)
+          } else {
+            a
+          }
         }
+      },
+      use = { a ->
+        if (stack.isEmpty()) a as Pair<Any?, suspend (ExitCase) -> Unit>
+        else useLoop(stack.first()(a), stack.drop(1), finalizers + { ex -> current.release(a, ex) }, handle)
       },
       release = { a, ex ->
         if (ex != ExitCase.Completed) {
