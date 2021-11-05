@@ -446,13 +446,16 @@ public sealed class Resource<out A> {
       parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
     }
 
+  @Deprecated("Internals of Resource are changing, do not rely on the Bind class.")
   public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
 
+  @Deprecated("Internals of Resource are changing, do not rely on the Allocate class.")
   public class Allocate<A>(
     public val acquire: suspend () -> A,
     public val release: suspend (A, ExitCase) -> Unit
   ) : Resource<A>()
 
+  @Deprecated("Internals of Resource are changing, do not rely on the Defer class.")
   public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
 
   public companion object {
