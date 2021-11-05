@@ -1203,13 +1203,13 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *
  * suspend fun main(): Unit {
  *   //sampleStart
- *   Either.Right(7).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
+ *   Either.Right(7).filterOrOther<String, Int>({ n -> n == 10 }, { s -> "Value '$s' is not equal to 10" })
  *     .let(::println) // Either.Left(Value '7' is not equal to 10")
  *
- *   Either.Right(10).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
+ *   Either.Right(10).filterOrOther<String, Int>({ it == 10 }, { "Value '$it' is not equal to 10" })
  *     .let(::println) // Either.Right(10)
  *
- *   Either.Left(12).filterOrOther({ str: String -> str.contains("impossible") }, { -1 })
+ *   Either.Left(12).filterOrOther<Int, String>({ str: String -> str.contains("impossible") }, { -1 })
  *     .let(::println) // Either.Left(12)
  *   //sampleEnd
  * }

@@ -55,7 +55,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  *     val x: Int? = 1
  *     ensureNotNull(x)
  *     println(x)
- *     ensureNotNull<Int>(null)
+ *     ensureNotNull<Int, Int>(null)
  *   }
  * //sampleEnd
  *   .let(::println)

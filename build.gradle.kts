@@ -41,11 +41,11 @@ configure(subprojects - project(":arrow-site")) {
   val ank: Configuration by configurations.creating
 
   dependencies {
-    dokkaGfmPlugin("io.arrow-kt:arrow-ank-dokka-plugin:0.5.2-alpha.1")
+    dokkaJekyllPlugin("io.arrow-kt:arrow-ank-dokka-plugin:0.5.2-alpha.1")
     ank(project(this@configure.path))
   }
 
-  tasks.named<DokkaTask>("dokkaGfm") {
+  tasks.named<DokkaTask>("dokkaJekyll") {
     outputDirectory.set(file("$rootDir/arrow-site/docs/apidocs"))
 
     dependsOn("assemble")
