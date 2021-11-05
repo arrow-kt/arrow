@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.identity
 import arrow.core.left
 import io.kotest.assertions.fail
 import io.kotest.matchers.should
@@ -104,9 +105,8 @@ class ResourceTest : ArrowFxSpec(
 
     "traverseResource: leftToRight" {
       checkAll(Arb.list(Arb.int())) { list ->
-        val mutable = mutableListOf<Int>()
-        list.traverseResource { mutable.add(it); Resource.just(Unit) }
-        mutable.toList() shouldBe list
+        list.traverseResource { Resource.just(it) }
+          .use(::identity) shouldBe list
       }
     }
 
