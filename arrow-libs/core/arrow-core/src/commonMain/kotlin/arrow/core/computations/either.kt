@@ -1,13 +1,11 @@
 package arrow.core.computations
 
 import arrow.continuations.Effect
-import arrow.continuations.generic.DelimitedScope
 import arrow.core.Cont
 import arrow.core.ContEffect
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Validated
-import arrow.core.cont
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
@@ -16,36 +14,30 @@ import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
 @Deprecated("Use ContEffect<E> instead")
-public interface EitherEffect<E, A> : Effect<Either<E, A>>, ContEffect<E> {
-  override fun control(): DelimitedScope<Either<E, A>> =
-    object : DelimitedScope<Either<E, A>> {
-      override suspend fun <B> shift(r: Either<E, A>): B =
-        when (r) {
-          is Left -> this@EitherEffect.shift(r.value)
-          is Either.Right ->
-            TODO("What to do here? This should never be called??")
-        }
-    }
+public fun interface EitherEffect<E, A> : Effect<Either<E, A>>, ContEffect<E> {
+
+  override suspend fun <B> shift(r: E): B =
+    control().shift(r.left())
 
   public override suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
-      is Left -> shift(value)
+      is Left -> control().shift(this)
     }
 
   public override suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
-      is Validated.Invalid -> shift(value)
+      is Validated.Invalid -> control().shift(Left(value))
     }
 
   public override suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
     fold(::identity) { throwable ->
-      shift(transform(throwable))
+      control().shift(transform(throwable).left())
     }
 
   public override suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
-    if (value) Unit else shift(orLeft())
+    if (value) Unit else orLeft().left().bind()
 }
 
 /**
@@ -80,8 +72,9 @@ public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLe
 
 // RestrictedEitherEffect cannot implement EitherEffect
 // Since EitherEffect defines a suspending capabilities
+// Deprecate in favor of RestrictedCont
 @RestrictsSuspension
-public interface RestrictedEitherEffect<E, A> : EitherEffect<E, A> {
+public fun interface RestrictedEitherEffect<E, A> : EitherEffect<E, A> {
   @Deprecated(
     "Cont cannot be bound by restricted suspension",
     level = DeprecationLevel.ERROR
@@ -92,15 +85,8 @@ public interface RestrictedEitherEffect<E, A> : EitherEffect<E, A> {
 @Suppress("ClassName")
 public object either {
   public inline fun <E, A> eager(crossinline c: suspend RestrictedEitherEffect<E, *>.() -> A): Either<E, A> =
-    Effect.restricted(eff = { delimitedScope ->
-      object : RestrictedEitherEffect<E, A>, ContEffect<E> {
-        override suspend fun <B> shift(r: E): B =
-          delimitedScope.shift(r.left())
-      }
-    }, f = c, just = { it.right() })
+    Effect.restricted(eff = { RestrictedEitherEffect { it } }, f = c, just = { it.right() })
 
   public suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
-    cont<E, A> {
-      c(object : EitherEffect<E, A>, ContEffect<E> by this {})
-    }.toEither()
+    Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }
