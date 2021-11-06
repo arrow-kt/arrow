@@ -1,3 +1,4 @@
+import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
@@ -22,11 +23,10 @@ import kotlin.coroutines.startCoroutine
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
@@ -162,8 +162,8 @@ class ContSpec : StringSpec({
     checkAll(Arb.int(), Arb.int()) { a, b ->
       cont<Int, String> {
         coroutineScope {
-          val fa = async<Nothing> { shift(a) }
-          val fb = async<Nothing> { shift(b) }
+          val fa = async<Nothing>(start = CoroutineStart.UNDISPATCHED) { shift(a) }
+          val fb = async<Nothing>(start = CoroutineStart.UNDISPATCHED) { shift(b) }
           fa.await()
           fb.await()
         }
