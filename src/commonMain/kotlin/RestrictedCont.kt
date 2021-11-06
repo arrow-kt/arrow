@@ -32,10 +32,6 @@ public interface RestrictedContEffect<R> {
     return if (left === EmptyValue) EmptyValue.unbox(right)
     else shift(EmptyValue.unbox(left))
   }
-
-
-      shift(r)
-    }, ::identity)
 }
 
 public interface RestrictedCont<R, A> {

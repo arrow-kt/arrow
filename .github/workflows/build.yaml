@@ -1,6 +1,14 @@
 name: "Build"
 
-on: pull_request
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   JAVA_OPTS: -Xms1g -Xmx3g
