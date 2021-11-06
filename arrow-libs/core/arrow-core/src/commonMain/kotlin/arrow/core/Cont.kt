@@ -1,7 +1,5 @@
 package arrow.core
 
-import arrow.continuations.generic.AtomicRef
-import arrow.continuations.generic.loop
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
@@ -120,34 +118,12 @@ public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: ()
 }
 
 // We create a `Token` for every scope, so we can properly differentiate between nested scopes
-private class ShiftCancellationException(val token: Token) : CancellationException("Shifted Continuation")
+private class ShiftCancellationException(val token: Token, val value: Any?) :
+  CancellationException("Shifted Continuation")
 
 // Class that represents a unique token by hash comparison
 private class Token {
   override fun toString(): String = "Token(${hashCode().toUInt().toString(16)})"
-}
-
-@JvmInline
-private value class Shifted<A>(private val state: AtomicRef<Any?> = AtomicRef(EmptyValue)) {
-  inline fun update(f: () -> A): Boolean {
-    var backing: Any? = EmptyValue
-    state.loop { a ->
-      if (a === EmptyValue) {
-        if (state.compareAndSet(
-            EmptyValue,
-            if (backing === EmptyValue) {
-              backing = f()
-              backing
-            } else backing
-          )
-        ) return true
-      } else {
-        return false
-      }
-    }
-  }
-
-  fun value(): A = EmptyValue.unbox(state.get())
 }
 
 // Reification of Cont program
@@ -156,31 +132,28 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
   override suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
       val token = Token()
-      val shifted = Shifted<B>()
-
       val effect = object : ContEffect<R> {
         // Shift away from this Continuation by intercepting it, and completing it with ShiftCancellationException
         // This is needed because this function will never yield a result,
         // so it needs to be cancelled to properly support coroutine cancellation
-        override suspend fun <B> shift(r: R): B {
-          // TODO if a concurrent coroutine called shift, do we also complete with `ShiftCancellationException`?
-          //      NOTE: This _should_ only possible if coroutines are already coupled to each-other with structured concurrency
-          //      So re-emitting CancellationException might not be needed ??
-          //      Related test: https://github.com/nomisRev/Continuation/blob/main/src/commonTest/kotlin/ContSpec.kt#L161
-          shifted.update { f(r) }
-          throw ShiftCancellationException(token)
-        }
+        override suspend fun <B> shift(r: R): B =
+          //Some interesting consequences of how Continuation Cancellation works in Kotlin.
+          // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
+          // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
+          // This means try/catch is also capable of recovering from monadic errors.
+          // See: ContSpec - try/catch tests
+          throw ShiftCancellationException(token, f(r))
       }
 
       try {
         suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
           res.fold(cont::resume) { throwable ->
-            if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(shifted.value())
+            if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(throwable.value as B)
             else cont.resumeWith(res)
           }
         })
       } catch (e: ShiftCancellationException) {
-        if (token == e.token) shifted.value() else throw e
+        if (token == e.token) e.value else throw e
       }
     }
 }
