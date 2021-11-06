@@ -714,11 +714,14 @@ private class ResEffectImpl : ResourceEffect {
           }
         }
       })
-      is Resource.Bind<*, *> -> Resource.Dsl {
-        val any = source.bind()
-        val ff = f as (Any?) -> Resource<A>
-        ff(any).bind()
-      }.bind()
+      is Resource.Bind<*, *> -> {
+        val dsl: suspend ResourceEffect.() -> A = {
+          val any = source.bind()
+          val ff = f as (Any?) -> Resource<A>
+          ff(any).bind()
+        }
+        dsl(this@ResEffectImpl)
+      }
       is Resource.Defer -> resource().bind()
     }
 }

@@ -31,7 +31,7 @@ class ResourceTest : ArrowFxSpec(
     "value resource is released with Complete" {
       checkAll(Arb.int()) { n ->
         val p = CompletableDeferred<ExitCase>()
-        Resource({ n }, { _, ex -> p.complete(ex) })
+        Resource({ n }, { _, ex -> require(p.complete(ex)) })
           .use { Unit }
 
         p.await() shouldBe ExitCase.Completed
@@ -41,7 +41,7 @@ class ResourceTest : ArrowFxSpec(
     "error resource finishes with error" {
       checkAll(Arb.throwable()) { e ->
         val p = CompletableDeferred<ExitCase>()
-        val r = Resource<Int>({ throw e }, { _, ex -> p.complete(ex) })
+        val r = Resource<Int>({ throw e }, { _, ex -> require(p.complete(ex)) })
 
         Either.catch {
           r.use { it + 1 }
@@ -53,11 +53,11 @@ class ResourceTest : ArrowFxSpec(
       checkAll(Arb.int()) { n ->
         val p = CompletableDeferred<ExitCase>()
         val start = CompletableDeferred<Unit>()
-        val r = Resource({ n }, { _, ex -> p.complete(ex) })
+        val r = Resource({ n }, { _, ex -> require(p.complete(ex)) })
 
         val f = async {
           r.use {
-            start.complete(Unit)
+            require(start.complete(Unit))
             never<Int>()
           }
         }
@@ -114,7 +114,7 @@ class ResourceTest : ArrowFxSpec(
       val exit = CompletableDeferred<ExitCase>()
       arrow.core.computations.either<String, Int> {
         arrow.fx.coroutines.computations.resource<Int> {
-          Resource({ 1 }) { _, ex -> exit.complete(ex) }.bind()
+          Resource({ 1 }) { _, ex -> require(exit.complete(ex)) }.bind()
           "error".left().bind()
           1
         }.use { it }
@@ -150,7 +150,7 @@ class ResourceTest : ArrowFxSpec(
       val res = promises.fold(Resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
         acc.flatMap { ii: Int ->
           Resource({ ii + i }) { _, _ ->
-            promise.complete(i)
+            require(promise.complete(i))
           }
         }
       }
@@ -168,7 +168,6 @@ class ResourceTest : ArrowFxSpec(
         }.shouldBeTypeOf<RuntimeException>()
 
         (1..depth).zip(promises) { i, promise ->
-          println(promise.isCompleted)
           promise.await() shouldBe i
         }
       }
@@ -186,7 +185,6 @@ class ResourceTest : ArrowFxSpec(
         }.shouldBeTypeOf<CancellationException>()
 
         (1..depth).zip(promises) { i, promise ->
-          println(promise.isCompleted)
           promise.await() shouldBe i
         }
       }
@@ -203,10 +201,10 @@ class ResourceTest : ArrowFxSpec(
             latch.await() shouldBe (1..depth).sum()
             throw cancel
           }) { _, _ -> }.parZip(resource.flatMap {
-            Resource({ latch.complete(it) }) { _, _ -> }
+            Resource({ require(latch.complete(it)) }) { _, _ -> }
           }) { _, _ -> }
           else resource.flatMap {
-            Resource({ latch.complete(it) }) { _, _ -> }
+            Resource({ require(latch.complete(it)) }) { _, _ -> }
           }.parZip(Resource({
             latch.await() shouldBe (1..depth).sum()
             throw cancel
@@ -227,8 +225,8 @@ class ResourceTest : ArrowFxSpec(
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
         val started = CompletableDeferred<Unit>()
         assertThrowable {
-          Resource({ started.complete(Unit); i }, { ii, ex ->
-            released.complete(ii to ex)
+          Resource({ require(started.complete(Unit)); i }, { ii, ex ->
+            require(released.complete(ii to ex))
           }).parZip(Resource({ started.await(); throw cancel }) { _, _ -> }) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
@@ -250,8 +248,8 @@ class ResourceTest : ArrowFxSpec(
             started.await()
             throw cancel
           }) { _, _ -> }
-            .parZip(Resource({ started.complete(Unit); i }, { ii, ex ->
-              released.complete(ii to ex)
+            .parZip(Resource({ require(started.complete(Unit)); i }, { ii, ex ->
+              require(released.complete(ii to ex))
             })) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
@@ -267,8 +265,10 @@ class ResourceTest : ArrowFxSpec(
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
         val started = CompletableDeferred<Unit>()
         assertThrowable {
-          Resource({ started.complete(Unit); i }, { ii, ex -> released.complete(ii to ex) })
-            .parZip(
+          Resource(
+            { require(started.complete(Unit)); i },
+            { ii, ex -> require(released.complete(ii to ex)) }
+          ).parZip(
               Resource({ started.await(); throw throwable }) { _, _ -> }
             ) { _, _ -> }
             .use { fail("It should never reach here") }
@@ -290,8 +290,10 @@ class ResourceTest : ArrowFxSpec(
             throw throwable
           }) { _, _ -> }
             .parZip(
-              Resource({ started.complete(Unit); i }, { ii, ex -> released.complete(ii to ex) })
-            ) { _, _ -> }
+              Resource(
+                { require(started.complete(Unit)); i },
+                { ii, ex -> require(released.complete(ii to ex)) }
+              )) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
 
@@ -307,7 +309,7 @@ class ResourceTest : ArrowFxSpec(
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         assertThrowable {
-          Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+          Resource({ i }, { ii, ex -> require(released.complete(ii to ex)) })
             .parZip(
               Resource({ }) { _, _ -> throw cancel }
             ) { _, _ -> }
@@ -328,7 +330,7 @@ class ResourceTest : ArrowFxSpec(
         assertThrowable {
           Resource({ }) { _, _ -> throw cancel }
             .parZip(
-              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+              Resource({ i }, { ii, ex -> require(released.complete(ii to ex)) })
             ) { _, _ -> }
             .use { /*fail("It should never reach here")*/ }
         }.shouldBeTypeOf<CancellationException>()
@@ -344,7 +346,7 @@ class ResourceTest : ArrowFxSpec(
         val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
         assertThrowable {
-          Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+          Resource({ i }, { ii, ex -> require(released.complete(ii to ex)) })
             .parZip(
               Resource({ }) { _, _ -> throw throwable }
             ) { _, _ -> }
@@ -364,7 +366,7 @@ class ResourceTest : ArrowFxSpec(
         assertThrowable {
           Resource({ }) { _, _ -> throw throwable }
             .parZip(
-              Resource({ i }, { ii, ex -> released.complete(ii to ex) })
+              Resource({ i }, { ii, ex -> require(released.complete(ii to ex)) })
             ) { _, _ -> }
             .use { }
         } shouldBe throwable
@@ -381,9 +383,9 @@ class ResourceTest : ArrowFxSpec(
         val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
 
         assertThrowable {
-          Resource({ a }) { aa, ex -> releasedA.complete(aa to ex) }
+          Resource({ a }) { aa, ex -> require(releasedA.complete(aa to ex)) }
             .parZip(
-              Resource({ b }) { bb, ex -> releasedB.complete(bb to ex) }
+              Resource({ b }) { bb, ex -> require(releasedB.complete(bb to ex)) }
             ) { _, _ -> }
             .use { throw throwable }
         } shouldBe throwable
@@ -409,7 +411,7 @@ class ResourceTest : ArrowFxSpec(
         }) { _, _ -> }
           .parZip(Resource({
             r.set("$b")
-            modifyGate.complete(0)
+            require(modifyGate.complete(0))
           }) { _, _ -> }) { _a, _b -> _a to _b }
           .use {
             r.get() shouldBe "$b$a"
