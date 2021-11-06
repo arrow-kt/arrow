@@ -21,6 +21,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * As per usual understanding of [DelimContScope] is required as I will only be commenting differences for now.
  */
+@Deprecated("Broken.")
 internal open class MultiShotDelimContScope<R>(val f: suspend RestrictedScope<R>.() -> R) : RestrictedScope<R> {
 
   // TODO Since runs blocking these don't need to be atomic

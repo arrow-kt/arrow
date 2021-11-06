@@ -2,6 +2,7 @@ package arrow.continuations
 
 import arrow.continuations.generic.DelimitedScope
 
+@Deprecated("Prefer using Cont<R, A>")
 public fun interface Effect<F> {
   public fun control(): DelimitedScope<F>
 

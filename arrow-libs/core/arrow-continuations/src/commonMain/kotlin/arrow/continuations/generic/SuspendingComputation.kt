@@ -10,6 +10,7 @@ internal const val UNDECIDED = 0
 internal const val SUSPENDED = 1
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated("Prefer using Cont<R, A>")
 internal open class SuspendMonadContinuation<R>(
   private val parent: Continuation<R>,
   val f: suspend SuspendedScope<R>.() -> R

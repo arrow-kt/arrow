@@ -63,6 +63,55 @@ public final class arrow/core/ConstKt {
 	public static final fun contramap (Larrow/core/Const;Lkotlin/jvm/functions/Function1;)Larrow/core/Const;
 }
 
+public abstract interface class arrow/core/Cont {
+	public abstract fun attempt ()Larrow/core/Cont;
+	public abstract fun flatMap (Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun handleError (Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun handleErrorWith (Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun map (Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun redeem (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun redeemWith (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public abstract fun toEither (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun toValidated (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/Cont$DefaultImpls {
+	public static fun attempt (Larrow/core/Cont;)Larrow/core/Cont;
+	public static fun flatMap (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun handleError (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun handleErrorWith (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun map (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun redeem (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun redeemWith (Larrow/core/Cont;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static fun toEither (Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun toValidated (Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/core/ContEffect {
+	public abstract fun bind (Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/ContEffect$DefaultImpls {
+	public static fun bind (Larrow/core/ContEffect;Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/ContEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/ContEffect;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/ContEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/ContEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun ensure (Larrow/core/ContEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/ContKt {
+	public static final fun cont (Lkotlin/jvm/functions/Function2;)Larrow/core/Cont;
+	public static final fun ensureNotNull (Larrow/core/ContEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class arrow/core/Currying {
 	public static final fun curried (Lkotlin/jvm/functions/Function10;)Lkotlin/jvm/functions/Function1;
 	public static final fun curried (Lkotlin/jvm/functions/Function11;)Lkotlin/jvm/functions/Function1;
@@ -2385,17 +2434,21 @@ public final class arrow/core/ValidatedKt {
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 }
 
-public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect {
+public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect, arrow/core/ContEffect {
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun control ()Larrow/continuations/generic/DelimitedScope;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/EitherEffect$DefaultImpls {
+	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/EitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun control (Larrow/core/computations/EitherEffect;)Larrow/continuations/generic/DelimitedScope;
 	public static fun ensure (Larrow/core/computations/EitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2442,12 +2495,16 @@ public final class arrow/core/computations/OptionKt {
 }
 
 public abstract interface class arrow/core/computations/RestrictedEitherEffect : arrow/core/computations/EitherEffect {
+	public abstract fun bind (Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/RestrictedEitherEffect$DefaultImpls {
+	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Cont;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun control (Larrow/core/computations/RestrictedEitherEffect;)Larrow/continuations/generic/DelimitedScope;
 	public static fun ensure (Larrow/core/computations/RestrictedEitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

@@ -1,9 +1,13 @@
 package arrow.core.computations
 
 import arrow.continuations.Effect
+import arrow.continuations.generic.DelimitedScope
+import arrow.core.Cont
+import arrow.core.ContEffect
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Validated
+import arrow.core.cont
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
@@ -11,51 +15,37 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
-public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
+@Deprecated("Use ContEffect<E> instead")
+public interface EitherEffect<E, A> : Effect<Either<E, A>>, ContEffect<E> {
+  override fun control(): DelimitedScope<Either<E, A>> =
+    object : DelimitedScope<Either<E, A>> {
+      override suspend fun <B> shift(r: Either<E, A>): B =
+        when (r) {
+          is Left -> this@EitherEffect.shift(r.value)
+          is Either.Right ->
+            TODO("What to do here? This should never be called??")
+        }
+    }
 
-  public suspend fun <B> Either<E, B>.bind(): B =
+  public override suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
-      is Left -> control().shift(this@bind)
+      is Left -> shift(value)
     }
 
-  public suspend fun <B> Validated<E, B>.bind(): B =
+  public override suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
-      is Validated.Invalid -> control().shift(Left(value))
+      is Validated.Invalid -> shift(value)
     }
 
-  public suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
+  public override suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
     fold(::identity) { throwable ->
-      control().shift(transform(throwable).left())
+      shift(transform(throwable))
     }
 
-  /**
-   * Ensure check if the [value] is `true`,
-   * and if it is it allows the `either { }` binding to continue.
-   * In case it is `false`, then it short-circuits the binding and returns
-   * the provided value by [orLeft] inside an [Either.Left].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.core.computations.either
-   *
-   * //sampleStart
-   * suspend fun main() {
-   *   either<String, Int> {
-   *     ensure(true) { "" }
-   *     println("ensure(true) passes")
-   *     ensure(false) { "failed" }
-   *     1
-   *   }
-   * //sampleEnd
-   *   .let(::println)
-   * }
-   * // println: "ensure(true) passes"
-   * // res: Either.Left("failed")
-   * ```
-   */
-  public suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
-    if (value) Unit else orLeft().left().bind()
+  public override suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
+    if (value) Unit else shift(orLeft())
 }
 
 /**
@@ -84,21 +74,33 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {
-  contract {
-    returns() implies (value != null)
-  }
-
+  contract { returns() implies (value != null) }
   return value ?: orLeft().left().bind()
 }
 
+// RestrictedEitherEffect cannot implement EitherEffect
+// Since EitherEffect defines a suspending capabilities
 @RestrictsSuspension
-public fun interface RestrictedEitherEffect<E, A> : EitherEffect<E, A>
+public interface RestrictedEitherEffect<E, A> : EitherEffect<E, A> {
+  @Deprecated(
+    "Cont cannot be bound by restricted suspension",
+    level = DeprecationLevel.ERROR
+  )
+  override suspend fun <B> Cont<E, B>.bind(): B = TODO()
+}
 
 @Suppress("ClassName")
 public object either {
   public inline fun <E, A> eager(crossinline c: suspend RestrictedEitherEffect<E, *>.() -> A): Either<E, A> =
-    Effect.restricted(eff = { RestrictedEitherEffect { it } }, f = c, just = { it.right() })
+    Effect.restricted(eff = { delimitedScope ->
+      object : RestrictedEitherEffect<E, A>, ContEffect<E> {
+        override suspend fun <B> shift(r: E): B =
+          delimitedScope.shift(r.left())
+      }
+    }, f = c, just = { it.right() })
 
   public suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
-    Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
+    cont<E, A> {
+      c(object : EitherEffect<E, A>, ContEffect<E> by this {})
+    }.toEither()
 }

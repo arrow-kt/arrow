@@ -21,6 +21,7 @@ internal object Reset {
    * use `Either.catch`, `Validated.catch` etc or `e.nonFatalOrThrow()`
    * to ensure you're not catching `ShortCircuit`.
    */
+  @Deprecated("Prefer using Cont<R, A> instead")
   public suspend fun <A> suspended(block: suspend SuspendedScope<A>.() -> A): A =
     suspendCoroutineUninterceptedOrReturn { cont ->
       SuspendMonadContinuation(cont, block)
@@ -33,6 +34,7 @@ internal object Reset {
    * This doesn't allow nesting of computation blocks, or foreign suspension.
    */
   // TODO This should be @RestrictSuspension but that breaks because a superclass is not considered to be correct scope
+  // TODO Can be replaced by RestrictedCont<R, A>
   fun <A> restricted(block: suspend RestrictedScope<A>.() -> A): A =
     DelimContScope(block).invoke()
 }
