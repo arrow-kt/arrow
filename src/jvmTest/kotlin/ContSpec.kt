@@ -39,6 +39,45 @@ class ContSpec : StringSpec({
   suspend fun Cont<*, *>.runCont(): Unit =
     fold({ }, { })
 
+  "Doesn't break try catch" {
+    checkAll(Arb.int(), Arb.string()) { i, s ->
+      cont<String, Int> {
+        try {
+          shift(s)
+        } catch (e: Throwable) {
+          i
+        }
+      }.fold({ fail("Should never come here") }, ::identity) shouldBe i
+    }
+  }
+
+  "Caught shift is ignored" {
+    checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
+      cont<String, Int> {
+        val x: Int = try {
+          shift(s)
+        } catch (e: Throwable) {
+          i
+        }
+        shift(s2)
+      }.fold(::identity) { fail("Should never come here") } shouldBe s2
+    }
+  }
+
+  "Finally runs" {
+    checkAll(Arb.string(), Arb.int()) { s, i ->
+      val promise = CompletableDeferred<Int>()
+      cont<String, Int> {
+        try {
+          shift(s)
+        } finally {
+          require(promise.complete(i))
+        }
+      }.fold(::identity) { fail("Should never come here") } shouldBe s
+      promise.await() shouldBe i
+    }
+  }
+
   "immediate values" {
     cont<Nothing, Int> {
       1
