@@ -36,9 +36,9 @@ jobs:
           key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             linux-step-gradle-
-      - name: Build
 
-        run: ./gradlew linuxX64Test jvmTest jsTest
+      - name: Build
+        run: ./gradlew jvmTest
 
       - name: "Prepare test reports"
         if: ${{ always() }}
@@ -55,25 +55,25 @@ jobs:
           name: test-reports
           path: test-reports
 
-  windows:
-    runs-on: windows-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Build
-        run: ./gradlew mingwX64Test
+#  windows:
+#    runs-on: windows-latest
+#    timeout-minutes: 20
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Restore Gradle cache
+#        id: cache
+#        uses: actions/cache@v2.1.6
+#        with:
+#          path: |
+#            ~/.gradle/caches
+#            ~/.gradle/wrapper
+#            ~/.konan
+#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#          restore-keys: |
+#            ${{ runner.os }}-gradle-
+#      - name: Build
+#        run: ./gradlew mingwX64Test
