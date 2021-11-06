@@ -1,4 +1,3 @@
-import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
@@ -39,7 +38,7 @@ class ContSpec : StringSpec({
   suspend fun Cont<*, *>.runCont(): Unit =
     fold({ }, { })
 
-  "Doesn't break try catch" {
+  "try/catch - can recover from shift" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
       cont<String, Int> {
         try {
@@ -51,7 +50,7 @@ class ContSpec : StringSpec({
     }
   }
 
-  "Caught shift is ignored" {
+  "try/catch - First shift is ignored and second is returned" {
     checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
       cont<String, Int> {
         val x: Int = try {
@@ -64,7 +63,7 @@ class ContSpec : StringSpec({
     }
   }
 
-  "Finally runs" {
+  "try/catch - finally works" {
     checkAll(Arb.string(), Arb.int()) { s, i ->
       val promise = CompletableDeferred<Int>()
       cont<String, Int> {
