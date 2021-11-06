@@ -171,7 +171,7 @@ class ContSpec : UnitSpec({
   "ensureNotNull in either computation" {
     fun square(i: Int): Int = i * i
 
-    checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift->
+    checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift ->
       val res = cont<String, Int> {
         ensureNotNull(i) { shift }
         square(i) // Smart-cast by contract
