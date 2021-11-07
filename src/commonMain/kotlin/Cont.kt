@@ -1,9 +1,11 @@
 import arrow.core.Either
+import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
@@ -26,14 +28,36 @@ public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
 public interface Cont<R, A> {
   suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B
 
+  suspend fun <B> fold(
+    error: suspend (Throwable) -> B,
+    f: suspend (R) -> B,
+    g: suspend (A) -> B
+  ): B = try {
+    fold(f, g)
+  } catch (e: Throwable) {
+    error(e.nonFatalOrThrow())
+  }
+
   suspend fun toEither(): Either<R, A> =
     fold({ Either.Left(it) }) { Either.Right(it) }
+
+  suspend fun toIor(): Ior<R, A> =
+    fold({ Ior.Left(it) }) { Ior.Right(it) }
 
   suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
+  suspend fun toOption(orElse: suspend (R) -> Option<A>): Option<A> =
+    fold(orElse, ::Some)
+
   fun attempt(): Cont<R, Result<A>> =
-    cont { runCatching { bind() } }
+    cont {
+      try {
+        Result.success(bind())
+      } catch (e: Throwable) {
+        Result.failure(e.nonFatalOrThrow())
+      }
+    }
 
   fun <B> map(f: suspend (A) -> B): Cont<R, B> =
     cont { fold(this::shift, f) }
@@ -66,6 +90,9 @@ interface ContEffect<R> {
    * Short-circuit the [Cont] computation with value [R].
    */
   public suspend fun <B> shift(r: R): B
+
+//  Can be implemented by catching ShiftCancellationException, and applying `g` over the shifted `R`.
+//  public suspend fun <B> catch(f: () -> B, g: (R) -> B): B
 
   /** ApplicativeError alias for shift */
   public suspend fun <B> raiseError(r: R): B =
@@ -102,6 +129,7 @@ interface ContEffect<R> {
     if (value) Unit else shift(shift())
 }
 
+
 // Monadic version of kotlin.requireNotNull
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so top-level.
 public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
@@ -115,7 +143,7 @@ public open class ControlThrowable(
   override val message: String? = null,
   override val cause: Throwable? = null
 ) : Throwable(message, cause) {
- // Expect/actual JVM (fillStackTrace)
+  // Expect/actual JVM (fillStackTrace)
 }
 
 // Reification of Cont program

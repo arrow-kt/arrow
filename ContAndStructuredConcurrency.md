@@ -177,5 +177,28 @@ That way we can solve the issue we currently have with `bracketCase` that it sig
 Since `bracketCase` can be aware of our `ShiftCancellationException`,
 then it can take the `cause` to signal `ExitCase.Cancelled`.
 
-Biggest downside:
-  With `CancellationException` we don't have to impose the rule **never catch ControlThrowable**.
+Downsides:
+  - With `CancellationException` we don't have to impose the rule **never catch ControlThrowable**.
+
+### Open ends..
+
+##### Does this break any semantics? 
+
+Ideally it seems that `shift` should not be callable from `launch`, but afaik that is not possible in vanilla Kotlin.
+With `CanellationException`, `shift` from within `async` seems to follow the Structured Concurrency Spec, when you don't call `await` it cannot cancel/shift its surrounding scope.
+But in that fashion `shift` should also ignore `shift` from within its calls.
+
+We could consider `launch`, `async`, and `coroutineScope` low-level operators where people need to keep the above restrictions in mind.
+
+Since Arrow Fx Coroutines offers high-level operators which don't expose any of the issues above. I.e.
+```kotlin
+cont<String, List<Int>> {
+  (0..100).parTraverse { i ->
+    shift<Int>("error")
+  }
+}
+
+cont<String, Int> {
+  parZip({ shift<Int>("error") }, { 1 }) { a, b -> a + b }
+}
+```

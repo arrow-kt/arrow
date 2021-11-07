@@ -10,6 +10,10 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.jvm.JvmInline
 
+/**
+ * `RestrictsSuspension` version of `Cont<R, A>`.
+ * This version runs eagerly, can can be used in non-suspending code.
+ */
 public fun <R, A> restrictedCont(f: suspend RestrictedContEffect<R>.() -> A): RestrictedCont<R, A> =
   RestrictedContDsl(f)
 
