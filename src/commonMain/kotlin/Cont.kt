@@ -18,7 +18,7 @@ import kotlin.coroutines.resume
 import kotlin.jvm.JvmInline
 
 public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
-  Continuation(f)
+  ContImpl(f)
 
 /**
  * [Cont] represents a suspending computation that runs will either
@@ -159,7 +159,7 @@ private class Token {
 }
 
 @JvmInline
-private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -> A) : Cont<R, A> {
+private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A) : Cont<R, A> {
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested folds
   override suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
@@ -169,11 +169,10 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
         // This is needed because this function will never yield a result,
         // so it needs to be cancelled to properly support coroutine cancellation
         override suspend fun <B> shift(r: R): B =
-
-        //Some interesting consequences of how Continuation Cancellation works in Kotlin.
-        // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
-        // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
-        // This means try/catch is also capable of recovering from monadic errors.
+          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+          // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
+          // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
+          // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
           throw ShiftCancellationException(token, r, f as suspend (Any?) -> Any?)
       }

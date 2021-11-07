@@ -305,6 +305,39 @@ class ContSpec : StringSpec({
     }
   }
 
+  "Concurrent shift - async funky scenario #1" {
+    val scenario = "I will NOT be overridden by shift, scope is waiting on async on the outside"
+    checkAll(Arb.int(), Arb.int()) { a, b ->
+      kotlin.runCatching {
+        coroutineScope {
+          cont<Int, String> {
+            val fa = async<Nothing> { shift(a) }
+            val fb = async<Nothing> { shift(b) }
+            scenario
+          }.fold({
+            fail("shift never works here")
+          }, ::identity) shouldBe scenario
+        }
+      }.exceptionOrNull()?.message shouldBe "Shifted Continuation"
+    }
+  }
+
+  "Concurrent shift - async funky scenario #2" {
+    val scenario = "I will NOT be overridden by shift, scope is waiting on async on the outside"
+    checkAll(Arb.int(), Arb.int()) { a, b ->
+      kotlin.runCatching {
+        coroutineScope {
+          cont<Int, Deferred<String>> {
+            val fa = async<Nothing> { shift(a) }
+            async { shift(b) }
+          }.fold({
+            fail("shift never works here")
+          }, ::identity).await()
+        }
+      }.exceptionOrNull()?.message shouldBe "Shifted Continuation"
+    }
+  }
+
   "Concurrent shift - async" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       cont<Int, String> {
