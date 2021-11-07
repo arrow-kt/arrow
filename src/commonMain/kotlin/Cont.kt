@@ -11,8 +11,8 @@ import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.jvm.JvmInline
@@ -92,9 +92,6 @@ interface ContEffect<R> {
    * Short-circuit the [Cont] computation with value [R].
    */
   public suspend fun <B> shift(r: R): B
-
-//  Can be implemented by catching ShiftCancellationException, and applying `g` over the shifted `R`.
-  public suspend fun <B> catch(f: suspend () -> B, g: suspend (R) -> B): B
 
   /** ApplicativeError alias for shift */
   public suspend fun <B> raiseError(r: R): B =
@@ -179,12 +176,6 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
         // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
           throw ShiftCancellationException(token, r, f as suspend (Any?) -> Any?)
-
-        override suspend fun <B> catch(f: suspend () -> B, g: suspend (R) -> B): B = try {
-          f()
-        } catch (e: ShiftCancellationException) {
-          if (e.token == token) g(e.shifted as R) else throw e
-        }
       }
 
       try {
@@ -203,12 +194,11 @@ private class FoldContinuation<B>(
   override val context: CoroutineContext,
   private val cont: Continuation<B>
 ) : Continuation<B> {
-
   override fun resumeWith(result: Result<B>) {
     result.fold(cont::resume) { throwable ->
       if (throwable is ShiftCancellationException && token == throwable.token) {
         val f: suspend () -> B = { throwable.fold(throwable.shifted) as B }
-        when(val res = f.startCoroutineUninterceptedOrReturn(cont)) {
+        when (val res = f.startCoroutineUninterceptedOrReturn(cont)) {
           COROUTINE_SUSPENDED -> Unit
           else -> cont.resume(res as B)
         }

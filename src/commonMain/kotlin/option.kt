@@ -22,9 +22,6 @@ value class OptionEffect(private val cont: ContEffect<None>) : ContEffect<None> 
 
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
-
-  override suspend fun <B> catch(f: suspend () -> B, g: suspend (None) -> B): B =
-    cont.catch(f, g)
 }
 
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.

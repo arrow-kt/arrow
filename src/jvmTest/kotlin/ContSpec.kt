@@ -187,16 +187,6 @@ class ContSpec : StringSpec({
     }.fold(::identity, ::identity) shouldBe "test"
   }
 
-  "Monadic catch" {
-    checkAll(Arb.string()) { s ->
-      cont<String, Int> {
-        catch({
-          shift(s)
-        }) { error -> error.length }
-      }.toEither() shouldBe Either.Right(s.length)
-    }
-  }
-
   // Fails https://github.com/Kotlin/kotlinx.coroutines/issues/3005
   "ensure null in either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
