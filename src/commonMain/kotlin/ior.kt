@@ -39,4 +39,7 @@ class IorEffect<E>(
 
   override suspend fun <B> shift(r: E): B =
     cont.shift(combine(r))
+
+  override suspend fun <B> catch(f: suspend () -> B, g: suspend (E) -> B): B =
+    cont.catch(f, g)
 }

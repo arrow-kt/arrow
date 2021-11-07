@@ -12,9 +12,6 @@ suspend fun <A> option(f: OptionEffect.() -> A): Option<A> =
 suspend fun <A> Cont<None, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }
 
-// Can be replaced by multiple receivers
-// context(ContEffect<None>)
-// fun <A> Option<A>.bind(): A = ...
 @JvmInline
 value class OptionEffect(private val cont: ContEffect<None>) : ContEffect<None> {
   suspend fun <B> Option<B>.bind(): B =
@@ -25,6 +22,9 @@ value class OptionEffect(private val cont: ContEffect<None>) : ContEffect<None> 
 
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
+
+  override suspend fun <B> catch(f: suspend () -> B, g: suspend (None) -> B): B =
+    cont.catch(f, g)
 }
 
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.

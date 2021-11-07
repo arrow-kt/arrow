@@ -9,8 +9,10 @@ import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.jvm.JvmInline
@@ -92,7 +94,7 @@ interface ContEffect<R> {
   public suspend fun <B> shift(r: R): B
 
 //  Can be implemented by catching ShiftCancellationException, and applying `g` over the shifted `R`.
-//  public suspend fun <B> catch(f: () -> B, g: (R) -> B): B
+  public suspend fun <B> catch(f: suspend () -> B, g: suspend (R) -> B): B
 
   /** ApplicativeError alias for shift */
   public suspend fun <B> raiseError(r: R): B =
@@ -149,7 +151,8 @@ public open class ControlThrowable(
 // Reification of Cont program
 private class ShiftCancellationException(
   val token: Token,
-  val value: Any?,
+  val shifted: Any?,
+  val fold: suspend (Any?) -> Any?,
   override val cause: CancellationException = CancellationException()
 ) : ControlThrowable("Shifted Continuation", cause)
 
@@ -175,18 +178,41 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
         // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
         // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
-          throw ShiftCancellationException(token, f(r))
+          throw ShiftCancellationException(token, r, f as suspend (Any?) -> Any?)
+
+        override suspend fun <B> catch(f: suspend () -> B, g: suspend (R) -> B): B = try {
+          f()
+        } catch (e: ShiftCancellationException) {
+          if (e.token == token) g(e.shifted as R) else throw e
+        }
       }
 
       try {
-        suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(Continuation(cont.context) { res ->
-          res.fold(cont::resume) { throwable ->
-            if (throwable is ShiftCancellationException && token == throwable.token) cont.resume(throwable.value as B)
-            else cont.resumeWith(res)
-          }
-        })
+        suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
       } catch (e: ShiftCancellationException) {
-        if (token == e.token) e.value else throw e
+        if (token == e.token) {
+          val f: suspend () -> B = { e.fold(e.shifted) as B }
+          f.startCoroutineUninterceptedOrReturn(cont)
+        } else throw e
       }
     }
+}
+
+private class FoldContinuation<B>(
+  private val token: Token,
+  override val context: CoroutineContext,
+  private val cont: Continuation<B>
+) : Continuation<B> {
+
+  override fun resumeWith(result: Result<B>) {
+    result.fold(cont::resume) { throwable ->
+      if (throwable is ShiftCancellationException && token == throwable.token) {
+        val f: suspend () -> B = { throwable.fold(throwable.shifted) as B }
+        when(val res = f.startCoroutineUninterceptedOrReturn(cont)) {
+          COROUTINE_SUSPENDED -> Unit
+          else -> cont.resume(res as B)
+        }
+      } else cont.resumeWith(result)
+    }
+  }
 }
