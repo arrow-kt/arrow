@@ -27,8 +27,12 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -244,70 +248,173 @@ class ContSpec : StringSpec({
 
   "Concurrent shift - async await" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
-      val promise = CompletableDeferred<ExitCase>()
+      cont<Int, String> {
+        coroutineScope {
+          val fa = async<String> { shift(a) }
+          val fb = async<String> { shift(b) }
+          fa.await() + fb.await()
+        }
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+    }
+  }
+
+  "Concurrent shift - async await exit results" {
+    checkAll(Arb.int()) { a ->
+      val scopeExit = CompletableDeferred<ExitCase>()
+      val fbExit = CompletableDeferred<ExitCase>()
+      val startLatches = (0..11).map { CompletableDeferred<Unit>() }
+      val nestedExits = (0..10).map { CompletableDeferred<ExitCase>() }
+
+      fun CoroutineScope.asyncTask(
+        start: CompletableDeferred<Unit>,
+        exit: CompletableDeferred<ExitCase>
+      ): Deferred<Unit> = async {
+        guaranteeCase({
+          start.complete(Unit)
+          never<Unit>()
+        }) { case ->
+          require(exit.complete(case))
+        }
+      }
+
       cont<Int, String> {
         guaranteeCase({
           coroutineScope {
-            val fa = async<String> { shift(a) }
-            val fb = async<String> { shift(b) }
-            fa.await() + fb.await()
+            val fa = async<Unit> {
+              startLatches.drop(1).zip(nestedExits) { start, promise ->
+                asyncTask(start, promise)
+              }
+              startLatches.awaitAll()
+              shift(a)
+            }
+            val fb = asyncTask(startLatches.first(), fbExit)
+            fa.await()
+            fb.await()
           }
-        }) { case -> require(promise.complete(case)) }
-      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+        }) { case ->
+          require(scopeExit.complete(case))
+        }
+        fail("Should never come here")
+      }.fold(::identity, ::identity) shouldBe a
       withTimeout(2.seconds) {
-        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+        scopeExit.await().shouldBeTypeOf<ExitCase.Failure>()
+        // This is ExitCase.Cancelled since it was cancelled by KotlinX CoroutineScope
+        fbExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        nestedExits.awaitAll().forEach { it.shouldBeTypeOf<ExitCase.Cancelled>() }
       }
     }
   }
 
   "Concurrent shift - async" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
-      val promise = CompletableDeferred<ExitCase>()
+      cont<Int, String> {
+        coroutineScope {
+          val fa = async<Nothing> { shift(a) }
+          val fb = async<Nothing> { shift(b) }
+          "I will be overwritten by shift - coroutineScope waits until all async are finished"
+        }
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+    }
+  }
+
+  "Concurrent shift - async exit results" {
+    checkAll(Arb.int()) { a ->
+      val scopeExit = CompletableDeferred<ExitCase>()
+      val fbExit = CompletableDeferred<ExitCase>()
+      val startLatches = (0..11).map { CompletableDeferred<Unit>() }
+      val nestedExits = (0..10).map { CompletableDeferred<ExitCase>() }
+
+      fun CoroutineScope.asyncTask(
+        start: CompletableDeferred<Unit>,
+        exit: CompletableDeferred<ExitCase>
+      ): Deferred<Unit> = async {
+        guaranteeCase({
+          start.complete(Unit)
+          never<Unit>()
+        }) { case ->
+          require(exit.complete(case))
+        }
+      }
+
       cont<Int, String> {
         guaranteeCase({
           coroutineScope {
-            val fa = async<Nothing> { shift(a) }
-            val fb = async<Nothing> { shift(b) }
-            ""
+            val fa = async<Unit> {
+              startLatches.drop(1).zip(nestedExits) { start, promise ->
+                asyncTask(start, promise)
+              }
+              startLatches.awaitAll()
+              shift(a)
+            }
+            val fb = asyncTask(startLatches.first(), fbExit)
           }
-        }) { case -> require(promise.complete(case)) }
-      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+        }) { case ->
+          require(scopeExit.complete(case))
+        }
+        fail("Should never come here")
+      }.fold(::identity, ::identity) shouldBe a
       withTimeout(2.seconds) {
-        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+        scopeExit.await().shouldBeTypeOf<ExitCase.Failure>()
+        // This is ExitCase.Cancelled since it was cancelled by KotlinX CoroutineScope
+        fbExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        nestedExits.awaitAll().forEach { it.shouldBeTypeOf<ExitCase.Cancelled>() }
       }
     }
   }
 
   "Concurrent shift - launch" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
-      val promise = CompletableDeferred<ExitCase>()
-      val jobB = CompletableDeferred<ExitCase>()
-      val started = CompletableDeferred<Unit>()
+      cont<Int, String> {
+        coroutineScope {
+          launch { shift(a) }
+          launch { shift(b) }
+          "This will be overriden by shift - scope waits until all launch finished"
+        }
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+    }
+  }
+
+  "Concurrent shift - launch exit results" {
+    checkAll(Arb.int()) { a ->
+      val scopeExit = CompletableDeferred<ExitCase>()
+      val fbExit = CompletableDeferred<ExitCase>()
+      val startLatches = (0..11).map { CompletableDeferred<Unit>() }
+      val nestedExits = (0..10).map { CompletableDeferred<ExitCase>() }
+
+      fun CoroutineScope.launchTask(
+        start: CompletableDeferred<Unit>,
+        exit: CompletableDeferred<ExitCase>
+      ): Job = launch {
+        guaranteeCase({
+          start.complete(Unit)
+          never<Unit>()
+        }) { case ->
+          require(exit.complete(case))
+        }
+      }
+
       cont<Int, String> {
         guaranteeCase({
           coroutineScope {
             val fa = launch {
-              started.await()
+              startLatches.drop(1).zip(nestedExits) { start, promise ->
+                launchTask(start, promise)
+              }
+              startLatches.awaitAll()
               shift(a)
             }
-            val fb = launch {
-              guaranteeCase({
-                started.complete(Unit)
-                never<Unit>()
-              }) { case ->
-                require(jobB.complete(case))
-              }
-            }
+            val fb = launchTask(startLatches.first(), fbExit)
           }
         }) { case ->
-          require(promise.complete(case))
+          require(scopeExit.complete(case))
         }
         fail("Should never come here")
-      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+      }.fold(::identity, ::identity) shouldBe a
       withTimeout(2.seconds) {
-        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+        scopeExit.await().shouldBeTypeOf<ExitCase.Failure>()
         // This is ExitCase.Cancelled since it was cancelled by KotlinX CoroutineScope
-        jobB.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        fbExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        nestedExits.awaitAll().forEach { it.shouldBeTypeOf<ExitCase.Cancelled>() }
       }
     }
   }
