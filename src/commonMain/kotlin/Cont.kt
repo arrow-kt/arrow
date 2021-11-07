@@ -8,9 +8,9 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.resume
 import kotlin.jvm.JvmInline
 
 public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
@@ -111,8 +111,19 @@ public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: ()
 
 // Full internal runtime implementation of Cont below
 
+public open class ControlThrowable(
+  override val message: String? = null,
+  override val cause: Throwable? = null
+) : Throwable(message, cause) {
+ // Expect/actual JVM (fillStackTrace)
+}
+
 // Reification of Cont program
-private class ShiftCancellationException(val token: Token, val value: Any?) : CancellationException("Shifted Continuation")
+private class ShiftCancellationException(
+  val token: Token,
+  val value: Any?,
+  override val cause: CancellationException = CancellationException()
+) : ControlThrowable("Shifted Continuation", cause)
 
 // Class that represents a unique token by hash comparison
 private class Token {
@@ -131,10 +142,10 @@ private value class Continuation<R, A>(private val f: suspend ContEffect<R>.() -
         // so it needs to be cancelled to properly support coroutine cancellation
         override suspend fun <B> shift(r: R): B =
 
-          //Some interesting consequences of how Continuation Cancellation works in Kotlin.
-          // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
-          // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
-          // This means try/catch is also capable of recovering from monadic errors.
+        //Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
+        // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
           throw ShiftCancellationException(token, f(r))
       }

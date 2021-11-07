@@ -2,11 +2,15 @@ import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.never
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
@@ -21,11 +25,12 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
@@ -50,16 +55,15 @@ class ContSpec : StringSpec({
     }
   }
 
-  "try/catch - First shift is ignored and second is returned" {
-    checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
+  "try/catch - can recover from shift suspended" {
+    checkAll(Arb.int(), Arb.string()) { i, s ->
       cont<String, Int> {
-        val x: Int = try {
-          shift(s)
+        try {
+          shift(s.suspend())
         } catch (e: Throwable) {
           i
         }
-        shift(s2)
-      }.fold(::identity) { fail("Should never come here") } shouldBe s2
+      }.fold({ fail("Should never come here") }, ::identity) shouldBe i
     }
   }
 
@@ -74,6 +78,46 @@ class ContSpec : StringSpec({
         }
       }.fold(::identity) { fail("Should never come here") } shouldBe s
       promise.await() shouldBe i
+    }
+  }
+
+  "try/catch - finally works suspended" {
+    checkAll(Arb.string(), Arb.int()) { s, i ->
+      val promise = CompletableDeferred<Int>()
+      cont<String, Int> {
+        try {
+          shift(s.suspend())
+        } finally {
+          require(promise.complete(i))
+        }
+      }.fold(::identity) { fail("Should never come here") } shouldBe s
+      promise.await() shouldBe i
+    }
+  }
+
+  "try/catch - First shift is ignored and second is returned" {
+    checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
+      cont<String, Int> {
+        val x: Int = try {
+          shift(s)
+        } catch (e: Throwable) {
+          i
+        }
+        shift(s2)
+      }.fold(::identity) { fail("Should never come here") } shouldBe s2
+    }
+  }
+
+  "try/catch - First shift is ignored and second is returned suspended" {
+    checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
+      cont<String, Int> {
+        val x: Int = try {
+          shift(s.suspend())
+        } catch (e: Throwable) {
+          i
+        }
+        shift(s2.suspend())
+      }.fold(::identity) { fail("Should never come here") } shouldBe s2
     }
   }
 
@@ -185,7 +229,9 @@ class ContSpec : StringSpec({
     }.fold(::identity, ::identity) shouldBe "hello"
 
     withTimeout(Duration.Companion.seconds(2)) {
-      cancelled.await().shouldNotBeNull().message shouldBe "Shifted Continuation"
+      // KotlinX internally wraps exceptions
+      cancelled.await().shouldNotBeNull()?.cause?.message shouldBe "Shifted Continuation"
+//      cancelled.await().shouldNotBeNull().message shouldBe "Shifted Continuation"
     }
   }
 
@@ -196,16 +242,73 @@ class ContSpec : StringSpec({
     }.runCont()
   }
 
-  "Concurrent shift" {
+  "Concurrent shift - async await" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
+      val promise = CompletableDeferred<ExitCase>()
       cont<Int, String> {
-        coroutineScope {
-          val fa = async<Nothing>(start = CoroutineStart.UNDISPATCHED) { shift(a) }
-          val fb = async<Nothing>(start = CoroutineStart.UNDISPATCHED) { shift(b) }
-          fa.await()
-          fb.await()
-        }
+        guaranteeCase({
+          coroutineScope {
+            val fa = async<String> { shift(a) }
+            val fb = async<String> { shift(b) }
+            fa.await() + fb.await()
+          }
+        }) { case -> require(promise.complete(case)) }
       }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+      withTimeout(2.seconds) {
+        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+      }
+    }
+  }
+
+  "Concurrent shift - async" {
+    checkAll(Arb.int(), Arb.int()) { a, b ->
+      val promise = CompletableDeferred<ExitCase>()
+      cont<Int, String> {
+        guaranteeCase({
+          coroutineScope {
+            val fa = async<Nothing> { shift(a) }
+            val fb = async<Nothing> { shift(b) }
+            ""
+          }
+        }) { case -> require(promise.complete(case)) }
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+      withTimeout(2.seconds) {
+        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+      }
+    }
+  }
+
+  "Concurrent shift - launch" {
+    checkAll(Arb.int(), Arb.int()) { a, b ->
+      val promise = CompletableDeferred<ExitCase>()
+      val jobB = CompletableDeferred<ExitCase>()
+      val started = CompletableDeferred<Unit>()
+      cont<Int, String> {
+        guaranteeCase({
+          coroutineScope {
+            val fa = launch {
+              started.await()
+              shift(a)
+            }
+            val fb = launch {
+              guaranteeCase({
+                started.complete(Unit)
+                never<Unit>()
+              }) { case ->
+                require(jobB.complete(case))
+              }
+            }
+          }
+        }) { case ->
+          require(promise.complete(case))
+        }
+        fail("Should never come here")
+      }.fold(::identity, ::identity) shouldBeIn listOf(a, b)
+      withTimeout(2.seconds) {
+        promise.await().shouldBeTypeOf<ExitCase.Failure>()
+        // This is ExitCase.Cancelled since it was cancelled by KotlinX CoroutineScope
+        jobB.await().shouldBeTypeOf<ExitCase.Cancelled>()
+      }
     }
   }
 })
