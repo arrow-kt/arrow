@@ -145,13 +145,13 @@ public open class ControlThrowable(
   // Expect/actual JVM (fillStackTrace)
 }
 
-// Reification of Cont program
-private class ShiftCancellationException(
+
+sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
+private class Internal(
   val token: Token,
   val shifted: Any?,
-  val fold: suspend (Any?) -> Any?,
-  override val cause: CancellationException = CancellationException()
-) : ControlThrowable("Shifted Continuation", cause)
+  val fold: suspend (Any?) -> Any?
+): ShiftCancellationException()
 
 // Class that represents a unique token by hash comparison
 private class Token {
@@ -169,17 +169,17 @@ private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A)
         // This is needed because this function will never yield a result,
         // so it needs to be cancelled to properly support coroutine cancellation
         override suspend fun <B> shift(r: R): B =
-          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-          // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
-          // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
-          // This means try/catch is also capable of recovering from monadic errors.
+        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
+        // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
-          throw ShiftCancellationException(token, r, f as suspend (Any?) -> Any?)
+          throw Internal(token, r, f as suspend (Any?) -> Any?)
       }
 
       try {
         suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-      } catch (e: ShiftCancellationException) {
+      } catch (e: Internal) {
         if (token == e.token) {
           val f: suspend () -> B = { e.fold(e.shifted) as B }
           f.startCoroutineUninterceptedOrReturn(cont)
@@ -195,7 +195,7 @@ private class FoldContinuation<B>(
 ) : Continuation<B> {
   override fun resumeWith(result: Result<B>) {
     result.fold(cont::resume) { throwable ->
-      if (throwable is ShiftCancellationException && token == throwable.token) {
+      if (throwable is Internal && token == throwable.token) {
         val f: suspend () -> B = { throwable.fold(throwable.shifted) as B }
         when (val res = f.startCoroutineUninterceptedOrReturn(cont)) {
           COROUTINE_SUSPENDED -> Unit
