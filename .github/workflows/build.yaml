@@ -4,9 +4,9 @@ on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
-    branches:
-      - main
-  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
     branches:
       - main
 
@@ -38,7 +38,7 @@ jobs:
             linux-step-gradle-
 
       - name: Build
-        run: ./gradlew jvmTest
+        run: ./gradlew check
 
       - name: "Prepare test reports"
         if: ${{ always() }}
