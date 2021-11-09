@@ -1,3 +1,5 @@
+package arrow
+
 import arrow.core.identity
 
 suspend fun <A> Cont<Nothing, A>.value(): A =

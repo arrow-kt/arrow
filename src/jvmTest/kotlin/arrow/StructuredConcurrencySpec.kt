@@ -1,3 +1,5 @@
+package arrow
+
 import arrow.core.identity
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase

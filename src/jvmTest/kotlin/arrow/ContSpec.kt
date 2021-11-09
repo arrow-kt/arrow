@@ -1,3 +1,5 @@
+package arrow
+
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left

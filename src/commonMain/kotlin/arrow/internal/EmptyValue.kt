@@ -1,4 +1,4 @@
-package internal
+package arrow.internal
 
 @PublishedApi
 internal object EmptyValue {

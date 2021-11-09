@@ -1,3 +1,5 @@
+package arrow
+
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.typeclasses.Semigroup
@@ -28,7 +30,7 @@ class IorSpec : StringSpec({
     } shouldBe Ior.Left("Hello, World!")
   }
 
-  "Concurrent - ior bind" {
+  "Concurrent - arrow.ior bind" {
     checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
       ior(Semigroup.list<String>()) {
         strs.mapIndexed { index, s ->

@@ -1,9 +1,11 @@
+package arrow
+
 import arrow.continuations.generic.AtomicRef
 import arrow.continuations.generic.updateAndGet
 import arrow.core.Ior
 import arrow.core.identity
+import arrow.internal.EmptyValue
 import arrow.typeclasses.Semigroup
-import internal.EmptyValue
 
 suspend fun <E, A> ior(semigroup: Semigroup<E>, f: suspend IorEffect<E>.() -> A): Ior<E, A> =
   cont<E, Ior<E, A>> {

@@ -1,7 +1,9 @@
+package arrow
+
 import arrow.core.Either
 import arrow.core.Validated
 import arrow.core.identity
-import internal.EmptyValue
+import arrow.internal.EmptyValue
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
