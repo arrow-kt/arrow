@@ -13,8 +13,8 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.jvm.JvmInline
 
 /**
- * `RestrictsSuspension` version of `Cont<R, A>`.
- * This version runs eagerly, can can be used in non-suspending code.
+ * `RestrictsSuspension` version of `Cont<R, A>`. This version runs eagerly, can can be used in
+ * non-suspending code.
  */
 public fun <R, A> restrictedCont(f: suspend RestrictedContEffect<R>.() -> A): RestrictedCont<R, A> =
   RestrictedContDsl(f)
@@ -22,80 +22,75 @@ public fun <R, A> restrictedCont(f: suspend RestrictedContEffect<R>.() -> A): Re
 @RestrictsSuspension
 public interface RestrictedContEffect<R> {
 
-  /**
-   * Short-circuit the [Cont] computation with value [R].
-   */
+  /** Short-circuit the [Cont] computation with value [R]. */
   public suspend fun <B> shift(r: R): B
 
   public suspend fun <A> RestrictedCont<R, A>.bind(): A {
     var left: Any? = EmptyValue
     var right: Any? = EmptyValue
-    fold({ r ->
-      left = r
-    }, { a ->
-      right = a
-    })
-    return if (left === EmptyValue) EmptyValue.unbox(right)
-    else shift(EmptyValue.unbox(left))
+    fold({ r -> left = r }, { a -> right = a })
+    return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
 }
 
 public interface RestrictedCont<R, A> {
   public fun <B> fold(f: (R) -> B, g: (A) -> B): B
 
-  public fun toEither(): Either<R, A> =
-    fold({ Either.Left(it) }) { Either.Right(it) }
+  public fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
 
   public fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
-  public fun <B> map(f: (A) -> B): RestrictedCont<R, B> =
-    flatMap { a ->
-      restrictedCont { f(a) }
-    }
+  public fun <B> map(f: (A) -> B): RestrictedCont<R, B> = flatMap { a -> restrictedCont { f(a) } }
 
-  public fun <B> flatMap(f: (A) -> RestrictedCont<R, B>): RestrictedCont<R, B> =
-    restrictedCont { f(bind()).bind() }
+  public fun <B> flatMap(f: (A) -> RestrictedCont<R, B>): RestrictedCont<R, B> = restrictedCont {
+    f(bind()).bind()
+  }
 
-  public fun attempt(): RestrictedCont<R, Result<A>> =
-    restrictedCont { kotlin.runCatching { bind() } }
+  public fun attempt(): RestrictedCont<R, Result<A>> = restrictedCont {
+    kotlin.runCatching { bind() }
+  }
 
-  public fun handleError(f: (R) -> A): RestrictedCont<Nothing, A> =
-    restrictedCont { fold(f, ::identity) }
+  public fun handleError(f: (R) -> A): RestrictedCont<Nothing, A> = restrictedCont {
+    fold(f, ::identity)
+  }
 
   public fun <R2> handleErrorWith(f: (R) -> RestrictedCont<R2, A>): RestrictedCont<R2, A> =
-    restrictedCont {
-      toEither().fold({ r ->
-        f(r).bind()
-      }, ::identity)
-    }
+      restrictedCont {
+    toEither().fold({ r -> f(r).bind() }, ::identity)
+  }
 
-  public fun <B> redeem(f: (R) -> B, g: (A) -> B): RestrictedCont<Nothing, B> =
-    restrictedCont { fold(f, g) }
+  public fun <B> redeem(f: (R) -> B, g: (A) -> B): RestrictedCont<Nothing, B> = restrictedCont {
+    fold(f, g)
+  }
 
   public fun <R2, B> redeemWith(
     f: (R) -> RestrictedCont<R2, B>,
     g: (A) -> RestrictedCont<R2, B>
-  ): RestrictedCont<R2, B> =
-    restrictedCont { fold(f, g).bind() }
+  ): RestrictedCont<R2, B> = restrictedCont { fold(f, g).bind() }
 }
 
 @JvmInline
-private value class RestrictedContDsl<R, A>(private val cont: suspend RestrictedContEffect<R>.() -> A) :
-  RestrictedCont<R, A> {
+private value class RestrictedContDsl<R, A>(
+  private val cont: suspend RestrictedContEffect<R>.() -> A
+) : RestrictedCont<R, A> {
   override fun <B> fold(f: (R) -> B, g: (A) -> B): B {
     var reset: Any? = EmptyValue
-    val effect = object : RestrictedContEffect<R> {
-      override suspend fun <B> shift(r: R): B =
-        suspendCoroutineUninterceptedOrReturn { cont ->
+    val effect =
+      object : RestrictedContEffect<R> {
+        override suspend fun <B> shift(r: R): B = suspendCoroutineUninterceptedOrReturn { cont ->
           reset = f(r)
           COROUTINE_SUSPENDED
         }
-    }
-    val a: Any? = cont.startCoroutineUninterceptedOrReturn(effect, Continuation(EmptyCoroutineContext) { shifted ->
-      // If we reach here, then it means we shifted.
-      shifted.getOrThrow()
-    })
+      }
+    val a: Any? =
+      cont.startCoroutineUninterceptedOrReturn(
+        effect,
+        Continuation(EmptyCoroutineContext) { shifted ->
+          // If we reach here, then it means we shifted.
+          shifted.getOrThrow()
+        }
+      )
     return if (a === COROUTINE_SUSPENDED && reset !== EmptyValue) EmptyValue.unbox(reset)
     else g(a as A)
   }

@@ -1,0 +1,40 @@
+[versions]
+arrow = "1.0.1"
+arrowGradleConfig = "0.5.1"
+coroutines = "1.5.2"
+dokka = "1.5.31"
+kotest = "5.0.0.M3"
+kotestGradle = "5.0.0.5"
+kotlin = "1.5.31"
+kotlinBinaryCompatibilityValidator = "0.8.0"
+githooks = "0.0.2"
+knit = "0.2.3"
+
+[libraries]
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
+arrow-fx = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
+kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
+kotlin-stdlibJDK8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
+kotlin-stdlibJS = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit" }
+knit-test = { module = "org.jetbrains.kotlinx:kotlinx-knit-test", version.ref = "knit" }
+
+[plugins]
+arrowGradleConfig-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradleConfig" }
+arrowGradleConfig-multiplatform = { id = "io.arrow-kt.arrow-gradle-config-multiplatform", version.ref = "arrowGradleConfig" }
+arrowGradleConfig-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", version.ref = "arrowGradleConfig" }
+arrowGradleConfig-publishMultiplatform = { id = "io.arrow-kt.arrow-gradle-config-publish-multiplatform", version.ref = "arrowGradleConfig" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
+githooks = { id = "com.github.jakemarsden.git-hooks", version.ref = "githooks" }
+knit = { id = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }

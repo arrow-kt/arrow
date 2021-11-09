@@ -13,30 +13,30 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
-class IorSpec : StringSpec({
-  "Accumulates" {
-    ior(Semigroup.string()) {
-      val one = Ior.Both("Hello", 1).bind()
-      val two = Ior.Both(", World!", 2).bind()
-      one + two
-    } shouldBe Ior.Both("Hello, World!", 3)
-  }
-
-  "Accumulates with Either" {
-    ior(Semigroup.string()) {
-      val one = Ior.Both("Hello", 1).bind()
-      val two: Int = Either.Left(", World!").bind()
-      one + two
-    } shouldBe Ior.Left("Hello, World!")
-  }
-
-  "Concurrent - arrow.ior bind" {
-    checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
-      ior(Semigroup.list<String>()) {
-        strs.mapIndexed { index, s ->
-          async { Ior.Both(listOf(s), index).bind() }
-        }.awaitAll()
-      }.mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
+class IorSpec :
+  StringSpec({
+    "Accumulates" {
+      ior(Semigroup.string()) {
+        val one = Ior.Both("Hello", 1).bind()
+        val two = Ior.Both(", World!", 2).bind()
+        one + two
+      } shouldBe Ior.Both("Hello, World!", 3)
     }
-  }
-})
+
+    "Accumulates with Either" {
+      ior(Semigroup.string()) {
+        val one = Ior.Both("Hello", 1).bind()
+        val two: Int = Either.Left(", World!").bind()
+        one + two
+      } shouldBe Ior.Left("Hello, World!")
+    }
+
+    "Concurrent - arrow.ior bind" {
+      checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
+        ior(Semigroup.list<String>()) {
+          strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
+        }
+          .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
+      }
+    }
+  })

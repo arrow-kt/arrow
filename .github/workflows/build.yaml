@@ -15,15 +15,15 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-
-  linux_jvm_and_js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-
+  check:
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+    runs-on: ${{matrix.os}}
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Checkout the repo
+        uses: actions/checkout@v2
 
       - name: Restore Gradle cache
         id: cache
@@ -32,48 +32,27 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
             ~/.konan
-          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            linux-step-gradle-
+          key: ${{ runner.os }}-check-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-check-
 
-      - name: Build
+      - name: Run Ubuntu tests
+        if: matrix.os == 'ubuntu-latest'
         run: ./gradlew check
 
-      - name: "Prepare test reports"
-        if: ${{ always() }}
-        run: |
-          mkdir test-reports
-          for report in `ls -d build/reports/tests`; do
-            module=$(echo $report | cut -d/ -f3)
-            cp -r $report test-reports/$module
-          done
-      - name: "Make test reports available to download"
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-reports
-          path: test-reports
+      - name: Run Windows tests
+        if: matrix.os == 'windows-latest'
+        run: ./gradlew mingwX64Test
 
-#  windows:
-#    runs-on: windows-latest
-#    timeout-minutes: 20
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Restore Gradle cache
-#        id: cache
-#        uses: actions/cache@v2.1.6
-#        with:
-#          path: |
-#            ~/.gradle/caches
-#            ~/.gradle/wrapper
-#            ~/.konan
-#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gradle-
-#      - name: Build
-#        run: ./gradlew mingwX64Test
+      - name: Bundle the build report
+        if: failure()
+        run: find . -type d -name 'reports' | zip -@ -r build-reports.zip
+
+      - name: Upload the build report
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: error-report
+          path: build-reports.zip
