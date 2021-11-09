@@ -45,14 +45,3 @@ jobs:
       - name: Run Windows tests
         if: matrix.os == 'windows-latest'
         run: ./gradlew mingwX64Test
-
-      - name: Bundle the build report
-        if: failure()
-        run: find . -type d -name 'reports' | zip -@ -r build-reports.zip
-
-      - name: Upload the build report
-        if: failure()
-        uses: actions/upload-artifact@master
-        with:
-          name: error-report
-          path: build-reports.zip
