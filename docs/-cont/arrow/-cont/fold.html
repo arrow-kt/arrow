@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>fold</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="Cont::arrow/Cont/fold/#kotlin.coroutines.SuspendFunction1[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]#kotlin.coroutines.SuspendFunction1[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//788909594">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">Cont</a>/<a href="../index.html">arrow</a>/<a href="index.html">Cont</a>/<a href="fold.html">fold</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span><span>fold</span></span></h1>
+          </div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">abstract suspend fun &lt;<a href="fold.html">B</a>&gt; <a href="fold.html">fold</a>(recover: suspend (<a href="index.html">R</a>) -&gt; <a href="fold.html">B</a>, transform: suspend (<a href="index.html">A</a>) -&gt; <a href="fold.html">B</a>): <a href="fold.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Runs the suspending computation by creating a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-continuation/index.html">Continuation</a>, and running the <code>fold</code> function over the computation.</p><p class="paragraph">When the <a href="index.html">Cont</a> has shifted with <a href="index.html">R</a> it will <a href="fold.html">recover</a> the shifted value to <a href="fold.html">B</a>, and when it ran the computation to completion it will <a href="fold.html">transform</a> the value <a href="index.html">A</a> to <a href="fold.html">B</a>.</p><div class="sample-container"><code class="" theme="idea"><pre>import arrow.cont<br>import kotlinx.coroutines.runBlocking<br><br>fun main() = runBlocking {<br>  cont&lt;String, Int&gt; {<br>    shift(&quot;Hello, World!&quot;)<br>  }.fold({ str: String -&gt; str }, { int -&gt; int.toString() })<br>   .let(::println)<br><br>  cont&lt;String, Int&gt; {<br>    1000<br>  }.fold({ str: String -&gt; str.length }, { int -&gt; int })<br>   .let(::println)<br>}</pre></code></div><!--- KNIT example-cont-02.kt --><div class="sample-container"><code class="" theme="idea"><pre>Hello, World!<br>1000</pre></code></div><!--- TEST --></div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="fold.html">B</a>&gt; <a href="fold.html">fold</a>(error: suspend (error: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a>) -&gt; <a href="fold.html">B</a>, recover: suspend (<a href="index.html">R</a>) -&gt; <a href="fold.html">B</a>, transform: suspend (<a href="index.html">A</a>) -&gt; <a href="fold.html">B</a>): <a href="fold.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<p class="paragraph">Like <code>fold</code> but also allows folding over any unexpected <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a> that might have occurred.</p><h2 class="">See also</h2><div data-togglable="See also"><div class="platform-hinted WithExtraAttributes" data-platform-hinted="data-platform-hinted" data-togglable="See also"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div data-togglable="See also"><div class="table" data-togglable="See also"><div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="main-subrow keyValue WithExtraAttributes RowTitle"><div class=""><span class="inline-flex"><a href="fold.html"><span>arrow.</span><wbr></wbr><span>Cont</span></a></span><span class="inline-flex"><div data-togglable="See also"></div></span></div><div></div></div></div></div></div></div></div></div></div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
