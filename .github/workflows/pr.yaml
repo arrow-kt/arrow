@@ -1,0 +1,72 @@
+name: "Build main"
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+
+env:
+  JAVA_OPTS: -Xms512m -Xmx1024m
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+    runs-on: ${{matrix.os}}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: ${{ runner.os }}-check-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-check-
+
+      - name: Run Ubuntu tests
+        if: matrix.os == 'ubuntu-latest'
+        run: ./gradlew check
+
+      - name: Run Windows tests
+        if: matrix.os == 'windows-latest'
+        run: ./gradlew mingwX64Test
+
+      - name: Bundle the build report
+        if: failure()
+        run: find . -type d -name 'reports' | zip -@ -r build-reports.zip
+
+      - name: Upload the build report
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: error-report
+          path: build-reports.zip
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Dokka
+        id: Dokka
+        continue-on-error: true
+        run: ./gradlew dokkaHtml
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto update docs
