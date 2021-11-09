@@ -80,6 +80,25 @@ public typealias Nel<A> = NonEmptyList<A>
  * }
  * ```
  *
+ * ## Destructuring NonEmptyLists
+ *
+ * A `NonEmptyList` can always be _destructured_ into two components, `head` and `tail`:
+ * 1) A `head`, consisting of a single element, and
+ * 2) A (potentially empty) `tail`, consisting of a `List` of the elements besides `head`.
+ *
+ * Descruturing can be done idiomatically through Kotlin's `destructuring declarations` syntax:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.NonEmptyList
+ *
+ * //sampleStart
+ * val (head, tail) = nonEmptyListOf(1, 2, 3, 5, 6)
+ * //sampleEnd
+ * fun main() {
+ *  println("head: $head, tail: $tail")
+ * }
+ * ```
+ *
  * ## Combining NonEmptyLists
  *
  * ### flatMap
@@ -157,6 +176,12 @@ public class NonEmptyList<out A>(
     if (index < 0 || index >= size) throw IndexOutOfBoundsException("$index is not in 1..${size - 1}")
     return if (index == 0) head else tail[index - 1]
   }
+
+  public operator fun component1(): A =
+    head
+
+  public operator fun component2(): List<A> =
+    tail
 
   override fun isEmpty(): Boolean = false
 
