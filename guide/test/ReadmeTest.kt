@@ -26,4 +26,32 @@ class ReadmeTest {
             "Either.Right(Failure(java.lang.RuntimeException: Boom))"
         )
     }
+
+    @Test
+    fun testExampleReadme06() {
+        captureOutput("ExampleReadme06") { example.exampleReadme06.main() }.verifyOutputLines(
+            "I got cancelled",
+            "I got cancelled",
+            "I got cancelled",
+            "I got cancelled",
+            "error"
+        )
+    }
+
+    @Test
+    fun testExampleReadme07() {
+        captureOutput("ExampleReadme07") { example.exampleReadme07.main() }.verifyOutputLines(
+            "I lost the race...",
+            "error"
+        )
+    }
+
+    @Test
+    fun testExampleReadme09() {
+        captureOutput("ExampleReadme09") { example.exampleReadme09.main() }.verifyOutputLines(
+            "Cancelled due to shift: ShiftCancellationException(Shifted Continuation)",
+            "Cancelled due to shift: ShiftCancellationException(Shifted Continuation)",
+            "FileNotFound(path=failure)"
+        )
+    }
 }

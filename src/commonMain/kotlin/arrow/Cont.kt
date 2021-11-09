@@ -1,6 +1,8 @@
 package arrow
 
 import arrow.core.Either
+import arrow.core.NonFatal
+import kotlin.Result
 import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
@@ -19,6 +21,38 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.jvm.JvmInline
 
+/**
+ * DSL for constructing Cont<R, A> values
+ *
+ * <!--- TEST_NAME ContTest -->
+ * ```kotlin
+ * import arrow.core.*
+ * import arrow.cont
+ * import kotlinx.coroutines.runBlocking
+ *
+ * fun main() = runBlocking<Unit> {
+ *   cont<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z = Option(3).bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold(::println, ::println)
+ *
+ *   cont<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z: Int = None.bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold(::println, ::println)
+ * }
+ * ```
+ * <!--- KNIT example-cont-01.kt -->
+ * ```text
+ * 6
+ * Option was empty
+ * ```
+ * <!--- TEST -->
+ */
 public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
   ContImpl(f)
 
@@ -30,30 +64,85 @@ public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> =
  * So [Cont] is defined by [fold], to map both values of [R] and [A] to a value of `B`.
  */
 public interface Cont<R, A> {
-  suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B
+  /**
+   * Runs the suspending computation by creating a [Continuation],
+   * and running the `fold` function over the computation.
+   *
+   * When the [Cont] has shifted with [R] it will [recover] the shifted value to [B],
+   * and when it ran the computation to completion it will [transform] the value [A] to [B].
+   *
+   * ```kotlin
+   * import arrow.cont
+   * import kotlinx.coroutines.runBlocking
+   *
+   * fun main() = runBlocking {
+   *   cont<String, Int> {
+   *     shift("Hello, World!")
+   *   }.fold({ str: String -> str }, { int -> int.toString() })
+   *    .let(::println)
+   *
+   *   cont<String, Int> {
+   *     1000
+   *   }.fold({ str: String -> str.length }, { int -> int })
+   *    .let(::println)
+   * }
+   * ```
+   * <!--- KNIT example-cont-02.kt -->
+   * ```text
+   * Hello, World!
+   * 1000
+   * ```
+   * <!--- TEST -->
+   */
+  suspend fun <B> fold(recover: suspend (shifted: R) -> B, transform: suspend (value: A) -> B): B
 
+  /**
+   * Like `fold` but also allows folding over any unexpected [Throwable] that might have occurred.
+   * @see fold
+   */
   suspend fun <B> fold(
-    error: suspend (Throwable) -> B,
-    f: suspend (R) -> B,
-    g: suspend (A) -> B
+    error: suspend (error: Throwable) -> B,
+    recover: suspend (shifted: R) -> B,
+    transform: suspend (value: A) -> B
   ): B = try {
-    fold(f, g)
+    fold(recover, transform)
   } catch (e: Throwable) {
     error(e.nonFatalOrThrow())
   }
 
+  /**
+   * [fold] the [Cont] into an [Either].
+   * Where the shifted value [R] is mapped to [Either.Left],
+   * and result value [A] is mapped to [Either.Right].
+   */
   suspend fun toEither(): Either<R, A> =
     fold({ Either.Left(it) }) { Either.Right(it) }
 
+  /**
+   * [fold] the [Cont] into an [Ior].
+   * Where the shifted value [R] is mapped to [Ior.Left],
+   * and result value [A] is mapped to [Ior.Right].
+   */
   suspend fun toIor(): Ior<R, A> =
     fold({ Ior.Left(it) }) { Ior.Right(it) }
 
+  /**
+   * [fold] the [Cont] into an [Validated].
+   * Where the shifted value [R] is mapped to [Validated.Invalid],
+   * and result value [A] is mapped to [Validated.Valid].
+   */
   suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
+  /**
+   * [fold] the [Cont] into an [Option].
+   * Where the shifted value [R] is mapped to [Option] by the provided function [orElse],
+   * and result value [A] is mapped to [Some].
+   */
   suspend fun toOption(orElse: suspend (R) -> Option<A>): Option<A> =
     fold(orElse, ::Some)
 
+  /** Runs the [Cont] and captures any [NonFatal] exception into [Result]. */
   fun attempt(): Cont<R, Result<A>> =
     cont {
       try {
@@ -63,27 +152,29 @@ public interface Cont<R, A> {
       }
     }
 
-  fun <B> map(f: suspend (A) -> B): Cont<R, B> =
-    cont { fold(this::shift, f) }
+  /** Maps the values [A] with the [transform] function into [B]. */
+  fun <B> map(transform: suspend (A) -> B): Cont<R, B> =
+    cont { fold(this::shift, transform) }
 
-  fun <B> flatMap(f: suspend (A) -> Cont<R, B>): Cont<R, B> =
-    cont { fold(this::shift, f).bind() }
+  /** Maps the values [A] with the [transform] function into another [Cont] effect. */
+  fun <B> flatMap(transform: suspend (A) -> Cont<R, B>): Cont<R, B> =
+    cont { fold(this::shift, transform).bind() }
 
-  fun handleError(f: suspend (R) -> A): Cont<Nothing, A> =
-    cont { fold(f, ::identity) }
+  fun handleError(recover: suspend (R) -> A): Cont<Nothing, A> =
+    cont { fold(recover, ::identity) }
 
-  fun <R2> handleErrorWith(f: suspend (R) -> Cont<R2, A>): Cont<R2, A> =
-    cont { fold({ f(it).bind() }, ::identity) }
+  fun <R2> handleErrorWith(recover: suspend (R) -> Cont<R2, A>): Cont<R2, A> =
+    cont { fold({ recover(it).bind() }, ::identity) }
 
-  fun <B> redeem(f: suspend (R) -> B, g: suspend (A) -> B): Cont<Nothing, B> =
-    cont { fold(f, g) }
+  fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Cont<Nothing, B> =
+    cont { fold(recover, transform) }
 
-  fun <R2, B> redeemWith(f: suspend (R) -> Cont<R2, B>, g: suspend (A) -> Cont<R2, B>): Cont<R2, B> =
-    cont { fold(f, g).bind() }
+  fun <R2, B> redeemWith(recover: suspend (R) -> Cont<R2, B>, transform: suspend (A) -> Cont<R2, B>): Cont<R2, B> =
+    cont { fold(recover, transform).bind() }
 }
 
-fun <R, A, B> Iterable<A>.traverseCont(f: (A) -> Cont<R, B>): Cont<R, List<B>> =
-  cont { map { f(it).bind() } }
+fun <R, A, B> Iterable<A>.traverseCont(transform: (A) -> Cont<R, B>): Cont<R, List<B>> =
+  cont { map { transform(it).bind() } }
 
 fun <R, A> Iterable<Cont<R, A>>.sequence(): Cont<R, List<A>> =
   traverseCont(::identity)
@@ -94,10 +185,6 @@ interface ContEffect<R> {
    * Short-circuit the [Cont] computation with value [R].
    */
   public suspend fun <B> shift(r: R): B
-
-  /** ApplicativeError alias for shift */
-  public suspend fun <B> raiseError(r: R): B =
-    shift(r)
 
   public suspend fun <B> Cont<R, B>.bind(): B =
     fold(this@ContEffect::shift, ::identity)
@@ -138,22 +225,14 @@ public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: ()
   return value ?: shift(shift())
 }
 
-// Full internal runtime implementation of Cont below
-
-public open class ControlThrowable(
-  override val message: String? = null,
-  override val cause: Throwable? = null
-) : Throwable(message, cause) {
-  // Expect/actual JVM (fillStackTrace)
-}
-
-
 sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 private class Internal(
   val token: Token,
   val shifted: Any?,
   val fold: suspend (Any?) -> Any?
-): ShiftCancellationException()
+): ShiftCancellationException() {
+  override fun toString(): String = "ShiftCancellationException($message)"
+}
 
 // Class that represents a unique token by hash comparison
 private class Token {
@@ -162,8 +241,23 @@ private class Token {
 
 @JvmInline
 private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A) : Cont<R, A> {
+
+  override fun attempt(): Cont<R, Result<A>> = ContImpl {
+      try {
+        Result.success(f())
+      } catch (e: Throwable) {
+        Result.failure(e.nonFatalOrThrow())
+      }
+    }
+
+  override fun <B> map(transform: suspend (A) -> B): Cont<R, B> =
+    ContImpl { transform(f()) }
+
+  override fun <B> flatMap(transform: suspend (A) -> Cont<R, B>): Cont<R, B> =
+    ContImpl { transform(f()).bind() }
+
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested folds
-  override suspend fun <B> fold(f: suspend (R) -> B, g: suspend (A) -> B): B =
+  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
       val token = Token()
       val effect = object : ContEffect<R> {
@@ -176,11 +270,11 @@ private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A)
         // This however also means that the user can try/catch shift and recover from the CancellationException and thus effectively recovering from the cancellation/shift.
         // This means try/catch is also capable of recovering from monadic errors.
           // See: ContSpec - try/catch tests
-          throw Internal(token, r, f as suspend (Any?) -> Any?)
+          throw Internal(token, r, recover as suspend (Any?) -> Any?)
       }
 
       try {
-        suspend { g(f(effect)) }.startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+        suspend { transform(f(effect)) }.startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
       } catch (e: Internal) {
         if (token == e.token) {
           val f: suspend () -> B = { e.fold(e.shifted) as B }
