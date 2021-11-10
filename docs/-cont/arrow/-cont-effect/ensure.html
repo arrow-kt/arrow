@@ -26,14 +26,14 @@
 <div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun <a href="ensure.html">ensure</a>(value: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>, shift: () -&gt; <a href="index.html">R</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun <a href="ensure.html">ensure</a>(condition: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>, shift: () -&gt; <a href="index.html">R</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-</div>
+<p class="paragraph">ensure that condition is <code>true</code>, if it's <code>false</code> it will <code>shift</code> with the provided value <a href="index.html">R</a>. Monadic version of <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.require</a>.</p><div class="sample-container"><code class="" theme="idea"><pre>suspend fun test() = checkAll(Arb.boolean(), Arb.string(), Arb.int()) { condition, failure, int -&gt;<br>  cont&lt;String, Int&gt; {<br>    ensure(condition) { failure }<br>    int<br>  }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)<br>}</pre></code></div><!--- KNIT example-cont-09.kt --><!--- TEST lines.isEmpty() --></div>
           <h2 class="">Sources</h2>
-          <div class="table" data-togglable="Sources"><a data-name="-1147010696%2FSource%2F788909594" anchor-label="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/Cont.kt#L196" id="-1147010696%2FSource%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table" data-togglable="Sources"><a data-name="-1147010696%2FSource%2F788909594" anchor-label="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/Cont.kt#L277" id="-1147010696%2FSource%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
             <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
               <div class="main-subrow keyValue ">
-                <div class=""><span class="inline-flex"><a href="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/Cont.kt#L196">common source</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1147010696%2FSource%2F788909594"></span>
+                <div class=""><span class="inline-flex"><a href="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/Cont.kt#L277">common source</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1147010696%2FSource%2F788909594"></span>
                       <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                     </span></span></div>
                 <div></div>

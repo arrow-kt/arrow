@@ -28,12 +28,12 @@
   <div>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend override fun &lt;<a href="shift.html">B</a>&gt; <a href="shift.html">shift</a>(r: <a href="index.html">E</a>): <a href="shift.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p></div>
+<p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p><div class="sample-container"><code class="" theme="idea"><pre>suspend fun test() = checkAll(Arb.string()) { str -&gt;<br>  cont&lt;String, Int&gt; {<br>    shift(str)<br>  }.fold({ it shouldBe str }, { fail(&quot;Computation never finishes&quot;) })<br>}</pre></code></div><!--- KNIT example-cont-03.kt --><!--- TEST lines.isEmpty() --></div>
           <h2 class="">Sources</h2>
-          <div class="table" data-togglable="Sources"><a data-name="1682491179%2FSource%2F788909594" anchor-label="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/ior.kt#L39" id="1682491179%2FSource%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
+          <div class="table" data-togglable="Sources"><a data-name="1682491179%2FSource%2F788909594" anchor-label="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/ior.kt#L40" id="1682491179%2FSource%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
             <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
               <div class="main-subrow keyValue ">
-                <div class=""><span class="inline-flex"><a href="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/ior.kt#L39">common source</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1682491179%2FSource%2F788909594"></span>
+                <div class=""><span class="inline-flex"><a href="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/ior.kt#L40">common source</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1682491179%2FSource%2F788909594"></span>
                       <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                     </span></span></div>
                 <div></div>

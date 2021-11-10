@@ -141,7 +141,7 @@
   <div>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">sealed class <a href="-shift-cancellation-exception/index.html">ShiftCancellationException</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-</div>
+<div class="brief "><p class="paragraph"><strong>AVOID USING THIS TYPE, it's meant for low-level cancellation code</strong> When in need in low-level code, you can use this type to differentiate between a foreign <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a> and the one from <a href="-cont/index.html">Cont</a>.</p></div></div>
 </div>
                     </div>
                   </div>
@@ -192,9 +192,15 @@
                       <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">suspend fun &lt;<a href="ensure-not-null.html">B</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt; <a href="-cont-effect/index.html">ContEffect</a>&lt;<span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span>&gt;.<a href="ensure-not-null.html">ensureNotNull</a>(value: <a href="ensure-not-null.html">B</a>?): <a href="ensure-not-null.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="symbol monospace">suspend fun &lt;<a href="ensure-not-null.html">R</a>, <a href="ensure-not-null.html">B</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt; <a href="-cont-effect/index.html">ContEffect</a>&lt;<a href="ensure-not-null.html">R</a>&gt;.<a href="ensure-not-null.html">ensureNotNull</a>(value: <a href="ensure-not-null.html">B</a>?, shift: () -&gt; <a href="ensure-not-null.html">R</a>): <a href="ensure-not-null.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">suspend fun &lt;<a href="ensure-not-null.html">B</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt; <a href="-cont-effect/index.html">ContEffect</a>&lt;<span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span>&gt;.<a href="ensure-not-null.html">ensureNotNull</a>(value: <a href="ensure-not-null.html">B</a>?): <a href="ensure-not-null.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
 </div>
+<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">suspend fun &lt;<a href="ensure-not-null.html">R</a>, <a href="ensure-not-null.html">B</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a>&gt; <a href="-cont-effect/index.html">ContEffect</a>&lt;<a href="ensure-not-null.html">R</a>&gt;.<a href="ensure-not-null.html">ensureNotNull</a>(value: <a href="ensure-not-null.html">B</a>?, shift: () -&gt; <a href="ensure-not-null.html">R</a>): <a href="ensure-not-null.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Ensure that <a href="ensure-not-null.html">value</a> is not <code>null</code>. if it's non-null it will be smart-casted and returned if it's <code>false</code> it will <code>shift</code> with the provided value <a href="ensure-not-null.html">R</a>. Monadic version of <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.requireNotNull</a>.</p></div></div>
 </div>
                     </div>
                   </div>
@@ -250,23 +256,6 @@
                     </div>
                   </div>
                 </div>
-<a data-name="-448861266%2FFunctions%2F788909594" anchor-label="sequence" id="-448861266%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-                <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="sequence.html"><span><span>sequence</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-448861266%2FFunctions%2F788909594"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">fun &lt;<a href="sequence.html">R</a>, <a href="sequence.html">A</a>&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a>&lt;<a href="-cont/index.html">Cont</a>&lt;<a href="sequence.html">R</a>, <a href="sequence.html">A</a>&gt;&gt;.<a href="sequence.html">sequence</a>(): <a href="-cont/index.html">Cont</a>&lt;<a href="sequence.html">R</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="sequence.html">A</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
-                    </div>
-                  </div>
-                </div>
 <a data-name="430020607%2FFunctions%2F788909594" anchor-label="toOption" id="430020607%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
                 <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
                   <div class="main-subrow keyValue ">
@@ -278,23 +267,6 @@
 
   <div>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">suspend fun &lt;<a href="to-option.html">A</a>&gt; <a href="-cont/index.html">Cont</a>&lt;<span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span>, <a href="to-option.html">A</a>&gt;.<a href="to-option.html">toOption</a>(): <span data-unresolved-link="arrow.core/Option///PointingToDeclaration/">Option</span>&lt;<a href="to-option.html">A</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
-                    </div>
-                  </div>
-                </div>
-<a data-name="1507877191%2FFunctions%2F788909594" anchor-label="traverseCont" id="1507877191%2FFunctions%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
-                <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="traverse-cont.html"><span>traverse</span><wbr></wbr><span><span>Cont</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1507877191%2FFunctions%2F788909594"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">fun &lt;<a href="traverse-cont.html">R</a>, <a href="traverse-cont.html">A</a>, <a href="traverse-cont.html">B</a>&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a>&lt;<a href="traverse-cont.html">A</a>&gt;.<a href="traverse-cont.html">traverseCont</a>(transform: (<a href="traverse-cont.html">A</a>) -&gt; <a href="-cont/index.html">Cont</a>&lt;<a href="traverse-cont.html">R</a>, <a href="traverse-cont.html">B</a>&gt;): <a href="-cont/index.html">Cont</a>&lt;<a href="traverse-cont.html">R</a>, <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a>&lt;<a href="traverse-cont.html">B</a>&gt;&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
 </div>
 </div>

@@ -28,7 +28,7 @@
   <div>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend override fun &lt;<a href="shift.html">B</a>&gt; <a href="shift.html">shift</a>(r: <span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span>): <a href="shift.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
-<p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p></div>
+<p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p><div class="sample-container"><code class="" theme="idea"><pre>suspend fun test() = checkAll(Arb.string()) { str -&gt;<br>  cont&lt;String, Int&gt; {<br>    shift(str)<br>  }.fold({ it shouldBe str }, { fail(&quot;Computation never finishes&quot;) })<br>}</pre></code></div><!--- KNIT example-cont-03.kt --><!--- TEST lines.isEmpty() --></div>
           <h2 class="">Sources</h2>
           <div class="table" data-togglable="Sources"><a data-name="439543938%2FSource%2F788909594" anchor-label="https://github.com/nomisRev/Continuation/tree/main/src/commonMain/kotlin/arrow/option.kt#L22" id="439543938%2FSource%2F788909594" data-filterable-set=":dokkaHtml/commonMain"></a>
             <div class="table-row" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain">
