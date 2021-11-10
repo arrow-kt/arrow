@@ -707,11 +707,9 @@ private class ResEffectImpl : ResourceEffect {
         // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
         // Otherwise we've saved the finalizer, and it will be called from somewhere else.
         if (ex != ExitCase.Completed) {
-          withContext(NonCancellable) {
-            val e = finalizers.get().cancelAll(ex)
-            val e2 = runCatching { release(a, ex) }.exceptionOrNull()
-            Platform.composeErrors(e, e2)?.let { throw it }
-          }
+          val e = finalizers.get().cancelAll(ex)
+          val e2 = runCatching { release(a, ex) }.exceptionOrNull()
+          Platform.composeErrors(e, e2)?.let { throw it }
         }
       })
       is Resource.Bind<*, *> -> {
