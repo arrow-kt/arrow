@@ -24,7 +24,8 @@ public class IorEffect<E>(semigroup: Semigroup<E>, private val cont: ContEffect<
   private fun combine(other: E): E =
     leftState.updateAndGet { state ->
       if (state === EmptyValue) other else EmptyValue.unbox<E>(state).combine(other)
-    } as E
+    } as
+      E
 
   public suspend fun <B> Ior<E, B>.bind(): B =
     when (this) {

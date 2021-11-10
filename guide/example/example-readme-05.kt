@@ -12,6 +12,7 @@ import io.kotest.matchers.types.*
 import kotlin.coroutines.cancellation.CancellationException
 import io.kotest.property.*
 import io.kotest.property.arbitrary.*
+import arrow.core.test.generators.*
 
 suspend fun parZip(): Unit = cont<String, Int> {
   parZip({

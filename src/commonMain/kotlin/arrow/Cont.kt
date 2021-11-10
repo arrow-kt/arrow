@@ -117,6 +117,13 @@ public interface Cont<R, A> {
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
   /**
+   * [fold] the [Cont] into an [Result]. Where the shifted value [R] is mapped to [Result] by the
+   * provided function [orElse], and result value [A] is mapped to [Result.success].
+   */
+  public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
+    fold(orElse) { a -> Result.success(a) }
+
+  /**
    * [fold] the [Cont] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
    * provided function [orElse], and result value [A] is mapped to [Some].
    */
@@ -131,16 +138,6 @@ public interface Cont<R, A> {
     }
   }
 
-  /** Maps the values [A] with the [transform] function into [B]. */
-  public fun <B> map(transform: suspend (A) -> B): Cont<R, B> = cont {
-    fold(this::shift, transform)
-  }
-
-  /** Maps the values [A] with the [transform] function into another [Cont] effect. */
-  public fun <B> flatMap(transform: suspend (A) -> Cont<R, B>): Cont<R, B> = cont {
-    fold(this::shift, transform).bind()
-  }
-
   public fun handleError(recover: suspend (R) -> A): Cont<Nothing, A> = cont {
     fold(recover, ::identity)
   }
@@ -150,20 +147,15 @@ public interface Cont<R, A> {
   }
 
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Cont<Nothing, B> =
-    cont { fold(recover, transform) }
+      cont {
+    fold(recover, transform)
+  }
 
   public fun <R2, B> redeemWith(
     recover: suspend (R) -> Cont<R2, B>,
     transform: suspend (A) -> Cont<R2, B>
   ): Cont<R2, B> = cont { fold(recover, transform).bind() }
 }
-
-public fun <R, A, B> Iterable<A>.traverseCont(transform: (A) -> Cont<R, B>): Cont<R, List<B>> =
-  cont {
-    map { transform(it).bind() }
-  }
-
-public fun <R, A> Iterable<Cont<R, A>>.sequence(): Cont<R, List<A>> = traverseCont(::identity)
 
 /** Context of the [Cont] DSL. */
 public interface ContEffect<R> {
@@ -181,44 +173,156 @@ public interface ContEffect<R> {
    */
   public suspend fun <B> shift(r: R): B
 
+  /**
+   * Runs the [Cont] to finish, returning [B] or [shift] in case of [R].
+   *
+   * ```kotlin
+   * fun <E, A> Either<E, A>.toCont(): Cont<E, A> = cont {
+   *   fold({ e -> shift(e) }, ::identity)
+   * }
+   *
+   * suspend fun test() = checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+   *   cont<String, Int> {
+   *     val x: Int = either.toCont().bind()
+   *     x
+   *   }.toEither() shouldBe either
+   * }
+   * ```
+   * <!--- KNIT example-cont-04.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> Cont<R, B>.bind(): B = fold(this@ContEffect::shift, ::identity)
 
+  /**
+   * Folds [Either] into [Cont], by returning [B] or a shift with [R].
+   *
+   * ```kotlin
+   * suspend fun test() = checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+   *   cont<String, Int> {
+   *     val x: Int = either.bind()
+   *     x
+   *   }.toEither() shouldBe either
+   * }
+   * ```
+   * <!--- KNIT example-cont-05.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> Either<R, B>.bind(): B =
     when (this) {
       is Either.Left -> shift(value)
       is Either.Right -> value
     }
 
+  /**
+   * Folds [Validated] into [Cont], by returning [B] or a shift with [R].
+   *
+   * ```kotlin
+   * suspend fun test() = checkAll(Arb.validated(Arb.string(), Arb.int())) { validated ->
+   *   cont<String, Int> {
+   *     val x: Int = validated.bind()
+   *     x
+   *   }.toValidated() shouldBe validated
+   * }
+   * ```
+   * <!--- KNIT example-cont-06.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> Validated<R, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
       is Validated.Invalid -> shift(value)
     }
 
+  /**
+   * Folds [Result] into [Cont], by returning [B] or a transforming [Throwable] into [R] and
+   * shifting the result.
+   *
+   * ```kotlin
+   * private val default = "failed"
+   * suspend fun test() = checkAll(Arb.result(Arb.int())) { result ->
+   *   cont<String, Int> {
+   *     val x: Int = result.bind { _: Throwable -> default }
+   *     x
+   *   }.toResult { Result.failure(RuntimeException()) }.getOrElse { default } shouldBe result.getOrElse { default }
+   * }
+   * ```
+   * <!--- KNIT example-cont-07.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
 
+  /**
+   * Folds [Option] into [Cont], by returning [B] or a transforming [None] into [R] and shifting the
+   * result.
+   *
+   * ```kotlin
+   * private val default = "failed"
+   * suspend fun test() = checkAll(Arb.option(Arb.int())) { option ->
+   *   cont<String, Int> {
+   *     val x: Int = option.bind { default }
+   *     x
+   *   }.toOption { None }.getOrElse { default } shouldBe option.getOrElse { default }
+   * }
+   * ```
+   * <!--- KNIT example-cont-08.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> Option<B>.bind(shift: () -> R): B =
     when (this) {
       None -> shift(shift())
       is Some -> value
     }
 
-  // Monadic version of kotlin.require
-  public suspend fun ensure(value: Boolean, shift: () -> R): Unit =
-    if (value) Unit else shift(shift())
+  /**
+   * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
+   * Monadic version of [kotlin.require].
+   *
+   * ```kotlin
+   * suspend fun test() = checkAll(Arb.boolean(), Arb.string(), Arb.int()) { condition, failure, int ->
+   *   cont<String, Int> {
+   *     ensure(condition) { failure }
+   *     int
+   *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
+   * }
+   * ```
+   * <!--- KNIT example-cont-09.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
+    if (condition) Unit else shift(shift())
 }
 
-// Monadic version of kotlin.requireNotNull
+/**
+ * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
+ * `false` it will `shift` with the provided value [R]. Monadic version of [kotlin.requireNotNull].
+ *
+ * ```kotlin
+ * suspend fun test() = checkAll(Arb.string(), Arb.int().orNull()) { failure, int: Int? ->
+ *   cont<String, Int> {
+ *     ensureNotNull(int) { failure }
+ *   }.toEither() shouldBe (int?.right() ?: failure.left())
+ * }
+ * ```
+ * <!--- KNIT example-cont-10.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so top-level.
 public suspend fun <R, B : Any> ContEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
 
+/**
+ * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level
+ * code, you can use this type to differentiate between a foreign [CancellationException] and the
+ * one from [Cont].
+ */
 public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 
-private class Internal(val token: Token, val shifted: Any?, val fold: suspend (Any?) -> Any?) :
+//  Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
+// `recover`.
+private class Internal(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
   ShiftCancellationException() {
   override fun toString(): String = "ShiftCancellationException($message)"
 }
@@ -239,60 +343,61 @@ private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A)
     }
   }
 
-  override fun <B> map(transform: suspend (A) -> B): Cont<R, B> = ContImpl { transform(f()) }
-
-  override fun <B> flatMap(transform: suspend (A) -> Cont<R, B>): Cont<R, B> = ContImpl {
-    transform(f()).bind()
-  }
-
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested
   // folds
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-    suspendCoroutineUninterceptedOrReturn { cont ->
-      val token = Token()
-      val effect =
-        object : ContEffect<R> {
-          // Shift away from this Continuation by intercepting it, and completing it with
-          // ShiftCancellationException
-          // This is needed because this function will never yield a result,
-          // so it needs to be cancelled to properly support coroutine cancellation
-          override suspend fun <B> shift(r: R): B =
+      suspendCoroutineUninterceptedOrReturn { cont ->
+    val token = Token()
+    val effect =
+      object : ContEffect<R> {
+        // Shift away from this Continuation by intercepting it, and completing it with
+        // ShiftCancellationException
+        // This is needed because this function will never yield a result,
+        // so it needs to be cancelled to properly support coroutine cancellation
+        override suspend fun <B> shift(r: R): B =
           // Some interesting consequences of how Continuation Cancellation works in Kotlin.
           // We have to throw CancellationException to signal the Continuation was cancelled, and we
           // shifted away.
           // This however also means that the user can try/catch shift and recover from the
           // CancellationException and thus effectively recovering from the cancellation/shift.
           // This means try/catch is also capable of recovering from monadic errors.
-            // See: ContSpec - try/catch tests
-            throw Internal(token, r, recover as suspend (Any?) -> Any?)
-        }
-
-      try {
-        suspend { transform(f(effect)) }
-          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-      } catch (e: Internal) {
-        if (token == e.token) {
-          val f: suspend () -> B = { e.fold(e.shifted) as B }
-          f.startCoroutineUninterceptedOrReturn(cont)
-        } else throw e
+          // See: ContSpec - try/catch tests
+          throw Internal(token, r, recover as suspend (Any?) -> Any?)
       }
+
+    try {
+      suspend { transform(f(effect)) }
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+    } catch (e: Internal) {
+      if (token == e.token) {
+        val f: suspend () -> B = { e.recover(e.shifted) as B }
+        f.startCoroutineUninterceptedOrReturn(cont)
+      } else throw e
     }
+  }
 }
 
+/**
+ * Continuation that runs the `recover` function, after attempting to calculate [B]. In case we
+ * encounter a `shift` after suspension, we will receive [Result.failure] with
+ * [ShiftCancellationException]. In that case we still need to run `suspend (R) -> B`, which is what
+ * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
+ * the result.
+ */
 private class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
-  private val cont: Continuation<B>
+  private val parent: Continuation<B>
 ) : Continuation<B> {
   override fun resumeWith(result: Result<B>) {
-    result.fold(cont::resume) { throwable ->
+    result.fold(parent::resume) { throwable ->
       if (throwable is Internal && token == throwable.token) {
-        val f: suspend () -> B = { throwable.fold(throwable.shifted) as B }
-        when (val res = f.startCoroutineUninterceptedOrReturn(cont)) {
+        val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
+        when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
           COROUTINE_SUSPENDED -> Unit
-          else -> cont.resume(res as B)
+          else -> parent.resume(res as B)
         }
-      } else cont.resumeWith(result)
+      } else parent.resumeWith(result)
     }
   }
 }

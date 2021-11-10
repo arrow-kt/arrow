@@ -19,4 +19,32 @@ class ContTest : StringSpec({
       example.exampleCont03.test()
     }
 
+    "ExampleCont04".config(timeout= Duration.seconds(1)) {
+      example.exampleCont04.test()
+    }
+
+    "ExampleCont05".config(timeout= Duration.seconds(1)) {
+      example.exampleCont05.test()
+    }
+
+    "ExampleCont06".config(timeout= Duration.seconds(1)) {
+      example.exampleCont06.test()
+    }
+
+    "ExampleCont07".config(timeout= Duration.seconds(1)) {
+      example.exampleCont07.test()
+    }
+
+    "ExampleCont08".config(timeout= Duration.seconds(1)) {
+      example.exampleCont08.test()
+    }
+
+    "ExampleCont09".config(timeout= Duration.seconds(1)) {
+      example.exampleCont09.test()
+    }
+
+    "ExampleCont10".config(timeout= Duration.seconds(1)) {
+      example.exampleCont10.test()
+    }
+
 })

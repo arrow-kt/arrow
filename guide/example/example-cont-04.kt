@@ -1,5 +1,5 @@
-// This file was automatically generated from README.md by Knit tool. Do not edit.
-package example.exampleReadme03
+// This file was automatically generated from Cont.kt by Knit tool. Do not edit.
+package example.exampleCont04
 
 import arrow.*
 import arrow.core.*
@@ -14,8 +14,13 @@ import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 import arrow.core.test.generators.*
 
-suspend fun <R, A> Cont<R, A>.toEither(): Either<R, A> =
-  fold({ Either.Left(it) }) { Either.Right(it) }
+fun <E, A> Either<E, A>.toCont(): Cont<E, A> = cont {
+  fold({ e -> shift(e) }, ::identity)
+}
 
-suspend fun <A> Cont<None, A>.toOption(): Option<A> =
-  fold(::identity) { Some(it) }
+suspend fun test() = checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
+  cont<String, Int> {
+    val x: Int = either.toCont().bind()
+    x
+  }.toEither() shouldBe either
+}

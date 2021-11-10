@@ -12,6 +12,7 @@ knit = "0.2.3"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-core-test = { module = "io.arrow-kt:arrow-core-test", version.ref = "arrow" }
 arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
 arrow-fx = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

@@ -1,5 +1,5 @@
 // This file was automatically generated from Cont.kt by Knit tool. Do not edit.
-package example.exampleCont02
+package example.exampleCont07
 
 import arrow.*
 import arrow.core.*
@@ -14,14 +14,10 @@ import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 import arrow.core.test.generators.*
 
-suspend fun test() {
-  val shift = cont<String, Int> {
-    shift("Hello, World!")
-  }.fold({ str: String -> str }, { int -> int.toString() })
-  shift shouldBe "Hello, World!"
-
-  val res = cont<String, Int> {
-    1000
-  }.fold({ str: String -> str.length }, { int -> int })
-  res shouldBe 1000
+private val default = "failed"
+suspend fun test() = checkAll(Arb.result(Arb.int())) { result ->
+  cont<String, Int> {
+    val x: Int = result.bind { _: Throwable -> default }
+    x
+  }.toResult { Result.failure(RuntimeException()) }.getOrElse { default } shouldBe result.getOrElse { default }
 }
