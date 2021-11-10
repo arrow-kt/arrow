@@ -19,5 +19,5 @@ suspend fun test() = checkAll(Arb.result(Arb.int())) { result ->
   cont<String, Int> {
     val x: Int = result.bind { _: Throwable -> default }
     x
-  }.toResult { Result.failure(RuntimeException()) }.getOrElse { default } shouldBe result.getOrElse { default }
+  }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
 }

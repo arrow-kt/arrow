@@ -19,5 +19,5 @@ suspend fun test() = checkAll(Arb.option(Arb.int())) { option ->
   cont<String, Int> {
     val x: Int = option.bind { default }
     x
-  }.toOption { None }.getOrElse { default } shouldBe option.getOrElse { default }
+  }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
 }

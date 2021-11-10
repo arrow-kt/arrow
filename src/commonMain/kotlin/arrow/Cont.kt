@@ -120,8 +120,8 @@ public interface Cont<R, A> {
    * [fold] the [Cont] into an [Result]. Where the shifted value [R] is mapped to [Result] by the
    * provided function [orElse], and result value [A] is mapped to [Result.success].
    */
-  public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
-    fold(orElse) { a -> Result.success(a) }
+//  public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
+//    fold(orElse) { a -> Result.success(a) }
 
   /**
    * [fold] the [Cont] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
@@ -243,7 +243,7 @@ public interface ContEffect<R> {
    *   cont<String, Int> {
    *     val x: Int = result.bind { _: Throwable -> default }
    *     x
-   *   }.toResult { Result.failure(RuntimeException()) }.getOrElse { default } shouldBe result.getOrElse { default }
+   *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
    * <!--- KNIT example-cont-07.kt -->
@@ -262,7 +262,7 @@ public interface ContEffect<R> {
    *   cont<String, Int> {
    *     val x: Int = option.bind { default }
    *     x
-   *   }.toOption { None }.getOrElse { default } shouldBe option.getOrElse { default }
+   *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
    * <!--- KNIT example-cont-08.kt -->
