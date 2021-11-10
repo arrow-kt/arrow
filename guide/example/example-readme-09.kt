@@ -1,19 +1,17 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme09
 
-import arrow.cont
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import arrow.Cont
-import arrow.ensureNotNull
-import java.io.File
-import java.io.FileNotFoundException
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
+
+import java.io.*
 
 @JvmInline
 value class Content(val body: List<String>)
@@ -44,14 +42,15 @@ fun <A: Job> A.onCancel(f: (CancellationException) -> Unit): A = also {
   }
 }
 
-fun main() = runBlocking<Unit> {
+suspend fun test() {
+  val exit = CompletableDeferred<CancellationException>()
   cont<FileError, Int> {
     withContext(Dispatchers.IO) {
-      launch { delay(1_000_000) }.onCancel { println("Cancelled due to shift: $it") }
-      val sleeper = async { delay(1_000_000) }.onCancel { println("Cancelled due to shift: $it") }
+      val job = launch { delay(1_000_000) }.onCancel { ce -> require(exit.complete(ce)) }
       val content = readFile("failure").bind()
-      sleeper.await()
+      job.join()
       content.body.size
     }
-  }.fold(::println, ::println)
+  }.fold({ e -> e shouldBe FileNotFound("failure") }, { fail("Int can never be the result") })
+  exit.await().shouldBeInstanceOf<CancellationException>()
 }

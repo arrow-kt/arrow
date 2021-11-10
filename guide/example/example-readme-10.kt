@@ -1,14 +1,17 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme10
 
-import arrow.cont
-import arrow.core.identity
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
-import io.kotest.matchers.collections.shouldBeIn
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
 
-fun main() = runBlocking {
+suspend fun test() {
   coroutineScope {
     cont<Int, String> {
       val fa = async<String> { shift(1) }

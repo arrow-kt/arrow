@@ -1,0 +1,16 @@
+// This file was automatically generated from ${file.name} by Knit tool. Do not edit.
+package ${test.package}
+
+import io.kotest.core.spec.style.StringSpec
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+
+@OptIn(ExperimentalTime::class)
+class ${test.name} : StringSpec({
+<#list cases as case>
+    "${case.name}".config(timeout= Duration.seconds(1)) {
+      ${case.knit.package}.${case.knit.name}.test()
+    }
+
+</#list>
+})

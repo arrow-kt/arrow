@@ -1,13 +1,17 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme02
 
-import arrow.Cont
-import arrow.cont
-import arrow.ensureNotNull
-import arrow.core.None
-import java.io.File
-import java.io.FileNotFoundException
-import kotlinx.coroutines.runBlocking
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
+
+import java.io.*
 
 @JvmInline
 value class Content(val body: List<String>)
@@ -32,10 +36,10 @@ fun readFile(path: String?): Cont<FileError, Content> = cont {
   }
 }
 
-fun main() = runBlocking<Unit> {
-  readFile("").toEither().also(::println)
-  readFile("not-found").toValidated().also(::println) 
-  readFile("gradle.properties").toIor().also(::println)
-  readFile("not-found").toOption { None }.also(::println)
-  readFile("nullable").fold({ _: FileError -> null }, { it }).also(::println)
+suspend fun test() {
+  readFile("").toEither() shouldBe Either.Left(EmptyPath)
+  readFile("not-found").toValidated() shouldBe  Validated.Invalid(FileNotFound("not-found"))
+  readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
+  readFile("not-found").toOption { None } shouldBe None
+  readFile("nullable").fold({ _: FileError -> null }, { it }) shouldBe null
 }

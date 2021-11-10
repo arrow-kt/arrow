@@ -1,19 +1,24 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme07
 
-import arrow.cont
-import arrow.core.merge
-import arrow.fx.coroutines.onCancel
-import arrow.fx.coroutines.raceN
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
 
-fun main() = runBlocking {
+suspend fun test() {
+  val exit = CompletableDeferred<ExitCase>()
   cont<String, Int> {
     raceN({
-      onCancel({ delay(1_000_000) }) { println("I lost the race...") }
+      guaranteeCase({ delay(1_000_000) }) { exitCase -> require(exit.complete(exitCase))  }
       5
     }) { shift<Int>("error") }
       .merge() // Flatten Either<Int, Int> result from race into Int
-  }.fold(::println, ::println)
+  }.fold({ msg -> msg shouldBe "error" }, { fail("Int can never be the result") })
+  exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
 }

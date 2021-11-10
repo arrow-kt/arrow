@@ -1,10 +1,15 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme04
 
-import arrow.Cont
-import arrow.cont
-import arrow.core.identity
-import kotlinx.coroutines.runBlocking
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
 
 val failed: Cont<String, Int> =
   cont { shift("failed") }
@@ -21,13 +26,13 @@ val redeemed: Cont<Nothing, Int> =
   failed.redeem({ str -> str.length }, ::identity)
 
 val captured: Cont<String, Result<Int>> = cont<String, Int> {
-  throw RuntimeException("Boom")
+  1
 }.attempt()
 
-fun main() = runBlocking<Unit> {
-  println(failed.toEither())
-  println(resolved.toEither())
-  println(newError.toEither())
-  println(redeemed.toEither())
-  println(captured.toEither())
+suspend fun test() {
+  failed.toEither() shouldBe Either.Left("failed")
+  resolved.toEither() shouldBe Either.Right(6)
+  newError.toEither() shouldBe Either.Left(listOf('d', 'e', 'l', 'i', 'a', 'f'))
+  redeemed.toEither() shouldBe Either.Right(6)
+  captured.toEither() shouldBe Either.Right(Result.success(1))
 }

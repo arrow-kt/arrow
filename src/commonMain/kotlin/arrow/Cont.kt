@@ -9,7 +9,6 @@ import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import kotlin.Result
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
@@ -26,32 +25,24 @@ import kotlin.jvm.JvmInline
  *
  * <!--- TEST_NAME ContTest -->
  * ```kotlin
- * import arrow.core.*
- * import arrow.cont
- * import kotlinx.coroutines.runBlocking
- *
- * fun main() = runBlocking<Unit> {
+ * suspend fun test() {
  *   cont<String, Int> {
  *     val x = Either.Right(1).bind()
  *     val y = Validated.Valid(2).bind()
  *     val z = Option(3).bind { "Option was empty" }
  *     x + y + z
- *   }.fold(::println, ::println)
+ *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
  *
  *   cont<String, Int> {
  *     val x = Either.Right(1).bind()
  *     val y = Validated.Valid(2).bind()
  *     val z: Int = None.bind { "Option was empty" }
  *     x + y + z
- *   }.fold(::println, ::println)
+ *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
  * }
  * ```
  * <!--- KNIT example-cont-01.kt -->
- * ```text
- * 6
- * Option was empty
- * ```
- * <!--- TEST -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <R, A> cont(f: suspend ContEffect<R>.() -> A): Cont<R, A> = ContImpl(f)
 
@@ -71,27 +62,20 @@ public interface Cont<R, A> {
    * ran the computation to completion it will [transform] the value [A] to [B].
    *
    * ```kotlin
-   * import arrow.cont
-   * import kotlinx.coroutines.runBlocking
-   *
-   * fun main() = runBlocking {
-   *   cont<String, Int> {
+   * suspend fun test() {
+   *   val shift = cont<String, Int> {
    *     shift("Hello, World!")
    *   }.fold({ str: String -> str }, { int -> int.toString() })
-   *    .let(::println)
+   *   shift shouldBe "Hello, World!"
    *
-   *   cont<String, Int> {
+   *   val res = cont<String, Int> {
    *     1000
    *   }.fold({ str: String -> str.length }, { int -> int })
-   *    .let(::println)
+   *   res shouldBe 1000
    * }
    * ```
    * <!--- KNIT example-cont-02.kt -->
-   * ```text
-   * Hello, World!
-   * 1000
-   * ```
-   * <!--- TEST -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public suspend fun <B> fold(
     recover: suspend (shifted: R) -> B,
@@ -166,9 +150,7 @@ public interface Cont<R, A> {
   }
 
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Cont<Nothing, B> =
-      cont {
-    fold(recover, transform)
-  }
+    cont { fold(recover, transform) }
 
   public fun <R2, B> redeemWith(
     recover: suspend (R) -> Cont<R2, B>,
@@ -177,9 +159,9 @@ public interface Cont<R, A> {
 }
 
 public fun <R, A, B> Iterable<A>.traverseCont(transform: (A) -> Cont<R, B>): Cont<R, List<B>> =
-    cont {
-  map { transform(it).bind() }
-}
+  cont {
+    map { transform(it).bind() }
+  }
 
 public fun <R, A> Iterable<Cont<R, A>>.sequence(): Cont<R, List<A>> = traverseCont(::identity)
 
@@ -255,35 +237,35 @@ private value class ContImpl<R, A>(private val f: suspend ContEffect<R>.() -> A)
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested
   // folds
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-      suspendCoroutineUninterceptedOrReturn { cont ->
-    val token = Token()
-    val effect =
-      object : ContEffect<R> {
-        // Shift away from this Continuation by intercepting it, and completing it with
-        // ShiftCancellationException
-        // This is needed because this function will never yield a result,
-        // so it needs to be cancelled to properly support coroutine cancellation
-        override suspend fun <B> shift(r: R): B =
+    suspendCoroutineUninterceptedOrReturn { cont ->
+      val token = Token()
+      val effect =
+        object : ContEffect<R> {
+          // Shift away from this Continuation by intercepting it, and completing it with
+          // ShiftCancellationException
+          // This is needed because this function will never yield a result,
+          // so it needs to be cancelled to properly support coroutine cancellation
+          override suspend fun <B> shift(r: R): B =
           // Some interesting consequences of how Continuation Cancellation works in Kotlin.
           // We have to throw CancellationException to signal the Continuation was cancelled, and we
           // shifted away.
           // This however also means that the user can try/catch shift and recover from the
           // CancellationException and thus effectively recovering from the cancellation/shift.
           // This means try/catch is also capable of recovering from monadic errors.
-          // See: ContSpec - try/catch tests
-          throw Internal(token, r, recover as suspend (Any?) -> Any?)
-      }
+            // See: ContSpec - try/catch tests
+            throw Internal(token, r, recover as suspend (Any?) -> Any?)
+        }
 
-    try {
-      suspend { transform(f(effect)) }
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-    } catch (e: Internal) {
-      if (token == e.token) {
-        val f: suspend () -> B = { e.fold(e.shifted) as B }
-        f.startCoroutineUninterceptedOrReturn(cont)
-      } else throw e
+      try {
+        suspend { transform(f(effect)) }
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+      } catch (e: Internal) {
+        if (token == e.token) {
+          val f: suspend () -> B = { e.fold(e.shifted) as B }
+          f.startCoroutineUninterceptedOrReturn(cont)
+        } else throw e
+      }
     }
-  }
 }
 
 private class FoldContinuation<B>(

@@ -1,17 +1,24 @@
 // This file was automatically generated from Cont.kt by Knit tool. Do not edit.
 package example.exampleCont02
 
-import arrow.cont
-import kotlinx.coroutines.runBlocking
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
 
-fun main() = runBlocking {
-  cont<String, Int> {
+suspend fun test() {
+  val shift = cont<String, Int> {
     shift("Hello, World!")
   }.fold({ str: String -> str }, { int -> int.toString() })
-   .let(::println)
+  shift shouldBe "Hello, World!"
 
-  cont<String, Int> {
+  val res = cont<String, Int> {
     1000
   }.fold({ str: String -> str.length }, { int -> int })
-   .let(::println)
+  res shouldBe 1000
 }

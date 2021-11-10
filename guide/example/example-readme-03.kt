@@ -1,12 +1,15 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme03
 
-import arrow.Cont
-import arrow.core.identity
-import arrow.core.Either
-import arrow.core.Option
-import arrow.core.None
-import arrow.core.Some
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
 
 suspend fun <R, A> Cont<R, A>.toEither(): Either<R, A> =
   fold({ Either.Left(it) }) { Either.Right(it) }

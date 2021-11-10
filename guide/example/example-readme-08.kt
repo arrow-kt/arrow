@@ -1,13 +1,17 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
 package example.exampleReadme08
 
-import arrow.cont
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.bracketCase
-import arrow.fx.coroutines.Resource
-import arrow.fx.coroutines.fromAutoCloseable
-import java.io.BufferedReader
-import java.io.File
+import arrow.*
+import arrow.core.*
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import io.kotest.matchers.collections.*
+import io.kotest.assertions.*
+import io.kotest.matchers.*
+import io.kotest.matchers.types.*
+import kotlin.coroutines.cancellation.CancellationException
+
+import java.io.*
 
 suspend fun bracketCase() = cont<String, Int> {
   bracketCase(

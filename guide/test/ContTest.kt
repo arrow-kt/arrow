@@ -1,23 +1,18 @@
 // This file was automatically generated from Cont.kt by Knit tool. Do not edit.
 package example.test
 
-import org.junit.Test
-import kotlinx.knit.test.*
+import io.kotest.core.spec.style.StringSpec
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
-class ContTest {
-    @Test
-    fun testExampleCont01() {
-        captureOutput("ExampleCont01") { example.exampleCont01.main() }.verifyOutputLines(
-            "6",
-            "Option was empty"
-        )
+@OptIn(ExperimentalTime::class)
+class ContTest : StringSpec({
+    "ExampleCont01".config(timeout= Duration.seconds(1)) {
+      example.exampleCont01.test()
     }
 
-    @Test
-    fun testExampleCont02() {
-        captureOutput("ExampleCont02") { example.exampleCont02.main() }.verifyOutputLines(
-            "Hello, World!",
-            "1000"
-        )
+    "ExampleCont02".config(timeout= Duration.seconds(1)) {
+      example.exampleCont02.test()
     }
-}
+
+})
