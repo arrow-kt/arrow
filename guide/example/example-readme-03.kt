@@ -10,6 +10,8 @@ import io.kotest.assertions.*
 import io.kotest.matchers.*
 import io.kotest.matchers.types.*
 import kotlin.coroutines.cancellation.CancellationException
+import io.kotest.property.*
+import io.kotest.property.arbitrary.*
 
 suspend fun <R, A> Cont<R, A>.toEither(): Either<R, A> =
   fold({ Either.Left(it) }) { Either.Right(it) }

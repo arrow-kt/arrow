@@ -1,5 +1,5 @@
 // This file was automatically generated from Cont.kt by Knit tool. Do not edit.
-package example.exampleCont02
+package example.exampleCont03
 
 import arrow.*
 import arrow.core.*
@@ -13,14 +13,8 @@ import kotlin.coroutines.cancellation.CancellationException
 import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 
-suspend fun test() {
-  val shift = cont<String, Int> {
-    shift("Hello, World!")
-  }.fold({ str: String -> str }, { int -> int.toString() })
-  shift shouldBe "Hello, World!"
-
-  val res = cont<String, Int> {
-    1000
-  }.fold({ str: String -> str.length }, { int -> int })
-  res shouldBe 1000
+suspend fun test() = checkAll(Arb.string()) { str ->
+  cont<String, Int> {
+    shift(str)
+  }.fold({ it shouldBe str }, { fail("Computation never finishes") })
 }

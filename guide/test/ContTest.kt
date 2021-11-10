@@ -15,4 +15,8 @@ class ContTest : StringSpec({
       example.exampleCont02.test()
     }
 
+    "ExampleCont03".config(timeout= Duration.seconds(1)) {
+      example.exampleCont03.test()
+    }
+
 })

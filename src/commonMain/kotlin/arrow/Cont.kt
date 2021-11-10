@@ -167,7 +167,18 @@ public fun <R, A> Iterable<Cont<R, A>>.sequence(): Cont<R, List<A>> = traverseCo
 
 /** Context of the [Cont] DSL. */
 public interface ContEffect<R> {
-  /** Short-circuit the [Cont] computation with value [R]. */
+  /**
+   * Short-circuit the [Cont] computation with value [R].
+   * ```kotlin
+   * suspend fun test() = checkAll(Arb.string()) { str ->
+   *   cont<String, Int> {
+   *     shift(str)
+   *   }.fold({ it shouldBe str }, { fail("Computation never finishes") })
+   * }
+   * ```
+   * <!--- KNIT example-cont-03.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
   public suspend fun <B> shift(r: R): B
 
   public suspend fun <B> Cont<R, B>.bind(): B = fold(this@ContEffect::shift, ::identity)
