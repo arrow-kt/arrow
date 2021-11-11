@@ -1,5 +1,5 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
-package example.exampleReadme05
+package example.exampleReadme12
 
 import arrow.*
 import arrow.core.*
@@ -14,13 +14,12 @@ import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 import arrow.core.test.generators.*
 
-suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
-  guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
-
-suspend fun test() = checkAll(Arb.string()) { error ->
-  val exit = CompletableDeferred<ExitCase>()
+suspend fun test() = checkAll(Arb.string(), Arb.string(), Arb.int()) { errorA, errorB, int ->
   cont<String, Int> {
-    parZip({ awaitExitCase<Int>(exit) }, { shift<Int>(error) }) { a, b -> a + b }
-  }.fold({ it shouldBe error }, { fail("Int can never be the result") })
-  exit.await().shouldBeTypeOf<ExitCase>()
+    coroutineScope<Int> {
+      launch { shift(errorA) }
+      launch { shift(errorB) }
+      int
+    }
+  }.fold({ fail("Shift can never finish") }, { it shouldBe int })
 }

@@ -16,32 +16,17 @@ import arrow.core.test.generators.*
 
 import java.io.*
 
-suspend fun bracketCase() = cont<String, Int> {
-  bracketCase(
-   acquire = { File("gradle.properties").bufferedReader() },
-   use = { reader -> 
-    // some logic
-    shift("file doesn't contain right content")
-   },
-   release = { reader, exitCase -> 
-     reader.close()
-     println(exitCase) // ExitCase.Cancelled(ShiftCancellationException("Shifted Continuation"))
-   }
-  )
-}.fold(::println, ::println) // "file doesn't contain right content"
-
-// Available from Arrow 1.1.x
-fun <A> Resource<A>.releaseCase(releaseCase: (A, ExitCase) -> Unit): Resource<A> =
-  flatMap { a -> Resource({ a }, releaseCase) }
-
-fun bufferedReader(path: String): Resource<BufferedReader> =
-  Resource.fromAutoCloseable {
-    File(path).bufferedReader()
-  }.releaseCase { _, exitCase -> println(exitCase) }
-
-suspend fun resource() = cont<String, Int> {
-  bufferedReader("gradle.properties").use { reader ->
-  // some logic
-  shift("file doesn't contain right content")
- } // ExitCase.Cancelled(ShiftCancellationException("Shifted Continuation")) printed from release
+suspend fun test() = checkAll(Arb.string()) { error ->
+  val exit = CompletableDeferred<ExitCase>()
+  cont<String, Int> {
+    bracketCase(
+      acquire = { File("build.gradle.kts").bufferedReader() },
+      use = { reader: BufferedReader -> shift(error) },
+      release = { reader, exitCase ->
+        reader.close()
+        exit.complete(exitCase)
+      }
+    )
+  }.fold({ it shouldBe error }, { fail("Int can never be the result") })
+  exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
 }

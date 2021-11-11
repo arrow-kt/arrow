@@ -14,14 +14,18 @@ import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 import arrow.core.test.generators.*
 
-suspend fun test() {
+suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
+  guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+
+suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
+  if (isCompleted) await() else null
+
+suspend fun test() = checkAll(Arb.string()) { error ->
   val exit = CompletableDeferred<ExitCase>()
   cont<String, Int> {
-    raceN({
-      guaranteeCase({ delay(1_000_000) }) { exitCase -> require(exit.complete(exitCase))  }
-      5
-    }) { shift<Int>("error") }
+    raceN({ awaitExitCase<Int>(exit) }) { shift<Int>(error) }
       .merge() // Flatten Either<Int, Int> result from race into Int
-  }.fold({ msg -> msg shouldBe "error" }, { fail("Int can never be the result") })
-  exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+  }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
+  // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran
+  exit.getOrNull()?.shouldBeTypeOf<ExitCase.Cancelled>()
 }

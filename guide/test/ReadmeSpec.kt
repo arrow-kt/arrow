@@ -23,12 +23,24 @@ class ReadmeSpec : StringSpec({
       example.exampleReadme07.test()
     }
 
+    "ExampleReadme08".config(timeout= Duration.seconds(1)) {
+      example.exampleReadme08.test()
+    }
+
     "ExampleReadme09".config(timeout= Duration.seconds(1)) {
       example.exampleReadme09.test()
     }
 
     "ExampleReadme10".config(timeout= Duration.seconds(1)) {
       example.exampleReadme10.test()
+    }
+
+    "ExampleReadme11".config(timeout= Duration.seconds(1)) {
+      example.exampleReadme11.test()
+    }
+
+    "ExampleReadme12".config(timeout= Duration.seconds(1)) {
+      example.exampleReadme12.test()
     }
 
 })

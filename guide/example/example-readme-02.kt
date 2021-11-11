@@ -41,8 +41,11 @@ fun readFile(path: String?): Cont<FileError, Content> = cont {
 
 suspend fun test() {
   readFile("").toEither() shouldBe Either.Left(EmptyPath)
-  readFile("not-found").toValidated() shouldBe  Validated.Invalid(FileNotFound("not-found"))
+  readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
   readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
-  readFile("not-found").toOption { None } shouldBe None
-  readFile("nullable").fold({ _: FileError -> null }, { it }) shouldBe null
+  readFile("README.MD").toOption { None } shouldBe None
+
+  readFile("build.gradle.kts").fold({ _: FileError -> null }, { it })
+    .shouldBeInstanceOf<Content>()
+    .body.shouldNotBeEmpty()
 }

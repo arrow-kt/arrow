@@ -1,5 +1,5 @@
 // This file was automatically generated from README.md by Knit tool. Do not edit.
-package example.exampleReadme01
+package example.exampleReadme11
 
 import arrow.*
 import arrow.core.*
@@ -14,13 +14,12 @@ import io.kotest.property.*
 import io.kotest.property.arbitrary.*
 import arrow.core.test.generators.*
 
-object EmptyPath
-
-fun readFile(path: String): Cont<EmptyPath, Unit> = cont {
-  if (path.isNotEmpty()) shift(EmptyPath) else Unit
-}
-
-fun readFile2(path: String?): Cont<EmptyPath, Unit> = cont {
-  ensureNotNull(path) { EmptyPath }
-  ensure(path.isEmpty()) { EmptyPath }
+suspend fun test() = checkAll(Arb.string(), Arb.string()) { errorA, errorB ->
+  coroutineScope {
+    cont<String, Int> {
+      val fa = async<Int> { shift(errorA) }
+      val fb = async<Int> { shift(errorB) }
+      fa.await() + fb.await()
+    }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") }) 
+  }
 }
