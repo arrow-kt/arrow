@@ -120,8 +120,8 @@ public interface Cont<R, A> {
    * [fold] the [Cont] into an [Result]. Where the shifted value [R] is mapped to [Result] by the
    * provided function [orElse], and result value [A] is mapped to [Result.success].
    */
-//  public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
-//    fold(orElse) { a -> Result.success(a) }
+  //  public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
+  //    fold(orElse) { a -> Result.success(a) }
 
   /**
    * [fold] the [Cont] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
