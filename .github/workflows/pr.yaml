@@ -34,8 +34,8 @@ jobs:
           key: ${{ runner.os }}-check-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-check-
 
-      - name: Run Ubuntu tests
-        if: matrix.os == 'ubuntu-latest'
+      - name: Run MacOs tests
+        if: matrix.os == 'macos-11.0'
         run: ./gradlew check
 
       - name: Run Windows tests
