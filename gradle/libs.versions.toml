@@ -1,6 +1,5 @@
 [versions]
 animalSniffer = "1.5.0"
-arrow = "1.0.0"
 arrowGradleConfig = "0.4.1"
 autoService = "1.0-rc7"
 compileTesting = "0.18"
@@ -14,11 +13,10 @@ kotlinTest = "3.3.3"
 kotlin = "1.5.31"
 kotlinBinaryCompatibilityValidator = "0.7.1"
 kotlinPoet = "1.5.0"
-mockWebServer = "3.13.1"
+mockWebServer = "4.9.2"
 retrofit = "2.8.1"
 
 [libraries]
-arrow-ankGradle = { module = "io.arrow-kt:arrow-ank-gradle", version.ref = "arrow" }
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
@@ -48,7 +46,6 @@ squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = 
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
-arrowAnk = { id = "ank-gradle-plugin", version.ref = "arrow" }
 arrowGradleConfig-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-jvm = { id = "io.arrow-kt.arrow-gradle-config-jvm", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-multiplatform = { id = "io.arrow-kt.arrow-gradle-config-multiplatform", version.ref = "arrowGradleConfig" }

@@ -12,7 +12,7 @@ import arrow.core.compose
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-public interface Semigroup<A> {
+public fun interface Semigroup<A> {
   /**
    * Combine two [A] values.
    */
