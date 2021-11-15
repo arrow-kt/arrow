@@ -5,10 +5,10 @@ coroutines = "1.5.2"
 dokka = "1.5.31"
 kotest = "5.0.0.M4"
 kotestGradle = "5.0.0.5"
-kotlin = "1.6.0-RC2"
+kotlin = "1.6.0"
 kotlinBinaryCompatibilityValidator = "0.8.0"
 githooks = "0.0.2"
-knit = "0.2.3"
+knit = "0.3.0"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
