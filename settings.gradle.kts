@@ -20,13 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-// ANK
-include("arrow-ank")
-project(":arrow-ank").projectDir = file("arrow-libs/ank/arrow-ank")
-
-include("arrow-ank-gradle")
-project(":arrow-ank-gradle").projectDir = file("arrow-libs/ank/arrow-ank-gradle")
-
 //CORE
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")
@@ -48,9 +41,6 @@ project(":arrow-meta-test-models").projectDir = file("arrow-libs/core/arrow-meta
 
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
-
-include("jekyll")
-project(":jekyll").projectDir = file("arrow-libs/dokka/jekyll")
 
 // FX
 include("arrow-fx-coroutines")
