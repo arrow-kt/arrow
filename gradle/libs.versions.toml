@@ -16,6 +16,7 @@ kotlinPoet = "1.5.0"
 ktlint = "10.1.0"
 mockWebServer = "4.9.2"
 retrofit = "2.8.1"
+knit = "0.3.0"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
@@ -44,6 +45,8 @@ squareup-kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotli
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+knit-test = { module = "org.jetbrains.kotlinx:kotlinx-knit-test", version.ref = "knit" }
+
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
@@ -58,3 +61,4 @@ kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGr
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+knit = { id = "org.jetbrains.kotlinx.kotlinx-knit", version.ref = "knit" }

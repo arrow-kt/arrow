@@ -26,6 +26,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -63,6 +64,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -100,6 +102,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -140,6 +143,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -181,6 +185,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-05.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -225,6 +230,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-06.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -271,6 +277,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-07.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -318,6 +325,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-08.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -368,6 +376,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-09.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -418,6 +427,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-10.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -472,6 +482,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-11.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -525,6 +536,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-12.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -583,6 +595,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-13.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -638,6 +651,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-14.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map

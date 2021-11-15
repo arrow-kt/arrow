@@ -29,6 +29,7 @@ package arrow.core
  *   println(nonFatal)
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  */
 // https://youtrack.jetbrains.com/issue/KT-36036

@@ -17,6 +17,7 @@ public const val DoubleInstanceDeprecation: String =
  * ```kotlin
  * (a.combineMultiplicate(b)).combineMultiplicate(c) == a.combineMultiplicate(b.combineMultiplicate(c))
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * The [one] function serves exactly like the [empty] function for an additive [Monoid], just adapted for the multiplicative
  * version. This forms the following law:
@@ -24,6 +25,7 @@ public const val DoubleInstanceDeprecation: String =
  * ```kotlin
  * a.combineMultiplicate(one()) == one().combineMultiplicate(a) == a
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  *
  * Please note that the empty function has been renamed to [zero] to get a consistent naming style inside the semiring.
  *
@@ -44,6 +46,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * ```kotlin:ank:playground
  * import arrow.typeclasses.Semiring
@@ -56,6 +59,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  *
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
@@ -72,6 +76,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-05.kt -->
  *
  * ```kotlin:ank:playground
  * import arrow.typeclasses.Semiring
@@ -86,6 +91,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-06.kt -->
  */
 public interface Semiring<A> {
 

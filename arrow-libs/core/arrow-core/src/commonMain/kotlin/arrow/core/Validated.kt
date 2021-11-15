@@ -37,6 +37,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * You run your program and it says key "url" not found. Turns out the key was "endpoint." So
  * you change your code and re-run. Now it says the "port" key was not a well-formed integer.
@@ -81,6 +82,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  *
  * Then we enumerate our errors. When asking for a config value, one of two things can go wrong:
  * The field is missing, or it is not well-formed with regards to the expected type.
@@ -91,6 +93,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  data class ParseConfig(val field: String): ConfigError()
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * We need a data type that can represent either a successful value (a parsed configuration), or an error.
  * It would look like the following, which Arrow provides in `arrow.Validated`:
@@ -101,6 +104,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
  * }
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  *
  * Now we are ready to write our parser.
  *
@@ -128,6 +132,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-05.kt -->
  *
  * And, as you can see, the parser runs sequentially: it first tries to get the map value and then tries to read it.
  * It's then straightforward to translate this to an effect block. We use here the `either` block which includes syntax
@@ -153,6 +158,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-06.kt -->
  *
  * Everything is in place to write the parallel validator. Remember that we can only do parallel
  * validation if each piece is independent. How do we ensure the data is independent? By
@@ -172,6 +178,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-07.kt -->
  *
  * We've run into a problem. In the case where both have errors, we want to report both. We
  * don't have a way to combine ConfigErrors. But, as clients, we can change our Validated
@@ -199,6 +206,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-08.kt -->
  *
  * ### Improving the validation
  *
@@ -219,6 +227,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-09.kt -->
  *
  * Note that there are multiple `zip` functions with more arities, so we could easily add more parameters without worrying about
  * the function blowing up in complexity.
@@ -236,6 +245,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-10.kt -->
  *
  * ---
  *
@@ -299,6 +309,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  println("valid = $valid")
  * }
  * ```
+ * <!--- KNIT example-arrow-11.kt -->
  *
  * But what happens when we have one or more errors? They are accumulated in a `NonEmptyList` wrapped in
  * an `Invalid` instance.
@@ -360,6 +371,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  println("valid = $valid")
  * }
  * ```
+ * <!--- KNIT example-arrow-12.kt -->
  *
  * ## Sequential Validation
  *
@@ -425,6 +437,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * ```
+ * <!--- KNIT example-arrow-13.kt -->
  *
  * ### `withEither`
  *
@@ -492,6 +505,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * ```
+ * <!--- KNIT example-arrow-14.kt -->
  */
 public sealed class Validated<out E, out A> {
 
@@ -566,6 +580,7 @@ public sealed class Validated<out E, out A> {
      *   println(result)
      * }
      * ```
+ * <!--- KNIT example-arrow-15.kt -->
      */
     @JvmStatic
     public inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
@@ -587,6 +602,7 @@ public sealed class Validated<out E, out A> {
      *   println("res2: $res2")
      * }
      * ```
+ * <!--- KNIT example-arrow-16.kt -->
      */
     @JvmStatic
     public inline fun <A, B, C, D> lift(
@@ -611,6 +627,7 @@ public sealed class Validated<out E, out A> {
    *   println(result)
    * }
    * ```
+ * <!--- KNIT example-arrow-17.kt -->
    */
   public fun void(): Validated<E, Unit> =
     map { Unit }
@@ -779,9 +796,11 @@ public sealed class Validated<out E, out A> {
    *
    * Example:
    * ```
+ * <!--- KNIT example-arrow-18.kt -->
    * Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
    * Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
    * ```
+ * <!--- KNIT example-arrow-19.kt -->
    */
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
     when (this) {
@@ -800,9 +819,11 @@ public sealed class Validated<out E, out A> {
    *
    * Example:
    * ```
+ * <!--- KNIT example-arrow-20.kt -->
    * Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
    * Invalid(12).tap { println("flower") }  // Result: Invalid(12)
    * ```
+ * <!--- KNIT example-arrow-21.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
     when (this) {
@@ -1128,6 +1149,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  *   println(chars)
  * }
  * ```
+ * <!--- KNIT example-arrow-22.kt -->
  */
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
@@ -1221,10 +1243,12 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  *
  * Example:
  * ```
+ * <!--- KNIT example-arrow-23.kt -->
  * Valid(5).andThen { Valid(10) } // Result: Valid(10)
  * Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
  * Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
  * ```
+ * <!--- KNIT example-arrow-24.kt -->
  */
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
   when (this) {

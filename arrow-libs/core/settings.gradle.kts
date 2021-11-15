@@ -1,5 +1,12 @@
 // This file allows to open just core libraries
 
+pluginManagement {
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+
 rootProject.name = "arrow-core-libs"
 
 include("arrow-meta:arrow-meta-test-models")

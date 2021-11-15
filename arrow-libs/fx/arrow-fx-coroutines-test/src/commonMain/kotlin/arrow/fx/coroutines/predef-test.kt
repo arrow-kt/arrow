@@ -141,6 +141,7 @@ public fun <A> A.suspended(): suspend () -> A =
  * }
  * assertEquals("Talk to a duck", exception.message)
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  * @see Assertions.assertThrows
  */
 public inline fun <A> assertThrowable(executable: () -> A): Throwable {

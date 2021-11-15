@@ -86,4 +86,4 @@ include("jekyll")
 project(":jekyll").projectDir = file("dokka/jekyll")
 
 // Examples
-include("examples")
+include("guide")

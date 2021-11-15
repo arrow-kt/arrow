@@ -40,6 +40,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * ## Removing an element from the set
  *
@@ -57,6 +58,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  *
  * ## Checking for membership
  *
@@ -75,6 +77,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * ## Where are operations like `isEmpty` or `size`?
  *

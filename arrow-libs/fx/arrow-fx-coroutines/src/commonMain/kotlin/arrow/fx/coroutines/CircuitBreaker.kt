@@ -70,6 +70,7 @@ import kotlin.time.ExperimentalTime
  * //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * A common pattern to make fault-tolerant/resilient systems is to compose a [CircuitBreaker] with a backing-off policy retry Schedule to guarantee not overloading the resource and the client interacting with it.
  * but also not the client that is interacting with the resource.
@@ -122,6 +123,7 @@ import kotlin.time.ExperimentalTime
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  */
 public class CircuitBreaker
 private constructor(

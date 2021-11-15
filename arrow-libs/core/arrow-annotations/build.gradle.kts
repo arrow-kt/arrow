@@ -1,7 +1,16 @@
+buildscript {
+  dependencies {
+    classpath("org.jetbrains.kotlinx:kotlinx-knit:0.3.0")
+  }
+}
+
+
 plugins {
   alias(libs.plugins.arrowGradleConfig.multiplatform)
   alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
 }
+
+apply(plugin = "kotlinx-knit")
 
 kotlin {
   sourceSets {
