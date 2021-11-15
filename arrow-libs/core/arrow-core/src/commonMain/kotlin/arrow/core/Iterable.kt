@@ -411,6 +411,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  */
 public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   align(other) { ior ->
@@ -441,6 +442,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
   padZip(other).map { fa(it.first, it.second) }
@@ -465,6 +467,7 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
@@ -489,6 +492,7 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  */
 public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
@@ -513,6 +517,7 @@ public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> 
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-arrow-05.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
@@ -537,6 +542,7 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-arrow-06.kt -->
  */
 public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -557,6 +563,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
   this.align(b).map(fa)
@@ -575,6 +582,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-08.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   alignRec(this, b)
@@ -618,6 +626,7 @@ public fun <A> Iterable<A>.salign(
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-09.kt -->
  */
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -642,6 +651,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-10.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
@@ -661,6 +671,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-11.kt -->
  */
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -687,6 +698,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-12.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
@@ -830,6 +842,8 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-arrow-13.kt -->
  */
 public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
@@ -853,6 +867,8 @@ public fun <A> Iterable<A>.tail(): List<A> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-arrow-14.kt -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   this.split()?.let { (fa, a) ->
@@ -872,6 +888,8 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-arrow-15.kt -->
  */
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
@@ -895,6 +913,8 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-arrow-16.kt -->
  */
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()

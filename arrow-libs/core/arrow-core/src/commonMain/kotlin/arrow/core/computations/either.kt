@@ -53,6 +53,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
    * // println: "ensure(true) passes"
    * // res: Either.Left("failed")
    * ```
+   * <!--- KNIT example-arrow-01.kt -->
    */
   public suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
     if (value) Unit else orLeft().left().bind()
@@ -81,6 +82,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  * // println: "1"
  * // res: Either.Left("failed")
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {

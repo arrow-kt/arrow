@@ -131,6 +131,7 @@ public suspend inline fun <A> guaranteeCase(
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  */
 public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
@@ -212,7 +213,8 @@ public suspend inline fun <A, B> bracket(
  *   //sampleEnd
  *   println(res)
  * }
- *  ```
+ * ```
+ * <!--- KNIT example-arrow-02.kt -->
  */
 public suspend inline fun <A, B> bracketCase(
   crossinline acquire: suspend () -> A,

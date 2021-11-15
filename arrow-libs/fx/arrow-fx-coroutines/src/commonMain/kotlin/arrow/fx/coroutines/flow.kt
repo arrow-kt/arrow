@@ -52,6 +52,7 @@ import kotlin.time.ExperimentalTime
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
@@ -105,6 +106,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
  * concurrently runs, "prefetching", the next element. i.e.
  *
@@ -121,6 +123,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
  */
@@ -176,6 +179,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  */
 @FlowPreview
 public inline fun <A, B> Flow<A>.parMapUnordered(

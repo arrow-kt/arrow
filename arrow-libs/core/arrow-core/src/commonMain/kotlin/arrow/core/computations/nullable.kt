@@ -36,6 +36,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * // println: "ensure(true) passes"
    * // res: null
    * ```
+ * <!--- KNIT example-arrow-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(null)
@@ -63,6 +64,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * // println: "1"
  * // res: null
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {

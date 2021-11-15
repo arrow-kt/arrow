@@ -54,6 +54,7 @@ import kotlin.jvm.JvmStatic
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  */
 public sealed class Eval<out A> {
@@ -75,6 +76,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-arrow-02.kt -->
      *
      * It will return 2.
      */
@@ -97,6 +99,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-arrow-03.kt -->
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
@@ -119,6 +122,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-arrow-04.kt -->
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */

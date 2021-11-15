@@ -1,11 +1,3 @@
-import arrow.ank.AnkExtension
-
-buildscript {
-    dependencies {
-        classpath(libs.arrow.ankGradle)
-    }
-}
-
 plugins {
     id(libs.plugins.kotlin.jvm.get().pluginId)
     id(libs.plugins.kotlin.kapt.get().pluginId)
@@ -19,15 +11,6 @@ dependencies {
     compileOnly(libs.kotlin.reflect)
 
     kapt(projects.arrowMeta)
-}
-
-// Ank Plugin is not applied for every library to avoid adding runtime dependencies
-apply(plugin = libs.plugins.arrowAnk.get().pluginId)
-
-configure<AnkExtension> {
-    source = file("/docs")
-    target = file("$buildDir/site")
-    classpath = sourceSets["main"].runtimeClasspath
 }
 
 tasks {

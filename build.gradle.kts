@@ -1,4 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath(libs.kotlinx.knit)
+    }
+}
+
 plugins {
+    base
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.animalSniffer) apply false
     alias(libs.plugins.kotest.multiplatform) apply false
@@ -6,6 +17,8 @@ plugins {
     alias(libs.plugins.kotlin.binaryCompatibilityValidator)
     alias(libs.plugins.arrowGradleConfig.nexus)
 }
+
+apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
 
 allprojects {
     group = property("projects.group").toString()
@@ -28,8 +41,4 @@ tasks {
     }
 
     runValidation.mustRunAfter(generateDoc)
-}
-
-apiValidation {
-    ignoredProjects.add("jekyll")
 }

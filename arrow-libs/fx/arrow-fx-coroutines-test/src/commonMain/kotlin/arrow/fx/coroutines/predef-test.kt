@@ -136,11 +136,14 @@ public fun <A> A.suspended(): suspend () -> A =
 /**
  * Example usage:
  * ```kotlin
- * val exception = assertThrows<IllegalArgumentException> {
+ * import io.kotest.assertions.throwables.shouldThrow
+ *
+ * val exception = shouldThrow<IllegalArgumentException> {
  *     throw IllegalArgumentException("Talk to a duck")
  * }
  * assertEquals("Talk to a duck", exception.message)
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  * @see Assertions.assertThrows
  */
 public inline fun <A> assertThrowable(executable: () -> A): Throwable {

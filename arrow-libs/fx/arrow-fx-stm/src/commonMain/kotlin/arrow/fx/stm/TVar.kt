@@ -38,6 +38,7 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-01.kt -->
  *
  * Reading from a [TVar] inside a transaction is done by using [STM.read].
  *
@@ -55,6 +56,7 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-02.kt -->
  *
  * > Checking the validity of a transaction is done by checking the contents of all accessed [TVar]'s before locking the [TVar]'s that have
  *  been written to and then checking only the [TVar]'s that have only been read not modified again. To keep transactions as fast as possible
@@ -81,6 +83,7 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-03.kt -->
  *
  * Modifying the value based on the initial value:
  *
@@ -98,6 +101,7 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-arrow-04.kt -->
  *
  * Writing a new value to the [TVar] and returning the initial value:
  *
@@ -116,6 +120,7 @@ import kotlin.coroutines.resume
  *   println("New value ${tvar.unsafeRead()}")
  * }
  * ```
+ * <!--- KNIT example-arrow-05.kt -->
  */
 public class TVar<A> internal constructor(a: A) {
   /**

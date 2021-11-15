@@ -46,6 +46,7 @@ public object result {
    *   } // Result.Success(3)
    * }
    * ```
+ * <!--- KNIT example-arrow-01.kt -->
    */
   public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
     kotlin.runCatching { block(ResultEffect) }

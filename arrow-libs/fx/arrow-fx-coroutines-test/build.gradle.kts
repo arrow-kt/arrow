@@ -24,6 +24,7 @@ kotlin {
                     implementation(libs.kotlin.stdlibCommon)
                 }
             }
+
             named("jvmMain") {
                 dependencies {
                     implementation(libs.kotlin.stdlibJDK8)
