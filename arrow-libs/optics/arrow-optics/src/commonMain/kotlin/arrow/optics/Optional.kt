@@ -45,7 +45,7 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
  *   println("original: $original, set: $set, modified: $modified")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-optional-new.kt -->
  *
  * A (polymorphic) [POptional] is useful when setting or modifying a value for a type with a optional polymorphic focus
  * i.e. POptional<Either<Int, Double>, Either<String, Double>, Int, String>
