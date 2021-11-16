@@ -35,7 +35,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * Should the [TMVar] be empty at the time of calling [STM.take], it will call [STM.retry], suspend and wait for another transaction to
  *  put a value back.
@@ -57,7 +57,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * Another effect of using either [STM.take] or [STM.tryTake] is that the [TMVar] will be empty after a successful call. Alternatively if you just
  *  want to read without emptying you can use either [STM.read] or [STM.tryRead] which will not remove the value.
@@ -78,7 +78,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * ```kotlin:ank:playground
  * import arrow.fx.stm.TMVar
@@ -94,7 +94,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * ## Setting the value of a [TMVar]:
  *
@@ -114,7 +114,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * Should the [TMVar] be full, [STM.put] will call [STM.retry] and wait for another transaction to empty the [TMVar] again.
  *  This can be avoided by using [STM.tryPut] instead. [STM.tryPut] returns whether or not the operation was successful.
@@ -134,7 +134,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * Another common pattern is to swap the value of a [TMVar], returning the old value and setting a new one:
  *
@@ -153,7 +153,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("New value ${atomically { tmvar.tryTake() } }")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * ## Checking if a [TMVar] is empty:
  *
@@ -173,7 +173,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmvar-new.kt -->
  *
  * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
  *  reads in the *same* transaction.

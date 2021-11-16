@@ -42,7 +42,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * > If the key is not present [STM.lookup] will not retry, instead it returns `null`.
  *
@@ -64,7 +64,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * Another option when adding elements is to use [STM.plusAssign]:
  *
@@ -82,7 +82,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * ## Updating an existing value [TMap]:
  *
@@ -105,7 +105,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * ## Checking membership
  *
@@ -126,7 +126,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * ## Removing a value from a [TMap]
  *
@@ -147,7 +147,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-tmap-new.kt -->
  *
  * ## Where are operations like `isEmpty` or `size`?
  *
