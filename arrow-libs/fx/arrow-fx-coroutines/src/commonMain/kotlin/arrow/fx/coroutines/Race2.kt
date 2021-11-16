@@ -38,7 +38,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-race2-new.kt -->
+ * <!--- KNIT example-race2-01.kt -->
  *
  * @param fa task to participate in the race
  * @param fb task to participate in the race
@@ -80,7 +80,7 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.()
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-race2-new.kt -->
+ * <!--- KNIT example-race2-02.kt -->
  *
  * @param fa task to participate in the race
  * @param fb task to participate in the race

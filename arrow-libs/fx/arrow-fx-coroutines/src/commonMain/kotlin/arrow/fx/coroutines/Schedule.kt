@@ -39,7 +39,7 @@ import kotlin.time.nanoseconds
  *
  * fun <A> recurTenTimes() = Schedule.recurs<A>(10)
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-01.kt -->
  *
  * A more complex schedule
  *
@@ -55,7 +55,7 @@ import kotlin.time.nanoseconds
  *     .andThen(Schedule.spaced<A>(60.seconds) and Schedule.recurs(100)).jittered()
  *     .zipRight(Schedule.identity<A>().collect())
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-02.kt -->
  *
  * This policy will recur with exponential backoff as long as the delay is less than 60 seconds and then continue with a spaced delay of 60 seconds.
  * The delay is also randomized slightly to avoid coordinated backoff from multiple services.
@@ -91,7 +91,7 @@ import kotlin.time.nanoseconds
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-03.kt -->
  *
  * However, when running this new effect, its output will be the number of iterations it has performed, as stated in the documentation of the function. Also notice that we did not handle the error case, there are overloads [repeatOrElse] and [repeatOrElseEither] which offer that capability, [repeat] will just rethrow any error encountered.
  *
@@ -115,7 +115,7 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-04.kt -->
  *
  * Following the same strategy, we can zip it with the [Schedule.identity] policy to keep only the last provided result by the effect.
  *
@@ -137,7 +137,7 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-05.kt -->
  *
  * Finally, if we want to keep all intermediate results, we can zip the policy with [Schedule.collect]:
  *
@@ -161,7 +161,7 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-06.kt -->
  *
  * ## Repeating an effect until/while it produces a certain value
  *
@@ -180,7 +180,7 @@ import kotlin.time.nanoseconds
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-07.kt -->
  *
  * ## Exponential backoff retries
  *
@@ -194,7 +194,7 @@ import kotlin.time.nanoseconds
  * @ExperimentalTime
  * val exponential = Schedule.exponential<Unit>(250.milliseconds)
  * ```
- * <!--- KNIT example-schedule-new.kt -->
+ * <!--- KNIT example-schedule-08.kt -->
  */
 public sealed class Schedule<Input, Output> {
 

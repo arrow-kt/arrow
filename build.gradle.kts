@@ -20,6 +20,31 @@ plugins {
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
 
+configure<kotlinx.knit.KnitPluginExtension> {
+    siteRoot = "https://arrow-kt.io/"
+    rootDir = file("arrow-libs")
+    files = fileTree(file("arrow-libs")) {
+        include("**/*.md")
+        include("**/*.kt")
+        include("**/*.kts")
+
+        exclude("**/build/**")
+        exclude("**/.gradle/**")
+    }
+}
+
+//knit {
+//    rootDir = "arrow-libs" // project root dir
+//    // Custom set of input files to process (default as shown below)
+//    files = fileTree(project.rootDir) {
+//        include '**/*.md'
+//        include '**/*.kt'
+//        include '**/*.kts'
+//        exclude '**/build/**'
+//        exclude '**/.gradle/**'
+//    }
+//}
+
 allprojects {
     group = property("projects.group").toString()
 }

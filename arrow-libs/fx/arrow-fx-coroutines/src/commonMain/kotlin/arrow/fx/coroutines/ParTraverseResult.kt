@@ -116,7 +116,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-partraverseresult-new.kt -->
+ * <!--- KNIT example-partraverseresult-01.kt -->
  */
 @JvmName("parSequenceResultScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResult(
@@ -171,7 +171,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
  *  println(res2)
  * }
  * ```
- * <!--- KNIT example-partraverseresult-new.kt -->
+ * <!--- KNIT example-partraverseresult-02.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverseResult(
   ctx: CoroutineContext = EmptyCoroutineContext,

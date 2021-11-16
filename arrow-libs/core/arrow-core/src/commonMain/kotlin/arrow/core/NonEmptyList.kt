@@ -27,7 +27,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-01.kt -->
  *
  * ## head
  *
@@ -44,7 +44,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-02.kt -->
  *
  * ## foldLeft
  *
@@ -65,7 +65,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-03.kt -->
  *
  * ## map
  *
@@ -82,7 +82,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-04.kt -->
  *
  * ## Combining NonEmptyLists
  *
@@ -108,7 +108,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-05.kt -->
  *
  * ### zip
  *
@@ -136,7 +136,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-nonemptylist-new.kt -->
+ * <!--- KNIT example-nonemptylist-06.kt -->
  *
  * ### Summary
  *

@@ -36,7 +36,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-semiring-new.kt -->
+ * <!--- KNIT example-semiring-01.kt -->
  *
  * ```kotlin:ank:playground
  * import arrow.typeclasses.Semiring
@@ -49,7 +49,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-semiring-new.kt -->
+ * <!--- KNIT example-semiring-02.kt -->
  *
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
@@ -66,7 +66,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-semiring-new.kt -->
+ * <!--- KNIT example-semiring-03.kt -->
  *
  * ```kotlin:ank:playground
  * import arrow.typeclasses.Semiring
@@ -81,7 +81,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-semiring-new.kt -->
+ * <!--- KNIT example-semiring-04.kt -->
  */
 public interface Semiring<A> {
 

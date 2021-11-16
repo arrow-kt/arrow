@@ -39,7 +39,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-01.kt -->
  *
  * It is also possible to write to the front of the queue, but since that accesses the read variable it can lead to worse overall performance:
  *
@@ -58,7 +58,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-02.kt -->
  *
  * ## Reading items from a [TQueue]
  *
@@ -80,7 +80,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-03.kt -->
  *
  * Should the queue be empty calling [STM.read] will cause the transaction to retry and thus wait for items to be added to the queue.
  *  This can be avoided using [STM.tryRead] instead:
@@ -100,7 +100,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-04.kt -->
  *
  * [STM.read] also removes the read item from the queue. Alternatively [STM.peek] will leave the queue unchanged on a read:
  *
@@ -121,7 +121,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-05.kt -->
  *
  * As with [STM.read] [STM.peek] will retry should the queue be empty. The alternative [STM.tryPeek] is there to avoid that:
  *
@@ -140,7 +140,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-06.kt -->
  *
  * It is also possible to read the entire list in one go using [STM.flush]:
  *
@@ -162,7 +162,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-07.kt -->
  *
  * ## Checking a queues size
  *
@@ -182,7 +182,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-08.kt -->
  *
  * Retrieving the actual size of a list can be done using [STM.size]:
  *
@@ -200,7 +200,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-09.kt -->
  *
  * > All three of these methods have to access both the write and read end of a [TQueue] and thus can increase contention. Use them sparingly!
  *
@@ -223,7 +223,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *   println("Items in queue ${atomically { tq.flush() }}")
  * }
  * ```
- * <!--- KNIT example-tqueue-new.kt -->
+ * <!--- KNIT example-tqueue-10.kt -->
  *
  * > This method also access both ends of the queue and thus should be used infrequently to avoid contention.
  */

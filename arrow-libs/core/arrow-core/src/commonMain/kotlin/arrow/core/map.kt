@@ -20,7 +20,7 @@ import kotlin.collections.flatMap as _flatMap
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-01.kt -->
  */
 public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
   zip(other) { _, a, b -> Pair(a, b) }
@@ -42,7 +42,7 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-02.kt -->
  */
 public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
   val destination = LinkedHashMap<Key, C>(size)
@@ -276,7 +276,7 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-03.kt -->
  */
 public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
   (keys + b.keys).mapNotNull { key ->
@@ -299,7 +299,7 @@ public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-04.kt -->
  */
 public fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
   this.align(b).mapValues(fa)
@@ -354,7 +354,7 @@ public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C)
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-05.kt -->
  */
 public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
   entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
@@ -380,7 +380,7 @@ public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-06.kt -->
  */
 public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fa).unalign()
@@ -399,7 +399,7 @@ public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): P
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-07.kt -->
  */
 public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
   entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
@@ -424,7 +424,7 @@ public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-map-new.kt -->
+ * <!--- KNIT example-map-08.kt -->
  */
 public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()

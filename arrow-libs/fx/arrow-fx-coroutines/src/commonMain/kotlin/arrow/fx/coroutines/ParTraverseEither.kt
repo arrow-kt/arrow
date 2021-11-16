@@ -96,7 +96,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-partraverseeither-new.kt -->
+ * <!--- KNIT example-partraverseeither-01.kt -->
  */
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(
@@ -191,7 +191,7 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  *  println(res2)
  * }
  * ```
- * <!--- KNIT example-partraverseeither-new.kt -->
+ * <!--- KNIT example-partraverseeither-02.kt -->
  */
 public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   ctx: CoroutineContext = EmptyCoroutineContext,

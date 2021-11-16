@@ -34,7 +34,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * // println: "ensure(true) passes"
    * // res: None
    * ```
- * <!--- KNIT example-option-new.kt -->
+ * <!--- KNIT example-option-computations-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(None)
@@ -62,7 +62,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * // println: "1"
  * // res: None
  * ```
- * <!--- KNIT example-option-new.kt -->
+ * <!--- KNIT example-option-computations-02.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
