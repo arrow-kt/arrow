@@ -36,7 +36,7 @@ import kotlin.coroutines.CoroutineContext
  *   }
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-resourceextensions-new.kt -->
  */
 public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
   Resource(f) { s, _ -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
@@ -56,7 +56,7 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
  *        // Both resources will be closed accordingly to their #close methods
  *     }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-resourceextensions-new.kt -->
  */
 public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
   Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
@@ -76,7 +76,7 @@ public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A):
  *        // Both resources will be closed accordingly to their #close methods
  *     }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-resourceextensions-new.kt -->
  */
 public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend () -> A): Resource<A> =
   Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
@@ -99,7 +99,7 @@ public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend (
  *     }
  *   }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-resourceextensions-new.kt -->
  */
 public fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
   fromExecutor {

@@ -47,7 +47,7 @@ import arrow.fx.coroutines.Resource
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-resource-new.kt -->
  */
 public interface ResourceEffect {
   public suspend fun <A> Resource<A>.bind(): A

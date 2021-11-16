@@ -135,7 +135,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-partraversevalidated-new.kt -->
  */
 @JvmName("parSequenceValidatedScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(
@@ -197,7 +197,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *  println(res2)
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-partraversevalidated-new.kt -->
  */
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,

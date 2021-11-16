@@ -22,7 +22,7 @@ import arrow.continuations.generic.AtomicRef
  *   println(count.get())
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-atomic-new.kt -->
  *
  * [Atomic] also offers some other interesting operators such as [modify], [tryUpdate], [access] & [lens].
  */
@@ -98,7 +98,7 @@ public interface Atomic<A> {
    *   println("Remaining: ${jobs.get()}")
    * }
    * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-atomic-new.kt -->
    */
   public suspend fun <B> modify(f: (A) -> Pair<A, B>): B
 
@@ -172,7 +172,7 @@ public interface Atomic<A> {
    *   println(state.get())
    * }
    * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-atomic-new.kt -->
    */
   public fun <B> lens(get: (A) -> B, set: (A, B) -> A): arrow.fx.coroutines.Atomic<B> =
     LensAtomic(this, get, set)
@@ -195,7 +195,7 @@ public interface Atomic<A> {
      *   println(count.get())
      * }
      * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-atomic-new.kt -->
      */
     public suspend operator fun <A> invoke(a: A): arrow.fx.coroutines.Atomic<A> = unsafe(a)
     public fun <A> unsafe(a: A): arrow.fx.coroutines.Atomic<A> = DefaultAtomic(a)
