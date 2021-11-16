@@ -444,9 +444,9 @@ public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> 
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
  * <!--- KNIT example-arrow-06.kt -->
@@ -564,9 +564,9 @@ public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> 
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
  * <!--- KNIT example-arrow-10.kt -->

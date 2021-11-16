@@ -1423,7 +1423,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val string: Either<Int, String> = "Hello".left()
+ *   val string: Either<Int, String> = "Hello".right()
  *   val chars: Either<Int, CharSequence> =
  *     string.widen<Int, CharSequence, String>()
  *   //sampleEnd
