@@ -429,8 +429,8 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *
  * suspend fun main() {
  *   val houseNumber = config.parse(Read.intRead, "house_number").andThen { number ->
- *     if (number >= 0) Valid(number)
- *     else Invalid(ConfigError.ParseConfig("house_number"))
+ *     if (number >= 0) Validated.Valid(number)
+ *     else Validated.Invalid(ConfigError.ParseConfig("house_number"))
  * }
  * //sampleEnd
  *  println(houseNumber)
@@ -796,11 +796,11 @@ public sealed class Validated<out E, out A> {
    *
    * Example:
    * ```
- * <!--- KNIT example-validated-18.kt -->
-   * Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
-   * Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
+   * import arrow.core.Validated
+   * Validated.Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
+   * Validated.Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
    * ```
- * <!--- KNIT example-validated-19.kt -->
+   * <!--- KNIT example-validated-18.kt -->
    */
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
     when (this) {
@@ -818,12 +818,13 @@ public sealed class Validated<out E, out A> {
    * Validated value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Validated
+   *
+   * Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
+   * Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
    * ```
- * <!--- KNIT example-validated-20.kt -->
-   * Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
-   * Invalid(12).tap { println("flower") }  // Result: Invalid(12)
-   * ```
- * <!--- KNIT example-validated-21.kt -->
+ * <!--- KNIT example-validated-19.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
     when (this) {
@@ -1149,7 +1150,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-validated-22.kt -->
+ * <!--- KNIT example-validated-20.kt -->
  */
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
@@ -1242,13 +1243,13 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  * Apply a function to a Valid value, returning a new Validation that may be valid or invalid
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Validated
+ * Validated.Valid(5).andThen { Valid(10) } // Result: Valid(10)
+ * Validated.Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
+ * Validated.Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
  * ```
- * <!--- KNIT example-validated-23.kt -->
- * Valid(5).andThen { Valid(10) } // Result: Valid(10)
- * Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
- * Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
- * ```
- * <!--- KNIT example-validated-24.kt -->
+ * <!--- KNIT example-validated-21.kt -->
  */
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
   when (this) {

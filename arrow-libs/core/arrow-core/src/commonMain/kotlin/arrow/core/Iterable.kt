@@ -477,7 +477,8 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  * with null for padding on the left.
  *
  * Example:
- * ```kotlin:ank:playground
+ *
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -487,9 +488,9 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
  * <!--- KNIT example-iterable-04.kt -->
@@ -537,9 +538,9 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
  * <!--- KNIT example-iterable-06.kt -->

@@ -96,27 +96,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
- * import arrow.core.*
- * import arrow.typeclasses.Semigroup
- * import arrow.fx.coroutines.*
- * import kotlinx.coroutines.Dispatchers
  *
- * typealias Task = suspend () -> ResultNel<Throwable, Unit>
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   fun getTask(id: Int): Task =
- *     suspend { Result.catchNel { println("Working on task $id on ${Thread.currentThread().name}") } }
- *
- *   val res = listOf(1, 2, 3)
- *     .map(::getTask)
- *     .parSequenceResult(Dispatchers.IO.nonEmptyList())
- *   //sampleEnd
- *   println(res)
- * }
- * ```
- * <!--- KNIT example-partraverseresult-01.kt -->
  */
 @JvmName("parSequenceResultScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResult(
@@ -146,32 +126,6 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
- * import arrow.core.*
- * import arrow.typeclasses.Semigroup
- * import arrow.fx.coroutines.*
- * import kotlinx.coroutines.Dispatchers
- *
- * object Error
- * data class User(val id: Int, val createdOn: String)
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   suspend fun getUserById(id: Int): ResultNel<Error, User> =
- *     if(id % 2 == 0) Error.invalidNel()
- *     else User(id, Thread.currentThread().name).validNel()
- *
- *   val res = listOf(1, 3, 5)
- *     .parTraverseResult(Dispatchers.IO.nonEmptyList(), ::getUserById)
- *
- *   val res2 = listOf(1, 2, 3, 4, 5)
- *     .parTraverseResult(Dispatchers.IO.nonEmptyList(), ::getUserById)
- *  //sampleEnd
- *  println(res)
- *  println(res2)
- * }
- * ```
- * <!--- KNIT example-partraverseresult-02.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverseResult(
   ctx: CoroutineContext = EmptyCoroutineContext,

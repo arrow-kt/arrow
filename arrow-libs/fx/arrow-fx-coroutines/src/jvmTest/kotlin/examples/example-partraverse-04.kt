@@ -12,7 +12,7 @@ suspend fun main(): Unit {
     User(id, Thread.currentThread().name)
 
   val res = listOf(1, 2, 3)
-    .parTraverse(Dispatchers.IO, ::getUserById)
+    .parTraverse(Dispatchers.IO) { getUserById(it) }
  //sampleEnd
  println(res)
 }

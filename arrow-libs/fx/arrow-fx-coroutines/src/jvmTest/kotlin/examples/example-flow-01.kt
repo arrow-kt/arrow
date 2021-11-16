@@ -6,12 +6,12 @@ import arrow.fx.coroutines.*
 suspend fun main(): Unit {
   var counter = 0
   val flow = flow {
-   emit(a)
+   emit(counter)
    if (++counter <= 5) throw RuntimeException("Bang!")
   }
   //sampleStart
  val sum = flow.retry(Schedule.recurs(5))
-   .reduce { acc, int -> acc + int }
+   .reduce(Int::plus)
   //sampleEnd
-  println(result)
+  println(sum)
 }

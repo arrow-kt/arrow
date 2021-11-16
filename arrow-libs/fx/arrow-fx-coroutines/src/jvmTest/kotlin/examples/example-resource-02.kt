@@ -1,6 +1,8 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource02
 
+import arrow.fx.coroutines.*
+
 val resourceA = resource {
   "A"
 } release { a ->

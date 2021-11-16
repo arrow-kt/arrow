@@ -8,7 +8,7 @@ val padLeft = listOf(1).rightPadZip(listOf("a", "b"))       // Result: [Pair(1, 
 val noPadding = listOf(1, 2).rightPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
 
 fun main() {
-  println("left = $left")
-  println("right = $right")
-  println("both = $both")
+  println("padRight = $padRight")
+  println("padLeft = $padLeft")
+  println("noPadding = $noPadding")
 }

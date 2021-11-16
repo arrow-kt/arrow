@@ -15,10 +15,10 @@ suspend fun main(): Unit {
     else User(id, Thread.currentThread().name).right()
 
   val res = listOf(1, 2, 3)
-    .parTraverseEither(Dispatchers.IO, ::getUserById)
+    .parTraverseEither(Dispatchers.IO) { getUserById(it) }
 
   val res2 = listOf(1, 4, 2, 3)
-    .parTraverseEither(Dispatchers.IO, ::getUserById)
+    .parTraverseEither(Dispatchers.IO) { getUserById(it) }
  //sampleEnd
  println(res)
  println(res2)

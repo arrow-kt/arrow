@@ -45,8 +45,8 @@ val config = Config(mapOf("house_number" to "-42"))
 
 suspend fun main() {
   val houseNumber = config.parse(Read.intRead, "house_number").andThen { number ->
-    if (number >= 0) Valid(number)
-    else Invalid(ConfigError.ParseConfig("house_number"))
+    if (number >= 0) Validated.Valid(number)
+    else Validated.Invalid(ConfigError.ParseConfig("house_number"))
 }
  println(houseNumber)
 }

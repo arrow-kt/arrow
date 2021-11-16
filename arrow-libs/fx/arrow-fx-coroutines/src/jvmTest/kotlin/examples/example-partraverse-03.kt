@@ -11,7 +11,7 @@ suspend fun main(): Unit {
     User(id, Thread.currentThread().name)
 
   val res = listOf(1, 2, 3)
-    .parTraverse(::getUserById)
+    .parTraverse { getUserById(it) }
  //sampleEnd
  println(res)
 }

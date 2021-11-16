@@ -76,6 +76,8 @@ import kotlinx.coroutines.withContext
  * and there are two ways to define the finalizers with `release` or `releaseCase`.
  *
  * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
  * val resourceA = resource {
  *   "A"
  * } release { a ->
@@ -511,7 +513,7 @@ public sealed class Resource<out A> {
      * import arrow.fx.coroutines.*
      *
      * suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
-     * suspend fun releaseResource(r: Int): Unit = println("Releasing expensive resource: $r")
+     * suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
      *
      * suspend fun main(): Unit {
      *   //sampleStart

@@ -161,7 +161,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  *     User(id, Thread.currentThread().name)
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverse(::getUserById)
+ *     .parTraverse { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  * }
@@ -192,7 +192,7 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  *     User(id, Thread.currentThread().name)
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverse(Dispatchers.IO, ::getUserById)
+ *     .parTraverse(Dispatchers.IO) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  * }

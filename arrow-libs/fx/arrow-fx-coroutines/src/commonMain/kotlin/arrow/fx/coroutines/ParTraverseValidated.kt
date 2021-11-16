@@ -188,10 +188,10 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *     else User(id, Thread.currentThread().name).validNel()
  *
  *   val res = listOf(1, 3, 5)
- *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList()) { getUserById(it) }
  *
  *   val res2 = listOf(1, 2, 3, 4, 5)
- *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList()) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  *  println(res2)
