@@ -40,7 +40,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *   println(nonFatal)
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-nonfatal-new.kt -->
  *
  */
 public expect fun NonFatal(t: Throwable): Boolean
