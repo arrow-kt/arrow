@@ -33,18 +33,6 @@ configure<kotlinx.knit.KnitPluginExtension> {
     }
 }
 
-//knit {
-//    rootDir = "arrow-libs" // project root dir
-//    // Custom set of input files to process (default as shown below)
-//    files = fileTree(project.rootDir) {
-//        include '**/*.md'
-//        include '**/*.kt'
-//        include '**/*.kts'
-//        exclude '**/build/**'
-//        exclude '**/.gradle/**'
-//    }
-//}
-
 allprojects {
     group = property("projects.group").toString()
 }
