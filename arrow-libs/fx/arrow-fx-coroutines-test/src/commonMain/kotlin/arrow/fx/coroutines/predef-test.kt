@@ -145,7 +145,7 @@ public fun <A> A.suspended(): suspend () -> A =
  *   require("Talk to a duck" == exception.message)
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  * @see Assertions.assertThrows
  */
 public inline fun <A> assertThrowable(executable: () -> A): Throwable {

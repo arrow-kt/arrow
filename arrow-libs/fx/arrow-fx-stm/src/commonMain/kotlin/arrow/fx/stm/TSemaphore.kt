@@ -31,7 +31,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * Should there be not enough permits the transaction will retry and wait until there are enough permits available again.
  *  [STM.tryAcquire] can be used to avoid this behaviour as it returns whether or not acquisition was successful.
@@ -51,7 +51,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * ## Release permits after use:
  *
@@ -71,7 +71,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * > As you can see there is no upper limit enforced when releasing. You are free to release more or less permits than you have taken, but that may
  *  invalidate some other implicit rules so doing so is not advised.
@@ -95,7 +95,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  */
 public data class TSemaphore internal constructor(internal val v: TVar<Int>) {

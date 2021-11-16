@@ -255,7 +255,7 @@ public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
   this.align(b).map(fa)
@@ -274,7 +274,7 @@ public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Se
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.align(b: Sequence<B>): Sequence<Ior<A, B>> =
   alignRec(this, b)
@@ -367,7 +367,7 @@ public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
@@ -389,7 +389,7 @@ public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): 
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
   sequence {
@@ -424,7 +424,7 @@ public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-arrow-05.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> C): Sequence<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
@@ -449,7 +449,7 @@ public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> 
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-arrow-06.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
@@ -480,7 +480,7 @@ public fun <A> Sequence<A>.once(): Sequence<A> =
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-arrow-07.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
   align(other) { ior ->
@@ -511,7 +511,7 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-arrow-08.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
   padZip(other).map { fa(it.first, it.second) }
@@ -544,7 +544,7 @@ public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-arrow-09.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> C): Sequence<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
@@ -569,7 +569,7 @@ public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> 
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-arrow-10.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -638,7 +638,7 @@ public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
  *   result?.let { println("(${it.first.toList()}, ${it.second.toList()})") }
  * }
  * ```
- * <!--- KNIT example-arrow-11.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
   firstOrNull()?.let { first ->
@@ -707,7 +707,7 @@ public fun <E, A, B> Sequence<A>.traverseValidated(
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
- * <!--- KNIT example-arrow-12.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
   fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
@@ -732,7 +732,7 @@ public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> 
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
- * <!--- KNIT example-arrow-13.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
   map(fa).unalign()
@@ -760,7 +760,7 @@ public fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-arrow-14.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
@@ -780,7 +780,7 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
- * <!--- KNIT example-arrow-15.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
   fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
@@ -805,7 +805,7 @@ public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
- * <!--- KNIT example-arrow-16.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
   map(fc).unzip()

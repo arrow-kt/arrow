@@ -77,7 +77,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
@@ -113,7 +113,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
@@ -166,7 +166,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  *  println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) -> B): List<B> =
   parTraverse(Dispatchers.Default, f)
@@ -197,7 +197,7 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  *  println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,

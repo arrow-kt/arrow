@@ -106,7 +106,7 @@ for example
  *  })
  * }
  * ```
- * <!--- KNIT example-arrow-new.kt -->
+ * <!--- KNIT example-contributing-new.kt -->
  */
 abstract class Refined<A, out B>
 ```

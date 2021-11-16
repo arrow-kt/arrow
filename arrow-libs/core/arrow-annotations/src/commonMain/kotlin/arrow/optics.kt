@@ -9,7 +9,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
  * ```kotlin
  * val x = 1
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-annotations-new.kt -->
  *
  * Empty arrays means "Everything that matches annotated class"
  */

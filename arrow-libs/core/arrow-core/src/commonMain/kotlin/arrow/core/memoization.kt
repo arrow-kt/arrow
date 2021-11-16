@@ -27,7 +27,7 @@ import kotlin.jvm.JvmName
  *   println("$value1 $value2")
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * Note that calling this function with the same parameters in parallel might cause the function to be executed twice.
  */

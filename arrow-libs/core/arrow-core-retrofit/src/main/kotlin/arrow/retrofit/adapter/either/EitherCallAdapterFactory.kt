@@ -21,7 +21,7 @@ import java.lang.reflect.Type
  *   suspend fun userResponse(): EitherR<ErrorBody, User>
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-retrofit-new.kt -->
  *
  * Using [Either] as the return type means that 200 status code and HTTP errors return a value,
  * other exceptions will throw.

@@ -33,7 +33,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * ## Reading a value from the array
  *
@@ -51,7 +51,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * ## Setting a value in the array
  *
@@ -71,7 +71,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * ## Transform the entire array
  *
@@ -88,7 +88,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * ## Folding the array
  *
@@ -106,7 +106,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-arrow-05.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public data class TArray<A>internal constructor(internal val v: Array<TVar<A>>) {
 

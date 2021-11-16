@@ -58,7 +58,7 @@ import kotlinx.coroutines.withContext
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
  * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
  * As a consequence of the resource leak, this program does not guarantee the correct release of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
@@ -88,7 +88,7 @@ import kotlinx.coroutines.withContext
  *   println("Releasing $b with exit: $exitCase")
  * }
  * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * Here `releaseCase` also signals with what [ExitCase] state the `use` step finished.
  *
@@ -130,7 +130,7 @@ import kotlinx.coroutines.withContext
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  *
  * [Resource]s are immutable and can be composed using [zip] or [parZip].
  * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
@@ -169,7 +169,7 @@ public sealed class Resource<out A> {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   @Suppress("UNCHECKED_CAST")
   public tailrec suspend infix fun <B> use(f: suspend (A) -> B): B =
@@ -250,7 +250,7 @@ public sealed class Resource<out A> {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-arrow-05.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    *
    * @see zip to combine independent resources together
    * @see parZip for combining independent resources in parallel
@@ -312,7 +312,7 @@ public sealed class Resource<out A> {
    * }
    * //sampleEnd
    * ```
- * <!--- KNIT example-arrow-06.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    *
    * @see parZip if you want to combine independent resources in parallel
    * @see flatMap to combine resources that rely on each-other.
@@ -463,7 +463,7 @@ public sealed class Resource<out A> {
    * }
    * //sampleEnd
    * ```
- * <!--- KNIT example-arrow-07.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
@@ -522,7 +522,7 @@ public sealed class Resource<out A> {
      *   //sampleEnd
      * }
      * ```
- * <!--- KNIT example-arrow-08.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
      */
     public operator fun <A> invoke(
       acquire: suspend () -> A,
@@ -569,7 +569,7 @@ public sealed class Resource<out A> {
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-arrow-09.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 @Deprecated(
   "Use the resource computation DSL instead",
@@ -653,7 +653,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  *   res.forEach(::println)
  * }
  * ```
- * <!--- KNIT example-arrow-10.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
   arrow.fx.coroutines.computations.resource {
@@ -698,7 +698,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  *   res.forEach(::println)
  * }
  * ```
- * <!--- KNIT example-arrow-11.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =

@@ -35,12 +35,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-01.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Left("tulip").isRight           // Result: false
    * Right("venus fly-trap").isRight // Result: true
    * Both("venus", "fly-trap").isRight // Result: false
    * ```
- * <!--- KNIT example-arrow-02.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public abstract val isRight: Boolean
 
@@ -49,12 +49,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-03.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Left("tulip").isLeft           // Result: true
    * Right("venus fly-trap").isLeft // Result: false
    * Both("venus", "fly-trap").isLeft // Result: false
    * ```
- * <!--- KNIT example-arrow-04.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public abstract val isLeft: Boolean
 
@@ -63,12 +63,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-05.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Left("tulip").isBoth           // Result: false
    * Right("venus fly-trap").isBoth // Result: false
    * Both("venus", "fly-trap").isBoth // Result: true
    * ```
- * <!--- KNIT example-arrow-06.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public abstract val isBoth: Boolean
 
@@ -132,7 +132,7 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-07.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * val result: Ior<EmailContactInfo, PostalContactInfo> = obtainContactInfo()
    * result.fold(
    *      { log("only have this email info: $it") },
@@ -140,7 +140,7 @@ public sealed class Ior<out A, out B> {
    *      { email, postal -> log("have this postal info: $postal and this email info: $email") }
    * )
    * ```
- * <!--- KNIT example-arrow-08.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    *
    * @param fa the function to apply if this is a [Left]
    * @param fb the function to apply if this is a [Right]
@@ -172,12 +172,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-09.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Ior.Right(12).map { "flower" } // Result: Right("flower")
    * Ior.Left(12).map { "flower" }  // Result: Left(12)
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
    * ```
- * <!--- KNIT example-arrow-10.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public inline fun <D> map(f: (B) -> D): Ior<A, D> =
     when (this) {
@@ -192,12 +192,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-11.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Ior.Right(12).bimap ({ "flower" }, { 12 }) // Result: Right(12)
    * Ior.Left(12).bimap({ "flower" }, { 12 })  // Result: Left("flower")
    * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
    * ```
- * <!--- KNIT example-arrow-12.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
     { Left(fa(it)) },
@@ -210,12 +210,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-13.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Ior.Right(12).map { "flower" } // Result: Right(12)
    * Ior.Left(12).map { "flower" }  // Result: Left("power")
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
    * ```
- * <!--- KNIT example-arrow-14.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
     { Left(fa(it)) },
@@ -229,12 +229,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-15.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Left("left").swap()   // Result: Right("left")
    * Right("right").swap() // Result: Left("right")
    * Both("left", "right").swap() // Result: Both("right", "left")
    * ```
- * <!--- KNIT example-arrow-16.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun swap(): Ior<B, A> = fold(
     { Right(it) },
@@ -270,7 +270,7 @@ public sealed class Ior<out A, out B> {
    *   println("both = $both")
    * }
    * ```
- * <!--- KNIT example-arrow-17.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun padNull(): Pair<A?, B?> = fold(
     { Pair(it, null) },
@@ -284,12 +284,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-18.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Right(12).toEither() // Result: Either.Right(12)
    * Left(12).toEither()  // Result: Either.Left(12)
    * Both("power", 12).toEither()  // Result: Either.Right(12)
    * ```
- * <!--- KNIT example-arrow-19.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun toEither(): Either<A, B> =
     fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
@@ -313,7 +313,7 @@ public sealed class Ior<out A, out B> {
    *   println("both = $both")
    * }
    * ```
- * <!--- KNIT example-arrow-20.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun orNull(): B? =
     fold({ null }, { it }, { _, b -> b })
@@ -338,7 +338,7 @@ public sealed class Ior<out A, out B> {
    *   println("both = $both")
    * }
    * ```
- * <!--- KNIT example-arrow-21.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun leftOrNull(): A? =
     fold({ it }, { null }, { a, _ -> a })
@@ -349,12 +349,12 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-22.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Right(12).toValidated() // Result: Valid(12)
    * Left(12).toValidated()  // Result: Invalid(12)
    * Both(12, "power").toValidated()  // Result: Valid("power")
    * ```
- * <!--- KNIT example-arrow-23.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public fun toValidated(): Validated<A, B> =
     fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
@@ -505,7 +505,7 @@ public sealed class Ior<out A, out B> {
    *
    * Example:
    * ```
- * <!--- KNIT example-arrow-24.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    * Ior.Both(5, 12).exists { it > 10 } // Result: true
    * Ior.Right(12).exists { it > 10 }   // Result: true
    * Ior.Right(7).exists { it > 10 }    // Result: false
@@ -513,7 +513,7 @@ public sealed class Ior<out A, out B> {
    * val left: Ior<Int, Int> = Ior.Left(12)
    * left.exists { it > 10 }      // Result: false
    * ```
- * <!--- KNIT example-arrow-25.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
    */
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate, { _, b -> predicate(b) })
@@ -689,7 +689,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-arrow-26.kt -->
+ * <!--- KNIT example-arrow-new.kt -->
  */
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this
