@@ -1,11 +1,8 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.jvm)
-  alias(libs.plugins.arrowGradleConfig.publishJvm)
-  id("org.jetbrains.kotlin.kapt")
-}
-
-publishJVM {
-  isDokkaEnabled = false
+  id(libs.plugins.kotlin.jvm.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
+  id(libs.plugins.kotlin.kapt.get().pluginId)
 }
 
 dependencies {
