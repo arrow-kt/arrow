@@ -11,6 +11,8 @@ public final class arrow/fx/coroutines/NamedThreadFactory : java/util/concurrent
 
 public final class arrow/fx/coroutines/Predef_testKt {
 	public static final fun assertThrowable (Lkotlin/jvm/functions/Function0;)Ljava/lang/Throwable;
+	public static final fun awaitExitCase (Lkotlinx/coroutines/CompletableDeferred;Lkotlinx/coroutines/CompletableDeferred;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun awaitExitCase (Lkotlinx/coroutines/channels/Channel;Lkotlinx/coroutines/CompletableDeferred;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun charRange (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun either (Larrow/core/Either;)Lio/kotest/matchers/Matcher;
 	public static final fun either (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
