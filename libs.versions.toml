@@ -2,7 +2,7 @@
 arrow = "1.0.1"
 arrowGradleConfig = "0.5.1"
 coroutines = "1.5.2"
-dokka = "1.5.31"
+dokka = "1.6.0"
 kotest = "5.0.0.RC"
 kotestGradle = "5.0.0.6"
 kotlin = "1.6.0"
