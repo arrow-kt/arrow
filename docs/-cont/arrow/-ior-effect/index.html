@@ -2,27 +2,31 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>IorEffect</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">Cont</a></div>
+      <div>0.0.0</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
-      <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="Cont::arrow/IorEffect///PointingToDeclaration//788909594">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">Cont</a>/<a href="../index.html">arrow</a>/<a href="index.html">IorEffect</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+      <div id="main"><script type="text/javascript" src="../../../scripts/main.js"></script>
+        <div class="main-content" id="content" pageIds="Cont::arrow/IorEffect///PointingToDeclaration//788909594">
+          <div class="breadcrumbs"><a href="../../../index.html">Cont</a>/<a href="../index.html">arrow</a>/<a href="index.html">IorEffect</a></div>
           <div class="cover ">
             <h1 class="cover"><span>Ior</span><wbr></wbr><span><span>Effect</span></span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">class <a href="index.html">IorEffect</a>&lt;<a href="index.html">E</a>&gt;(semigroup: <span data-unresolved-link="arrow.typeclasses/Semigroup///PointingToDeclaration/">Semigroup</span>&lt;<a href="index.html">E</a>&gt;, cont: <a href="../-cont-effect/index.html">ContEffect</a>&lt;<a href="index.html">E</a>&gt;) : <a href="../-cont-effect/index.html">ContEffect</a>&lt;<a href="index.html">E</a>&gt; , <span data-unresolved-link="arrow.typeclasses/Semigroup///PointingToDeclaration/">Semigroup</span>&lt;<a href="index.html">E</a>&gt; <span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">IorEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">(</span>semigroup<span class="token operator">: </span><span data-unresolved-link="arrow.typeclasses/Semigroup///PointingToDeclaration/">Semigroup</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">, </span>cont<span class="token operator">: </span><a href="../-cont-effect/index.html">ContEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">)</span> : <a href="../-cont-effect/index.html">ContEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token operator">&gt; </span>, <span data-unresolved-link="arrow.typeclasses/Semigroup///PointingToDeclaration/">Semigroup</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token operator">&gt; </span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Sources">Sources</button></div>
@@ -35,43 +39,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="../-cont-effect/bind.html">B</a>&gt; <a href="../-cont/index.html">Cont</a>&lt;<a href="index.html">E</a>, <a href="../-cont-effect/bind.html">B</a>&gt;.<a href="../-cont-effect/bind.html">bind</a>(): <a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Runs the <a href="../-cont/index.html">Cont</a> to finish, returning <a href="../-cont-effect/bind.html">B</a> or <a href="../-cont-effect/shift.html">shift</a> in case of <a href="../-cont-effect/index.html">R</a>.</p></div></div>
-<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="../-cont-effect/bind.html">B</a>&gt; <span data-unresolved-link="arrow.core/Either///PointingToDeclaration/">Either</span>&lt;<a href="index.html">E</a>, <a href="../-cont-effect/bind.html">B</a>&gt;.<a href="../-cont-effect/bind.html">bind</a>(): <a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Either///PointingToDeclaration/">Either</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a shift with <a href="../-cont-effect/index.html">R</a>.</p></div></div>
-<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="../-cont-effect/bind.html">B</a>&gt; <span data-unresolved-link="arrow.core/Validated///PointingToDeclaration/">Validated</span>&lt;<a href="index.html">E</a>, <a href="../-cont-effect/bind.html">B</a>&gt;.<a href="../-cont-effect/bind.html">bind</a>(): <a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Validated///PointingToDeclaration/">Validated</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a shift with <a href="../-cont-effect/index.html">R</a>.</p></div></div>
-<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">suspend fun &lt;<a href="bind.html">B</a>&gt; <span data-unresolved-link="arrow.core/Ior///PointingToDeclaration/">Ior</span>&lt;<a href="index.html">E</a>, <a href="bind.html">B</a>&gt;.<a href="bind.html">bind</a>(): <a href="bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="../-cont-effect/bind.html">B</a>&gt; <span data-unresolved-link="arrow.core/Option///PointingToDeclaration/">Option</span>&lt;<a href="../-cont-effect/bind.html">B</a>&gt;.<a href="../-cont-effect/bind.html">bind</a>(shift: () -&gt; <a href="index.html">E</a>): <a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Option///PointingToDeclaration/">Option</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a transforming <span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span> into <a href="../-cont-effect/index.html">R</a> and shifting the result.</p></div></div>
-<div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun &lt;<a href="../-cont-effect/bind.html">B</a>&gt; <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a>&lt;<a href="../-cont-effect/bind.html">B</a>&gt;.<a href="../-cont-effect/bind.html">bind</a>(transform: (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a>) -&gt; <a href="index.html">E</a>): <a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Folds <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a transforming <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a> into <a href="../-cont-effect/index.html">R</a> and shifting the result.</p></div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt; </span><a href="../-cont/index.html">Cont</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-cont-effect/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Runs the <a href="../-cont/index.html">Cont</a> to finish, returning <a href="../-cont-effect/bind.html">B</a> or <a href="../-cont-effect/shift.html">shift</a> in case of <a href="../-cont-effect/index.html">R</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt; </span><span data-unresolved-link="arrow.core/Either///PointingToDeclaration/">Either</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-cont-effect/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Either///PointingToDeclaration/">Either</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a shift with <a href="../-cont-effect/index.html">R</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt; </span><span data-unresolved-link="arrow.core/Validated///PointingToDeclaration/">Validated</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-cont-effect/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Validated///PointingToDeclaration/">Validated</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a shift with <a href="../-cont-effect/index.html">R</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="bind.html">B</a><span class="token operator">&gt; </span><span data-unresolved-link="arrow.core/Ior///PointingToDeclaration/">Ior</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt; </span><span data-unresolved-link="arrow.core/Option///PointingToDeclaration/">Option</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-cont-effect/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span>shift<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Folds <span data-unresolved-link="arrow.core/Option///PointingToDeclaration/">Option</span> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a transforming <span data-unresolved-link="arrow.core/None///PointingToDeclaration/">None</span> into <a href="../-cont-effect/index.html">R</a> and shifting the result.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-cont-effect/bind.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-cont-effect/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span>transform<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-cont-effect/bind.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Folds <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a> into <a href="../-cont/index.html">Cont</a>, by returning <a href="../-cont-effect/bind.html">B</a> or a transforming <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a> into <a href="../-cont-effect/index.html">R</a> and shifting the result.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -82,13 +52,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open override fun <a href="index.html">E</a>.<a href="index.html#-355549150%2FFunctions%2F788909594">combine</a>(b: <a href="index.html">E</a>): <a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html">E</a><span class="token punctuation">.</span><a href="index.html#-355549150%2FFunctions%2F788909594"><span class="token function">combine</span></a><span class="token punctuation">(</span>b<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -99,13 +65,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend fun <a href="../-cont-effect/ensure.html">ensure</a>(condition: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a>, shift: () -&gt; <a href="index.html">E</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">ensure that condition is <code>true</code>, if it's <code>false</code> it will <code>shift</code> with the provided value <a href="../-cont-effect/index.html">R</a>. Monadic version of <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.require</a>.</p></div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../-cont-effect/ensure.html"><span class="token function">ensure</span></a><span class="token punctuation">(</span>condition<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span>shift<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">E</a><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">ensure that condition is <code class="lang-kotlin">true</code>, if it's <code class="lang-kotlin">false</code> it will <code class="lang-kotlin">shift</code> with the provided value <a href="../-cont-effect/index.html">R</a>. Monadic version of <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.require</a>.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -116,13 +78,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open override fun <a href="index.html">E</a>.<a href="index.html#-653956091%2FFunctions%2F788909594">maybeCombine</a>(b: <a href="index.html">E</a>?): <a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html">E</a><span class="token punctuation">.</span><a href="index.html#-653956091%2FFunctions%2F788909594"><span class="token function">maybeCombine</span></a><span class="token punctuation">(</span>b<span class="token operator">: </span><a href="index.html">E</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -133,13 +91,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open operator override fun <a href="index.html">E</a>.<a href="index.html#-840239269%2FFunctions%2F788909594">plus</a>(b: <a href="index.html">E</a>): <a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="index.html">E</a><span class="token punctuation">.</span><a href="index.html#-840239269%2FFunctions%2F788909594"><span class="token function">plus</span></a><span class="token punctuation">(</span>b<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">E</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -150,13 +104,9 @@
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":dokkaHtml/commonMain" data-filterable-set=":dokkaHtml/commonMain"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace">open suspend override fun &lt;<a href="shift.html">B</a>&gt; <a href="shift.html">shift</a>(r: <a href="index.html">E</a>): <a href="shift.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<div class="brief "><p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p></div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="shift.html">B</a><span class="token operator">&gt; </span><a href="shift.html"><span class="token function">shift</span></a><span class="token punctuation">(</span>r<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="shift.html">B</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Short-circuit the <a href="../-cont/index.html">Cont</a> computation with value R.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -175,7 +125,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2021 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>
