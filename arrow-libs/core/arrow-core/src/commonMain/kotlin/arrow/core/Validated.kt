@@ -22,22 +22,17 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * Or perhaps you're reading from a configuration file. One could imagine the configuration library
  * you're using returns an `Either`. Your parsing may look something like:
  *
- * ```kotlin:ank
- * import arrow.core.Either
- * import arrow.core.Either.Left
- * import arrow.core.flatMap
+ * ```kotlin
+ * import arrow.core.*
+ * import arrow.core.computations.*
  *
- * //sampleStart
  * data class ConnectionParams(val url: String, val port: Int)
  *
- * fun <A> config(key: String): Either<String, A> = Left(key)
+ * //sampleStart
+ * fun <A> config(key: String): Either<String, A> = key.left()
  *
- * config<String>("url").flatMap { url ->
- *  config<Int>("port").map { ConnectionParams(url, it) }
- * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-01.kt -->
  *
  * You run your program and it says key "url" not found. Turns out the key was "endpoint." So
  * you change your code and re-run. Now it says the "port" key was not a well-formed integer.
@@ -60,7 +55,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * `Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only
  * for `String` and `Int` for brevity.
  *
- * ```kotlin:ank
+ * ```kotlin
  * //sampleStart
  * abstract class Read<A> {
  *
@@ -82,7 +77,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-02.kt -->
  *
  * Then we enumerate our errors. When asking for a config value, one of two things can go wrong:
  * The field is missing, or it is not well-formed with regards to the expected type.
@@ -93,7 +87,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  data class ParseConfig(val field: String): ConfigError()
  * }
  * ```
- * <!--- KNIT example-validated-03.kt -->
  *
  * We need a data type that can represent either a successful value (a parsed configuration), or an error.
  * It would look like the following, which Arrow provides in `arrow.Validated`:
@@ -104,17 +97,10 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
  * }
  * ```
- * <!--- KNIT example-validated-04.kt -->
  *
  * Now we are ready to write our parser.
  *
  * ```kotlin:ank
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.Validated
- * import arrow.core.valid
- * import arrow.core.invalid
  *
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
@@ -132,17 +118,12 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-05.kt -->
  *
  * And, as you can see, the parser runs sequentially: it first tries to get the map value and then tries to read it.
  * It's then straightforward to translate this to an effect block. We use here the `either` block which includes syntax
  * to obtain `A` from values of `Validated<*, A>` through the [arrow.core.computations.EitherEffect.invoke]
  *
  * ```kotlin:ank
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
  *
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
@@ -158,14 +139,12 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-06.kt -->
  *
  * Everything is in place to write the parallel validator. Remember that we can only do parallel
  * validation if each piece is independent. How do we ensure the data is independent? By
  * asking for all of it up front. Let's start with two pieces of data.
  *
  * ```kotlin:ank
- * import arrow.core.Validated
  * //sampleStart
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
  *  return when {
@@ -178,7 +157,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-07.kt -->
  *
  * We've run into a problem. In the case where both have errors, we want to report both. We
  * don't have a way to combine ConfigErrors. But, as clients, we can change our Validated
@@ -192,8 +170,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * Time to validate:
  *
  * ```kotlin:ank
- * import arrow.core.NonEmptyList
- * import arrow.core.Validated
  * //sampleStart
  * fun <E, A, B, C> parallelValidate
  *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
@@ -206,7 +182,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-08.kt -->
  *
  * ### Improving the validation
  *
@@ -216,18 +191,12 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * The above function can be rewritten as follows:
  *
  * ```kotlin:ank:silent
- * import arrow.core.Validated
- * import arrow.core.validNel
- * import arrow.core.zip
- * import arrow.typeclasses.Semigroup
- *
  * //sampleStart
  * val parallelValidate =
  *    1.validNel().zip(Semigroup.nonEmptyList<ConfigError>(), 2.validNel())
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-09.kt -->
  *
  * Note that there are multiple `zip` functions with more arities, so we could easily add more parameters without worrying about
  * the function blowing up in complexity.
@@ -245,20 +214,12 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
- * <!--- KNIT example-validated-10.kt -->
  *
  * ---
  *
  * Coming back to our example, when no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- * import arrow.core.NonEmptyList
- * import arrow.typeclasses.Semigroup
- *
  * data class ConnectionParams(val url: String, val port: Int)
  *
  * abstract class Read<A> {
@@ -309,19 +270,11 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  println("valid = $valid")
  * }
  * ```
- * <!--- KNIT example-validated-11.kt -->
  *
  * But what happens when we have one or more errors? They are accumulated in a `NonEmptyList` wrapped in
  * an `Invalid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- * import arrow.core.NonEmptyList
- * import arrow.typeclasses.Semigroup
- *
  * data class ConnectionParams(val url: String, val port: Int)
  *
  * abstract class Read<A> {
@@ -371,7 +324,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  *  println("valid = $valid")
  * }
  * ```
- * <!--- KNIT example-validated-12.kt -->
  *
  * ## Sequential Validation
  *
@@ -384,11 +336,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * the supplied function that in turn returns a `Validated` instance
  *
  * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- *
  * abstract class Read<A> {
  *  abstract fun read(s: String): A?
  *
@@ -437,7 +384,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * ```
- * <!--- KNIT example-validated-13.kt -->
  *
  * ### `withEither`
  *
@@ -445,15 +391,6 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * instance into an Either instance and apply it to a function.
  *
  * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.flatMap
- * import arrow.core.left
- * import arrow.core.right
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- *
  * abstract class Read<A> {
  *  abstract fun read(s: String): A?
  *
@@ -505,7 +442,7 @@ public typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * ```
- * <!--- KNIT example-validated-14.kt -->
+ * <!--- KNIT example-validated-01.kt -->
  */
 public sealed class Validated<out E, out A> {
 
@@ -580,7 +517,7 @@ public sealed class Validated<out E, out A> {
      *   println(result)
      * }
      * ```
- * <!--- KNIT example-validated-15.kt -->
+ * <!--- KNIT example-validated-02.kt -->
      */
     @JvmStatic
     public inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
@@ -602,7 +539,7 @@ public sealed class Validated<out E, out A> {
      *   println("res2: $res2")
      * }
      * ```
- * <!--- KNIT example-validated-16.kt -->
+ * <!--- KNIT example-validated-03.kt -->
      */
     @JvmStatic
     public inline fun <A, B, C, D> lift(
@@ -627,7 +564,7 @@ public sealed class Validated<out E, out A> {
    *   println(result)
    * }
    * ```
- * <!--- KNIT example-validated-17.kt -->
+ * <!--- KNIT example-validated-04.kt -->
    */
   public fun void(): Validated<E, Unit> =
     map { Unit }
@@ -800,7 +737,7 @@ public sealed class Validated<out E, out A> {
    * Validated.Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
    * Validated.Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
    * ```
-   * <!--- KNIT example-validated-18.kt -->
+   * <!--- KNIT example-validated-05.kt -->
    */
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
     when (this) {
@@ -824,7 +761,7 @@ public sealed class Validated<out E, out A> {
    * Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
    * Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
    * ```
- * <!--- KNIT example-validated-19.kt -->
+ * <!--- KNIT example-validated-06.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
     when (this) {
@@ -1150,7 +1087,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-validated-20.kt -->
+ * <!--- KNIT example-validated-07.kt -->
  */
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
@@ -1249,7 +1186,7 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  * Validated.Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
  * Validated.Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
  * ```
- * <!--- KNIT example-validated-21.kt -->
+ * <!--- KNIT example-validated-08.kt -->
  */
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
   when (this) {
