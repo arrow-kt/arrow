@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Ubuntu tests
         if: matrix.os == 'macos-11.0'
-        run: ./gradlew test
+        run: ./gradlew test -x spotlessKotlin
 
       - name: Run Windows tests
         if: matrix.os == 'windows-latest'
