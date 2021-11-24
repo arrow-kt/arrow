@@ -18,7 +18,7 @@ jobs:
   check:
     strategy:
       matrix:
-        os: [ macos-11.0 ]
+        os: [ windows-latest, macos-11.0 ]
     runs-on: ${{matrix.os}}
     timeout-minutes: 30
     steps:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Ubuntu tests
         if: matrix.os == 'macos-11.0'
-        run: ./gradlew jvmTest
+        run: ./gradlew check
 
       - name: Run Windows tests
         if: matrix.os == 'windows-latest'
