@@ -49,6 +49,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  *
  * ```kotlin:ank
  * import arrow.core.computations.nullable
+ * import arrow.core.computations.ensureNotNull
  *
  * //sampleStart
  * suspend fun main() {

@@ -47,6 +47,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  *
  * ```kotlin:ank
  * import arrow.core.computations.option
+ * import arrow.core.computations.ensureNotNull
  *
  * //sampleStart
  * suspend fun main() {

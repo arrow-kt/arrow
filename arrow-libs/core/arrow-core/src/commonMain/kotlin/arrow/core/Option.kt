@@ -218,6 +218,7 @@ import kotlin.jvm.JvmStatic
  *
  * ```kotlin:ank:playground
  * import arrow.core.some
+ * import arrow.core.none
  *
  * //sampleStart
  *  val some = 1.some()
