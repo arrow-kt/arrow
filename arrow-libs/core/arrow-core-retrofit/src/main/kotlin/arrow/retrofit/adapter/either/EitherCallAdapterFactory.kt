@@ -13,12 +13,17 @@ import java.lang.reflect.Type
  * Adding this to [Retrofit] will enable you to return [Either] from your service methods.
  *
  * ```kotlin
+ * import arrow.core.Either
+ * import retrofit2.http.GET
+ *
+ * data class User(val name: String)
+ * data class ErrorBody(val msg: String)
  * interface MyService {
  *   @GET("/user/me")
  *   suspend fun user(): Either<ErrorBody, User>
  *
  *   @GET("/user/me")
- *   suspend fun userResponse(): EitherR<ErrorBody, User>
+ *   suspend fun userResponse(): Either<ErrorBody, User>
  * }
  * ```
  * <!--- KNIT example-arrow-retrofit-01.kt -->
