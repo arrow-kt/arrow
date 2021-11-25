@@ -40,8 +40,15 @@ jobs:
 
       - name: Run Ubuntu tests
         if: matrix.os == 'macos-11.0'
-        run: ./gradlew test -x spotlessKotlin
+        run: ./gradlew test
 
       - name: Run Windows tests
         if: matrix.os == 'windows-latest'
         run: ./gradlew mingwX64Test
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'

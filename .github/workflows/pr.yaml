@@ -42,6 +42,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: ./gradlew mingwX64Test
 
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
+
   docs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
