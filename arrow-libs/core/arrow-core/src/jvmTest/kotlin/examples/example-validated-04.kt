@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleValidated04
 
 import arrow.core.Validated
-
-Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
-Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+fun main() {
+  Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
+  Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+}

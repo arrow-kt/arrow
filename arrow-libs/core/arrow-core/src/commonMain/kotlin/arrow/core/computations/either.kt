@@ -36,7 +36,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
    * In case it is `false`, then it short-circuits the binding and returns
    * the provided value by [orLeft] inside an [Either.Left].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.computations.either
    *
    * //sampleStart
@@ -64,7 +64,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
  * Otherwise, if the [value] is null then the [either] binding will short-circuit with [orLeft] inside of [Either.Left].
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.computations.either
  * import arrow.core.computations.ensureNotNull
  *

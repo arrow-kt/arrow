@@ -36,7 +36,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *
  * Running a transaction is then done using [atomically]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
@@ -90,7 +90,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *
  * This is achieved by the primitive [retry]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
@@ -150,7 +150,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * [orElse] is another important primitive which allows a user to detect if a branch called [retry] and then use a fallback instead.
  *  If the fallback retries as well the whole transaction retries.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.runBlocking
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
@@ -204,7 +204,7 @@ public interface STM {
    *
    * The main use for this is to abort once the transaction has hit an invalid state or otherwise needs to wait for changes.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    * import arrow.fx.stm.stm
    *
@@ -224,7 +224,7 @@ public interface STM {
   /**
    * Run the given transaction and fallback to the other one if the first one calls [retry].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    * import arrow.fx.stm.stm
    *
@@ -244,7 +244,7 @@ public interface STM {
   /**
    * Run [f] and handle any exception thrown with [onError].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    *
    * suspend fun main() {
@@ -263,7 +263,7 @@ public interface STM {
   /**
    * Read the value from a [TVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -289,7 +289,7 @@ public interface STM {
   /**
    * Set the value of a [TVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -315,7 +315,7 @@ public interface STM {
   /**
    * Modify the value of a [TVar]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -338,7 +338,7 @@ public interface STM {
   /**
    * Swap the content of the [TVar]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -368,7 +368,7 @@ public interface STM {
   /**
    * Read the value from a [TMVar] and empty it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -398,7 +398,7 @@ public interface STM {
   /**
    * Put a value into an empty [TMVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -426,7 +426,7 @@ public interface STM {
   /**
    * Read a value from a [TMVar] without removing it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -456,7 +456,7 @@ public interface STM {
   /**
    * Same as [TMVar.take] except it returns null if the [TMVar] is empty and thus never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -481,7 +481,7 @@ public interface STM {
   /**
    * Same as [TMVar.put] except that it returns true or false if was successful or it retried.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -510,7 +510,7 @@ public interface STM {
   /**
    * Same as [TMVar.read] except that it returns null if the [TMVar] is empty and thus never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -537,7 +537,7 @@ public interface STM {
   /**
    * Check if a [TMVar] is empty. This function never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -561,7 +561,7 @@ public interface STM {
   /**
    * Check if a [TMVar] is not empty. This function never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -586,7 +586,7 @@ public interface STM {
   /**
    * Swap the content of a [TMVar] or retry if it is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -612,7 +612,7 @@ public interface STM {
   /**
    * Returns the currently available number of permits in a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -637,7 +637,7 @@ public interface STM {
   /**
    * Acquire 1 permit from a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -663,7 +663,7 @@ public interface STM {
   /**
    * Acquire [n] permit from a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -692,7 +692,7 @@ public interface STM {
   /**
    * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -719,7 +719,7 @@ public interface STM {
   /**
    * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -746,7 +746,7 @@ public interface STM {
   /**
    * Release a permit back to the [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -770,7 +770,7 @@ public interface STM {
   /**
    * Release [n] permits back to the [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -802,7 +802,7 @@ public interface STM {
   /**
    * Append an element to the [TQueue].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -826,7 +826,7 @@ public interface STM {
   /**
    * Append an element to the [TQueue]. Alias for [STM.write].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -849,7 +849,7 @@ public interface STM {
   /**
    * Remove the front element from the [TQueue] or retry if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -888,7 +888,7 @@ public interface STM {
   /**
    * Same as [TQueue.read] except it returns null if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -913,7 +913,7 @@ public interface STM {
   /**
    * Drains all entries of a [TQueue] into a single list.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -944,7 +944,7 @@ public interface STM {
   /**
    * Read the front element of a [TQueue] without removing it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -974,7 +974,7 @@ public interface STM {
   /**
    * Same as [TQueue.peek] except it returns null if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1002,7 +1002,7 @@ public interface STM {
   /**
    * Prepend an element to the [TQueue].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1030,7 +1030,7 @@ public interface STM {
   /**
    * Check if a [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1056,7 +1056,7 @@ public interface STM {
   /**
    * Check if a [TQueue] is not empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1082,7 +1082,7 @@ public interface STM {
   /**
    * Filter a [TQueue], removing all elements for which [pred] returns false.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1111,7 +1111,7 @@ public interface STM {
   /**
    * Return the current number of elements in a [TQueue]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1137,7 +1137,7 @@ public interface STM {
   /**
    * Read a variable from the [TArray].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1163,7 +1163,7 @@ public interface STM {
   /**
    * Set a variable in the [TArray].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1191,7 +1191,7 @@ public interface STM {
   /**
    * Modify each element in a [TArray] by applying [f].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1214,7 +1214,7 @@ public interface STM {
   /**
    * Fold a [TArray] to a single value.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1239,7 +1239,7 @@ public interface STM {
   /**
    * Check if a key [k] is in the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1264,7 +1264,7 @@ public interface STM {
   /**
    * Lookup a value at the specific key [k]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1291,7 +1291,7 @@ public interface STM {
   /**
    * Alias of [STM.lookup]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1317,7 +1317,7 @@ public interface STM {
   /**
    * Add a key value pair to the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1339,7 +1339,7 @@ public interface STM {
   /**
    * Alias for [STM.insert]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1359,7 +1359,7 @@ public interface STM {
   /**
    * Add a key value pair to the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1379,7 +1379,7 @@ public interface STM {
   /**
    * Update a value at a key if it exists.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1404,7 +1404,7 @@ public interface STM {
   /**
    * Remove a key value pair from a map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1428,7 +1428,7 @@ public interface STM {
   /**
    * Check if an element is already in the set
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1451,7 +1451,7 @@ public interface STM {
   /**
    * Adds an element to the set.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1473,7 +1473,7 @@ public interface STM {
   /**
    * Adds an element to the set. Alias of [STM.insert].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1493,7 +1493,7 @@ public interface STM {
   /**
    * Remove an element from the set.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1517,7 +1517,7 @@ public interface STM {
 /**
  * Helper to create stm blocks that can be run with [STM.orElse]
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.stm
  *
@@ -1543,7 +1543,7 @@ public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
 /**
  * Retry if [b] is false otherwise does nothing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.stm
  *

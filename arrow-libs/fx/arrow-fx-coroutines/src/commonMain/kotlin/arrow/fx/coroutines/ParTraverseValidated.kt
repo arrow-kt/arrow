@@ -115,7 +115,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
@@ -172,7 +172,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*

@@ -36,7 +36,7 @@ import kotlin.time.ExperimentalTime
  *
  * @see [Schedule] for how to build a schedule.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.flow.*
  * import arrow.fx.coroutines.*
  * suspend fun main(): Unit {
@@ -89,7 +89,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  *
  * See [parMapUnordered] if there is no requirement to retain the order of the original stream.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList
@@ -110,7 +110,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
  * concurrently runs, "prefetching", the next element. i.e.
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.fx.coroutines.*
  *
  *  suspend fun main(): Unit {
@@ -162,7 +162,7 @@ public inline fun <A, B> Flow<A>.parMap(
  *
  * See [parMap] if retaining the original order of the stream is required.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList

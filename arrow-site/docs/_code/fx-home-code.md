@@ -1,7 +1,7 @@
 ---
 library: fx
 ---
-```kotlin:ank:playground
+```kotlin
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 

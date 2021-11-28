@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
  * tasks are executed, but no new tasks will be accepted.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
@@ -44,7 +44,7 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
 /**
  * Creates a [Resource] from an [Closeable], which uses [Closeable.close] for releasing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.io.FileInputStream
  *
@@ -64,7 +64,7 @@ public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A):
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.io.FileInputStream
  *
@@ -86,7 +86,7 @@ public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend (
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
  * tasks are executed, but no new tasks will be accepted.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.withContext
  *

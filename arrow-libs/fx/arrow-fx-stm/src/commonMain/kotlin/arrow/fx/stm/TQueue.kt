@@ -23,7 +23,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * Writing to the end of the queue is done by using [STM.write]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -43,7 +43,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * It is also possible to write to the front of the queue, but since that accesses the read variable it can lead to worse overall performance:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -64,7 +64,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * There are several different ways to read from a [TQueue], the most common one being [STM.read]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -85,7 +85,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  * Should the queue be empty calling [STM.read] will cause the transaction to retry and thus wait for items to be added to the queue.
  *  This can be avoided using [STM.tryRead] instead:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -104,7 +104,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * [STM.read] also removes the read item from the queue. Alternatively [STM.peek] will leave the queue unchanged on a read:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -125,7 +125,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * As with [STM.read] [STM.peek] will retry should the queue be empty. The alternative [STM.tryPeek] is there to avoid that:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -144,7 +144,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * It is also possible to read the entire list in one go using [STM.flush]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -168,7 +168,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * Checking if a queue is empty can be done by using either [STM.isEmpty] or [STM.isNotEmpty]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -186,7 +186,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * Retrieving the actual size of a list can be done using [STM.size]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *
@@ -208,7 +208,7 @@ public fun <A> STM.newTQueue(): TQueue<A> = TQueue(newTVar(PList.Nil), newTVar(P
  *
  * It is also possible to remove elements from a [TQueue] using [STM.removeAll]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TQueue
  * import arrow.fx.stm.atomically
  *

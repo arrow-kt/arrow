@@ -75,7 +75,7 @@ public sealed class Validated<out E, out A> {
     /**
      * Lifts two functions to the Bifunctor type.
      *
-     * ```kotlin:ank
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main(args: Array<String>) {
@@ -102,7 +102,7 @@ public sealed class Validated<out E, out A> {
    * Discards the [A] value inside [Validated] signaling this container may be pointing to a noop
    * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -306,9 +306,10 @@ public sealed class Validated<out E, out A> {
    * Example:
    * ```kotlin
    * import arrow.core.Validated
-   *
-   * Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
-   * Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+   * fun main() {
+   *   Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
+   *   Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+   * }
    * ```
  * <!--- KNIT example-validated-04.kt -->
    */
@@ -624,12 +625,12 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
  *
- * ```kotlin:ank:playground:extension
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val string: Validated<Int, String> = "Hello".invalid()
+ *   val string: Validated<Int, String> = "Hello".valid()
  *   val chars: Validated<Int, CharSequence> =
  *     string.widen<Int, CharSequence, String>()
  *   //sampleEnd
@@ -731,9 +732,13 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  * Example:
  * ```kotlin
  * import arrow.core.Validated
- * Validated.Valid(5).andThen { Valid(10) } // Result: Valid(10)
- * Validated.Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
- * Validated.Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
+ * import arrow.core.andThen
+ *
+ * fun main() {
+ *   Validated.Valid(5).andThen { Validated.Valid(10) } // Result: Valid(10)
+ *   Validated.Valid(5).andThen { Validated.Invalid(10) } // Result: Invalid(10)
+ *   Validated.Invalid(5).andThen { Validated.Valid(10) } // Result: Invalid(5)
+ * }
  * ```
  * <!--- KNIT example-validated-06.kt -->
  */

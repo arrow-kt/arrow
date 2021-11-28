@@ -25,7 +25,7 @@ public const val DoubleInstanceDeprecation: String =
  *
  * Here a some examples:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -38,7 +38,7 @@ public const val DoubleInstanceDeprecation: String =
  * ```
  * <!--- KNIT example-semiring-01.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -53,7 +53,7 @@ public const val DoubleInstanceDeprecation: String =
  *
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -68,7 +68,7 @@ public const val DoubleInstanceDeprecation: String =
  * ```
  * <!--- KNIT example-semiring-03.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {

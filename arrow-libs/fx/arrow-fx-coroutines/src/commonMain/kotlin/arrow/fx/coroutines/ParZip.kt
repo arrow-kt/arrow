@@ -12,7 +12,7 @@ import kotlinx.coroutines.awaitAll
 /**
  * Runs [fa], [fb] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -48,7 +48,7 @@ public suspend inline fun <A, B, C> parZip(
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb] in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -88,7 +88,7 @@ public suspend inline fun <A, B, C> parZip(
 /**
  * Runs [fa], [fb], [fc] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -127,7 +127,7 @@ public suspend inline fun <A, B, C, D> parZip(
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb] & [fc] in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -171,7 +171,7 @@ public suspend inline fun <A, B, C, D> parZip(
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -214,7 +214,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc] & [fd]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -263,7 +263,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -309,7 +309,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd] & [fe]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -362,7 +362,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -411,7 +411,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe] & [ff]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -468,7 +468,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -520,7 +520,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff] & [fg]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -581,7 +581,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -636,7 +636,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff] & [fg]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *

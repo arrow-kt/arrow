@@ -20,7 +20,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *
  * Taking the value out of a [TMVar]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -42,7 +42,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *
  * This behaviour can be avoided by using [STM.tryTake] instead:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -63,7 +63,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *  want to read without emptying you can use either [STM.read] or [STM.tryRead] which will not remove the value.
  *  As with [STM.take] [STM.read] will fail and retry the transaction should the [TMVar] be empty, whereas [STM.tryTake] and [STM.tryRead] will return null instead.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -80,7 +80,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  * ```
  * <!--- KNIT example-tmvar-03.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -100,7 +100,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *
  * Changing the value of an empty [TMVar]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -119,7 +119,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  * Should the [TMVar] be full, [STM.put] will call [STM.retry] and wait for another transaction to empty the [TMVar] again.
  *  This can be avoided by using [STM.tryPut] instead. [STM.tryPut] returns whether or not the operation was successful.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -138,7 +138,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *
  * Another common pattern is to swap the value of a [TMVar], returning the old value and setting a new one:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *
@@ -159,7 +159,7 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  *
  * Checking if a [TMVar] is empty or not can be done by either using [STM.isEmpty] or [STM.isNotEmpty]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMVar
  * import arrow.fx.stm.atomically
  *

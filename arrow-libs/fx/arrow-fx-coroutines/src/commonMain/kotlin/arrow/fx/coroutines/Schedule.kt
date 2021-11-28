@@ -34,7 +34,7 @@ import kotlin.time.nanoseconds
  * ## Constructing a policy:
  *
  * Constructing a simple schedule which recurs 10 times until it succeeds:
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * fun <A> recurTenTimes() = Schedule.recurs<A>(10)
@@ -43,7 +43,7 @@ import kotlin.time.nanoseconds
  *
  * A more complex schedule
  *
- * ```kotlin:ank
+ * ```kotlin
  * import kotlin.time.seconds
  * import kotlin.time.milliseconds
  * import kotlin.time.ExperimentalTime
@@ -78,7 +78,7 @@ import kotlin.time.nanoseconds
  *
  * Assuming we have a suspend effect in, and we want to repeat it 3 times after its first successful execution, we can do:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -97,7 +97,7 @@ import kotlin.time.nanoseconds
  *
  * If we want to discard the values provided by the repetition of the effect, we can combine our policy with [Schedule.unit], using the [zipLeft] or [zipRight] combinators, which will keep just the output of one of the policies:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -119,7 +119,7 @@ import kotlin.time.nanoseconds
  *
  * Following the same strategy, we can zip it with the [Schedule.identity] policy to keep only the last provided result by the effect.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -141,7 +141,7 @@ import kotlin.time.nanoseconds
  *
  * Finally, if we want to keep all intermediate results, we can zip the policy with [Schedule.collect]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -167,7 +167,7 @@ import kotlin.time.nanoseconds
  *
  * We can make use of the policies doWhile or doUntil to repeat an effect while or until its produced result matches a given predicate.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -186,7 +186,7 @@ import kotlin.time.nanoseconds
  *
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import kotlin.time.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*

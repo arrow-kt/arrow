@@ -21,7 +21,7 @@ import kotlin.jvm.JvmStatic
  * Then, to handle these exceptions, we have to make sure we catch them at the call site. This
  * all becomes even more unwieldy when we try to compose exception-throwing procedures.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.andThen
  *
  * //sampleStart
@@ -49,7 +49,7 @@ import kotlin.jvm.JvmStatic
  *
  * By convention, the right side of an `Either` is used to hold successful values.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * val right: Either<String, Int> =
@@ -62,7 +62,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-02.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * val left: Either<String, Int> =
@@ -82,7 +82,7 @@ import kotlin.jvm.JvmStatic
  *
  * So, the map and flatMap methods are right-biased:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -96,7 +96,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-04.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -120,7 +120,7 @@ import kotlin.jvm.JvmStatic
  *
  * Using exception-throwing code, we could write something like this:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -140,7 +140,7 @@ import kotlin.jvm.JvmStatic
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  * import arrow.core.left
@@ -166,7 +166,7 @@ import kotlin.jvm.JvmStatic
  *
  * These calls to `parse` return a [Left] and [Right] value
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * fun parse(s: String): Either<NumberFormatException, Int> =
@@ -186,7 +186,7 @@ import kotlin.jvm.JvmStatic
  *
  * Now, using combinators like `flatMap` and `map`, we can compose our functions together.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -223,7 +223,7 @@ import kotlin.jvm.JvmStatic
  * [SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing [Left] and [Right]
  * values.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -260,7 +260,7 @@ import kotlin.jvm.JvmStatic
  * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
  * can go wrong in our program.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  * //sampleStart
@@ -292,7 +292,7 @@ import kotlin.jvm.JvmStatic
  * we are able to comphrensively handle failure without resulting in an `else` branch; moreover,
  * since Error is sealed, no outside code can add additional subtypes that we might fail to handle.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -336,7 +336,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * //sampleStart
@@ -363,7 +363,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatMap
  * import arrow.core.left
@@ -451,7 +451,7 @@ import kotlin.jvm.JvmStatic
  *
  * Either can also map over the [Left] value with `mapLeft`, which is similar to map, but applies on left instances.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * //sampleStart
@@ -469,7 +469,7 @@ import kotlin.jvm.JvmStatic
  *
  * `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either.Left
  * import arrow.core.Either
  *
@@ -486,7 +486,7 @@ import kotlin.jvm.JvmStatic
  * For using Either's syntax on arbitrary data types.
  * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.right
  *
  * val right7 =
@@ -499,7 +499,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-17.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.left
  *
  *  val leftHello =
@@ -512,7 +512,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-18.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.right
  * import arrow.core.contains
  *
@@ -526,7 +526,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-19.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.left
  * import arrow.core.getOrElse
  *
@@ -540,7 +540,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-20.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.left
  * import arrow.core.getOrHandle
  *
@@ -558,7 +558,7 @@ import kotlin.jvm.JvmStatic
  * passed as first parameter, in case the expression evaluates to `false` it will give an `Either.Left<L>` build from the second parameter.
  * If the expression evaluates to a `true` it will take the third parameter and give an `Either.Right<R>`:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * val value =
@@ -571,7 +571,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-22.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  *
  * val value =
@@ -586,7 +586,7 @@ import kotlin.jvm.JvmStatic
  *
  * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is [Left]
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.right
  *
@@ -600,7 +600,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-24.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.left
  *
@@ -620,7 +620,7 @@ import kotlin.jvm.JvmStatic
  *
  * As an example, we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.getOrHandle
  *
@@ -646,7 +646,7 @@ import kotlin.jvm.JvmStatic
  *
  * See the examples below:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either.Right
  * import arrow.core.leftIfNull
  *
@@ -660,7 +660,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-27.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either.Right
  * import arrow.core.leftIfNull
  *
@@ -674,7 +674,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-28.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either.Left
  * import arrow.core.leftIfNull
  *
@@ -694,7 +694,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightIfNotNull
  *
  * val value =
@@ -707,7 +707,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-30.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightIfNotNull
  *
  * val value =
@@ -726,7 +726,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightIfNull
  *
  * val value =
@@ -739,7 +739,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-either-32.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightIfNull
  *
  * val value =
@@ -932,7 +932,7 @@ public sealed class Either<out A, out B> {
    * Returns the right value if it exists, otherwise null
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Either.Left
    * import arrow.core.Either.Right
    *
@@ -1139,7 +1139,7 @@ public sealed class Either<out A, out B> {
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
      *  that can be applied over all [Either] values in the shape of Either<A, B>
      *
-     *  ```kotlin:ank:playground
+     *  ```kotlin
      *  import arrow.core.*
      *
      *  fun main(args: Array<String>) {
@@ -1257,7 +1257,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *
  * Example:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * suspend fun main(): Unit {
@@ -1418,7 +1418,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
 /**
  * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, B>
  *
- * ```kotlin:ank:playground:extension
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {

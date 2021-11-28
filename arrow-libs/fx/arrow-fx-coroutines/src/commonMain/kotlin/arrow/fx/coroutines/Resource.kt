@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
  *
  * Consider the following use case:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class UserProcessor {
@@ -96,7 +96,7 @@ import kotlinx.coroutines.withContext
  *
  * # Using and composing Resource
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class UserProcessor {
@@ -150,7 +150,7 @@ public sealed class Resource<out A> {
    * Use the created resource
    * When done will run all finalizers
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * class DataSource {
@@ -221,7 +221,7 @@ public sealed class Resource<out A> {
    * Useful when there is a need to create resources that depend on other resources,
    * for combining independent values [zip] provides nicer syntax without the need for callback nesting.
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * object Connection
@@ -278,7 +278,7 @@ public sealed class Resource<out A> {
    * Useful to compose up to 9 independent resources,
    * see example for more details on how to use in code.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * class UserProcessor {
@@ -428,7 +428,7 @@ public sealed class Resource<out A> {
    *
    * Useful in the case that starting a resource takes considerable computing resources or time.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    * import kotlinx.coroutines.delay
    *
@@ -509,7 +509,7 @@ public sealed class Resource<out A> {
     /**
      * Construct a [Resource] from a allocating function [acquire] and a release function [release].
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.fx.coroutines.*
      *
      * suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
@@ -546,7 +546,7 @@ public sealed class Resource<out A> {
  * Marker for `suspend () -> A` to be marked as the [Use] action of a [Resource].
  * Offers a convenient DSL to use [Resource] for simple resources.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -623,7 +623,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
 /**
  * Traverse this [Iterable] and collects the resulting `Resource<B>` of [f] into a `Resource<List<B>>`.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -668,7 +668,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  * Sequences this [Iterable] of [Resource]s.
  * [Iterable.map] and [sequence] is equivalent to [traverseResource].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {

@@ -396,7 +396,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -427,7 +427,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  * on a zip.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -452,7 +452,7 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  * on a zip, excluding all cases where the right value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -503,7 +503,7 @@ public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> 
  * on a zip, excluding all cases where the left value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -528,7 +528,7 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  * with null for padding on the right.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -551,7 +551,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -572,7 +572,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -616,7 +616,7 @@ public fun <A> Iterable<A>.salign(
 /**
  * unzips the structure holding the resulting elements in an `Pair`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -637,7 +637,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
 /**
  * after applying the given function unzip the resulting structure into its elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -660,7 +660,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
 /**
  * splits a union into its component parts.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -686,7 +686,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -833,7 +833,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
 /**
  * attempt to split the computation, giving access to the first result.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -857,7 +857,7 @@ public fun <A> Iterable<A>.tail(): List<A> =
 /**
  * interleave both computations in a fair way.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -879,7 +879,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
 /**
  * Fair conjunction. Similarly to interleave
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -902,7 +902,7 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * If its first argument succeeds at all, then the results will be
  * fed into the success branch. Otherwise, the failure branch is taken.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -962,7 +962,7 @@ public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
  *
  *  Kind<F, A> -> Kind<F, B>
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.core.*
  *
  *  fun main(args: Array<String>) {

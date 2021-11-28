@@ -13,7 +13,7 @@ Referential transparency allows us to reason about the different pieces of our p
 
 To create a pure function in Kotlin, let's use the keyword `fun`:
 
-```kotlin:ank:playground
+```kotlin
 //sampleStart
 fun helloWorld(): String =
   "Hello World"
@@ -91,7 +91,7 @@ KotlinX Coroutines offers `runBlocking`, `launch` and `async` to run a suspended
 Usage of unsafe runner functions (like `runBlocking` in this case) is reserved for the end of the world and may be the only impure execution of a well-typed functional program.
 `launch` and `async` can however also be used in pure/safe ways if they're used within another `suspend fun`.
 
-```kotlin:ank:playground
+```kotlin
 import kotlinx.coroutines.*
 import arrow.fx.coroutines.*
 

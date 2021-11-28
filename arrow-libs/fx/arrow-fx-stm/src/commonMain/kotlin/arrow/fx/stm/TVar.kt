@@ -27,7 +27,7 @@ import kotlin.coroutines.resume
  *  race conditions again. However the benefit of using this over `atomically { tvar.read() }` is that it avoids creating a transaction and is
  *  thus much faster.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  *
  * suspend fun main() {
@@ -42,7 +42,7 @@ import kotlin.coroutines.resume
  *
  * Reading from a [TVar] inside a transaction is done by using [STM.read].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -69,7 +69,7 @@ import kotlin.coroutines.resume
  *
  * Writing a new value to the [TVar]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -87,7 +87,7 @@ import kotlin.coroutines.resume
  *
  * Modifying the value based on the initial value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -105,7 +105,7 @@ import kotlin.coroutines.resume
  *
  * Writing a new value to the [TVar] and returning the initial value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *

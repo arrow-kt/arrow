@@ -32,7 +32,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example of stack safety:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Eval
  *
  * //sampleStart
@@ -66,7 +66,7 @@ public sealed class Eval<out A> {
      *
      * @param a is an already computed value of type [A]
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {
@@ -89,7 +89,7 @@ public sealed class Eval<out A> {
      *
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {
@@ -112,7 +112,7 @@ public sealed class Eval<out A> {
      *
      * @param f is a function or computation that will be called every time `.value()` is invoked.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {

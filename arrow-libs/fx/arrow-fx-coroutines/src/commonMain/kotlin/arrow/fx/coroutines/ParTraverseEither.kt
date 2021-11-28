@@ -76,7 +76,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
@@ -167,7 +167,7 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers

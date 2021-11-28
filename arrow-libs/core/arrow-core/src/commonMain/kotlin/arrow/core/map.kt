@@ -9,7 +9,7 @@ import kotlin.collections.flatMap as _flatMap
  * Combines to structures by taking the intersection of their shapes
  * and using `Pair` to hold the elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -29,7 +29,7 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * Combines to structures by taking the intersection of their shapes
  * and combining the elements with the given function.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -265,7 +265,7 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -286,7 +286,7 @@ public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -339,7 +339,7 @@ public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C)
 /**
  * Splits a union into its component parts.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -368,7 +368,7 @@ public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -388,7 +388,7 @@ public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): P
 /**
  * Unzips the structure holding the resulting elements in an `Pair`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -409,7 +409,7 @@ public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
 /**
  * After applying the given function unzip the resulting structure into its elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {

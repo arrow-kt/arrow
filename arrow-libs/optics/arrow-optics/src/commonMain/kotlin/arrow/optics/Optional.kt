@@ -23,7 +23,7 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
 /**
  * [Optional] is an optic that allows to focus into a structure and querying or [copy]'ing an optional focus.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some

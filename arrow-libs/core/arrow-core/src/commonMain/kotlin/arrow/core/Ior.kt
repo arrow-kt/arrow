@@ -105,7 +105,7 @@ public sealed class Ior<out A, out B> {
      *  Lifts a function `(B) -> C` to the [Ior] structure returning a polymorphic function
      *  that can be applied over all [Ior] values in the shape of Ior<A, B>
      *
-     *  ```kotlin:ank:playground
+     *  ```kotlin
      *  import arrow.core.*
      *
      *  fun main(args: Array<String>) {
@@ -255,7 +255,7 @@ public sealed class Ior<out A, out B> {
    * Return this [Ior] as [Pair] of nullables]
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
    * //sampleStart
@@ -299,7 +299,7 @@ public sealed class Ior<out A, out B> {
    * and [null] if this is a [Left].
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
    * //sampleStart
@@ -323,7 +323,7 @@ public sealed class Ior<out A, out B> {
    * and [null] if this is a [Right].
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
    * //sampleStart
@@ -677,7 +677,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
  *
- * ```kotlin:ank:playground:extension
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {

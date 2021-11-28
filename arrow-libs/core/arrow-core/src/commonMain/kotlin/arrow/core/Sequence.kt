@@ -242,7 +242,7 @@ public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.align
  *
  * fun main(args: Array<String>) {
@@ -263,7 +263,7 @@ public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Se
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.align
  *
  * fun main(args: Array<String>) {
@@ -354,7 +354,7 @@ public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
  * If its first argument succeeds at all, then the results will be
  * fed into the success branch. Otherwise, the failure branch is taken.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.ifThen
  *
  * fun main(args: Array<String>) {
@@ -377,7 +377,7 @@ public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): 
 /**
  * interleave both computations in a fair way.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.interleave
  *
  * fun main(args: Array<String>) {
@@ -409,7 +409,7 @@ public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
  * on a zip, excluding all cases where the right value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.leftPadZip
  *
  * //sampleStart
@@ -434,7 +434,7 @@ public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> 
  * with null for padding on the left.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.leftPadZip
  *
  * //sampleStart
@@ -465,7 +465,7 @@ public fun <A> Sequence<A>.once(): Sequence<A> =
  * Returns a [Sequence<Pair<A?, B?>>] containing the zipped values of the two sequences with null for padding.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.padZip
  *
  * //sampleStart
@@ -496,7 +496,7 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
  * on a zip.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.padZip
  *
  * //sampleStart
@@ -529,7 +529,7 @@ public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
  * on a zip, excluding all cases where the left value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightPadZip
  *
  * //sampleStart
@@ -554,7 +554,7 @@ public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> 
  * with null for padding on the right.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.rightPadZip
  *
  * //sampleStart
@@ -628,7 +628,7 @@ public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
 /**
  * attempt to split the computation, giving access to the first result.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.split
  *
  * fun main(args: Array<String>) {
@@ -695,7 +695,7 @@ public fun <E, A, B> Sequence<A>.traverseValidated(
 /**
  * splits an union into its component parts.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.bothIor
  * import arrow.core.leftIor
  * import arrow.core.unalign
@@ -721,7 +721,7 @@ public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.leftIor
  * import arrow.core.unalign
  *
@@ -750,7 +750,7 @@ public fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
 /**
  * Fair conjunction. Similarly to interleave
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.unweave
  *
  * fun main(args: Array<String>) {
@@ -770,7 +770,7 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
 /**
  * unzips the structure holding the resulting elements in an `Pair`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
@@ -790,7 +790,7 @@ public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
 /**
  * after applying the given function unzip the resulting structure into its elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
@@ -818,7 +818,7 @@ public fun <A> Sequence<A>.void(): Sequence<Unit> =
  *
  *  Kind<F, A> -> Kind<F, B>
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.core.widen
  *
  *  fun main(args: Array<String>) {

@@ -10,7 +10,7 @@ import arrow.fx.coroutines.Resource
  *
  *  * # Using and composing Resource
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.computations.resource
  * import arrow.fx.coroutines.release
  *

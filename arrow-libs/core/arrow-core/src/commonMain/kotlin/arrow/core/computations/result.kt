@@ -25,7 +25,7 @@ public object result {
   /**
    * Provides a computation block for [Result] which is build on top of Kotlin's Result Std operations.
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.core.*
    *
    * fun main() {

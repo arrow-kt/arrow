@@ -10,7 +10,7 @@ import arrow.continuations.generic.AtomicRef
  * So in case you don't need to pass around an atomic reference, or use it in top-level functions
  * it's advised to use `atomic` from Atomic Fu directly.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main() {
@@ -75,7 +75,7 @@ public interface Atomic<A> {
   /**
    * Modify allows to inspect the state [A] of the [AtomicRef], update it and extract a different state [B].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * typealias Id = Int
@@ -145,7 +145,7 @@ public interface Atomic<A> {
    * and need to work with with certain properties individually,
    * or want to hide parts of your domain from a dependency.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * data class Preference(val isEnabled: Boolean)
@@ -184,7 +184,7 @@ public interface Atomic<A> {
      *
      * Data type on top of [atomic] to use in parallel functions.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.fx.coroutines.*
      *
      * suspend fun main() {

@@ -16,7 +16,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *
  * Similar to normal arrays there are a few ways to create a [TArray]:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.fx.stm.TArray
  * import arrow.fx.stm.atomically
  *
@@ -37,7 +37,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *
  * ## Reading a value from the array
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TArray
  * import arrow.fx.stm.atomically
  *
@@ -55,7 +55,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *
  * ## Setting a value in the array
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TArray
  * import arrow.fx.stm.atomically
  *
@@ -75,7 +75,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *
  * ## Transform the entire array
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TArray
  * import arrow.fx.stm.atomically
  *
@@ -92,7 +92,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *
  * ## Folding the array
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TArray
  * import arrow.fx.stm.atomically
  *

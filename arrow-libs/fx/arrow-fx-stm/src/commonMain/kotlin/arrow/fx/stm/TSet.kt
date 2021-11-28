@@ -26,7 +26,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *
  * Adding an element can be achieved by using either [STM.insert] or its alias [STM.plusAssign]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *
@@ -44,7 +44,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *
  * ## Removing an element from the set
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *
@@ -62,7 +62,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *
  * ## Checking for membership
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *

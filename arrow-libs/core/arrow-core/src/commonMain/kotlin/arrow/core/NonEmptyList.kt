@@ -15,7 +15,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  * A `NonEmptyList` guarantees the list always has at least 1 element.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.nonEmptyListOf
  *
  * val value =
@@ -33,7 +33,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  * Unlike `List[0]`, `NonEmptyList.head` it's a safe operation that guarantees no exception throwing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.nonEmptyListOf
  *
  * val value =
@@ -52,7 +52,7 @@ public typealias Nel<A> = NonEmptyList<A>
  * The first argument is a function that addresses the __seed value__, this can be any object of any type which will then become the resulting typed value.
  * The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
  *
@@ -71,7 +71,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  * `map` allows us to transform `A` into `B` in `NonEmptyList< A >`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.nonEmptyListOf
  *
  * val value =
@@ -90,7 +90,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  * `flatMap` allows us to compute over the contents of multiple `NonEmptyList< * >` values
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
  *
@@ -114,7 +114,7 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  * Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
  * import arrow.core.zip

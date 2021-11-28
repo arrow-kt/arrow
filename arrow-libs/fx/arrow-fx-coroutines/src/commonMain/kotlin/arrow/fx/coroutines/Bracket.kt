@@ -107,7 +107,7 @@ public suspend inline fun <A> guaranteeCase(
  * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
  * of its exit condition.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -183,7 +183,7 @@ public suspend inline fun <A, B> bracket(
  *
  * @param release is the action to release the allocated resource after [use] terminates.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {

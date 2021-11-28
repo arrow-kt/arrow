@@ -17,7 +17,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * and if it is it allows the `option { }` binding to continue.
    * In case it is `false`, then it short-circuits the binding and returns [None].
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.core.computations.option
    *
    * //sampleStart
@@ -45,7 +45,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
  * Otherwise, if the [value] is null then the [option] binding will short-circuit with [None].
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.computations.option
  * import arrow.core.computations.ensureNotNull
  *

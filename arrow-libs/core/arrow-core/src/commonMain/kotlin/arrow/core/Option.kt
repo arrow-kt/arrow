@@ -16,7 +16,7 @@ import kotlin.jvm.JvmStatic
  *
  * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.none
@@ -34,7 +34,7 @@ import kotlin.jvm.JvmStatic
  *
  * Let's write a function that may or may not give us a string, thus returning `Option<String>`:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -48,7 +48,7 @@ import kotlin.jvm.JvmStatic
  *
  * Using `getOrElse`, we can provide a default value `"No value"` when the optional argument `None` does not exist:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -68,7 +68,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-03.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -90,7 +90,7 @@ import kotlin.jvm.JvmStatic
  *
  * Checking whether option has value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -110,7 +110,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-05.kt -->
  * Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  *
  * //sampleStart
@@ -125,7 +125,7 @@ import kotlin.jvm.JvmStatic
  *
  * Option can also be used with when statements:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -143,7 +143,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-07.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -165,7 +165,7 @@ import kotlin.jvm.JvmStatic
  *
  * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the option:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -186,7 +186,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-09.kt -->
  * Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.Some
  *
@@ -200,7 +200,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-10.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.none
  *
@@ -216,7 +216,7 @@ import kotlin.jvm.JvmStatic
  *
  * Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.some
  * import arrow.core.none
  *
@@ -231,7 +231,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-12.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.toOption
  *
  * //sampleStart
@@ -250,7 +250,7 @@ import kotlin.jvm.JvmStatic
  *
  * You can easily convert between `A?` and `Option<A>` by using the `toOption()` extension or `Option.fromNullable` constructor.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.firstOrNone
  * import arrow.core.toOption
  *
@@ -270,7 +270,7 @@ import kotlin.jvm.JvmStatic
  *
  * ### Transforming the inner contents
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Some
  *
  * fun main() {
@@ -285,7 +285,7 @@ import kotlin.jvm.JvmStatic
  *
  * ### Computing over independent values
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Some
  *
  *  val value =
@@ -300,7 +300,7 @@ import kotlin.jvm.JvmStatic
  *
  * ### Computing over dependent values ignoring absence
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.Option
@@ -320,7 +320,7 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-17.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.none
@@ -1021,7 +1021,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *
  *  Option<A> -> Option<B>
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.core.Option
  *  import arrow.core.some
  *  import arrow.core.widen

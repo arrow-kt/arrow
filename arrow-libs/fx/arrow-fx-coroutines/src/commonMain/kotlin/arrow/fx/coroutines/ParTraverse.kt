@@ -60,7 +60,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * typealias Task = suspend () -> Unit
@@ -95,7 +95,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -150,7 +150,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * data class User(val id: Int, val createdOn: String)
@@ -180,7 +180,7 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *

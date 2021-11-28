@@ -6,7 +6,7 @@ package arrow.core
  * @throws Throwable the Throwable `this` if Fatal
  * @return the Throwable `this` if NonFatal
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.*
  * import arrow.core.*
  *

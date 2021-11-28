@@ -25,7 +25,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Reading from a [TMap] can be done using either [STM.lookup] or its alias [STM.get].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -50,7 +50,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Inserting can be done using either [STM.insert] or its alias [STM.set]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -68,7 +68,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Another option when adding elements is to use [STM.plusAssign]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -88,7 +88,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Using [STM.update] it is possible to update an existing value of a [TMap]. If the value is not present it does nothing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -111,7 +111,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Using [STM.member] it is possible to check if a [TMap] contains a value for a key:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -132,7 +132,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Removing is done by using [STM.remove]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *

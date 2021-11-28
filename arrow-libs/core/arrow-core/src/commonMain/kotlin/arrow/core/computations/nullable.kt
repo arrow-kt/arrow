@@ -19,7 +19,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * and if it is it allows the `nullable { }` binding to continue.
    * In case it is `false`, then it short-circuits the binding and returns `null`.
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.core.computations.nullable
    *
    * //sampleStart
@@ -47,7 +47,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
  * Otherwise, if the [value] is null then the [option] binding will short-circuit with [None].
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.computations.nullable
  * import arrow.core.computations.ensureNotNull
  *

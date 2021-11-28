@@ -14,7 +14,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *
  * ## Acquiring one or more permits
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -36,7 +36,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  * Should there be not enough permits the transaction will retry and wait until there are enough permits available again.
  *  [STM.tryAcquire] can be used to avoid this behaviour as it returns whether or not acquisition was successful.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -57,7 +57,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *
  * Permits can be released again using [STM.release]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -80,7 +80,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *
  * ## Reading how many permits are currently available
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
