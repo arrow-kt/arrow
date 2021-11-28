@@ -6,7 +6,6 @@ buildscript {
 
   dependencies {
     classpath(libs.kotlinx.knit)
-    classpath(libs.arrowGradleConfig.dokkaFenceWorkaround)
   }
 }
 
@@ -44,18 +43,11 @@ tasks {
     group = "documentation"
     commandLine("sh", "gradlew", "dokkaGfm")
   }
-  val runValidation by creating(Exec::class) {
-    group = "documentation"
-    commandLine("sh", "gradlew", "arrow-ank:runAnk")
-  }
   val buildDoc by creating(Exec::class) {
     group = "documentation"
     description = "Generates and validates the documentation"
     dependsOn(generateDoc)
-    dependsOn(runValidation)
   }
-
-  runValidation.mustRunAfter(generateDoc)
 
   val undocumentedProjects = listOf(
     project(":arrow-core-test"),

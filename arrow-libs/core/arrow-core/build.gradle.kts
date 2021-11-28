@@ -39,34 +39,3 @@ kotlin {
     }
   }
 }
-
-setupDokka()
-
-dependencies {
-  dokkaGfmPlugin("io.arrow-kt:arrow-gradle-config-dokka")
-}
-
-fun Project.setupDokka(baseUrl: String = properties["pom.smc.url"]?.toString() ?: "") {
-  afterEvaluate {
-    tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaGfm") {
-      outputDirectory.set(file("${rootProject.rootDir}/arrow-site/docs"))
-      extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
-        dokkaSourceSets.named(kotlinSourceSet.name) {
-          perPackageOption {
-            matchingRegex.set(".*\\.internal.*") // match all .internal packages and sub-packages
-            suppress.set(true)
-          }
-          skipDeprecated.set(true)
-          reportUndocumented.set(false)
-          kotlinSourceSet.kotlin.srcDirs.forEach { srcDir ->
-            sourceLink {
-              localDirectory.set(srcDir)
-              remoteUrl.set(uri("$baseUrl/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
-              remoteLineSuffix.set("#L")
-            }
-          }
-        }
-      }
-    }
-  }
-}

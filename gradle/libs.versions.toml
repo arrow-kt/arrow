@@ -1,6 +1,6 @@
 [versions]
 animalSniffer = "1.5.0"
-arrowGradleConfig = "0.6.0-alpha.1"
+arrowGradleConfig = "0.6.0-alpha.2"
 autoService = "1.0-rc7"
 compileTesting = "0.18"
 coroutines = "1.5.2"
@@ -19,12 +19,8 @@ retrofit = "2.8.1"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
-arrowGradleConfig-dokkaFenceWorkaround = { module = "io.arrow-kt:arrow-gradle-config-dokka-fence-workaround", version.ref = "arrowGradleConfig" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
-dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
-dokka-gfmPluginx = { module = "org.jetbrains.dokka:gfm-plugin", version.ref = "dokka" }
 google-autoService = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
 google-compileTesting = { module = "com.google.testing.compile:compile-testing", version.ref = "compileTesting" }
 jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }

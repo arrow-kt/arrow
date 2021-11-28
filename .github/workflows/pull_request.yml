@@ -39,14 +39,14 @@ jobs:
       - name: "ApiCheck"
         run: ./gradlew apiCheck
 
-      - name: "Run code formatter"
-        run: ./gradlew spotlessCheck
+#      - name: "Run code formatter"
+#        run: ./gradlew spotlessCheck
 
       - name: "Create API doc"
         run: ./gradlew dokkaGfm
 
-      - name: "Validate documentation"
-        run: ./gradlew arrow-site:runAnk
+#      - name: "Validate documentation"
+#        run: ./gradlew arrow-site:runAnk
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop

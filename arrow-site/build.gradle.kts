@@ -14,10 +14,6 @@ dependencies {
 }
 
 tasks {
-    register<Exec>("generateAndValidateDoc") {
-        workingDir = file("../arrow-libs")
-        commandLine("sh", "gradlew", "buildDoc")
-    }
 
     register<Exec>("generateSite") {
         commandLine("sh", "generate-site.sh")
@@ -26,11 +22,11 @@ tasks {
     register("buildSite") {
         group = "documentation"
         description = "Generates and validates the documentation, and generates the website"
-        dependsOn("generateAndValidateDoc")
+        dependsOn("buildDoc")
         dependsOn("generateSite")
     }
 
-    named("generateSite").get().mustRunAfter("generateAndValidateDoc")
+    named("generateSite").get().mustRunAfter("buildDoc")
 
     named<Delete>("clean") {
         delete("$projectDir/docs/apidocs")
