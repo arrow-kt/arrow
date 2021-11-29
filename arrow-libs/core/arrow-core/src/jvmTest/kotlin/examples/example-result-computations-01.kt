@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleResultComputations01
 
 import arrow.core.*
+import arrow.core.computations.result
 
 fun main() {
   result { // We can safely use assertion based operation inside blocks
@@ -9,7 +10,7 @@ fun main() {
   } // Result.Failure(IllegalArgumentException("Boom"))
 
   result {
-    Result.failure(RuntimeException("Boom"))
+    Result.failure<Int>(RuntimeException("Boom"))
       .recover { 1 }
       .bind()
   } // Result.Success(1)

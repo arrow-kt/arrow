@@ -253,6 +253,7 @@ import kotlin.jvm.JvmStatic
  * ```kotlin
  * import arrow.core.firstOrNone
  * import arrow.core.toOption
+ * import arrow.core.Option
  *
  * //sampleStart
  * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")

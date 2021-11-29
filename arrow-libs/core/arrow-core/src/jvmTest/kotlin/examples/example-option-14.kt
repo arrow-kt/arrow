@@ -3,6 +3,7 @@ package arrow.core.examples.exampleOption14
 
 import arrow.core.firstOrNone
 import arrow.core.toOption
+import arrow.core.Option
 
 val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
 

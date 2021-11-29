@@ -27,11 +27,12 @@ public object result {
    *
    * ```kotlin
    * import arrow.core.*
+   * import arrow.core.computations.result
    *
    * fun main() {
    *   result { // We can safely use assertion based operation inside blocks
    *     kotlin.require(false) { "Boom" }
-   *   } // Result.Failure(IllegalArgumentException("Boom"))
+   *   } // Result.Failure<Int>(IllegalArgumentException("Boom"))
    *
    *   result {
    *     Result.failure(RuntimeException("Boom"))
