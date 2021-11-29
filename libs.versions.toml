@@ -9,6 +9,7 @@ kotlin = "1.6.0"
 kotlinBinaryCompatibilityValidator = "0.8.0"
 githooks = "0.0.2"
 knit = "0.3.0"
+kover = "0.4.3"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
@@ -39,3 +40,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 githooks = { id = "com.github.jakemarsden.git-hooks", version.ref = "githooks" }
 knit = { id = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref="kover" }
