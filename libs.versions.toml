@@ -9,7 +9,7 @@ kotlin = "1.6.0"
 kotlinBinaryCompatibilityValidator = "0.8.0"
 githooks = "0.0.2"
 knit = "0.3.0"
-kover = "0.4.3"
+kover = "0.4.4"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
