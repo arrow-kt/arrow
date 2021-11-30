@@ -1,0 +1,95 @@
+name: "Publish documentation for testing"
+
+on:
+  push:
+    branches:
+      - add-knit-test
+    paths:
+      - 'arrow-libs/**'
+      - 'arrow-site/**'
+      - '.github/**'
+
+jobs:
+  publish_doc:
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID_FOR_TESTING }}
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      BASEDIR: ${{github.workspace}}/arrow-libs
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
+      JAVA_OPTS: -Xms2g -Xmx4g
+      JEKYLL_ENV: production
+      S3_BUCKET: ${{ secrets.S3_BUCKET_FOR_TESTING }}
+
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "Setup"
+        run: brew install grep
+
+      - name: "Set env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+
+      - name: "Show env"
+        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+
+      - name: "Prepare environment"
+        working-directory: arrow-site
+        run: |
+          mkdir $BASEDIR/logs
+          brew install tree
+          bundle install --gemfile Gemfile --path vendor/bundle
+
+      - name: "Assemble"
+        run: |
+          echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
+          ./gradlew assemble
+
+      - name: "Create API doc"
+        run: ./gradlew dokkaGfm
+
+      - name: "Landing page: build"
+        working-directory: arrow-site
+        run: |
+          bundle exec jekyll build -b docs -s docs
+          tree _site > $BASEDIR/logs/content.log
+
+      - name: "Landing page: publish"
+        working-directory: arrow-site
+        run: |
+          echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
+          ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+
+      - name: "Latest release: publish (/docs)"
+        working-directory: arrow-site
+        run: |
+          echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
+          ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
+
+      - name: "Site: publish sitemap.xml"
+        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        run: |
+          ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
+          aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
+
+      - name: CloudFront cache invalidation
+        run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+
+      - name: List S3
+        run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: arrow-libs/logs
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
