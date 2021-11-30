@@ -145,13 +145,10 @@ jobs:
       - name: "Create API doc"
         run: ./gradlew  --no-parallel dokkaGfm
 
-      - name: "Validate documentation"
-        run: ./gradlew arrow-site:runAnk
-
       - name: "Landing page: build"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs -s build/site
+          bundle exec jekyll build -s docs
           tree _site > $BASEDIR/logs/content.log
 
       - name: "Landing page: publish"
@@ -166,7 +163,7 @@ jobs:
       - name: "Latest release: build (docs/)"
         if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs -s build/site
+          bundle exec jekyll build -s docs
           tree _site > $BASEDIR/logs/content_docs.log
 
       - name: "Latest release: publish (docs/)"
@@ -179,7 +176,7 @@ jobs:
         if: env.NEW_RELEASE_VERSION_EXISTS == '1'
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
+          bundle exec jekyll build -s docs/${SHORT_VERSION}
           tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
 
       - name: "Latest release: publish release directory (docs/<major.minor>)"
@@ -196,7 +193,7 @@ jobs:
       - name: "Next version: build (/docs/next)"
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs/next -s build/site
+          bundle exec jekyll build -s docs/next
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: "Next version: publish (/docs/next)"

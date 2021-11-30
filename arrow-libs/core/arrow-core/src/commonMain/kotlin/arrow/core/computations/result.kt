@@ -35,7 +35,7 @@ public object result {
    *   } // Result.Failure<Int>(IllegalArgumentException("Boom"))
    *
    *   result {
-   *     Result.failure(RuntimeException("Boom"))
+   *     Result.failure<Int>(RuntimeException("Boom"))
    *       .recover { 1 }
    *       .bind()
    *   } // Result.Success(1)
