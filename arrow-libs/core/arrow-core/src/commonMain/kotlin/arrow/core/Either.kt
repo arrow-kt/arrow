@@ -1343,6 +1343,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  * ```kotlin
  * import arrow.core.Either.Left
  * import arrow.core.Either.Right
+ * import arrow.core.merge
  *
  * fun main() {
  *   Right(12).merge() // Result: 12

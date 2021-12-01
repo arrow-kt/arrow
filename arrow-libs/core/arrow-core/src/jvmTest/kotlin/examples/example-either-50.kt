@@ -3,6 +3,7 @@ package arrow.core.examples.exampleEither50
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.merge
 
 fun main() {
   Right(12).merge() // Result: 12
