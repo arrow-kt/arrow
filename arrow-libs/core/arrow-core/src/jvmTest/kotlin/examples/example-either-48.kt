@@ -1,12 +1,14 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither48
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
+import arrow.core.Either.*
+import arrow.core.Either
+import arrow.core.filterOrElse
 
-val right = Right(12).orNull() // Result: 12
-val left = Left(12).orNull()   // Result: null
 fun main() {
-  println("right = $right")
-  println("left = $left")
+  Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
+  Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
+
+  val left: Either<Int, Int> = Left(12)
+  left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
 }

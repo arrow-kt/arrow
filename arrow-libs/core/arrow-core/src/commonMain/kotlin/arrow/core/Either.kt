@@ -650,12 +650,12 @@ import kotlin.jvm.JvmStatic
  * import arrow.core.Either.Right
  * import arrow.core.leftIfNull
  *
- * val value =
- * //sampleStart
- *  Right(12).leftIfNull({ -1 })
- * //sampleEnd
  * fun main() {
- *  println(value)
+ *   val value =
+ *   //sampleStart
+ *     Right(12).leftIfNull({ -1 })
+ *   //sampleEnd
+ *   println(value)
  * }
  * ```
  * <!--- KNIT example-either-27.kt -->
@@ -780,15 +780,14 @@ public sealed class Either<out A, out B> {
    * Applies `ifLeft` if this is a [Left] or `ifRight` if this is a [Right].
    *
    * Example:
-   * ```
- * <!--- KNIT example-either-34.kt -->
+   * ```kotlin
    * val result: Either<Exception, Value> = possiblyFailingOperation()
    * result.fold(
    *      { log("operation failed with $it") },
    *      { log("operation succeeded with $it") }
    * )
    * ```
- * <!--- KNIT example-either-35.kt -->
+   * <!--- KNIT example-either-34.kt -->
    *
    * @param ifLeft the function to apply if this is a [Left]
    * @param ifRight the function to apply if this is a [Right]
@@ -820,12 +819,15 @@ public sealed class Either<out A, out B> {
    * If this is a [Left], then return the left value in [Right] or vice versa.
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.*
+   *
+   * fun main() {
+   *   Either.Left("left").swap()   // Result: Right("left")
+   *   Either.Right("right").swap() // Result: Left("right")
+   * }
    * ```
- * <!--- KNIT example-either-36.kt -->
-   * Left("left").swap()   // Result: Right("left")
-   * Right("right").swap() // Result: Left("right")
-   * ```
- * <!--- KNIT example-either-37.kt -->
+   * <!--- KNIT example-either-35.kt -->
    */
   public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
@@ -834,12 +836,15 @@ public sealed class Either<out A, out B> {
    * The given function is applied if this is a [Right].
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.*
+   *
+   * fun main() {
+   *   Either.Right(12).map { "flower" } // Result: Right("flower")
+   *   Either.Left(12).map { "flower" }  // Result: Left(12)
+   * }
    * ```
- * <!--- KNIT example-either-38.kt -->
-   * Right(12).map { "flower" } // Result: Right("flower")
-   * Left(12).map { "flower" }  // Result: Left(12)
-   * ```
- * <!--- KNIT example-either-39.kt -->
+   * <!--- KNIT example-either-36.kt -->
    */
   public inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
@@ -848,12 +853,15 @@ public sealed class Either<out A, out B> {
    * The given function is applied if this is a [Left].
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.*
+   *
+   * fun main() {
+   *  Either.Right(12).mapLeft { "flower" } // Result: Right(12)
+   *  Either.Left(12).mapLeft { "flower" }  // Result: Left("flower")
+   * }
    * ```
- * <!--- KNIT example-either-40.kt -->
-   * Right(12).mapLeft { "flower" } // Result: Right(12)
-   * Left(12).mapLeft { "flower" }  // Result: Left("flower")
-   * ```
- * <!--- KNIT example-either-41.kt -->
+   * <!--- KNIT example-either-37.kt -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
@@ -865,12 +873,15 @@ public sealed class Either<out A, out B> {
    * Either value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.*
+   *
+   * fun main() {
+   *   Either.Right(12).tapLeft { println("flower") } // Result: Right(12)
+   *   Either.Left(12).tapLeft { println("flower") }  // Result: prints "flower" and returns: Left(12)
+   * }
    * ```
- * <!--- KNIT example-either-42.kt -->
-   * Right(12).tapLeft { println("flower") } // Result: Right(12)
-   * Left(12).tapLeft { println("flower") }  // Result: prints "flower" and returns: Left(12)
-   * ```
- * <!--- KNIT example-either-43.kt -->
+   * <!--- KNIT example-either-38.kt -->
    */
   public inline fun tapLeft(f: (A) -> Unit): Either<A, B> =
     when (this) {
@@ -888,12 +899,15 @@ public sealed class Either<out A, out B> {
    * Either value is returned
    *
    * Example:
+   * ```kotlin
+   *  import arrow.core.*
+   *
+   * fun main() {
+   *   Either.Right(12).tap { println("flower") } // Result: prints "flower" and returns: Right(12)
+   *   Either.Left(12).tap { println("flower") }  // Result: Left(12)
+   * }
    * ```
- * <!--- KNIT example-either-44.kt -->
-   * Right(12).tap { println("flower") } // Result: prints "flower" and returns: Right(12)
-   * Left(12).tap { println("flower") }  // Result: Left(12)
-   * ```
- * <!--- KNIT example-either-45.kt -->
+   * <!--- KNIT example-either-39.kt -->
    */
   public inline fun tap(f: (B) -> Unit): Either<A, B> =
     when (this) {
@@ -915,15 +929,19 @@ public sealed class Either<out A, out B> {
    * the given predicate to the [Right] value.
    *
    * Example:
-   * ```
- * <!--- KNIT example-either-46.kt -->
-   * Right(12).exists { it > 10 } // Result: true
-   * Right(7).exists { it > 10 }  // Result: false
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.Either.Left
    *
-   * val left: Either<Int, Int> = Left(12)
-   * left.exists { it > 10 }      // Result: false
+   * fun main() {
+   *  Either.Right(12).exists { it > 10 } // Result: true
+   *  Either.Right(7).exists { it > 10 }  // Result: false
+   *
+   *  val left: Either<Int, Int> = Left(12)
+   *  left.exists { it > 10 }      // Result: false
+   * }
    * ```
- * <!--- KNIT example-either-47.kt -->
+   * <!--- KNIT example-either-40.kt -->
    */
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
@@ -945,7 +963,7 @@ public sealed class Either<out A, out B> {
    *   println("left = $left")
    * }
    * ```
- * <!--- KNIT example-either-48.kt -->
+   * <!--- KNIT example-either-41.kt -->
    */
   public fun orNull(): B? = fold({ null }, { it })
 
@@ -1001,12 +1019,16 @@ public sealed class Either<out A, out B> {
    * Returns `true` if [Left]
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.*
+   *
+   *  fun main(args: Array<String>) {
+   *   //sampleStart
+   *   Left("foo").isEmpty()  // Result: true
+   *   Right("foo").isEmpty() // Result: false
+   * }
    * ```
- * <!--- KNIT example-either-49.kt -->
-   * Left("foo").isEmpty()  // Result: true
-   * Right("foo").isEmpty() // Result: false
-   * ```
- * <!--- KNIT example-either-50.kt -->
+   * <!--- KNIT example-either-42.kt -->
    */
   public fun isEmpty(): Boolean = isLeft
 
@@ -1014,12 +1036,17 @@ public sealed class Either<out A, out B> {
    * Returns `true` if [Right]
    *
    * Example:
+   * ```kotlin
+   *  import arrow.core.*
+   *
+   *  fun main(args: Array<String>) {
+   *   //sampleStart
+   *   Left("foo").isEmpty()  // Result: false
+   *   Right("foo").isEmpty() // Result: true
+   *   //sampleEnd
+   * }
    * ```
- * <!--- KNIT example-either-51.kt -->
-   * Left("foo").isEmpty()  // Result: false
-   * Right("foo").isEmpty() // Result: true
-   * ```
- * <!--- KNIT example-either-52.kt -->
+   * <!--- KNIT example-either-43.kt -->
    */
   public fun isNotEmpty(): Boolean = isRight
 
@@ -1151,6 +1178,7 @@ public sealed class Either<out A, out B> {
      *   println(result)
      *  }
      *  ```
+     * <!--- KNIT example-either-44.kt -->
      */
     @JvmStatic
     public fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
@@ -1183,12 +1211,16 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  * Returns the value from this [Right] or the given argument if this is a [Left].
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Either.Right
+ * import arrow.core.Either.Left
+ *
+ * fun main() {
+ *   Right(12).getOrElse { 17 } // Result: 12
+ *   Left(12).getOrElse { 17 }  // Result: 17
+ * }
  * ```
- * <!--- KNIT example-either-53.kt -->
- * Right(12).getOrElse { 17 } // Result: 12
- * Left(12).getOrElse { 17 }  // Result: 17
- * ```
- * <!--- KNIT example-either-54.kt -->
+ * <!--- KNIT example-either-45.kt -->
  */
 public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
@@ -1197,12 +1229,16 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * Returns the value from this [Right] or null if this is a [Left].
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Either.Right
+ * import arrow.core.Either.Left
+ *
+ * fun main() {
+ *   Right(12).orNull() // Result: 12
+ *   Left(12).orNull()  // Result: null
+ * }
  * ```
- * <!--- KNIT example-either-55.kt -->
- * Right(12).orNull() // Result: 12
- * Left(12).orNull()  // Result: null
- * ```
- * <!--- KNIT example-either-56.kt -->
+ * <!--- KNIT example-either-46.kt -->
  */
 public fun <B> Either<*, B>.orNull(): B? =
   getOrElse { null }
@@ -1212,12 +1248,17 @@ public fun <B> Either<*, B>.orNull(): B? =
  * the value of [Left].
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Either.Right
+ * import arrow.core.Either.Left
+ * import arrow.core.getOrHandle
+ *
+ * fun main() {
+ *   Right(12).getOrHandle { 17 } // Result: 12
+ *   Left(12).getOrHandle { it + 5 } // Result: 17
+ * }
  * ```
- * <!--- KNIT example-either-57.kt -->
- * Right(12).getOrHandle { 17 } // Result: 12
- * Left(12).getOrHandle { it + 5 } // Result: 17
- * ```
- * <!--- KNIT example-either-58.kt -->
+ * <!--- KNIT example-either-47.kt -->
  */
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1232,15 +1273,20 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  * Returns [Left] with the existing value of [Left] if this is a [Left].<br>
  *
  * Example:
- * ```
- * <!--- KNIT example-either-59.kt -->
- * Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
- * Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
+ * ```kotlin
+ * import arrow.core.Either.*
+ * import arrow.core.Either
+ * import arrow.core.filterOrElse
  *
- * val left: Either<Int, Int> = Left(12)
- * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
+ * fun main() {
+ *   Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
+ *   Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
+ *
+ *   val left: Either<Int, Int> = Left(12)
+ *   left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
+ * }
  * ```
- * <!--- KNIT example-either-60.kt -->
+ * <!--- KNIT example-either-48.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
@@ -1273,7 +1319,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-either-61.kt -->
+ * <!--- KNIT example-either-49.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap {
@@ -1285,12 +1331,16 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  * Returns the value from this [Right] or [Left].
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Either.Left
+ * import arrow.core.Either.Right
+ *
+ * fun main() {
+ *   Right(12).merge() // Result: 12
+ *   Left(12).merge() // Result: 12
+ * }
  * ```
- * <!--- KNIT example-either-62.kt -->
- * Right(12).merge() // Result: 12
- * Left(12).merge() // Result: 12
- * ```
- * <!--- KNIT example-either-63.kt -->
+ * <!--- KNIT example-either-50.kt -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
@@ -1304,14 +1354,18 @@ public inline fun <A> Either<A, A>.merge(): A =
  * Returns [Left] with the existing value of [Left] if this is an [Left].
  *
  * Example:
- * ```
- * <!--- KNIT example-either-64.kt -->
- * Right(12).leftIfNull({ -1 })   // Result: Right(12)
- * Right(null).leftIfNull({ -1 }) // Result: Left(-1)
+ * ```kotlin
+ * import arrow.core.Either.*
+ * import arrow.core.leftIfNull
  *
- * Left(12).leftIfNull({ -1 })    // Result: Left(12)
+ * fun main() {
+ *   Right(12).leftIfNull({ -1 })   // Result: Right(12)
+ *   Right(null).leftIfNull({ -1 }) // Result: Left(-1)
+ *
+ *   Left(12).leftIfNull({ -1 })    // Result: Left(12)
+ * }
  * ```
- * <!--- KNIT example-either-65.kt -->
+ * <!--- KNIT example-either-51.kt -->
  */
 public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   flatMap { it.rightIfNotNull { default() } }
@@ -1321,12 +1375,18 @@ public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B
  * returns `false` otherwise.
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Either.Right
+ * import arrow.core.Either.Left
+ * import arrow.core.contains
+ *
+ * fun main() {
+ *   Right("something").contains("something") // Result: true
+ *   Right("something").contains("anything")  // Result: false
+ *   Left("something").contains("something")  // Result: false
+ * }
  * ```
  * <!--- KNIT example-arrow-core-either-contains-01.kt -->
- * Right("something").contains("something") // Result: true
- * Right("something").contains("anything")  // Result: false
- * Left("something").contains("something")  // Result: false
- *  ```
  *
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
@@ -1349,12 +1409,15 @@ public fun <A> A.right(): Either<Nothing, A> = Right(this)
  * [Left].
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.rightIfNotNull
+ *
+ * fun main() {
+ *   "value".rightIfNotNull { "left" } // Right(b="value")
+ *   null.rightIfNotNull { "left" }    // Left(a="left")
+ * }
  * ```
- * <!--- KNIT example-either-66.kt -->
- * "value".rightIfNotNull { "left" } // Right(b="value")
- * null.rightIfNotNull { "left" }    // Left(a="left")
- * ```
- * <!--- KNIT example-either-67.kt -->
+ * <!--- KNIT example-either-52.kt -->
  */
 public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Left(default())
@@ -1430,7 +1493,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-either-68.kt -->
+ * <!--- KNIT example-either-53.kt -->
  */
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this

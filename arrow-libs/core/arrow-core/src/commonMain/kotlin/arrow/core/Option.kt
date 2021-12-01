@@ -424,12 +424,16 @@ public sealed class Option<out A> {
    * None value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).tapNone { println("flower") } // Result: Some(12)
+   *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+   * }
    * ```
- * <!--- KNIT example-option-19.kt -->
-   * Some(12).tapNone { println("flower") } // Result: Some(12)
-   * none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
-   * ```
- * <!--- KNIT example-option-20.kt -->
+   * <!--- KNIT example-option-19.kt -->
    */
   public inline fun tapNone(f: () -> Unit): Option<A> =
     when (this) {
@@ -447,12 +451,16 @@ public sealed class Option<out A> {
    * Some value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
+   *   none<Int>().tap { println("flower") }  // Result: None
+   * }
    * ```
- * <!--- KNIT example-option-21.kt -->
-   * Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
-   * none<Int>().tap { println("flower") }  // Result: None
-   * ```
- * <!--- KNIT example-option-22.kt -->
+   * <!--- KNIT example-option-20.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Option<A> =
     when (this) {
@@ -712,15 +720,20 @@ public sealed class Option<out A> {
    * Otherwise, returns false.
    *
    * Example:
-   * ```
- * <!--- KNIT example-option-23.kt -->
-   * Some(12).exists { it > 10 } // Result: true
-   * Some(7).exists { it > 10 }  // Result: false
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
    *
-   * val none: Option<Int> = None
-   * none.exists { it > 10 }      // Result: false
+   * fun main() {
+   *   Some(12).exists { it > 10 } // Result: true
+   *   Some(7).exists { it > 10 }  // Result: false
+   *
+   *   val none: Option<Int> = None
+   *   none.exists { it > 10 }      // Result: false
+   * }
    * ```
- * <!--- KNIT example-option-24.kt -->
+   * <!--- KNIT example-option-21.kt -->
    *
    * @param predicate the predicate to test
    */
@@ -732,15 +745,20 @@ public sealed class Option<out A> {
    * Otherwise, returns null.
    *
    * Example:
-   * ```
- * <!--- KNIT example-option-25.kt -->
-   * Some(12).exists { it > 10 } // Result: 12
-   * Some(7).exists { it > 10 }  // Result: null
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
    *
-   * val none: Option<Int> = None
-   * none.exists { it > 10 }      // Result: null
+   * fun main() {
+   *   Some(12).exists { it > 10 } // Result: 12
+   *   Some(7).exists { it > 10 }  // Result: null
+   *
+   *   val none: Option<Int> = None
+   *   none.exists { it > 10 }      // Result: null
+   * }
    * ```
- * <!--- KNIT example-option-26.kt -->
+   * <!--- KNIT example-option-22.kt -->
    */
   public inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
@@ -1035,6 +1053,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
+ * <!--- KNIT example-option-23.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this

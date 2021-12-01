@@ -88,7 +88,7 @@ public sealed class Validated<out E, out A> {
      *   println("res2: $res2")
      * }
      * ```
- * <!--- KNIT example-validated-01.kt -->
+     * <!--- KNIT example-validated-01.kt -->
      */
     @JvmStatic
     public inline fun <A, B, C, D> lift(
@@ -113,7 +113,7 @@ public sealed class Validated<out E, out A> {
    *   println(result)
    * }
    * ```
- * <!--- KNIT example-validated-02.kt -->
+   * <!--- KNIT example-validated-02.kt -->
    */
   public fun void(): Validated<E, Unit> =
     map { Unit }
@@ -281,10 +281,13 @@ public sealed class Validated<out E, out A> {
    * Validated value is returned
    *
    * Example:
-   * ```
+   * ```kotlin
    * import arrow.core.Validated
-   * Validated.Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
-   * Validated.Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
+   *
+   * fun main() {
+   *   Validated.Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
+   *   Validated.Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
+   * }
    * ```
    * <!--- KNIT example-validated-03.kt -->
    */
@@ -306,12 +309,13 @@ public sealed class Validated<out E, out A> {
    * Example:
    * ```kotlin
    * import arrow.core.Validated
+   *
    * fun main() {
    *   Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
    *   Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
    * }
    * ```
- * <!--- KNIT example-validated-04.kt -->
+   * <!--- KNIT example-validated-04.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
     when (this) {
