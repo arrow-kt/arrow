@@ -11,13 +11,11 @@ on:
 
 jobs:
   publish_doc:
-
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID_FOR_TESTING }}
       AWS_DEFAULT_REGION: eu-west-1
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      BASEDIR: ${{github.workspace}}/arrow-libs
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
       JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
@@ -46,7 +44,8 @@ jobs:
         run: |
           mkdir $BASEDIR/logs
           brew install tree
-          bundle install --gemfile Gemfile --path vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle install --gemfile Gemfile
 
       - name: "Assemble"
         run: |
@@ -74,8 +73,33 @@ jobs:
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
 
+      - name: "Latest release: build release directory (/docs/<major.minor>)"
+        run: |
+          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
+          bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
+          tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+
+      - name: "Latest release: publish release directory (/docs/<major.minor>)"
+        run: |
+          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
+          echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
+          if [ "${SHORT_VERSION}" != "" ]; then
+            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
+          else
+            exit 1
+          fi
+
+      - name: "Next version: build (/docs/next)"
+        run: |
+          bundle exec jekyll build -b docs/next -s docs
+          tree _site > $BASEDIR/logs/content_docs-next.log
+
+      - name: "Next version: publish (/docs/next)"
+        run: |
+          echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+
       - name: "Site: publish sitemap.xml"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
