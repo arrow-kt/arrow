@@ -16,7 +16,7 @@ jobs:
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID_FOR_TESTING }}
       AWS_DEFAULT_REGION: eu-west-1
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      BASEDIR: ${{GITHUB_WORKSPACE}}/arrow-libs
+      BASEDIR: ${{github.workspace}}/arrow-libs
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
       JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
