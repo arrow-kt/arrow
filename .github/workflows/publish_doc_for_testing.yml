@@ -48,11 +48,6 @@ jobs:
           bundle config set --local path 'vendor/bundle'
           bundle install --gemfile Gemfile
 
-      - name: "Assemble"
-        run: |
-          echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
-          ./gradlew assemble
-
       - name: "Create API doc"
         run: ./gradlew dokkaGfm
 
@@ -75,12 +70,14 @@ jobs:
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
 
       - name: "Latest release: build release directory (/docs/<major.minor>)"
+        working-directory: arrow-site
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
           bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
           tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
 
       - name: "Latest release: publish release directory (/docs/<major.minor>)"
+        working-directory: arrow-site
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
           echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
@@ -91,11 +88,13 @@ jobs:
           fi
 
       - name: "Next version: build (/docs/next)"
+        working-directory: arrow-site
         run: |
           bundle exec jekyll build -b docs/next -s docs
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: "Next version: publish (/docs/next)"
+        working-directory: arrow-site
         run: |
           echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
           aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
