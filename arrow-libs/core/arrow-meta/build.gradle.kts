@@ -1,11 +1,8 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.jvm)
-  alias(libs.plugins.arrowGradleConfig.publishJvm)
-  id("org.jetbrains.kotlin.kapt")
-}
-
-publishJVM {
-  isDokkaEnabled = false
+  id(libs.plugins.kotlin.jvm.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
+  id(libs.plugins.kotlin.kapt.get().pluginId)
 }
 
 dependencies {
@@ -25,7 +22,7 @@ dependencies {
   kaptTest(libs.google.autoService)
   testImplementation(libs.google.compileTesting)
   testImplementation(fileTree("dir" to "./src/test/libs", "includes" to listOf("*.jar")))
-  testImplementation(projects.arrowMeta.arrowMetaTestModels)
+  testImplementation(projects.arrowMetaTestModels)
   testImplementation(libs.jUnitJUnit)
   testRuntimeOnly(libs.jUnitVintageEngine)
   testImplementation(libs.kotlinTest.runnerJUnit4) { exclude(group = "io.arrow-kt") }

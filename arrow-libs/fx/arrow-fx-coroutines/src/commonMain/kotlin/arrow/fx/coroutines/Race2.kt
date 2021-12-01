@@ -17,7 +17,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * Cancelling the operation cancels all participants.
  * An [uncancellable] participant will back-pressure the result of [raceN].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.suspendCancellableCoroutine
@@ -38,6 +38,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-race2-01.kt -->
  *
  * @param fa task to participate in the race
  * @param fb task to participate in the race
@@ -57,7 +58,7 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.()
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa] & [fb] in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
@@ -79,6 +80,7 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.()
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-race2-02.kt -->
  *
  * @param fa task to participate in the race
  * @param fb task to participate in the race

@@ -10,7 +10,7 @@ import arrow.fx.coroutines.Resource
  *
  *  * # Using and composing Resource
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.computations.resource
  * import arrow.fx.coroutines.release
  *
@@ -47,6 +47,7 @@ import arrow.fx.coroutines.Resource
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-resource-computations-01.kt -->
  */
 public interface ResourceEffect {
   public suspend fun <A> Resource<A>.bind(): A

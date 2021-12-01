@@ -17,7 +17,7 @@ It combines the properties of a `Lens` (getting, setting, and modifying) with th
 
 For a structure `List<Int>`, we can create an `Optional` to focus an optional head `Int`.
 
-```kotlin:ank
+```kotlin
 import arrow.core.*
 import arrow.optics.*
 
@@ -29,18 +29,18 @@ val optionalHead: Optional<List<Int>, Int> = Optional(
 
 Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.*
 
 POptional.listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
-```kotlin:ank
+```kotlin
 POptional.listHead<Int>().modify(listOf(1, 3, 6)) { head -> head * 5 }
 ```
 
 We can also lift such functions.
 
-```kotlin:ank
+```kotlin
 val lifted = POptional.listHead<Int>().lift { head -> head * 5 }
 lifted(emptyList<Int>())
 ```
@@ -51,7 +51,7 @@ An `Optional` instance can be manually constructed from any default or custom `I
 
 We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Option<User>`. So, we first want to look into `Option`, which **optionally** could be a `Some`. And then we want to look into `User`, which optionally filled in his email.
 
-```kotlin:ank
+```kotlin
 data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
@@ -63,10 +63,10 @@ val optEmail: Optional<Option<Participant>, String> = PPrism.some<Participant>()
 
 optEmail.getOrNull(Some(Participant("test", "email")))
 ```
-```kotlin:ank
+```kotlin
 optEmail.getOrNull(None)
 ```
-```kotlin:ank
+```kotlin
 optEmail.getOrNull(Some(Participant("test", null)))
 ```
 
@@ -86,7 +86,7 @@ The `Optionals` will be generated as extension properties on the companion objec
   companion object
 }
 ```
-```kotlin:ank:silent
+```kotlin
 val optionalAge: Optional<Person, Int> = Person.age
 val optionalAddress: Optional<Person, Address> = Person.address
 ```
@@ -97,7 +97,7 @@ A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }
 
 Given a `PPrism` with a focus into `Some` of `Option<Pair<Int, String>>` that can polymorphically change its content to `Pair<String, String>` and a `PLens` with a focus into the `Pair<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Pair` within.
 
-```kotlin:ank
+```kotlin
 val pprism = PPrism.pSome<Pair<Int, String>, Pair<String, String>>()
 val plens = PLens.pairPFirst<Int, String, String>()
 
@@ -106,7 +106,7 @@ val somePair: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>,
 
 val lifted: (Option<Pair<Int, String>>) -> Option<Pair<String, String>> = somePair.lift { _ -> "Hello, " }
 ```
-```kotlin:ank
+```kotlin
 lifted(None)
 ```
 

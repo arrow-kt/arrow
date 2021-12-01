@@ -25,16 +25,17 @@ public object result {
   /**
    * Provides a computation block for [Result] which is build on top of Kotlin's Result Std operations.
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.core.*
+   * import arrow.core.computations.result
    *
    * fun main() {
    *   result { // We can safely use assertion based operation inside blocks
    *     kotlin.require(false) { "Boom" }
-   *   } // Result.Failure(IllegalArgumentException("Boom"))
+   *   } // Result.Failure<Int>(IllegalArgumentException("Boom"))
    *
    *   result {
-   *     Result.failure(RuntimeException("Boom"))
+   *     Result.failure<Int>(RuntimeException("Boom"))
    *       .recover { 1 }
    *       .bind()
    *   } // Result.Success(1)
@@ -46,6 +47,7 @@ public object result {
    *   } // Result.Success(3)
    * }
    * ```
+ * <!--- KNIT example-result-computations-01.kt -->
    */
   public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
     kotlin.runCatching { block(ResultEffect) }

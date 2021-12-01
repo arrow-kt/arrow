@@ -60,7 +60,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * typealias Task = suspend () -> Unit
@@ -77,6 +77,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-partraverse-01.kt -->
  */
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
@@ -94,7 +95,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -112,6 +113,7 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-partraverse-02.kt -->
  */
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
@@ -148,7 +150,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * data class User(val id: Int, val createdOn: String)
@@ -159,11 +161,12 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  *     User(id, Thread.currentThread().name)
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverse(::getUserById)
+ *     .parTraverse { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  * }
  * ```
+ * <!--- KNIT example-partraverse-03.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) -> B): List<B> =
   parTraverse(Dispatchers.Default, f)
@@ -177,7 +180,7 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -189,11 +192,12 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  *     User(id, Thread.currentThread().name)
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverse(Dispatchers.IO, ::getUserById)
+ *     .parTraverse(Dispatchers.IO) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  * }
  * ```
+ * <!--- KNIT example-partraverse-04.kt -->
  */
 public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,

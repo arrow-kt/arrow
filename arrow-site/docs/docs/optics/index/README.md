@@ -14,17 +14,17 @@ permalink: /optics/index/
 If, for a structure `S`, the optionally focus `A` can be indexed by `I`, then `Index` can create an `Optional` with focus at `S` for a given index `I`.
 We can use that `Optional` to safely operate on that focus `S` (i.e., operating on items in a `List` based on the index position).
 
-```kotlin:ank
+```kotlin
 import arrow.optics.typeclasses.Index
 
 val thirdListItemOptional = Index.list<String>().index(3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3"), "newValue")
 ```
-```kotlin:ank
+```kotlin
 thirdListItemOptional.set(listOf("0", "1", "2"), "newValue")
 ```
-```kotlin:ank
+```kotlin
 thirdListItemOptional.setNullable(listOf("0", "1", "2"), "newValue")
 ```
 

@@ -1,13 +1,10 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.multiplatform)
-  alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
+  id(libs.plugins.kotlin.multiplatform.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))
-
-publishMultiplatform {
-  isDokkaEnabled = false
-}
 
 kotlin {
   sourceSets {

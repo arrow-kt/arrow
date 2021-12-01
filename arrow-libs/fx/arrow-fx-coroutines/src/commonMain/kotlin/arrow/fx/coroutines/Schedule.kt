@@ -34,15 +34,16 @@ import kotlin.time.nanoseconds
  * ## Constructing a policy:
  *
  * Constructing a simple schedule which recurs 10 times until it succeeds:
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * fun <A> recurTenTimes() = Schedule.recurs<A>(10)
  * ```
+ * <!--- KNIT example-schedule-01.kt -->
  *
  * A more complex schedule
  *
- * ```kotlin:ank
+ * ```kotlin
  * import kotlin.time.seconds
  * import kotlin.time.milliseconds
  * import kotlin.time.ExperimentalTime
@@ -54,6 +55,7 @@ import kotlin.time.nanoseconds
  *     .andThen(Schedule.spaced<A>(60.seconds) and Schedule.recurs(100)).jittered()
  *     .zipRight(Schedule.identity<A>().collect())
  * ```
+ * <!--- KNIT example-schedule-02.kt -->
  *
  * This policy will recur with exponential backoff as long as the delay is less than 60 seconds and then continue with a spaced delay of 60 seconds.
  * The delay is also randomized slightly to avoid coordinated backoff from multiple services.
@@ -76,7 +78,7 @@ import kotlin.time.nanoseconds
  *
  * Assuming we have a suspend effect in, and we want to repeat it 3 times after its first successful execution, we can do:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -89,12 +91,13 @@ import kotlin.time.nanoseconds
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-schedule-03.kt -->
  *
  * However, when running this new effect, its output will be the number of iterations it has performed, as stated in the documentation of the function. Also notice that we did not handle the error case, there are overloads [repeatOrElse] and [repeatOrElseEither] which offer that capability, [repeat] will just rethrow any error encountered.
  *
  * If we want to discard the values provided by the repetition of the effect, we can combine our policy with [Schedule.unit], using the [zipLeft] or [zipRight] combinators, which will keep just the output of one of the policies:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -112,10 +115,11 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
+ * <!--- KNIT example-schedule-04.kt -->
  *
  * Following the same strategy, we can zip it with the [Schedule.identity] policy to keep only the last provided result by the effect.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -133,10 +137,11 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
+ * <!--- KNIT example-schedule-05.kt -->
  *
  * Finally, if we want to keep all intermediate results, we can zip the policy with [Schedule.collect]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -156,12 +161,13 @@ import kotlin.time.nanoseconds
  *   println(res2)
  * }
  * ```
+ * <!--- KNIT example-schedule-06.kt -->
  *
  * ## Repeating an effect until/while it produces a certain value
  *
  * We can make use of the policies doWhile or doUntil to repeat an effect while or until its produced result matches a given predicate.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -174,12 +180,13 @@ import kotlin.time.nanoseconds
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-schedule-07.kt -->
  *
  * ## Exponential backoff retries
  *
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import kotlin.time.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
@@ -187,6 +194,7 @@ import kotlin.time.nanoseconds
  * @ExperimentalTime
  * val exponential = Schedule.exponential<Unit>(250.milliseconds)
  * ```
+ * <!--- KNIT example-schedule-08.kt -->
  */
 public sealed class Schedule<Input, Output> {
 

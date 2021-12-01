@@ -6,7 +6,7 @@ package arrow.core
  * @throws Throwable the Throwable `this` if Fatal
  * @return the Throwable `this` if NonFatal
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.*
  * import arrow.core.*
  *
@@ -29,6 +29,7 @@ package arrow.core
  *   println(nonFatal)
  * }
  * ```
+ * <!--- KNIT example-nonfatalorthrow-01.kt -->
  *
  */
 // https://youtrack.jetbrains.com/issue/KT-36036

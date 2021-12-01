@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
  *
  * Consider the following use case:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class UserProcessor {
@@ -58,6 +58,7 @@ import kotlinx.coroutines.withContext
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-resource-01.kt -->
  * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
  * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
  * As a consequence of the resource leak, this program does not guarantee the correct release of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
@@ -75,6 +76,8 @@ import kotlinx.coroutines.withContext
  * and there are two ways to define the finalizers with `release` or `releaseCase`.
  *
  * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
  * val resourceA = resource {
  *   "A"
  * } release { a ->
@@ -87,12 +90,13 @@ import kotlinx.coroutines.withContext
  *   println("Releasing $b with exit: $exitCase")
  * }
  * ```
+ * <!--- KNIT example-resource-02.kt -->
  *
  * Here `releaseCase` also signals with what [ExitCase] state the `use` step finished.
  *
  * # Using and composing Resource
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class UserProcessor {
@@ -128,6 +132,7 @@ import kotlinx.coroutines.withContext
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-resource-03.kt -->
  *
  * [Resource]s are immutable and can be composed using [zip] or [parZip].
  * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
@@ -145,7 +150,7 @@ public sealed class Resource<out A> {
    * Use the created resource
    * When done will run all finalizers
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * class DataSource {
@@ -166,6 +171,7 @@ public sealed class Resource<out A> {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-resource-04.kt -->
    */
   @Suppress("UNCHECKED_CAST")
   public tailrec suspend infix fun <B> use(f: suspend (A) -> B): B =
@@ -215,7 +221,7 @@ public sealed class Resource<out A> {
    * Useful when there is a need to create resources that depend on other resources,
    * for combining independent values [zip] provides nicer syntax without the need for callback nesting.
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * object Connection
@@ -246,6 +252,7 @@ public sealed class Resource<out A> {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-resource-05.kt -->
    *
    * @see zip to combine independent resources together
    * @see parZip for combining independent resources in parallel
@@ -271,7 +278,7 @@ public sealed class Resource<out A> {
    * Useful to compose up to 9 independent resources,
    * see example for more details on how to use in code.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * class UserProcessor {
@@ -307,6 +314,7 @@ public sealed class Resource<out A> {
    * }
    * //sampleEnd
    * ```
+ * <!--- KNIT example-resource-06.kt -->
    *
    * @see parZip if you want to combine independent resources in parallel
    * @see flatMap to combine resources that rely on each-other.
@@ -420,7 +428,7 @@ public sealed class Resource<out A> {
    *
    * Useful in the case that starting a resource takes considerable computing resources or time.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    * import kotlinx.coroutines.delay
    *
@@ -457,6 +465,7 @@ public sealed class Resource<out A> {
    * }
    * //sampleEnd
    * ```
+ * <!--- KNIT example-resource-07.kt -->
    */
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
@@ -500,11 +509,11 @@ public sealed class Resource<out A> {
     /**
      * Construct a [Resource] from a allocating function [acquire] and a release function [release].
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.fx.coroutines.*
      *
      * suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
-     * suspend fun releaseResource(r: Int): Unit = println("Releasing expensive resource: $r")
+     * suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
      *
      * suspend fun main(): Unit {
      *   //sampleStart
@@ -515,6 +524,7 @@ public sealed class Resource<out A> {
      *   //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-resource-08.kt -->
      */
     public operator fun <A> invoke(
       acquire: suspend () -> A,
@@ -536,7 +546,7 @@ public sealed class Resource<out A> {
  * Marker for `suspend () -> A` to be marked as the [Use] action of a [Resource].
  * Offers a convenient DSL to use [Resource] for simple resources.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -561,6 +571,7 @@ public sealed class Resource<out A> {
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-resource-09.kt -->
  */
 @Deprecated(
   "Use the resource computation DSL instead",
@@ -612,7 +623,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
 /**
  * Traverse this [Iterable] and collects the resulting `Resource<B>` of [f] into a `Resource<List<B>>`.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -644,6 +655,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  *   res.forEach(::println)
  * }
  * ```
+ * <!--- KNIT example-resource-10.kt -->
  */
 public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
   arrow.fx.coroutines.computations.resource {
@@ -656,7 +668,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  * Sequences this [Iterable] of [Resource]s.
  * [Iterable.map] and [sequence] is equivalent to [traverseResource].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * class File(url: String) {
@@ -688,6 +700,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  *   res.forEach(::println)
  * }
  * ```
+ * <!--- KNIT example-resource-11.kt -->
  */
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =

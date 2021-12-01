@@ -58,7 +58,6 @@ jobs:
         run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
 
       - name: Publish Apple, Linux, JVM & JS targets
-        working-directory: arrow-libs
         run: |
           ./gradlew publishToSonatype
           echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Apple, Linux, JVM & JS deployed!"
@@ -96,7 +95,6 @@ jobs:
         shell: bash
 
       - name: Publish Windows
-        working-directory: arrow-libs
         run: |
           ./gradlew publishToSonatype
           echo "$(cat gradle.properties | grep projects.version | cut -d'=' -f2) MingwX64 deployed!"
@@ -106,14 +104,14 @@ jobs:
 
   publish_doc:
     env:
-      JAVA_OPTS: -Xms2g -Xmx4g
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      S3_BUCKET: ${{ secrets.S3_BUCKET }}
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       AWS_DEFAULT_REGION: eu-west-1
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
+      JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
     runs-on: macos-latest
     timeout-minutes: 60
@@ -138,90 +136,69 @@ jobs:
         run: |
           mkdir $BASEDIR/logs
           brew install tree
-          bundle install --gemfile Gemfile --path vendor/bundle
-
-      - name: "Assemble"
-        working-directory: arrow-libs
-        run: |
-          echo "Additional step to avoid a random failure with Dokka 0.10.0 and MPP"
-          ./gradlew assemble
+          bundle config set --local path 'vendor/bundle'
+          bundle install --gemfile Gemfile
 
       - name: "Create API doc"
-        working-directory: arrow-libs
-        run: ./gradlew  --no-parallel dokkaGfm
-
-      - name: "Validate documentation"
-        working-directory: arrow-site
-        run: ./gradlew runAnk
+        run: ./gradlew dokkaGfm
 
       - name: "Landing page: build"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs -s build/site
+          bundle exec jekyll build -b docs -s docs
           tree _site > $BASEDIR/logs/content.log
 
       - name: "Landing page: publish"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
 
-      - name: "Remove index for versions"
+      - name: "Latest release: publish (/docs)"
         working-directory: arrow-site
-        run: rm -f build/site/index.md
-
-      - name: "Latest release: build (docs/)"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
-        run: |
-          bundle exec jekyll build -b docs -s build/site
-          tree _site > $BASEDIR/logs/content_docs.log
-
-      - name: "Latest release: publish (docs/)"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
-        working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
 
-      - name: "Latest release: build release directory (docs/<major.minor>)"
-        if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      - name: "Latest release: build release directory (/docs/<major.minor>)"
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          bundle exec jekyll build -b docs/${SHORT_VERSION} -s build/site
+          bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
           tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
 
-      - name: "Latest release: publish release directory (docs/<major.minor>)"
-        if: env.NEW_RELEASE_VERSION_EXISTS == '1'
+      - name: "Latest release: publish release directory (/docs/<major.minor>)"
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
           echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
           if [ "${SHORT_VERSION}" != "" ]; then
-            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
+            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
           else
             exit 1
           fi
 
       - name: "Next version: build (/docs/next)"
-        if: ${{ github.ref == 'refs/heads/main' }}
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs/next -s build/site
+          bundle exec jekyll build -b docs/next -s docs
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: "Next version: publish (/docs/next)"
-        if: ${{ github.ref == 'refs/heads/main' }}
         working-directory: arrow-site
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
-          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
 
       - name: "Site: publish sitemap.xml"
-        if: ${{ env.NEW_RELEASE_VERSION_EXISTS == '1' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
