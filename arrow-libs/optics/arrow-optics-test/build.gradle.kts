@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.publish)
 }
 
+apply(plugin = "io.arrow-kt.optics")
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {

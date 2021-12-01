@@ -3,6 +3,8 @@ plugins {
     id(libs.plugins.kotlin.kapt.get().pluginId)
 }
 
+apply(plugin = "io.arrow-kt.optics")
+
 dependencies {
     implementation(projects.arrowCore)
     implementation(projects.arrowFxCoroutines)

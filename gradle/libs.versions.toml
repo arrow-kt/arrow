@@ -12,6 +12,7 @@ kotlinBinaryCompatibilityValidator = "0.7.1"
 knit = "0.3.0"
 mockWebServer = "4.9.2"
 retrofit = "2.8.1"
+arrowMeta = "1.6.0-SNAPSHOT"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
@@ -31,6 +32,7 @@ kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "k
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+arrowMeta-optics = { module = "io.arrow-kt.optics:io.arrow-kt.optics.gradle.plugin", version.ref="arrowMeta" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }

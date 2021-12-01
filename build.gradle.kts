@@ -1,11 +1,19 @@
 buildscript {
   repositories {
     mavenCentral()
-    mavenLocal()
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
   }
 
   dependencies {
     classpath(libs.kotlinx.knit)
+    classpath(libs.arrowMeta.optics)
+  }
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
   }
 }
 
