@@ -1,0 +1,24 @@
+//[arrow-core](../../../index.md)/[arrow.core](../index.md)/[NonEmptyList](index.md)/[zip](zip.md)
+
+# zip
+
+[common]\
+fun &lt;[B](zip.md)&gt; [zip](zip.md)(fb: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;): [NonEmptyList](index.md)&lt;[Pair](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html)&lt;[A](index.md), [B](zip.md)&gt;&gt;
+
+inline fun &lt;[B](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, map: ([A](index.md), [B](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, f: [NonEmptyList](index.md)&lt;[F](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, f: [NonEmptyList](index.md)&lt;[F](zip.md)&gt;, g: [NonEmptyList](index.md)&lt;[G](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, f: [NonEmptyList](index.md)&lt;[F](zip.md)&gt;, g: [NonEmptyList](index.md)&lt;[G](zip.md)&gt;, h: [NonEmptyList](index.md)&lt;[H](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md), [I](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, f: [NonEmptyList](index.md)&lt;[F](zip.md)&gt;, g: [NonEmptyList](index.md)&lt;[G](zip.md)&gt;, h: [NonEmptyList](index.md)&lt;[H](zip.md)&gt;, i: [NonEmptyList](index.md)&lt;[I](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md), [I](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;
+
+inline fun &lt;[B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md), [I](zip.md), [J](zip.md), [Z](zip.md)&gt; [zip](zip.md)(b: [NonEmptyList](index.md)&lt;[B](zip.md)&gt;, c: [NonEmptyList](index.md)&lt;[C](zip.md)&gt;, d: [NonEmptyList](index.md)&lt;[D](zip.md)&gt;, e: [NonEmptyList](index.md)&lt;[E](zip.md)&gt;, f: [NonEmptyList](index.md)&lt;[F](zip.md)&gt;, g: [NonEmptyList](index.md)&lt;[G](zip.md)&gt;, h: [NonEmptyList](index.md)&lt;[H](zip.md)&gt;, i: [NonEmptyList](index.md)&lt;[I](zip.md)&gt;, j: [NonEmptyList](index.md)&lt;[J](zip.md)&gt;, map: ([A](index.md), [B](zip.md), [C](zip.md), [D](zip.md), [E](zip.md), [F](zip.md), [G](zip.md), [H](zip.md), [I](zip.md), [J](zip.md)) -&gt; [Z](zip.md)): [NonEmptyList](index.md)&lt;[Z](zip.md)&gt;

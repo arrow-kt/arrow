@@ -1,0 +1,30 @@
+//[arrow-fx-coroutines](../../index.md)/[arrow.fx.coroutines](index.md)/[parSequenceValidatedN](par-sequence-validated-n.md)
+
+# parSequenceValidatedN
+
+[common]\
+
+@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "parSequenceValidatedNScoped")
+
+suspend fun &lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt; [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html)&lt;suspend CoroutineScope.() -&gt; [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt;&gt;.[parSequenceValidatedN](par-sequence-validated-n.md)(semigroup: [Semigroup](../../../arrow-core/arrow-core/arrow.typeclasses/-semigroup/index.md)&lt;[E](par-sequence-validated-n.md)&gt;, n: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)): [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](par-sequence-validated-n.md)&gt;&gt;
+
+Traverses this [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html) and runs f in [n](par-sequence-validated-n.md) parallel operations on [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html). If one or more of the tasks returns [Validated.Invalid](../../../arrow-core/arrow-core/arrow.core/-validated/-invalid/index.md) then all the [Validated.Invalid](../../../arrow-core/arrow-core/arrow.core/-validated/-invalid/index.md) results will be combined using [semigroup](par-sequence-validated-n.md).
+
+Cancelling this operation cancels all running tasks.
+
+[common]\
+suspend fun &lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt; [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html)&lt;suspend () -&gt; [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt;&gt;.[parSequenceValidatedN](par-sequence-validated-n.md)(semigroup: [Semigroup](../../../arrow-core/arrow-core/arrow.typeclasses/-semigroup/index.md)&lt;[E](par-sequence-validated-n.md)&gt;, n: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)): [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](par-sequence-validated-n.md)&gt;&gt;
+
+suspend fun &lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt; [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html)&lt;suspend () -&gt; [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt;&gt;.[parSequenceValidatedN](par-sequence-validated-n.md)(ctx: [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html) = EmptyCoroutineContext, semigroup: [Semigroup](../../../arrow-core/arrow-core/arrow.typeclasses/-semigroup/index.md)&lt;[E](par-sequence-validated-n.md)&gt;, n: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)): [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](par-sequence-validated-n.md)&gt;&gt;
+
+[common]\
+
+@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "parSequenceValidatedNScoped")
+
+suspend fun &lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt; [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html)&lt;suspend CoroutineScope.() -&gt; [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [A](par-sequence-validated-n.md)&gt;&gt;.[parSequenceValidatedN](par-sequence-validated-n.md)(ctx: [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html) = EmptyCoroutineContext, semigroup: [Semigroup](../../../arrow-core/arrow-core/arrow.typeclasses/-semigroup/index.md)&lt;[E](par-sequence-validated-n.md)&gt;, n: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)): [Validated](../../../arrow-core/arrow-core/arrow.core/-validated/index.md)&lt;[E](par-sequence-validated-n.md), [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](par-sequence-validated-n.md)&gt;&gt;
+
+Traverses this [Iterable](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html) and runs f in [n](par-sequence-validated-n.md) parallel operations on [CoroutineContext](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html). If one or more of the tasks returns [Validated.Invalid](../../../arrow-core/arrow-core/arrow.core/-validated/-invalid/index.md) then all the [Validated.Invalid](../../../arrow-core/arrow-core/arrow.core/-validated/-invalid/index.md) results will be combined using [semigroup](par-sequence-validated-n.md).
+
+Coroutine context is inherited from a CoroutineScope, additional context elements can be specified with [ctx](par-sequence-validated-n.md) argument. If the combined context does not have any dispatcher nor any other [ContinuationInterceptor](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-continuation-interceptor/index.html), then Dispatchers.Default is used. **WARNING** If the combined context has a single threaded [ContinuationInterceptor](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-continuation-interceptor/index.html), this function will not run in parallel.
+
+Cancelling this operation cancels all running tasks.

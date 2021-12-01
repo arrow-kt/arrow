@@ -1,0 +1,6 @@
+//[arrow-meta](../../../index.md)/[arrow.meta.ast](../index.md)/[Property](index.md)/[Property](-property.md)
+
+# Property
+
+[jvm]\
+fun [Property](-property.md)(name: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), type: [TypeName](../-type-name/index.md), mutable: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) = false, kdoc: [Code](../-code/index.md)? = null, initializer: [Code](../-code/index.md)? = null, delegated: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) = false, getter: [Func](../-func/index.md)? = null, setter: [Func](../-func/index.md)? = null, receiverType: [TypeName](../-type-name/index.md)? = null, jvmPropertySignature: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)? = null, jvmFieldSignature: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)? = null, annotations: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Annotation](../-annotation/index.md)&gt; = emptyList(), modifiers: [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[Modifier](../-modifier/index.md)&gt; = emptyList())

@@ -9,12 +9,9 @@ dependencies {
     implementation(projects.arrowFxStm)
     implementation(projects.arrowOptics)
     compileOnly(libs.kotlin.reflect)
-
-    kapt(projects.arrowMeta)
 }
 
 tasks {
-
     register<Exec>("generateSite") {
         commandLine("sh", "generate-site.sh")
     }

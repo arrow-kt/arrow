@@ -44,7 +44,3 @@ kotlin {
     }
   }
 }
-
-dependencies {
-  "kaptTest"(projects.arrowMeta)
-}

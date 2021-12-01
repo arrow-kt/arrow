@@ -1,0 +1,17 @@
+//[arrow-optics](../../../../index.md)/[arrow.optics.typeclasses](../../index.md)/[FilterIndex](../index.md)/[Companion](index.md)
+
+# Companion
+
+[common]\
+object [Companion](index.md)
+
+## Functions
+
+| Name | Summary |
+|---|---|
+| [fromIso](from-iso.md) | [common]<br>fun &lt;[S](from-iso.md), [A](from-iso.md), [I](from-iso.md), [B](from-iso.md)&gt; [fromIso](from-iso.md)(FI: [FilterIndex](../index.md)&lt;[A](from-iso.md), [I](from-iso.md), [B](from-iso.md)&gt;, iso: [Iso](../../../arrow.optics/index.md#1786632304%2FClasslikes%2F-617900156)&lt;[S](from-iso.md), [A](from-iso.md)&gt;): [FilterIndex](../index.md)&lt;[S](from-iso.md), [I](from-iso.md), [B](from-iso.md)&gt;<br>Lift an instance of [FilterIndex](../index.md) using an [Iso](../../../arrow.optics/index.md#1786632304%2FClasslikes%2F-617900156) |
+| [list](list.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](list.md)&gt; [list](list.md)(): [FilterIndex](../index.md)&lt;[List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](list.md)&gt;, [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html), [A](list.md)&gt;<br>[FilterIndex](../index.md) instance definition for [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html). |
+| [map](map.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[K](map.md), [V](map.md)&gt; [map](map.md)(): [FilterIndex](../index.md)&lt;[Map](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html)&lt;[K](map.md), [V](map.md)&gt;, [K](map.md), [V](map.md)&gt; |
+| [nonEmptyList](non-empty-list.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](non-empty-list.md)&gt; [nonEmptyList](non-empty-list.md)(): [FilterIndex](../index.md)&lt;[NonEmptyList](../../../../../arrow-core/arrow-core/arrow.core/-non-empty-list/index.md)&lt;[A](non-empty-list.md)&gt;, [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html), [A](non-empty-list.md)&gt;<br>[FilterIndex](../index.md) instance definition for [NonEmptyList](../../../../../arrow-core/arrow-core/arrow.core/-non-empty-list/index.md). |
+| [sequence](sequence.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](sequence.md)&gt; [sequence](sequence.md)(): [FilterIndex](../index.md)&lt;[Sequence](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html)&lt;[A](sequence.md)&gt;, [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html), [A](sequence.md)&gt; |
+| [string](string.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun [string](string.md)(): [FilterIndex](../index.md)&lt;[String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html), [Char](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html)&gt;<br>[FilterIndex](../index.md) instance for [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html). It allows filtering of every [Char](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char/index.html) in a [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) by its index's position. |

@@ -51,7 +51,6 @@ tasks {
 
   val undocumentedProjects = listOf(
     project(":arrow-core-test"),
-    project(":arrow-meta"),
     project(":arrow-fx-coroutines-test"),
     project(":arrow-optics-test"),
   )

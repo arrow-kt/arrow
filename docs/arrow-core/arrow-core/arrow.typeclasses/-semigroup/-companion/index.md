@@ -1,0 +1,34 @@
+//[arrow-core](../../../../index.md)/[arrow.typeclasses](../../index.md)/[Semigroup](../index.md)/[Companion](index.md)
+
+# Companion
+
+[common]\
+object [Companion](index.md)
+
+## Types
+
+| Name | Summary |
+|---|---|
+| [NonEmptyListSemigroup](-non-empty-list-semigroup/index.md) | [common]<br>object [NonEmptyListSemigroup](-non-empty-list-semigroup/index.md) : [Semigroup](../index.md)&lt;[NonEmptyList](../../../arrow.core/-non-empty-list/index.md)&lt;[Any](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html)?&gt;&gt; |
+
+## Functions
+
+| Name | Summary |
+|---|---|
+| [boolean](boolean.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "Boolean")<br>fun [boolean](boolean.md)(): [Semigroup](../index.md)&lt;[Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)&gt; |
+| [byte](byte.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "Byte")<br>fun [byte](byte.md)(): [Semigroup](../index.md)&lt;[Byte](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html)&gt; |
+| [const](const.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "constant")<br>fun &lt;[A](const.md), [T](const.md)&gt; [const](const.md)(SA: [Semigroup](../index.md)&lt;[A](const.md)&gt;): [Semigroup](../index.md)&lt;[Const](../../../arrow.core/-const/index.md)&lt;[A](const.md), [T](const.md)&gt;&gt; |
+| [either](either.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](either.md), [B](either.md)&gt; [either](either.md)(SA: [Semigroup](../index.md)&lt;[A](either.md)&gt;, SB: [Semigroup](../index.md)&lt;[B](either.md)&gt;): [Semigroup](../index.md)&lt;[Either](../../../arrow.core/-either/index.md)&lt;[A](either.md), [B](either.md)&gt;&gt; |
+| [endo](endo.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](endo.md)&gt; [endo](endo.md)(): [Semigroup](../index.md)&lt;[Endo](../../../arrow.core/-endo/index.md)&lt;[A](endo.md)&gt;&gt; |
+| [int](int.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "Integer")<br>fun [int](int.md)(): [Semigroup](../index.md)&lt;[Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)&gt; |
+| [ior](ior.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](ior.md), [B](ior.md)&gt; [ior](ior.md)(SA: [Semigroup](../index.md)&lt;[A](ior.md)&gt;, SB: [Semigroup](../index.md)&lt;[B](ior.md)&gt;): [Semigroup](../index.md)&lt;[Ior](../../../arrow.core/-ior/index.md)&lt;[A](ior.md), [B](ior.md)&gt;&gt; |
+| [list](list.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](list.md)&gt; [list](list.md)(): [Semigroup](../index.md)&lt;[List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[A](list.md)&gt;&gt; |
+| [long](long.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "Long")<br>fun [long](long.md)(): [Semigroup](../index.md)&lt;[Long](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)&gt; |
+| [map](map.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[K](map.md), [A](map.md)&gt; [map](map.md)(SG: [Semigroup](../index.md)&lt;[A](map.md)&gt;): [Semigroup](../index.md)&lt;[Map](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html)&lt;[K](map.md), [A](map.md)&gt;&gt; |
+| [nonEmptyList](non-empty-list.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](non-empty-list.md)&gt; [nonEmptyList](non-empty-list.md)(): [Semigroup](../index.md)&lt;[NonEmptyList](../../../arrow.core/-non-empty-list/index.md)&lt;[A](non-empty-list.md)&gt;&gt; |
+| [option](option.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](option.md)&gt; [option](option.md)(SGA: [Semigroup](../index.md)&lt;[A](option.md)&gt;): [Semigroup](../index.md)&lt;[Option](../../../arrow.core/-option/index.md)&lt;[A](option.md)&gt;&gt; |
+| [pair](pair.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](pair.md), [B](pair.md)&gt; [pair](pair.md)(SA: [Semigroup](../index.md)&lt;[A](pair.md)&gt;, SB: [Semigroup](../index.md)&lt;[B](pair.md)&gt;): [Semigroup](../index.md)&lt;[Pair](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html)&lt;[A](pair.md), [B](pair.md)&gt;&gt; |
+| [sequence](sequence.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[A](sequence.md)&gt; [sequence](sequence.md)(): [Semigroup](../index.md)&lt;[Sequence](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html)&lt;[A](sequence.md)&gt;&gt; |
+| [short](short.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>@[JvmName](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-name/index.html)(name = "Short")<br>fun [short](short.md)(): [Semigroup](../index.md)&lt;[Short](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-short/index.html)&gt; |
+| [string](string.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun [string](string.md)(): [Semigroup](../index.md)&lt;[String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)&gt; |
+| [validated](validated.md) | [common]<br>@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)<br>fun &lt;[E](validated.md), [A](validated.md)&gt; [validated](validated.md)(SE: [Semigroup](../index.md)&lt;[E](validated.md)&gt;, SA: [Semigroup](../index.md)&lt;[A](validated.md)&gt;): [Semigroup](../index.md)&lt;[Validated](../../../arrow.core/-validated/index.md)&lt;[E](validated.md), [A](validated.md)&gt;&gt; |

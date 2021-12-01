@@ -1,0 +1,6 @@
+//[arrow-meta](../../../../index.md)/[arrow.meta.ast](../../index.md)/[TypeName](../index.md)/[WildcardType](index.md)/[upperBounds](upper-bounds.md)
+
+# upperBounds
+
+[jvm]\
+val [upperBounds](upper-bounds.md): [List](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)&lt;[TypeName](../index.md)&gt;
