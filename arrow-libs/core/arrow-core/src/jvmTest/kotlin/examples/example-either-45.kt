@@ -3,6 +3,7 @@ package arrow.core.examples.exampleEither45
 
 import arrow.core.Either.Right
 import arrow.core.Either.Left
+import arrow.core.getOrElse
 
 fun main() {
   Right(12).getOrElse { 17 } // Result: 12

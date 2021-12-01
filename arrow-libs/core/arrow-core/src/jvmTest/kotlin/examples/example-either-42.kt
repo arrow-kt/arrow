@@ -5,6 +5,6 @@ import arrow.core.*
 
  fun main(args: Array<String>) {
   //sampleStart
-  Left("foo").isEmpty()  // Result: true
-  Right("foo").isEmpty() // Result: false
+  Either.Left("foo").isEmpty()  // Result: true
+  Either.Right("foo").isEmpty() // Result: false
 }

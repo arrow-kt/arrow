@@ -5,7 +5,7 @@ package arrow.core.examples.exampleEither43
 
  fun main(args: Array<String>) {
   //sampleStart
-  Left("foo").isEmpty()  // Result: false
-  Right("foo").isEmpty() // Result: true
+  Either.Left("foo").isEmpty()  // Result: false
+  Either.Right("foo").isEmpty() // Result: true
   //sampleEnd
 }

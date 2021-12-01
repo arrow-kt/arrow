@@ -781,11 +781,19 @@ public sealed class Either<out A, out B> {
    *
    * Example:
    * ```kotlin
-   * val result: Either<Exception, Value> = possiblyFailingOperation()
-   * result.fold(
-   *      { log("operation failed with $it") },
-   *      { log("operation succeeded with $it") }
-   * )
+   * import arrow.core.*
+   *
+   * fun main() {
+   *   fun possiblyFailingOperation(): Either.Right<Int> =
+   *     Either.Right(1)
+   *   //sampleStart
+   *   val result: Either<Exception, Int> = possiblyFailingOperation()
+   *   result.fold(
+   *        { println("operation failed with $it") },
+   *        { println("operation succeeded with $it") }
+   *   )
+   *   //sampleEnd
+   * }
    * ```
    * <!--- KNIT example-either-34.kt -->
    *
@@ -1024,8 +1032,8 @@ public sealed class Either<out A, out B> {
    *
    *  fun main(args: Array<String>) {
    *   //sampleStart
-   *   Left("foo").isEmpty()  // Result: true
-   *   Right("foo").isEmpty() // Result: false
+   *   Either.Left("foo").isEmpty()  // Result: true
+   *   Either.Right("foo").isEmpty() // Result: false
    * }
    * ```
    * <!--- KNIT example-either-42.kt -->
@@ -1041,8 +1049,8 @@ public sealed class Either<out A, out B> {
    *
    *  fun main(args: Array<String>) {
    *   //sampleStart
-   *   Left("foo").isEmpty()  // Result: false
-   *   Right("foo").isEmpty() // Result: true
+   *   Either.Left("foo").isEmpty()  // Result: false
+   *   Either.Right("foo").isEmpty() // Result: true
    *   //sampleEnd
    * }
    * ```
@@ -1214,6 +1222,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  * ```kotlin
  * import arrow.core.Either.Right
  * import arrow.core.Either.Left
+ * import arrow.core.getOrElse
  *
  * fun main() {
  *   Right(12).getOrElse { 17 } // Result: 12
