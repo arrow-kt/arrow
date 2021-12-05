@@ -17,7 +17,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
-import kotlin.math.max
 
 class OptionalTest : UnitSpec() {
 
