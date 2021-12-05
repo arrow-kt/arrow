@@ -447,6 +447,7 @@ public abstract interface class arrow/optics/POptional : arrow/optics/Fold, arro
 	public static final field Companion Larrow/optics/POptional$Companion;
 	public abstract fun choice (Larrow/optics/POptional;)Larrow/optics/POptional;
 	public abstract fun compose (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static fun filter (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
 	public abstract fun first ()Larrow/optics/POptional;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
@@ -463,6 +464,7 @@ public abstract interface class arrow/optics/POptional : arrow/optics/Fold, arro
 
 public final class arrow/optics/POptional$Companion {
 	public final fun codiagonal ()Larrow/optics/POptional;
+	public final fun filter (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
 	public final fun id ()Larrow/optics/PIso;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/optics/POptional;
 	public final fun listHead ()Larrow/optics/POptional;
