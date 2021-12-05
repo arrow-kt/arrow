@@ -152,13 +152,15 @@ class OptionalTest : UnitSpec() {
 
     "Checking existence predicate over the target should result in same result as predicate" {
       checkAll(Arb.list(Arb.int().orNull()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int?>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
+        Optional.listHead<Int?>()
+          .exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
       }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
       checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int>().all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
+        Optional.listHead<Int>()
+          .all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
       }
     }
 
@@ -169,5 +171,37 @@ class OptionalTest : UnitSpec() {
         joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
       }
     }
+
+    "get should return value if predicate is true and null if otherwise" {
+      checkAll(Arb.int(), Arb.boolean()) { int, predicate ->
+        Optional.filter<Int> { predicate }.getOrNull(int) shouldBe (if (predicate) int else null)
+      }
+    }
+
+    "set should return value if predicate is true and null if otherwise" {
+      checkAll(Arb.int(), Arb.int(), Arb.boolean()) { int, newValue, predicate ->
+        Optional.filter<Int> { predicate }
+          .set(int, newValue) shouldBe (if (predicate) newValue else int)
+      }
+    }
+
+    "getAll should return the old list if predicate is true" {
+      checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
+        (Fold.list<Int>() compose Optional.filter { predicate }).getAll(list) shouldBe (if (predicate) list else emptyList())
+      }
+    }
+
+    "set with predicate true should have the same result with map" {
+      checkAll(Arb.list(Arb.int()), Arb.functionAToB<Int, Int>(Arb.int())) { list, f ->
+        (Traversal.list<Int>() compose Optional.filter { true }).modify(list, f) shouldBe list.map(f)
+      }
+    }
+
+    "set with predicate false should return the old list" {
+      checkAll(Arb.list(Arb.int()), Arb.functionAToB<Int, Int>(Arb.int())) { list, f ->
+        (Traversal.list<Int>() compose Optional.filter { false }).modify(list, f) shouldBe list
+      }
+    }
+
   }
 }
