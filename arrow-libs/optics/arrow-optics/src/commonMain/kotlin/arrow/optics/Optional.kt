@@ -204,5 +204,16 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
       getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
       set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
     )
+
+    /**
+     * [Optional] to itself if it satisfies the predicate.
+     * Filter can break the fusion property, if replace or modify do not preserve the predicate.
+     */
+    @JvmStatic
+    public fun <A> filter(predicate: (A) -> Boolean): Optional<A, A> =
+      Optional(
+        getOption = { if (predicate(it)) Some(it) else None },
+        set = { current, newValue -> if (predicate(current)) newValue else current }
+      )
   }
 }
