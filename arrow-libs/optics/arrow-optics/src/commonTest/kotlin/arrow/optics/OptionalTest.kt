@@ -17,6 +17,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import kotlin.math.max
 
 class OptionalTest : UnitSpec() {
 
@@ -159,6 +160,12 @@ class OptionalTest : UnitSpec() {
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
       checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
         Optional.listHead<Int>().all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
+      }
+    }
+
+    "Set a value over a non empty list target then the first item of the result should be the value" {
+      checkAll(Arb.list(Arb.int(), 1..maxDepth), Arb.int()) { list, value ->
+        Optional.listHead<Int>().set(list, value)[0] shouldBe value
       }
     }
 
