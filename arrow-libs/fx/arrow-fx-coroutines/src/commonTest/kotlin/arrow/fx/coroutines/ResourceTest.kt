@@ -112,7 +112,7 @@ class ResourceTest : ArrowFxSpec(
 
     "Resource can close from either" {
       val exit = CompletableDeferred<ExitCase>()
-      arrow.core.computations.either<String, Int> {
+      arrow.core.coroutines.either<String, Int> {
         arrow.fx.coroutines.computations.resource<Int> {
           Resource({ 1 }) { _, ex -> require(exit.complete(ex)) }.bind()
           "error".left().bind()
@@ -120,8 +120,8 @@ class ResourceTest : ArrowFxSpec(
         }.use { it }
       } shouldBe "error".left()
       // Should be ExitCase.Cancelled but still Failure due to ShortCircuit
-      // Cont<R, A> will fix this issue by properly shifting and cancelling
-      exit.await().shouldBeTypeOf<ExitCase.Failure>()
+      // Control<R, A> will fix this issue by properly shifting and cancelling
+      exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
 
     val depth: Int = 100

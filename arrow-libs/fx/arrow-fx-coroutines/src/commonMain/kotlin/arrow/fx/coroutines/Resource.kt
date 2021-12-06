@@ -4,16 +4,72 @@ import arrow.continuations.generic.AtomicRef
 import arrow.continuations.generic.update
 import arrow.core.NonEmptyList
 import arrow.core.ValidatedNel
+import arrow.core.coroutines.ControlEffect
 import arrow.core.identity
 import arrow.core.invalidNel
 import arrow.core.traverseValidated
 import arrow.core.valid
-import arrow.fx.coroutines.computations.ResourceEffect
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+
+import arrow.fx.coroutines.Resource
+
+/**
+ * Computation block for the [Resource] type.
+ * The [Resource] allows us to describe resources as immutable values,
+ * and compose them together in simple ways.
+ * This way you can split the logic of what a `Resource` is and how it should be closed from how you use them.
+ *
+ *  * # Using and composing Resource
+ *
+ * ```kotlin
+ * import resource
+ * import arrow.fx.coroutines.release
+ *
+ * class UserProcessor {
+ *   fun start(): Unit = println("Creating UserProcessor")
+ *   fun shutdown(): Unit = println("Shutting down UserProcessor")
+ *   fun process(ds: DataSource): List<String> =
+ *    ds.users().map { "Processed $it" }
+ * }
+ *
+ * class DataSource {
+ *   fun connect(): Unit = println("Connecting dataSource")
+ *   fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+ *   fun close(): Unit = println("Closed dataSource")
+ * }
+ *
+ * class Service(val db: DataSource, val userProcessor: UserProcessor) {
+ *   suspend fun processData(): List<String> = userProcessor.process(db)
+ * }
+ *
+ * //sampleStart
+ * val userProcessor = resource {
+ *   UserProcessor().also(UserProcessor::start)
+ * } release UserProcessor::shutdown
+ *
+ * val dataSource = resource {
+ *   DataSource().also { it.connect() }
+ * } release DataSource::close
+ *
+ * suspend fun main(): Unit {
+ *   resource<Service> {
+ *     Service(dataSource.bind(), userProcessor.bind())
+ *   }.use { service -> service.processData() }
+ * }
+ * //sampleEnd
+ * ```
+ * <!--- KNIT example-resource-computations-01.kt -->
+ */
+public interface ResourceEffect : ControlEffect<Nothing> {
+  public suspend fun <A> Resource<A>.bind(): A
+}
+
+public fun <A> resource(f: suspend ResourceEffect.() -> A): Resource<A> =
+  Resource.Dsl(f)
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
@@ -203,14 +259,14 @@ public sealed class Resource<out A> {
     }
 
   public fun <B> map(f: suspend (A) -> B): Resource<B> =
-    arrow.fx.coroutines.computations.resource { f(bind()) }
+    resource { f(bind()) }
 
   /** Useful for setting up/configuring an acquired resource */
   public fun <B> tap(f: suspend (A) -> Unit): Resource<A> =
-    arrow.fx.coroutines.computations.resource { bind().also { f(it) } }
+    resource { bind().also { f(it) } }
 
   public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       val a = bind()
       ff.bind()(a)
     }
@@ -257,12 +313,12 @@ public sealed class Resource<out A> {
    * @see zip to combine independent resources together
    * @see parZip for combining independent resources in parallel
    */
-  public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> = arrow.fx.coroutines.computations.resource {
+  public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> = resource {
     f(bind()).bind()
   }
 
   public inline fun <B, C> zip(other: Resource<B>, crossinline combine: (A, B) -> C): Resource<C> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       combine(bind(), other.bind())
     }
 
@@ -324,7 +380,7 @@ public sealed class Resource<out A> {
     c: Resource<C>,
     crossinline map: (A, B, C) -> D
   ): Resource<D> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind())
     }
 
@@ -334,7 +390,7 @@ public sealed class Resource<out A> {
     d: Resource<D>,
     crossinline map: (A, B, C, D) -> E
   ): Resource<E> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind())
     }
 
@@ -345,7 +401,7 @@ public sealed class Resource<out A> {
     e: Resource<E>,
     crossinline map: (A, B, C, D, E) -> G
   ): Resource<G> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind())
     }
 
@@ -357,7 +413,7 @@ public sealed class Resource<out A> {
     f: Resource<F>,
     crossinline map: (A, B, C, D, E, F) -> G
   ): Resource<G> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind())
     }
 
@@ -370,7 +426,7 @@ public sealed class Resource<out A> {
     g: Resource<G>,
     crossinline map: (A, B, C, D, E, F, G) -> H
   ): Resource<H> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind())
     }
 
@@ -384,7 +440,7 @@ public sealed class Resource<out A> {
     h: Resource<H>,
     crossinline map: (A, B, C, D, E, F, G, H) -> I
   ): Resource<I> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind())
     }
 
@@ -399,7 +455,7 @@ public sealed class Resource<out A> {
     i: Resource<I>,
     crossinline map: (A, B, C, D, E, F, G, H, I) -> J
   ): Resource<J> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind())
     }
 
@@ -415,7 +471,7 @@ public sealed class Resource<out A> {
     j: Resource<J>,
     crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K
   ): Resource<K> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind())
     }
 
@@ -472,7 +528,7 @@ public sealed class Resource<out A> {
     fb: Resource<B>,
     f: suspend (A, B) -> C
   ): Resource<C> =
-    arrow.fx.coroutines.computations.resource {
+    resource {
       parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
     }
 
@@ -480,7 +536,7 @@ public sealed class Resource<out A> {
     "Bind is being deprecated. Use resource DSL instead",
     ReplaceWith(
       "resource { f(source.bind()) }",
-      "arrow.fx.coroutines.computations.resource"
+      "resource"
     )
   )
   public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
@@ -494,7 +550,7 @@ public sealed class Resource<out A> {
     "Defer is being deprecated. Use resource DSL instead",
     ReplaceWith(
       "resource { resource.invoke().bind() }",
-      "arrow.fx.coroutines.computations.resource"
+      "resource"
     )
   )
   public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
@@ -577,7 +633,7 @@ public sealed class Resource<out A> {
   "Use the resource computation DSL instead",
   ReplaceWith(
     "resource { acquire() }",
-    "arrow.fx.coroutines.computations.resource"
+    "resource"
   )
 )
 public inline class Use<A>(internal val acquire: suspend () -> A)
@@ -587,10 +643,7 @@ public inline class Use<A>(internal val acquire: suspend () -> A)
  */
 @Deprecated(
   "Use the resource computation DSL instead",
-  ReplaceWith(
-    "resource { acquire() }",
-    "arrow.fx.coroutines.computations.resource"
-  )
+  level= DeprecationLevel.HIDDEN
 )
 public fun <A> resource(acquire: suspend () -> A): Use<A> = Use(acquire)
 
@@ -602,7 +655,7 @@ public infix fun <A> Use<A>.release(release: suspend (A) -> Unit): Resource<A> =
  * Composes a [release] action to a [Resource.use] action creating a [Resource].
  */
 public infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): Resource<A> =
-  arrow.fx.coroutines.computations.resource {
+  resource {
     val a = bind()
     Resource({ a }, { _, _ -> release(a) }).bind()
   }
@@ -615,7 +668,7 @@ public infix fun <A> Use<A>.releaseCase(release: suspend (A, ExitCase) -> Unit):
  * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
  */
 public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
-  arrow.fx.coroutines.computations.resource {
+  resource {
     val a = bind()
     Resource({ a }, { _, ex -> release(a, ex) }).bind()
   }
@@ -658,7 +711,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  * <!--- KNIT example-resource-10.kt -->
  */
 public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
-  arrow.fx.coroutines.computations.resource {
+  resource {
     map { a ->
       f(a).bind()
     }
@@ -735,6 +788,8 @@ private class ResEffectImpl : ResourceEffect {
       }
       is Resource.Defer -> resource().bind()
     }
+
+  override suspend fun <B> shift(r: Nothing): B = r
 }
 
 // Version that doesn't rethrow `CancellationException` because we need to run all finalizers regardless of CancellationException
