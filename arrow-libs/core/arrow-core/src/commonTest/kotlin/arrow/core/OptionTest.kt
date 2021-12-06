@@ -126,8 +126,8 @@ class OptionTest : UnitSpec() {
     }
 
     "map" {
-      some.map(String::toUpperCase) shouldBe Some("KOTLIN")
-      none.map(String::toUpperCase) shouldBe None
+      some.map { it.uppercase() } shouldBe Some("KOTLIN")
+      none.map { it.uppercase() } shouldBe None
     }
 
     "zip" {
@@ -141,7 +141,7 @@ class OptionTest : UnitSpec() {
 
     "mapNotNull" {
       some.mapNotNull { it.toIntOrNull() } shouldBe None
-      some.mapNotNull { it.toUpperCase() } shouldBe Some("KOTLIN")
+      some.mapNotNull { it.uppercase() } shouldBe Some("KOTLIN")
     }
 
     "fold" {
@@ -150,8 +150,8 @@ class OptionTest : UnitSpec() {
     }
 
     "flatMap" {
-      some.flatMap { Some(it.toUpperCase()) } shouldBe Some("KOTLIN")
-      none.flatMap { Some(it.toUpperCase()) } shouldBe None
+      some.flatMap { Some(it.uppercase()) } shouldBe Some("KOTLIN")
+      none.flatMap { Some(it.uppercase()) } shouldBe None
     }
 
     "align" {

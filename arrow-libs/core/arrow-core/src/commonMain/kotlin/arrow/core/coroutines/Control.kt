@@ -187,7 +187,7 @@ public interface ControlEffect<R> {
    * Runs the [Control] to finish, returning [B] or [shift] in case of [R].
    *
    * ```kotlin
-   * fun <E, A> Either<E, A>.toCont(): control<E, A> = cont {
+   * fun <E, A> Either<E, A>.toCont(): Control<E, A> = control {
    *   fold({ e -> shift(e) }, ::identity)
    * }
    *

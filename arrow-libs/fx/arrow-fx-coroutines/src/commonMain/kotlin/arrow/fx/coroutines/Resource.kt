@@ -26,7 +26,7 @@ import arrow.fx.coroutines.Resource
  *  * # Using and composing Resource
  *
  * ```kotlin
- * import resource
+ * import arrow.fx.coroutines.resource
  * import arrow.fx.coroutines.release
  *
  * class UserProcessor {
