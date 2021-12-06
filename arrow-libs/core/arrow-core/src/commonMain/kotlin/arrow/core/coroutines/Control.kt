@@ -3,6 +3,7 @@
 package arrow.core.coroutines
 
 import arrow.core.Either
+import arrow.core.EmptyValue
 import arrow.core.Ior
 import arrow.core.NonFatal
 import arrow.core.None
@@ -15,6 +16,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
@@ -49,12 +51,6 @@ import kotlin.jvm.JvmName
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <R, A> control(f: suspend ControlEffect<R>.() -> A): Control<R, A> = ControlImpl(f)
-
-/**
- * TODO
- */
-public suspend fun <E, A> either(f: suspend ControlEffect<E>.() -> A): Either<E, A> =
-  control(f).toEither()
 
 /**
  * [Control] represents a suspending computation that runs will either
@@ -337,6 +333,11 @@ private class ShiftCancellation(val token: Token, val shifted: Any?, val recover
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
+private class EagerShiftCancellation(val token: Token, val shifted: Any?, val recover: (Any?) -> Any?) :
+  ShiftCancellationException() {
+  override fun toString(): String = "ShiftCancellationException($message)"
+}
+
 private class Token {
   override fun toString(): String = "Token(${hashCode().toString(16)})"
 }
@@ -407,6 +408,47 @@ private class FoldContinuation<B>(
           else -> parent.resume(res as B)
         }
       } else parent.resumeWith(result)
+    }
+  }
+}
+
+@JvmInline
+internal value class EagerControlDsl<R, A>(
+  private val cont: suspend EagerControlEffect<R>.() -> A
+) : EagerControl<R, A> {
+  override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
+    val token = Token()
+    val effect =
+      object : EagerControlEffect<R> {
+        // Shift away from this Continuation by intercepting it, and completing it with
+        // ShiftCancellationException
+        // This is needed because this function will never yield a result,
+        // so it needs to be cancelled to properly support coroutine cancellation
+        override suspend fun <B> shift(r: R): B =
+        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we
+        // shifted away.
+        // This however also means that the user can try/catch shift and recover from the
+        // CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
+          // See: ContSpec - try/catch tests
+          throw EagerShiftCancellation(token, r, recover as (Any?) -> Any?)
+      }
+
+    return try {
+      var result: Any? = EmptyValue
+      suspend { transform(cont(effect)) }
+        .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) {
+          it.fold({ result = it }) { throwable ->
+            if (throwable is EagerShiftCancellation && token == throwable.token) {
+              throwable.recover(throwable.shifted) as B
+            } else throw throwable
+          }
+        })
+      result as B
+    } catch (e: EagerShiftCancellation) {
+      if (token == e.token) e.recover(e.shifted) as B
+      else throw e
     }
   }
 }

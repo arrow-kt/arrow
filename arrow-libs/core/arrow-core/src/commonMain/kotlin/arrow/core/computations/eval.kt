@@ -4,20 +4,25 @@ import arrow.continuations.Effect
 import arrow.core.Eval
 import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated("EvalEffect is deprecated. Use Eval.value() instead.")
 public fun interface EvalEffect<A> : Effect<Eval<A>> {
 
-  public suspend fun <B> Eval<B>.bind(): B =
-    value()
+  @Deprecated("EvalEffect is deprecated.", ReplaceWith("this.value()"))
+  public suspend fun <B> Eval<B>.bind(): B = value()
 }
 
+@Deprecated("EvalEffect is deprecated. Use `Eval.value()` instead.")
 @RestrictsSuspension
 public fun interface RestrictedEvalEffect<A> : EvalEffect<A>
 
 @Suppress("ClassName")
+@Deprecated("eval computations are redundant and thus deprecated. Use Eval.value() instead.")
 public object eval {
+  @Deprecated("eval computations are redundant and thus deprecated. Use Eval.value() instead.")
   public inline fun <A> eager(crossinline func: suspend RestrictedEvalEffect<A>.() -> A): Eval<A> =
     Effect.restricted(eff = { RestrictedEvalEffect { it } }, f = func, just = Eval.Companion::now)
 
+  @Deprecated("eval computations are redundant and thus deprecated. Use Eval.value() instead.")
   public suspend inline operator fun <A> invoke(crossinline func: suspend EvalEffect<*>.() -> A): Eval<A> =
     Effect.suspended(eff = { EvalEffect { it } }, f = func, just = Eval.Companion::now)
 }
