@@ -24,9 +24,49 @@ env:
   GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
 
 jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.4.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.konan
+          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            mac-step-gradle-
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
   publish:
-    runs-on: macos-latest
+    needs: build
+
     timeout-minutes: 35
+
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -45,13 +85,24 @@ jobs:
           restore-keys: |
             mac-step-gradle-
 
-      - name: Publish
+      - name: Publish alpha version
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, "alpha") }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+      - name: Publish final version
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
   publish_doc:
+    needs: publish
+
+    timeout-minutes: 60
+
+    runs-on: macos-latest
+
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
@@ -61,9 +112,6 @@ jobs:
       JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
-
-    runs-on: macos-latest
-    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v2
@@ -89,21 +137,21 @@ jobs:
 
       - name: "Landing page: build"
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         run: |
           bundle exec jekyll build -b docs -s docs
           tree _site > $BASEDIR/logs/content.log
 
       - name: "Landing page: publish"
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         run: |
           echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
 
       - name: "Latest release: publish (/docs)"
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
