@@ -2,11 +2,8 @@ name: "Publish all libs, Arrow-stack and Docs"
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'arrow-libs/**'
-      - '.github/**'
+    tags:
+      - '+([0-9]).+([0-9]).+([0-9])-+([a-z]).+([0-9])'
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
@@ -27,7 +24,7 @@ env:
   GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
 
 jobs:
-  publish_apple_linux_jvm_js:
+  publish:
     runs-on: macos-latest
     timeout-minutes: 35
 
@@ -48,56 +45,8 @@ jobs:
           restore-keys: |
             mac-step-gradle-
 
-      - name: "Install grep"
-        run: brew install grep
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: Publish Apple, Linux, JVM & JS targets
-        run: |
-          ./gradlew publishToSonatype
-          echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Apple, Linux, JVM & JS deployed!"
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  publish_windows:
-    runs-on: windows-latest
-    timeout-minutes: 25
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-        shell: bash
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-        shell: bash
-
-      - name: Publish Windows
-        run: |
-          ./gradlew publishToSonatype
-          echo "$(cat gradle.properties | grep projects.version | cut -d'=' -f2) MingwX64 deployed!"
+      - name: Publish
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
@@ -117,7 +66,6 @@ jobs:
     timeout-minutes: 60
 
     steps:
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -125,11 +73,8 @@ jobs:
       - name: "Setup"
         run: brew install grep
 
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
 
       - name: "Prepare environment"
         working-directory: arrow-site
@@ -163,42 +108,38 @@ jobs:
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
 
-      - name: "Latest release: build release directory (/docs/<major.minor>)"
+      - name: "Latest release: build release directory (/docs/<major.minor.patch>)"
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
-          tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+          bundle exec jekyll build -b docs/${{ env.lib_version }} -s docs
+          tree _site > $BASEDIR/logs/content_docs-${{ env.lib_version }}.log
 
-      - name: "Latest release: publish release directory (/docs/<major.minor>)"
+      - name: "Latest release: publish release directory (/docs/<major.minor.patch>)"
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
-          if [ "${SHORT_VERSION}" != "" ]; then
-            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
+          if [ "${{ env.lib_version }}" != "" ]; then
+            aws s3 sync _site s3://$S3_BUCKET/docs/${{ env.lib_version }} --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
           else
             exit 1
           fi
 
       - name: "Next version: build (/docs/next)"
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, "alpha") }}
         run: |
           bundle exec jekyll build -b docs/next -s docs
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: "Next version: publish (/docs/next)"
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, "alpha") }}
         run: |
-          echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
           aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
 
       - name: "Site: publish sitemap.xml"
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
