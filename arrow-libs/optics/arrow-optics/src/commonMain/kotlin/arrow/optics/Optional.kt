@@ -210,7 +210,6 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
      *
      * Select all the elements which satisfies the predicate.
      * ```kotlin
-     *
      * import arrow.optics.Traversal
      * import arrow.optics.Optional
      *
@@ -218,13 +217,12 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
      *
      * positiveNumbers.getAll(listOf(1,2,-3,4,-5)) == listOf(1,2,4)
      * positiveNumbers.modify(listOf(1,2,-3,4,-5)) { it * 10 } == listOf(10,20,-3,40,-5)
+     *```
      *
      * `filter` can break the fusion property, if `replace` or `modify` do not preserve the predicate. For example, here
      * the first `modify` {`x - 3`} transform the positive number 1 into the negative number -2.
      *
-     *```
-     * ```kotlin
-     *
+     *```kotlin
      * import arrow.optics.Traversal
      * import arrow.optics.Optional
      *
@@ -233,7 +231,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
      * val firstStep       = positiveNumbers.modify(list){ it - 3 }            // List(-2, 2, -3)
      * val secondStep      = positiveNumbers.modify(firstStep) { it * 2 }      // List(-2, 4, -3)
      * val bothSteps       = positiveNumbers.modify(list){ (it - 3) * 2)       // List(-4, 4, -3)
-     *  // secondStep != bothSteps
+     * // secondStep != bothSteps
      * ```
      */
 
