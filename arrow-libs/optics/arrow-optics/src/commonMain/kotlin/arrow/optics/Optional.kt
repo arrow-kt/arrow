@@ -207,8 +207,36 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
 
     /**
      * [Optional] to itself if it satisfies the predicate.
-     * Filter can break the fusion property, if replace or modify do not preserve the predicate.
+     *
+     * Select all the elements which satisfies the predicate.
+     * ```kotlin
+     *
+     * import arrow.optics.Traversal
+     * import arrow.optics.Optional
+     *
+     * val positiveNumbers = Traversal.list<Int>() compose Optional.filter { it >= 0 }
+     *
+     * positiveNumbers.getAll(listOf(1,2,-3,4,-5)) == listOf(1,2,4)
+     * positiveNumbers.modify(listOf(1,2,-3,4,-5)) { it * 10 } == listOf(10,20,-3,40,-5)
+     *
+     * `filter` can break the fusion property, if `replace` or `modify` do not preserve the predicate. For example, here
+     * the first `modify` {`x - 3`} transform the positive number 1 into the negative number -2.
+     *
+     *```
+     * ```kotlin
+     *
+     * import arrow.optics.Traversal
+     * import arrow.optics.Optional
+     *
+     * val positiveNumbers = Traversal.list<Int>() compose Optional.filter { it >= 0 }
+     * val list            = listOf(1, 5, -3)
+     * val firstStep       = positiveNumbers.modify(list){ it - 3 }            // List(-2, 2, -3)
+     * val secondStep      = positiveNumbers.modify(firstStep) { it * 2 }      // List(-2, 4, -3)
+     * val bothSteps       = positiveNumbers.modify(list){ (it - 3) * 2)       // List(-4, 4, -3)
+     *  // secondStep != bothSteps
+     * ```
      */
+
     @JvmStatic
     public fun <A> filter(predicate: (A) -> Boolean): Optional<A, A> =
       Optional(
