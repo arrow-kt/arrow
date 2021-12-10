@@ -79,12 +79,12 @@ s [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on Kotli
 Configure Arrow for your project
 <div class="setup-jdk-android" markdown="1">
 <div class="jdk-item" markdown="1">
-![Jdk](/img/quickstart/jdk-logo.svg "jdk")
+![Jdk]({{ "/img/quickstart/jdk-logo.svg" | relative_url }} "jdk")
 
 Make sure to have the latest version of JDK 1.8 installed.
 </div>
 <div class="android-item" markdown="1">
-![Android](/img/quickstart/android-logo.svg "android")
+![Android]({{ "/img/quickstart/android-logo.svg" | relative_url }} "android")
 
 <!--- Module Libraries -->
 Arrow supports Android starting on API 21 and up.
