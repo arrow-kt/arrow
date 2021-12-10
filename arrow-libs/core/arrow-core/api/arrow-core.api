@@ -2255,6 +2255,8 @@ public abstract class arrow/core/Validated {
 	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun catchNel (Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun conditionally (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+    public static final fun conditionallyNel (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
 	public final fun exist (Lkotlin/jvm/functions/Function1;)Z
 	public final fun findOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;

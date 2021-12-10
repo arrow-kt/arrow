@@ -3,23 +3,32 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
+import arrow.core.test.generators.validated
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.core.test.generators.validated
 import io.kotest.assertions.fail
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.*
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
 
   init {
+    "conditionally should create Valid instance only if test is true" {
+      checkAll(Arb.boolean(), Arb.int(), Arb.string()) { t: Boolean, i: Int, s: String ->
+        val expected = if (t) Valid(i) else Invalid(s)
+        Validated.conditionally(t, { s }, { i }) shouldBe expected
+      }
+    }
+
+    "conditionallyNel should create Valid instance only if test is true" {
+      checkAll(Arb.boolean(), Arb.int(), Arb.string()) { t: Boolean, i: Int, s: String ->
+        val expected = if (t) Validated.validNel<String, Int>(i) else Validated.invalidNel(s)
+        Validated.conditionallyNel(t, { s }, { i }) shouldBe expected
+      }
+    }
 
     "fold should call function on Invalid" {
       val exception = Exception("My Exception")

@@ -1,9 +1,9 @@
 package arrow.core
 
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -96,6 +96,38 @@ public sealed class Validated<out E, out A> {
       crossinline fr: (B) -> D
     ): (Validated<A, B>) -> Validated<C, D> =
       { fa -> fa.bimap(fl, fr) }
+
+    /**
+     * Will create an [Validated] from the result of evaluating the first parameter using the functions
+     * provided on second and third parameters. Second parameter represents function for creating
+     * an [Invalid] in case of a false result of evaluation and third parameter will be used
+     * to create a [Valid] in case of a true result.
+     *
+     * @param test expression to evaluate and build an [Validated]
+     * @param ifFalse function to create a [Invalid] in case of false result of test
+     * @param ifTrue function to create a [Valid] in case of true result of test
+     *
+     * @return [Valid] if evaluation succeed, [Invalid] otherwise
+     */
+    @JvmStatic
+    public inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Validated<L, R> =
+      if (test) Valid(ifTrue()) else Invalid(ifFalse())
+
+    /**
+     * Will create an [ValidatedNel] from the result of evaluating the first parameter using the functions
+     * provided on second and third parameters. Second parameter represents function for creating
+     * a [Invalid] in case of a false result of evaluation and third parameter will be used
+     * to create a [Valid] in case of a true result.
+     *
+     * @param test expression to evaluate and build an [ValidatedNel]
+     * @param ifFalse function to create a [Invalid] in case of false result of test
+     * @param ifTrue function to create a [Valid] in case of true result of test
+     *
+     * @return [Valid] if evaluation succeed, [Invalid] otherwise
+     */
+    @JvmStatic
+    public inline fun <L, R> conditionallyNel(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): ValidatedNel<L, R> =
+      if (test) validNel(ifTrue()) else invalidNel(ifFalse())
   }
 
   /**
