@@ -132,11 +132,6 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Download Arrow version file
-        uses: actions/download-artifact@v2
-        with:
-          name: arrow-version
-
       - name: Set version to an environment variable
         run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
 
