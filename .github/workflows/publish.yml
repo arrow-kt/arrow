@@ -31,6 +31,9 @@ jobs:
       matrix:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
+    outputs:
+      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
@@ -58,11 +61,9 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Upload Arrow version file
-        uses: actions/upload-artifact@v2
-        with:
-          name: arrow-version
-          path: build/semver/version.txt
+      - id: get-arrow-version
+        name: Get Arrow version
+        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
@@ -137,7 +138,7 @@ jobs:
           name: arrow-version
 
       - name: Set version to an environment variable
-        run: echo "LIB_VERSION=$(head -n 1 version.txt| cut -d. -f1-2)" >> $GITHUB_ENV
+        run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
 
       - name: Prepare environment
         working-directory: arrow-site
