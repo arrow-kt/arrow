@@ -14,6 +14,7 @@
 @import "base/animated";
 
 // Components
+
 @import "components/common/button";
 @import "components/common/footer";
 @import "components/home/nav";
@@ -22,3 +23,5 @@
 @import "components/home/quickstart";
 @import "components/docs/doc-body";
 @import "components/docs/doc-content";
+@import "components/docs/highlight";
+@import "components/docs/code";
