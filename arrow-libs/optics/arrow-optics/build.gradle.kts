@@ -27,25 +27,26 @@ kotlin {
   }
 }
 
-//fun DependencyHandlerScope.kspAll(dependencyNotation: Any): Unit {
-//  val exclude = setOf("commonMain", "commonTest", "nativeMain", "nativeTest")
-//  add("kspMetadata", dependencyNotation)
-//  kotlin.sourceSets
-//    .filter { it.name !in exclude }
-//    .forEach {
-//      val task = "ksp${it.name.capitalize().removeSuffix("Main")}"
-//      add(task, dependencyNotation)
-//    }
-//}
-
-//kotlin.sourceSets.commonMain {
-//  kotlin.srcDir("build/generated/ksp/commonMain/kotlin")
-//}
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
-  if (name != "kspKotlinMetadata") {
-    dependsOn("kspKotlinMetadata")
-  }
+fun DependencyHandlerScope.kspAll(dependencyNotation: Any): Unit {
+  val exclude = setOf("commonMain", "commonTest", "nativeMain", "nativeTest")
+  add("kspMetadata", dependencyNotation)
+  kotlin.sourceSets
+    .filter { it.name !in exclude }
+    .forEach {
+      val task = "ksp${it.name.capitalize().removeSuffix("Main")}"
+      add(task, dependencyNotation)
+    }
 }
+
+kotlin.sourceSets.commonTest {
+  kotlin.srcDir("build/generated/ksp/commonTest/kotlin")
+}
+//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
+//  if (name != "kspKotlinMetadata") {
+//    dependsOn("kspKotlinMetadata")
+//  }
+//}
 dependencies {
-  add("kspMetadata", libs.arrow.optics.ksp)
+//  add("kspMetadata", libs.arrow.optics.ksp)
+  kspAll(libs.arrow.optics.ksp)
 }
