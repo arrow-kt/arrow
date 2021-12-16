@@ -1,7 +1,7 @@
 [versions]
 animalSniffer = "1.5.0"
 arrowGradleConfig = "0.6.0-alpha.4"
-coroutines = "1.6.0-RC2"
+coroutines = "1.6.0-RC"
 dokka = "1.5.30"
 jUnit = "4.12"
 jUnitVintage = "5.5.2"
