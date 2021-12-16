@@ -29,12 +29,12 @@ public fun interface Snoc<S, A> {
   /**
    * Provides an [Optional] between [S] and its init [S].
    */
-  public fun initOption(): Optional<S, S> = snoc() compose PLens.pairFirst()
+  public fun initOption(): Optional<S, S> = TODO()//snoc() compose PLens.pairFirst()
 
   /**
    * Provides an [Optional] between [S] and its last element [A].
    */
-  public fun lastOption(): Optional<S, A> = snoc() compose PLens.pairSecond()
+  public fun lastOption(): Optional<S, A> = TODO()//snoc() compose PLens.pairSecond()
 
   /**
    * Selects all elements except the last.

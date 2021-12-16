@@ -6,7 +6,6 @@ buildscript {
 
   dependencies {
     classpath(libs.kotlinx.knit)
-    classpath(libs.arrowMeta.optics)
   }
 }
 

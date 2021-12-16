@@ -1,15 +1,14 @@
 plugins {
     id(libs.plugins.kotlin.jvm.get().pluginId)
-    id(libs.plugins.kotlin.kapt.get().pluginId)
+    alias(libs.plugins.ksp)
 }
-
-apply(plugin = "io.arrow-kt.optics")
 
 dependencies {
     implementation(projects.arrowCore)
     implementation(projects.arrowFxCoroutines)
     implementation(projects.arrowFxStm)
     implementation(projects.arrowOptics)
+    ksp(libs.arrow.optics.ksp)
     compileOnly(libs.kotlin.reflect)
 }
 

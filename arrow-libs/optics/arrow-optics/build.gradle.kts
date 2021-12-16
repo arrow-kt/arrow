@@ -2,7 +2,7 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  id(libs.plugins.kotlin.kapt.get().pluginId)
+  alias(libs.plugins.ksp)
 }
 
 apply(plugin = "io.kotest.multiplatform")
@@ -15,7 +15,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        implementation(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlibCommon)
       }
     }
 
@@ -24,23 +24,28 @@ kotlin {
         implementation(projects.arrowOpticsTest)
       }
     }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJDK8)
-      }
-    }
-    jvmTest {
-      kotlin.srcDirs("/build/generated/source/kapt/test")
-
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
-      }
-    }
   }
+}
+
+//fun DependencyHandlerScope.kspAll(dependencyNotation: Any): Unit {
+//  val exclude = setOf("commonMain", "commonTest", "nativeMain", "nativeTest")
+//  add("kspMetadata", dependencyNotation)
+//  kotlin.sourceSets
+//    .filter { it.name !in exclude }
+//    .forEach {
+//      val task = "ksp${it.name.capitalize().removeSuffix("Main")}"
+//      add(task, dependencyNotation)
+//    }
+//}
+
+//kotlin.sourceSets.commonMain {
+//  kotlin.srcDir("build/generated/ksp/commonMain/kotlin")
+//}
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
+  if (name != "kspKotlinMetadata") {
+    dependsOn("kspKotlinMetadata")
+  }
+}
+dependencies {
+  add("kspMetadata", libs.arrow.optics.ksp)
 }
