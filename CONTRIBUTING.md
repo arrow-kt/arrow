@@ -32,20 +32,18 @@ Can't find what you're looking for? Please, contact us at [#arrow on Kotlin Slac
 
 ### Steps
 
-To build all the libraries (compilation + tests) and examples:
+To build all the libraries (compilation + tests) and examples run in the project root (`arrow` directory):
 
 ```bash
-cd arrow-libs
 ./gradlew build
 ```
 
-To build just CORE libraries, FX libraries, OPTICS libraries, etc. select the correspondent directory.
+To build just CORE libraries, FX libraries, OPTICS libraries etc. run the corresponding [subproject's](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name) `build` task.
 
 For instance, for CORE libraries:
 
 ```bash
-cd arrow-libs/core
-./gradlew build
+./gradlew :arrow-core:build
 ```
 
 ## How to generate and validate the documentation
