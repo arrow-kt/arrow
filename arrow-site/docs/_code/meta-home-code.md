@@ -1,15 +1,14 @@
 ---
 library: meta
 ---
-```kotlin
+<!--- INCLUDE
 import arrow.meta.CliPlugin
 import arrow.meta.Meta
 import arrow.meta.invoke
 import arrow.meta.quotes.Transform
 import arrow.meta.quotes.namedFunction
-
-//sampleStart
-
+-->
+```kotlin
 val Meta.helloWorld: CliPlugin get() =
   "Hello World" {
     meta(
@@ -23,5 +22,4 @@ val Meta.helloWorld: CliPlugin get() =
       }
     )
   }
-//sampleEnd
 ```
