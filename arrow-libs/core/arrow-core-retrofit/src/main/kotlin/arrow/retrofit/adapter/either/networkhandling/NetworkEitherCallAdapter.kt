@@ -15,6 +15,34 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.concurrent.TimeoutException
 
+/**
+ * Provides a [CallAdapter] wrapping the call result into an [Either].
+ *
+ * The adapter is opinionated regarding the returned error type which is [CallError].
+ * This error type is a sealed class hierarchy mapping different communication failure types:
+ * * HTTP error responses (4xx, 5xx)
+ * * network errors (device has no network)
+ * * timeout errors
+ * * other unexpected errors
+ *
+ * This way the adapter can avoid throwing exceptions in these cases.
+ *
+ * A Retrofit API definition using this adapter has to adhere to the following pattern (where T is the expected response type):
+ * ```
+ * @GET(".")
+ * suspend fun getSomeData(): Either<CallError, T>
+ * ```
+ *
+ * If the result is a success (response code 2xx) and has a response body then the (parsed) response body is
+ * returned wrapped into a [Right].
+ *
+ * If you expect a response with no response body (e.g. 204 OK) make sure to define your call as returning [Unit] in the success case.
+ * Otherwise the call will return a [Left] signifying error.
+ * ```
+ * @POST("light/switch")
+ * suspend fun switchLight(@Body switchPosition: SwitchPosition): Either<CallError, Unit>
+ * ```
+ */
 public class NetworkEitherCallAdapterFactory : CallAdapter.Factory() {
 
   override fun get(
