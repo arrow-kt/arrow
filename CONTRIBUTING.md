@@ -30,7 +30,7 @@ Can't find what you're looking for? Please, contact us at [#arrow on Kotlin Slac
 
 - JDK 8
 
-### Steps
+### Building the whole project
 
 To build all the libraries (compilation + tests) and examples run in the project root (`arrow` directory):
 
@@ -38,9 +38,24 @@ To build all the libraries (compilation + tests) and examples run in the project
 ./gradlew build
 ```
 
-To build just CORE libraries, FX libraries, OPTICS libraries etc. run the corresponding [subproject's](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name) `build` task.
+### Building a single library
 
-For instance, for CORE libraries:
+To build just CORE library, FX library, OPTICS library etc.:
+
+1. Find the Gradle subproject name by running
+
+```bash
+./gradlew projects
+```
+
+E.g. for the CORE subproject you will get
+```
+Root project 'arrow'
+...
++--- Project ':arrow-core'
+```
+
+2.  Append `:build` after the subproject name and run this task. See also Gradle documentation [how to run subproject tasks.](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name)
 
 ```bash
 ./gradlew :arrow-core:build
