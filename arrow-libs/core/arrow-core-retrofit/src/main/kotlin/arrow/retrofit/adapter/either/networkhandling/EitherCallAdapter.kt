@@ -13,10 +13,9 @@ import retrofit2.Retrofit
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 
-public class EitherCallAdapterFactory : CallAdapter.Factory() {
+public class NetworkEitherCallAdapterFactory : CallAdapter.Factory() {
 
   override fun get(
     returnType: Type,
@@ -24,11 +23,11 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     retrofit: Retrofit
   ): CallAdapter<*, *>? {
     if (getRawType(returnType) != Call::class.java) return null
-    check(returnType is ParameterizedType) { "Return type must be a parameterized type." }
+    require(returnType is ParameterizedType) { "Return type must be a parameterized type." }
 
     val responseType = getParameterUpperBound(0, returnType)
     if (getRawType(responseType) != Either::class.java) return null
-    check(responseType is ParameterizedType) { "Response type must be a parameterized type." }
+    require(responseType is ParameterizedType) { "Response type must be a parameterized type." }
 
     val leftType = getParameterUpperBound(0, responseType)
     if (getRawType(leftType) != CallError::class.java) return null
@@ -82,7 +81,7 @@ private class EitherCall<R>(
       override fun onFailure(call: Call<R?>, throwable: Throwable) {
         val error = when (throwable) {
           is TimeoutException -> TimeoutError(throwable)
-          is IOException, is ConnectException -> NetworkError(throwable)
+          is IOException -> NetworkError(throwable)
           else -> UnexpectedCallError(throwable)
         }
         callback.onResponse(this@EitherCall, Response.success(Left(error)))
@@ -100,7 +99,8 @@ private class EitherCall<R>(
 
   override fun cancel() = delegate.cancel()
 
-  override fun execute(): Response<Either<CallError, R>> = throw UnsupportedOperationException()
+  override fun execute(): Response<Either<CallError, R>> =
+    throw UnsupportedOperationException("This adapter does not support sync execution")
 
   override fun request(): Request = delegate.request()
 }
