@@ -5,6 +5,8 @@ import arrow.core.test.generators.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
@@ -59,6 +61,24 @@ class SequenceKTest : UnitSpec() {
       }.map { it.toList() }
       res shouldBe Validated.Valid(acc)
       res shouldBe Validated.Valid((0..20_000).toList())
+    }
+
+    "traverseResult stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res = (0..20_001).asSequence().traverseResult { a ->
+        if (a > 20_000) {
+          Result.failure(RuntimeException("$a is too big!"))
+        } else {
+          acc.add(a)
+          Result.success(a)
+        }
+      }
+      acc shouldBe (0 .. 20_000).toList()
+      res.shouldBeFailure {
+        it.shouldNotBeNull()
+        it.message shouldBe "20001 is too big!"
+      }
     }
 
     "traverseValidated acummulates" {

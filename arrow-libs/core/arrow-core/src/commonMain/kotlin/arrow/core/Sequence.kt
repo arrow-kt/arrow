@@ -621,6 +621,9 @@ public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
+public fun <A> Sequence<Result<A>>.sequenceResult(): Result<Sequence<A>> =
+  traverseResult(::identity)
+
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
   else map { generateSequence { it } }
@@ -691,6 +694,20 @@ public fun <E, A, B> Sequence<A>.traverseValidated(
     }
   }
 }.map { it.asSequence() }
+
+public fun <A, B> Sequence<A>.traverseResult(f: (A) -> Result<B>): Result<Sequence<B>> {
+  val acc = mutableListOf<B>()
+
+  forEach { a ->
+    val res = f(a)
+
+    res.fold(acc::add) {
+      return@traverseResult Result.failure(it)
+    }
+  }
+  return Result.success(acc.asSequence())
+}
+
 
 /**
  * splits an union into its component parts.
