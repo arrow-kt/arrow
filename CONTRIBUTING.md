@@ -68,17 +68,7 @@ Dokka is responsible for generating documentation based on source code annotatio
 In order to generate the documentation and validate it:
 
 ```bash
-cd arrow-libs
 ./gradlew buildDoc
-```
-
-That Gradle task is equivalent to run Dokka and Ank:
-
-```bash
-cd arrow-libs
-./gradlew dokka
-cd ../arrow-site
-./gradlew runAnk
 ```
 
 ### Doc snippets policies
