@@ -215,12 +215,11 @@ If any of these actions fails, an issue will be created to be solved as soon as 
 
 ### How to upgrade Gradle
 
-The use of Gradle appears in several places: `arrow-libs`, `arrow-libs/core`, `arrow-stack`, etc.
+The use of Gradle appears in several subprojects: `arrow-core`, `arrow-stack`, etc.
 
-However, links are being used so it's just necessary to upgrade Gradle in `arrow-libs` directory:
+However, links are being used so it's just necessary to upgrade Gradle in the project root directory:
 
 ```
-cd arrow-libs
 ./gradlew wrapper --gradle-version <new-version>
 ```
 
