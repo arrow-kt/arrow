@@ -60,9 +60,14 @@ tasks {
     project(":arrow-core-test"),
     project(":arrow-fx-coroutines-test"),
     project(":arrow-optics-test"),
+    project(":arrow-optics-ksp"),
   )
 
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaJekyllMultiModule { removeChildTasks(undocumentedProjects) }
+}
+
+apiValidation {
+  ignoredProjects.addAll(listOf("arrow-optics-ksp", "arrow-optics-test", "arrow-site"))
 }
