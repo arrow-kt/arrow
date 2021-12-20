@@ -294,7 +294,7 @@ public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (Int, A) -> B
   }
 }
 
-public suspend fun <A, B> Flow<A>.traverseResult(f: suspend (A) -> Result<B>): Result<Flow<B>> {
+public suspend fun <A, B> Flow<A>.traverseResult(f: suspend (A) -> Result<B>): Result<List<B>> {
 
   val acc = mutableListOf<B>()
 
@@ -309,15 +309,15 @@ public suspend fun <A, B> Flow<A>.traverseResult(f: suspend (A) -> Result<B>): R
     return Result.failure(e.e as Throwable)
   }
 
-  return Result.success(acc.asFlow())
+  return Result.success(acc)
 }
 
 private class ExitTraverseException(val e: Any?) : Exception()
 
-public suspend fun <A> Flow<Result<A>>.sequenceResult(): Result<Flow<A>> =
+public suspend fun <A> Flow<Result<A>>.sequenceResult(): Result<List<A>> =
   traverseResult(::identity)
 
-public suspend fun <A, B, E> Flow<A>.traverseEither(f: suspend (A) -> Either<E, B>): Either<E, Flow<B>> {
+public suspend fun <A, B, E> Flow<A>.traverseEither(f: suspend (A) -> Either<E, B>): Either<E, List<B>> {
 
   val acc = mutableListOf<B>()
 
@@ -330,13 +330,13 @@ public suspend fun <A, B, E> Flow<A>.traverseEither(f: suspend (A) -> Either<E, 
     return Either.Left(e.e as E)
   }
 
-  return acc.asFlow().right()
+  return acc.right()
 }
 
-public suspend fun <L, R> Flow<Either<L, R>>.sequenceEither(): Either<L, Flow<R>> =
+public suspend fun <L, R> Flow<Either<L, R>>.sequenceEither(): Either<L, List<R>> =
   traverseEither(::identity)
 
-public suspend fun <A, B> Flow<A>.traverseOption(f: suspend (A) -> Option<B>): Option<Flow<B>> {
+public suspend fun <A, B> Flow<A>.traverseOption(f: suspend (A) -> Option<B>): Option<List<B>> {
 
   val acc = mutableListOf<B>()
 
@@ -349,16 +349,16 @@ public suspend fun <A, B> Flow<A>.traverseOption(f: suspend (A) -> Option<B>): O
     return None
   }
 
-  return acc.asFlow().some()
+  return acc.some()
 }
 
-public suspend fun <A> Flow<Option<A>>.sequenceOption(): Option<Flow<A>> =
+public suspend fun <A> Flow<Option<A>>.sequenceOption(): Option<List<A>> =
   traverseOption(::identity)
 
 public suspend fun <E, A, B> Flow<A>.traverseValidated(
   SG: Semigroup<E>,
   f: suspend (A) -> Validated<E, B>
-): Validated<E, Flow<B>> {
+): Validated<E, List<B>> {
   val valids = mutableListOf<B>()
   var invalid: E? = null
 
@@ -373,8 +373,8 @@ public suspend fun <E, A, B> Flow<A>.traverseValidated(
     }, valids::add)
   }
 
-  return invalid?.invalid() ?: valids.asFlow().valid()
+  return invalid?.invalid() ?: valids.valid()
 }
 
-public suspend fun <E, A> Flow<Validated<E, A>>.sequenceValidated(SG: Semigroup<E>): Validated<E, Flow<A>> =
+public suspend fun <E, A> Flow<Validated<E, A>>.sequenceValidated(SG: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(SG, ::identity)
