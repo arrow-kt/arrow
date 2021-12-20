@@ -695,7 +695,7 @@ public fun <E, A, B> Sequence<A>.traverseValidated(
   }
 }.map { it.asSequence() }
 
-public fun <A, B> Sequence<A>.traverseResult(f: (A) -> Result<B>): Result<Sequence<B>> {
+public inline fun <A, B> Sequence<A>.traverseResult(f: (A) -> Result<B>): Result<Sequence<B>> {
   val acc = mutableListOf<B>()
 
   forEach { a ->
