@@ -25,7 +25,7 @@ class ValidatedTest : UnitSpec() {
 
     "conditionallyNel should create Valid instance only if test is true" {
       checkAll(Arb.boolean(), Arb.int(), Arb.string()) { t: Boolean, i: Int, s: String ->
-        val expected = if (t) Validated.validNel<String, Int>(i) else Validated.invalidNel(s)
+        val expected: ValidatedNel<String, Int> = if (t) Validated.validNel(i) else Validated.invalidNel(s)
         Validated.conditionallyNel(t, { s }, { i }) shouldBe expected
       }
     }
