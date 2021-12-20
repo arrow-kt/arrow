@@ -13,7 +13,9 @@ knit = "0.3.0"
 mockWebServer = "4.9.2"
 retrofit = "2.8.1"
 arrowMeta = "2.0-SNAPSHOT"
-ksp = "1.6.0-1.0.2"
+kspVersion = "1.6.0-1.0.2"
+kotlinCompileTesting = "1.4.6"
+jUnitJupiter = "5.8.2"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
@@ -21,6 +23,8 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }
 jUnitVintageEngine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "jUnitVintage" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jUnitJupiter" }
+junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jUnitJupiter" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
@@ -33,7 +37,8 @@ kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "k
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-arrow-optics-ksp = { module = "io.arrow-kt:arrow-optics-ksp", version.ref="arrowMeta" }
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
+kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
@@ -45,8 +50,7 @@ arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versionin
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }

@@ -97,9 +97,9 @@ class BoundedTest : UnitSpec() {
     }
 
     "Working with Every in Optics should be same as in DSL" {
-      Every.map<Keys, String>().run {
+      PEvery.map<Keys, String>().run {
         Db.content.every.modify(db, String::toUpperCase)
-      } shouldBe (Db.content compose Every.map()).modify(db, String::toUpperCase)
+      } shouldBe (Db.content compose PEvery.map()).modify(db, String::toUpperCase)
     }
   }
 }

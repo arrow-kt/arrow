@@ -18,35 +18,32 @@ kotlin {
         api(libs.kotlin.stdlibCommon)
       }
     }
-
     commonTest {
       dependencies {
         implementation(projects.arrowOpticsTest)
       }
     }
+    jvmMain {
+      dependencies {
+        implementation(libs.kotlin.stdlibJDK8)
+      }
+    }
+    jvmTest {
+      dependencies {
+        implementation(libs.kotlin.stdlibJDK8)
+      }
+    }
+    jsMain {
+      dependencies {
+        implementation(libs.kotlin.stdlibJS)
+      }
+    }
   }
 }
 
-fun DependencyHandlerScope.kspAll(dependencyNotation: Any): Unit {
-  val exclude = setOf("commonMain", "commonTest", "nativeMain", "nativeTest")
-  add("kspMetadata", dependencyNotation)
-  kotlin.sourceSets
-    .filter { it.name !in exclude }
-    .forEach {
-      val task = "ksp${it.name.capitalize().removeSuffix("Main")}"
-      add(task, dependencyNotation)
-    }
-}
-
-kotlin.sourceSets.commonTest {
-  kotlin.srcDir("build/generated/ksp/commonTest/kotlin")
-}
-//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().all {
-//  if (name != "kspKotlinMetadata") {
-//    dependsOn("kspKotlinMetadata")
-//  }
-//}
 dependencies {
-//  add("kspMetadata", libs.arrow.optics.ksp)
-  kspAll(libs.arrow.optics.ksp)
+  kspJvmTest(projects.arrowOpticsKsp)
+  kspJsTest(projects.arrowOpticsKsp)
+  kspLinuxX64Test(projects.arrowOpticsKsp)
+  kspMingwX64Test(projects.arrowOpticsKsp)
 }
