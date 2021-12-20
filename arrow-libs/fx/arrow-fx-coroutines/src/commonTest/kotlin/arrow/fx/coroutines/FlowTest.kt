@@ -1,14 +1,26 @@
 package arrow.fx.coroutines
 
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Validated
+import arrow.core.invalid
+import arrow.core.left
+import arrow.core.right
+import arrow.core.some
+import arrow.core.valid
+import arrow.typeclasses.Semigroup
 import io.kotest.assertions.fail
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,6 +33,87 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 class FlowTest : ArrowFxSpec(
   spec = {
+
+    "traverseResult" {
+      val acc = mutableListOf<Int>()
+      val res =
+        (0..20_001).asFlow()
+          .traverseResult {
+            runCatching {
+              if (it > 20_000) {
+                throw RuntimeException("$it is too big!")
+              }
+              acc.add(it)
+              it
+            }
+          }
+      res.shouldBeFailure {
+        it.shouldNotBeNull()
+        it.message shouldBe "20001 is too big!"
+      }
+      acc shouldBe (0..20_000).toList()
+    }
+
+    "traverseOption" {
+      val acc = mutableListOf<Int>()
+      val res =
+        (0..20_001).asFlow()
+          .traverseOption {
+            if (it > 20_000) {
+              None
+            } else {
+              acc.add(it)
+              it.some()
+            }
+          }
+      res shouldBe None
+      acc shouldBe (0..20_000).toList()
+    }
+
+    "traverseEither" {
+      val acc = mutableListOf<Int>()
+      val res =
+        (0..20_001).asFlow()
+          .traverseEither {
+            if (it > 20_000) {
+              "$it is too big!".left()
+            } else {
+              acc.add(it)
+              it.right()
+            }
+          }
+      res.shouldBeInstanceOf<Either.Left<String>>()
+      res.value shouldBe "20001 is too big!"
+      acc shouldBe (0..20_000).toList()
+    }
+
+    "traverseValidated" {
+      val acc = mutableListOf<Int>()
+      val res = (0..20_001).asFlow()
+        .traverseValidated(Semigroup.string()) {
+          if (it > 20_000) {
+            "$it is too big!".invalid()
+          } else {
+            acc.add(it)
+            it.valid()
+          }
+        }
+      res.shouldBeInstanceOf<Validated.Invalid<String>>()
+      res.value shouldBe "20001 is too big!"
+      acc shouldBe (0..20_000).toList()
+    }
+
+    "traverseValidated accumulates invalids" {
+      val acc = mutableListOf<Int>()
+      val res =
+        (0..10).asFlow()
+          .traverseValidated(Semigroup.int()) {
+            acc.add(it)
+            it.invalid()
+          }
+      res.shouldBeInstanceOf<Validated.Invalid<String>>()
+      res.value shouldBe (0..10).sum()
+    }
 
     "Retry - flow fails" {
       val bang = RuntimeException("Bang!")

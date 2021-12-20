@@ -3,6 +3,16 @@
 
 package arrow.fx.coroutines
 
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Validated
+import arrow.core.identity
+import arrow.core.invalid
+import arrow.core.right
+import arrow.core.some
+import arrow.core.valid
+import arrow.typeclasses.Semigroup
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -25,9 +35,11 @@ import kotlinx.coroutines.flow.produceIn
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.zip
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
@@ -281,3 +293,88 @@ public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (Int, A) -> B
     f(index++, value)
   }
 }
+
+public suspend fun <A, B> Flow<A>.traverseResult(f: suspend (A) -> Result<B>): Result<Flow<B>> {
+
+  val acc = mutableListOf<B>()
+
+  try {
+    collect { a ->
+      val res = f(a)
+      res.fold(acc::add) {
+        throw ExitTraverseException(it)
+      }
+    }
+  } catch (e: ExitTraverseException) {
+    return Result.failure(e.e as Throwable)
+  }
+
+  return Result.success(acc.asFlow())
+}
+
+private class ExitTraverseException(val e: Any?) : Exception()
+
+public suspend fun <A> Flow<Result<A>>.sequenceResult(): Result<Flow<A>> =
+  traverseResult(::identity)
+
+public suspend fun <A, B, E> Flow<A>.traverseEither(f: suspend (A) -> Either<E, B>): Either<E, Flow<B>> {
+
+  val acc = mutableListOf<B>()
+
+  try {
+    collect { a ->
+      val res = f(a)
+      res.fold({ throw ExitTraverseException(it) }, acc::add)
+    }
+  } catch (e: ExitTraverseException) {
+    return Either.Left(e.e as E)
+  }
+
+  return acc.asFlow().right()
+}
+
+public suspend fun <L, R> Flow<Either<L, R>>.sequenceEither(): Either<L, Flow<R>> =
+  traverseEither(::identity)
+
+public suspend fun <A, B> Flow<A>.traverseOption(f: suspend (A) -> Option<B>): Option<Flow<B>> {
+
+  val acc = mutableListOf<B>()
+
+  try {
+    collect { a ->
+      val res = f(a)
+      res.fold({ throw ExitTraverseException(Unit) }, acc::add)
+    }
+  } catch (e: ExitTraverseException) {
+    return None
+  }
+
+  return acc.asFlow().some()
+}
+
+public suspend fun <A> Flow<Option<A>>.sequenceOption(): Option<Flow<A>> =
+  traverseOption(::identity)
+
+public suspend fun <E, A, B> Flow<A>.traverseValidated(
+  SG: Semigroup<E>,
+  f: suspend (A) -> Validated<E, B>
+): Validated<E, Flow<B>> {
+  val valids = mutableListOf<B>()
+  var invalid: E? = null
+
+  collect { a ->
+    val res = f(a)
+    res.fold({ e ->
+      invalid = invalid?.let {
+        SG.run {
+          it.combine(e)
+        }
+      } ?: e
+    }, valids::add)
+  }
+
+  return invalid?.invalid() ?: valids.asFlow().valid()
+}
+
+public suspend fun <E, A> Flow<Validated<E, A>>.sequenceValidated(SG: Semigroup<E>): Validated<E, Flow<A>> =
+  traverseValidated(SG, ::identity)
