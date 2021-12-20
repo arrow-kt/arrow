@@ -31,6 +31,7 @@ kotlin {
     jvmTest {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)
+        implementation(libs.junitJupiterEngine)
       }
     }
     jsMain {
@@ -46,4 +47,7 @@ dependencies {
   kspJsTest(projects.arrowOpticsKsp)
   kspLinuxX64Test(projects.arrowOpticsKsp)
   kspMingwX64Test(projects.arrowOpticsKsp)
+  kspIosX64Test(projects.arrowOpticsKsp)
+  // kspAndroidNativeX64Test(projects.arrowOpticsKsp)
+  // kspAndroidNativeArm64Test(projects.arrowOpticsKsp)
 }
