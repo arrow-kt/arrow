@@ -68,9 +68,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.konan
-          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: new-linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            linux-step-gradle-
+            new-linux-step-gradle-
 
       - name: Build
         run: ./gradlew linuxX64Test jvmTest jsTest
