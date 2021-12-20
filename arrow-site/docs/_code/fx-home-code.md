@@ -1,7 +1,7 @@
 ---
 library: fx
 ---
-```kotlin
+<!--- INCLUDE
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 
@@ -23,17 +23,13 @@ suspend fun hire(employee: Employee): Employee =
   
 fun employee(name: String, company: Company): Employee =
   Employee(name, company)
-
-suspend fun main() {
-    //sampleStart
-
-
+-->
+```kotlin
+suspend fun process(): List<Employee> {
     //maps each function to `::employee` in parallel
     val audrey = parZip({ "Audrey" }, { company("Arrow") }) { name, company -> Employee(name, company) }
     val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { name, company -> Employee(name, company) }
     val candidates = listOf(audrey, pepe)
-    val employees = candidates.parTraverse { hire(it) } //hires in parallel
-    //sampleEnd
-    println(employees)
+    return candidates.parTraverse { hire(it) } //hires in parallel
 }
 ```

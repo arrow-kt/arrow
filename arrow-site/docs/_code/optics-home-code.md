@@ -1,8 +1,7 @@
 ---
 library: optics
 ---
-{: data-executable="true"}
-```kotlin
+<!--- INCLUDE
 package example
 import arrow.core.*
 import arrow.optics.*
@@ -32,26 +31,21 @@ data class Employee(val name: String, val company: Company?) {
     )
   }
 }
-fun main() {
-  //sampleStart
 
-
-  val john =
-  Employee("Audrey Tang",
-          Company("Arrow",
-                  Address("Functional city",
-                          Street(42, "lambda street"))))
-
-  val modify = Employee.company.address.street.name
-      .modify(john, String::toUpperCase)
-
-  println(modify)
-//sampleEnd
-}
 val <A> Optional<A, Company>.address: Optional<A, Address>
   get() = this compose Company.address
 val <A> Optional<A, Address>.street: Optional<A, Street>
   get() = this compose Address.street
 val <A> Optional<A, Street>.name: Optional<A, String>
   get() = this compose Street.name
+-->
+```kotlin
+  val john =
+  Employee("Audrey Tang",
+          Company("Arrow",
+                  Address("Functional city",
+                          Street(42, "lambda street"))))
+
+  val modified = Employee.company.address.street.name
+      .modify(john, String::toUpperCase)
 ```
