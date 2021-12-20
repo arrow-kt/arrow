@@ -42,13 +42,18 @@ kotlin {
   }
 }
 
+fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
+  val exclude = setOf("commonTest", "nativeTest")
+  kotlin.sourceSets
+    .filter { it.name !in exclude && it.name.contains("Test") }
+    .forEach {
+      val task = "ksp${it.name.capitalize()}"
+      configurations.findByName(task)?.let {
+        add(task, dependencyNotation)
+      }
+    }
+}
+
 dependencies {
-  kspJvmTest(projects.arrowOpticsKsp)
-  kspJsTest(projects.arrowOpticsKsp)
-  kspLinuxX64Test(projects.arrowOpticsKsp)
-  kspMingwX64Test(projects.arrowOpticsKsp)
-  kspIosX64Test(projects.arrowOpticsKsp)
-  kspMacosX64Test(projects.arrowOpticsKsp)
-  // kspAndroidNativeX64Test(projects.arrowOpticsKsp)
-  // kspAndroidNativeArm64Test(projects.arrowOpticsKsp)
+  kspTest(projects.arrowOpticsKsp)
 }
