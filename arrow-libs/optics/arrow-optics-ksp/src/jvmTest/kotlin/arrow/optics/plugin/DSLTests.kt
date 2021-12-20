@@ -13,9 +13,7 @@ class DSLTests {
       |val modify = Employees.employees.every(Every.list()).company.address
       |  .street.name.modify(employees, String::toUpperCase)
       |val r = modify.employees.map { it.company?.address?.street?.name }.toString()
-      """ {
-      "r".source.evalsTo("[LAMBDA STREET, LAMBDA STREET]")
-    }
+      """.evals("r" to "[LAMBDA STREET, LAMBDA STREET]")
   }
 
   @Test
@@ -26,9 +24,7 @@ class DSLTests {
       |$dslValues
       |val modify = Db.content.at(At.map(), One).set(db, None)
       |val r = modify.toString()
-      """ {
-      "r".source.evalsTo("Db(content={Two=two, Three=three, Four=four})")
-    }
+      """.evals("r" to "Db(content={Two=two, Three=three, Four=four})")
   }
 
   // Db.content.at(At.map(), One).set(db, None)

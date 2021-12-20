@@ -1,21 +1,22 @@
 [versions]
 animalSniffer = "1.5.0"
 arrowGradleConfig = "0.6.0-alpha.4"
+assertj = "3.21.0"
 coroutines = "1.6.0-RC"
+classgraph = "4.8.137"
 dokka = "1.5.30"
 jUnit = "4.12"
+jUnitJupiter = "5.8.2"
 jUnitVintage = "5.5.2"
 kotest = "5.0.2"
 kotestGradle = "5.0.2"
 kotlin = "1.6.0"
 kotlinBinaryCompatibilityValidator = "0.7.1"
+kotlinCompileTesting = "1.4.6"
 knit = "0.3.0"
+kspVersion = "1.6.0-1.0.2"
 mockWebServer = "4.9.2"
 retrofit = "2.8.1"
-arrowMeta = "2.0-SNAPSHOT"
-kspVersion = "1.6.0-1.0.2"
-kotlinCompileTesting = "1.4.6"
-jUnitJupiter = "5.8.2"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
@@ -39,6 +40,10 @@ squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gs
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
+kotlinCompileTestingKsp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }

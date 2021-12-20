@@ -19,6 +19,19 @@ dependencies {
   testImplementation(libs.kotlin.stdlibJDK8)
   testImplementation(libs.junitJupiter)
   testImplementation(libs.junitJupiterEngine)
+  testImplementation(libs.assertj)
+  testImplementation(libs.classgraph)
+  testImplementation(libs.kotlinCompileTesting) {
+    exclude(
+      group = libs.classgraph.get().module.group,
+      module = libs.classgraph.get().module.name
+    )
+    exclude(
+      group = libs.kotlin.stdlibJDK8.get().module.group,
+      module = libs.kotlin.stdlibJDK8.get().module.name
+    )
+  }
+  testImplementation(libs.kotlinCompileTestingKsp)
   testRuntimeOnly(projects.arrowOpticsKsp)
   testRuntimeOnly(projects.arrowAnnotations)
   testRuntimeOnly(projects.arrowCore)

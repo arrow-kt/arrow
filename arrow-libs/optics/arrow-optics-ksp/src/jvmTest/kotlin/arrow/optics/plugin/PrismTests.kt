@@ -16,8 +16,6 @@ class PrismTests {
       |}
       |val i: Prism<PrismSealed, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1
       |val r = i != null
-      """ {
-      "r".source.evalsTo(true)
-    }
+      """.evals("r" to true)
   }
 }

@@ -1,11 +1,5 @@
 package arrow.optics.plugin
 
-import arrow.meta.plugin.testing.Assert
-import arrow.meta.plugin.testing.AssertSyntax
-import arrow.meta.plugin.testing.CompilerTest
-import arrow.meta.plugin.testing.Dependency
-import arrow.meta.plugin.testing.assertThis
-
 const val imports =
   """
       import arrow.core.None
@@ -69,21 +63,3 @@ const val dslValues =
       |  )
       |)"""
 
-operator fun String.invoke(assert: AssertSyntax.() -> Assert) {
-  val arrowVersion = System.getProperty("arrowVersion")
-  val arrowAnnotations = Dependency("arrow-annotations:$arrowVersion")
-  val arrowCore = Dependency("arrow-core:$arrowVersion")
-  val arrowOptics = Dependency("arrow-optics:$arrowVersion")
-  assertThis(
-    CompilerTest(
-      config = {
-        listOf(
-          addDependencies(arrowAnnotations, arrowCore, arrowOptics),
-          addSymbolProcessors(OpticsProcessorProvider())
-        )
-      },
-      code = { this@invoke.source },
-      assert = { assert() }
-    )
-  )
-}

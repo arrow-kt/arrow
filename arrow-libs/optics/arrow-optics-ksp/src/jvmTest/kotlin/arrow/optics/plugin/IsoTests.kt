@@ -17,9 +17,7 @@ class IsoTests {
       |
       |val i: Iso<IsoData, String> = IsoData.iso
       |val r = i != null
-      """ {
-      "r".source.evalsTo(true)
-    }
+      """.evals("r" to true)
   }
 
   @Test
@@ -34,9 +32,7 @@ class IsoTests {
       |
       |val i: Iso<IsoSecondaryConstructor, Pair<Int, String>> = IsoSecondaryConstructor.iso
       |val r = i != null
-      """ {
-      "r".source.evalsTo(true)
-    }
+      """.evals("r" to true)
   }
 
   @Test
@@ -47,9 +43,7 @@ class IsoTests {
       |data class IsoNoCompanion(
       |  val field1: String
       |)
-      """ {
-      failsWith { it.contains("IsoNoCompanion".noCompanion) }
-    }
+      """.failsWith { it.contains("IsoNoCompanion".noCompanion) }
   }
 
   @Test
@@ -84,8 +78,6 @@ class IsoTests {
       |) {
       |  companion object
       |}
-      """ {
-      failsWith { it.contains("IsoXXL".isoTooBigErrorMessage) }
-    }
+      """.failsWith { it.contains("IsoXXL".isoTooBigErrorMessage) }
   }
 }
