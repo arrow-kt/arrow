@@ -229,8 +229,8 @@ This short guideline provides all the things to keep in mind when adding a new m
 
 - Configuration:
   - Add `<module>/gradle.properties`
-  - Add `<module>/build.gradle`
-  - Update `settings.xml`
+  - Add `<module>/build.gradle.kts`
+  - Update `settings.gradle.kts`
 - Website:
   - Update [sidebar files](arrow-site/docs/_data)
 - Utilities:
