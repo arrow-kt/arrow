@@ -27,7 +27,7 @@ import kotlin.coroutines.resume
  *  race conditions again. However the benefit of using this over `atomically { tvar.read() }` is that it avoids creating a transaction and is
  *  thus much faster.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  *
  * suspend fun main() {
@@ -38,10 +38,11 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-tvar-01.kt -->
  *
  * Reading from a [TVar] inside a transaction is done by using [STM.read].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -55,6 +56,7 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-tvar-02.kt -->
  *
  * > Checking the validity of a transaction is done by checking the contents of all accessed [TVar]'s before locking the [TVar]'s that have
  *  been written to and then checking only the [TVar]'s that have only been read not modified again. To keep transactions as fast as possible
@@ -67,7 +69,7 @@ import kotlin.coroutines.resume
  *
  * Writing a new value to the [TVar]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -81,10 +83,11 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-tvar-03.kt -->
  *
  * Modifying the value based on the initial value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -98,10 +101,11 @@ import kotlin.coroutines.resume
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-tvar-04.kt -->
  *
  * Writing a new value to the [TVar] and returning the initial value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.atomically
  *
@@ -116,6 +120,7 @@ import kotlin.coroutines.resume
  *   println("New value ${tvar.unsafeRead()}")
  * }
  * ```
+ * <!--- KNIT example-tvar-05.kt -->
  */
 public class TVar<A> internal constructor(a: A) {
   /**

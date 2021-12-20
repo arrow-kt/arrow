@@ -17,7 +17,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * and if it is it allows the `option { }` binding to continue.
    * In case it is `false`, then it short-circuits the binding and returns [None].
    *
-   * ```kotlin:ank
+   * ```kotlin
    * import arrow.core.computations.option
    *
    * //sampleStart
@@ -34,6 +34,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * // println: "ensure(true) passes"
    * // res: None
    * ```
+ * <!--- KNIT example-option-computations-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(None)
@@ -44,8 +45,9 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * When the value is not null, then it will be returned as non null and the check value is now smart-checked to non-null.
  * Otherwise, if the [value] is null then the [option] binding will short-circuit with [None].
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.computations.option
+ * import arrow.core.computations.ensureNotNull
  *
  * //sampleStart
  * suspend fun main() {
@@ -61,6 +63,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * // println: "1"
  * // res: None
  * ```
+ * <!--- KNIT example-option-computations-02.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {

@@ -36,7 +36,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *
  * Running a transaction is then done using [atomically]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
@@ -71,6 +71,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *   println("Balance account 2: ${acc2.unsafeRead()}")
  * }
  * ```
+ * <!--- KNIT example-stm-01.kt -->
  * This example shows a banking service moving money from one account to the other with [STM].
  * Should the first account not have enough money we throw an exception. This code is guaranteed to never deadlock and to never
  *  produce an invalid state by committing after the read state has changed concurrently.
@@ -89,7 +90,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *
  * This is achieved by the primitive [retry]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
  * import arrow.fx.stm.STM
@@ -137,6 +138,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *   println("Balance account 2: ${acc2.unsafeRead()}")
  * }
  * ```
+ * <!--- KNIT example-stm-02.kt -->
  *
  * Here in this (silly) example we changed `withdraw` to use [retry] and thus wait until enough money is in the account, which after
  *  a few seconds just happens to be the case.
@@ -148,7 +150,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * [orElse] is another important primitive which allows a user to detect if a branch called [retry] and then use a fallback instead.
  *  If the fallback retries as well the whole transaction retries.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.runBlocking
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.TVar
@@ -176,6 +178,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *     .also { println("Transaction returned $it") }
  * }
  * ```
+ * <!--- KNIT example-stm-03.kt -->
  *
  * This example uses [stm] which is a helper just like the stdlib function [suspend] to ease use of an infix function like [orElse].
  * In this transaction, when the value inside the variable is not in the correct range, the transaction retries (due to [check] calling [retry]).
@@ -201,7 +204,7 @@ public interface STM {
    *
    * The main use for this is to abort once the transaction has hit an invalid state or otherwise needs to wait for changes.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    * import arrow.fx.stm.stm
    *
@@ -214,13 +217,14 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-04.kt -->
    */
   public fun retry(): Nothing
 
   /**
    * Run the given transaction and fallback to the other one if the first one calls [retry].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    * import arrow.fx.stm.stm
    *
@@ -233,13 +237,14 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-05.kt -->
    */
   public infix fun <A> (STM.() -> A).orElse(other: STM.() -> A): A
 
   /**
    * Run [f] and handle any exception thrown with [onError].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.atomically
    *
    * suspend fun main() {
@@ -251,13 +256,14 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-06.kt -->
    */
   public fun <A> catch(f: STM.() -> A, onError: STM.(Throwable) -> A): A
 
   /**
    * Read the value from a [TVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -271,6 +277,7 @@ public interface STM {
    *   println(result)
    * }
    * ```
+ * <!--- KNIT example-stm-07.kt -->
    *
    * This comes with a few guarantees:
    * - Any given [TVar] is only ever read once during a transaction.
@@ -282,7 +289,7 @@ public interface STM {
   /**
    * Set the value of a [TVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -296,6 +303,7 @@ public interface STM {
    *   println(result)
    * }
    * ```
+ * <!--- KNIT example-stm-08.kt -->
    *
    * Similarly to [read] this comes with a few guarantees:
    * - For multiple writes to the same [TVar] in a transaction only the last will actually be performed
@@ -307,7 +315,7 @@ public interface STM {
   /**
    * Modify the value of a [TVar]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -321,6 +329,7 @@ public interface STM {
    *   println(result)
    * }
    * ```
+ * <!--- KNIT example-stm-09.kt -->
    *
    * `modify(f) = write(f(read()))`
    */
@@ -329,7 +338,7 @@ public interface STM {
   /**
    * Swap the content of the [TVar]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TVar
    * import arrow.fx.stm.atomically
    *
@@ -344,6 +353,7 @@ public interface STM {
    *   println("New value ${tvar.unsafeRead()}")
    * }
    * ```
+ * <!--- KNIT example-stm-10.kt -->
    *
    * @return The previous value stored inside the [TVar]
    */
@@ -358,7 +368,7 @@ public interface STM {
   /**
    * Read the value from a [TMVar] and empty it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -373,6 +383,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-11.kt -->
    *
    * This retries if the [TMVar] is empty and leaves the [TMVar] empty if it succeeded.
    *
@@ -387,7 +398,7 @@ public interface STM {
   /**
    * Put a value into an empty [TMVar].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -401,6 +412,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-12.kt -->
    *
    * This retries if the [TMVar] is not empty.
    *
@@ -414,7 +426,7 @@ public interface STM {
   /**
    * Read a value from a [TMVar] without removing it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -429,6 +441,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-13.kt -->
    *
    * This retries if the [TMVar] is empty but does not take the value out if it succeeds.
    *
@@ -443,7 +456,7 @@ public interface STM {
   /**
    * Same as [TMVar.take] except it returns null if the [TMVar] is empty and thus never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -458,6 +471,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-14.kt -->
    */
   public fun <A> TMVar<A>.tryTake(): A? = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.None) }
@@ -467,7 +481,7 @@ public interface STM {
   /**
    * Same as [TMVar.put] except that it returns true or false if was successful or it retried.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -482,6 +496,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-15.kt -->
    *
    * This function never retries.
    *
@@ -495,7 +510,7 @@ public interface STM {
   /**
    * Same as [TMVar.read] except that it returns null if the [TMVar] is empty and thus never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -509,6 +524,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-16.kt -->
    *
    * @see TMVar.read for a function that retries if the [TMVar] is empty.
    * @see TMVar.tryTake for a function that leaves the [TMVar] empty after reading.
@@ -521,7 +537,7 @@ public interface STM {
   /**
    * Check if a [TMVar] is empty. This function never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -535,6 +551,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-17.kt -->
    *
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
@@ -544,7 +561,7 @@ public interface STM {
   /**
    * Check if a [TMVar] is not empty. This function never retries.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -558,6 +575,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-18.kt -->
    *
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
@@ -568,7 +586,7 @@ public interface STM {
   /**
    * Swap the content of a [TMVar] or retry if it is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMVar
    * import arrow.fx.stm.atomically
    *
@@ -583,6 +601,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
+ * <!--- KNIT example-stm-19.kt -->
    */
   public fun <A> TMVar<A>.swap(a: A): A = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.Some(a)) }
@@ -593,7 +612,7 @@ public interface STM {
   /**
    * Returns the currently available number of permits in a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -608,6 +627,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-20.kt -->
    *
    * This function never retries.
    */
@@ -617,7 +637,7 @@ public interface STM {
   /**
    * Acquire 1 permit from a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -631,6 +651,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-21.kt -->
    *
    * This function will retry if there are no permits available.
    *
@@ -642,7 +663,7 @@ public interface STM {
   /**
    * Acquire [n] permit from a [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -656,6 +677,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-22.kt -->
    *
    * This function will retry if there are less than [n] permits available.
    *
@@ -670,7 +692,7 @@ public interface STM {
   /**
    * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -685,6 +707,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-23.kt -->
    *
    * This function never retries.
    *
@@ -696,7 +719,7 @@ public interface STM {
   /**
    * Like [TSemaphore.acquire] except that it returns whether or not acquisition was successful.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -711,6 +734,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-24.kt -->
    *
    * This function never retries.
    *
@@ -722,7 +746,7 @@ public interface STM {
   /**
    * Release a permit back to the [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -736,6 +760,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-25.kt -->
    *
    * This function never retries.
    */
@@ -745,7 +770,7 @@ public interface STM {
   /**
    * Release [n] permits back to the [TSemaphore].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSemaphore
    * import arrow.fx.stm.atomically
    *
@@ -759,6 +784,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-26.kt -->
    *
    * [n] must be non-negative.
    *
@@ -776,7 +802,7 @@ public interface STM {
   /**
    * Append an element to the [TQueue].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -790,6 +816,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-27.kt -->
    *
    * This function never retries.
    */
@@ -799,7 +826,7 @@ public interface STM {
   /**
    * Append an element to the [TQueue]. Alias for [STM.write].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -813,6 +840,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-28.kt -->
    *
    * This function never retries.
    */
@@ -821,7 +849,7 @@ public interface STM {
   /**
    * Remove the front element from the [TQueue] or retry if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -837,6 +865,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-29.kt -->
    *
    * @see TQueue.tryRead for a version that does not retry.
    * @see TQueue.peek for a version that does not remove the element.
@@ -859,7 +888,7 @@ public interface STM {
   /**
    * Same as [TQueue.read] except it returns null if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -874,6 +903,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-30.kt -->
    *
    * This function never retries.
    */
@@ -883,7 +913,7 @@ public interface STM {
   /**
    * Drains all entries of a [TQueue] into a single list.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -901,6 +931,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-31.kt -->
    *
    * This function never retries.
    */
@@ -913,7 +944,7 @@ public interface STM {
   /**
    * Read the front element of a [TQueue] without removing it.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -930,6 +961,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-32.kt -->
    *
    * This function retries if the [TQueue] is empty.
    *
@@ -942,7 +974,7 @@ public interface STM {
   /**
    * Same as [TQueue.peek] except it returns null if the [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -957,6 +989,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-33.kt -->
    *
    * This function never retries.
    *
@@ -969,7 +1002,7 @@ public interface STM {
   /**
    * Prepend an element to the [TQueue].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -984,6 +1017,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-34.kt -->
    *
    * Mainly used to implement [TQueue.peek] and since this writes to the read variable of a [TQueue] excessive use
    *  can lead to contention on consumers. Prefer appending to a [TQueue] if possible.
@@ -996,7 +1030,7 @@ public interface STM {
   /**
    * Check if a [TQueue] is empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1010,6 +1044,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-35.kt -->
    *
    * This function never retries.
    *
@@ -1021,7 +1056,7 @@ public interface STM {
   /**
    * Check if a [TQueue] is not empty.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1035,6 +1070,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-36.kt -->
    *
    * This function never retries.
    *
@@ -1046,7 +1082,7 @@ public interface STM {
   /**
    * Filter a [TQueue], removing all elements for which [pred] returns false.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1061,6 +1097,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
+ * <!--- KNIT example-stm-37.kt -->
    *
    * This function never retries.
    *
@@ -1074,7 +1111,7 @@ public interface STM {
   /**
    * Return the current number of elements in a [TQueue]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TQueue
    * import arrow.fx.stm.atomically
    *
@@ -1088,6 +1125,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-38.kt -->
    *
    * This function never retries.
    *
@@ -1099,7 +1137,7 @@ public interface STM {
   /**
    * Read a variable from the [TArray].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1113,6 +1151,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-39.kt -->
    *
    * Throws if [i] is out of bounds.
    *
@@ -1124,7 +1163,7 @@ public interface STM {
   /**
    * Set a variable in the [TArray].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1140,6 +1179,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-40.kt -->
    *
    * Throws if [i] is out of bounds.
    *
@@ -1151,7 +1191,7 @@ public interface STM {
   /**
    * Modify each element in a [TArray] by applying [f].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1164,6 +1204,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-41.kt -->
    *
    * This function never retries.
    */
@@ -1173,7 +1214,7 @@ public interface STM {
   /**
    * Fold a [TArray] to a single value.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TArray
    * import arrow.fx.stm.atomically
    *
@@ -1187,6 +1228,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-42.kt -->
    *
    * This function never retries.
    */
@@ -1197,7 +1239,7 @@ public interface STM {
   /**
    * Check if a key [k] is in the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1212,6 +1254,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-43.kt -->
    *
    * This function never retries.
    */
@@ -1221,7 +1264,7 @@ public interface STM {
   /**
    * Lookup a value at the specific key [k]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1238,6 +1281,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-44.kt -->
    *
    * > If the key is not present [STM.lookup] will not retry, instead it returns `null`.
    */
@@ -1247,7 +1291,7 @@ public interface STM {
   /**
    * Alias of [STM.lookup]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1264,6 +1308,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-45.kt -->
    *
    * > If the key is not present [STM.get] will not retry, instead it returns `null`.
    */
@@ -1272,7 +1317,7 @@ public interface STM {
   /**
    * Add a key value pair to the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1285,6 +1330,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-46.kt -->
    */
   public fun <K, V> TMap<K, V>.insert(k: K, v: V): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { k to v }
@@ -1293,7 +1339,7 @@ public interface STM {
   /**
    * Alias for [STM.insert]
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1306,13 +1352,14 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-47.kt -->
    */
   public operator fun <K, V> TMap<K, V>.set(k: K, v: V): Unit = insert(k, v)
 
   /**
    * Add a key value pair to the map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1325,13 +1372,14 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-48.kt -->
    */
   public operator fun <K, V> TMap<K, V>.plusAssign(kv: Pair<K, V>): Unit = insert(kv.first, kv.second)
 
   /**
    * Update a value at a key if it exists.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1347,6 +1395,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-49.kt -->
    */
   public fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { it?.second?.let(fn)?.let { k to it } }
@@ -1355,7 +1404,7 @@ public interface STM {
   /**
    * Remove a key value pair from a map
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TMap
    * import arrow.fx.stm.atomically
    *
@@ -1369,6 +1418,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-50.kt -->
    */
   public fun <K, V> TMap<K, V>.remove(k: K): Unit {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { null }
@@ -1378,7 +1428,7 @@ public interface STM {
   /**
    * Check if an element is already in the set
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1393,6 +1443,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
+ * <!--- KNIT example-stm-51.kt -->
    */
   public fun <A> TSet<A>.member(a: A): Boolean =
     lookupHamtWithHash(hamt, hashFn(a)) { it == a } != null
@@ -1400,7 +1451,7 @@ public interface STM {
   /**
    * Adds an element to the set.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1413,6 +1464,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-52.kt -->
    */
   public fun <A> TSet<A>.insert(a: A): Unit {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { a }
@@ -1421,7 +1473,7 @@ public interface STM {
   /**
    * Adds an element to the set. Alias of [STM.insert].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1434,13 +1486,14 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-53.kt -->
    */
   public operator fun <A> TSet<A>.plusAssign(a: A): Unit = insert(a)
 
   /**
    * Remove an element from the set.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.stm.TSet
    * import arrow.fx.stm.atomically
    *
@@ -1454,6 +1507,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
+ * <!--- KNIT example-stm-54.kt -->
    */
   public fun <A> TSet<A>.remove(a: A): Unit {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { null }
@@ -1463,7 +1517,7 @@ public interface STM {
 /**
  * Helper to create stm blocks that can be run with [STM.orElse]
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.stm
  *
@@ -1480,6 +1534,7 @@ public interface STM {
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-stm-55.kt -->
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
@@ -1488,7 +1543,7 @@ public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
 /**
  * Retry if [b] is false otherwise does nothing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.atomically
  * import arrow.fx.stm.stm
  *
@@ -1505,6 +1560,7 @@ public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-stm-56.kt -->
  *
  * `check(b) = if (b.not()) retry() else Unit`
  */

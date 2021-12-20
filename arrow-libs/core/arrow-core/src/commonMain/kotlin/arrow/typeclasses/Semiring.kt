@@ -14,16 +14,8 @@ public const val DoubleInstanceDeprecation: String =
  *  It requires the multiplicative [Monoid] to distribute over the additive one. The operations of the multiplicative [Monoid] have been renamed to
  *  [one] and [combineMultiplicate] for easier use.
  *
- * ```kotlin
- * (a.combineMultiplicate(b)).combineMultiplicate(c) == a.combineMultiplicate(b.combineMultiplicate(c))
- * ```
- *
  * The [one] function serves exactly like the [empty] function for an additive [Monoid], just adapted for the multiplicative
  * version. This forms the following law:
- *
- * ```kotlin
- * a.combineMultiplicate(one()) == one().combineMultiplicate(a) == a
- * ```
  *
  * Please note that the empty function has been renamed to [zero] to get a consistent naming style inside the semiring.
  *
@@ -33,7 +25,7 @@ public const val DoubleInstanceDeprecation: String =
  *
  * Here a some examples:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -44,8 +36,9 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-semiring-01.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -56,10 +49,11 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-semiring-02.kt -->
  *
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -72,8 +66,9 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-semiring-03.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.typeclasses.Semiring
  *
  * fun main(args: Array<String>) {
@@ -86,6 +81,7 @@ public const val DoubleInstanceDeprecation: String =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-semiring-04.kt -->
  */
 public interface Semiring<A> {
 

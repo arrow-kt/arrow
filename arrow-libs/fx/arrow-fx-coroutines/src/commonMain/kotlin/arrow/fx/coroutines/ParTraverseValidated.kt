@@ -115,7 +115,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
@@ -135,6 +135,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-partraversevalidated-01.kt -->
  */
 @JvmName("parSequenceValidatedScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(
@@ -171,7 +172,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.typeclasses.Semigroup
  * import arrow.fx.coroutines.*
@@ -187,15 +188,16 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  *     else User(id, Thread.currentThread().name).validNel()
  *
  *   val res = listOf(1, 3, 5)
- *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList()) { getUserById(it) }
  *
  *   val res2 = listOf(1, 2, 3, 4, 5)
- *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList(), ::getUserById)
+ *     .parTraverseValidated(Dispatchers.IO, Semigroup.nonEmptyList()) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  *  println(res2)
  * }
  * ```
+ * <!--- KNIT example-partraversevalidated-02.kt -->
  */
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,

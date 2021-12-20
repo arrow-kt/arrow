@@ -11,7 +11,7 @@ It provides a convenient way to attach or detach elements to the beginning side 
 
 It can be constructed by providing the `Prism`.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.typeclasses.Cons
 
 val listFirst = Cons.list<Int>().cons()
@@ -23,7 +23,7 @@ It defines two functions: `cons` and `uncons`.
 
 `cons` prepends an element `A` to a structure `S`.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.cons
 
 1 cons listOf(2, 3)
@@ -31,11 +31,11 @@ import arrow.optics.cons
 
 `uncons` detaches the first element `A` from a structure `S`.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.uncons
 
 listOf(1, 2, 3).uncons()
 ```
-```kotlin:ank
+```kotlin
 emptyList<Int>().uncons()
 ```

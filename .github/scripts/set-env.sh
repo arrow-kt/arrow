@@ -15,22 +15,22 @@ if [ "$GITHUB_REF" == "refs/heads/main" ]; then
     fi
 
     if [ "$LATEST_PUBLISHED_VERSION" == "" ]; then exit 1; fi
-    RELEASE_VERSION=$(grep "projects.latestVersion" $BASEDIR/gradle.properties | cut -d= -f2)
+    RELEASE_VERSION=$(grep "projects.latestVersion" gradle.properties | cut -d= -f2)
     if [ "$LATEST_PUBLISHED_VERSION" != "$RELEASE_VERSION" ]; then NEW_RELEASE_VERSION_EXISTS=1; fi
 else
     echo "Into release branch ..."
     BRANCH_VERSION=$(echo $GITHUB_REF | cut -d/ -f4)
-    RELEASE_VERSION=$(grep "projects.latestVersion" $BASEDIR/gradle.properties | cut -d= -f2)
+    RELEASE_VERSION=$(grep "projects.latestVersion" gradle.properties | cut -d= -f2)
     if [ "$BRANCH_VERSION" == "$RELEASE_VERSION" ]; then
         NEW_RELEASE_VERSION_EXISTS=1
     else
-        perl -pe "s/^projects.version=.*/projects.version=$BRANCH_VERSION-SNAPSHOT/g" -i $BASEDIR/gradle.properties
+        perl -pe "s/^projects.version=.*/projects.version=$BRANCH_VERSION-SNAPSHOT/g" -i gradle.properties
     fi
 fi
 
 if [ $NEW_RELEASE_VERSION_EXISTS == 1 ]; then
-    perl -pe "s/^projects.version=.*/projects.version=$RELEASE_VERSION/g" -i $BASEDIR/gradle.properties
-    perl -pe "s/^org.gradle.parallel=.*/org.gradle.parallel=false/g" -i $BASEDIR/gradle.properties
+    perl -pe "s/^projects.version=.*/projects.version=$RELEASE_VERSION/g" -i gradle.properties
+    perl -pe "s/^org.gradle.parallel=.*/org.gradle.parallel=false/g" -i gradle.properties
 fi
 
 echo "LATEST_PUBLISHED_VERSION=$LATEST_PUBLISHED_VERSION" >> $GITHUB_ENV

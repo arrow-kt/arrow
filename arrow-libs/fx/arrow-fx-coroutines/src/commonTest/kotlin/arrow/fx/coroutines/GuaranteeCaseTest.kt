@@ -17,7 +17,7 @@ class GuaranteeCaseTest : ArrowFxSpec(
 
         val res = guaranteeCase(
           fa = { i },
-          finalizer = { ex -> p.complete(ex) }
+          finalizer = { ex -> require(p.complete(ex)) }
         )
 
         p.await() shouldBe ExitCase.Completed
@@ -31,7 +31,7 @@ class GuaranteeCaseTest : ArrowFxSpec(
         val attempted = Either.catch {
           guaranteeCase<Int>(
             fa = { throw e },
-            finalizer = { ex -> p.complete(ex) }
+            finalizer = { ex -> require(p.complete(ex)) }
           )
         }
 
@@ -50,7 +50,7 @@ class GuaranteeCaseTest : ArrowFxSpec(
             start.complete(Unit)
             never<Unit>()
           },
-          finalizer = { ex -> p.complete(ex) }
+          finalizer = { ex -> require(p.complete(ex)) }
         )
       }
 

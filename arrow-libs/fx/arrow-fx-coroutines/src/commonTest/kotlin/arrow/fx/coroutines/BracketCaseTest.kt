@@ -16,20 +16,28 @@ class BracketCaseTest : ArrowFxSpec(
   spec = {
     "Immediate acquire bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
+        var once = true
         bracketCase(
           acquire = { a },
           use = { aa -> Pair(aa, b) },
-          release = { _, _ -> Unit }
+          release = { _, _ ->
+            require(once)
+            once = false
+          }
         ) shouldBe Pair(a, b)
       }
     }
 
     "Suspended acquire bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
+        var once = true
         bracketCase(
           acquire = { a.suspend() },
           use = { aa -> Pair(aa, b) },
-          release = { _, _ -> Unit }
+          release = { _, _ ->
+            require(once)
+            once = false
+          }
         ) shouldBe Pair(a, b)
       }
     }
@@ -60,20 +68,28 @@ class BracketCaseTest : ArrowFxSpec(
 
     "Immediate use bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
+        var once = true
         bracketCase(
           acquire = { a },
           use = { aa -> Pair(aa, b).suspend() },
-          release = { _, _ -> Unit }
+          release = { _, _ ->
+            require(once)
+            once = false
+          }
         ) shouldBe Pair(a, b)
       }
     }
 
     "Suspended use bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
+        var once = true
         bracketCase(
           acquire = { a },
           use = { aa -> Pair(aa, b).suspend() },
-          release = { _, _ -> Unit }
+          release = { _, _ ->
+            require(once)
+            once = false
+          }
         ) shouldBe Pair(a, b)
       }
     }
@@ -309,7 +325,7 @@ class BracketCaseTest : ArrowFxSpec(
               mVar.send(y)
             },
             use = { never<Unit>() },
-            release = { _, exitCase -> p.complete(exitCase) }
+            release = { _, exitCase -> require(p.complete(exitCase)) }
           )
         }
 

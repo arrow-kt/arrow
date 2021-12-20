@@ -29,7 +29,7 @@ package com.example.domain
 
 The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.dsl.*
 import com.example.domain.*
 import arrow.optics.Optional
@@ -62,7 +62,7 @@ object TimeoutError: NetworkError()
 
 Let's imagine we have a function `f` of type `(HttpError) -> HttpError`, and we want to invoke it on the `NetworkResult`.
 
-```kotlin:ank
+```kotlin
 val networkResult: NetworkResult = HttpError("boom!")
 val f: (String) -> String = String::toUpperCase
 
@@ -74,7 +74,7 @@ when (networkResult) {
 
 We can rewrite this code with our generated DSL.
 
-```kotlin:ank
+```kotlin
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
 
@@ -90,7 +90,7 @@ The DSL also has special support for [Every]({{ '/optics/every' | relative_url }
 }
 ```
 
-```kotlin:ank
+```kotlin
 import arrow.optics.Every
 
 val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
@@ -101,7 +101,7 @@ Employees.employees.every(Every.list<Employee>()).company.address.street.name.mo
 
 If you are in the scope of `Each`, you don't need to specify the instance.
 
-```kotlin:ank
+```kotlin
 Every.list<Employee>().run {
   Employees.employees.every.company.address.street.name.modify(employees, String::capitalize)
 }
@@ -119,7 +119,7 @@ Every.list<Employee>().run {
 
 Here we focus into the value of a given key in `MapK`.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.typeclasses.At
 
 val db = Db(mapOf(
@@ -133,7 +133,7 @@ Db.content.at(At.map(), 2).some.modify(db, String::reversed)
 
 If you are in the scope of `At`, you don't need to specify the instance.
 
-```kotlin:ank
+```kotlin
 At.map<Int, String>().run {
   Db.content.at(2).some.modify(db, String::reversed)
 }
@@ -144,7 +144,7 @@ At.map<Int, String>().run {
 `Index` can be used to operate on a structure `S` that can index `A` by an index `I` (i.e., a `List<Employee>` by its index position or a `Map<K, V>` by its keys `K`).
 
 
-```kotlin:ank
+```kotlin
 import arrow.optics.typeclasses.Index
 
 val updatedJohn = Employees.employees.index(Index.list(), 0).company.address.street.name.modify(employees, String::capitalize)
@@ -153,7 +153,7 @@ updatedJohn
 
 In the scope of `Index`, you don't need to specify the instance, so we can enable `operator fun get` syntax.
 
-```kotlin:ank
+```kotlin
 Index.list<Employee>().run {
   Employees.employees[0].company.address.street.name.getOrNull(updatedJohn)
 }
@@ -161,7 +161,7 @@ Index.list<Employee>().run {
 
 Since [Index]({{ '/optics/index' | relative_url }}) returns an [Optional]({{ '/optics/optional' | relative_url }}), `index` and `[]` are safe operations.
 
-```kotlin:ank
+```kotlin
 Index.list<Employee>().run {
   Employees.employees[2].company.address.street.name.getOrNull(employees)
 }

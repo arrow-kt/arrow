@@ -111,7 +111,7 @@ All operators found in Arrow Fx check for cancellation, and make you `suspend` c
 
 A small example of an infinite loop below, where `parZip` checks for cancellation and this the `sleeper` function is cancellable even though it runs in an infinite recursion loop.
 
-```kotlin:ank
+```kotlin
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.*
 

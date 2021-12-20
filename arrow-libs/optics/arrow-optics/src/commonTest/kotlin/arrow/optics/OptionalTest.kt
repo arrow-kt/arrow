@@ -162,6 +162,12 @@ class OptionalTest : UnitSpec() {
       }
     }
 
+    "Set a value over a non empty list target then the first item of the result should be the value" {
+      checkAll(Arb.list(Arb.int(), 1..maxDepth), Arb.int()) { list, value ->
+        Optional.listHead<Int>().set(list, value)[0] shouldBe value
+      }
+    }
+
     "Joining two optionals together with same target should yield same result" {
       val joinedOptional = Optional.listHead<Int>().choice(Optional.defaultHead())
 

@@ -12,7 +12,7 @@ It can be seen as a wrapper of a get function `(S) -> A` that can be composed wi
 
 Creating a `Getter` can be done by referencing a property of a data classes or by providing a function.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.*
 import arrow.*
 
@@ -22,7 +22,7 @@ val healthGetter = Getter(Player::health)
 val player = Player(75)
 healthGetter.get(player)
 ```
-```kotlin:ank
+```kotlin
 import arrow.core.*
 
 fun <T> nonEmptyListHead() = Getter<NonEmptyList<T>, T> {
@@ -34,7 +34,7 @@ nonEmptyListHead<Int>().get(nonEmptyListOf(1, 2, 3, 4))
 
 Or, from any of the optics defined in `arrow-optics` that allow getting its focus safely.
 
-```kotlin:ank:silent
+```kotlin
 import arrow.core.*
 import arrow.optics.*
 
@@ -46,7 +46,7 @@ val tupleGetter: Getter<Pair<String, Int>, String> = PLens.pairFirst<String, Int
 
 Unlike a regular `get` function, a `Getter` composes. Similar to a `Lens`, we can compose `Getter`s to create telescopes and zoom into nested structures.
 
-```kotlin:ank
+```kotlin
 val firstBar: Getter<NonEmptyList<Player>, Int> = Lens.nonEmptyListHead<Player>() compose healthGetter
 firstBar.get(Player(5).nel())
 ```

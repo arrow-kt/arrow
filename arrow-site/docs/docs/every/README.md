@@ -17,7 +17,7 @@ A structure `S` that has a focus `A`:
 
 An `Every` can simply be created by providing the `map` & `foldMap` function.
 
-```kotlin:ank:playground
+```kotlin
 import arrow.optics.*
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
@@ -42,7 +42,7 @@ fun main(): Unit {
 
 Or by using any of the pre-defined of `Every` on its `Companion` object.
 
-```kotlin:ank:playground
+```kotlin
 Every.list<Int>().modify(listOf(1, 2, 3, 4), Int::inc)
 ```
 
@@ -57,7 +57,7 @@ data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 data class Employees(val employees: List<Employee>)
 ```
-```kotlin:ank
+```kotlin
 val john = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val jane = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val employees = Employees(listOf(john, jane))
@@ -65,7 +65,7 @@ val employees = Employees(listOf(john, jane))
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
 
-```kotlin:ank
+```kotlin
 employees.employees.map { employee ->
   employee.copy(
           company = employee.company.copy(

@@ -354,7 +354,9 @@ public final class arrow/fx/coroutines/ResourceExtensionsKt {
 }
 
 public final class arrow/fx/coroutines/ResourceKt {
+	public static final fun release (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public static final fun release-zgiIeyo (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+	public static final fun releaseCase (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun releaseCase-zgiIeyo (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun resource (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/fx/coroutines/Resource;
@@ -486,5 +488,13 @@ public final class arrow/fx/coroutines/Use {
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Lkotlin/jvm/functions/Function1;
+}
+
+public abstract interface class arrow/fx/coroutines/computations/ResourceEffect {
+	public abstract fun bind (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/computations/ResourceKt {
+	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 }
 

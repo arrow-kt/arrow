@@ -36,22 +36,23 @@ import kotlin.time.ExperimentalTime
  *
  * @see [Schedule] for how to build a schedule.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.flow.*
  * import arrow.fx.coroutines.*
  * suspend fun main(): Unit {
  *   var counter = 0
  *   val flow = flow {
- *    emit(a)
+ *    emit(counter)
  *    if (++counter <= 5) throw RuntimeException("Bang!")
  *   }
  *   //sampleStart
  *  val sum = flow.retry(Schedule.recurs(5))
- *    .reduce { acc, int -> acc + int }
+ *    .reduce(Int::plus)
  *   //sampleEnd
- *   println(result)
+ *   println(sum)
  * }
  * ```
+ * <!--- KNIT example-flow-01.kt -->
  *
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
@@ -88,7 +89,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  *
  * See [parMapUnordered] if there is no requirement to retain the order of the original stream.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList
@@ -105,10 +106,11 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-flow-02.kt -->
  * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
  * concurrently runs, "prefetching", the next element. i.e.
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.fx.coroutines.*
  *
  *  suspend fun main(): Unit {
@@ -121,6 +123,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-flow-03.kt -->
  *
  * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
  */
@@ -159,7 +162,7 @@ public inline fun <A, B> Flow<A>.parMap(
  *
  * See [parMap] if retaining the original order of the stream is required.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import kotlinx.coroutines.delay
  * import kotlinx.coroutines.flow.flowOf
  * import kotlinx.coroutines.flow.toList
@@ -176,6 +179,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-flow-04.kt -->
  */
 @FlowPreview
 public inline fun <A, B> Flow<A>.parMapUnordered(

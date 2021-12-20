@@ -95,7 +95,7 @@ for example
  *
  * The example below shows a refined type `Positive` that ensures [Int] is > than 0.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.refinement.Refined
  * import arrow.refinement.ensure
  *

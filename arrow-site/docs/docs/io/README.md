@@ -78,7 +78,7 @@ Both also forces us to go through certain set of methods to execute/run the effe
 When writing functional code style we often want to express our domain errors as clearly as possible, a popular pattern is to return `Either<DomainError, SuccessValue>`.
 Let's assume following domain, and compare two snippets one using `IO<Either<E, A>>` and another `suspend () -> Either<E, A>`.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -120,7 +120,7 @@ suspend suspendedIOProgram(): Either<PersistenceError, ProcessedUser> =
 
 ##### suspend () -> Either<E, A>
 
-```kotlin:ank
+```kotlin
 import arrow.core.computations.either
 
 suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
@@ -140,7 +140,7 @@ They allow us to elegantly define `syntax` for a certain type. Let's see a simpl
 
 Let's reuse our previous domain of`User`, `ProcessedUser`, but let's introduce `Repo` and `Persistence` layers to mimick what could be a small app with a couple layers.
 
-```kotlin:ank
+```kotlin
 interface Repo {
     suspend fun fetchUsers(): List<User>
 }
@@ -155,7 +155,7 @@ interface Persistence {
 
 Given the above defined layers we can easily compose them by creating a product which implements the dependencies by delegation.
 
-```kotlin:ank
+```kotlin
 class DataModule(
     persistence: Persistence,
     repo: Repo
@@ -165,7 +165,7 @@ class DataModule(
 We can also define top-level functions based on constraints on the receiver.
 Here we define `getProcessedUsers` which can only be called where `R` is both `Repo` and `Persistence`.
 
-```kotlin:ank
+```kotlin
 /**
  * Generic top-level function based on syntax enabled by [Persistence] & [Repo] constraint
  */

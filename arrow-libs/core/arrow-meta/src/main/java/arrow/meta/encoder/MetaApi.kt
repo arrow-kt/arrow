@@ -238,9 +238,11 @@ public interface MetaApi {
    * it's hierarchical dependencies to other type classes
    * ex: override fun MF(): arrow.typeclasses.Monad<F> in the KleisliMonadInstance
    * ```
+ * <!--- KNIT example-arrow-01.kt -->
    * fun <F, D> Companion.monad(MF: Monad<F>): KleisliMonad<F, D> =
    *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.typeclasses.Monad<F> = MF }`
    * ```
+ * <!--- KNIT example-arrow-02.kt -->
    */
   public val TypeClassInstance.requiredAbstractFunctions: List<Func>
 
@@ -249,9 +251,11 @@ public interface MetaApi {
    * the [requiredAbstractFunctions]
    * ex: override fun MF: Monad<F> in KleisliMonadInstance
    * ```
+ * <!--- KNIT example-arrow-03.kt -->
    * fun <F, D> Companion.monad(MF: Monad<F>): KleisliMonad<F, D> =
    *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.typeclasses.Monad<F> = MF }`
    * ```
+ * <!--- KNIT example-arrow-04.kt -->
    */
   public val TypeClassInstance.requiredParameters: List<Parameter>
 

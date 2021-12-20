@@ -38,7 +38,7 @@ import kotlin.time.ExperimentalTime
  * Let's say we'd want to create a [CircuitBreaker] that only allows us to call a remote service twice,
  * and then whenever more than two requests fail with an exception, the circuit breaker starts short-circuiting failing-fast.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatten
  * import arrow.fx.coroutines.CircuitBreaker
@@ -70,6 +70,7 @@ import kotlin.time.ExperimentalTime
  * //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-circuitbreaker-01.kt -->
  *
  * A common pattern to make fault-tolerant/resilient systems is to compose a [CircuitBreaker] with a backing-off policy retry Schedule to guarantee not overloading the resource and the client interacting with it.
  * but also not the client that is interacting with the resource.
@@ -78,7 +79,7 @@ import kotlin.time.ExperimentalTime
  * The reason why [Schedule] is not sufficient to make your system resilient is because you also have to take into account parallel calls to your functions,
  *; In contrast, a [CircuitBreaker] can track failures of every function call or even different functions to the same resource or service.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.Either
  * import arrow.fx.coroutines.CircuitBreaker
  * import arrow.fx.coroutines.Schedule
@@ -122,6 +123,7 @@ import kotlin.time.ExperimentalTime
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-circuitbreaker-02.kt -->
  */
 public class CircuitBreaker
 private constructor(
