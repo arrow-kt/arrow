@@ -161,13 +161,25 @@ Please, follow the link to [create an issue](https://github.com/arrow-kt/arrow/i
 
 ### How to create a pull request
 
+The easiest way to contribute to Arrow is to create a branch from a fork, and then create a PR on Github from your branch.
+
+Arrow is a large project that uses several tools to verify that the code is formatted consistently, and that we don't break downstream projects that rely on Arrow's API across versions. 
+
+For code formatting we use [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-gradle) with [KtFmt](https://github.com/facebookincubator/ktfmt) and for API binary compatibility we use [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator). They need to run before you commit and push your code to Github.
+
+If you've included those changes for binary compatibility and formatted the code correctly it's time to open your PR and get your contribution into Arrow. Thanks ahead of time for your effort and contributions 🙏
+
 #### Requirements to change an existing feature
 
-If you want to propose a fix, rename, move, etc. please, ensure that these checks pass:
+If you want to propose a fix, rename, move etc., please execute these required tasks and make sure they pass:
 
-* Required checks:
-    * `arrow libraries: build`
-    * `arrow libraries: build documentation`
+* Required tasks:
+```bash
+./gradlew spotlessApply # Format code
+./gradlew apiDump # Generate .api files for binary compatibility review
+./gradlew build
+./gradlew buildDoc
+```
 * The approval by 2 maintainers of the Arrow Community.
 
 #### Requirements to add a new feature
@@ -175,14 +187,17 @@ If you want to propose a fix, rename, move, etc. please, ensure that these check
 Please, ensure these points when adding a new feature:
 
 * Include documentation via [Dokka](https://kotlinlang.org/docs/reference/kotlin-doc.html). Please, find examples in the existing code to follow the same pattern.
-* [Use Ank to validate for code snippets](https://github.com/arrow-kt/arrow/blob/main/arrow-libs/ank/README.md)
 * Include tests that cover the proper cases
 
-When creating the pull request, ensure that these checks pass:
+When creating the pull request, please execute these required tasks and make sure they pass:
 
-* Required automatic checks:
-    * `arrow libraries: build`
-    * `arrow libraries: build documentation`
+* Required tasks:
+```bash
+./gradlew spotlessApply # Format code
+./gradlew apiDump # Generate .api files for binary compatibility review
+./gradlew build
+./gradlew buildDoc
+```
 * The approval by 2 maintainers of the Arrow Community.
 
 #### How to download the tests report
