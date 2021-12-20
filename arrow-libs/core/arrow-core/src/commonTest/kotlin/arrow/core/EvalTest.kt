@@ -17,12 +17,12 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
+      /*FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
         it.bind()
       },
       FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::eager) {
         it.bind()
-      }
+      }*/
     )
 
     "should map wrapped value" {
