@@ -63,7 +63,7 @@ Root project 'arrow'
 
 ## How to generate and validate the documentation
 
-Dokka is responsible for generating documentation based on source code annotations. Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
+Dokka is responsible for generating documentation based on source code annotations. [Knit](https://github.com/Kotlin/kotlinx-knit) is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
 
 In order to generate the documentation and validate it:
 
@@ -88,7 +88,7 @@ Public docs in Arrow follow a particular structure that ensures users have a sim
 
 Declarations including classes, functions, and others must include docs in the following structure:
 
-All Kdocs should include a short header that describes what the data type or function is for and an `ank` fenced block demonstrating its use
+All Kdocs should include a short header that describes what the data type or function is for and a triple backticks ``` fenced block demonstrating its use
 
 for example
 
@@ -117,24 +117,17 @@ abstract class Refined<A, out B>
 
 If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.
 
-For the mentioned cases, you should double-check which `Ank` modifiers you want to use for the snippets (`silent`, `replace`, or `outFile(<file>)`). You'll find more details about each one of those in [Ank docs](https://github.com/arrow-kt/arrow-ank). See some real examples [on this docs PR](https://github.com/arrow-kt/arrow/pull/1134/files).
-
-Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add this `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making them runnable).
-
 ## How to run the website in your local workspace
 
 ```sh
-cd arrow-site
-./gradlew buildSite
+./gradlew :arrow-site:buildSite
 ```
 
-That Gradle task is equivalent to run Dokka, Ank and Jekyll build:
+That Gradle task is equivalent to run Dokka and Jekyll build:
 
 ```bash
-cd arrow-libs
-./gradlew dokka
-cd ../arrow-site
-./gradlew runAnk
+./gradlew dokkaGfm
+cd arrow-site
 bundle install --gemfile Gemfile --path vendor/bundle
 bundle exec jekyll serve -s build/site
 ```
