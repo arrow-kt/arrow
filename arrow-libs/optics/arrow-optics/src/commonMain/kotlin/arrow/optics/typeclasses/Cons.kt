@@ -26,14 +26,14 @@ public fun interface Cons<S, A> {
   /**
    * Provides an [Optional] between [S] and its first element [A].
    */
-  public fun firstOption(): Optional<S, A> = TODO()
-//    cons() compose PLens.pairPFirst()
+  public fun firstOption(): Optional<S, A> =
+    cons() compose PLens.pairPFirst()
 
   /**
    * Provides an [Optional] between [S] and its tail [S].
    */
-  public fun tailOption(): Optional<S, S> = TODO()
-//    cons() compose PLens.pairPSecond()
+  public fun tailOption(): Optional<S, S> =
+    cons() compose PLens.pairPSecond()
 
   /**
    * Prepend an element [A] to the first element of [S].
