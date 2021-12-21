@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.produceIn
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.zip
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -378,3 +377,22 @@ public suspend fun <E, A, B> Flow<A>.traverseValidated(
 
 public suspend fun <E, A> Flow<Validated<E, A>>.sequenceValidated(SG: Semigroup<E>): Validated<E, List<A>> =
   traverseValidated(SG, ::identity)
+
+public suspend fun <A, B> Flow<A>.traverseNullable(f: suspend (A) -> B?): List<B>? {
+
+  val acc = mutableListOf<B>()
+
+  try {
+    collect { a ->
+      val b = f(a) ?: throw ExitTraverseException(Unit)
+      acc.add(b)
+    }
+  } catch (e: ExitTraverseException) {
+    return null
+  }
+
+  return acc
+}
+
+public suspend fun <A> Flow<A?>.sequenceNullable(): List<A>? =
+  traverseNullable(::identity)

@@ -10,6 +10,7 @@ import arrow.core.some
 import arrow.core.valid
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.fail
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
@@ -67,6 +68,22 @@ class FlowTest : ArrowFxSpec(
             }
           }
       res shouldBe None
+      acc shouldBe (0..20_000).toList()
+    }
+
+    "traverseNullable" {
+      val acc = mutableListOf<Int>()
+      val res =
+        (0..20_001).asFlow()
+          .traverseNullable {
+            if (it > 20_000) {
+              null
+            } else {
+              acc.add(it)
+              it
+            }
+          }
+      res.shouldBeNull()
       acc shouldBe (0..20_000).toList()
     }
 
