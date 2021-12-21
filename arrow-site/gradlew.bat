@@ -1,1 +1,0 @@
-../arrow-libs/gradlew.bat

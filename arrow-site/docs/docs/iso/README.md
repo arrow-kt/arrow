@@ -13,7 +13,7 @@ Isos can be seen as a pair of functions that represent an isomorphism, `get`, an
 
 A simple structure `Point2D` is equivalent to `Pair<Int, Int>`, so we can create an `Iso<Point2D, Pair<Int, Int>>`
 
-```kotlin:ank
+```kotlin
 import arrow.*
 import arrow.core.*
 import arrow.optics.*
@@ -28,30 +28,30 @@ val pointIsoPair: Iso<Point2D, Pair<Int, Int>> = Iso(
 val point = Point2D(6, 10)
 point
 ```
-```kotlin:ank
+```kotlin
 val pair = pointIsoPair.get(point)
 pair
 ```
-```kotlin:ank
+```kotlin
 pointIsoPair.reverseGet(pair)
 ```
 
 Given an `Iso<Point2D, Pair<Int, Int>>`, we also have an `Iso<Pair<Int, Int>, Point2D>`. Since it represents an isomorphism between equivalent structures, we can reverse it.
 
-```kotlin:ank:silent
+```kotlin
 val reversedIso: Iso<Pair<Int, Int>, Point2D> = pointIsoPair.reverse()
 ```
 
 Using an `Iso`, we can modify our source `S` with a function that works on our focus `A`.
 
-```kotlin:ank
+```kotlin
 val addFive: (Pair<Int, Int>) -> Pair<Int, Int> = { (a, b) -> (a + 5) to (b + 5) }
 pointIsoPair.modify(point, addFive)
 ```
 
 A function `(A) -> A` can be lifted to a function `(S) -> S`
 
-```kotlin:ank
+```kotlin
 val liftedAddFive: (Point2D) -> Point2D = pointIsoPair.lift(addFive)
 liftedAddFive(point)
 ```
@@ -60,7 +60,7 @@ liftedAddFive(point)
 
 By composing Isos, we can create additional Isos without defining them. When dealing with different APIs or frameworks, we frequently run into multiple equivalent but different structures like `Point2D`, `Pair`, `Coord`, etc.
 
-```kotlin:ank
+```kotlin
 data class Coord(val xAxis: Int, val yAxis: Int)
 
 val pairIsoCoord: Iso<Pair<Int, Int>, Coord> = Iso(
@@ -73,7 +73,7 @@ By composing `pointIsoPair` and `pairIsoCoord` (and/or reversing), we can use `P
 
 Composing an `Iso` with functions can also be useful for changing the input or output type of a function. The `Iso<A?, Option<A>>` is available in `arrow-optics` as `PIso.nullableToOption()`.
 
-```kotlin:ank
+```kotlin
 val unknownCode: (String) -> String? = { value ->
     "unknown $value"
 }
@@ -98,7 +98,7 @@ The `Iso` will be generated as a extension property on the companion object `val
   companion object
 }
 ```
-```kotlin:ank:silent
+```kotlin
 val iso: Iso<Pos, Pair<Int, Int>> = Pos.iso
 ```
 
@@ -107,7 +107,7 @@ When dealing with polymorphic equivalent structures, we can create polymorphic I
 
 Given our previous structures `Pair<A, B>` and a structure `Tuple2<A, B>`, we can create a polymorphic `PIso` that represents a `get: (Pair<A, B>) -> Tuple2<A, B>` and a `reverseGet: (Tuple2<C, D) -> Pair<C, D>`.
 
-```kotlin:ank
+```kotlin
 data class Tuple2<A, B>(val a: A, val b: B) {
   fun reversed(): Tuple2<B, A> =
     Tuple2(b, a)
@@ -122,7 +122,7 @@ fun <A, B, C, D> pair(): PIso<Pair<A, B>, Pair<C, D>, Tuple2<A, B>, Tuple2<C, D>
 `PIso` (defined above) can lift a `reverse` function of `(Tuple2<A, B>) -> Tuple2<B, A>` to a function `(Pair<A, B>) -> Pair<B, A>`,
 this allows us to use functions defined for `Tuple2` for a value of type `Pair`.
 
-```kotlin:ank
+```kotlin
 val reverseTupleAsPair: (Pair<Int, String>) -> Pair<String, Int> =
   pair<Int, String, String, Int>().lift(Tuple2<Int, String>::reversed)
 

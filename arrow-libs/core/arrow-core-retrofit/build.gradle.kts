@@ -1,10 +1,10 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.jvm)
-  alias(libs.plugins.arrowGradleConfig.publishJvm)
+  id(libs.plugins.kotlin.jvm.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
 }
 
 apply(from = property("TEST_COVERAGE"))
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER"))
 
 dependencies {

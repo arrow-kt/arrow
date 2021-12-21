@@ -1,8 +1,7 @@
 ---
 library: core
 ---
-{: data-executable="true"}
-```kotlin:ank
+<!--- INCLUDE
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -25,10 +24,8 @@ typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
 fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
 fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
 fun prepare(tool: Knife, ingredient: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
-suspend fun main() {
-//sampleStart
-
-
+-->
+```kotlin
 suspend fun prepareLunch(): Either<CookingException, Salad> =
   either<CookingException, Salad> {
     val lettuce = takeFoodFromRefrigerator().bind()
@@ -36,8 +33,4 @@ suspend fun prepareLunch(): Either<CookingException, Salad> =
     val lunch = prepare(knife, lettuce).bind()
     lunch
   }
-
-println(prepareLunch())
-//sampleEnd
-}
 ```

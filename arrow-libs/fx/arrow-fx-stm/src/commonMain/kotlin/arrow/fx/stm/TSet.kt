@@ -26,7 +26,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *
  * Adding an element can be achieved by using either [STM.insert] or its alias [STM.plusAssign]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *
@@ -40,10 +40,11 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-tset-01.kt -->
  *
  * ## Removing an element from the set
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *
@@ -57,10 +58,11 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-tset-02.kt -->
  *
  * ## Checking for membership
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSet
  * import arrow.fx.stm.atomically
  *
@@ -75,6 +77,7 @@ public fun <A> STM.newTSet(): TSet<A> = newTSet { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-tset-03.kt -->
  *
  * ## Where are operations like `isEmpty` or `size`?
  *

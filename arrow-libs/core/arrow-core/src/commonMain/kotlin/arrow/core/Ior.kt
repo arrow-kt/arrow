@@ -34,11 +34,17 @@ public sealed class Ior<out A, out B> {
    * Returns `true` if this is a [Right], `false` otherwise.
    *
    * Example:
+   *
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Left("tulip").isRight           // Result: false
+   *   Ior.Right("venus fly-trap").isRight // Result: true
+   *   Ior.Both("venus", "fly-trap").isRight // Result: false
+   * }
    * ```
-   * Left("tulip").isRight           // Result: false
-   * Right("venus fly-trap").isRight // Result: true
-   * Both("venus", "fly-trap").isRight // Result: false
-   * ```
+   * <!--- KNIT example-ior-01.kt -->
    */
   public abstract val isRight: Boolean
 
@@ -46,11 +52,17 @@ public sealed class Ior<out A, out B> {
    * Returns `true` if this is a [Left], `false` otherwise.
    *
    * Example:
+   *
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Left("tulip").isLeft           // Result: true
+   *   Ior.Right("venus fly-trap").isLeft // Result: false
+   *   Ior.Both("venus", "fly-trap").isLeft // Result: false
+   * }
    * ```
-   * Left("tulip").isLeft           // Result: true
-   * Right("venus fly-trap").isLeft // Result: false
-   * Both("venus", "fly-trap").isLeft // Result: false
-   * ```
+ * <!--- KNIT example-ior-02.kt -->
    */
   public abstract val isLeft: Boolean
 
@@ -58,11 +70,16 @@ public sealed class Ior<out A, out B> {
    * Returns `true` if this is a [Both], `false` otherwise.
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Left("tulip").isBoth           // Result: false
+   *   Ior.Right("venus fly-trap").isBoth // Result: false
+   *   Ior.Both("venus", "fly-trap").isBoth // Result: true
+   * }
    * ```
-   * Left("tulip").isBoth           // Result: false
-   * Right("venus fly-trap").isBoth // Result: false
-   * Both("venus", "fly-trap").isBoth // Result: true
-   * ```
+ * <!--- KNIT example-ior-03.kt -->
    */
   public abstract val isBoth: Boolean
 
@@ -99,7 +116,7 @@ public sealed class Ior<out A, out B> {
      *  Lifts a function `(B) -> C` to the [Ior] structure returning a polymorphic function
      *  that can be applied over all [Ior] values in the shape of Ior<A, B>
      *
-     *  ```kotlin:ank:playground
+     *  ```kotlin
      *  import arrow.core.*
      *
      *  fun main(args: Array<String>) {
@@ -124,15 +141,6 @@ public sealed class Ior<out A, out B> {
   /**
    * Applies `fa` if this is a [Left], `fb` if this is a [Right] or `fab` if this is a [Both]
    *
-   * Example:
-   * ```
-   * val result: Ior<EmailContactInfo, PostalContactInfo> = obtainContactInfo()
-   * result.fold(
-   *      { log("only have this email info: $it") },
-   *      { log("only have this postal info: $it") },
-   *      { email, postal -> log("have this postal info: $postal and this email info: $email") }
-   * )
-   * ```
    *
    * @param fa the function to apply if this is a [Left]
    * @param fb the function to apply if this is a [Right]
@@ -163,11 +171,16 @@ public sealed class Ior<out A, out B> {
    * The given function is applied if this is a [Right] or [Both] to `B`.
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).map { "flower" } // Result: Right("flower")
+   *   Ior.Left(12).map { "flower" }  // Result: Left(12)
+   *   Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
+   * }
    * ```
-   * Ior.Right(12).map { "flower" } // Result: Right("flower")
-   * Ior.Left(12).map { "flower" }  // Result: Left(12)
-   * Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
-   * ```
+ * <!--- KNIT example-ior-04.kt -->
    */
   public inline fun <D> map(f: (B) -> D): Ior<A, D> =
     when (this) {
@@ -181,11 +194,16 @@ public sealed class Ior<out A, out B> {
    * and apply `fb` if this is [Right] or [Both] to `B`
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).bimap ({ "flower" }, { 12 }) // Result: Right(12)
+   *   Ior.Left(12).bimap({ "flower" }, { 12 })  // Result: Left("flower")
+   *   Ior.Both(12, "power").bimap ({ it * 2 }, { b -> "flower $b" })   // Result: Both("flower power", 24)
+   * }
    * ```
-   * Ior.Right(12).bimap ({ "flower" }, { 12 }) // Result: Right(12)
-   * Ior.Left(12).bimap({ "flower" }, { 12 })  // Result: Left("flower")
-   * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
-   * ```
+ * <!--- KNIT example-ior-05.kt -->
    */
   public inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
     { Left(fa(it)) },
@@ -197,11 +215,16 @@ public sealed class Ior<out A, out B> {
    * The given function is applied if this is a [Left] or [Both] to `A`.
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).map { "flower" } // Result: Right(12)
+   *   Ior.Left(12).map { "flower" }  // Result: Left("power")
+   *   Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
+   * }
    * ```
-   * Ior.Right(12).map { "flower" } // Result: Right(12)
-   * Ior.Left(12).map { "flower" }  // Result: Left("power")
-   * Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
-   * ```
+   * <!--- KNIT example-ior-06.kt -->
    */
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
     { Left(fa(it)) },
@@ -214,11 +237,16 @@ public sealed class Ior<out A, out B> {
    * when this is [Both] , left and right values are swap
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Left("left").swap()   // Result: Right("left")
+   *   Ior.Right("right").swap() // Result: Left("right")
+   *   Ior.Both("left", "right").swap() // Result: Both("right", "left")
+   * }
    * ```
-   * Left("left").swap()   // Result: Right("left")
-   * Right("right").swap() // Result: Left("right")
-   * Both("left", "right").swap() // Result: Both("right", "left")
-   * ```
+ * <!--- KNIT example-ior-07.kt -->
    */
   public fun swap(): Ior<B, A> = fold(
     { Right(it) },
@@ -239,21 +267,20 @@ public sealed class Ior<out A, out B> {
    * Return this [Ior] as [Pair] of nullables]
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
-   * //sampleStart
-   * val right = Ior.Right(12).padNull()         // Result: Pair(null, 12)
-   * val left = Ior.Left(12).padNull()           // Result: Pair(12, null)
-   * val both = Ior.Both("power", 12).padNull()  // Result: Pair("power", 12)
-   * //sampleEnd
-   *
    * fun main() {
+   *   val right = Ior.Right(12).padNull()         // Result: Pair(null, 12)
+   *   val left = Ior.Left(12).padNull()           // Result: Pair(12, null)
+   *   val both = Ior.Both("power", 12).padNull()  // Result: Pair("power", 12)
+   *
    *   println("right = $right")
    *   println("left = $left")
    *   println("both = $both")
    * }
    * ```
+ * <!--- KNIT example-ior-08.kt -->
    */
   public fun padNull(): Pair<A?, B?> = fold(
     { Pair(it, null) },
@@ -266,11 +293,16 @@ public sealed class Ior<out A, out B> {
    * and [Either.Left] if this is a [Left].
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).toEither() // Result: Either.Right(12)
+   *   Ior.Left(12).toEither()  // Result: Either.Left(12)
+   *   Ior.Both("power", 12).toEither()  // Result: Either.Right(12)
+   * }
    * ```
-   * Right(12).toEither() // Result: Either.Right(12)
-   * Left(12).toEither()  // Result: Either.Left(12)
-   * Both("power", 12).toEither()  // Result: Either.Right(12)
-   * ```
+ * <!--- KNIT example-ior-09.kt -->
    */
   public fun toEither(): Either<A, B> =
     fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
@@ -280,20 +312,20 @@ public sealed class Ior<out A, out B> {
    * and [null] if this is a [Left].
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
-   * //sampleStart
-   * val right = Ior.Right(12).orNull()         // Result: 12
-   * val left = Ior.Left(12).orNull()           // Result: null
-   * val both = Ior.Both(12, "power").orNull()  // Result: "power"
-   * //sampleEnd
    * fun main() {
+   *   val right = Ior.Right(12).orNull()         // Result: 12
+   *   val left = Ior.Left(12).orNull()           // Result: null
+   *   val both = Ior.Both(12, "power").orNull()  // Result: "power"
+   *
    *   println("right = $right")
    *   println("left = $left")
    *   println("both = $both")
    * }
    * ```
+ * <!--- KNIT example-ior-10.kt -->
    */
   public fun orNull(): B? =
     fold({ null }, { it }, { _, b -> b })
@@ -303,21 +335,19 @@ public sealed class Ior<out A, out B> {
    * and [null] if this is a [Right].
    *
    * Example:
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.Ior
    *
-   * //sampleStart
-   * val right = Ior.Right(12).leftOrNull()         // Result: null
-   * val left = Ior.Left(12).leftOrNull()           // Result: 12
-   * val both = Ior.Both(12, "power").leftOrNull()  // Result: 12
-   * //sampleEnd
-   *
    * fun main() {
+   *   val right = Ior.Right(12).leftOrNull()         // Result: null
+   *   val left = Ior.Left(12).leftOrNull()           // Result: 12
+   *   val both = Ior.Both(12, "power").leftOrNull()  // Result: 12
    *   println("right = $right")
    *   println("left = $left")
    *   println("both = $both")
    * }
    * ```
+ * <!--- KNIT example-ior-11.kt -->
    */
   public fun leftOrNull(): A? =
     fold({ it }, { null }, { a, _ -> a })
@@ -327,11 +357,16 @@ public sealed class Ior<out A, out B> {
    * and [Validated.Invalid] if this is a [Left].
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).toValidated() // Result: Valid(12)
+   *   Ior.Left(12).toValidated()  // Result: Invalid(12)
+   *   Ior.Both(12, "power").toValidated()  // Result: Valid("power")
+   * }
    * ```
-   * Right(12).toValidated() // Result: Valid(12)
-   * Left(12).toValidated()  // Result: Invalid(12)
-   * Both(12, "power").toValidated()  // Result: Valid("power")
-   * ```
+ * <!--- KNIT example-ior-12.kt -->
    */
   public fun toValidated(): Validated<A, B> =
     fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
@@ -481,14 +516,18 @@ public sealed class Ior<out A, out B> {
    * the given predicate to the [Right] value.
    *
    * Example:
-   * ```
-   * Ior.Both(5, 12).exists { it > 10 } // Result: true
-   * Ior.Right(12).exists { it > 10 }   // Result: true
-   * Ior.Right(7).exists { it > 10 }    // Result: false
+   * ```kotlin
+   * import arrow.core.Ior
    *
-   * val left: Ior<Int, Int> = Ior.Left(12)
-   * left.exists { it > 10 }      // Result: false
+   * fun main() {
+   *   Ior.Both(5, 12).exists { it > 10 } // Result: true
+   *   Ior.Right(12).exists { it > 10 }   // Result: true
+   *   Ior.Right(7).exists { it > 10 }    // Result: false
+   *   val left: Ior<Int, Int> = Ior.Left(12)
+   *   left.exists { it > 10 }      // Result: false
+   * }
    * ```
+ * <!--- KNIT example-ior-13.kt -->
    */
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate, { _, b -> predicate(b) })
@@ -652,7 +691,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
  *
- * ```kotlin:ank:playground:extension
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -664,6 +703,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
  *   println(chars)
  * }
  * ```
+ * <!--- KNIT example-ior-14.kt -->
  */
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this

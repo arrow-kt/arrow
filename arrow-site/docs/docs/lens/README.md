@@ -14,7 +14,7 @@ Lenses can be seen as a pair of functions, a getter, and a setter. A `Lens<S, A>
 
 Given a simple structure `Player`, we can create a `Lens<Player, Int>` to get, set, or modify its value.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.*
 
 data class Player(val health: Int)
@@ -26,19 +26,19 @@ val playerLens: Lens<Player, Int> = Lens(
 
 val player = Player(70)
 ```
-```kotlin:ank
+```kotlin
 playerLens.get(player)
 ```
-```kotlin:ank
+```kotlin
 playerLens.set(player, 100)
 ```
-```kotlin:ank
+```kotlin
 playerLens.modify(player) { it - 20 }
 ```
 
 We can also `lift` above function `(Int) -> Int` to `(Player) -> Player`.
 
-```kotlin:ank
+```kotlin
 val lift: (Player) -> Player = playerLens.lift { it + 10 }
 lift(player)
 ```
@@ -57,14 +57,14 @@ data class Address(val city: String, val street: Street)
 data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 ```
-```kotlin:ank
+```kotlin
 val employee = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 employee
 ```
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
 
-```kotlin:ank
+```kotlin
 employee.copy(
         company = employee.company.copy(
                 address = employee.company.address.copy(
@@ -127,14 +127,14 @@ The lenses will be generated as extension properties on the companion object `va
 
 For `Account`, two lenses will be generated: `val Account.Companion.balance: Lens<Account, Int>` and `val Account.Companion.available: Lens<Account, Int>`.
 
-```kotlin:ank:silent
+```kotlin
 val balanceLens: Lens<Account, Int> = Account.balance
 ```
 
 ### Polymorphic lenses <a id="Plens"></a>
 When dealing with polymorphic product types, we can also have polymorphic lenses that allow us to morph the type of the focus (and, as a result, the constructed type) of our `PLens`. The following method is also available as `PLens.pPairFirst<A, B, R>()` in the `arrow.optics` package.
 
-```kotlin:ank
+```kotlin
 fun <A, B, R> pair(): PLens<Pair<A, B>, Pair<R, B>, A, R> = PLens(
         { it.first },
         { ab, r -> r to ab.second }

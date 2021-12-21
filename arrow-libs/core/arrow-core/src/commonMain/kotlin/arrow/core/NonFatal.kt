@@ -13,7 +13,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @param t the Throwable to check
  * @return true if the provided `Throwable` is to be considered non-fatal, or false if it is to be considered fatal
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.*
  * import arrow.core.*
  *
@@ -40,6 +40,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *   println(nonFatal)
  * }
  * ```
+ * <!--- KNIT example-nonfatal-01.kt -->
  *
  */
 public expect fun NonFatal(t: Throwable): Boolean

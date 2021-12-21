@@ -11,488 +11,6 @@ public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 public typealias Valid<A> = Validated.Valid<A>
 public typealias Invalid<E> = Validated.Invalid<E>
 
-/**
- *
- *
- * Imagine you are filling out a web form to sign up for an account. You input your username and
- * password, then submit. A response comes back saying your username can't have dashes in it,
- * so you make some changes, then resubmit. You can't have special characters either. Change, resubmit.
- * Password needs to have at least one capital letter. Change, resubmit. Password needs to have at least one number.
- *
- * Or perhaps you're reading from a configuration file. One could imagine the configuration library
- * you're using returns an `Either`. Your parsing may look something like:
- *
- * ```kotlin:ank
- * import arrow.core.Either
- * import arrow.core.Either.Left
- * import arrow.core.flatMap
- *
- * //sampleStart
- * data class ConnectionParams(val url: String, val port: Int)
- *
- * fun <A> config(key: String): Either<String, A> = Left(key)
- *
- * config<String>("url").flatMap { url ->
- *  config<Int>("port").map { ConnectionParams(url, it) }
- * }
- * //sampleEnd
- * ```
- *
- * You run your program and it says key "url" not found. Turns out the key was "endpoint." So
- * you change your code and re-run. Now it says the "port" key was not a well-formed integer.
- *
- * It would be nice to have all of these errors reported simultaneously. The username's inability to
- * have dashes can be validated separately from it not having special characters, as well as
- * from the password needing to have certain requirements. A misspelled (or missing) field in
- * a config can be validated separately from another field not being well-formed.
- *
- * # Enter `Validated`.
- *
- * ## Parallel Validation
- *
- * Our goal is to report any and all errors across independent bits of data. For instance, when
- * we ask for several pieces of configuration, each configuration field can be validated separately
- * from one another. How then do we ensure that the data we are working with is independent?
- * We ask for both of them up front.
- *
- * As our running example, we will look at config parsing. Our config will be represented by a
- * `Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only
- * for `String` and `Int` for brevity.
- *
- * ```kotlin:ank
- * //sampleStart
- * abstract class Read<A> {
- *
- * abstract fun read(s: String): A?
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object: Read<String>() {
- *     override fun read(s: String): String? = s
- *    }
- *
- *   val intRead: Read<Int> =
- *    object: Read<Int>() {
- *     override fun read(s: String): Int? =
- *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
- *    }
- *  }
- * }
- * //sampleEnd
- * ```
- *
- * Then we enumerate our errors. When asking for a config value, one of two things can go wrong:
- * The field is missing, or it is not well-formed with regards to the expected type.
- *
- * ```kotlin:ank
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String): ConfigError()
- *  data class ParseConfig(val field: String): ConfigError()
- * }
- * ```
- *
- * We need a data type that can represent either a successful value (a parsed configuration), or an error.
- * It would look like the following, which Arrow provides in `arrow.Validated`:
- *
- * ```kotlin
- * sealed class Validated<out E, out A> {
- *  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
- *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
- * }
- * ```
- *
- * Now we are ready to write our parser.
- *
- * ```kotlin:ank
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.Validated
- * import arrow.core.valid
- * import arrow.core.invalid
- *
- * //sampleStart
- * data class Config(val map: Map<String, String>) {
- *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
- *   val v = map[key]
- *   return when (v) {
- *    null -> Validated.Invalid(ConfigError.MissingConfig(key))
- *    else ->
- *     when (val s = read.read(v)) {
- *      null -> ConfigError.ParseConfig(key).invalid()
- *      else -> s.valid()
- *     }
- *   }
- *  }
- * }
- * //sampleEnd
- * ```
- *
- * And, as you can see, the parser runs sequentially: it first tries to get the map value and then tries to read it.
- * It's then straightforward to translate this to an effect block. We use here the `either` block which includes syntax
- * to obtain `A` from values of `Validated<*, A>` through the [arrow.core.computations.EitherEffect.invoke]
- *
- * ```kotlin:ank
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- *
- * //sampleStart
- * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
- *     val value = Validated.fromNullable(map[key]) {
- *       ConfigError.MissingConfig(key)
- *     }.bind()
- *     val readVal = Validated.fromNullable(read.read(value)) {
- *       ConfigError.ParseConfig(key)
- *     }.bind()
- *     readVal
- *   }
- * }
- * //sampleEnd
- * ```
- *
- * Everything is in place to write the parallel validator. Remember that we can only do parallel
- * validation if each piece is independent. How do we ensure the data is independent? By
- * asking for all of it up front. Let's start with two pieces of data.
- *
- * ```kotlin:ank
- * import arrow.core.Validated
- * //sampleStart
- * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
- *  return when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
- *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
- *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
- *   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
- *   else -> TODO()
- *  }
- * }
- * //sampleEnd
- * ```
- *
- * We've run into a problem. In the case where both have errors, we want to report both. We
- * don't have a way to combine ConfigErrors. But, as clients, we can change our Validated
- * values where the error can be combined, say, a `List<ConfigError>`. We are going to use a
- * `NonEmptyList<ConfigError>`—the NonEmptyList statically guarantees we have at least one value,
- * which aligns with the fact that, if we have an Invalid, then we most certainly have at least one error.
- * This technique is so common there is a convenient method on `Validated` called `toValidatedNel`
- * that turns any `Validated<E, A>` value to a `Validated<NonEmptyList<E>, A>`. Additionally, the
- * type alias `ValidatedNel<E, A>` is provided.
- *
- * Time to validate:
- *
- * ```kotlin:ank
- * import arrow.core.NonEmptyList
- * import arrow.core.Validated
- * //sampleStart
- * fun <E, A, B, C> parallelValidate
- *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
- *  when {
- *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.value, v2.value))
- *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
- *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
- *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.value, listOf(v2.value)))
- *   else -> throw IllegalStateException("Not possible value")
- *  }
- * //sampleEnd
- * ```
- *
- * ### Improving the validation
- *
- * Kotlin says that our match is not exhaustive and we have to add `else`. To solve this, we would need to nest our when,
- * but that would complicate the code. To achieve this, Arrow provides [zip].
- * This function combines [Validated]s by accumulating errors in a tuple, which we can then map.
- * The above function can be rewritten as follows:
- *
- * ```kotlin:ank:silent
- * import arrow.core.Validated
- * import arrow.core.validNel
- * import arrow.core.zip
- * import arrow.typeclasses.Semigroup
- *
- * //sampleStart
- * val parallelValidate =
- *    1.validNel().zip(Semigroup.nonEmptyList<ConfigError>(), 2.validNel())
- *     { a, b -> /* combine the result */ }
- * //sampleEnd
- * ```
- *
- * Note that there are multiple `zip` functions with more arities, so we could easily add more parameters without worrying about
- * the function blowing up in complexity.
- *
- * When working with `NonEmptyList` in the `Invalid` side, there is no need to supply `Semigroup` as shown in the example above.
- *
- * ```kotlin:ank:silent
- * import arrow.core.Validated
- * import arrow.core.validNel
- * import arrow.core.zip
- *
- * //sampleStart
- * val parallelValidate =
- *   1.validNel().zip(2.validNel())
- *     { a, b -> /* combine the result */ }
- * //sampleEnd
- * ```
- *
- * ---
- *
- * Coming back to our example, when no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
- *
- * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- * import arrow.core.NonEmptyList
- * import arrow.typeclasses.Semigroup
- *
- * data class ConnectionParams(val url: String, val port: Int)
- *
- * abstract class Read<A> {
- *  abstract fun read(s: String): A?
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object : Read<String>() {
- *     override fun read(s: String): String? = s
- *    }
- *
- *   val intRead: Read<Int> =
- *    object : Read<Int>() {
- *     override fun read(s: String): Int? =
- *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
- *    }
- *  }
- * }
- *
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String) : ConfigError()
- *  data class ParseConfig(val field: String) : ConfigError()
- * }
- *
- * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
- *     val value = Validated.fromNullable(map[key]) {
- *       ConfigError.MissingConfig(key)
- *     }.bind()
- *     val readVal = Validated.fromNullable(read.read(value)) {
- *       ConfigError.ParseConfig(key)
- *     }.bind()
- *     readVal
- *   }.toValidatedNel()
- * }
- *
- *
- * suspend fun main() {
- * //sampleStart
- *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
- *
- *  val valid = config.parse(Read.stringRead, "url").zip(
- *    Semigroup.nonEmptyList<ConfigError>(),
- *    config.parse(Read.intRead, "port")
- *  ) { url, port -> ConnectionParams(url, port) }
- * //sampleEnd
- *  println("valid = $valid")
- * }
- * ```
- *
- * But what happens when we have one or more errors? They are accumulated in a `NonEmptyList` wrapped in
- * an `Invalid` instance.
- *
- * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- * import arrow.core.NonEmptyList
- * import arrow.typeclasses.Semigroup
- *
- * data class ConnectionParams(val url: String, val port: Int)
- *
- * abstract class Read<A> {
- *  abstract fun read(s: String): A?
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object : Read<String>() {
- *     override fun read(s: String): String? = s
- *    }
- *
- *   val intRead: Read<Int> =
- *    object : Read<Int>() {
- *     override fun read(s: String): Int? =
- *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
- *    }
- *  }
- * }
- *
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String) : ConfigError()
- *  data class ParseConfig(val field: String) : ConfigError()
- * }
- *
- * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
- *     val value = Validated.fromNullable(map[key]) {
- *       ConfigError.MissingConfig(key)
- *     }.bind()
- *     val readVal = Validated.fromNullable(read.read(value)) {
- *       ConfigError.ParseConfig(key)
- *     }.bind()
- *     readVal
- *   }.toValidatedNel()
- * }
- *
- * suspend fun main() {
- * //sampleStart
- * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
- *
- * val valid = config.parse(Read.stringRead, "url").zip(
- *  Semigroup.nonEmptyList<ConfigError>(),
- *  config.parse(Read.intRead, "port")
- * ) { url, port -> ConnectionParams(url, port) }
- * //sampleEnd
- *  println("valid = $valid")
- * }
- * ```
- *
- * ## Sequential Validation
- *
- * If you do want error accumulation, but occasionally run into places where sequential validation is needed,
- * then Validated provides a couple of methods that can be used.
- *
- * ### `andThen`
- *
- * The `andThen` method is similar to `flatMap`. In case of a valid instance it will pass the valid value into
- * the supplied function that in turn returns a `Validated` instance
- *
- * ```kotlin:ank:playground
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- *
- * abstract class Read<A> {
- *  abstract fun read(s: String): A?
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object : Read<String>() {
- *     override fun read(s: String): String? = s
- *    }
- *
- *   val intRead: Read<Int> =
- *    object : Read<Int>() {
- *     override fun read(s: String): Int? =
- *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
- *    }
- *  }
- * }
- *
- * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
- *     val value = Validated.fromNullable(map[key]) {
- *       ConfigError.MissingConfig(key)
- *     }.bind()
- *     val readVal = Validated.fromNullable(read.read(value)) {
- *       ConfigError.ParseConfig(key)
- *     }.bind()
- *     readVal
- *   }.toValidatedNel()
- * }
- *
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String) : ConfigError()
- *  data class ParseConfig(val field: String) : ConfigError()
- * }
- *
- * //sampleStart
- * val config = Config(mapOf("house_number" to "-42"))
- *
- * suspend fun main() {
- *   val houseNumber = config.parse(Read.intRead, "house_number").andThen { number ->
- *     if (number >= 0) Valid(number)
- *     else Invalid(ConfigError.ParseConfig("house_number"))
- * }
- * //sampleEnd
- *  println(houseNumber)
- * }
- *
- * ```
- *
- * ### `withEither`
- *
- * The `withEither` method to allow you to temporarily turn a Validated
- * instance into an Either instance and apply it to a function.
- *
- * ```kotlin:ank:playground
- * import arrow.core.Either
- * import arrow.core.flatMap
- * import arrow.core.left
- * import arrow.core.right
- * import arrow.core.Validated
- * import arrow.core.computations.either
- * import arrow.core.valid
- * import arrow.core.invalid
- *
- * abstract class Read<A> {
- *  abstract fun read(s: String): A?
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object : Read<String>() {
- *     override fun read(s: String): String? = s
- *    }
- *
- *   val intRead: Read<Int> =
- *    object : Read<Int>() {
- *     override fun read(s: String): Int? =
- *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
- *    }
- *  }
- * }
- *
- * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
- *     val value = Validated.fromNullable(map[key]) {
- *       ConfigError.MissingConfig(key)
- *     }.bind()
- *     val readVal = Validated.fromNullable(read.read(value)) {
- *       ConfigError.ParseConfig(key)
- *     }.bind()
- *     readVal
- *   }.toValidatedNel()
- * }
- *
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String) : ConfigError()
- *  data class ParseConfig(val field: String) : ConfigError()
- * }
- *
- * //sampleStart
- * fun positive(field: String, i: Int): Either<ConfigError, Int> =
- *  if (i >= 0) i.right()
- *  else ConfigError.ParseConfig(field).left()
- *
- * val config = Config(mapOf("house_number" to "-42"))
- *
- * suspend fun main() {
- *   val houseNumber = config.parse(Read.intRead, "house_number").withEither { either ->
- *     either.flatMap { positive("house_number", it) }
- *   }
- * //sampleEnd
- *  println(houseNumber)
- * }
- *
- * ```
- */
 public sealed class Validated<out E, out A> {
 
   public companion object {
@@ -550,23 +68,6 @@ public sealed class Validated<out E, out A> {
         e.nonFatalOrThrow().invalidNel()
       }
 
-    /**
-     * Lifts a function `A -> B` to the [Validated] structure.
-     *
-     * `A -> B -> Validated<E, A> -> Validated<E, B>`
-     *
-     * ```kotlin:ank:playground:extension
-     * import arrow.core.*
-     *
-     * fun main(args: Array<String>) {
-     *   val result =
-     *   //sampleStart
-     *   Validated.lift { s: CharSequence -> "$s World" }("Hello".valid())
-     *   //sampleEnd
-     *   println(result)
-     * }
-     * ```
-     */
     @JvmStatic
     public inline fun <E, A, B> lift(crossinline f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
       { fa -> fa.map(f) }
@@ -574,7 +75,7 @@ public sealed class Validated<out E, out A> {
     /**
      * Lifts two functions to the Bifunctor type.
      *
-     * ```kotlin:ank
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main(args: Array<String>) {
@@ -587,6 +88,7 @@ public sealed class Validated<out E, out A> {
      *   println("res2: $res2")
      * }
      * ```
+     * <!--- KNIT example-validated-01.kt -->
      */
     @JvmStatic
     public inline fun <A, B, C, D> lift(
@@ -600,7 +102,7 @@ public sealed class Validated<out E, out A> {
    * Discards the [A] value inside [Validated] signaling this container may be pointing to a noop
    * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -611,6 +113,7 @@ public sealed class Validated<out E, out A> {
    *   println(result)
    * }
    * ```
+   * <!--- KNIT example-validated-02.kt -->
    */
   public fun void(): Validated<E, Unit> =
     map { Unit }
@@ -778,10 +281,15 @@ public sealed class Validated<out E, out A> {
    * Validated value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Validated
+   *
+   * fun main() {
+   *   Validated.Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
+   *   Validated.Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
+   * }
    * ```
-   * Valid(12).tapInvalid { println("flower") } // Result: Valid(12)
-   * Invalid(12).tapInvalid { println("flower") }  // Result: prints "flower" and returns: Invalid(12)
-   * ```
+   * <!--- KNIT example-validated-03.kt -->
    */
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
     when (this) {
@@ -799,10 +307,15 @@ public sealed class Validated<out E, out A> {
    * Validated value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Validated
+   *
+   * fun main() {
+   *   Validated.Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
+   *   Validated.Invalid(12).tap { println("flower") }  // Result: Invalid(12)
+   * }
    * ```
-   * Valid(12).tap { println("flower") } // Result: prints "flower" and returns: Valid(12)
-   * Invalid(12).tap { println("flower") }  // Result: Invalid(12)
-   * ```
+   * <!--- KNIT example-validated-04.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
     when (this) {
@@ -1116,18 +629,19 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
  *
- * ```kotlin:ank:playground:extension
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val string: Validated<Int, String> = "Hello".invalid()
+ *   val string: Validated<Int, String> = "Hello".valid()
  *   val chars: Validated<Int, CharSequence> =
  *     string.widen<Int, CharSequence, String>()
  *   //sampleEnd
  *   println(chars)
  * }
  * ```
+ * <!--- KNIT example-validated-05.kt -->
  */
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
@@ -1220,11 +734,17 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  * Apply a function to a Valid value, returning a new Validation that may be valid or invalid
  *
  * Example:
+ * ```kotlin
+ * import arrow.core.Validated
+ * import arrow.core.andThen
+ *
+ * fun main() {
+ *   Validated.Valid(5).andThen { Validated.Valid(10) } // Result: Valid(10)
+ *   Validated.Valid(5).andThen { Validated.Invalid(10) } // Result: Invalid(10)
+ *   Validated.Invalid(5).andThen { Validated.Valid(10) } // Result: Invalid(5)
+ * }
  * ```
- * Valid(5).andThen { Valid(10) } // Result: Valid(10)
- * Valid(5).andThen { Invalid(10) } // Result: Invalid(10)
- * Invalid(5).andThen { Valid(10) } // Result: Invalid(5)
- * ```
+ * <!--- KNIT example-validated-06.kt -->
  */
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
   when (this) {

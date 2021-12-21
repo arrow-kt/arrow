@@ -16,7 +16,7 @@ import kotlin.jvm.JvmStatic
  *
  * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.none
@@ -30,10 +30,11 @@ import kotlin.jvm.JvmStatic
  *  println("emptyValue = $emptyValue")
  * }
  * ```
+ * <!--- KNIT example-option-01.kt -->
  *
  * Let's write a function that may or may not give us a string, thus returning `Option<String>`:
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -43,10 +44,11 @@ import kotlin.jvm.JvmStatic
  *  if (flag) Some("Found value") else None
  * //sampleEnd
  * ```
+ * <!--- KNIT example-option-02.kt -->
  *
  * Using `getOrElse`, we can provide a default value `"No value"` when the optional argument `None` does not exist:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -64,8 +66,9 @@ import kotlin.jvm.JvmStatic
  *  println(value1)
  * }
  * ```
+ * <!--- KNIT example-option-03.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -83,10 +86,11 @@ import kotlin.jvm.JvmStatic
  *  println(value2)
  * }
  * ```
+ * <!--- KNIT example-option-04.kt -->
  *
  * Checking whether option has value:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -103,9 +107,10 @@ import kotlin.jvm.JvmStatic
  *  println("valueNone = $valueNone")
  * }
  * ```
+ * <!--- KNIT example-option-05.kt -->
  * Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  *
  * //sampleStart
@@ -116,10 +121,11 @@ import kotlin.jvm.JvmStatic
  *  println("option = $option")
  * }
  * ```
+ * <!--- KNIT example-option-06.kt -->
  *
  * Option can also be used with when statements:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -135,8 +141,9 @@ import kotlin.jvm.JvmStatic
  *  println("value = $value")
  * }
  * ```
+ * <!--- KNIT example-option-07.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -152,12 +159,13 @@ import kotlin.jvm.JvmStatic
  *  println("value = $value")
  * }
  * ```
+ * <!--- KNIT example-option-08.kt -->
  *
  * An alternative for pattern matching is folding. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.
  *
  * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the option:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -175,9 +183,10 @@ import kotlin.jvm.JvmStatic
  *  println("mappedResult2 = $mappedResult2")
  * }
  * ```
+ * <!--- KNIT example-option-09.kt -->
  * Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.Some
  *
@@ -189,8 +198,9 @@ import kotlin.jvm.JvmStatic
  *  println(fold)
  * }
  * ```
+ * <!--- KNIT example-option-10.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Option
  * import arrow.core.none
  *
@@ -202,11 +212,13 @@ import kotlin.jvm.JvmStatic
  *  println(fold)
  * }
  * ```
+ * <!--- KNIT example-option-11.kt -->
  *
  * Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.some
+ * import arrow.core.none
  *
  * //sampleStart
  *  val some = 1.some()
@@ -217,8 +229,9 @@ import kotlin.jvm.JvmStatic
  *  println("none = $none")
  * }
  * ```
+ * <!--- KNIT example-option-12.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.toOption
  *
  * //sampleStart
@@ -233,12 +246,14 @@ import kotlin.jvm.JvmStatic
  *  println("valueFromStr = $valueFromStr")
  * }
  * ```
+ * <!--- KNIT example-option-13.kt -->
  *
  * You can easily convert between `A?` and `Option<A>` by using the `toOption()` extension or `Option.fromNullable` constructor.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.firstOrNone
  * import arrow.core.toOption
+ * import arrow.core.Option
  *
  * //sampleStart
  * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
@@ -252,10 +267,11 @@ import kotlin.jvm.JvmStatic
  *  println("filled = $filled")
  * }
  * ```
+ * <!--- KNIT example-option-14.kt -->
  *
  * ### Transforming the inner contents
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Some
  *
  * fun main() {
@@ -266,10 +282,11 @@ import kotlin.jvm.JvmStatic
  *  println(value)
  * }
  * ```
+ * <!--- KNIT example-option-15.kt -->
  *
  * ### Computing over independent values
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Some
  *
  *  val value =
@@ -280,10 +297,11 @@ import kotlin.jvm.JvmStatic
  *  println(value)
  * }
  * ```
+ * <!--- KNIT example-option-16.kt -->
  *
  * ### Computing over dependent values ignoring absence
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.Option
@@ -301,8 +319,9 @@ import kotlin.jvm.JvmStatic
  *  println(value())
  * }
  * ```
+ * <!--- KNIT example-option-17.kt -->
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.none
@@ -321,6 +340,7 @@ import kotlin.jvm.JvmStatic
  *  println(value())
  * }
  * ```
+ * <!--- KNIT example-option-18.kt -->
  *
  * ## Credits
  *
@@ -404,10 +424,16 @@ public sealed class Option<out A> {
    * None value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).tapNone { println("flower") } // Result: Some(12)
+   *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+   * }
    * ```
-   * Some(12).tapNone { println("flower") } // Result: Some(12)
-   * none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
-   * ```
+   * <!--- KNIT example-option-19.kt -->
    */
   public inline fun tapNone(f: () -> Unit): Option<A> =
     when (this) {
@@ -425,10 +451,16 @@ public sealed class Option<out A> {
    * Some value is returned
    *
    * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
+   *   none<Int>().tap { println("flower") }  // Result: None
+   * }
    * ```
-   * Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
-   * none<Int>().tap { println("flower") }  // Result: None
-   * ```
+   * <!--- KNIT example-option-20.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Option<A> =
     when (this) {
@@ -688,13 +720,20 @@ public sealed class Option<out A> {
    * Otherwise, returns false.
    *
    * Example:
-   * ```
-   * Some(12).exists { it > 10 } // Result: true
-   * Some(7).exists { it > 10 }  // Result: false
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
    *
-   * val none: Option<Int> = None
-   * none.exists { it > 10 }      // Result: false
+   * fun main() {
+   *   Some(12).exists { it > 10 } // Result: true
+   *   Some(7).exists { it > 10 }  // Result: false
+   *
+   *   val none: Option<Int> = None
+   *   none.exists { it > 10 }      // Result: false
+   * }
    * ```
+   * <!--- KNIT example-option-21.kt -->
    *
    * @param predicate the predicate to test
    */
@@ -706,13 +745,20 @@ public sealed class Option<out A> {
    * Otherwise, returns null.
    *
    * Example:
-   * ```
-   * Some(12).exists { it > 10 } // Result: 12
-   * Some(7).exists { it > 10 }  // Result: null
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
    *
-   * val none: Option<Int> = None
-   * none.exists { it > 10 }      // Result: null
+   * fun main() {
+   *   Some(12).exists { it > 10 } // Result: 12
+   *   Some(7).exists { it > 10 }  // Result: null
+   *
+   *   val none: Option<Int> = None
+   *   none.exists { it > 10 }      // Result: null
+   * }
    * ```
+   * <!--- KNIT example-option-22.kt -->
    */
   public inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
@@ -994,7 +1040,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *
  *  Option<A> -> Option<B>
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.core.Option
  *  import arrow.core.some
  *  import arrow.core.widen
@@ -1007,6 +1053,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
+ * <!--- KNIT example-option-23.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this

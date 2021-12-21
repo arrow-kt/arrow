@@ -14,7 +14,7 @@ For example, `S == List<Int>` to which we apply `(Int) -> String` with `Monoid<S
 
 Creating a `Fold` can be done by manually defining `foldMap`.
 
-```kotlin:ank
+```kotlin
 import arrow.core.*
 import arrow.optics.*
 import arrow.typeclasses.*
@@ -27,16 +27,16 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 
 `Fold` has an API similar to `kotlin.collections`, but because it's defined in terms of `foldMap`, there are no associative fold functions available.
 
-```kotlin:ank
+```kotlin
 nullableFold<Int>().isEmpty(null)
 ```
-```kotlin:ank
+```kotlin
 Fold.nonEmptyList<Int>().combineAll(Monoid.int(), nonEmptyListOf(1, 2, 3))
 ```
-```kotlin:ank
+```kotlin
 nullableFold<Int>().firstOrNull(null)
 ```
-```kotlin:ank
+```kotlin
 Fold.nonEmptyList<Int>().firstOrNull(nonEmptyListOf(1, 2, 3, 4))
 ```
 
@@ -44,7 +44,7 @@ Fold.nonEmptyList<Int>().firstOrNull(nonEmptyListOf(1, 2, 3, 4))
 
 Composing `Fold` can be used for accessing foci in nested structures.
 
-```kotlin:ank
+```kotlin
 val nestedNelFold: Fold<NonEmptyList<NonEmptyList<Int>>, NonEmptyList<Int>> = Fold.nonEmptyList()
 
 val nestedNel = nonEmptyListOf(1, 2, 3, 4).map {

@@ -15,7 +15,7 @@ For example, `S == List<Int>` to which we apply `(Int) -> String` and we get `T 
 
 A `Traversal` can simply be created by providing the `map` function.
 
-```kotlin:ank:playground
+```kotlin
 import arrow.optics.*
 
 fun main(): Unit {
@@ -43,7 +43,7 @@ data class Company(val name: String, val address: Address)
 data class Employee(val name: String, val company: Company)
 data class Employees(val employees: List<Employee>)
 ```
-```kotlin:ank
+```kotlin
 val john = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val jane = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
 val employees = Employees(listOf(john, jane))
@@ -51,7 +51,7 @@ val employees = Employees(listOf(john, jane))
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
 
-```kotlin:ank
+```kotlin
 employees.employees.map { employee ->
   employee.copy(
           company = employee.company.copy(

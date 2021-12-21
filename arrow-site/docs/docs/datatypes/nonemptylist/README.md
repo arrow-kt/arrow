@@ -18,7 +18,7 @@ video: TC6IzE61OyE
 compile "io.arrow-kt:arrow-core-data:$arrow_version"
 ```
 
-```kotlin:ank
+```kotlin
 // namespace
 import arrow.core.*
 ```
@@ -27,7 +27,7 @@ import arrow.core.*
 
 A `NonEmptyList` guarantees the list always has at least 1 element.
 
-```kotlin:ank:silent
+```kotlin
 nonEmptyListOf(1, 2, 3, 4, 5) // NonEmptyList<Int>
 nonEmptyListOf(1, 2) // NonEmptyList<Int>
 //nonEmptyListOf() // does not compile
@@ -47,7 +47,7 @@ When we fold over a `NonEmptyList`, we turn a `NonEmptyList< A >` into `B` by pr
 The first argument is a function that addresses the __seed value__, this can be any object of any type which will then become the resulting typed value.
 The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.
 
-```kotlin:ank
+```kotlin
 fun sumNel(nel: NonEmptyList<Int>): Int =
   nel.foldLeft(0) { acc, n -> acc + n }
 
@@ -58,7 +58,7 @@ sumNel(nonEmptyListOf(1, 1, 1, 1))
 
 `map` allows us to transform `A` into `B` in `NonEmptyList< A >`
 
-```kotlin:ank
+```kotlin
 nonEmptyListOf(1, 1, 1, 1).map { it + 1 }
 ```
 
@@ -66,7 +66,7 @@ nonEmptyListOf(1, 1, 1, 1).map { it + 1 }
 
 `flatMap` allows us to compute over the contents of multiple `NonEmptyList< * >` values
 
-```kotlin:ank
+```kotlin
 val nelOne: NonEmptyList<Int> = nonEmptyListOf(1)
 val nelTwo: NonEmptyList<Int> = nonEmptyListOf(2)
 
@@ -81,7 +81,7 @@ nelOne.flatMap { one ->
 
 Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
 
-```kotlin:ank
+```kotlin
 import arrow.core.*
 import java.util.*
 

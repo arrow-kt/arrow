@@ -76,7 +76,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
@@ -96,6 +96,7 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *   println(res)
  * }
  * ```
+ * <!--- KNIT example-partraverseeither-01.kt -->
  */
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(
@@ -166,7 +167,7 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  *
  * Cancelling this operation cancels all running tasks.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
@@ -181,15 +182,16 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  *     else User(id, Thread.currentThread().name).right()
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverseEither(Dispatchers.IO, ::getUserById)
+ *     .parTraverseEither(Dispatchers.IO) { getUserById(it) }
  *
  *   val res2 = listOf(1, 4, 2, 3)
- *     .parTraverseEither(Dispatchers.IO, ::getUserById)
+ *     .parTraverseEither(Dispatchers.IO) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  *  println(res2)
  * }
  * ```
+ * <!--- KNIT example-partraverseeither-02.kt -->
  */
 public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   ctx: CoroutineContext = EmptyCoroutineContext,

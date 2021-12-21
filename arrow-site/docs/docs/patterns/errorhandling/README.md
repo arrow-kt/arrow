@@ -20,7 +20,7 @@ The program simulates the typical lunch scenario where we have to get the ingred
 
 ### Requirements
 
-```kotlin:ank
+```kotlin
 /** model */
 object Lettuce
 object Knife
@@ -35,7 +35,7 @@ fun prepare(tool: Knife, ingredient: Lettuce): Salad = TODO()
 
 A naive implementation that uses exceptions may look like this
 
-```kotlin:ank
+```kotlin
 fun takeFoodFromRefrigerator(): Lettuce = throw RuntimeException("You need to go to the store and buy some ingredients")
 fun getKnife(): Knife = throw RuntimeException("Your knife needs to be sharpened")
 fun prepare(tool: Knife, ingredient: Lettuce): Salad = Salad
@@ -121,7 +121,7 @@ We use [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-
 
 When using `Nullable types`, our previous example may look like:
 
-```kotlin:ank
+```kotlin
 fun takeFoodFromRefrigerator(): Lettuce? = null
 fun getKnife(): Knife? = null
 fun prepare(tool: Knife, ingredient: Lettuce): Salad? = Salad
@@ -130,7 +130,7 @@ fun prepare(tool: Knife, ingredient: Lettuce): Salad? = Salad
 It's easy to work with [`Nullable types`](https://kotlinlang.org/docs/null-safety.html#nullable-types-and-non-null-types) if your lang supports special syntax like `?` as Kotlin does. 
 Nullable types are faster than boxed types like `Option`. Nonetheless `Option` is also supported by Arrow to interop with Java based libraries that use `null` as signal or interruption value like [ReactiveX RxJava](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls). Additionally `Option` is useful in generic code when not constraining with generic bounds of `A : Any` and using null as a nested signal to produce values of `Option<Option<A>>` since A? can't have double nesting.
 
-```kotlin:ank
+```kotlin
 import arrow.core.computations.nullable
 
 fun prepareLunch(): Salad? {
@@ -144,7 +144,7 @@ fun prepareLunch(): Salad? {
 In addition to `let` provided by the standard library Arrow provides `nullable` which allows the use of [Computation Expressions]({{ '/patterns/monad_comprehensions' | relative_url }}).
 
 
-```kotlin:ank
+```kotlin
 import arrow.core.computations.nullable
 
 suspend fun prepareLunch(): Salad? =
@@ -175,7 +175,7 @@ We should redefine our functions to express that their result is not just a `Let
 
 We can now assign proper types and values to the exceptional cases.
 
-```kotlin:ank
+```kotlin
 sealed class CookingException {
   object NastyLettuce: CookingException()
   object KnifeIsDull: CookingException()
@@ -191,7 +191,7 @@ In Kotlin, it is encoded using sealed hierarchies. We can think of sealed hierar
 
 Once we have an ADT defined to model our known errors, we can redefine our functions.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -205,7 +205,7 @@ Arrow also provides an `Effect` instance for `Either` in the same way it did for
 Except for the types signatures, our program remains unchanged when we compute over `Either`.
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -224,7 +224,7 @@ suspend fun prepareEither(): Either<CookingException, Salad> =
 
 In this different validation example, we demonstrate how we can use `Validated` to perform validation with error accumulation or short-circuit strategies.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Nel
 import arrow.core.ValidatedNel
 import arrow.core.computations.either
@@ -239,7 +239,7 @@ import arrow.core.zip
 
 *Model*
 
-```kotlin:ank
+```kotlin
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
   data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
@@ -252,7 +252,7 @@ data class Email(val value: String)
 
 *Strategies*
 
-```kotlin:ank
+```kotlin
 /** strategies **/
 sealed class Strategy {
   object FailFast : Strategy()
@@ -298,7 +298,7 @@ object Rules {
 
 *Program*
 
-```kotlin:ank
+```kotlin
 val fields = listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails 
@@ -308,13 +308,13 @@ val fields = listOf(
 
 *Fail Fast*
 
-```kotlin:ank
+```kotlin
 Rules(Strategy.FailFast, fields)
 ```
 
 *Error Accumulation*
 
-```kotlin:ank
+```kotlin
 Rules(Strategy.ErrorAccumulation, fields)
 ```
 

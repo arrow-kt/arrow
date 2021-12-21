@@ -18,7 +18,7 @@ Given a `Prism<S, A>`, we can write functions that work on the focus `A` without
 
 For a sum type `NetworkResult`, we can create a `Prism` that has a focus into `Success`.
 
-```kotlin:ank
+```kotlin
 import arrow.core.*
 import arrow.optics.*
 
@@ -42,7 +42,7 @@ As is clear from above `Prism` definition, it gathers two concepts: pattern matc
 
 As mentioned, we can now operate on `NetworkResult` as if it were `Success`.
 
-```kotlin:ank
+```kotlin
 val networkResult = NetworkResult.Success("content")
 
 networkSuccessPrism.modify(networkResult) { success ->
@@ -52,7 +52,7 @@ networkSuccessPrism.modify(networkResult) { success ->
 
 We can also lift such functions.
 
-```kotlin:ank
+```kotlin
 val lifted: (NetworkResult) -> NetworkResult = networkSuccessPrism.lift { success ->
         success.copy(content = "different content")
 }
@@ -61,7 +61,7 @@ lifted(NetworkResult.Failure)
 
 `Prisms` can easily be created by using any of the already mentioned constructors, although, for a `sealed class`, a `Prism` could easily be [generated](#generated-prisms). But we can also use a `PartialFunction` to create a `Prism`.
 
-```kotlin:ank
+```kotlin
 val doubleToInt: Prism<Double, Int> = Prism(
   getOption = { double: Double ->
     val i = double.toInt()
@@ -77,7 +77,7 @@ Nesting pattern matching blocks are tedious. We would prefer to define them sepa
 
 Let's imagine from our previous example that we want to retrieve an `Int` from the network. We get a `Success` OR a `Failure` from the network. In case of a `Success`, we want to safely cast the `String` to an `Int`.
 
-```kotlin:ank
+```kotlin
 import arrow.core.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
@@ -87,13 +87,13 @@ val successToInt: Prism<NetworkResult.Success, Int> = Prism(
 
 val networkInt: Prism<NetworkResult, Int> = networkSuccessPrism compose successToInt
 ```
-```kotlin:ank
+```kotlin
 networkInt.getOrNull(NetworkResult.Success("invalid int"))
 ```
-```kotlin:ank
+```kotlin
 networkInt.getOrNull(NetworkResult.Failure)
 ```
-```kotlin:ank
+```kotlin
 networkInt.getOrNull(NetworkResult.Success("5"))
 ```
 `Prism` can be composed with all optics but `Getter`, and result in the following optics:
@@ -114,7 +114,7 @@ The prisms will be generated as extension properties on the companion object `va
   data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
-```kotlin:ank:silent
+```kotlin
 val circleShape: Prism<Shape, Shape.Circle> = Shape.circle
 val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```

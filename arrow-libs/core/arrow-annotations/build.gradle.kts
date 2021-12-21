@@ -1,6 +1,7 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.multiplatform)
-  alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
+  id(libs.plugins.kotlin.multiplatform.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
 }
 
 kotlin {
@@ -28,5 +29,4 @@ kotlin {
   }
 }
 
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))

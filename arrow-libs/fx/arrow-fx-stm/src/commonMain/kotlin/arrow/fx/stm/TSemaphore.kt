@@ -14,7 +14,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *
  * ## Acquiring one or more permits
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -31,11 +31,12 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
+ * <!--- KNIT example-tsemaphore-01.kt -->
  *
  * Should there be not enough permits the transaction will retry and wait until there are enough permits available again.
  *  [STM.tryAcquire] can be used to avoid this behaviour as it returns whether or not acquisition was successful.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -50,12 +51,13 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
+ * <!--- KNIT example-tsemaphore-02.kt -->
  *
  * ## Release permits after use:
  *
  * Permits can be released again using [STM.release]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -69,6 +71,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
+ * <!--- KNIT example-tsemaphore-03.kt -->
  *
  * > As you can see there is no upper limit enforced when releasing. You are free to release more or less permits than you have taken, but that may
  *  invalidate some other implicit rules so doing so is not advised.
@@ -77,7 +80,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *
  * ## Reading how many permits are currently available
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TSemaphore
  * import arrow.fx.stm.atomically
  *
@@ -92,6 +95,7 @@ public fun STM.newTSem(initial: Int): TSemaphore = TSemaphore(newTVar(checkNotNe
  *   println("Permits remaining ${atomically { tsem.available() }}")
  * }
  * ```
+ * <!--- KNIT example-tsemaphore-04.kt -->
  *
  */
 public data class TSemaphore internal constructor(internal val v: TVar<Int>) {

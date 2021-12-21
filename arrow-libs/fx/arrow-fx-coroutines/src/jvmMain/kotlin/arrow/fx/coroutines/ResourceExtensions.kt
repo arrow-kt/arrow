@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
  * tasks are executed, but no new tasks will be accepted.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
@@ -36,6 +36,7 @@ import kotlin.coroutines.CoroutineContext
  *   }
  * }
  * ```
+ * <!--- KNIT example-resourceextensions-01.kt -->
  */
 public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
   Resource(f) { s, _ -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
@@ -43,7 +44,7 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
 /**
  * Creates a [Resource] from an [Closeable], which uses [Closeable.close] for releasing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.io.FileInputStream
  *
@@ -55,6 +56,7 @@ public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Re
  *        // Both resources will be closed accordingly to their #close methods
  *     }
  * ```
+ * <!--- KNIT example-resourceextensions-02.kt -->
  */
 public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
   Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
@@ -62,7 +64,7 @@ public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A):
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import java.io.FileInputStream
  *
@@ -74,6 +76,7 @@ public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A):
  *        // Both resources will be closed accordingly to their #close methods
  *     }
  * ```
+ * <!--- KNIT example-resourceextensions-03.kt -->
  */
 public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend () -> A): Resource<A> =
   Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
@@ -83,7 +86,7 @@ public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend (
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
  * tasks are executed, but no new tasks will be accepted.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.withContext
  *
@@ -96,6 +99,7 @@ public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend (
  *     }
  *   }
  * ```
+ * <!--- KNIT example-resourceextensions-04.kt -->
  */
 public fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
   fromExecutor {

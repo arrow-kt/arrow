@@ -4,17 +4,18 @@ import arrow.core.Either
 import arrow.fx.coroutines.ArrowFxSpec
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.never
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -51,18 +52,18 @@ class ParMap3Test : ArrowFxSpec(
     }
 
     "Cancelling parMapN 3 cancels all participants" {
-      checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
+      checkAll {
         val s = Channel<Unit>()
-        val pa = CompletableDeferred<Pair<Int, ExitCase>>()
-        val pb = CompletableDeferred<Pair<Int, ExitCase>>()
-        val pc = CompletableDeferred<Pair<Int, ExitCase>>()
+        val pa = CompletableDeferred<ExitCase>()
+        val pb = CompletableDeferred<ExitCase>()
+        val pc = CompletableDeferred<ExitCase>()
 
         val loserA: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+          { awaitExitCase(s, pa) }
         val loserB: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+          { awaitExitCase(s, pb) }
         val loserC: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+          { awaitExitCase(s, pc) }
 
         val f = async { parZip(loserA, loserB, loserC) { _a, _b, _c -> Triple(_a, _b, _c) } }
 
@@ -71,18 +72,9 @@ class ParMap3Test : ArrowFxSpec(
         s.send(Unit)
         f.cancel()
 
-        pa.await().let { (res, exit) ->
-          res shouldBe a
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
-        pb.await().let { (res, exit) ->
-          res shouldBe b
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
-        pc.await().let { (res, exit) ->
-          res shouldBe c
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
+        pa.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        pb.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        pc.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
 
@@ -90,36 +82,52 @@ class ParMap3Test : ArrowFxSpec(
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3)),
-        Arb.int(),
-        Arb.int()
-      ) { e, winningTask, a, b ->
+      ) { e, winningTask ->
         val s = Channel<Unit>()
-        val pa = CompletableDeferred<Pair<Int, ExitCase>>()
-        val pb = CompletableDeferred<Pair<Int, ExitCase>>()
+        val pa = CompletableDeferred<ExitCase>()
+        val pb = CompletableDeferred<ExitCase>()
 
         val winner: suspend CoroutineScope.() -> Int = { s.send(Unit); s.send(Unit); throw e }
         val loserA: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+          { awaitExitCase(s, pa) }
         val loserB: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+          { awaitExitCase(s, pb) }
 
         val r = Either.catch {
           when (winningTask) {
-            1 -> parZip(winner, loserA, loserB) { _, _, _ -> Unit }
-            2 -> parZip(loserA, winner, loserB) { _, _, _ -> Unit }
-            else -> parZip(loserA, loserB, winner) { _, _, _ -> Unit }
+            1 -> parZip(winner, loserA, loserB) { _, _, _ -> }
+            2 -> parZip(loserA, winner, loserB) { _, _, _ -> }
+            else -> parZip(loserA, loserB, winner) { _, _, _ -> }
           }
         }
 
-        pa.await().let { (res, exit) ->
-          res shouldBe a
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
-        pb.await().let { (res, exit) ->
-          res shouldBe b
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
+        pa.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        pb.await().shouldBeTypeOf<ExitCase.Cancelled>()
         r should leftException(e)
+      }
+    }
+
+    "parMapN CancellationException on right can cancel rest" {
+      checkAll(Arb.string(), Arb.int(1..3)) { msg, cancel ->
+        val s = Channel<Unit>()
+        val pa = CompletableDeferred<ExitCase>()
+        val pb = CompletableDeferred<ExitCase>()
+
+        val winner: suspend CoroutineScope.() -> Int = { repeat(2) { s.send(Unit) }; throw CancellationException(msg) }
+        val loserA: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pa) }
+        val loserB: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pb) }
+
+        try {
+          when (cancel) {
+            1 -> parZip(winner, loserA, loserB) { _, _, _ -> }
+            2 -> parZip(loserA, winner, loserB) { _, _, _ -> }
+            else -> parZip(loserA, loserB, winner) { _, _, _ -> }
+          }
+        } catch (e: CancellationException) {
+          e.message shouldBe msg
+        }
+        pa.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        pb.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
   }
