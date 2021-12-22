@@ -32,7 +32,7 @@ dependencies {
     )
   }
   testImplementation(libs.kotlinCompileTestingKsp)
-  testRuntimeOnly(projects.arrowOpticsKsp)
+  testRuntimeOnly(projects.arrowOpticsKspPlugin)
   testRuntimeOnly(projects.arrowAnnotations)
   testRuntimeOnly(projects.arrowCore)
   testRuntimeOnly(projects.arrowOptics)

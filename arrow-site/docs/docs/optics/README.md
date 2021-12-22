@@ -131,7 +131,7 @@ plugins {
 }
 
 dependencies {
-    ksp("io.arrow-kt:arrow-optics-ksp:2.0-SNAPSHOT")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:1.0.1")
 }
 ```
 
@@ -189,7 +189,7 @@ plugins {
 }
 
 dependencies {
-    ksp "io.arrow-kt:arrow-optics-ksp:2.0-SNAPSHOT"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:1.0.1"
 }
 ```
 
