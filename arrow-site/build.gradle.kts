@@ -1,6 +1,6 @@
 plugins {
     id(libs.plugins.kotlin.jvm.get().pluginId)
-    id(libs.plugins.kotlin.kapt.get().pluginId)
+    alias(libs.plugins.ksp)
 }
 
 dependencies {
@@ -8,13 +8,11 @@ dependencies {
     implementation(projects.arrowFxCoroutines)
     implementation(projects.arrowFxStm)
     implementation(projects.arrowOptics)
+    ksp(projects.arrowOpticsKsp)
     compileOnly(libs.kotlin.reflect)
-
-    kapt(projects.arrowMeta)
 }
 
 tasks {
-
     register<Exec>("generateSite") {
         commandLine("sh", "generate-site.sh")
     }

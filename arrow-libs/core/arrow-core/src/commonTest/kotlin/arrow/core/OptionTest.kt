@@ -29,7 +29,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
-      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
+      /*FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
         Arb.string().map(Option.Companion::invoke),
         Arb.option(Arb.string()),
         Option<String>::equals,
@@ -44,7 +44,7 @@ class OptionTest : UnitSpec() {
         option::eager
       ) {
         it.bind()
-      }
+      }*/
     )
 
     "ensure null in option computation" {
