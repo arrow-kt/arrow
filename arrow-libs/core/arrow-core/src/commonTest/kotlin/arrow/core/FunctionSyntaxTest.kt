@@ -114,6 +114,22 @@ class FunctionSyntaxTest : UnitSpec() {
       helloX("Arrow") shouldBe "Hello, Arrow!"
     }
 
+    "partially leading arguments" {
+      val sum5ints = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
+      val sum4intsTo10 = sum5ints.partially(10)
+      val sum3intsTo15 = sum4intsTo10.partially(5)
+      val sum2intsTo17 = sum3intsTo15.partially(2)
+      sum2intsTo17(1, 2) shouldBe 20
+
+      val sum2intsTo21 = sum5ints.partially(10, 5, 6)
+      sum2intsTo21(1, 2) shouldBe 24
+
+      val prefixAndPostfix = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
+
+      val helloX = prefixAndPostfix.partially("Hello, ", "Arrow")
+      helloX("!") shouldBe "Hello, Arrow!"
+    }
+
     "suspend partially" {
       val sum5ints: suspend (Int, Int, Int, Int, Int) -> Int = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
       val sum4intsTo10 = sum5ints.partially5(10)
@@ -125,6 +141,22 @@ class FunctionSyntaxTest : UnitSpec() {
 
       val helloX = prefixAndPostfix.partially1("Hello, ").partially2("!")
       helloX("Arrow") shouldBe "Hello, Arrow!"
+    }
+
+    "suspend partially leading arguments" {
+      val sum5ints: suspend (Int, Int, Int, Int, Int) -> Int = { a: Int, b: Int, c: Int, d: Int, e: Int -> a + b + c + d + e }
+      val sum4intsTo10 = sum5ints.partially(10)
+      val sum3intsTo15 = sum4intsTo10.partially(5)
+      val sum2intsTo17 = sum3intsTo15.partially(2)
+      sum2intsTo17(1, 2) shouldBe 20
+
+      val sum2intsTo21 = sum5ints.partially(10, 5, 6)
+      sum2intsTo21(1, 2) shouldBe 24
+
+      val prefixAndPostfix: suspend (String, String, String) -> String = { prefix: String, x: String, postfix: String -> "$prefix$x$postfix" }
+
+      val helloX = prefixAndPostfix.partially("Hello, ", "Arrow")
+      helloX("!") shouldBe "Hello, Arrow!"
     }
 
     "partials" {
