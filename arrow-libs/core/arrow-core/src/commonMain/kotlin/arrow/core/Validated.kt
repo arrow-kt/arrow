@@ -823,6 +823,3 @@ public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-public inline fun <E> E.soWrong(): ValidatedNel<E, Nothing> =
-  invalidNel()
