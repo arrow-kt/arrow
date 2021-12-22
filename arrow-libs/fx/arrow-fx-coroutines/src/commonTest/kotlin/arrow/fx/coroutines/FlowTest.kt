@@ -8,6 +8,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -79,7 +80,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1).parMap { index ->
             guaranteeCase({
               latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex -> exit.complete(ex) })
           }.collect()
         }
@@ -100,7 +101,7 @@ class FlowTest : ArrowFxSpec(
             if (index == n) {
               guaranteeCase({
                 latch.complete(Unit)
-                never<Unit>()
+                awaitCancellation()
               }, { ex -> exit.complete(Pair(i, ex)) })
             } else {
               latch.await()
@@ -126,7 +127,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1, 2).parMap { index ->
             guaranteeCase({
               if (index == 2) latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex ->
               if (index == 1) exitA.complete(Pair(i, ex))
               else exitB.complete(Pair(i2, ex))
@@ -176,7 +177,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1).parMapUnordered {
             guaranteeCase({
               latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex -> exit.complete(ex) })
           }.collect()
         }
@@ -198,7 +199,7 @@ class FlowTest : ArrowFxSpec(
             if (index == n) {
               guaranteeCase({
                 latch.complete(Unit)
-                never<Unit>()
+                awaitCancellation()
               }, { ex -> exit.complete(Pair(i, ex)) })
             } else {
               latch.await()
@@ -224,7 +225,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1, 2).parMapUnordered { index ->
             guaranteeCase({
               if (index == 2) latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex ->
               if (index == 1) exitA.complete(Pair(i, ex))
               else exitB.complete(Pair(i2, ex))
