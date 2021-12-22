@@ -25,7 +25,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Reading from a [TMap] can be done using either [STM.lookup] or its alias [STM.get].
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -42,6 +42,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-tmap-01.kt -->
  *
  * > If the key is not present [STM.lookup] will not retry, instead it returns `null`.
  *
@@ -49,7 +50,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *
  * Inserting can be done using either [STM.insert] or its alias [STM.set]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -63,10 +64,11 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-tmap-02.kt -->
  *
  * Another option when adding elements is to use [STM.plusAssign]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -80,12 +82,13 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-tmap-03.kt -->
  *
  * ## Updating an existing value [TMap]:
  *
  * Using [STM.update] it is possible to update an existing value of a [TMap]. If the value is not present it does nothing.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -102,12 +105,13 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-tmap-04.kt -->
  *
  * ## Checking membership
  *
  * Using [STM.member] it is possible to check if a [TMap] contains a value for a key:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -122,12 +126,13 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   println("Result $result")
  * }
  * ```
+ * <!--- KNIT example-tmap-05.kt -->
  *
  * ## Removing a value from a [TMap]
  *
  * Removing is done by using [STM.remove]:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.stm.TMap
  * import arrow.fx.stm.atomically
  *
@@ -142,6 +147,7 @@ public fun <K, V> STM.newTMap(): TMap<K, V> = newTMap { it.hashCode() }
  *   //sampleEnd
  * }
  * ```
+ * <!--- KNIT example-tmap-06.kt -->
  *
  * ## Where are operations like `isEmpty` or `size`?
  *

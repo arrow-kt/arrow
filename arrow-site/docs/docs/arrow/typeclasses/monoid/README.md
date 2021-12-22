@@ -18,19 +18,19 @@ Having `empty` defined allows us to combine all the elements of some potentially
 
 Let's see the instance of Monoid<String> in action:
 
-```kotlin:ank
+```kotlin
 import arrow.typeclasses.Monoid
 
 Monoid.string().run { empty() }
 ```
 
-```kotlin:ank
+```kotlin
 Monoid.string().run {
   listOf("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
 
-```kotlin:ank
+```kotlin
 import arrow.core.Option
 import arrow.core.Some
 import arrow.typeclasses.Monoid
@@ -42,7 +42,7 @@ The advantage of using these type class provided methods, rather than the specif
 
 This is also true if we define our own instances. As an example, let's use `Foldable`'s `foldMap`, which maps over values accumulating the results, using the available `Monoid` for the type mapped onto.
 
-```kotlin:ank
+```kotlin
 import arrow.core.foldMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
@@ -50,7 +50,7 @@ import arrow.typeclasses.Monoid
 listOf(1, 2, 3, 4, 5).foldMap(Monoid.int(), ::identity)
 ```
 
-```kotlin:ank
+```kotlin
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
 
@@ -59,7 +59,7 @@ listOf(1, 2, 3, 4, 5).foldMap(Monoid.string()) { it.toString() }
 
 To use this with a function that produces a pair, we can define a Monoid for a pair that will be valid for any pair where the types it contains also have a Monoid available.
 
-```kotlin:ank:silent
+```kotlin
 import arrow.typeclasses.Monoid
 
 fun <A, B> monoidPair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
@@ -77,7 +77,7 @@ fun <A, B> monoidPair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
 
 This way, we are able to combine both values in one pass, hurrah!
 
-```kotlin:ank
+```kotlin
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
 

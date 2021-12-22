@@ -47,7 +47,7 @@ for which we also have a [tutorial]({{ '/patterns/monads' | relative_url }}).
 Implementations of `Effect` are available for internal types like `Either`, `Option` and others.
 Let's see one example of the block `either` that uses Effect to implement monad `invoke` over `Either`. Here we fetch from a database the information about the dean of a university some student attend:
 
-```kotlin:ank:playground
+```kotlin
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -121,7 +121,7 @@ The `Effect` interface is itself exposed as receiver functions which projects it
 
 Let's see a minimal example.
 
-```kotlin:ank:playground
+```kotlin
 import arrow.core.computations.either
 
 //sampleStart
@@ -152,7 +152,7 @@ This is our first challenge. We've created an instance of [`Right`]({{ '/apidocs
 From the previous snippet, the first intuition would be to call `fold` on `one` to get the value and otherwise throw an exception if it was a `Left`.
 This will blow up the stack and won't be obvious to users that our method can fail with an exceptions. What we want instead is to suspend and short-circuit on Left values and continue computing over Right values.
 
-```kotlin:ank:playground
+```kotlin
 import arrow.core.computations.either
 import arrow.core.Either.Left
 
@@ -171,7 +171,7 @@ What `invoke()` does is use the rest of the sequential operations as the functio
 
 The equivalent code without using comprehensions would look like:
 
-```kotlin:ank:playground
+```kotlin
 import arrow.core.flatMap
 import arrow.core.Either.Left
 
@@ -188,7 +188,7 @@ suspend fun main() {
 
 With this new style, we can rewrite our original example of database fetching as:
 
-```kotlin:ank:playground
+```kotlin
 import arrow.core.computations.either
 import arrow.core.Either
 import arrow.core.Either.Left

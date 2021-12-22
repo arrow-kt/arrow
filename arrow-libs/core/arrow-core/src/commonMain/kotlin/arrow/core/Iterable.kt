@@ -396,7 +396,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -411,6 +411,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-iterable-01.kt -->
  */
 public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   align(other) { ior ->
@@ -426,7 +427,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  * on a zip.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -441,6 +442,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-iterable-02.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
   padZip(other).map { fa(it.first, it.second) }
@@ -450,7 +452,7 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  * on a zip, excluding all cases where the right value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -465,6 +467,7 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-iterable-03.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
@@ -474,7 +477,8 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  * with null for padding on the left.
  *
  * Example:
- * ```kotlin:ank:playground
+ *
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -484,11 +488,12 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-iterable-04.kt -->
  */
 public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
@@ -498,7 +503,7 @@ public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> 
  * on a zip, excluding all cases where the left value is null.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -513,6 +518,7 @@ public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> 
  *   println("both = $both")
  * }
  * ```
+ * <!--- KNIT example-iterable-05.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
@@ -522,7 +528,7 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  * with null for padding on the right.
  *
  * Example:
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * //sampleStart
@@ -532,11 +538,12 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  * //sampleEnd
  *
  * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ *   println("padRight = $padRight")
+ *   println("padLeft = $padLeft")
+ *   println("noPadding = $noPadding")
  * }
  * ```
+ * <!--- KNIT example-iterable-06.kt -->
  */
 public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -544,7 +551,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -557,6 +564,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
   this.align(b).map(fa)
@@ -564,7 +572,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -575,6 +583,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-08.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   alignRec(this, b)
@@ -607,7 +616,7 @@ public fun <A> Iterable<A>.salign(
 /**
  * unzips the structure holding the resulting elements in an `Pair`
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -618,6 +627,7 @@ public fun <A> Iterable<A>.salign(
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-09.kt -->
  */
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -627,7 +637,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
 /**
  * after applying the given function unzip the resulting structure into its elements.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -642,6 +652,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-10.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
@@ -649,7 +660,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
 /**
  * splits a union into its component parts.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -661,6 +672,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-11.kt -->
  */
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -674,7 +686,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -687,6 +699,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
+ * <!--- KNIT example-iterable-12.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
@@ -820,7 +833,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
 /**
  * attempt to split the computation, giving access to the first result.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -830,6 +843,8 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-iterable-13.kt -->
  */
 public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
@@ -842,7 +857,7 @@ public fun <A> Iterable<A>.tail(): List<A> =
 /**
  * interleave both computations in a fair way.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -853,6 +868,8 @@ public fun <A> Iterable<A>.tail(): List<A> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-iterable-14.kt -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   this.split()?.let { (fa, a) ->
@@ -862,7 +879,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
 /**
  * Fair conjunction. Similarly to interleave
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -872,6 +889,8 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-iterable-15.kt -->
  */
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
@@ -883,7 +902,7 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * If its first argument succeeds at all, then the results will be
  * fed into the success branch. Otherwise, the failure branch is taken.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
@@ -895,6 +914,8 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  *   //sampleEnd
  *   println(result)
  * }
+ * ```
+ * <!--- KNIT example-iterable-16.kt -->
  */
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
@@ -941,7 +962,7 @@ public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
  *
  *  Kind<F, A> -> Kind<F, B>
  *
- *  ```kotlin:ank:playground
+ *  ```kotlin
  *  import arrow.core.*
  *
  *  fun main(args: Array<String>) {

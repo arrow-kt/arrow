@@ -17,7 +17,8 @@ table {
 }
 
 
-.doc-content {
+.doc-content,
+.browser-code {
 
   pre {
     margin-bottom: 1rem;
@@ -74,7 +75,21 @@ table {
     }
 }
 
+.browser-code {
 
-.language-kotlin {
-    display: none;
+  code {
+    &.hljs {
+      background: $white;
+      font-size: 0.875rem;
+      overflow-x: visible;
+    }
+  }
+
+
+  pre {
+    margin-bottom: 0;
+    &.highlight {
+      margin-bottom: 0;
+    }
+  }
 }

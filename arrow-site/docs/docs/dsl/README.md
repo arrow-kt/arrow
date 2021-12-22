@@ -27,9 +27,9 @@ package com.example.domain
 }
 ```
 
-The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class.
+The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class. In most cases those optics will be [lenses]({{ '/optics/lens' | relative_url }}), which allow both focus and modification, as shown in the next snippet.
 
-```kotlin:ank
+```kotlin
 import arrow.optics.dsl.*
 import com.example.domain.*
 import arrow.optics.Optional
@@ -40,7 +40,7 @@ val optional: Optional<Employee, String> = Employee.company.address.street.name
 optional.modify(john, String::toUpperCase)
 ```
 
-Arrow can also generate DSL for a `sealed class`, which can help reduce boilerplate code, or improve readability.
+Arrow can also generate DSL for a `sealed class`, which can help reduce boilerplate code, or improve readability. In that case we speak of [optionals]({{ '/optics/optional' | relative_url }}), which allow dealing with possibly-missing data, and [prisms]({{ '/optics/prism' | relative_url }}), which provide construction.
 
 ```kotlin
 package com.example.domain
@@ -62,7 +62,7 @@ object TimeoutError: NetworkError()
 
 Let's imagine we have a function `f` of type `(HttpError) -> HttpError`, and we want to invoke it on the `NetworkResult`.
 
-```kotlin:ank
+```kotlin
 val networkResult: NetworkResult = HttpError("boom!")
 val f: (String) -> String = String::toUpperCase
 
@@ -74,6 +74,8 @@ when (networkResult) {
 
 We can rewrite this code with our generated DSL.
 
-```kotlin:ank
+```kotlin
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
+
+There are more kinds of optics, you can read about them in the sidebar to the left. In particular, handling containers of data (lists, collections) becomes easier when using the [optics for collections]({{ '/optics/collections_dsl/' | relative_url }}).

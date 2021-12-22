@@ -32,7 +32,7 @@ import kotlin.jvm.JvmStatic
  *
  * Example of stack safety:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.core.Eval
  *
  * //sampleStart
@@ -54,6 +54,7 @@ import kotlin.jvm.JvmStatic
  * }
  * //sampleEnd
  * ```
+ * <!--- KNIT example-eval-01.kt -->
  *
  */
 public sealed class Eval<out A> {
@@ -65,7 +66,7 @@ public sealed class Eval<out A> {
      *
      * @param a is an already computed value of type [A]
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {
@@ -75,6 +76,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-eval-02.kt -->
      *
      * It will return 2.
      */
@@ -87,7 +89,7 @@ public sealed class Eval<out A> {
      *
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {
@@ -97,6 +99,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-eval-03.kt -->
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
@@ -109,7 +112,7 @@ public sealed class Eval<out A> {
      *
      * @param f is a function or computation that will be called every time `.value()` is invoked.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.core.*
      *
      * fun main() {
@@ -119,6 +122,7 @@ public sealed class Eval<out A> {
      * //sampleEnd
      * }
      * ```
+ * <!--- KNIT example-eval-04.kt -->
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */

@@ -12,7 +12,7 @@ import kotlinx.coroutines.awaitAll
 /**
  * Runs [fa], [fb] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -27,6 +27,7 @@ import kotlinx.coroutines.awaitAll
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-01.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -47,7 +48,7 @@ public suspend inline fun <A, B, C> parZip(
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb] in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -64,6 +65,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-02.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -86,7 +88,7 @@ public suspend inline fun <A, B, C> parZip(
 /**
  * Runs [fa], [fb], [fc] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -102,6 +104,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-03.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -124,7 +127,7 @@ public suspend inline fun <A, B, C, D> parZip(
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb] & [fc] in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -142,6 +145,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-04.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -167,7 +171,7 @@ public suspend inline fun <A, B, C, D> parZip(
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [Dispatchers.Default] and combines their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -184,6 +188,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-05.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -209,7 +214,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc] & [fd]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -228,6 +233,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-06.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -257,7 +263,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -275,6 +281,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-07.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -302,7 +309,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd] & [fe]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -322,6 +329,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-08.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -354,7 +362,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -373,6 +381,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-09.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -402,7 +411,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe] & [ff]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -423,6 +432,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-10.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -458,7 +468,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -478,6 +488,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-11.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -509,7 +520,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff] & [fg]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -531,6 +542,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-12.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -569,7 +581,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [Dispatchers.Default] and combines
  * their results using the provided function.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main(): Unit {
@@ -590,6 +602,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-13.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -623,7 +636,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff] & [fg]
  * in parallel.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
  *
@@ -645,6 +658,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-14.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map

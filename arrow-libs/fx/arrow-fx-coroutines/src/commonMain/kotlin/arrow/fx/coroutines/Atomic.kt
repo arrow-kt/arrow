@@ -10,7 +10,7 @@ import arrow.continuations.generic.AtomicRef
  * So in case you don't need to pass around an atomic reference, or use it in top-level functions
  * it's advised to use `atomic` from Atomic Fu directly.
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.fx.coroutines.*
  *
  * suspend fun main() {
@@ -22,6 +22,7 @@ import arrow.continuations.generic.AtomicRef
  *   println(count.get())
  * }
  * ```
+ * <!--- KNIT example-atomic-01.kt -->
  *
  * [Atomic] also offers some other interesting operators such as [modify], [tryUpdate], [access] & [lens].
  */
@@ -74,7 +75,7 @@ public interface Atomic<A> {
   /**
    * Modify allows to inspect the state [A] of the [AtomicRef], update it and extract a different state [B].
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * typealias Id = Int
@@ -97,6 +98,7 @@ public interface Atomic<A> {
    *   println("Remaining: ${jobs.get()}")
    * }
    * ```
+ * <!--- KNIT example-atomic-02.kt -->
    */
   public suspend fun <B> modify(f: (A) -> Pair<A, B>): B
 
@@ -143,7 +145,7 @@ public interface Atomic<A> {
    * and need to work with with certain properties individually,
    * or want to hide parts of your domain from a dependency.
    *
-   * ```kotlin:ank:playground
+   * ```kotlin
    * import arrow.fx.coroutines.*
    *
    * data class Preference(val isEnabled: Boolean)
@@ -170,6 +172,7 @@ public interface Atomic<A> {
    *   println(state.get())
    * }
    * ```
+ * <!--- KNIT example-atomic-03.kt -->
    */
   public fun <B> lens(get: (A) -> B, set: (A, B) -> A): arrow.fx.coroutines.Atomic<B> =
     LensAtomic(this, get, set)
@@ -181,7 +184,7 @@ public interface Atomic<A> {
      *
      * Data type on top of [atomic] to use in parallel functions.
      *
-     * ```kotlin:ank:playground
+     * ```kotlin
      * import arrow.fx.coroutines.*
      *
      * suspend fun main() {
@@ -192,6 +195,7 @@ public interface Atomic<A> {
      *   println(count.get())
      * }
      * ```
+ * <!--- KNIT example-atomic-04.kt -->
      */
     public suspend operator fun <A> invoke(a: A): arrow.fx.coroutines.Atomic<A> = unsafe(a)
     public fun <A> unsafe(a: A): arrow.fx.coroutines.Atomic<A> = DefaultAtomic(a)

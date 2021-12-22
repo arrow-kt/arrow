@@ -147,16 +147,13 @@ dependencies {
 To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
 ```
-buildscript {
-  repositories {
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-  }
-  dependencies {
-    classpath("io.arrow-kt.optics:io.arrow-kt.optics.gradle.plugin:1.0-SNAPSHOT")
-  }
+plugins {
+    id("com.google.devtools.ksp") version "1.6.0-1.0.2"
 }
 
-apply(plugin = "io.arrow-kt.optics")
+dependencies {
+    ksp("io.arrow-kt:arrow-optics-ksp:2.0-SNAPSHOT")
+}
 ```
 
 Now you are ready to learn about the [Optics DSL]({{ '/optics/dsl/' | relative_url }})!
@@ -208,16 +205,13 @@ dependencies {
 To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
 ```groovy
-buildscript {
-  repositories {
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-  }
-  dependencies {
-    classpath 'io.arrow-kt.optics:io.arrow-kt.optics.gradle.plugin:1.0-SNAPSHOT'
-  }
+plugins {
+    id "com.google.devtools.ksp" version "1.6.0-1.0.2"
 }
 
-apply plugin: 'io.arrow-kt.optics'
+dependencies {
+    ksp "io.arrow-kt:arrow-optics-ksp:2.0-SNAPSHOT"
+}
 ```
 
 Now you are ready to learn about the [Optics DSL]({{ '/optics/dsl/' | relative_url }})!

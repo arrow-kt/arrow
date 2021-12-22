@@ -1,11 +1,11 @@
 plugins {
-  alias(libs.plugins.arrowGradleConfig.multiplatform)
-  alias(libs.plugins.arrowGradleConfig.publishMultiplatform)
+  id(libs.plugins.kotlin.multiplatform.get().pluginId)
+  alias(libs.plugins.arrowGradleConfig.kotlin)
+  alias(libs.plugins.arrowGradleConfig.publish)
 }
 
 apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
-apply(from = property("DOC_CREATION"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
@@ -14,7 +14,7 @@ kotlin {
       dependencies {
         api(projects.arrowContinuations)
         api(projects.arrowAnnotations)
-        implementation(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlibCommon)
       }
     }
     commonTest {
