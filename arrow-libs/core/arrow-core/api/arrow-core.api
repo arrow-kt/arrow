@@ -2359,6 +2359,7 @@ public final class arrow/core/ValidatedKt {
 	public static final fun sequenceEither (Larrow/core/Validated;)Larrow/core/Either;
 	public static final fun sequenceNullable (Larrow/core/Validated;)Larrow/core/Validated;
 	public static final fun sequenceOption (Larrow/core/Validated;)Larrow/core/Option;
+	public static final fun soWrong (Ljava/lang/Object;)Larrow/core/Validated;
 	public static final fun toIor (Larrow/core/Validated;)Larrow/core/Ior;
 	public static final fun valid (Ljava/lang/Object;)Larrow/core/Validated;
 	public static final fun validNel (Ljava/lang/Object;)Larrow/core/Validated;
