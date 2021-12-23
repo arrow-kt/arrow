@@ -2,12 +2,12 @@ options:
   - title: Quick Start
     url: /optics/
 
-  - title: DSL
-    url: /optics/dsl/
-
-  - title: Types
+  - title: Values DSL
 
     nested_options:
+
+      - title: Overview
+        url: /optics/dsl/
 
       - title: Iso
         url: /optics/iso/
@@ -26,6 +26,13 @@ options:
 
       - title: Setter
         url: /optics/setter/
+
+  - title: Collections DSL
+
+    nested_options:
+
+      - title: Overview
+        url: /optics/collections_dsl/
 
       - title: Fold
         url: /optics/fold/

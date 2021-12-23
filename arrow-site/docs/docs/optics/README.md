@@ -20,10 +20,20 @@ permalink: /optics/
 
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing,
 composing, and transforming deeply nested immutable data structures.
-
 Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism](
 {{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and
-traversing deep values in sealed and data classes models.s
+traversing deep values in sealed and data classes models.
+
+```kotlin
+// an immutable value with very nested components
+val john = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
+// an Optional points to one place in the value
+val optional: Optional<Employee, String> = Employee.company.address.street.name
+// and now you can modify into a new copy without nested 'copy's!
+optional.modify(john, String::toUpperCase)
+```
+
+Scroll down and learn what Arrow Optics can do for you(r code)!
 </div>
 
 <div class="quickstart-intro" markdown="1">
@@ -33,37 +43,48 @@ traversing deep values in sealed and data classes models.s
 
 <div class="quickstart-coroutines-item" markdown="1">
 #### Quick Start
-  - [Gradle Setup]({{ '/optics/#Gradle-kotlin' | relative_url }})
-  - [Maven Setup]({{ '/optics/#Maven' | relative_url }})
-</div>
-
-<div class="quickstart-coroutines-item" markdown="1">
-#### DSL 
+  - [Gradle Setup]({{ '/optics/#setup' | relative_url }})
   - [Optics DSL]({{ '/optics/dsl/' | relative_url }})
-</div>
-
-<div class="quickstart-coroutines-item" markdown="1">
-#### Extensions and data types
-  - [Iso]({{ '/optics/iso/' | relative_url }})
-  - [Lens]({{ '/optics/lens/' | relative_url }})
-  - [Optional]({{ '/optics/optional/' | relative_url }})
-  - [Prism]({{ '/optics/prims/' | relative_url }})
-  - [Getter]({{ '/optics/getter/' | relative_url }})
-  - [Setter]({{ '/optics/setter/' | relative_url }})
-  - [Fold]({{ '/optics/fold/' | relative_url }})
-  - [Traversal]({{ '/optics/traversal/' | relative_url }})
-  - [Every]({{ '/optics/every/' | relative_url }})
-  - [Cons]({{ '/optics/cons/' | relative_url }})
-  - [Snoc]({{ '/optics/snoc/' | relative_url }})
-  - [At]({{ '/optics/at/' | relative_url }})
-  - [Index]({{ '/optics/index/' | relative_url }})
-  - [FilterIndex]({{ '/optics/filterindex/' | relative_url }})
+  - [Optics DSL for Collections]({{ '/optics/collections_dsl/' | relative_url }})
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
 #### Additional information
-  - [Kotlin Data classes](https://kotlinlang.org/docs/data-classes.html)
-  - [Kotlin Sealed classes](https://kotlinlang.org/docs/sealed-classes.html)
+- [Kotlin Data classes](https://kotlinlang.org/docs/data-classes.html)
+- [Kotlin Sealed classes](https://kotlinlang.org/docs/sealed-classes.html)
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### [Optics DSL for Values]({{ '/optics/dsl/' | relative_url }})
+
+###### Focus and modification
+
+  - [Iso]({{ '/optics/iso/' | relative_url }}): 1-to-1 relations
+  - [Lens]({{ '/optics/lens/' | relative_url }}): focus and modify one value
+  - [Optional]({{ '/optics/optional/' | relative_url }}): optional value
+
+###### Single behavior
+
+  - [Getter]({{ '/optics/getter/' | relative_url }}): focus on one value
+  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value
+  - [Setter]({{ '/optics/setter/' | relative_url }}): modify one value
+  
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### [Optics DSL for Collections]({{ '/optics/collections_dsl/' | relative_url }})
+
+- [Every]({{ '/optics/every/' | relative_url }}): focus and modification
+- [Fold]({{ '/optics/fold/' | relative_url }}): only focus
+- [Traversal]({{ '/optics/traversal/' | relative_url }}): only modification
+
+###### Point to elements
+
+- [Cons]({{ '/optics/cons/' | relative_url }})
+- [Snoc]({{ '/optics/snoc/' | relative_url }})
+- [At]({{ '/optics/at/' | relative_url }})
+- [Index]({{ '/optics/index/' | relative_url }})
+- [FilterIndex]({{ '/optics/filterindex/' | relative_url }})
 </div>
 </div>
 </div>
