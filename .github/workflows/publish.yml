@@ -7,7 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  JAVA_OPTS: -Xms512m -Xmx1024m
+  JAVA_OPTS: -Xms2g -Xmx4g
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
