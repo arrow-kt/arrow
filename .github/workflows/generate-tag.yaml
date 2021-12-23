@@ -46,16 +46,6 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       - name: Gradle build
         run: ./gradlew build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
@@ -80,16 +70,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-
-      - name: Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
 
       - name: Generate Tag
         run: ./gradlew createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
