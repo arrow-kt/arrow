@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  JAVA_OPTS: -Xms1g -Xmx3g
+  JAVA_OPTS: -Xms2g -Xmx4g
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
