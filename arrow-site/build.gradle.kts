@@ -8,7 +8,7 @@ dependencies {
     implementation(projects.arrowFxCoroutines)
     implementation(projects.arrowFxStm)
     implementation(projects.arrowOptics)
-    ksp(projects.arrowOpticsKsp)
+    ksp(projects.arrowOpticsKspPlugin)
     compileOnly(libs.kotlin.reflect)
 }
 

@@ -55,5 +55,5 @@ fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
 }
 
 dependencies {
-  kspTest(projects.arrowOpticsKsp)
+  kspTest(projects.arrowOpticsKspPlugin)
 }

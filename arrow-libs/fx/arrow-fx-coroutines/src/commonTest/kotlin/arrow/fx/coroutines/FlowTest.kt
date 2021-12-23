@@ -5,10 +5,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.positiveInts
-import kotlinx.coroutines.CancellationException
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 class FlowTest : ArrowFxSpec(
@@ -72,28 +72,22 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMap - triggers cancel signal" {
-      checkAll(Arb.int(), Arb.int(1..2)) { i, n ->
+      checkAll {
         val latch = CompletableDeferred<Unit>()
-        val exit = CompletableDeferred<Pair<Int, ExitCase>>()
+        val exit = CompletableDeferred<ExitCase>()
 
-        assertThrowable {
-          flowOf(1, 2).parMap { index ->
-            if (index == n) {
-              guaranteeCase({
-                latch.complete(Unit)
-                never<Unit>()
-              }, { ex -> exit.complete(Pair(i, ex)) })
-            } else {
-              latch.await()
-              throw CancellationException(null, null)
-            }
+        val job = launch {
+          flowOf(1).parMap { index ->
+            guaranteeCase({
+              latch.complete(Unit)
+              awaitCancellation()
+            }, { ex -> exit.complete(ex) })
           }.collect()
-          fail("Cannot reach here. CancellationException should be thrown.")
-        }.shouldBeTypeOf<CancellationException>()
-
-        val (ii, ex) = exit.await()
-        ii shouldBe i
-        ex.shouldBeTypeOf<ExitCase.Cancelled>()
+        }
+        latch.await()
+        job.cancelAndJoin()
+        job.isCancelled shouldBe true
+        exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
 
@@ -107,7 +101,7 @@ class FlowTest : ArrowFxSpec(
             if (index == n) {
               guaranteeCase({
                 latch.complete(Unit)
-                never<Unit>()
+                awaitCancellation()
               }, { ex -> exit.complete(Pair(i, ex)) })
             } else {
               latch.await()
@@ -133,7 +127,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1, 2).parMap { index ->
             guaranteeCase({
               if (index == 2) latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex ->
               if (index == 1) exitA.complete(Pair(i, ex))
               else exitB.complete(Pair(i2, ex))
@@ -175,28 +169,23 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMapUnordered - triggers cancel signal" {
-      checkAll(Arb.int(), Arb.int(1..2)) { i, n ->
+      checkAll {
         val latch = CompletableDeferred<Unit>()
-        val exit = CompletableDeferred<Pair<Int, ExitCase>>()
+        val exit = CompletableDeferred<ExitCase>()
 
-        assertThrowable {
-          flowOf(1, 2).parMapUnordered { index ->
-            if (index == n) {
-              guaranteeCase({
-                latch.complete(Unit)
-                never<Unit>()
-              }, { ex -> exit.complete(Pair(i, ex)) })
-            } else {
-              latch.await()
-              throw CancellationException(null, null)
-            }
+        val job = launch {
+          flowOf(1).parMapUnordered {
+            guaranteeCase({
+              latch.complete(Unit)
+              awaitCancellation()
+            }, { ex -> exit.complete(ex) })
           }.collect()
-          fail("Cannot reach here. CancellationException should be thrown.")
-        }.shouldBeTypeOf<CancellationException>()
+        }
+        latch.await()
+        job.cancelAndJoin()
 
-        val (ii, ex) = exit.await()
-        ii shouldBe i
-        ex.shouldBeTypeOf<ExitCase.Cancelled>()
+        job.isCancelled shouldBe true
+        exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
 
@@ -210,7 +199,7 @@ class FlowTest : ArrowFxSpec(
             if (index == n) {
               guaranteeCase({
                 latch.complete(Unit)
-                never<Unit>()
+                awaitCancellation()
               }, { ex -> exit.complete(Pair(i, ex)) })
             } else {
               latch.await()
@@ -236,7 +225,7 @@ class FlowTest : ArrowFxSpec(
           flowOf(1, 2).parMapUnordered { index ->
             guaranteeCase({
               if (index == 2) latch.complete(Unit)
-              never<Unit>()
+              awaitCancellation()
             }, { ex ->
               if (index == 1) exitA.complete(Pair(i, ex))
               else exitB.complete(Pair(i2, ex))
