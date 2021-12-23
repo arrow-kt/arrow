@@ -94,12 +94,8 @@ jobs:
       - name: Generate Tag
         run: ./gradlew createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          branch: 'main'
-          tags: true
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Push
+        run: git push --follow-tags
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
