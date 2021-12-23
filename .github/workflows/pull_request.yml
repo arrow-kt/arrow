@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  JAVA_OPTS: -Xms2g -Xmx4g
+  JAVA_OPTS: -Xms1g -Xmx3g
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
@@ -40,3 +40,43 @@ jobs:
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
+
+  update_api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: misc-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            misc-step-gradle-
+
+      - name: "Set env"
+        run: |
+          echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
+          echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
+
+      - name: "Dump new API files"
+        run: ./gradlew apiDump
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
+      - name: "Commit new API files"
+        uses: stefanzweifel/git-auto-commit-action@v4.12.0
+        with:
+          commit_message: Update API files
+          file_pattern: arrow-libs/**/api/*.api

@@ -35,7 +35,7 @@
         justify-content: flex-start;
         align-items: center;
         height: $base-point-grid * 4;
-        background: rgba($white, 10%);
+        background: rgba($white, 0.15);
         border-radius: 4px 4px 0 0;
 
         li {
@@ -43,7 +43,7 @@
           height: $base-point-grid;
           border-radius: 100%;
           margin-right: 6px;
-          background: rgba($white, 20%);
+          background: rgba($white, 0.5);
 
           &:first-child {
             margin-left: 10px;
@@ -52,10 +52,14 @@
       }
 
       .browser-code {
-        overflow: hidden;
+        
+        overflow-x: scroll;
+        overflow-y: auto;
+        height: 400px;
         background: $white;
         box-shadow: 0 10px 10px rgba(#000, 0.1);
         border-radius: 0 0 4px 4px;
+        color: #777;
 
         .console-close,
         .run-button {

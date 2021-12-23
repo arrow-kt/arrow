@@ -1,19 +1,20 @@
 [versions]
 animalSniffer = "1.5.0"
 arrowGradleConfig = "0.6.0"
-autoService = "1.0-rc7"
-compileTesting = "0.18"
-coroutines = "1.5.2"
+assertj = "3.21.0"
+coroutines = "1.6.0"
+classgraph = "4.8.137"
 dokka = "1.5.30"
 jUnit = "4.12"
+jUnitJupiter = "5.8.2"
 jUnitVintage = "5.5.2"
-kotest = "5.0.0.M2"
-kotestGradle = "5.0.0.5"
-kotlinTest = "3.3.3"
-kotlin = "1.5.31"
+kotest = "5.0.2"
+kotestGradle = "5.0.2"
+kotlin = "1.6.10"
 kotlinBinaryCompatibilityValidator = "0.7.1"
-kotlinPoet = "1.5.0"
+kotlinCompileTesting = "1.4.7"
 knit = "0.3.0"
+kspVersion = "1.6.10-1.0.2"
 mockWebServer = "4.9.2"
 retrofit = "2.8.1"
 
@@ -21,24 +22,28 @@ retrofit = "2.8.1"
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-google-autoService = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
-google-compileTesting = { module = "com.google.testing.compile:compile-testing", version.ref = "compileTesting" }
 jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }
 jUnitVintageEngine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "jUnitVintage" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jUnitJupiter" }
+junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jUnitJupiter" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotlinTest-runnerJUnit4 = { module = "io.kotlintest:kotlintest-runner-junit4", version.ref = "kotlinTest" }
 kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlibJDK8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
 kotlin-stdlibJS = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
-squareup-kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
+kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
+kotlinCompileTestingKsp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
@@ -50,7 +55,7 @@ arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versionin
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }

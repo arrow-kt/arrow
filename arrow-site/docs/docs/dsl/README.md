@@ -27,7 +27,7 @@ package com.example.domain
 }
 ```
 
-The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class.
+The DSL will be generated in the same package as your `data class`, and can be used on the `Companion` of your class. In most cases those optics will be [lenses]({{ '/optics/lens' | relative_url }}), which allow both focus and modification, as shown in the next snippet.
 
 ```kotlin
 import arrow.optics.dsl.*
@@ -40,7 +40,7 @@ val optional: Optional<Employee, String> = Employee.company.address.street.name
 optional.modify(john, String::toUpperCase)
 ```
 
-Arrow can also generate DSL for a `sealed class`, which can help reduce boilerplate code, or improve readability.
+Arrow can also generate DSL for a `sealed class`, which can help reduce boilerplate code, or improve readability. In that case we speak of [optionals]({{ '/optics/optional' | relative_url }}), which allow dealing with possibly-missing data, and [prisms]({{ '/optics/prism' | relative_url }}), which provide construction.
 
 ```kotlin
 package com.example.domain
@@ -78,91 +78,4 @@ We can rewrite this code with our generated DSL.
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
 
-The DSL also has special support for [Every]({{ '/optics/every' | relative_url }}), [At]({{ '/optics/at' | relative_url }}), [Index]({{ '/optics/index' | relative_url }}), etc.
-
-### Every
-
-`Every` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
-
-```kotlin
-@optics data class Employees(val employees: List<Employee>) {
-  companion object
-}
-```
-
-```kotlin
-import arrow.optics.Every
-
-val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
-val employees = Employees(listOf(john, jane))
-
-Employees.employees.every(Every.list<Employee>()).company.address.street.name.modify(employees, String::capitalize)
-```
-
-If you are in the scope of `Each`, you don't need to specify the instance.
-
-```kotlin
-Every.list<Employee>().run {
-  Employees.employees.every.company.address.street.name.modify(employees, String::capitalize)
-}
-```
-
-### At
-
-`At` can be used to focus in `A` at a given index `I` for a given structure `S`.
-
-```kotlin
-@optics data class Db(val content: Map<Int, String>) {
-  companion object
-}
-```
-
-Here we focus into the value of a given key in `MapK`.
-
-```kotlin
-import arrow.optics.typeclasses.At
-
-val db = Db(mapOf(
-  1 to "one",
-  2 to "two",
-  3 to "three"
-))
-
-Db.content.at(At.map(), 2).some.modify(db, String::reversed)
-```
-
-If you are in the scope of `At`, you don't need to specify the instance.
-
-```kotlin
-At.map<Int, String>().run {
-  Db.content.at(2).some.modify(db, String::reversed)
-}
-```
-
-### Index
-
-`Index` can be used to operate on a structure `S` that can index `A` by an index `I` (i.e., a `List<Employee>` by its index position or a `Map<K, V>` by its keys `K`).
-
-
-```kotlin
-import arrow.optics.typeclasses.Index
-
-val updatedJohn = Employees.employees.index(Index.list(), 0).company.address.street.name.modify(employees, String::capitalize)
-updatedJohn
-```
-
-In the scope of `Index`, you don't need to specify the instance, so we can enable `operator fun get` syntax.
-
-```kotlin
-Index.list<Employee>().run {
-  Employees.employees[0].company.address.street.name.getOrNull(updatedJohn)
-}
-```
-
-Since [Index]({{ '/optics/index' | relative_url }}) returns an [Optional]({{ '/optics/optional' | relative_url }}), `index` and `[]` are safe operations.
-
-```kotlin
-Index.list<Employee>().run {
-  Employees.employees[2].company.address.street.name.getOrNull(employees)
-}
-```
+There are more kinds of optics, you can read about them in the sidebar to the left. In particular, handling containers of data (lists, collections) becomes easier when using the [optics for collections]({{ '/optics/collections_dsl/' | relative_url }}).
