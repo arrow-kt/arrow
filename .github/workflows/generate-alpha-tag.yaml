@@ -3,7 +3,7 @@ name: generate-alpha-tag
 on:
   push:
     branches:
-      - rr-js-add-versioning-plugin
+      - main
 
 env:
   JAVA_OPTS: -Xms2g -Xmx4g

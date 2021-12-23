@@ -93,11 +93,11 @@ jobs:
             mac-step-gradle-
 
       - name: Publish alpha version
-        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, "alpha") }}
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, 'alpha') }}
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, "alpha") && !contains(env.lib_version, "beta") && !contains(env.lib_version, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, 'alpha') && !contains(env.lib_version, 'beta') && !contains(env.lib_version, 'rc') }}
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
@@ -162,28 +162,28 @@ jobs:
 
       - name: Build release directory (/docs)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, "alpha") && !contains(env.LIB_VERSION, "beta") && !contains(env.LIB_VERSION, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: |
           bundle exec jekyll build -b docs -s docs
           tree _site > $BASEDIR/logs/content_docs-${{ env.LIB_VERSION }}.log
 
       - name: Publish documentation (/docs)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, "alpha") && !contains(env.LIB_VERSION, "beta") && !contains(env.LIB_VERSION, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/sync-docs-with-aws.sh
 
       - name: Build release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, "alpha") && !contains(env.LIB_VERSION, "beta") && !contains(env.LIB_VERSION, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: |
           bundle exec jekyll build -b docs/${{ env.LIB_VERSION }} -s docs
           tree _site > $BASEDIR/logs/content_docs-${{ env.LIB_VERSION }}.log
 
       - name: Publish release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, "alpha") && !contains(env.LIB_VERSION, "beta") && !contains(env.LIB_VERSION, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: |
           aws s3 sync _site s3://$S3_BUCKET/docs/${{ env.LIB_VERSION }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
@@ -201,7 +201,7 @@ jobs:
           aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
       - name: Publish sitemap.xml
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, "alpha") && !contains(env.LIB_VERSION, "beta") && !contains(env.LIB_VERSION, "rc") }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
