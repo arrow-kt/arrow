@@ -4,8 +4,12 @@ import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.pair
+
+val distinctValuesList: Arb<List<Pair<Int, Int>>> =
+  Arb.list(Arb.pair(Arb.int(), Arb.int())).map { it.distinctBy(Pair<Int, Int>::component1) }
 
 class TMapTest : ArrowFxSpec(
   spec = {
@@ -17,7 +21,7 @@ class TMapTest : ArrowFxSpec(
       }
     }
     "insert multiple values" {
-      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int())).map { it.distinct() }) { pairs ->
+      checkAll(distinctValuesList) { pairs ->
         val map = TMap.new<Int, Int>()
         atomically {
           for ((k, v) in pairs) map.insert(k, v)
@@ -28,7 +32,7 @@ class TMapTest : ArrowFxSpec(
       }
     }
     "insert multiple colliding values" {
-      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { pairs ->
+      checkAll(distinctValuesList) { pairs ->
         val map = TMap.new<Int, Int> { 0 } // hash function that always returns 0
         atomically {
           for ((k, v) in pairs) map.insert(k, v)
