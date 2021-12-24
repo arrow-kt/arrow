@@ -2,6 +2,9 @@ name: "pull_request"
 
 on: pull_request
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dorg.gradle.project.kotlin.incremental.multiplatform=false -Dorg.gradle.project.kotlin.native.disableCompilerDaemon=true -Dorg.gradle.parallel=false"
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
