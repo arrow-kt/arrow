@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.prependTo
+import arrow.core.toOption
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -203,6 +204,12 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
     public fun <A> listTail(): Optional<List<A>, List<A>> = Optional(
       getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
       set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
+    )
+
+    @JvmStatic
+    public fun <A> nullable(): Optional<A?, A> = Optional(
+      getOption = { it.toOption() },
+      set = { source, new -> source?.let { new } }
     )
   }
 }
