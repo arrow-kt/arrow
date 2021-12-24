@@ -23,7 +23,16 @@ jobs:
           java-version: 11
 
       - name: Build
+        if: matrix.os == 'macos-latest'
         run: ./gradlew build
+
+      - name: Build
+        if: matrix.os == 'ubuntu-latest'
+        run: ./gradlew build
+
+      - name: Build
+        if: matrix.os == 'windows-latest'
+        run: ./gradlew mingwX64Test
 
       - name: Upload reports
         if: failure()
