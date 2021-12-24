@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.project.kotlin.incremental.multiplatform=false -Dorg.gradle.daemon=false -Dorg.gradle.project.kotlin.native.disableCompilerDaemon=true -Dorg.gradle.jvmargs="-Xmx4096M -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.project.kotlin.incremental.multiplatform=false -Dorg.gradle.daemon=false -Dorg.gradle.project.kotlin.native.disableCompilerDaemon=true -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -24,12 +24,9 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-          architecture: x64
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0.1
-        with:
-          arguments: build
+        run: ./gradlew build
 
       - name: Upload reports
         if: failure()
@@ -55,7 +52,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-          architecture: x64
 
       - name: "Dump new API files"
         run: ./gradlew apiDump
