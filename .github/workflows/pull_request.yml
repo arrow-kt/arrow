@@ -2,9 +2,6 @@ name: "pull_request"
 
 on: pull_request
 
-env:
-  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.project.kotlin.incremental.multiplatform=false -Dorg.gradle.daemon=false -Dorg.gradle.project.kotlin.native.disableCompilerDaemon=true -Dorg.gradle.jvmargs="-Xmx6g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -35,9 +32,6 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
   update_api:
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -55,9 +49,6 @@ jobs:
 
       - name: "Dump new API files"
         run: ./gradlew apiDump
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
 
       - name: "Commit new API files"
         uses: stefanzweifel/git-auto-commit-action@v4.12.0
