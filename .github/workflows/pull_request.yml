@@ -29,7 +29,6 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         with:
-          gradle-version: 6.7
           cache-disabled: true
           arguments: -S --no-daemon --stacktrace build
 
