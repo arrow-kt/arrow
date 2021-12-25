@@ -25,7 +25,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         with:
-          arguments: build
+          arguments: build --no-daemon --stacktrace
 
       - name: Upload reports
         if: failure()
