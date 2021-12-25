@@ -44,6 +44,13 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: 'gradle-daemon-log'
+          path: '/home/runner/.gradle/daemon/**'
+
   update_api:
     runs-on: ubuntu-latest
     timeout-minutes: 60
