@@ -4,15 +4,15 @@ enableFeaturePreview("VERSION_CATALOGS")
 
 rootProject.name = "arrow"
 
-plugins {
-  id("com.gradle.enterprise") version "3.8"
-}
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
     }
+}
+
+plugins {
+  id("com.gradle.enterprise") version "3.8"
 }
 
 dependencyResolutionManagement {
