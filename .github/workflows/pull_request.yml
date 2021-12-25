@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dfile.encoding=utf-8 -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dfile.encoding=utf-8 -Dorg.gradle.project.kotlin.native.disableCompilerDaemon=true -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"
 
 jobs:
   build:
