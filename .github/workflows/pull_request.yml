@@ -3,6 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
+  JAVA_OPTS: -Djava.net.preferIPv4Stack=true
   GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Djava.net.preferIPv4Stack=true" -Dfile.encoding=UTF-8
 
 jobs:
