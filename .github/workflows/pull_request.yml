@@ -27,15 +27,15 @@ jobs:
 
       - name: Build
         if: matrix.os == 'macos-latest'
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build --no-daemon --stacktrace  --scan
 
       - name: Build
         if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build --no-daemon --stacktrace  --scan
 
       - name: Build
         if: matrix.os == 'windows-latest'
-        run: ./gradlew mingwX64Test --no-daemon
+        run: ./gradlew mingwX64Test --no-daemon --stacktrace --scan
 
       - name: Upload reports
         if: failure()
@@ -60,7 +60,7 @@ jobs:
           java-version: 11
 
       - name: "Dump new API files"
-        run: ./gradlew apiDump  --no-daemon
+        run: ./gradlew apiDump  --no-daemon  --scan
 
       - name: "Commit new API files"
         uses: stefanzweifel/git-auto-commit-action@v4.12.0
