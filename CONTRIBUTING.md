@@ -169,10 +169,18 @@ If you want to propose a fix, rename, move etc., please execute these required t
 * Required tasks:
 ```bash
 ./gradlew spotlessApply # Format code
-./gradlew apiDump # Generate .api files for binary compatibility review
 ./gradlew build
 ./gradlew buildDoc
 ```
+
+Note: if, when running `build`, you see the following error:
+
+```bash
+> Task :arrow-core:apiCheck FAILED
+```
+
+This means you have changed (advertently or not) some public API. In this case read in the next point below how to resolve this.
+
 * The approval by 2 maintainers of the Arrow Community.
 
 #### Requirements to add a new feature
@@ -187,11 +195,33 @@ When creating the pull request, please execute these required tasks and make sur
 * Required tasks:
 ```bash
 ./gradlew spotlessApply # Format code
-./gradlew apiDump # Generate .api files for binary compatibility review
 ./gradlew build
 ./gradlew buildDoc
 ```
-* The approval by 2 maintainers of the Arrow Community.
+
+Note: as part of the `build` task `apiCheck` is run. If you have added/changed any public APIs, this task will fail with a message like this one:
+
+```bash
+> Task :arrow-core:apiCheck FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':arrow-core:apiCheck'.
+> API check failed for project arrow-core.
+  --- /Users/john/projects/arrow/arrow-libs/core/arrow-core/api/arrow-core-retrofit.api
+  +++ /Users/john/projects/arrow/arrow-libs/core/arrow-core/build/api/arrow-core-retrofit.api
+ ```
+
+To make the check pass you need to run:
+
+```bash
+./gradlew apiDump
+```
+
+This will generate updated `.api` files which you can then manually review (if the API changes are the ones you intended) and commit and push for the Arrow maintainers to review as well.
+
+* The approval by 2 maintainers of the Arrow Community is required as well.
 
 #### How to download the tests report
 
