@@ -38,7 +38,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         with:
           cache-disabled: true
-          arguments: -S --no-daemon --stacktrace build -jsTest
+          arguments: -S --no-daemon --stacktrace build -xjsTest
 
       - name: Upload reports
         if: failure()
