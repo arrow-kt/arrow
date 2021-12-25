@@ -25,6 +25,12 @@ jobs:
           distribution: 'temurin'
           java-version: 11
 
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+      - name: Remove .gradle
+        run: rm -rf /home/runner/.gradle
+
       - name: Build
         if: matrix.os == 'macos-latest'
         run: ./gradlew build --no-daemon --stacktrace  --scan
@@ -65,6 +71,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
+
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+      - name: Remove .gradle
+        run: rm -rf /home/runner/.gradle
 
       - name: "Dump new API files"
         run: ./gradlew apiDump  --no-daemon  --scan
