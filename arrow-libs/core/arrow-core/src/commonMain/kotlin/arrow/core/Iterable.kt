@@ -710,8 +710,8 @@ public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
   }
 }
 
-public fun <A> Iterable<A>.combineOrNull(SG: Semigroup<A>): A? = SG.run {
-  this@combineOrNull.reduceOrNull { acc, a ->
+public fun <A> Iterable<A>.combineAllOrNull(SG: Semigroup<A>): A? = SG.run {
+  this@combineAllOrNull.reduceOrNull { acc, a ->
     acc.combine(a)
   }
 }
