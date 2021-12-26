@@ -72,3 +72,21 @@ tasks {
 apiValidation {
   ignoredProjects.addAll(listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site"))
 }
+
+
+val appleTest = tasks.create("appleTest")
+
+subprojects {
+  afterEvaluate {
+    val appleTargets = setOf("tvos", "watchos", "ios", "macos")
+
+    extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
+      ?.sourceSets
+      ?.filter { appleTargets.any { target -> it.name.contains(target) } && it.name.contains("Test") }
+      ?.forEach {
+        tasks.findByName(it.name)?.let { task ->
+          appleTest.dependsOn(task)
+        }
+      }
+  }
+}
