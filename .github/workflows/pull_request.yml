@@ -35,7 +35,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: -S --no-daemon --full-stacktrace --scan check
+          arguments: -S --no-daemon --full-stacktrace --scan build
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
