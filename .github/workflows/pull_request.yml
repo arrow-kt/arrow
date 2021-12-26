@@ -29,13 +29,14 @@ jobs:
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os != 'windows-latest'
         with:
-          arguments: build --no-daemon --stacktrace
+          cache-disabled: true
+          arguments: build --full-stacktrace --no-daemon
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'windows-latest'
         with:
-          arguments: build -xjsTest --no-daemon --stacktrace
+          arguments: build -xjsTest --full-stacktrace --no-daemon
 
       - name: Upload reports
         if: failure()
