@@ -710,6 +710,12 @@ public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
   }
 }
 
+public fun <A> Iterable<A>.combineOrNull(SG: Semigroup<A>): A? = SG.run {
+  this@combineOrNull.reduceOrNull { acc, a ->
+    acc.combine(a)
+  }
+}
+
 /**
  * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
  */
