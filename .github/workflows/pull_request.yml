@@ -38,7 +38,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           cache-disabled: true
-          arguments: -S --no-daemon --full-stacktrace --scan jvmTest jsTest linuxX64Test apiCheck spotlessCheck
+          arguments: -S --no-daemon --full-stacktrace --scan jvmTest jsTest linuxX64Test apiCheck
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
