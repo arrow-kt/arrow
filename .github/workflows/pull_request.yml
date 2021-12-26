@@ -44,7 +44,6 @@ jobs:
           arguments: -S --no-daemon --full-stacktrace --scan build -xjsTest
 
       - name: Upload reports
-        if: failure()
         uses: actions/upload-artifact@v2.2.4
         with:
           name: 'reports-${{ matrix.os }}'
