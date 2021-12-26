@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'macos-latest', 'windows-latest' ]
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
     steps:
       - name: Checkout
@@ -28,10 +28,17 @@ jobs:
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
-        if: matrix.os != 'windows-latest'
+        if: matrix.os == 'macos-latest'
         with:
           cache-disabled: true
-          arguments: -S --no-daemon --full-stacktrace --scan build
+          arguments: -S --no-daemon --full-stacktrace --scan appleTest
+
+      - name: Build
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          cache-disabled: true
+          arguments: -S --no-daemon --full-stacktrace --scan jvmTest jsTest linuxX64Test apiCheck spotlessCheck
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
