@@ -29,19 +29,19 @@ jobs:
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'macos-latest'
         with:
-          arguments: -S --no-daemon --full-stacktrace --scan appleTest
+          arguments: --full-stacktrace --scan appleTest
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: -S --no-daemon --full-stacktrace --scan build
+          arguments: --full-stacktrace --scan check
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'windows-latest'
         with:
-          arguments: -S --no-daemon --full-stacktrace --scan mingwX64Test
+          arguments: --full-stacktrace --scan mingwX64Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.2.4
