@@ -25,6 +25,14 @@ jobs:
           distribution: 'temurin'
           java-version: 11
 
+      - name: Update Ubuntu dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update
+
+      - name: Install Ubuntu Node & Chrome
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install nodejs chromium-browser
+
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os != 'windows-latest'
