@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -22,22 +22,22 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2.4.0
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: appleTest
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'macos-latest'
         with:
           arguments: --full-stacktrace --scan appleTest
 
-      - name: Build
+      - name: Ubuntu build
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace --scan build
 
-      - name: Build
+      - name: mingwX64Test
         uses: gradle/gradle-build-action@v2.0.1
         if: matrix.os == 'windows-latest'
         with:
@@ -49,12 +49,8 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: 'gradle-daemon-log'
-          path: '/home/runner/.gradle/daemon/**'
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
 
   update_api:
     runs-on: ubuntu-latest
@@ -68,13 +64,16 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2.4.0
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       - name: Build
         uses: gradle/gradle-build-action@v2.0.1
         with:
           arguments: apiDump
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
 
       - name: "Commit new API files"
         uses: stefanzweifel/git-auto-commit-action@v4.12.0
