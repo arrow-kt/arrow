@@ -80,12 +80,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set version to an environment variable
+        run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
+
       - name: Publish alpha version
-        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, 'alpha') }}
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.LIB_VERSION, 'alpha') }}
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, 'alpha') && !contains(env.lib_version, 'beta') && !contains(env.lib_version, 'rc') }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
