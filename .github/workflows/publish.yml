@@ -64,7 +64,9 @@ jobs:
 
       - id: get-arrow-version
         name: Get Arrow version
-        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
+        run: |
+          ./gradlew
+          echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.3.1
