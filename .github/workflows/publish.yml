@@ -7,8 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  JAVA_OPTS: -Xms2g -Xmx4g
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
@@ -26,7 +25,6 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
@@ -41,26 +39,47 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2.4.0
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
-        run: ./gradlew build
+      - name: appleTest
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'macos-latest'
+        with:
+          arguments: --full-stacktrace --scan appleTest
+
+      - name: Ubuntu build
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace --scan build
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace --scan mingwX64Test
 
       - id: get-arrow-version
         name: Get Arrow version
-        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
+        run: |
+          ./gradlew
+          echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
   publish:
     needs: build
-
     timeout-minutes: 35
-
     runs-on: macos-latest
 
     steps:
@@ -68,12 +87,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set version to an environment variable
+        run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
+
       - name: Publish alpha version
-        if: ${{ github.ref == 'refs/heads/main' && contains(env.lib_version, 'alpha') }}
+        if: ${{ github.ref == 'refs/heads/main' && contains(env.LIB_VERSION, 'alpha') }}
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.lib_version, 'alpha') && !contains(env.lib_version, 'beta') && !contains(env.lib_version, 'rc') }}
+        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
@@ -81,9 +103,7 @@ jobs:
 
   publish_doc:
     needs: publish
-
     timeout-minutes: 60
-
     runs-on: macos-latest
 
     env:
@@ -91,8 +111,6 @@ jobs:
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       AWS_DEFAULT_REGION: eu-west-1
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
-      JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
@@ -103,7 +121,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2.4.0
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11

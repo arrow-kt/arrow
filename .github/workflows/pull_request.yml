@@ -3,8 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  JAVA_OPTS: -Xms2g -Xmx4g
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -21,19 +20,31 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2.4.0
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: appleTest
         uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'macos-latest'
         with:
-          arguments: build
+          arguments: --full-stacktrace --scan appleTest
+
+      - name: Ubuntu build
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace --scan build
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.0.1
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace --scan mingwX64Test
 
       - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v2.3.1
         with:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
@@ -50,28 +61,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.gradle/yarn
-            ~/.gradle/nodejs
-            ~/.konan
-          key: misc-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            misc-step-gradle-
-
       - name: Set up Java
-        uses: actions/setup-java@v2.4.0
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: "Dump new API files"
-        run: ./gradlew apiDump
+      - name: Build
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          arguments: apiDump
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop

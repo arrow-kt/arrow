@@ -6,8 +6,7 @@ on:
       - main
 
 env:
-  JAVA_OPTS: -Xms2g -Xmx4g
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -20,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2.3.1
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -45,7 +44,7 @@ jobs:
           token: ${{ secrets.TOKEN_GITHUB_ACTION }}
 
       - name: Set up Java
-        uses: actions/setup-java@v2.3.1
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'zulu'
           java-version: 11
