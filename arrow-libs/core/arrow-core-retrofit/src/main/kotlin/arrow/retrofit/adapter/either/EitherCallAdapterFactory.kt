@@ -1,6 +1,8 @@
 package arrow.retrofit.adapter.either
 
 import arrow.core.Either
+import arrow.retrofit.adapter.either.networkhandling.CallError
+import arrow.retrofit.adapter.either.networkhandling.NetworkEitherCallAdapter
 import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
@@ -61,7 +63,10 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
-        ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
+        if (errorType == CallError::class.java)
+          NetworkEitherCallAdapter(bodyType)
+        else
+          ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
       }
       ResponseE::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
