@@ -64,9 +64,7 @@ jobs:
 
       - id: get-arrow-version
         name: Get Arrow version
-        run: |
-          ./gradlew
-          echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt| cut -d. -f1-2)"
+        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt)"
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.3.1
@@ -87,15 +85,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set version to an environment variable
-        run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
-
       - name: Publish alpha version
-        if: ${{ github.ref == 'refs/heads/main' && contains(env.LIB_VERSION, 'alpha') }}
+        if: |
+          contains(needs.build.outputs.arrow-version, 'alpha') ||
+          contains(needs.build.outputs.arrow-version, 'beta') ||
+          contains(needs.build.outputs.arrow-version, 'rc')
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc')
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
