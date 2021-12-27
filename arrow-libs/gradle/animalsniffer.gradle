@@ -22,6 +22,6 @@ animalsniffer {
     ignore 'java.lang.*'
 }
 dependencies {
-    implementation "org.codehaus.mojo:animal-sniffer-annotations:1.19"
+    implementation "org.codehaus.mojo:animal-sniffer-annotations:1.20"
     signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
 }
