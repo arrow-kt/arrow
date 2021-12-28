@@ -57,7 +57,7 @@ private class EitherCall<R>(
       override fun onFailure(call: Call<R?>, throwable: Throwable) {
         val error = when (throwable) {
           is TimeoutException -> TimeoutError(throwable)
-          is IOException -> NetworkError(throwable)
+          is IOException -> IOError(throwable)
           else -> UnexpectedCallError(throwable)
         }
         callback.onResponse(this@EitherCall, Response.success(error.left()))

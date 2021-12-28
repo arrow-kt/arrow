@@ -16,9 +16,9 @@ public data class HttpError(val code: Int, val body: String, override val cause:
 public data class TimeoutError(override val cause: Throwable? = null) : CallError(cause)
 
 /**
- * Network error on client.
+ * IO error: network error, malformed JSON etc. Check the [cause] for details.
  */
-public data class NetworkError(override val cause: Throwable) : CallError(cause)
+public data class IOError(override val cause: Throwable) : CallError(cause)
 
 /**
  * Unknown API error.

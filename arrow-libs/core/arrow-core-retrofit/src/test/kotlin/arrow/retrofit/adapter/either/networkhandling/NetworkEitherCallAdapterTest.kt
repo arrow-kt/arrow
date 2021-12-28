@@ -1,16 +1,20 @@
 package arrow.retrofit.adapter.either.networkhandling
 
+import arrow.core.Either.Left
 import arrow.core.left
 import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
+import com.google.gson.stream.MalformedJsonException
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.SocketTimeoutException
 
 class NetworkEitherCallAdapterTest : UnitSpec() {
 
@@ -46,28 +50,31 @@ class NetworkEitherCallAdapterTest : UnitSpec() {
       body shouldBe HttpError(code = 400, body = """{"errorCode":666}""").left()
     }
 
-    "should throw for 200 with invalid JSON" {
+    "should return IOError for 200 with invalid JSON" {
       server.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
-      val body = runCatching { service.getEither() }
+      val body = service.getEither()
 
-      body.isFailure shouldBe true
+      body.shouldBeInstanceOf<Left<IOError>>()
+        .value.cause.shouldBeInstanceOf<MalformedJsonException>()
     }
 
-    "should throw for 400 and invalid JSON" {
+    "should return HttpError for 400 and invalid JSON" {
       server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
-      val body = runCatching { service.getEither() }
+      val body = service.getEither()
 
-      body.isFailure shouldBe true
+      val value = body.shouldBeInstanceOf<Left<HttpError>>().value
+      value.shouldBe(HttpError(code = 400, body = """not a valid JSON"""))
     }
 
-    "should throw when server disconnects" {
+    "should return IOError when server disconnects" {
       server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
-      val body = runCatching { service.getEither() }
+      val body = service.getEither()
 
-      body.isFailure shouldBe true
+      body.shouldBeInstanceOf<Left<IOError>>()
+        .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
     }
   }
 }
