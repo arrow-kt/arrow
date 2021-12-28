@@ -77,7 +77,7 @@ jobs:
 
   publish:
     needs: build
-    timeout-minutes: 35
+    timeout-minutes: 120
     runs-on: macos-latest
 
     steps:
@@ -91,19 +91,23 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Publish alpha version
+      - name: Publish alpha/beta/rc version
+        uses: gradle/gradle-build-action@v2.0.1
         if: |
           contains(needs.build.outputs.arrow-version, 'alpha') ||
           contains(needs.build.outputs.arrow-version, 'beta') ||
           contains(needs.build.outputs.arrow-version, 'rc')
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        with:
+          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
+        uses: gradle/gradle-build-action@v2.0.1
         if: |
           !contains(needs.build.outputs.arrow-version, 'alpha') &&
           !contains(needs.build.outputs.arrow-version, 'beta') &&
           !contains(needs.build.outputs.arrow-version, 'rc')
-        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
+        with:
+          arguments: publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
@@ -133,9 +137,6 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Set version to an environment variable
-        run: echo "LIB_VERSION=${{needs.build.outputs.arrow-version}}" >> $GITHUB_ENV
-
       - name: Prepare environment
         working-directory: arrow-site
         run: |
@@ -149,60 +150,71 @@ jobs:
 
       - name: Build landing page
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           bundle exec jekyll build -b docs -s docs --config docs/_config_for_landing_page.yml
           tree _site > $BASEDIR/logs/content.log
 
       - name: Publish landing page
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/sync-main-with-aws.sh
 
       - name: Build release directory (/docs)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc') }}
         run: |
           bundle exec jekyll build -b docs -s docs
           tree _site > $BASEDIR/logs/content_docs-${{ env.LIB_VERSION }}.log
 
       - name: Publish documentation (/docs)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc') }}
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/sync-docs-with-aws.sh
 
       - name: Build release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc') }}
         run: |
           bundle exec jekyll build -b docs/${{ env.LIB_VERSION }} -s docs
           tree _site > $BASEDIR/logs/content_docs-${{ env.LIB_VERSION }}.log
 
       - name: Publish release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc') }}
         run: |
           aws s3 sync _site s3://$S3_BUCKET/docs/${{ env.LIB_VERSION }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
       - name: Build latest version (/docs/next)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           bundle exec jekyll build -b docs/next -s docs
           tree _site > $BASEDIR/logs/content_docs-next.log
 
       - name: Publish latest version (/docs/next)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
       - name: Publish sitemap.xml
-        if: ${{ github.ref == 'refs/heads/main' && !contains(env.LIB_VERSION, 'alpha') && !contains(env.LIB_VERSION, 'beta') && !contains(env.LIB_VERSION, 'rc') }}
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc') }}
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
