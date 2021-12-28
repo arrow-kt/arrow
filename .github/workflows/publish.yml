@@ -92,18 +92,22 @@ jobs:
           java-version: 11
 
       - name: Publish alpha/beta/rc version
+        uses: gradle/gradle-build-action@v2.0.1
         if: |
           contains(needs.build.outputs.arrow-version, 'alpha') ||
           contains(needs.build.outputs.arrow-version, 'beta') ||
           contains(needs.build.outputs.arrow-version, 'rc')
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        with:
+          arguments: --full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
+        uses: gradle/gradle-build-action@v2.0.1
         if: |
           !contains(needs.build.outputs.arrow-version, 'alpha') &&
           !contains(needs.build.outputs.arrow-version, 'beta') &&
           !contains(needs.build.outputs.arrow-version, 'rc')
-        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
+        with:
+          arguments: --full-stacktrace publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
