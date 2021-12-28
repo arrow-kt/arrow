@@ -34,6 +34,23 @@ import java.lang.reflect.Type
  * other exceptions will throw.
  *
  * [ResponseE] is similar to [retrofit2.Response] but uses [Either] for the response body.
+ *
+ * If you want an adapter that never throws but instead wraps all errors in a dedicated type
+ * (including no network, timeout, malformed JSON) then define [CallError] as your error type
+ * argument:
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.retrofit.adapter.either.networkhandling.CallError
+ * import retrofit2.http.GET
+ *
+ * data class User(val name: String)
+ * interface MyService {
+ *   @GET("/user/me")
+ *   suspend fun user(): Either<CallError, User>
+ * }
+ * ```
+ * <!--- KNIT example-arrow-retrofit-02.kt -->
  */
 public class EitherCallAdapterFactory : CallAdapter.Factory() {
 
