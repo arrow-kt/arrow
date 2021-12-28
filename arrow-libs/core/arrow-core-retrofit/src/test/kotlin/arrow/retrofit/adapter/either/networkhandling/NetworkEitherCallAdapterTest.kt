@@ -14,25 +14,28 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.net.SocketTimeoutException
+import java.io.EOFException
+import java.net.ConnectException
 
 class NetworkEitherCallAdapterTest : UnitSpec() {
 
-  private val server = MockWebServer()
+  private lateinit var server: MockWebServer
 
-  private val service: CallErrorTestClient by lazy {
-    Retrofit.Builder()
-      .baseUrl(server.url("/"))
-      .addConverterFactory(GsonConverterFactory.create())
-      .addCallAdapterFactory(EitherCallAdapterFactory.create())
-      .build()
-      .create(CallErrorTestClient::class.java)
-  }
+  private lateinit var service: CallErrorTestClient
 
   init {
 
-    beforeSpec { server.start() }
-    afterSpec { server.shutdown() }
+    beforeAny {
+      server = MockWebServer()
+      server.start()
+      service = Retrofit.Builder()
+        .baseUrl(server.url("/"))
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(EitherCallAdapterFactory.create())
+        .build()
+        .create(CallErrorTestClient::class.java)
+    }
+    afterAny { server.shutdown() }
 
     "should return ResponseMock for 200 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
@@ -74,7 +77,24 @@ class NetworkEitherCallAdapterTest : UnitSpec() {
       val body = service.getEither()
 
       body.shouldBeInstanceOf<Left<IOError>>()
-        .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
+        .value.cause.shouldBeInstanceOf<ConnectException>()
+    }
+
+    "should return Unit when service method returns Unit and null body received" {
+      server.enqueue(MockResponse().setResponseCode(204))
+
+      val body = service.postSomething("Sample string")
+
+      body shouldBe Unit.right()
+    }
+
+    "should return IOError when service method returns type other than Unit but null body received" {
+      server.enqueue(MockResponse())
+
+      val body = service.getEither()
+
+      body.shouldBeInstanceOf<Left<IOError>>()
+        .value.cause.shouldBeInstanceOf<EOFException>()
     }
   }
 }
