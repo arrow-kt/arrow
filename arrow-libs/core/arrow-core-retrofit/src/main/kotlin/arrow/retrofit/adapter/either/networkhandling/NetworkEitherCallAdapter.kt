@@ -50,7 +50,13 @@ private class EitherCall<R>(
           @Suppress("UNCHECKED_CAST")
           Unit.right() as Either<CallError, R>
         } else {
-          UnexpectedCallError("Response body was null").left()
+          UnexpectedCallError(
+            IllegalStateException(
+              "Response code is ${code()} but body is null.\n" +
+                "If you expect response body to be null then define your API method as returning Unit:\n" +
+                "@POST fun postSomething(): Either<CallError, Unit>"
+            )
+          ).left()
         }
       }
 
