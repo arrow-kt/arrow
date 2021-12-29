@@ -73,7 +73,7 @@ class NetworkEitherCallAdapterTest : UnitSpec() {
     }
 
     "should return IOError when server disconnects" {
-      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
+      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AT_START })
 
       val body = service.getEither()
 
