@@ -45,9 +45,16 @@ import java.lang.reflect.Type
  * import retrofit2.http.GET
  *
  * data class User(val name: String)
+ *
  * interface MyService {
+ *
  *   @GET("/user/me")
  *   suspend fun user(): Either<CallError, User>
+ *
+ *   // Set the expected response type as Unit if you expect a null response body
+ *   // (e.g. for 204 No Content response)
+ *   @POST("/")
+ *   suspend fun postSomething(@Body something: String): Either<CallError, Unit>
  * }
  * ```
  * <!--- KNIT example-arrow-retrofit-02.kt -->
