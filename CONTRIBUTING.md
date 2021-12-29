@@ -65,6 +65,22 @@ Root project 'arrow'
 
 Dokka is responsible for generating documentation based on source code annotations. [Knit](https://github.com/Kotlin/kotlinx-knit) is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
 
+The `build` task runs `knitCheck` to check if all Knit annotated doc snippets have been generated as examples. Knit code example annotations look like HTML comments inside the code KDoc comments:
+```kotlin
+/**
+ * ```kotlin
+ * // Code example goes here
+ * ```
+ * <!--- KNIT example-arrow-core-01.kt -->
+ */
+```
+
+If you added/changed any Knit annotated code snippets to the docs you have to run the `knit` task to (re-)generate the examples, otherwise your build will fail:
+
+```bash
+./gradlew knit
+```
+
 In order to generate the documentation and validate it:
 
 ```bash
@@ -166,6 +182,12 @@ If you've included those changes for binary compatibility and formatted the code
 
 If you want to propose a fix, rename, move etc., please execute these required tasks and make sure they pass:
 
+* If you changed/added [Knit](https://github.com/Kotlin/kotlinx-knit) annotated code snippets in KDocs:
+
+```bash
+./gradlew knit # (Re-)generate code examples from snippets in docs
+```
+
 * Required tasks:
 ```bash
 ./gradlew spotlessApply # Format code
@@ -191,6 +213,12 @@ Please, ensure these points when adding a new feature:
 * Include tests that cover the proper cases
 
 When creating the pull request, please execute these required tasks and make sure they pass:
+
+* If you changed/added [Knit](https://github.com/Kotlin/kotlinx-knit) annotated code snippets in KDocs:
+
+```bash
+./gradlew knit # (Re-)generate code examples from snippets in docs
+```
 
 * Required tasks:
 ```bash
