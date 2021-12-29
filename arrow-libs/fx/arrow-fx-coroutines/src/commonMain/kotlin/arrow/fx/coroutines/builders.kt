@@ -1,8 +1,10 @@
 package arrow.fx.coroutines
 
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.awaitCancellation
 
+// TODO deprecate?
 public suspend fun <A> never(): A =
-  suspendCancellableCoroutine<Nothing> {}
+  awaitCancellation()
 
+// TODO deprecate?
 public suspend fun unit(): Unit = Unit

@@ -40,7 +40,7 @@ captures/
 
 # Intellij
 *.iml
-.idea
+.idea/*
 !.idea/vcs.xml
 
 # Keystore files

@@ -20,10 +20,20 @@ permalink: /optics/
 
 Arrow Optics provides an automatic DSL that allows users to use `.` notation when accessing,
 composing, and transforming deeply nested immutable data structures.
-
 Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relative_url }}), [Prism](
 {{ '/optics/prism/' | relative_url }}), and others from which we can generalize accessing and
-traversing deep values in sealed and data classes models.s
+traversing deep values in sealed and data classes models.
+
+```kotlin
+// an immutable value with very nested components
+val john = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
+// an Optional points to one place in the value
+val optional: Optional<Employee, String> = Employee.company.address.street.name
+// and now you can modify into a new copy without nested 'copy's!
+optional.modify(john, String::toUpperCase)
+```
+
+Scroll down and learn what Arrow Optics can do for you(r code)!
 </div>
 
 <div class="quickstart-intro" markdown="1">
@@ -33,37 +43,48 @@ traversing deep values in sealed and data classes models.s
 
 <div class="quickstart-coroutines-item" markdown="1">
 #### Quick Start
-  - [Gradle Setup]({{ '/optics/#Gradle-kotlin' | relative_url }})
-  - [Maven Setup]({{ '/optics/#Maven' | relative_url }})
-</div>
-
-<div class="quickstart-coroutines-item" markdown="1">
-#### DSL 
+  - [Gradle Setup]({{ '/optics/#setup' | relative_url }})
   - [Optics DSL]({{ '/optics/dsl/' | relative_url }})
-</div>
-
-<div class="quickstart-coroutines-item" markdown="1">
-#### Extensions and data types
-  - [Iso]({{ '/optics/iso/' | relative_url }})
-  - [Lens]({{ '/optics/lens/' | relative_url }})
-  - [Optional]({{ '/optics/optional/' | relative_url }})
-  - [Prism]({{ '/optics/prims/' | relative_url }})
-  - [Getter]({{ '/optics/getter/' | relative_url }})
-  - [Setter]({{ '/optics/setter/' | relative_url }})
-  - [Fold]({{ '/optics/fold/' | relative_url }})
-  - [Traversal]({{ '/optics/traversal/' | relative_url }})
-  - [Every]({{ '/optics/every/' | relative_url }})
-  - [Cons]({{ '/optics/cons/' | relative_url }})
-  - [Snoc]({{ '/optics/snoc/' | relative_url }})
-  - [At]({{ '/optics/at/' | relative_url }})
-  - [Index]({{ '/optics/index/' | relative_url }})
-  - [FilterIndex]({{ '/optics/filterindex/' | relative_url }})
+  - [Optics DSL for Collections]({{ '/optics/collections_dsl/' | relative_url }})
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
 #### Additional information
-  - [Kotlin Data classes](https://kotlinlang.org/docs/data-classes.html)
-  - [Kotlin Sealed classes](https://kotlinlang.org/docs/sealed-classes.html)
+- [Kotlin Data classes](https://kotlinlang.org/docs/data-classes.html)
+- [Kotlin Sealed classes](https://kotlinlang.org/docs/sealed-classes.html)
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### [Optics DSL for Values]({{ '/optics/dsl/' | relative_url }})
+
+###### Focus and modification
+
+  - [Iso]({{ '/optics/iso/' | relative_url }}): 1-to-1 relations
+  - [Lens]({{ '/optics/lens/' | relative_url }}): focus and modify one value
+  - [Optional]({{ '/optics/optional/' | relative_url }}): optional value
+
+###### Single behavior
+
+  - [Getter]({{ '/optics/getter/' | relative_url }}): focus on one value
+  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value
+  - [Setter]({{ '/optics/setter/' | relative_url }}): modify one value
+  
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
+#### [Optics DSL for Collections]({{ '/optics/collections_dsl/' | relative_url }})
+
+- [Every]({{ '/optics/every/' | relative_url }}): focus and modification
+- [Fold]({{ '/optics/fold/' | relative_url }}): only focus
+- [Traversal]({{ '/optics/traversal/' | relative_url }}): only modification
+
+###### Point to elements
+
+- [Cons]({{ '/optics/cons/' | relative_url }})
+- [Snoc]({{ '/optics/snoc/' | relative_url }})
+- [At]({{ '/optics/at/' | relative_url }})
+- [Index]({{ '/optics/index/' | relative_url }})
+- [FilterIndex]({{ '/optics/filterindex/' | relative_url }})
 </div>
 </div>
 </div>
@@ -74,37 +95,20 @@ traversing deep values in sealed and data classes models.s
 --------------------------------------------------------------------------------
 -->
 
-<div class="setup" markdown="1">
+<div id="setup" class="setup" markdown="1">
 ## Setup
-
-{: .setup-subtitle}
-Configure Arrow for your project
-<div class="setup-jdk-android" markdown="1">
-<div class="jdk-item" markdown="1">
-![Jdk](/img/quickstart/jdk-logo.svg "jdk")
-
-Make sure to have the latest version of JDK 1.8 installed.
-</div>
-<div class="android-item" markdown="1">
-![Android](/img/quickstart/android-logo.svg "android")
-
-<!--- Module Libraries -->
-Arrow supports Android starting on API 21 and up.
-</div>
-</div>
 
 <div class="setup-graddle-maven" markdown="1">
 <!-- Tab links -->
 <div class="tab" markdown="1">
   <button class="tablinks" onclick="openSetup(event, 'Gradle-kotlin')" id="defaultOpen" markdown="1">Gradle Kotlin DSL</button>
   <button class="tablinks" onclick="openSetup(event, 'Gradle-Groovy')" markdown="1">Gradle Groovy DSL</button>
-  <button class="tablinks" onclick="openSetup(event, 'Maven')" markdown="1">Maven</button>
 </div>
 
 <!-- Tab content -->
 <div id="Gradle-kotlin" class="tabcontent" markdown="1">
 
-#### Basic Setup
+#### Step 1: add the repository
 
 In your project's root `build.gradle.kts`, append this repository to your list:
 
@@ -116,20 +120,17 @@ allprojects {
 }
 ```
 
+#### Step 2: add the library
+
 Add the dependencies into the project's `build.gradle.kts`:
 
 ```
-apply plugin: 'kotlin-kapt'
-
 dependencies {
     implementation("io.arrow-kt:arrow-optics:1.0.1")
-    kapt("io.arrow-kt:arrow-meta:1.0.1")
 }
 ```
 
-#### BOM file
-
-To avoid specifying the Arrow version for every dependency, a BOM file is available:
+If you are using more than one Arrow dependency, you can avoid specifying the same version over and over by using a BOM file:
 
 ```
 dependencies {
@@ -141,28 +142,27 @@ dependencies {
 }
 ```
 
-#### Next development version
+#### Step 3: add the plug-in
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
+To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
 ```
-allprojects {
-    repositories {
-        ...
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    }
+plugins {
+    id("com.google.devtools.ksp") version "1.6.0-1.0.2"
+}
 
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
+dependencies {
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:1.0.1")
 }
 ```
+
+Now you are ready to learn about the [Optics DSL]({{ '/optics/dsl/' | relative_url }})!
 
 </div>
 
 <div id="Gradle-Groovy" class="tabcontent" markdown="1">
 
-#### Basic Setup
+#### Step 1: add the repository
 
 In your project's root `build.gradle`, append this repository to your list:
 
@@ -174,24 +174,23 @@ allprojects {
 }
 ```
 
+#### Step 2: add the library
+
 Add the dependencies into the project's `build.gradle`:
 
 ```groovy
-apply plugin: 'kotlin-kapt'
-
 def arrow_version = "1.0.1"
+
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
-#### BOM file
-
-To avoid specifying the Arrow version for every dependency, a BOM file is available:
+If you are using more than one Arrow dependency, you can avoid specifying the same version over and over by using a BOM file:
 
 ```groovy
 def arrow_version = "1.0.1"
+
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -201,140 +200,25 @@ dependencies {
 }
 ```
 
-#### Next development version
+#### Step 3: add the plug-in
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
+To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
 ```groovy
-allprojects {
-    repositories {
-        ...
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
+plugins {
+    id "com.google.devtools.ksp" version "1.6.0-1.0.2"
+}
 
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' }
+dependencies {
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:1.0.1"
 }
 ```
 
-</div>
-
-<div id="Maven" class="tabcontent" markdown="1">
-
-#### Basic Setup
-
-Make sure to have at least the latest version of JDK 1.8 installed. Add to your pom.xml file the
-following properties:
-
-```xml
-
-<properties>
-    <kotlin.version>1.5.31</kotlin.version>
-    <arrow.version>1.0.1</arrow.version>
-</properties>
-```
-
-Add the dependencies that you want to use:
-
-```xml
-
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-```
-
-#### Enabling kapt for the Optics DSL
-
-For the Optics DSL, enable annotation processing using Kotlin plugin:
-
-```xml
-
-<plugin>
-    <groupId>org.jetbrains.kotlin</groupId>
-    <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
-    <executions>
-        <execution>
-            <id>kapt</id>
-            <goals>
-                <goal>kapt</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-                <annotationProcessorPaths>
-                    <annotationProcessorPath>
-                        <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-meta</artifactId>
-                        <version>${arrow.version}</version>
-                    </annotationProcessorPath>
-                </annotationProcessorPaths>
-            </configuration>
-        </execution>
-        <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-                <goal>compile</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-            </configuration>
-        </execution>
-        <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-                <goal>test-compile</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
-
-#### BOM file
-
-To avoid specifying the Arrow version for every dependency, a BOM file is available:
-
-```xml
-
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-stack</artifactId>
-            <version>${arrow.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement><dependencies>
-...
-</dependencies>
-```
-
-#### Next development version
-
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```xml
-
-<repository>
-    <snapshotss>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
-</repository>
-```
+Now you are ready to learn about the [Optics DSL]({{ '/optics/dsl/' | relative_url }})!
 
 </div>
+
+
 </div>
 
 </div>

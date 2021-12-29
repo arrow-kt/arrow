@@ -955,6 +955,22 @@ public sealed class Either<out A, out B> {
     fold({ false }, predicate)
 
   /**
+   * Returns `true` if [Left] or returns the result of the application of
+   * the given predicate to the [Right] value.
+   *
+   * Example:
+   * ```
+   * Right(12).all { it > 10 } // Result: true
+   * Right(7).all { it > 10 }  // Result: false
+   *
+   * val left: Either<Int, Int> = Left(12)
+   * left.all { it > 10 }      // Result: true
+   * ```
+   */
+  public inline fun all(predicate: (B) -> Boolean): Boolean =
+    fold({ true }, predicate)
+
+  /**
    * Returns the right value if it exists, otherwise null
    *
    * Example:
@@ -1019,9 +1035,6 @@ public sealed class Either<out A, out B> {
       is Right -> if (predicate(this.value)) this.value else null
       is Left -> null
     }
-
-  public inline fun all(predicate: (B) -> Boolean): Boolean =
-    fold({ true }, predicate)
 
   /**
    * Returns `true` if [Left]
