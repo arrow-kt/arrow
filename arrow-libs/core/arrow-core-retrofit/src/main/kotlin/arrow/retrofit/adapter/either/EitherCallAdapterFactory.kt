@@ -35,8 +35,8 @@ import java.lang.reflect.Type
  *
  * [ResponseE] is similar to [retrofit2.Response] but uses [Either] for the response body.
  *
- * If you want an adapter that never throws but instead wraps all errors in a dedicated type
- * (including no network, timeout, malformed JSON) then define [CallError] as your error type
+ * If you want an adapter that never throws but instead wraps all errors (including no network,
+ * timeout, malformed JSON) in a dedicated type then define [CallError] as your error type
  * argument:
  *
  * ```kotlin
