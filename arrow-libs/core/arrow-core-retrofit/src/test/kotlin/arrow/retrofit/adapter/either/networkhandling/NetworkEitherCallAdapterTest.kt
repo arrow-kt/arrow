@@ -16,6 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.EOFException
 import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 class NetworkEitherCallAdapterTest : UnitSpec() {
 
@@ -78,6 +79,15 @@ class NetworkEitherCallAdapterTest : UnitSpec() {
 
       body.shouldBeInstanceOf<Left<IOError>>()
         .value.cause.shouldBeInstanceOf<ConnectException>()
+    }
+
+    "should return IOError when no response" {
+      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.NO_RESPONSE })
+
+      val body = service.getEither()
+
+      body.shouldBeInstanceOf<Left<IOError>>()
+        .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
     }
 
     "should return Unit when service method returns Unit and null body received" {

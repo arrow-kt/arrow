@@ -11,7 +11,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import java.lang.reflect.Type
-import java.util.concurrent.TimeoutException
 
 internal class NetworkEitherCallAdapter<R>(
   private val successType: Type
@@ -61,10 +60,10 @@ private class EitherCall<R>(
       }
 
       override fun onFailure(call: Call<R?>, throwable: Throwable) {
-        val error = when (throwable) {
-          is TimeoutException -> TimeoutError(throwable)
-          is IOException -> IOError(throwable)
-          else -> UnexpectedCallError(throwable)
+        val error = if (throwable is IOException) {
+          IOError(throwable)
+        } else {
+          UnexpectedCallError(throwable)
         }
         callback.onResponse(this@EitherCall, Response.success(error.left()))
       }

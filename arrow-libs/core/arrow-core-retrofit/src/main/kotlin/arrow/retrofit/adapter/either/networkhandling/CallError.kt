@@ -11,12 +11,7 @@ public sealed class CallError
 public data class HttpError(val code: Int, val body: String) : CallError()
 
 /**
- * The request timed out.
- */
-public data class TimeoutError(val cause: Throwable) : CallError()
-
-/**
- * IO error: network error, malformed JSON etc. Check the [cause] for details.
+ * IO error: no network, socket timeout, malformed JSON etc. Check the [cause] for details.
  */
 public data class IOError(val cause: Throwable) : CallError()
 
