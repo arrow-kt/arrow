@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -25,7 +25,9 @@ jobs:
           java-version: 11
 
       - name: Gradle build
-        run: ./gradlew build "-Psemver.stage=alpha"
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          arguments: --full-stacktrace build "-Psemver.stage=alpha"
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
@@ -50,7 +52,9 @@ jobs:
           java-version: 11
 
       - name: Generate Tag
-        run: ./gradlew createSemverTag "-Psemver.stage=alpha"
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          arguments: --full-stacktrace createSemverTag "-Psemver.stage=alpha"
 
       - name: Push
         run: git push --follow-tags

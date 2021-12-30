@@ -7,7 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
@@ -146,7 +146,9 @@ jobs:
           bundle install --gemfile Gemfile
 
       - name: Create API doc
-        run: ./gradlew dokkaGfm
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          arguments: --full-stacktrace dokkaGfm
 
       - name: Build landing page
         working-directory: arrow-site
