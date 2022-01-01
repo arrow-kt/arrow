@@ -4,7 +4,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
@@ -265,6 +264,47 @@ class NonEmptyListTest : UnitSpec() {
         val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
           .let(NonEmptyList.Companion::fromListUnsafe)
+        result shouldBe expected
+      }
+    }
+
+    "max element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.max()
+        val expected = a.maxOrNull()
+        result shouldBe expected
+      }
+    }
+
+    "maxBy element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.maxBy(::identity)
+        val expected = a.maxByOrNull(::identity)
+        result shouldBe expected
+      }
+    }
+
+    "min element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.min()
+        val expected = a.minOrNull()
+        result shouldBe expected
+      }
+    }
+
+
+    "minBy element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.minBy(::identity)
+        val expected = a.minByOrNull(::identity)
         result shouldBe expected
       }
     }
