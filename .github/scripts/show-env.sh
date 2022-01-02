@@ -1,8 +1,0 @@
-#!/bin/bash
- 
-set -e
-
-# grep projects.version $BASEDIR/gradle.properties
-echo "LATEST_PUBLISHED_VERSION: $LATEST_PUBLISHED_VERSION"
-echo "RELEASE_VERSION: $RELEASE_VERSION"
-echo "NEW_RELEASE_VERSION_EXISTS: $NEW_RELEASE_VERSION_EXISTS"

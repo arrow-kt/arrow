@@ -11,6 +11,10 @@ pluginManagement {
     }
 }
 
+plugins {
+  id("com.gradle.enterprise") version "3.8"
+}
+
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -32,12 +36,6 @@ project(":arrow-core-test").projectDir = file("arrow-libs/core/arrow-core-test")
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
-include("arrow-meta")
-project(":arrow-meta").projectDir = file("arrow-libs/core/arrow-meta")
-
-include("arrow-meta-test-models")
-project(":arrow-meta-test-models").projectDir = file("arrow-libs/core/arrow-meta/arrow-meta-test-models")
-
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 
@@ -55,6 +53,9 @@ project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 include("arrow-optics")
 project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
 
+include("arrow-optics-ksp-plugin")
+project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
+
 include("arrow-optics-test")
 project(":arrow-optics-test").projectDir = file("arrow-libs/optics/arrow-optics-test")
 
@@ -65,3 +66,10 @@ project(":arrow-stack").projectDir = file("arrow-libs/stack")
 // SITE
 include("arrow-site")
 project(":arrow-site").projectDir = file("arrow-site")
+
+gradleEnterprise {
+  buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+  }
+}
