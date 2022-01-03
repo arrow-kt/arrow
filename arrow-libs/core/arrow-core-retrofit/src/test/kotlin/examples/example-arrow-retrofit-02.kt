@@ -3,7 +3,9 @@ package arrow.core.retrofit.examples.exampleArrowRetrofit02
 
 import arrow.core.Either
 import arrow.retrofit.adapter.either.networkhandling.CallError
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 data class User(val name: String)
 
