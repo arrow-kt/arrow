@@ -26,19 +26,19 @@ jobs:
           java-version: 11
 
       - name: appleTest
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'macos-latest'
         with:
           arguments: --full-stacktrace --scan appleTest
 
       - name: Ubuntu build
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace --scan build
 
       - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'windows-latest'
         with:
           arguments: --full-stacktrace --scan mingwX64Test
@@ -68,7 +68,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         with:
           arguments: apiDump
 
