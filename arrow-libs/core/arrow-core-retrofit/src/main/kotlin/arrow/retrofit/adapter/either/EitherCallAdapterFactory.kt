@@ -56,7 +56,10 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     }
   }
 
-  private fun eitherAdapter(returnType: ParameterizedType, retrofit: Retrofit): CallAdapter<Type, out Call<out Any>>? {
+  private fun eitherAdapter(
+    returnType: ParameterizedType,
+    retrofit: Retrofit
+  ): CallAdapter<Type, out Call<out Any>>? {
     val wrapperType = getParameterUpperBound(0, returnType)
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
