@@ -98,6 +98,14 @@ class NetworkEitherCallAdapterTest : UnitSpec() {
       body shouldBe Unit.right()
     }
 
+    "should return Unit when service method returns Unit and JSON body received" {
+      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+
+      val body = service.postSomething("Sample string")
+
+      body shouldBe Unit.right()
+    }
+
     "should return IOError when service method returns type other than Unit but null body received" {
       server.enqueue(MockResponse())
 
