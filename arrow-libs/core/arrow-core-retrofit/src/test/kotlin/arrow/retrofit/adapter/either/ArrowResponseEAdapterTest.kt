@@ -53,6 +53,17 @@ class ArrowResponseEAdapterTest : UnitSpec() {
       }
     }
 
+    "should return Unit when service method returns Unit and JSON body received" {
+      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+
+      val responseE = service.postSomethingResponseE("Sample string")
+
+      with(responseE) {
+        code shouldBe 200
+        body shouldBe Unit.right()
+      }
+    }
+
     "should return ErrorMock for 400 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"errorCode":42}""").setResponseCode(400))
 
