@@ -6,7 +6,7 @@ import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import retrofit2.http.GET
 
-interface SuspedApiClientTest {
+interface TestSuspendApiClient {
 
   @GET("/")
   suspend fun getEither(): Either<ErrorMock, ResponseMock>

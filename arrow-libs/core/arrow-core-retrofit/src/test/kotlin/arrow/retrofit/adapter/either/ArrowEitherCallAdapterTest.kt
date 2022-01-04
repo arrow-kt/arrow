@@ -5,7 +5,7 @@ import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
-import arrow.retrofit.adapter.retrofit.SuspedApiClientTest
+import arrow.retrofit.adapter.retrofit.TestSuspendApiClient
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -15,21 +15,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class ArrowEitherCallAdapterTest : UnitSpec() {
 
-  private val server = MockWebServer()
-
-  private val service: SuspedApiClientTest by lazy {
-    Retrofit.Builder()
-      .baseUrl(server.url("/"))
-      .addConverterFactory(GsonConverterFactory.create())
-      .addCallAdapterFactory(EitherCallAdapterFactory.create())
-      .build()
-      .create(SuspedApiClientTest::class.java)
-  }
+  private lateinit var server: MockWebServer
+  private lateinit var service: TestSuspendApiClient
 
   init {
 
-    beforeSpec { server.start() }
-    afterSpec { server.shutdown() }
+    beforeAny {
+      server = MockWebServer()
+      server.start()
+      service = Retrofit.Builder()
+        .baseUrl(server.url("/"))
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(EitherCallAdapterFactory.create())
+        .build()
+        .create(TestSuspendApiClient::class.java)
+    }
+
+    afterAny { server.shutdown() }
 
     "should return ResponseMock for 200 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
