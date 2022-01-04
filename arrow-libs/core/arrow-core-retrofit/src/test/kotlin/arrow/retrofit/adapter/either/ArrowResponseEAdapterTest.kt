@@ -5,7 +5,7 @@ import arrow.core.right
 import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
-import arrow.retrofit.adapter.retrofit.TestSuspendApiClient
+import arrow.retrofit.adapter.retrofit.SuspendApiTestClient
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ArrowResponseEAdapterTest : UnitSpec() {
 
   private lateinit var server: MockWebServer
-  private lateinit var service: TestSuspendApiClient
+  private lateinit var service: SuspendApiTestClient
 
   init {
 
@@ -28,7 +28,7 @@ class ArrowResponseEAdapterTest : UnitSpec() {
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(EitherCallAdapterFactory.create())
         .build()
-        .create(TestSuspendApiClient::class.java)
+        .create(SuspendApiTestClient::class.java)
     }
 
     afterAny { server.shutdown() }
