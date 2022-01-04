@@ -65,7 +65,7 @@ Root project 'arrow'
 
 Dokka is responsible for generating documentation based on source code annotations. [Knit](https://github.com/Kotlin/kotlinx-knit) is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
 
-The `build` task runs `knitCheck` to check if all Knit annotated doc snippets have been generated as examples. Knit code example annotations look like HTML comments inside the code KDoc comments:
+The `build` task runs `knitCheck` to check if all Knit annotated code snippets in KDoc comments have been generated as examples. Knit code snippet annotations look like HTML comments inside KDoc:
 ```kotlin
 /**
  * ```kotlin
@@ -75,7 +75,7 @@ The `build` task runs `knitCheck` to check if all Knit annotated doc snippets ha
  */
 ```
 
-If you added/changed any Knit annotated code snippets to the docs you have to run the `knit` task to (re-)generate the examples, otherwise your build will fail:
+If you added/changed any Knit annotated code snippets in the docs you have to run the `knit` task to (re-)generate the examples, otherwise your build will fail:
 
 ```bash
 ./gradlew knit
