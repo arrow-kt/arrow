@@ -44,23 +44,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: appleTest
-        uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'macos-latest'
-        with:
-          arguments: --full-stacktrace appleTest
-
       - name: Ubuntu build
         uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace build
-
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'windows-latest'
-        with:
-          arguments: --full-stacktrace mingwX64Test
 
       - id: get-arrow-version
         name: Get Arrow version
