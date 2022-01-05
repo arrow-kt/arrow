@@ -7,7 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
@@ -48,19 +48,19 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'macos-latest'
         with:
-          arguments: --full-stacktrace --scan appleTest
+          arguments: --full-stacktrace appleTest
 
       - name: Ubuntu build
         uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: --full-stacktrace --scan build
+          arguments: --full-stacktrace build
 
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2.1.0
         if: matrix.os == 'windows-latest'
         with:
-          arguments: --full-stacktrace --scan mingwX64Test
+          arguments: --full-stacktrace mingwX64Test
 
       - id: get-arrow-version
         name: Get Arrow version
