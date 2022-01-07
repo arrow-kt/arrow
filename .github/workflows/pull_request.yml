@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -25,23 +25,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: appleTest
+      - name: build
         uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'macos-latest'
         with:
-          arguments: --full-stacktrace --scan appleTest
-
-      - name: Ubuntu build
-        uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          arguments: --full-stacktrace --scan build
-
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.1.0
-        if: matrix.os == 'windows-latest'
-        with:
-          arguments: --full-stacktrace --scan mingwX64Test
+          arguments: --full-stacktrace build
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.3.1
