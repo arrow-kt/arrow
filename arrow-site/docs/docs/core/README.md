@@ -234,7 +234,7 @@ Add the dependencies that you want to use:
 
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core</artifactId>
+    <artifactId>arrow-core-jvm</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 ```
