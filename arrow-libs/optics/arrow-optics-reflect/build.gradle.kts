@@ -15,7 +15,6 @@ kotlin {
       dependencies {
         api(projects.arrowCore)
         api(projects.arrowOptics)
-        api(libs.kotlin.stdlibCommon)
         implementation(libs.kotlin.stdlibJDK8)
         api(libs.kotlin.reflect)
       }
