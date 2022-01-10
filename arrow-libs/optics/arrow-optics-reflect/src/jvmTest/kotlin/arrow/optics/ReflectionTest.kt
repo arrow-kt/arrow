@@ -47,7 +47,7 @@ object ReflectionTest: UnitSpec() {
     "instances" {
       val things = listOf(Fork, Spoon, Fork)
       val forks = Every.list<Cutlery>() compose instance<Cutlery, Fork>()
-      val spoons = Every.list<Cutlery>() compose instance<Cutlery, Fork>()
+      val spoons = Every.list<Cutlery>() compose instance<Cutlery, Spoon>()
       forks.size(things) shouldBe 2
       spoons.size(things) shouldBe 1
     }
