@@ -42,12 +42,12 @@ public final class arrow/retrofit/adapter/either/networkhandling/HttpError : arr
 }
 
 public final class arrow/retrofit/adapter/either/networkhandling/IOError : arrow/retrofit/adapter/either/networkhandling/CallError {
-	public fun <init> (Ljava/lang/Throwable;)V
-	public final fun component1 ()Ljava/lang/Throwable;
-	public final fun copy (Ljava/lang/Throwable;)Larrow/retrofit/adapter/either/networkhandling/IOError;
-	public static synthetic fun copy$default (Larrow/retrofit/adapter/either/networkhandling/IOError;Ljava/lang/Throwable;ILjava/lang/Object;)Larrow/retrofit/adapter/either/networkhandling/IOError;
+	public fun <init> (Ljava/io/IOException;)V
+	public final fun component1 ()Ljava/io/IOException;
+	public final fun copy (Ljava/io/IOException;)Larrow/retrofit/adapter/either/networkhandling/IOError;
+	public static synthetic fun copy$default (Larrow/retrofit/adapter/either/networkhandling/IOError;Ljava/io/IOException;ILjava/lang/Object;)Larrow/retrofit/adapter/either/networkhandling/IOError;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCause ()Ljava/lang/Throwable;
+	public final fun getCause ()Ljava/io/IOException;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
