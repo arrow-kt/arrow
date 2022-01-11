@@ -268,8 +268,8 @@ configuration:
 ```xml
 
 <repository>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     <snapshots>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         <updatePolicy>always</updatePolicy>
     </snapshots>
 </repository>
