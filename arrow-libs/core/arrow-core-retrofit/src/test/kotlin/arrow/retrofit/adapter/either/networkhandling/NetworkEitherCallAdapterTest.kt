@@ -5,10 +5,14 @@ import arrow.core.left
 import arrow.core.right
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
@@ -16,16 +20,17 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.io.EOFException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
+@ExperimentalSerializationApi
 class NetworkEitherCallAdapterTestSuite : StringSpec({
   include(networkEitherCallAdapterTests(GsonConverterFactory.create()))
   include(networkEitherCallAdapterTests(MoshiConverterFactory.create()))
+  include(networkEitherCallAdapterTests(Json.asConverterFactory("application/json".toMediaType())))
 })
 
-fun networkEitherCallAdapterTests(
+private fun networkEitherCallAdapterTests(
   jsonConverterFactory: Converter.Factory
 ) = stringSpec {
   var server: MockWebServer? = null
@@ -110,12 +115,11 @@ fun networkEitherCallAdapterTests(
     body shouldBe Unit.right()
   }
 
-  "should return IOError when service method returns type other than Unit but null body received" {
+  "should return CallError when service method returns type other than Unit but null body received" {
     server!!.enqueue(MockResponse())
 
     val body = service!!.getEither()
 
-    body.shouldBeInstanceOf<Left<IOError>>()
-      .value.cause.shouldBeInstanceOf<EOFException>()
+    body.shouldBeInstanceOf<Left<CallError>>()
   }
 }

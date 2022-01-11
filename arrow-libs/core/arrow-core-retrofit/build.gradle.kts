@@ -2,6 +2,7 @@ plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.kotlinx.serialization) // Needed for testing only
 }
 
 apply(from = property("TEST_COVERAGE"))
@@ -18,4 +19,6 @@ dependencies {
   testImplementation(libs.squareup.okhttpMockWebServer)
   testImplementation(libs.squareup.retrofitConverterGson)
   testImplementation(libs.squareup.retrofitConverterMoshi)
+  testImplementation(libs.kotlinx.serializationJson)
+  testImplementation(libs.jakewharton.retrofitConverterKotlinxSerialization)
 }
