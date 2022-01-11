@@ -64,12 +64,13 @@ private fun networkEitherCallAdapterTests(
     body shouldBe HttpError(code = 400, body = """{"errorCode":666}""").left()
   }
 
-  "should return IOError for 200 with invalid JSON" {
+  "should return CallError for 200 with invalid JSON" {
     server!!.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
     val body = service!!.getEither()
 
-    body.shouldBeInstanceOf<Left<IOError>>()
+    body.shouldBeInstanceOf<Left<*>>()
+      .value.shouldBeInstanceOf<CallError>()
   }
 
   "should return HttpError for 400 and invalid JSON" {
@@ -77,8 +78,7 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    val value = body.shouldBeInstanceOf<Left<HttpError>>().value
-    value.shouldBe(HttpError(code = 400, body = """not a valid JSON"""))
+    body shouldBe HttpError(code = 400, body = """not a valid JSON""").left()
   }
 
   "should return IOError when server disconnects" {
@@ -86,8 +86,9 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    body.shouldBeInstanceOf<Left<IOError>>()
-      .value.cause.shouldBeInstanceOf<ConnectException>()
+    body.shouldBeInstanceOf<Left<*>>()
+      .value.shouldBeInstanceOf<IOError>()
+      .cause.shouldBeInstanceOf<ConnectException>()
   }
 
   "should return IOError when no response" {
@@ -95,8 +96,9 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    body.shouldBeInstanceOf<Left<IOError>>()
-      .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
+    body.shouldBeInstanceOf<Left<*>>()
+      .value.shouldBeInstanceOf<IOError>()
+      .cause.shouldBeInstanceOf<SocketTimeoutException>()
   }
 
   "should return Unit when service method returns Unit and null body received" {
@@ -120,6 +122,7 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    body.shouldBeInstanceOf<Left<CallError>>()
+    body.shouldBeInstanceOf<Left<*>>()
+      .value.shouldBeInstanceOf<CallError>()
   }
 }
