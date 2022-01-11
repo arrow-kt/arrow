@@ -3,116 +3,119 @@ package arrow.retrofit.adapter.either.networkhandling
 import arrow.core.Either.Left
 import arrow.core.left
 import arrow.core.right
-import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
-import com.google.gson.stream.MalformedJsonException
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
+import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.EOFException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
-class NetworkEitherCallAdapterTest : UnitSpec() {
+class NetworkEitherCallAdapterTestSuite : StringSpec({
+  include(networkEitherCallAdapterTests(GsonConverterFactory.create()))
+  include(networkEitherCallAdapterTests(MoshiConverterFactory.create()))
+})
 
-  private lateinit var server: MockWebServer
+fun networkEitherCallAdapterTests(
+  jsonConverterFactory: Converter.Factory
+) = stringSpec {
+  var server: MockWebServer? = null
+  var service: CallErrorTestClient? = null
 
-  private lateinit var service: CallErrorTestClient
+  beforeAny {
+    server = MockWebServer()
+    server!!.start()
+    service = Retrofit.Builder()
+      .baseUrl(server!!.url("/"))
+      .addConverterFactory(jsonConverterFactory)
+      .addCallAdapterFactory(EitherCallAdapterFactory.create())
+      .build()
+      .create(CallErrorTestClient::class.java)
+  }
+  afterAny { server!!.shutdown() }
 
-  init {
+  "should return ResponseMock for 200 with valid JSON" {
+    server!!.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
-    beforeAny {
-      server = MockWebServer()
-      server.start()
-      service = Retrofit.Builder()
-        .baseUrl(server.url("/"))
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(EitherCallAdapterFactory.create())
-        .build()
-        .create(CallErrorTestClient::class.java)
-    }
-    afterAny { server.shutdown() }
+    val body = service!!.getEither()
 
-    "should return ResponseMock for 200 with valid JSON" {
-      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+    body shouldBe ResponseMock("Arrow rocks").right()
+  }
 
-      val body = service.getEither()
+  "should return HttpError for 400" {
+    server!!.enqueue(MockResponse().setBody("""{"errorCode":666}""").setResponseCode(400))
 
-      body shouldBe ResponseMock("Arrow rocks").right()
-    }
+    val body = service!!.getEither()
 
-    "should return HttpError for 400" {
-      server.enqueue(MockResponse().setBody("""{"errorCode":666}""").setResponseCode(400))
+    body shouldBe HttpError(code = 400, body = """{"errorCode":666}""").left()
+  }
 
-      val body = service.getEither()
+  "should return IOError for 200 with invalid JSON" {
+    server!!.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
-      body shouldBe HttpError(code = 400, body = """{"errorCode":666}""").left()
-    }
+    val body = service!!.getEither()
 
-    "should return IOError for 200 with invalid JSON" {
-      server.enqueue(MockResponse().setBody("""not a valid JSON"""))
+    body.shouldBeInstanceOf<Left<IOError>>()
+  }
 
-      val body = service.getEither()
+  "should return HttpError for 400 and invalid JSON" {
+    server!!.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
-      body.shouldBeInstanceOf<Left<IOError>>()
-        .value.cause.shouldBeInstanceOf<MalformedJsonException>()
-    }
+    val body = service!!.getEither()
 
-    "should return HttpError for 400 and invalid JSON" {
-      server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
+    val value = body.shouldBeInstanceOf<Left<HttpError>>().value
+    value.shouldBe(HttpError(code = 400, body = """not a valid JSON"""))
+  }
 
-      val body = service.getEither()
+  "should return IOError when server disconnects" {
+    server!!.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AT_START })
 
-      val value = body.shouldBeInstanceOf<Left<HttpError>>().value
-      value.shouldBe(HttpError(code = 400, body = """not a valid JSON"""))
-    }
+    val body = service!!.getEither()
 
-    "should return IOError when server disconnects" {
-      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AT_START })
+    body.shouldBeInstanceOf<Left<IOError>>()
+      .value.cause.shouldBeInstanceOf<ConnectException>()
+  }
 
-      val body = service.getEither()
+  "should return IOError when no response" {
+    server!!.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.NO_RESPONSE })
 
-      body.shouldBeInstanceOf<Left<IOError>>()
-        .value.cause.shouldBeInstanceOf<ConnectException>()
-    }
+    val body = service!!.getEither()
 
-    "should return IOError when no response" {
-      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.NO_RESPONSE })
+    body.shouldBeInstanceOf<Left<IOError>>()
+      .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
+  }
 
-      val body = service.getEither()
+  "should return Unit when service method returns Unit and null body received" {
+    server!!.enqueue(MockResponse().setResponseCode(204))
 
-      body.shouldBeInstanceOf<Left<IOError>>()
-        .value.cause.shouldBeInstanceOf<SocketTimeoutException>()
-    }
+    val body = service!!.postSomething("Sample string")
 
-    "should return Unit when service method returns Unit and null body received" {
-      server.enqueue(MockResponse().setResponseCode(204))
+    body shouldBe Unit.right()
+  }
 
-      val body = service.postSomething("Sample string")
+  "should return Unit when service method returns Unit and JSON body received" {
+    server!!.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
-      body shouldBe Unit.right()
-    }
+    val body = service!!.postSomething("Sample string")
 
-    "should return Unit when service method returns Unit and JSON body received" {
-      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+    body shouldBe Unit.right()
+  }
 
-      val body = service.postSomething("Sample string")
+  "should return IOError when service method returns type other than Unit but null body received" {
+    server!!.enqueue(MockResponse())
 
-      body shouldBe Unit.right()
-    }
+    val body = service!!.getEither()
 
-    "should return IOError when service method returns type other than Unit but null body received" {
-      server.enqueue(MockResponse())
-
-      val body = service.getEither()
-
-      body.shouldBeInstanceOf<Left<IOError>>()
-        .value.cause.shouldBeInstanceOf<EOFException>()
-    }
+    body.shouldBeInstanceOf<Left<IOError>>()
+      .value.cause.shouldBeInstanceOf<EOFException>()
   }
 }
