@@ -223,7 +223,7 @@ following properties:
 ```xml
 
 <properties>
-    <kotlin.version>1.5.31</kotlin.version>
+    <kotlin.version>1.6.10</kotlin.version>
     <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
@@ -234,7 +234,7 @@ Add the dependencies that you want to use:
 
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core-jvm</artifactId>
+    <artifactId>arrow-core</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 ```
