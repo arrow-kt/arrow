@@ -247,10 +247,10 @@ Execution failed for task ':arrow-core:apiCheck'.
   +++ /Users/john/projects/arrow/arrow-libs/core/arrow-core/build/api/arrow-core-retrofit.api
  ```
 
-To make the check pass you need to run the `apiDump` task in the subproject which API you modified (here `arrow-core` as example):
+To make the check pass you need to run:
 
 ```bash
-./gradlew :arrow-core:apiDump
+./gradlew apiDump
 ```
 
 This will generate updated `.api` files which you can then manually review (if the API changes are the ones you intended) and commit and push for the Arrow maintainers to review as well.
