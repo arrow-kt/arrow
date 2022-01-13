@@ -29,7 +29,7 @@ import kotlin.time.ExperimentalTime
  *    - All requests short-circuit/fail-fast with `ExecutionRejected`
  *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
  *
- *  3. [HalfOpen]: The [CircuitBreaker] is in this state while it's allowing a request to go through, as as a `test request`
+ *  3. [HalfOpen]: The [CircuitBreaker] is in this state while it's allowing a request to go through, as a `test request`
  *    - All other requests made while `test request` is still running will short-circuit/fail-fast.
  *    - If the `test request` succeeds then the [CircuitBreaker] is tripped back into [Closed], with the resetTimeout and the failures count also reset to initial values.
  *    - If the `test request` fails, then the [CircuitBreaker] is tripped back into [Open], the [resetTimeout] is multiplied by the [exponentialBackoffFactor], up to the configured [maxResetTimeout].
