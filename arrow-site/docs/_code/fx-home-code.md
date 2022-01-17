@@ -26,10 +26,14 @@ fun employee(name: String, company: Company): Employee =
 -->
 ```kotlin
 suspend fun process(): List<Employee> {
-    //maps each function to `::employee` in parallel
-    val audrey = parZip({ "Audrey" }, { company("Arrow") }) { name, company -> Employee(name, company) }
-    val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { name, company -> Employee(name, company) }
-    val candidates = listOf(audrey, pepe)
-    return candidates.parTraverse { hire(it) } //hires in parallel
+  // maps to 'Employee' in parallel using 'parZip'
+  val audrey = parZip({ "Audrey" }, { company("Arrow") }) { 
+    name, company -> Employee(name, company) 
+  } 
+  val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { 
+    name, company -> Employee(name, company) 
+  }
+  // hires in parallel using 'parTraverse'
+  return listOf(audrey, pepe).parTraverse { hire(it) } 
 }
 ```
