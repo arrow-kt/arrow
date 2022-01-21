@@ -29,14 +29,16 @@ public abstract class arrow/retrofit/adapter/either/networkhandling/CallError {
 }
 
 public final class arrow/retrofit/adapter/either/networkhandling/HttpError : arrow/retrofit/adapter/either/networkhandling/CallError {
-	public fun <init> (ILjava/lang/String;)V
+	public fun <init> (ILjava/lang/String;Ljava/lang/String;)V
 	public final fun component1 ()I
 	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (ILjava/lang/String;)Larrow/retrofit/adapter/either/networkhandling/HttpError;
-	public static synthetic fun copy$default (Larrow/retrofit/adapter/either/networkhandling/HttpError;ILjava/lang/String;ILjava/lang/Object;)Larrow/retrofit/adapter/either/networkhandling/HttpError;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (ILjava/lang/String;Ljava/lang/String;)Larrow/retrofit/adapter/either/networkhandling/HttpError;
+	public static synthetic fun copy$default (Larrow/retrofit/adapter/either/networkhandling/HttpError;ILjava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/retrofit/adapter/either/networkhandling/HttpError;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBody ()Ljava/lang/String;
 	public final fun getCode ()I
+	public final fun getMessage ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

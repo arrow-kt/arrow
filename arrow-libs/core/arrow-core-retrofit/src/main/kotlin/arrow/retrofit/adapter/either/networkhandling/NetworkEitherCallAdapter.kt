@@ -36,8 +36,12 @@ private class EitherCall<R>(
       private fun Response<R>.toEither(): Either<CallError, R> {
         // Http error response (4xx - 5xx)
         if (!isSuccessful) {
-          val errorBody = errorBody()?.string() ?: ""
-          return HttpError(code(), errorBody).left()
+          val errorBody = errorBody()!!.string()
+          return HttpError(
+            code = code(),
+            message = message(),
+            body = errorBody
+          ).left()
         }
 
         // Http success response with body

@@ -61,7 +61,11 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    body shouldBe HttpError(code = 400, body = """{"errorCode":666}""").left()
+    body shouldBe HttpError(
+      code = 400,
+      message = "Client Error",
+      body = """{"errorCode":666}"""
+    ).left()
   }
 
   "should return CallError for 200 with invalid JSON" {
@@ -78,7 +82,11 @@ private fun networkEitherCallAdapterTests(
 
     val body = service!!.getEither()
 
-    body shouldBe HttpError(code = 400, body = """not a valid JSON""").left()
+    body shouldBe HttpError(
+      code = 400,
+      message = "Client Error",
+      body = """not a valid JSON"""
+    ).left()
   }
 
   "should return IOError when server disconnects" {

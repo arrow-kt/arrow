@@ -10,7 +10,11 @@ public sealed class CallError
 /**
  * Http request returned an error response.
  */
-public data class HttpError(val code: Int, val body: String) : CallError()
+public data class HttpError(
+  val code: Int,
+  val message: String,
+  val body: String
+) : CallError()
 
 /**
  * IO error: no network, socket timeout etc. Check the [cause] for details.
