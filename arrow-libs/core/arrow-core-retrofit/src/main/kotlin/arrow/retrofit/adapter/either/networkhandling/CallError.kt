@@ -13,7 +13,7 @@ public sealed class CallError
 public data class HttpError(val code: Int, val body: String) : CallError()
 
 /**
- * IO error: no network, socket timeout, malformed JSON etc. Check the [cause] for details.
+ * IO error: no network, socket timeout etc. Check the [cause] for details.
  */
 public data class IOError(val cause: IOException) : CallError()
 
