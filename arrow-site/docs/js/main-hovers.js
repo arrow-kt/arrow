@@ -28,8 +28,8 @@ const fxArrowLogo = document.getElementById('fx-arrow-animation');
 // optics elements
 const opticsArrowLogo = document.getElementById('optics-arrow-animation');
 
-// meta elements
-const metaArrowLogo = document.getElementById('meta-arrow-animation');
+// analysis elements
+const analysisArrowLogo = document.getElementById('analysis-arrow-animation');
 
 // Features elements
 const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
@@ -65,10 +65,14 @@ function checkActiveFeature(arrowFeature) {
           commonHoverStyle(current_id);
           opticsHoverStyle();
           break;
-        case 'meta':
+        case 'analysis':
           commonHoverStyle(current_id);
-          metaHoverStyle();
+          analysisHoverStyle();
           break;
+        // case 'meta':
+        //   commonHoverStyle(current_id);
+        //   metaHoverStyle();
+        //   break;
         default:
           baseHoverStyle();
       }
@@ -149,7 +153,7 @@ function commonHoverStyle(id) {
   footerBrandDark.style.opacity = 0;
   footerBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
-  siteNav.classList.remove('core', 'fx', 'meta', 'optics');
+  siteNav.classList.remove('core', 'fx', 'analysis', 'meta', 'optics');
   arrayCategoryIconDark.map(obj => obj.style.opacity = 0);
   setOpacity(arrayCategoryIconWhite, id, 0.5);
   setOpacity(arrayHeaderCategoryRow, id, 0.5);
@@ -168,7 +172,7 @@ function coreHoverStyle() {
   }
   arrowFxAnimation.stop();
   arrowOpticsAnimation.stop();
-  arrowMetaAnimation.stop();
+  arrowAnalysisAnimation.stop();
 }
 
 function fxHoverStyle() {
@@ -179,7 +183,7 @@ function fxHoverStyle() {
   }
   arrowCoreAnimation.stop();
   arrowOpticsAnimation.stop();
-  arrowMetaAnimation.stop();
+  arrowAnalysisAnimation.stop();
 }
 
 function opticsHoverStyle() {
@@ -190,14 +194,14 @@ function opticsHoverStyle() {
   }
   arrowCoreAnimation.stop();
   arrowFxAnimation.stop();
-  arrowMetaAnimation.stop();
+  arrowAnalysisAnimation.stop();
 }
 
-function metaHoverStyle() {
+function analysisHoverStyle() {
   body.style.background = "#2E3B44 url('img/home/hover-lines-header.svg') repeat-x";
-  metaArrowLogo.style.opacity = 1;
+  analysisArrowLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    addClassName(siteNav, 'meta');
+    addClassName(siteNav, 'analysis');
   }
   arrowCoreAnimation.stop();
   arrowFxAnimation.stop();
@@ -249,7 +253,7 @@ function mobileMode() {
   arrayCategoryIconWhite.map(el => el.style.opacity = 0);
   arrayCategoryIconDark.map(el => el.style.opacity = 0);
   arrowBaseAnimation.stop();
-  siteNav.classList.remove('fx', 'meta', 'optics');
+  siteNav.classList.remove('fx', 'analysis', 'optics');
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'core');
   }
