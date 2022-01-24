@@ -269,9 +269,6 @@ configuration:
 
 <repository>
     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    <snapshots>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
 </repository>
 ```
 
