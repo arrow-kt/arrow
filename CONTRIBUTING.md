@@ -94,7 +94,7 @@ use the following priority check list:
 
 #### 1. Snippets for public API docs
 
-If the snippet is just docs for a public method of a type (as in arguments, return type, or how it should be used from call sites), that should be inlined in the Kdocs of that given method using Dokka. That's done under the actual type file. [Here you have a simple example for `Option` methods](https://github.com/arrow-kt/arrow/blob/11a65faa9eed23182994778fa0ce218b69bfc4ba/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt#L14).
+If the snippet is just docs for a public method of a type (as in arguments, return type, or how it should be used from call sites), that should be inlined in the Kdocs of that given method using Dokka and annotated with Knit (see above for more details). That's done under the actual type file. Here you have [a simple example for `Option` type](https://github.com/arrow-kt/arrow/blob/8659228f06bb44b2ea42d18b97d3dc0bdf424763/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/Option.kt#L19).
 
 That will automatically inline the docs of each method into the docs of the given data type. This is intended to be used just for public APIs exposed to users of the library.
 
@@ -104,29 +104,35 @@ Public docs in Arrow follow a particular structure that ensures users have a sim
 
 Declarations including classes, functions, and others must include docs in the following structure:
 
-All Kdocs should include a short header that describes what the data type or function is for and a triple backticks ``` fenced block demonstrating its use
+All Kdocs should include a short header that describes what the data type or function is for and a triple backticks ``` fenced block demonstrating its use (ending with an appropriate Knit annotation)
 
 for example
 
 ```kotlin
 /**
- * [Refined] is an Abstract class providing predicate validation in refined types companions.
- *
- * The example below shows a refined type `Positive` that ensures [Int] is > than 0.
+ * (...)
+ * 
+ * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
  * ```kotlin
- * import arrow.refinement.Refined
- * import arrow.refinement.ensure
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.none
  *
- * @JvmInline
- * value class Positive /* private constructor */ (val value: Int) {
- *  companion object : Refined<Int, Positive>(::Positive, {
- *    ensure((it > 0) to "$it should be > 0")
- *  })
+ * //sampleStart
+ * val someValue: Option<String> = Some("I am wrapped in something")
+ * val emptyValue: Option<String> = none()
+ * //sampleEnd
+ * fun main() {
+ *  println("value = $someValue")
+ *  println("emptyValue = $emptyValue")
  * }
  * ```
- */
-abstract class Refined<A, out B>
+ * <!--- KNIT example-option-01.kt -->
+ *  
+ * (...)
+ */ 
+public sealed class Option<out A> {
 ```
 
 #### 2. Snippets for broader samples
