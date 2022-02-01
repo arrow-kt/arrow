@@ -26,8 +26,13 @@ import kotlin.jvm.JvmInline
  * DSL for constructing Effect<R, A> values
  *
  * ```kotlin
- * import arrow.core.*
- * import arrow.core.computations.*
+ * import arrow.core.Either
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Validated
+ * import arrow.core.continuations.control
+ * import io.kotest.assertions.fail
+ * import io.kotest.matchers.shouldBe
  *
  * fun main() {
  *   control<String, Int> {
@@ -65,10 +70,10 @@ public interface Effect<R, A> {
    * ran the computation to completion it will [transform] the value [A] to [B].
    *
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.computations.*
+   * import arrow.core.continuations.control
+   * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * suspend fun main() {
    *   val shift = control<String, Int> {
    *     shift("Hello, World!")
    *   }.fold({ str: String -> str }, { int -> int.toString() })
@@ -167,13 +172,14 @@ public interface ControlEffect<R> {
   /**
    * Short-circuit the [Effect] computation with value [R].
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.computations.*
+   * import arrow.core.continuations.control
+   * import io.kotest.assertions.fail
+   * import io.kotest.matchers.shouldBe
    *
    * suspend fun main() {
    *   control<String, Int> {
    *     shift("SHIFT ME")
-   *   }.fold({ it shouldBe str }, { fail("Computation never finishes") })
+   *   }.fold({ it shouldBe "SHIFT ME" }, { fail("Computation never finishes") })
    * }
    * ```
    * <!--- KNIT example-control-03.kt -->
@@ -185,15 +191,17 @@ public interface ControlEffect<R> {
    *
    * ```kotlin
    * import arrow.core.Either
-   * import arrow.core.Either.Left
-   * import arrow.core.continuations.*
+   * import arrow.core.continuations.Effect
+   * import arrow.core.continuations.control
+   * import arrow.core.identity
+   * import io.kotest.matchers.shouldBe
    *
    * fun <E, A> Either<E, A>.toCont(): Effect<E, A> = control {
    *   fold({ e -> shift(e) }, ::identity)
    * }
    *
-   * fun main() {
-   *   val either = Either.Left(24)
+   * suspend fun main() {
+   *   val either = Either.Left("failed")
    *   control<String, Int> {
    *     val x: Int = either.toCont().bind()
    *     x
@@ -208,11 +216,12 @@ public interface ControlEffect<R> {
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.continuations.*
+   * import arrow.core.Either
+   * import arrow.core.continuations.control
+   * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
-   *   val either = Either.Right("shift")
+   * suspend fun main() {
+   *   val either = Either.Right(9)
    *   control<String, Int> {
    *     val x: Int = either.bind()
    *     x
@@ -231,10 +240,11 @@ public interface ControlEffect<R> {
    * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
    *
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.computations.*
+   * import arrow.core.Validated
+   * import arrow.core.continuations.control
+   * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * suspend fun main() {
    *   val validated = Validated.Valid(40)
    *   control<String, Int> {
    *     val x: Int = validated.bind()
@@ -255,8 +265,12 @@ public interface ControlEffect<R> {
    * shifting the result.
    *
    * ```kotlin
+   * import arrow.core.continuations.control
+   * import arrow.core.identity
+   * import io.kotest.matchers.shouldBe
+   *
    * private val default = "failed"
-   * fun main() {
+   * suspend fun main() {
    *   val result = Result.success(1)
    *   control<String, Int> {
    *     val x: Int = result.bind { _: Throwable -> default }
@@ -274,11 +288,15 @@ public interface ControlEffect<R> {
    * result.
    *
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.continuations.*
+   * import arrow.core.None
+   * import arrow.core.Option
+   * import arrow.core.continuations.control
+   * import arrow.core.getOrElse
+   * import arrow.core.identity
+   * import io.kotest.matchers.shouldBe
    *
    * private val default = "failed"
-   * fun main() {
+   * suspend fun main() {
    *   val option: Option<Int> = None
    *   control<String, Int> {
    *     val x: Int = option.bind { default }
@@ -299,10 +317,11 @@ public interface ControlEffect<R> {
    * Monadic version of [kotlin.require].
    *
    * ```kotlin
-   * import arrow.core.*
-   * import arrow.core.continuations.*
+   * import arrow.core.Either
+   * import arrow.core.continuations.control
+   * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * suspend fun main() {
    *   val condition = true
    *   val failure = "failed"
    *   val int = 4
@@ -323,10 +342,13 @@ public interface ControlEffect<R> {
  * `false` it will `shift` with the provided value [R]. Monadic version of [kotlin.requireNotNull].
  *
  * ```kotlin
- * import arrow.core.*
- * import arrow.core.computations.*
+ * import arrow.core.continuations.control
+ * import arrow.core.continuations.ensureNotNull
+ * import arrow.core.left
+ * import arrow.core.right
+ * import io.kotest.matchers.shouldBe
  *
- * fun main() {
+ * suspend fun main() {
  *   val failure = "failed"
  *   val int: Int? = null
  *   control<String, Int> {
