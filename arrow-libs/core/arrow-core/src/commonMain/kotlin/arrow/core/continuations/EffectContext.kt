@@ -24,7 +24,7 @@ public interface EffectContext<R> {
    *   }.fold({ it shouldBe "SHIFT ME" }, { fail("Computation never finishes") })
    * }
    * ```
-   * <!--- KNIT example-effect-03.kt -->
+   * <!--- KNIT example-effect-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
 
@@ -50,7 +50,7 @@ public interface EffectContext<R> {
    *   }.toEither() shouldBe either
    * }
    * ```
-   * <!--- KNIT example-effect-04.kt -->
+   * <!--- KNIT example-effect-02.kt -->
    */
   public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectContext::shift, ::identity)
 
@@ -70,7 +70,7 @@ public interface EffectContext<R> {
    *   }.toEither() shouldBe either
    * }
    * ```
-   * <!--- KNIT example-effect-05.kt -->
+   * <!--- KNIT example-effect-03.kt -->
    */
   public suspend fun <B> Either<R, B>.bind(): B =
     when (this) {
@@ -94,7 +94,7 @@ public interface EffectContext<R> {
    *   }.toValidated() shouldBe validated
    * }
    * ```
-   * <!--- KNIT example-effect-06.kt -->
+   * <!--- KNIT example-effect-04.kt -->
    */
   public suspend fun <B> Validated<R, B>.bind(): B =
     when (this) {
@@ -120,7 +120,7 @@ public interface EffectContext<R> {
    *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-07.kt -->
+   * <!--- KNIT example-effect-05.kt -->
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
@@ -146,7 +146,7 @@ public interface EffectContext<R> {
    *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-08.kt -->
+   * <!--- KNIT example-effect-06.kt -->
    */
   public suspend fun <B> Option<B>.bind(shift: () -> R): B =
     when (this) {
@@ -173,7 +173,7 @@ public interface EffectContext<R> {
    *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
    * }
    * ```
-   * <!--- KNIT example-effect-09.kt -->
+   * <!--- KNIT example-effect-07.kt -->
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
@@ -198,7 +198,7 @@ public interface EffectContext<R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-10.kt -->
+ * <!--- KNIT example-effect-08.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so top-level.
 public suspend fun <R, B : Any> EffectContext<R>.ensureNotNull(value: B?, shift: () -> R): B {
