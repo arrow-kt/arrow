@@ -1,14 +1,15 @@
-// This file was automatically generated from Control.kt by Knit tool. Do not edit.
+// This file was automatically generated from EffectContext.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect05
 
-import arrow.core.Either
 import arrow.core.continuations.effect
+import arrow.core.identity
 import io.kotest.matchers.shouldBe
 
+private val default = "failed"
 suspend fun main() {
-  val either = Either.Right(9)
+  val result = Result.success(1)
   effect<String, Int> {
-    val x: Int = either.bind()
+    val x: Int = result.bind { _: Throwable -> default }
     x
-  }.toEither() shouldBe either
+  }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
 }

@@ -1,4 +1,4 @@
-// This file was automatically generated from Control.kt by Knit tool. Do not edit.
+// This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect01
 
 import arrow.core.Either

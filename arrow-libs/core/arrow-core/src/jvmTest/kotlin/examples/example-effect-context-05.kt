@@ -1,18 +1,15 @@
 // This file was automatically generated from EffectContext.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffect06
+package arrow.core.examples.exampleEffectContext05
 
-import arrow.core.None
-import arrow.core.Option
 import arrow.core.continuations.effect
-import arrow.core.getOrElse
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 
 private val default = "failed"
 suspend fun main() {
-  val option: Option<Int> = None
+  val result = Result.success(1)
   effect<String, Int> {
-    val x: Int = option.bind { default }
+    val x: Int = result.bind { _: Throwable -> default }
     x
-  }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
+  }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
 }
