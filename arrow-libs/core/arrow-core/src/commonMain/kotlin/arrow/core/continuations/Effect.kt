@@ -4,14 +4,11 @@ import arrow.core.Either
 import arrow.core.EmptyValue
 import arrow.core.Ior
 import arrow.core.NonFatal
-import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -30,19 +27,19 @@ import kotlin.jvm.JvmInline
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Validated
- * import arrow.core.continuations.control
+ * import arrow.core.continuations.effect
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  *
- * fun main() {
- *   control<String, Int> {
+ * suspend fun main() {
+ *   effect<String, Int> {
  *     val x = Either.Right(1).bind()
  *     val y = Validated.Valid(2).bind()
  *     val z = Option(3).bind { "Option was empty" }
  *     x + y + z
  *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
  *
- *   control<String, Int> {
+ *   effect<String, Int> {
  *     val x = Either.Right(1).bind()
  *     val y = Validated.Valid(2).bind()
  *     val z: Int = None.bind { "Option was empty" }
@@ -50,9 +47,9 @@ import kotlin.jvm.JvmInline
  *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
  * }
  * ```
- * <!--- KNIT example-control-01.kt -->
+ * <!--- KNIT example-effect-01.kt -->
  */
-public fun <R, A> control(f: suspend ControlEffect<R>.() -> A): Effect<R, A> = EffectImpl(f)
+public fun <R, A> effect(f: suspend EffectContext<R>.() -> A): Effect<R, A> = EffectImpl(f)
 
 /**
  * [Effect] represents a suspending computation that runs will either
@@ -70,22 +67,22 @@ public interface Effect<R, A> {
    * ran the computation to completion it will [transform] the value [A] to [B].
    *
    * ```kotlin
-   * import arrow.core.continuations.control
+   * import arrow.core.continuations.effect
    * import io.kotest.matchers.shouldBe
    *
    * suspend fun main() {
-   *   val shift = control<String, Int> {
+   *   val shift = effect<String, Int> {
    *     shift("Hello, World!")
    *   }.fold({ str: String -> str }, { int -> int.toString() })
    *   shift shouldBe "Hello, World!"
    *
-   *   val res = control<String, Int> {
+   *   val res = effect<String, Int> {
    *     1000
    *   }.fold({ str: String -> str.length }, { int -> int })
    *   res shouldBe 1000
    * }
    * ```
-   * <!--- KNIT example-control-02.kt -->
+   * <!--- KNIT example-effect-02.kt -->
    */
   public suspend fun <B> fold(
     recover: suspend (shifted: R) -> B,
@@ -140,7 +137,7 @@ public interface Effect<R, A> {
   public suspend fun toOption(orElse: suspend (R) -> Option<A>): Option<A> = fold(orElse, ::Some)
 
   /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
-  public fun attempt(): Effect<R, Result<A>> = control {
+  public fun attempt(): Effect<R, Result<A>> = effect {
     try {
       Result.success(bind())
     } catch (e: Throwable) {
@@ -148,220 +145,23 @@ public interface Effect<R, A> {
     }
   }
 
-  public fun handleError(recover: suspend (R) -> A): Effect<Nothing, A> = control {
+  public fun handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
     fold(recover, ::identity)
   }
 
-  public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, A>): Effect<R2, A> = control {
+  public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, A>): Effect<R2, A> = effect {
     fold({ recover(it).bind() }, ::identity)
   }
 
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
-    control {
+    effect {
       fold(recover, transform)
     }
 
   public fun <R2, B> redeemWith(
     recover: suspend (R) -> Effect<R2, B>,
     transform: suspend (A) -> Effect<R2, B>
-  ): Effect<R2, B> = control { fold(recover, transform).bind() }
-}
-
-/** Context of the [Effect] DSL. */
-public interface ControlEffect<R> {
-  /**
-   * Short-circuit the [Effect] computation with value [R].
-   * ```kotlin
-   * import arrow.core.continuations.control
-   * import io.kotest.assertions.fail
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   control<String, Int> {
-   *     shift("SHIFT ME")
-   *   }.fold({ it shouldBe "SHIFT ME" }, { fail("Computation never finishes") })
-   * }
-   * ```
-   * <!--- KNIT example-control-03.kt -->
-   */
-  public suspend fun <B> shift(r: R): B
-
-  /**
-   * Runs the [Effect] to finish, returning [B] or [shift] in case of [R].
-   *
-   * ```kotlin
-   * import arrow.core.Either
-   * import arrow.core.continuations.Effect
-   * import arrow.core.continuations.control
-   * import arrow.core.identity
-   * import io.kotest.matchers.shouldBe
-   *
-   * fun <E, A> Either<E, A>.toCont(): Effect<E, A> = control {
-   *   fold({ e -> shift(e) }, ::identity)
-   * }
-   *
-   * suspend fun main() {
-   *   val either = Either.Left("failed")
-   *   control<String, Int> {
-   *     val x: Int = either.toCont().bind()
-   *     x
-   *   }.toEither() shouldBe either
-   * }
-   * ```
-   * <!--- KNIT example-control-04.kt -->
-   */
-  public suspend fun <B> Effect<R, B>.bind(): B = fold(this@ControlEffect::shift, ::identity)
-
-  /**
-   * Folds [Either] into [Effect], by returning [B] or a shift with [R].
-   *
-   * ```kotlin
-   * import arrow.core.Either
-   * import arrow.core.continuations.control
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   val either = Either.Right(9)
-   *   control<String, Int> {
-   *     val x: Int = either.bind()
-   *     x
-   *   }.toEither() shouldBe either
-   * }
-   * ```
-   * <!--- KNIT example-control-05.kt -->
-   */
-  public suspend fun <B> Either<R, B>.bind(): B =
-    when (this) {
-      is Either.Left -> shift(value)
-      is Either.Right -> value
-    }
-
-  /**
-   * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
-   *
-   * ```kotlin
-   * import arrow.core.Validated
-   * import arrow.core.continuations.control
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   val validated = Validated.Valid(40)
-   *   control<String, Int> {
-   *     val x: Int = validated.bind()
-   *     x
-   *   }.toValidated() shouldBe validated
-   * }
-   * ```
-   * <!--- KNIT example-control-06.kt -->
-   */
-  public suspend fun <B> Validated<R, B>.bind(): B =
-    when (this) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> shift(value)
-    }
-
-  /**
-   * Folds [Result] into [Effect], by returning [B] or a transforming [Throwable] into [R] and
-   * shifting the result.
-   *
-   * ```kotlin
-   * import arrow.core.continuations.control
-   * import arrow.core.identity
-   * import io.kotest.matchers.shouldBe
-   *
-   * private val default = "failed"
-   * suspend fun main() {
-   *   val result = Result.success(1)
-   *   control<String, Int> {
-   *     val x: Int = result.bind { _: Throwable -> default }
-   *     x
-   *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
-   * }
-   * ```
-   * <!--- KNIT example-control-07.kt -->
-   */
-  public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
-    fold(::identity) { throwable -> shift(transform(throwable)) }
-
-  /**
-   * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
-   * result.
-   *
-   * ```kotlin
-   * import arrow.core.None
-   * import arrow.core.Option
-   * import arrow.core.continuations.control
-   * import arrow.core.getOrElse
-   * import arrow.core.identity
-   * import io.kotest.matchers.shouldBe
-   *
-   * private val default = "failed"
-   * suspend fun main() {
-   *   val option: Option<Int> = None
-   *   control<String, Int> {
-   *     val x: Int = option.bind { default }
-   *     x
-   *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
-   * }
-   * ```
-   * <!--- KNIT example-control-08.kt -->
-   */
-  public suspend fun <B> Option<B>.bind(shift: () -> R): B =
-    when (this) {
-      None -> shift(shift())
-      is Some -> value
-    }
-
-  /**
-   * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
-   * Monadic version of [kotlin.require].
-   *
-   * ```kotlin
-   * import arrow.core.Either
-   * import arrow.core.continuations.control
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   val condition = true
-   *   val failure = "failed"
-   *   val int = 4
-   *   control<String, Int> {
-   *     ensure(condition) { failure }
-   *     int
-   *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
-   * }
-   * ```
-   * <!--- KNIT example-control-09.kt -->
-   */
-  public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
-    if (condition) Unit else shift(shift())
-}
-
-/**
- * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
- * `false` it will `shift` with the provided value [R]. Monadic version of [kotlin.requireNotNull].
- *
- * ```kotlin
- * import arrow.core.continuations.control
- * import arrow.core.continuations.ensureNotNull
- * import arrow.core.left
- * import arrow.core.right
- * import io.kotest.matchers.shouldBe
- *
- * suspend fun main() {
- *   val failure = "failed"
- *   val int: Int? = null
- *   control<String, Int> {
- *     ensureNotNull(int) { failure }
- *   }.toEither() shouldBe (int?.right() ?: failure.left())
- * }
- * ```
- * <!--- KNIT example-control-10.kt -->
- */
-@OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so top-level.
-public suspend fun <R, B : Any> ControlEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
-  contract { returns() implies (value != null) }
-  return value ?: shift(shift())
+  ): Effect<R2, B> = effect { fold(recover, transform).bind() }
 }
 
 /**
@@ -389,7 +189,7 @@ private class Token {
 }
 
 @JvmInline
-private value class EffectImpl<R, A>(private val f: suspend ControlEffect<R>.() -> A) : Effect<R, A> {
+private value class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() -> A) : Effect<R, A> {
 
   override fun attempt(): Effect<R, Result<A>> = EffectImpl {
     try {
@@ -402,10 +202,10 @@ private value class EffectImpl<R, A>(private val f: suspend ControlEffect<R>.() 
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested
   // folds
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-    suspendCoroutineUninterceptedOrReturn { control ->
+    suspendCoroutineUninterceptedOrReturn { continuation ->
       val token = Token()
       val effect =
-        object : ControlEffect<R> {
+        object : EffectContext<R> {
           // Shift away from this Continuation by intercepting it, and completing it with
           // ShiftCancellationException
           // This is needed because this function will never yield a result,
@@ -423,11 +223,11 @@ private value class EffectImpl<R, A>(private val f: suspend ControlEffect<R>.() 
 
       try {
         suspend { transform(f(effect)) }
-          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, control.context, control))
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, continuation.context, continuation))
       } catch (e: Internal) {
         if (token == e.token) {
           val f: suspend () -> B = { e.recover(e.shifted) as B }
-          f.startCoroutineUninterceptedOrReturn(control)
+          f.startCoroutineUninterceptedOrReturn(continuation)
         } else throw e
       }
     }
@@ -459,13 +259,13 @@ private class FoldContinuation<B>(
 }
 
 @JvmInline
-internal value class EagerControlDsl<R, A>(
-  private val control: suspend EagerControlEffect<R>.() -> A
-) : EagerControl<R, A> {
+internal value class EagerEffectDsl<R, A>(
+  private val control: suspend EagerEffectContext<R>.() -> A
+) : EagerEffect<R, A> {
   override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
     val token = Token()
     val effect =
-      object : EagerControlEffect<R> {
+      object : EagerEffectContext<R> {
         // Shift away from this Continuation by intercepting it, and completing it with
         // ShiftCancellationException
         // This is needed because this function will never yield a result,

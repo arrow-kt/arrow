@@ -20,6 +20,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowCoreTest)
+        implementation(projects.arrowFxCoroutines)
       }
     }
     jvmMain {
