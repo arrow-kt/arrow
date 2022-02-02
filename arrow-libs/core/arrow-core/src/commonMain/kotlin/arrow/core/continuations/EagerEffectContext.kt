@@ -5,6 +5,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.jvm.JvmInline
 
 @RestrictsSuspension
 public interface EagerEffectContext<R> {
@@ -25,8 +26,8 @@ private class Eager(val token: Token, val shifted: Any?, val recover: (Any?) -> 
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
-// change to inline value class after fix in 1.6.20
-internal data class EagerEffectDsl<R, A>(
+@JvmInline
+internal value class EagerEffectDsl<R, A>(
   private val f: suspend EagerEffectContext<R>.() -> A
 ) : EagerEffect<R, A> {
   override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {

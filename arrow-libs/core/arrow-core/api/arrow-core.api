@@ -2560,7 +2560,6 @@ public abstract interface class arrow/core/continuations/Effect {
 	public abstract fun toEither (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun toIor (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun toResult-gIAlu-s (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun toValidated (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2574,7 +2573,6 @@ public final class arrow/core/continuations/Effect$DefaultImpls {
 	public static fun toEither (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun toIor (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun toOption (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun toResult-gIAlu-s (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun toValidated (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2583,7 +2581,6 @@ public abstract interface class arrow/core/continuations/EffectContext {
 	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -2593,7 +2590,6 @@ public final class arrow/core/continuations/EffectContext$DefaultImpls {
 	public static fun bind (Larrow/core/continuations/EffectContext;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/EffectContext;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/EffectContext;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EffectContext;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/continuations/EffectContext;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

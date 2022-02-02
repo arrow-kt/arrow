@@ -114,12 +114,12 @@ public interface Effect<R, A> {
   public suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
-  /**
+  /*
    * [fold] the [Effect] into an [Result]. Where the shifted value [R] is mapped to [Result] by the
    * provided function [orElse], and result value [A] is mapped to [Result.success].
-   */
   public suspend fun toResult(orElse: suspend (R) -> Result<A>): Result<A> =
     fold(orElse) { a -> Result.success(a) }
+  */
 
   /**
    * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the

@@ -16,6 +16,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.jvm.JvmInline
 
 /** Context of the [Effect] DSL. */
 public interface EffectContext<R> {
@@ -128,10 +129,10 @@ public interface EffectContext<R> {
    *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-context-05.kt -->
-   */
+   * // <!--- KNIT example-effect-context-05.kt -->
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
+  */
 
   /**
    * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
@@ -154,7 +155,7 @@ public interface EffectContext<R> {
    *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-context-06.kt -->
+   * <!--- KNIT example-effect-context-05.kt -->
    */
   public suspend fun <B> Option<B>.bind(shift: () -> R): B =
     when (this) {
@@ -181,7 +182,7 @@ public interface EffectContext<R> {
    *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
    * }
    * ```
-   * <!--- KNIT example-effect-context-07.kt -->
+   * <!--- KNIT example-effect-context-06.kt -->
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
@@ -206,7 +207,7 @@ public interface EffectContext<R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-context-08.kt -->
+ * <!--- KNIT example-effect-context-07.kt -->
  */
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so top-level.
 public suspend fun <R, B : Any> EffectContext<R>.ensureNotNull(value: B?, shift: () -> R): B {
@@ -234,8 +235,8 @@ internal class Token {
   override fun toString(): String = "Token(${hashCode().toUInt().toString(16)})"
 }
 
-// change to inline value class after fix in 1.6.20
-internal data class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() -> A) : Effect<R, A> {
+@JvmInline
+internal value class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() -> A) : Effect<R, A> {
 
   @Suppress("MoveLambdaOutsideParentheses")
   override fun attempt(): Effect<R, Result<A>> = EffectImpl({
