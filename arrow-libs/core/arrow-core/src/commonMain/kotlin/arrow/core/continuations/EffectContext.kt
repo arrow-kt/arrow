@@ -251,7 +251,7 @@ internal data class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() 
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
     suspendCoroutineUninterceptedOrReturn { continuation ->
       val token = Token()
-      val effect: EffectContext<R> =
+      val effectContext: EffectContext<R> =
         object : EffectContext<R> {
           // Shift away from this Continuation by intercepting it, and completing it with
           // ShiftCancellationException
@@ -269,7 +269,7 @@ internal data class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() 
         }
 
       try {
-        suspend { transform(f(effect)) }
+        suspend { transform(f(effectContext)) }
           .startCoroutineUninterceptedOrReturn(FoldContinuation(token, continuation.context, continuation))
       } catch (e: Internal) {
         if (token == e.token) {
