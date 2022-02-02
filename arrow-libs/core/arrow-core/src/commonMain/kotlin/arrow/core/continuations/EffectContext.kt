@@ -6,8 +6,16 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.resume
 
 /** Context of the [Effect] DSL. */
 public interface EffectContext<R> {
@@ -205,3 +213,95 @@ public suspend fun <R, B : Any> EffectContext<R>.ensureNotNull(value: B?, shift:
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
+
+
+/**
+ * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level
+ * code, you can use this type to differentiate between a foreign [CancellationException] and the
+ * one from [Effect].
+ */
+public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
+
+//  Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
+// `recover`.
+private class Internal(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
+  ShiftCancellationException() {
+  override fun toString(): String = "ShiftCancellationException($message)"
+}
+
+// Class that represents a unique token by hash comparison
+internal class Token {
+  override fun toString(): String = "Token(${hashCode().toUInt().toString(16)})"
+}
+
+// change to inline value class after fix in 1.6.20
+internal data class EffectImpl<R, A>(private val f: suspend EffectContext<R>.() -> A) : Effect<R, A> {
+
+  @Suppress("MoveLambdaOutsideParentheses")
+  override fun attempt(): Effect<R, Result<A>> = EffectImpl({
+    try {
+      Result.success(f())
+    } catch (e: Throwable) {
+      Result.failure(e.nonFatalOrThrow())
+    }
+  })
+
+  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
+  // folds
+  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
+    suspendCoroutineUninterceptedOrReturn { continuation ->
+      val token = Token()
+      val effect: EffectContext<R> =
+        object : EffectContext<R> {
+          // Shift away from this Continuation by intercepting it, and completing it with
+          // ShiftCancellationException
+          // This is needed because this function will never yield a result,
+          // so it needs to be cancelled to properly support coroutine cancellation
+          override suspend fun <B> shift(r: R): B =
+          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+          // We have to throw CancellationException to signal the Continuation was cancelled, and we
+          // shifted away.
+          // This however also means that the user can try/catch shift and recover from the
+          // CancellationException and thus effectively recovering from the cancellation/shift.
+          // This means try/catch is also capable of recovering from monadic errors.
+            // See: ContSpec - try/catch tests
+            throw Internal(token, r, recover as suspend (Any?) -> Any?)
+        }
+
+      try {
+        suspend { transform(f(effect)) }
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, continuation.context, continuation))
+      } catch (e: Internal) {
+        if (token == e.token) {
+          val f: suspend () -> B = { e.recover(e.shifted) as B }
+          f.startCoroutineUninterceptedOrReturn(continuation)
+        } else throw e
+      }
+    }
+}
+
+/**
+ * Continuation that runs the `recover` function, after attempting to calculate [B]. In case we
+ * encounter a `shift` after suspension, we will receive [Result.failure] with
+ * [ShiftCancellationException]. In that case we still need to run `suspend (R) -> B`, which is what
+ * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
+ * the result.
+ */
+private class FoldContinuation<B>(
+  private val token: Token,
+  override val context: CoroutineContext,
+  private val parent: Continuation<B>
+) : Continuation<B> {
+  override fun resumeWith(result: Result<B>) {
+    result.fold(parent::resume) { throwable ->
+      if (throwable is Internal && token == throwable.token) {
+        val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
+        when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
+          COROUTINE_SUSPENDED -> Unit
+          else -> parent.resume(res as B)
+        }
+      } else parent.resumeWith(result)
+    }
+  }
+}
+
