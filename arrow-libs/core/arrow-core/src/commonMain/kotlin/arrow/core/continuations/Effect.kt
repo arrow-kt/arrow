@@ -43,7 +43,7 @@ import kotlin.coroutines.Continuation
 public fun <R, A> effect(f: suspend EffectContext<R>.() -> A): Effect<R, A> = EffectImpl(f)
 
 /**
- * [Effect] represents a suspending computation that runs will either
+ * [Effect] represents a suspending computation that runs and will either
  * - Complete with a value of [A].
  * - Short-circuit with a value of [R].
  *
