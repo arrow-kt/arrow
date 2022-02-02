@@ -120,6 +120,13 @@ public interface Effect<R, A> {
    */
   public suspend fun toOption(orElse: suspend (R) -> Option<A>): Option<A> = fold(orElse, ::Some)
 
+  /**
+   * [fold] the [Effect] into [A?].
+   * Where the shifted value [R] is mapped to [null] or results with a value [A].
+   */
+  public suspend fun orNull(): A? =
+    fold({ null }, ::identity)
+
   /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
   public fun attempt(): Effect<R, Result<A>> = effect {
     try {
