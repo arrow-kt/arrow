@@ -1,8 +1,7 @@
-package arrow.core.computations
+package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.Ior
-import arrow.core.continuations.ior
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
