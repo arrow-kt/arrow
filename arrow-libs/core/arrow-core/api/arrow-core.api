@@ -2656,6 +2656,10 @@ public final class arrow/core/continuations/IorEffectScope : arrow/core/continua
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/core/continuations/IorKt {
+	public static final fun ior (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class arrow/core/continuations/OptionEffectScope : arrow/core/continuations/EffectScope {
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2688,6 +2692,7 @@ public final class arrow/core/continuations/OptionEffectScope : arrow/core/conti
 
 public final class arrow/core/continuations/OptionKt {
 	public static final fun ensureNotNull (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun option (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toOption (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2702,17 +2707,6 @@ public final class arrow/core/continuations/Token {
 public final class arrow/core/continuations/either {
 	public static final field INSTANCE Larrow/core/continuations/either;
 	public final fun eager (Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
-	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/core/continuations/ior {
-	public static final field INSTANCE Larrow/core/continuations/ior;
-	public final fun invoke (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/core/continuations/option {
-	public static final field INSTANCE Larrow/core/continuations/option;
-	public final fun eager (Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

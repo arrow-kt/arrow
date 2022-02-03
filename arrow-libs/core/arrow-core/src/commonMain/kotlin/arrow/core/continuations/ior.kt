@@ -7,19 +7,16 @@ import arrow.core.Ior
 import arrow.core.identity
 import arrow.typeclasses.Semigroup
 
-@Suppress("ClassName")
-public object ior {
-  public suspend inline operator fun <E, A> invoke(
-    semigroup: Semigroup<E>,
-    crossinline f: suspend IorEffectScope<E>.() -> A
-  ): Ior<E, A> =
-    effect<E, Ior<E, A>> {
-      val effect = IorEffectScope(semigroup, this)
-      val res = f(effect)
-      val leftState = effect.leftState.get()
-      if (leftState === EmptyValue) Ior.Right(res) else Ior.Both(EmptyValue.unbox(leftState), res)
-    }.fold({ Ior.Left(it) }, ::identity)
-}
+public suspend inline fun <E, A> ior(
+  semigroup: Semigroup<E>,
+  crossinline f: suspend IorEffectScope<E>.() -> A
+): Ior<E, A> =
+  effect<E, Ior<E, A>> {
+    val effect = IorEffectScope(semigroup, this)
+    val res = f(effect)
+    val leftState = effect.leftState.get()
+    if (leftState === EmptyValue) Ior.Right(res) else Ior.Both(EmptyValue.unbox(leftState), res)
+  }.fold({ Ior.Left(it) }, ::identity)
 
 public class IorEffectScope<E>(semigroup: Semigroup<E>, private val effect: EffectScope<E>) :
   EffectScope<E>, Semigroup<E> by semigroup {

@@ -7,7 +7,7 @@ import arrow.core.continuations.effect
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 
-fun <E, A> Either<E, A>.toCont(): Effect<E, A> = effect {
+suspend fun <E, A> Either<E, A>.toCont(): Effect<E, A> = effect {
   fold({ e -> shift(e) }, ::identity)
 }
 
