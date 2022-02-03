@@ -52,7 +52,7 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
 }
 
 /**
- * `RestrictsSuspension` version of `Effect<R, A>`. This version runs eagerly, can can be used in
+ * `RestrictsSuspension` version of `Effect<R, A>`. This version runs eagerly, and can be used in
  * non-suspending code.
  */
 public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.() -> A): EagerEffect<R, A> =
