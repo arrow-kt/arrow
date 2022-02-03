@@ -1,8 +1,6 @@
 package arrow.core.continuations
 
 import arrow.core.Either
-import arrow.core.computations.either
-import arrow.core.computations.ensureNotNull
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
