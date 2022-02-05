@@ -1,5 +1,6 @@
 package arrow.optics.plugin
 
+import arrow.optics.plugin.internals.typeParametersErrorMessage
 import org.junit.jupiter.api.Test
 
 class LensTests {
@@ -31,5 +32,35 @@ class LensTests {
       |val i: Lens<LensesSecondaryConstructor, String> = LensesSecondaryConstructor.fieldString
       |val r = i != null
       """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses which mentions imported elements`() {
+    """
+      |$imports
+      |import kotlin.time.Duration
+      |
+      |@optics
+      |data class OpticsTest(val time: Duration) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<OpticsTest, Duration> = OpticsTest.time
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses which mentions type arguments`() {
+    """
+      |$imports
+      |@optics
+      |data class OpticsTest<A>(val field: A) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<OpticsTest, Int> = OpticsTest<Int>.time
+      |val r = i != null
+      """.failsWith { it.contains("OpticsTest".typeParametersErrorMessage) }
   }
 }

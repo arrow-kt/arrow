@@ -45,9 +45,16 @@ jobs:
           java-version: 11
 
       - name: build
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os != 'windows-latest'
         with:
           arguments: --full-stacktrace build
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace mingwX64Test
 
       - id: get-arrow-version
         name: Get Arrow version
@@ -67,6 +74,9 @@ jobs:
     timeout-minutes: 120
     runs-on: macos-latest
 
+    outputs:
+      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -78,8 +88,12 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - id: get-arrow-version
+        name: Get Arrow version
+        run: echo "::set-output name=arrow-version::${{needs.build.outputs.arrow-version}}"
+
       - name: Publish alpha/beta/rc version
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
         if: |
           contains(needs.build.outputs.arrow-version, 'alpha') ||
           contains(needs.build.outputs.arrow-version, 'beta') ||
@@ -88,7 +102,7 @@ jobs:
           arguments: --full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
         if: |
           !contains(needs.build.outputs.arrow-version, 'alpha') &&
           !contains(needs.build.outputs.arrow-version, 'beta') &&
@@ -133,7 +147,7 @@ jobs:
           bundle install --gemfile Gemfile
 
       - name: Create API doc
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
         with:
           arguments: --full-stacktrace dokkaGfm
 
@@ -152,19 +166,19 @@ jobs:
       - name: Build release directory (/docs)
         working-directory: arrow-site
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
           bundle exec jekyll build -b docs -s docs
-          tree _site > $BASEDIR/logs/content_docs-${{ needs.build.outputs.arrow-version }}.log
+          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
 
       - name: Publish documentation (/docs)
         working-directory: arrow-site
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/sync-docs-with-aws.sh
@@ -172,21 +186,21 @@ jobs:
       - name: Build release directory (/docs/<major.minor>)
         working-directory: arrow-site
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
-          bundle exec jekyll build -b docs/${{ needs.build.outputs.arrow-version }} -s docs
-          tree _site > $BASEDIR/logs/content_docs-${{ needs.build.outputs.arrow-version }}.log
+          bundle exec jekyll build -b docs/${{ needs.publish.outputs.arrow-version }} -s docs
+          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
 
       - name: Publish release directory (/docs/<major.minor>)
         working-directory: arrow-site
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
-          aws s3 sync _site s3://$S3_BUCKET/docs/${{ needs.build.outputs.arrow-version }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/${{ needs.publish.outputs.arrow-version }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
       - name: Build latest version (/docs/next)
         working-directory: arrow-site
@@ -201,9 +215,9 @@ jobs:
 
       - name: Publish sitemap.xml
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
