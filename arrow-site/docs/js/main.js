@@ -117,15 +117,15 @@ function loadEvent() {
     }
   });
 
-  // meta elements
-  const metaPlayHover = document.getElementById('meta');
+  // analysis elements
+  const analysisPlayHover = document.getElementById('analysis');
 
-  metaPlayHover.addEventListener('mouseenter', () => {
+  analysisPlayHover.addEventListener('mouseenter', () => {
     if (screenSize() > mobileModeBreakPoint) {
       arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-      metaPlayHover.classList.add('active');
+      analysisPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
-      arrowMetaAnimation.play();
+      arrowAnalysisAnimation.play();
       arrowBaseAnimation.stop();
     }
   });

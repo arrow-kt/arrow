@@ -1,5 +1,5 @@
 plugins {
-  id(libs.plugins.kotlin.multiplatform.get().pluginId)
+  id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
 }
@@ -7,8 +7,6 @@ plugins {
 kotlin {
   explicitApi = null
 }
-
-apply(plugin = "io.kotest.multiplatform")
 
 apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))

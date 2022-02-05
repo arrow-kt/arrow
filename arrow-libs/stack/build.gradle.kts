@@ -4,7 +4,6 @@ plugins {
 }
 
 group = property("projects.group").toString()
-version = property("projects.version").toString()
 
 dependencies {
   constraints {

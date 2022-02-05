@@ -11,6 +11,10 @@ pluginManagement {
     }
 }
 
+plugins {
+  id("com.gradle.enterprise") version "3.8.1"
+}
+
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
@@ -62,3 +66,10 @@ project(":arrow-stack").projectDir = file("arrow-libs/stack")
 // SITE
 include("arrow-site")
 project(":arrow-site").projectDir = file("arrow-site")
+
+gradleEnterprise {
+  buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+  }
+}

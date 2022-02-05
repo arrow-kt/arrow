@@ -2,7 +2,7 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.ksp)
+//  alias(libs.plugins.ksp)
 }
 
 apply(plugin = "io.kotest.multiplatform")
@@ -42,18 +42,19 @@ kotlin {
   }
 }
 
-fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
-  val exclude = setOf("commonTest", "nativeTest")
-  kotlin.sourceSets
-    .filter { it.name !in exclude && it.name.contains("Test") }
-    .forEach {
-      val task = "ksp${it.name.capitalize()}"
-      configurations.findByName(task)?.let {
-        add(task, dependencyNotation)
-      }
-    }
-}
+//fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
+//  val exclude = setOf("commonTest", "nativeTest")
+//  add("kspMetadata", dependencyNotation)
+//  kotlin.sourceSets
+//    .filter { it.name !in exclude && it.name.contains("Test") }
+//    .forEach {
+//      val task = "ksp${it.name.capitalize()}"
+//      configurations.findByName(task)?.let {
+//        add(task, dependencyNotation)
+//      }
+//    }
+//}
 
-dependencies {
-  kspTest(projects.arrowOpticsKspPlugin)
-}
+//dependencies {
+//  kspTest(projects.arrowOpticsKspPlugin)
+//}

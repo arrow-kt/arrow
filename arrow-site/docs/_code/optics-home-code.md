@@ -41,11 +41,13 @@ val <A> Optional<A, Street>.name: Optional<A, String>
 -->
 ```kotlin
   val john =
-  Employee("Audrey Tang",
-          Company("Arrow",
-                  Address("Functional city",
-                          Street(42, "lambda street"))))
+    Employee("Audrey Tang",
+             Company("Arrow",
+                     Address("Functional City",
+                             Street(42, "Lambda St."))))
 
-  val modified = Employee.company.address.street.name
-      .modify(john, String::toUpperCase)
+  // an optic is a reference to a piece of information
+  val optic = Employee.company.address.street.name
+  // which we then use to query or modify immutable data
+  val modified = optic.modify(john, String::toUpperCase)
 ```
