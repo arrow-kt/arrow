@@ -109,7 +109,7 @@ public interface Effect<R, A> {
     }
   }
 
-  public suspend fun handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
+  public fun handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
     fold(recover, ::identity)
   }
 
