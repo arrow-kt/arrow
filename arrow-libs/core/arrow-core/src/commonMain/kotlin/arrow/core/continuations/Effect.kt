@@ -122,7 +122,7 @@ public interface Effect<R, A> {
       fold(recover, transform)
     }
 
-  public suspend fun <R2, B> redeemWith(
+  public fun <R2, B> redeemWith(
     recover: suspend (R) -> Effect<R2, B>,
     transform: suspend (A) -> Effect<R2, B>
   ): Effect<R2, B> = effect { fold(recover, transform).bind() }
