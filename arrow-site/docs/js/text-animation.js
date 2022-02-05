@@ -91,4 +91,4 @@ function typeWriter(id, ar) {
   }
 }
 
-Resources
+// Resources

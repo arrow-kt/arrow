@@ -35,12 +35,22 @@ const arrowOpticsAnimation = lottie.loadAnimation({
   path: 'js/json/arrow-optics.json'
 });
 
-// meta animation
+// analysis animation
+const arrowAnalysisAnimation = lottie.loadAnimation({
+  container: document.getElementById('analysis-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: false,
+  path: 'js/json/arrow-analysis.json'
+});
+
+
+/* // meta animation
 const arrowMetaAnimation = lottie.loadAnimation({
   container: document.getElementById('meta-arrow-animation'),
   renderer: 'svg' / 'canvas' / 'html',
   loop: false,
   autoplay: false,
   path: 'js/json/arrow-meta.json'
-});
+}); */
 

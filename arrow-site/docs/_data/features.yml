@@ -12,7 +12,7 @@ content:
       id: core
 
     - title: FX
-      description: Functional Effects Framework companion to KotlinX Coroutines.
+      description: Functional Effects Framework companion to KotlinX Coroutines
       icon: img/home/arrow-fx-lines
       url: /fx/
       id: fx
@@ -22,6 +22,12 @@ content:
       icon: img/home/arrow-optics-lines
       url: /optics/
       id: optics
+
+    - title: Analysis
+      description: Pre-, post-condition, and invariant checks for your Kotlin code
+      icon: img/home/arrow-analysis-lines
+      url: /meta/analysis/
+      id: analysis
 
     - title: Meta
       description: Metaprogramming library for Kotlin compiler plugins

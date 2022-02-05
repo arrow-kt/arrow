@@ -5,8 +5,14 @@ val String.otherClassTypeErrorMessage
     """
       |$this cannot be annotated with @optics
       | ^
-      |
-      |Only data and sealed classes can be annotated with @optics annotation""".trimMargin()
+      |Only data and sealed classes can be annotated with @optics""".trimMargin()
+
+val String.typeParametersErrorMessage
+  get() =
+    """
+      |$this cannot be annotated with @optics
+      | ^
+      |Only classes with no type parameters can be annotated with @optics""".trimMargin()
 
 val String.lensErrorMessage
   get() =
@@ -56,10 +62,14 @@ val String.dslErrorMessage
   get() =
     """
       |Cannot generate DSL (arrow.optics.BoundSetter) for $this
-      |                                           ^
+      |                                                    ^
       |arrow.optics.OpticsTarget.DSL is an invalid @optics argument for $this.
       |It is only valid for data classes and sealed classes.
       """.trimMargin()
 
 val String.noCompanion
-  get() = "@optics annotated class $this needs to declare companion object."
+  get() =
+    """
+      |$this must declare a companion object
+      | ^
+      |A companion object is required for the generated optics""".trimMargin()

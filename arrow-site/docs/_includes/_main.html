@@ -4,6 +4,7 @@
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
       {% if item.id != "quickstart" %}
+      {% if item.id != "meta" %}
       <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url | relative_url }}">
         <div id="{{ item.id }}-header" class="item-header">
           <div id="icon-{{ item.id }}-content" class="icon-content">
@@ -15,6 +16,7 @@
           <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
       </a>
+      {% endif %}
       {% endif %}
       {% endfor %}
     </div>

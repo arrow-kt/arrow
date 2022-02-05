@@ -27,6 +27,8 @@ fun prepare(tool: Knife, ingredient: Lettuce): Either<InsufficientAmountOfLettuc
 -->
 ```kotlin
 suspend fun prepareLunch(): Either<CookingException, Salad> =
+  // with the 'either' computation block
+  // we follow a "fail fast" strategy
   either<CookingException, Salad> {
     val lettuce = takeFoodFromRefrigerator().bind()
     val knife = getKnife().bind()

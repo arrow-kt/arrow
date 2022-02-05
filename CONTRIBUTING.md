@@ -30,42 +30,61 @@ Can't find what you're looking for? Please, contact us at [#arrow on Kotlin Slac
 
 - JDK 8
 
-### Steps
+### Building the whole project
 
-To build all the libraries (compilation + tests) and examples:
+To build all the libraries (compilation + tests) and examples run in the project root (`arrow` directory):
 
 ```bash
-cd arrow-libs
 ./gradlew build
 ```
 
-To build just CORE libraries, FX libraries, OPTICS libraries, etc. select the correspondent directory.
+### Building a single library
 
-For instance, for CORE libraries:
+To build just CORE library, FX library, OPTICS library etc.:
+
+1. Find the Gradle subproject name by running
 
 ```bash
-cd arrow-libs/core
-./gradlew build
+./gradlew projects
+```
+
+E.g. for the CORE subproject you will get
+```
+Root project 'arrow'
+...
++--- Project ':arrow-core'
+```
+
+2.  Append `:build` after the subproject name and run this task. See also Gradle documentation [how to run subproject tasks.](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name)
+
+```bash
+./gradlew :arrow-core:build
 ```
 
 ## How to generate and validate the documentation
 
-Dokka is responsible for generating documentation based on source code annotations. Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
+Dokka is responsible for generating documentation based on source code annotations. [Knit](https://github.com/Kotlin/kotlinx-knit) is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
+
+The `build` task runs `knitCheck` to check if all Knit annotated code snippets in KDoc comments have been generated as examples. Knit code snippet annotations look like HTML comments inside KDoc:
+```kotlin
+/**
+ * ```kotlin
+ * // Code example goes here
+ * ```
+ * <!--- KNIT example-arrow-core-01.kt -->
+ */
+```
+
+If you added/changed any Knit annotated code snippets in the docs you have to run the `knit` task to (re-)generate the examples, otherwise your build will fail:
+
+```bash
+./gradlew knit
+```
 
 In order to generate the documentation and validate it:
 
 ```bash
-cd arrow-libs
 ./gradlew buildDoc
-```
-
-That Gradle task is equivalent to run Dokka and Ank:
-
-```bash
-cd arrow-libs
-./gradlew dokka
-cd ../arrow-site
-./gradlew runAnk
 ```
 
 ### Doc snippets policies
@@ -75,7 +94,7 @@ use the following priority check list:
 
 #### 1. Snippets for public API docs
 
-If the snippet is just docs for a public method of a type (as in arguments, return type, or how it should be used from call sites), that should be inlined in the Kdocs of that given method using Dokka. That's done under the actual type file. [Here you have a simple example for `Option` methods](https://github.com/arrow-kt/arrow/blob/11a65faa9eed23182994778fa0ce218b69bfc4ba/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt#L14).
+If the snippet is just docs for a public method of a type (as in arguments, return type, or how it should be used from call sites), that should be inlined in the Kdocs of that given method using Dokka and annotated with Knit (see above for more details). That's done under the actual type file. Here you have [a simple example for `Option` type](https://github.com/arrow-kt/arrow/blob/8659228f06bb44b2ea42d18b97d3dc0bdf424763/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/Option.kt#L19).
 
 That will automatically inline the docs of each method into the docs of the given data type. This is intended to be used just for public APIs exposed to users of the library.
 
@@ -85,53 +104,52 @@ Public docs in Arrow follow a particular structure that ensures users have a sim
 
 Declarations including classes, functions, and others must include docs in the following structure:
 
-All Kdocs should include a short header that describes what the data type or function is for and an `ank` fenced block demonstrating its use
+All Kdocs should include a short header that describes what the data type or function is for and a triple backticks ``` fenced block demonstrating its use (ending with an appropriate Knit annotation)
 
 for example
 
 ```kotlin
 /**
- * [Refined] is an Abstract class providing predicate validation in refined types companions.
- *
- * The example below shows a refined type `Positive` that ensures [Int] is > than 0.
+ * (...)
+ * 
+ * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
  * ```kotlin
- * import arrow.refinement.Refined
- * import arrow.refinement.ensure
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.none
  *
- * @JvmInline
- * value class Positive /* private constructor */ (val value: Int) {
- *  companion object : Refined<Int, Positive>(::Positive, {
- *    ensure((it > 0) to "$it should be > 0")
- *  })
+ * //sampleStart
+ * val someValue: Option<String> = Some("I am wrapped in something")
+ * val emptyValue: Option<String> = none()
+ * //sampleEnd
+ * fun main() {
+ *  println("value = $someValue")
+ *  println("emptyValue = $emptyValue")
  * }
  * ```
- */
-abstract class Refined<A, out B>
+ * <!--- KNIT example-option-01.kt -->
+ *  
+ * (...)
+ */ 
+public sealed class Option<out A> {
 ```
 
 #### 2. Snippets for broader samples
 
 If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.
 
-For the mentioned cases, you should double-check which `Ank` modifiers you want to use for the snippets (`silent`, `replace`, or `outFile(<file>)`). You'll find more details about each one of those in [Ank docs](https://github.com/arrow-kt/arrow-ank). See some real examples [on this docs PR](https://github.com/arrow-kt/arrow/pull/1134/files).
-
-Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add this `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making them runnable).
-
 ## How to run the website in your local workspace
 
 ```sh
-cd arrow-site
-./gradlew buildSite
+./gradlew :arrow-site:buildSite
 ```
 
-That Gradle task is equivalent to run Dokka, Ank and Jekyll build:
+That Gradle task is equivalent to run Dokka and Jekyll build:
 
 ```bash
-cd arrow-libs
-./gradlew dokka
-cd ../arrow-site
-./gradlew runAnk
+./gradlew dokkaGfm
+cd arrow-site
 bundle install --gemfile Gemfile --path vendor/bundle
 bundle exec jekyll serve -s build/site
 ```
@@ -158,13 +176,39 @@ Please, follow the link to [create an issue](https://github.com/arrow-kt/arrow/i
 
 ### How to create a pull request
 
+The easiest way to contribute to Arrow is to create a branch from a fork, and then create a PR on Github from your branch.
+
+Arrow is a large project that uses several tools to verify that the code is formatted consistently, and that we don't break downstream projects that rely on Arrow's API across versions. 
+
+For code formatting we use [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-gradle) with [KtFmt](https://github.com/facebookincubator/ktfmt) and for API binary compatibility we use [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator). They need to run before you commit and push your code to Github.
+
+If you've included those changes for binary compatibility and formatted the code correctly it's time to open your PR and get your contribution into Arrow. Thanks ahead of time for your effort and contributions 🙏
+
 #### Requirements to change an existing feature
 
-If you want to propose a fix, rename, move, etc. please, ensure that these checks pass:
+If you want to propose a fix, rename, move etc., please execute these required tasks and make sure they pass:
 
-* Required checks:
-    * `arrow libraries: build`
-    * `arrow libraries: build documentation`
+* If you changed/added [Knit](https://github.com/Kotlin/kotlinx-knit) annotated code snippets in KDocs:
+
+```bash
+./gradlew knit # (Re-)generate code examples from snippets in docs
+```
+
+* Required tasks:
+```bash
+./gradlew spotlessApply # Format code
+./gradlew build
+./gradlew buildDoc
+```
+
+Note: if, when running `build`, you see the following error:
+
+```bash
+> Task :arrow-core:apiCheck FAILED
+```
+
+This means you have changed (advertently or not) some public API. In this case read in the next point below how to resolve this.
+
 * The approval by 2 maintainers of the Arrow Community.
 
 #### Requirements to add a new feature
@@ -172,15 +216,46 @@ If you want to propose a fix, rename, move, etc. please, ensure that these check
 Please, ensure these points when adding a new feature:
 
 * Include documentation via [Dokka](https://kotlinlang.org/docs/reference/kotlin-doc.html). Please, find examples in the existing code to follow the same pattern.
-* [Use Ank to validate for code snippets](https://github.com/arrow-kt/arrow/blob/main/arrow-libs/ank/README.md)
 * Include tests that cover the proper cases
 
-When creating the pull request, ensure that these checks pass:
+When creating the pull request, please execute these required tasks and make sure they pass:
 
-* Required automatic checks:
-    * `arrow libraries: build`
-    * `arrow libraries: build documentation`
-* The approval by 2 maintainers of the Arrow Community.
+* If you changed/added [Knit](https://github.com/Kotlin/kotlinx-knit) annotated code snippets in KDocs:
+
+```bash
+./gradlew knit # (Re-)generate code examples from snippets in docs
+```
+
+* Required tasks:
+```bash
+./gradlew spotlessApply # Format code
+./gradlew build
+./gradlew buildDoc
+```
+
+Note: as part of the `build` task `apiCheck` is run. If you have added/changed any public APIs, this task will fail with a message like this one:
+
+```bash
+> Task :arrow-core:apiCheck FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':arrow-core:apiCheck'.
+> API check failed for project arrow-core.
+  --- /Users/john/projects/arrow/arrow-libs/core/arrow-core/api/arrow-core-retrofit.api
+  +++ /Users/john/projects/arrow/arrow-libs/core/arrow-core/build/api/arrow-core-retrofit.api
+ ```
+
+To make the check pass you need to run:
+
+```bash
+./gradlew apiDump
+```
+
+This will generate updated `.api` files which you can then manually review (if the API changes are the ones you intended) and commit and push for the Arrow maintainers to review as well.
+
+* The approval by 2 maintainers of the Arrow Community is required as well.
 
 #### How to download the tests report
 
@@ -204,12 +279,11 @@ If any of these actions fails, an issue will be created to be solved as soon as 
 
 ### How to upgrade Gradle
 
-The use of Gradle appears in several places: `arrow-libs`, `arrow-libs/core`, `arrow-stack`, etc.
+The use of Gradle appears in several subprojects: `arrow-core`, `arrow-stack`, etc.
 
-However, links are being used so it's just necessary to upgrade Gradle in `arrow-libs` directory:
+However, links are being used so it's just necessary to upgrade Gradle in the project root directory:
 
 ```
-cd arrow-libs
 ./gradlew wrapper --gradle-version <new-version>
 ```
 
@@ -219,8 +293,8 @@ This short guideline provides all the things to keep in mind when adding a new m
 
 - Configuration:
   - Add `<module>/gradle.properties`
-  - Add `<module>/build.gradle`
-  - Update `settings.xml`
+  - Add `<module>/build.gradle.kts`
+  - Update `settings.gradle.kts`
 - Website:
   - Update [sidebar files](arrow-site/docs/_data)
 - Utilities:
