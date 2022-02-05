@@ -117,7 +117,7 @@ public interface Effect<R, A> {
     fold({ recover(it).bind() }, ::identity)
   }
 
-  public suspend fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
+  public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
     effect {
       fold(recover, transform)
     }
