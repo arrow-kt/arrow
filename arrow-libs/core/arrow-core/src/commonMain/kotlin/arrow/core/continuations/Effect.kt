@@ -101,7 +101,7 @@ public interface Effect<R, A> {
   public suspend fun orNull(): A? = fold({ null }, ::identity)
 
   /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
-  public suspend fun attempt(): Effect<R, Result<A>> = effect {
+  public fun attempt(): Effect<R, Result<A>> = effect {
     try {
       Result.success(bind())
     } catch (e: Throwable) {
