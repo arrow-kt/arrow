@@ -2572,14 +2572,14 @@ public final class arrow/core/continuations/EagerEffectScopeKt {
 }
 
 public abstract interface class arrow/core/continuations/Effect {
-	public abstract fun attempt (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun attempt ()Larrow/core/continuations/Effect;
 	public abstract fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun handleError (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun handleErrorWith (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun handleError (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
+	public abstract fun handleErrorWith (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public abstract fun orNull (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun redeem (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun redeemWith (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun redeem (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
+	public abstract fun redeemWith (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public abstract fun toEither (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun toIor (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2587,13 +2587,13 @@ public abstract interface class arrow/core/continuations/Effect {
 }
 
 public final class arrow/core/continuations/Effect$DefaultImpls {
-	public static fun attempt (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun attempt (Larrow/core/continuations/Effect;)Larrow/core/continuations/Effect;
 	public static fun fold (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun handleError (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun handleErrorWith (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun handleError (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
+	public static fun handleErrorWith (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public static fun orNull (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun redeem (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun redeemWith (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun redeem (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
+	public static fun redeemWith (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public static fun toEither (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun toIor (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun toOption (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2601,7 +2601,7 @@ public final class arrow/core/continuations/Effect$DefaultImpls {
 }
 
 public final class arrow/core/continuations/EffectKt {
-	public static final fun effect (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun effect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 }
 
 public abstract interface class arrow/core/continuations/EffectScope {
