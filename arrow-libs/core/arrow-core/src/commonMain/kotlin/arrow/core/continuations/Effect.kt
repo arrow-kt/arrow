@@ -205,7 +205,7 @@ internal class FoldContinuation<B>(
  * ```
  * <!--- KNIT example-effect-02.kt -->
  */
-public suspend inline fun <R, A> effect(crossinline f: suspend EffectScope<R>.() -> A): Effect<R, A> =
+public inline fun <R, A> effect(crossinline f: suspend EffectScope<R>.() -> A): Effect<R, A> =
   object : Effect<R, A> {
     // We create a `Token` for fold Continuation, so we can properly differentiate between nested
     // folds
