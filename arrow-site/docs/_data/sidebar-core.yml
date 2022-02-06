@@ -52,6 +52,9 @@ options:
       - title: Coroutines & Computation blocks
         url: /fx/coroutines/
 
+      - title: Semantics of Structured Concurrency and Effect
+        url: /arrow/core/continuations/
+
   - title: Media
     url: https://media.arrow-kt.io/tags/core/
 

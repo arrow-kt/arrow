@@ -68,6 +68,7 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
   - [Kotlin's Std Lib Guide](https://kotlinlang.org/api/latest/jvm/stdlib/)
   - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
   - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
+  - [Semantics of Structured Concurrency and Effect]({{ '/arrow/core/continuations/' | relative_url }})
 </div>
 </div>
 </div>
