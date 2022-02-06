@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="96px" height="118px" viewBox="0 0 96 118" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Analysis@1x</title>
+    <defs>
+        <linearGradient x1="50%" y1="-7.62502133%" x2="50%" y2="76.062468%" id="linearGradient-1">
+            <stop stop-color="#132532" offset="0%"></stop>
+            <stop stop-color="#132532" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="51.4816284%" y1="8.80126953%" x2="50.0009385%" y2="99.9422305%" id="linearGradient-2">
+            <stop stop-color="#636363" offset="0.0821200284%"></stop>
+            <stop stop-color="#262626" offset="99.9366554%"></stop>
+        </linearGradient>
+        <linearGradient x1="51.4816284%" y1="8.80126953%" x2="50.0338651%" y2="97.9155031%" id="linearGradient-3">
+            <stop stop-color="#821B87" offset="0%"></stop>
+            <stop stop-color="#6400C6" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="51.4746136%" y1="9.23305049%" x2="50.0338651%" y2="97.9155031%" id="linearGradient-4">
+            <stop stop-color="#A52FB1" offset="0%"></stop>
+            <stop stop-color="#7300E3" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="4.44118049%" x2="50%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#D9D9D9" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.0899530157" offset="100%"></stop>
+        </linearGradient>
+        <path d="M37.9879007,3.92588806 L37.9879007,3.92588806 L37.9879007,3.92588806 L37.9879007,21.3931631 C37.9879007,27.9858895 34.7389131,34.1551232 29.3026462,37.8848742 L19.0055399,44.9495831 L19.0055399,44.9495831 L8.695855,37.882811 C3.25659942,34.154474 0.0047600485,27.984548 0.0034553365,21.3901567 L0,3.92588806 L0,3.92588806 C12.5302062,1.33600096 25.4576945,1.33600096 37.9879007,3.92588806 Z" id="path-6"></path>
+        <linearGradient x1="54.2329052%" y1="8.80126953%" x2="50.09675%" y2="97.9155031%" id="linearGradient-8">
+            <stop stop-color="#A32DB3" offset="0%"></stop>
+            <stop stop-color="#6400C6" offset="100%"></stop>
+        </linearGradient>
+        <path d="M62.3554917,64.518457 L62.3554917,64.518457 L62.3554917,64.518457 L62.3554917,75.1649805 C62.3554917,81.7577068 59.1065042,87.9269405 53.6702372,91.6566916 L47.9971768,95.5489035 L47.9971768,95.5489035 L42.3158347,91.6546283 C36.8765791,87.9262913 33.6247398,81.7563653 33.6234351,75.1619741 L33.6213292,64.518457 L33.6213292,64.518457 C43.099215,62.5594586 52.877606,62.5594586 62.3554917,64.518457 Z" id="path-9"></path>
+        <filter x="-5.2%" y="0.0%" width="110.4%" height="104.4%" filterUnits="objectBoundingBox" id="filter-10">
+            <feGaussianBlur stdDeviation="1" in="SourceAlpha" result="shadowBlurInner1"></feGaussianBlur>
+            <feOffset dx="0" dy="1" in="shadowBlurInner1" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.183848911   0 0 0 0 0.0409700588   0 0 0 0 0.197391234  0 0 0 0.592220386 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-13-Copy" transform="translate(-645.000000, -341.000000)">
+            <g id="Analysis" transform="translate(645.000000, 341.000000)">
+                <polygon id="Path-5" fill-opacity="0.7" fill="url(#linearGradient-1)" points="0 96 48.0029907 72 96 96 48 117.773437"></polygon>
+                <polygon id="Path" fill="url(#linearGradient-2)" transform="translate(72.000000, 48.000000) scale(-1, 1) translate(-72.000000, -48.000000) " points="96 0 48 96 96 72"></polygon>
+                <polygon id="Path" fill="url(#linearGradient-3)" points="48 0 0 96 48 72"></polygon>
+                <polygon id="Path" fill="url(#linearGradient-4)" transform="translate(72.000000, 48.000000) scale(-1, 1) translate(-72.000000, -48.000000) " points="96 0 48 96 96 72"></polygon>
+                <path d="M66.9823608,60 L66.9823608,60 L66.9823608,60 L66.9823608,77.4672751 C66.9823608,84.0600014 63.7333733,90.2292351 58.2971063,93.9589862 L48,101.023695 L48,101.023695 L37.6903151,93.9569229 C32.2510595,90.2285859 28.9992202,84.0586599 28.9979155,77.4642687 L28.9944601,60 L28.9944601,60 C41.5246664,57.4101129 54.4521546,57.4101129 66.9823608,60 Z" id="path-copy" fill="#FFFFFF"></path>
+                <g id="Rectangle" transform="translate(28.994460, 56.074112)">
+                    <mask id="mask-7" fill="white">
+                        <use xlink:href="#path-6"></use>
+                    </mask>
+                    <use id="Mask" fill-opacity="0.7" fill="url(#linearGradient-5)" xlink:href="#path-6"></use>
+                    <rect fill="#D8D8D8" mask="url(#mask-7)" x="19.0055399" y="1.92588806" width="19" height="43"></rect>
+                </g>
+                <g id="path-copy-2">
+                    <use fill="url(#linearGradient-8)" fill-rule="evenodd" xlink:href="#path-9"></use>
+                    <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+                </g>
+                <polyline id="Path-26" stroke="#FFFFFF" stroke-width="5" points="40.323349 76.9363785 46.5322571 83.2677612 57.1893349 71.7447205"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

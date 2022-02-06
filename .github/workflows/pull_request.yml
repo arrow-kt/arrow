@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -25,23 +25,17 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: appleTest
-        uses: gradle/gradle-build-action@v2.0.1
-        if: matrix.os == 'macos-latest'
+      - name: build
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os != 'windows-latest'
         with:
-          arguments: --full-stacktrace --scan appleTest
-
-      - name: Ubuntu build
-        uses: gradle/gradle-build-action@v2.0.1
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          arguments: --full-stacktrace --scan build
+          arguments: --full-stacktrace build
 
       - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.3
         if: matrix.os == 'windows-latest'
         with:
-          arguments: --full-stacktrace --scan mingwX64Test
+          arguments: --full-stacktrace mingwX64Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.3.1
@@ -68,7 +62,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.3
         with:
           arguments: apiDump
 
@@ -76,7 +70,7 @@ jobs:
         run: ./gradlew --stop
 
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4.12.0
+        uses: stefanzweifel/git-auto-commit-action@v4.13.1
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api

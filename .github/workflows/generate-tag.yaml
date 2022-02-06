@@ -27,7 +27,7 @@ on:
           - 'auto'
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -46,7 +46,9 @@ jobs:
           java-version: 11
 
       - name: Gradle build
-        run: ./gradlew build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          arguments: --full-stacktrace build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
@@ -71,7 +73,9 @@ jobs:
           java-version: 11
 
       - name: Generate Tag
-        run: ./gradlew createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          arguments: --full-stacktrace createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
       - name: Push
         run: git push --follow-tags

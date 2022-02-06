@@ -7,6 +7,7 @@ import arrow.optics.plugin.internals.join
 import arrow.optics.plugin.internals.noCompanion
 import arrow.optics.plugin.internals.otherClassTypeErrorMessage
 import arrow.optics.plugin.internals.snippets
+import arrow.optics.plugin.internals.typeParametersErrorMessage
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -36,14 +37,21 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
       return
     }
 
+    // check that it does not have type arguments
+    if (klass.typeParameters.isNotEmpty()) {
+      logger.error(klass.simpleName.asString().typeParametersErrorMessage, klass)
+      return
+    }
+
     // check that the companion object exists
-    val companion = klass.companionObject
-    if (companion == null) {
+    if (klass.companionObject == null) {
       logger.error(klass.simpleName.asString().noCompanion, klass)
       return
     }
 
-    adt(klass, logger).snippets().groupBy(Snippet::fqName).values.map(List<Snippet>::join).forEach {
+    val adts = adt(klass, logger)
+    val snippets = adts.snippets()
+    snippets.groupBy(Snippet::fqName).values.map(List<Snippet>::join).forEach {
       val writer =
         codegen
           .createNewFile(
