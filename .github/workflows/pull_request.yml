@@ -26,9 +26,16 @@ jobs:
           java-version: 11
 
       - name: build
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os != 'windows-latest'
         with:
           arguments: --full-stacktrace build
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace mingwX64Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v2.3.1
@@ -55,7 +62,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.1.0
+        uses: gradle/gradle-build-action@v2.1.3
         with:
           arguments: apiDump
 
@@ -63,7 +70,7 @@ jobs:
         run: ./gradlew --stop
 
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4.12.0
+        uses: stefanzweifel/git-auto-commit-action@v4.13.1
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api

@@ -16,7 +16,7 @@ You can find all functions and extension functions for Kotlin's Std in the API d
 
 ## Parallelization & Concurrency
 
-Arrow Fx comes with a set of built-in concurrent and parallel functions and data types that acompany what you find in KotlinX Coroutines. This allows users to write complex parallel and concurrent code in suspend style, in a elegant and imperative way without wrappers.
+Arrow Fx comes with a set of built-in concurrent and parallel functions and data types that accompany what you find in KotlinX Coroutines. This allows users to write complex parallel and concurrent code in suspend style, in a elegant and imperative way without wrappers.
 
 To follow [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async), all parallel suspend operators in Arrow Fx behave in the following way:
 
@@ -65,7 +65,7 @@ Exception in thread "main" java.lang.RuntimeException: Boom
 
 #### Parallel cancellation
 
-All parallel functions guarantee that if they get cancelled, that all children will also get cancelled before the parallel function returns. This allows the other paralell running tasks to gracefully exit and close their resources before returning.
+All parallel functions guarantee that if they get cancelled, that all children will also get cancelled before the parallel function returns. This allows the other parallel running tasks to gracefully exit and close their resources before returning.
 
 ```
 import arrow.fx.coroutines.*
@@ -99,7 +99,7 @@ Exception in thread "main" kotlinx.coroutines.JobCancellationException: Deferred
 ```
 
  In the snippet above we can see that first task finished immediately and prints `ExitCase.Completed`, the second task _never_ completes, and it gets cancelled with `ExitCase.Cancelled` by the parent scope.
- After `parZip` has gracefully cancelled all it's children, `async` will throw the `JobCancellationException`.
+ After `parZip` has gracefully cancelled all its children, `async` will throw the `JobCancellationException`.
  
  All parallel operators you find in Arrow Fx Coroutines follow this same pattern when exceptions occur.
 
@@ -107,9 +107,9 @@ Exception in thread "main" kotlinx.coroutines.JobCancellationException: Deferred
 
 The cancellation system is inherited from KotlinX Coroutines and works the same. See [KotlinX Coroutines documentation on cancellation](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html).
 
-All operators found in Arrow Fx check for cancellation, and make you `suspend` code cancellable.
+All operators found in Arrow Fx check for cancellation, and make your `suspend` code cancellable.
 
-A small example of an infinite loop below, where `parZip` checks for cancellation and this the `sleeper` function is cancellable even though it runs in an infinite recursion loop.
+A small example of an infinite loop below, where `parZip` checks for cancellation and the `sleeper` function is cancellable even though it runs in an infinite recursion loop.
 
 ```kotlin
 import arrow.fx.coroutines.*
@@ -140,7 +140,7 @@ suspend fun main(): Unit = coroutineScope {
 
 ### Racing parallel operations
 
-Racing parallel task has an additional propety to the ones described above.
+Racing parallel tasks has an additional propety to the ones described above.
 
 When racing multiple parallel tasks against each-other, the winning task cancels the others. When the winner of a race is known, we can cancel all other tasks because their results will get discarded anyway.
 This allows the other paralell running tasks to gracefully exit and close their resources as soon as possible.
@@ -165,6 +165,6 @@ I can never win the race. Finished with Cancelled(exception=kotlinx.coroutines.J
 Either.Right(I am going to win, immediately)
 ```
 
-Here we see that if we race a first task that is never going to finish, with a second task that wins immediately that the first losing task gets cancelled before we declare the second task the winner.
+Here we see that if we race a first task that is never going to finish with a second task that wins immediately, the first losing task gets cancelled before we declare the second task the winner.
 
 So this also follows the pattern of [Structured Concurrency](https://kotlinlang.org/docs/composing-suspending-functions.html#structured-concurrency-with-async), where all children are completed before continuing. 
