@@ -1,5 +1,5 @@
 // This file was automatically generated from EffectScope.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffectContext08
+package arrow.core.examples.exampleEffectScope09
 
 import arrow.core.continuations.effect
 import arrow.core.continuations.ensureNotNull
