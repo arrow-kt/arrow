@@ -68,7 +68,6 @@ class EagerEffectSpec : StringSpec({
     Either.catch { eagerEffect<Nothing, Nothing> { throw e }.runCont() } shouldBe Either.Left(e)
   }
 
-  // Fails
   "ensure null in eager either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
       either.eager<String, Int> {
@@ -78,7 +77,6 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  // Fails
   "ensureNotNull in eager either computation" {
     fun square(i: Int): Int = i * i
 

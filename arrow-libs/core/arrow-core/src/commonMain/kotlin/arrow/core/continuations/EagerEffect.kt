@@ -100,16 +100,14 @@ public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.
         }
 
       return try {
-        val value: AtomicRef<Any?> = AtomicRef(EmptyValue)
         suspend { transform(f(effect)) }
           .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
-            result.fold({ value.set(it) }) { throwable ->
+            result.getOrElse { throwable ->
               if (throwable is Eager && token == throwable.token) {
                 throwable.recover(throwable.shifted) as B
               } else throw throwable
             }
-          })
-        value.get() as B
+          }) as B
       } catch (e: Eager) {
         if (token == e.token) e.recover(e.shifted) as B
         else throw e
