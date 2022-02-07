@@ -4,6 +4,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.identity
+import kotlin.jvm.JvmInline
 
 public suspend fun <A> Effect<None, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }
@@ -11,7 +12,11 @@ public suspend fun <A> Effect<None, A>.toOption(): Option<A> =
 public fun <A> EagerEffect<None, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }
 
-public interface OptionEffectScope : EffectScope<None> {
+@JvmInline
+public value class OptionEffectScope(private val cont: EffectScope<None>) : EffectScope<None> {
+  override suspend fun <B> shift(r: None): B =
+    cont.shift(r)
+
   public suspend fun <B> Option<B>.bind(): B =
     bind { None }
 
@@ -25,16 +30,11 @@ public interface OptionEffectScope : EffectScope<None> {
     ensureNotNull(value) { None }
 }
 
-public fun optionEffectScope(cont: EffectScope<None>): OptionEffectScope =
-  object : OptionEffectScope {
-    override suspend fun <B> shift(r: None): B = cont.shift(r)
-  }
-
 @Suppress("ClassName")
 public object option {
   public inline fun <A> eager(crossinline f: suspend EagerEffectScope<None>.() -> A): Option<A> =
     eagerEffect(f).toOption()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend OptionEffectScope.() -> A): Option<A> =
-    effect<None, A> { f(optionEffectScope(this)) }.toOption()
+    effect<None, A> { f(OptionEffectScope(this)) }.toOption()
 }
