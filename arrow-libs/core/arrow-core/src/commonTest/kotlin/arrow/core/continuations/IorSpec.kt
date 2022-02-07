@@ -41,7 +41,7 @@ class IorSpec :
     }
 
     "Accumulates eagerly" {
-      ior(Semigroup.string()) {
+      ior.eager(Semigroup.string()) {
         val one = Ior.Both("Hello", 1).bind()
         val two = Ior.Both(", World!", 2).bind()
         one + two

@@ -1,8 +1,6 @@
 package arrow.core.continuations
 
-import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
-import arrow.core.EmptyValue
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
