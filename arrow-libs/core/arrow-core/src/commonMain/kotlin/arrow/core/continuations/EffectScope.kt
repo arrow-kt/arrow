@@ -1,7 +1,6 @@
 package arrow.core.continuations
 
 import arrow.core.Either
-import arrow.core.Eval
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -179,30 +178,6 @@ public interface EffectScope<R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
-
-
-  /**
-   * Folds [Eval], by returning [B].
-   *
-   * ```kotlin
-   * import arrow.core.Eval
-   * import arrow.core.continuations.effect
-   * import arrow.core.identity
-   * import io.kotest.matchers.shouldBe
-   *
-   * private val default = "failed"
-   * suspend fun main() {
-   *   val eval: Eval<Int> = Eval.now(5)
-   *   effect<String, Int> {
-   *     val x: Int = eval.bind()
-   *     x
-   *   }.fold({ default }, ::identity) shouldBe eval.value()
-   * }
-   * ```
-   * <!--- KNIT example-effect-scope-08.kt -->
-   */
-  public suspend fun <B> Eval<B>.bind(): B =
-    value()
 }
 
 /**
@@ -224,7 +199,7 @@ public interface EffectScope<R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-scope-09.kt -->
+ * <!--- KNIT example-effect-scope-08.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {

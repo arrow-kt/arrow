@@ -2,7 +2,6 @@ package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.EmptyValue
-import arrow.core.Eval
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -45,9 +44,6 @@ public interface EagerEffectScope<R> {
       None -> shift(shift())
       is Some -> value
     }
-
-  public suspend fun <B> Eval<B>.bind(): B =
-    value()
 
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())

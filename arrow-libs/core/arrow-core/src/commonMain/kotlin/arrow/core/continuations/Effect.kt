@@ -146,7 +146,7 @@ internal class Internal(val token: Token, val shifted: Any?, val recover: suspen
 // Class that represents a unique token by hash comparison
 @PublishedApi
 internal class Token {
-  override fun toString(): String = "Token(${hashCode().toUInt().toString(16)})"
+  override fun toString(): String = "Token(${hashCode().toString(16)})"
 }
 
 /**

@@ -1,5 +1,6 @@
 package arrow.core.continuations
 
+import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
 import arrow.core.EmptyValue
 import arrow.core.Ior
@@ -99,16 +100,16 @@ public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.
         }
 
       return try {
-        var result: Any? = EmptyValue
+        val value: AtomicRef<Any?> = AtomicRef(EmptyValue)
         suspend { transform(f(effect)) }
-          .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) {
-            it.fold({ result = it }) { throwable ->
+          .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
+            result.fold({ value.set(it) }) { throwable ->
               if (throwable is Eager && token == throwable.token) {
                 throwable.recover(throwable.shifted) as B
               } else throw throwable
             }
           })
-        result as B
+        value.get() as B
       } catch (e: Eager) {
         if (token == e.token) e.recover(e.shifted) as B
         else throw e

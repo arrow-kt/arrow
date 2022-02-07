@@ -39,4 +39,20 @@ class IorSpec :
           .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
       }
     }
+
+    "Accumulates eagerly" {
+      ior(Semigroup.string()) {
+        val one = Ior.Both("Hello", 1).bind()
+        val two = Ior.Both(", World!", 2).bind()
+        one + two
+      } shouldBe Ior.Both("Hello, World!", 3)
+    }
+
+    "Accumulates with Either eagerly" {
+      ior.eager(Semigroup.string()) {
+        val one = Ior.Both("Hello", 1).bind()
+        val two: Int = Either.Left(", World!").bind()
+        one + two
+      } shouldBe Ior.Left("Hello, World!")
+    }
   })
