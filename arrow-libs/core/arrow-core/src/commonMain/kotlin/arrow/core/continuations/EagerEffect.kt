@@ -2,8 +2,12 @@ package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.EmptyValue
+import arrow.core.Ior
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
@@ -11,10 +15,28 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 public interface EagerEffect<R, A> {
   public fun <B> fold(recover: (R) -> B, transform: (A) -> B): B
 
+  public fun <B> fold(
+    error: (error: Throwable) -> B,
+    recover: (shifted: R) -> B,
+    transform: (value: A) -> B
+  ): B =
+    try {
+      fold(recover, transform)
+    } catch (e: Throwable) {
+      error(e.nonFatalOrThrow())
+    }
+
+  public fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
+
   public fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
 
   public fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+
+  public fun orNull(): A? = fold({ null }, ::identity)
+
+  public fun toOption(orElse: (R) -> Option<A>): Option<A> =
+    fold(orElse, ::Some)
 
   public fun <B> map(f: (A) -> B): EagerEffect<R, B> = flatMap { a -> eagerEffect { f(a) } }
 
