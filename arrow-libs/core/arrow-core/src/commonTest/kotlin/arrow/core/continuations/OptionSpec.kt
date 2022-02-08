@@ -50,10 +50,11 @@ class OptionSpec : StringSpec({
       throw IllegalStateException("This should not be executed")
     } shouldBe None
   }
+
   "simple case" {
     option.eager {
       "s".length.bind()
-    } shouldBe 1
+    }.orNull() shouldBe 1
   }
 
   "multiple types" {
@@ -61,7 +62,7 @@ class OptionSpec : StringSpec({
       val number = "s".length
       val string = number.toString().bind()
       string
-    } shouldBe "1"
+    }.orNull() shouldBe "1"
   }
 
   "short circuit" {
@@ -69,7 +70,7 @@ class OptionSpec : StringSpec({
       val number: Int = "s".length
       (number.takeIf { it > 1 }?.toString()).bind()
       throw IllegalStateException("This should not be executed")
-    } shouldBe null
+    }.orNull() shouldBe null
   }
 
   "short circuit option" {
@@ -77,7 +78,7 @@ class OptionSpec : StringSpec({
       val number = Some("s".length)
       number.filter { it > 1 }.map(Int::toString).bind()
       throw IllegalStateException("This should not be executed")
-    } shouldBe null
+    }.orNull() shouldBe null
   }
 
   "when expression" {
@@ -88,7 +89,7 @@ class OptionSpec : StringSpec({
         else -> null
       }.bind()
       string
-    } shouldBe "1"
+    }.orNull() shouldBe "1"
   }
 
   "if expression" {
@@ -100,7 +101,7 @@ class OptionSpec : StringSpec({
         null
       }.bind()
       string
-    } shouldBe "1"
+    }.orNull() shouldBe "1"
   }
 
   "if expression short circuit" {
@@ -112,6 +113,6 @@ class OptionSpec : StringSpec({
         null
       }.bind()
       string
-    } shouldBe null
+    }.orNull() shouldBe null
   }
 })
