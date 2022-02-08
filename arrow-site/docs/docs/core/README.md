@@ -21,8 +21,7 @@ permalink: /core/
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' |
 relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }})
 and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' |
-relative_url }}) that can be used when implementing [error handling patterns]({{ '
-/patterns/error_handling/' | relative_url }}).
+relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 
 Core also includes the base continuation effects system, which includes patterns to remove callbacks
 and enables controlled effects in direct syntax. Some applications of the effect system reduce
@@ -80,12 +79,12 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 Configure Arrow for your project
 <div class="setup-jdk-android" markdown="1">
 <div class="jdk-item" markdown="1">
-![Jdk](/img/quickstart/jdk-logo.svg "jdk")
+![Jdk]({{ "/img/quickstart/jdk-logo.svg" | relative_url }} "jdk")
 
 Make sure to have the latest version of JDK 1.8 installed.
 </div>
 <div class="android-item" markdown="1">
-![Android](/img/quickstart/android-logo.svg "android")
+![Android]({{ "/img/quickstart/android-logo.svg" | relative_url }} "android")
 
 <!--- Module Libraries -->
 Arrow supports Android starting on API 21 and up.
@@ -138,20 +137,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```
-allprojects {
-    repositories {
-        ...
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
-}
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -196,20 +182,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```groovy
-allprojects {
-    repositories {
-        ...
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' }
-}
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -223,7 +196,7 @@ following properties:
 ```xml
 
 <properties>
-    <kotlin.version>1.5.31</kotlin.version>
+    <kotlin.version>1.6.10</kotlin.version>
     <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
@@ -262,18 +235,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```xml
-
-<repository>
-    <snapshotss>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
-</repository>
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>

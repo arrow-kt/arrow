@@ -1,11 +1,18 @@
 buildscript {
   repositories {
     mavenCentral()
-    mavenLocal()
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
   }
 
   dependencies {
     classpath(libs.kotlinx.knit)
+  }
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
   }
 }
 
@@ -17,6 +24,7 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
+  alias(libs.plugins.arrowGradleConfig.versioning)
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
@@ -51,12 +59,16 @@ tasks {
 
   val undocumentedProjects = listOf(
     project(":arrow-core-test"),
-    project(":arrow-meta"),
     project(":arrow-fx-coroutines-test"),
     project(":arrow-optics-test"),
+    project(":arrow-optics-ksp-plugin"),
   )
 
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaJekyllMultiModule { removeChildTasks(undocumentedProjects) }
+}
+
+apiValidation {
+  ignoredProjects.addAll(listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site"))
 }

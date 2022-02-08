@@ -3,12 +3,50 @@ name: "pull_request"
 on: pull_request
 
 env:
-  BASEDIR: ${{github.workspace}}/arrow-libs
-  JAVA_OPTS: -Xms1g -Xmx3g
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
 
 jobs:
-  code_formatter_dokka_ank:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: build
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os != 'windows-latest'
+        with:
+          arguments: --full-stacktrace build
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace mingwX64Test
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
+  update_api:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -17,150 +55,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.gradle/yarn
-            ~/.gradle/nodejs
-            ~/.konan
-          key: misc-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            misc-step-gradle-
-
-      - name: "Set env"
-        run: |
-          echo "$JAVA_HOME_8_X64/bin" >> $GITHUB_PATH
-          echo "JAVA_HOME=$JAVA_HOME_8_X64" >> $GITHUB_ENV
-
-      - name: "ApiCheck"
-        run: ./gradlew apiCheck
-
-#      - name: "Run code formatter"
-#        run: ./gradlew spotlessCheck
-
-      - name: "Create API doc"
-        run: ./gradlew dokkaGfm
-
-#      - name: "Validate documentation"
-#        run: ./gradlew arrow-site:runAnk
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  linux_jvm_and_js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: linux-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            linux-step-gradle-
+          distribution: 'zulu'
+          java-version: 11
 
       - name: Build
-        run: ./gradlew linuxX64Test jvmTest jsTest
-
-      - name: "Prepare test reports"
-        if: ${{ always() }}
-        run: |
-          mkdir test-reports
-          for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
-            module=$(echo $report | cut -d/ -f3)
-            cp -r $report test-reports/$module
-          done
-
-      - name: "Make test reports available to download"
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: gradle/gradle-build-action@v2.1.3
         with:
-          name: test-reports
-          path: test-reports
+          arguments: apiDump
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
-  apple:
-    runs-on: macos-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
+      - name: "Commit new API files"
+        uses: stefanzweifel/git-auto-commit-action@v4.13.1
         with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            mac-step-gradle-
-
-      - name: Build
-        run: ./gradlew iosX64Test macosX64Test tvosX64Test watchosX64Test
-
-      - name: "Prepare test reports"
-        if: ${{ always() }}
-        run: |
-          mkdir test-reports
-          for report in `ls -d arrow-libs/**/**/build/reports/tests`; do
-            module=$(echo $report | cut -d/ -f3)
-            cp -r $report test-reports/$module
-          done
-
-      - name: "Make test reports available to download"
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-reports
-          path: test-reports
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  windows:
-    runs-on: windows-latest
-
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build
-        run: ./gradlew mingwX64Test
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+          commit_message: Update API files
+          file_pattern: arrow-libs/**/api/*.api

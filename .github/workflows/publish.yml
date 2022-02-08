@@ -2,20 +2,16 @@ name: "Publish all libs, Arrow-stack and Docs"
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'arrow-libs/**'
-      - '.github/**'
+    tags:
+      - '**'
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  JAVA_OPTS: -Xms512m -Xmx1024m
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
   ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
-  GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=false -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
   OSS_USER: '${{ secrets.OSS_USER }}'
   OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
   OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
@@ -27,111 +23,122 @@ env:
   GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
 
 jobs:
-  publish_apple_linux_jvm_js:
-    runs-on: macos-latest
-    timeout-minutes: 35
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+
+    outputs:
+      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
 
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: mac-step-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            mac-step-gradle-
+          distribution: 'zulu'
+          java-version: 11
 
-      - name: "Install grep"
-        run: brew install grep
+      - name: build
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os != 'windows-latest'
+        with:
+          arguments: --full-stacktrace build
 
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2.1.3
+        if: matrix.os == 'windows-latest'
+        with:
+          arguments: --full-stacktrace mingwX64Test
 
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
+      - id: get-arrow-version
+        name: Get Arrow version
+        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt)"
 
-      - name: Publish Apple, Linux, JVM & JS targets
-        run: |
-          ./gradlew publishToSonatype
-          echo "$(cat $BASEDIR/gradle.properties | grep projects.version | cut -d'=' -f2) Apple, Linux, JVM & JS deployed!"
+      - name: Upload reports
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
-  publish_windows:
-    runs-on: windows-latest
-    timeout-minutes: 25
+  publish:
+    needs: build
+    timeout-minutes: 120
+    runs-on: macos-latest
+
+    outputs:
+      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Restore Gradle cache
-        id: cache
-        uses: actions/cache@v2.1.6
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          distribution: 'zulu'
+          java-version: 11
 
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-        shell: bash
+      - id: get-arrow-version
+        name: Get Arrow version
+        run: echo "::set-output name=arrow-version::${{needs.build.outputs.arrow-version}}"
 
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-        shell: bash
+      - name: Publish alpha/beta/rc version
+        uses: gradle/gradle-build-action@v2.1.3
+        if: |
+          contains(needs.build.outputs.arrow-version, 'alpha') ||
+          contains(needs.build.outputs.arrow-version, 'beta') ||
+          contains(needs.build.outputs.arrow-version, 'rc')
+        with:
+          arguments: --full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository
 
-      - name: Publish Windows
-        run: |
-          ./gradlew publishToSonatype
-          echo "$(cat gradle.properties | grep projects.version | cut -d'=' -f2) MingwX64 deployed!"
+      - name: Publish final version
+        uses: gradle/gradle-build-action@v2.1.3
+        if: |
+          !contains(needs.build.outputs.arrow-version, 'alpha') &&
+          !contains(needs.build.outputs.arrow-version, 'beta') &&
+          !contains(needs.build.outputs.arrow-version, 'rc')
+        with:
+          arguments: --full-stacktrace publishToSonatype closeSonatypeStagingRepository
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
 
   publish_doc:
+    needs: publish
+    timeout-minutes: 60
+    runs-on: macos-latest
+
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       AWS_DEFAULT_REGION: eu-west-1
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=false"
-      JAVA_OPTS: -Xms2g -Xmx4g
       JEKYLL_ENV: production
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
-    runs-on: macos-latest
-    timeout-minutes: 60
-
     steps:
-
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
 
-      - name: "Setup"
-        run: brew install grep
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
 
-      - name: "Set env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/set-env.sh
-
-      - name: "Show env"
-        run: ${GITHUB_WORKSPACE}/.github/scripts/show-env.sh
-
-      - name: "Prepare environment"
+      - name: Prepare environment
         working-directory: arrow-site
         run: |
           mkdir $BASEDIR/logs
@@ -139,71 +146,83 @@ jobs:
           bundle config set --local path 'vendor/bundle'
           bundle install --gemfile Gemfile
 
-      - name: "Create API doc"
-        run: ./gradlew dokkaGfm
+      - name: Create API doc
+        uses: gradle/gradle-build-action@v2.1.3
+        with:
+          arguments: --full-stacktrace dokkaGfm
 
-      - name: "Landing page: build"
+      - name: Build landing page
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          bundle exec jekyll build -b docs -s docs
+          bundle exec jekyll build -b docs -s docs --config docs/_config_for_landing_page.yml
           tree _site > $BASEDIR/logs/content.log
 
-      - name: "Landing page: publish"
+      - name: Publish landing page
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
-          ${GITHUB_WORKSPACE}/.github/scripts/publish-landing-page.sh
+          ${GITHUB_WORKSPACE}/.github/scripts/sync-main-with-aws.sh
 
-      - name: "Latest release: publish (/docs)"
+      - name: Build release directory (/docs)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: |
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
+        run: |
+          bundle exec jekyll build -b docs -s docs
+          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
+
+      - name: Publish documentation (/docs)
+        working-directory: arrow-site
+        if: |
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
-          ${GITHUB_WORKSPACE}/.github/scripts/publish-latest-release.sh
+          ${GITHUB_WORKSPACE}/.github/scripts/sync-docs-with-aws.sh
 
-      - name: "Latest release: build release directory (/docs/<major.minor>)"
+      - name: Build release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: |
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
-          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          bundle exec jekyll build -b docs/${SHORT_VERSION} -s docs
-          tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+          bundle exec jekyll build -b docs/${{ needs.publish.outputs.arrow-version }} -s docs
+          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
 
-      - name: "Latest release: publish release directory (/docs/<major.minor>)"
+      - name: Publish release directory (/docs/<major.minor>)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: |
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
-          SHORT_VERSION=$(echo $RELEASE_VERSION | cut -d. -f1-2)
-          echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
-          if [ "${SHORT_VERSION}" != "" ]; then
-            aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
-          else
-            exit 1
-          fi
+          aws s3 sync _site s3://$S3_BUCKET/docs/${{ needs.publish.outputs.arrow-version }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
-      - name: "Next version: build (/docs/next)"
+      - name: Build latest version (/docs/next)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           bundle exec jekyll build -b docs/next -s docs
           tree _site > $BASEDIR/logs/content_docs-next.log
 
-      - name: "Next version: publish (/docs/next)"
+      - name: Publish latest version (/docs/next)
         working-directory: arrow-site
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
-          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "index.html" >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/next --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
-      - name: "Site: publish sitemap.xml"
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Publish sitemap.xml
+        if: |
+          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
+          !contains(needs.publish.outputs.arrow-version, 'beta') &&
+          !contains(needs.publish.outputs.arrow-version, 'rc')
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
 
-      - name: CloudFront cache invalidation
+      - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
 
       - name: List S3
@@ -212,7 +231,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: logs
-          path: arrow-libs/logs
+          path: arrow-libs/logs.
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop

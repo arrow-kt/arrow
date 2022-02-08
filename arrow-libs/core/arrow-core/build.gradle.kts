@@ -14,7 +14,7 @@ kotlin {
       dependencies {
         api(projects.arrowContinuations)
         api(projects.arrowAnnotations)
-        implementation(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlibCommon)
       }
     }
     commonTest {

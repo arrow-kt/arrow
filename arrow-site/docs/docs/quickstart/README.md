@@ -38,7 +38,7 @@ Core also includes the base continuation effects system, which includes patterns
 <a href="{{ "/core/" | relative_url }}" class="library-cta core" markdown="1">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
-![Core](/img/quickstart/modular-libraries-core.svg "Arrow Core")
+![Core]({{ "/img/quickstart/modular-libraries-core.svg" | relative_url }} "Arrow Core")
 </div>
 </div>
 <!--- Module library Fx
@@ -53,7 +53,7 @@ By leveraging the power of KotlinX Coroutines and the compiler support for CPS t
 <a href="{{ "/fx/" | relative_url }}" class="library-cta fx">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
-![Core](/img/quickstart/modular-libraries-fx.svg "Arrow Core")
+![Fx]({{ "/img/quickstart/modular-libraries-fx.svg" | relative_url }} "Arrow Fx")
 </div>
 </div>
 <!--- Module library Optics
@@ -68,7 +68,7 @@ Optics also offers all the base types such as [Lens]({{ "/optics/lens/" | relati
 <a href="{{ "/optics/" | relative_url }}" class="library-cta optics">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
-![Core](/img/quickstart/modular-libraries-optics.svg "Arrow Core")
+![Optics]({{ "/img/quickstart/modular-libraries-optics.svg" | relative_url }} "Arrow Optics")
 </div>
 </div>
 <!--- Module library Meta start
@@ -83,7 +83,7 @@ Some type system features proposed by Arrow such as union types, product types, 
 <a href="{{ "/meta/" | relative_url }}" class="library-cta meta">Read more</a>
 </div>
 <div class="library-item-brand" markdown="1">
-![Core](/img/quickstart/modular-libraries-meta.svg "Arrow Core")
+![Meta]({{ "/img/quickstart/modular-libraries-meta.svg" | relative_url }} "Arrow Meta")
 </div>
 </div>
 
@@ -102,12 +102,12 @@ Some type system features proposed by Arrow such as union types, product types, 
 Configure Arrow for your project
 <div class="setup-jdk-android" markdown="1">
 <div class="jdk-item" markdown="1">
-![Jdk](/img/quickstart/jdk-logo.svg "jdk")
+![Jdk]({{ "/img/quickstart/jdk-logo.svg" | relative_url }} "jdk")
 
 Make sure to have the latest version of JDK 1.8 installed.
 </div>
 <div class="android-item" markdown="1">
-![Android](/img/quickstart/android-logo.svg "android")
+![Android]({{ "/img/quickstart/android-logo.svg" | relative_url }} "android")
 
 <!--- Module Libraries -->
 Arrow supports Android starting on API 21 and up.

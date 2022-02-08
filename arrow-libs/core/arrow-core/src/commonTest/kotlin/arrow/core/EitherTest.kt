@@ -36,7 +36,7 @@ class EitherTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
-      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
+      /*FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
         Arb.int().map(::Right),
         ARB.map { it },
         Either<String, Int>::equals,
@@ -51,7 +51,7 @@ class EitherTest : UnitSpec() {
         either::eager
       ) {
         it.bind()
-      }
+      }*/
     )
 
     "isLeft should return true if Left and false if Right" {
