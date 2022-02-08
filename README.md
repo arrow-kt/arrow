@@ -18,9 +18,9 @@ blocks to empower users to write pure FP apps and libraries built atop higher or
 Use the list below to learn more about Λrrow's main features.
 
 - [Documentation](http://arrow-kt.io)
-- [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
-- [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
-- [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
+  - [Core](https://arrow-kt.io/docs/core/): error handling and monads
+  - [Fx](https://arrow-kt.io/docs/fx/): interfacing with external systems
+  - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
 #### Curated external links
 
