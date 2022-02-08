@@ -1,6 +1,6 @@
 ---
 layout: docs-optics
-title: Fold
+title: OptionalGetter
 permalink: /optics/optional_getter/
 ---
 
