@@ -29,4 +29,24 @@ class OptionSpec : StringSpec({
       throw IllegalStateException("This should not be executed")
     } shouldBe None
   }
+
+  "ensureNotNull in eager option computation" {
+    fun square(i: Int): Int = i * i
+    checkAll(Arb.int().orNull()) { i: Int? ->
+      option {
+        val ii = i
+        ensureNotNull(ii)
+        square(ii) // Smart-cast by contract
+      } shouldBe i.toOption().map(::square)
+    }
+  }
+
+  "eager short circuit null" {
+    option.eager {
+      val number: Int = "s".length
+      val x = ensureNotNull(number.takeIf { it > 1 })
+      x
+      throw IllegalStateException("This should not be executed")
+    } shouldBe None
+  }
 })
