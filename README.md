@@ -20,7 +20,7 @@ Use the list below to learn more about Λrrow's main features.
 - [Documentation](http://arrow-kt.io)
   - [Core](https://arrow-kt.io/docs/core/): error handling and monads
   - [Fx](https://arrow-kt.io/docs/fx/): interfacing with external systems
-  - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
+  - [Optics](https://arrow-kt.io/docs/optics/): inspecting and modifying data structures
 
 #### Curated external links
 
