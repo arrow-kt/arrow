@@ -14,7 +14,7 @@ import kotlin.coroutines.RestrictsSuspension
 @RestrictsSuspension
 public interface EagerEffectScope<R> {
 
-  /** Short-circuit the [Effect] computation with value [R]. */
+  /** Short-circuit the [EagerEffect] computation with value [R]. */
   public suspend fun <B> shift(r: R): B
 
   public suspend fun <A> EagerEffect<R, A>.bind(): A {
