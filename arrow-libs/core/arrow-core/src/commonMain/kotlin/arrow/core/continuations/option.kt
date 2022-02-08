@@ -4,6 +4,8 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.identity
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 
 public suspend fun <A> Effect<None, A>.toOption(): Option<A> =
@@ -25,9 +27,18 @@ public value class OptionEffectScope(private val cont: EffectScope<None>) : Effe
 
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
+}
 
-  public suspend fun <B> ensureNotNull(value: B?): B =
-    ensureNotNull(value) { None }
+@OptIn(ExperimentalContracts::class)
+public suspend fun <B> OptionEffectScope.ensureNotNull(value: B?): B {
+  contract { returns() implies (value != null) }
+  return ensureNotNull(value) { None }
+}
+
+@OptIn(ExperimentalContracts::class)
+public suspend fun <B> OptionEagerEffectScope.ensureNotNull(value: B?): B {
+  contract { returns() implies (value != null) }
+  return ensureNotNull(value) { None }
 }
 
 @JvmInline
@@ -44,16 +55,15 @@ public value class OptionEagerEffectScope(private val cont: EagerEffectScope<Non
 
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
-
-  public suspend fun <B> ensureNotNull(value: B?): B =
-    ensureNotNull(value) { None }
 }
 
 @Suppress("ClassName")
 public object option {
   public inline fun <A> eager(crossinline f: suspend OptionEagerEffectScope.() -> A): Option<A> =
-    @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-    eagerEffect<None, A> { f(OptionEagerEffectScope(this)) }.toOption()
+    eagerEffect<None, A> {
+      @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
+      f(OptionEagerEffectScope(this))
+    }.toOption()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend OptionEffectScope.() -> A): Option<A> =
     effect<None, A> { f(OptionEffectScope(this)) }.toOption()
