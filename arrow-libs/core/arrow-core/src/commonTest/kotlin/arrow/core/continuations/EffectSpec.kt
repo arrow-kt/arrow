@@ -20,23 +20,19 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.suspendCancellableCoroutine
 
 class EffectSpec :
   StringSpec({
     "try/catch - can recover from shift" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
         effect<String, Int> {
-            try {
-              shift(s)
-            } catch (e: Throwable) {
-              i
-            }
+          try {
+            shift(s)
+          } catch (e: Throwable) {
+            i
           }
+        }
           .fold({ fail("Should never come here") }, ::identity) shouldBe i
       }
     }
@@ -44,12 +40,12 @@ class EffectSpec :
     "try/catch - can recover from shift suspended" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
         effect<String, Int> {
-            try {
-              shift(s.suspend())
-            } catch (e: Throwable) {
-              i
-            }
+          try {
+            shift(s.suspend())
+          } catch (e: Throwable) {
+            i
           }
+        }
           .fold({ fail("Should never come here") }, ::identity) shouldBe i
       }
     }
@@ -99,16 +95,6 @@ class EffectSpec :
       }
     }
 
-    suspend fun test() {
-      val leakedAsync =
-        coroutineScope<suspend () -> Deferred<Unit>> {
-          suspend {
-            async { println("I am never going to run, until I get called invoked from outside") }
-          }
-        }
-      leakedAsync.invoke().await()
-    }
-
     "try/catch - First shift is ignored and second is returned suspended" {
       checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
         effect<String, Int> {
@@ -148,33 +134,32 @@ class EffectSpec :
 
     "Can short-circuit immediately from nested blocks" {
       effect<String, Int> {
-          effect<Nothing, Long> { shift("test") }.runCont()
-          fail("Should never reach this point")
-        }
+        effect<Nothing, Long> { shift("test") }.runCont()
+        fail("Should never reach this point")
+      }
         .runCont() shouldBe "test"
     }
 
     "Can short-circuit suspended from nested blocks" {
       effect<String, Int> {
-          effect<Nothing, Long> { shift("test".suspend()) }.runCont()
-          fail("Should never reach this point")
-        }
+        effect<Nothing, Long> { shift("test".suspend()) }.runCont()
+        fail("Should never reach this point")
+      }
         .runCont() shouldBe "test"
     }
 
     "Can short-circuit immediately after suspending from nested blocks" {
       effect<String, Int> {
-          effect<Nothing, Long> {
-              1L.suspend()
-              shift("test".suspend())
-            }
-            .runCont()
-          fail("Should never reach this point")
+        effect<Nothing, Long> {
+          1L.suspend()
+          shift("test".suspend())
         }
+          .runCont()
+        fail("Should never reach this point")
+      }
         .runCont() shouldBe "test"
     }
 
-    // Fails https://github.com/Kotlin/kotlinx.coroutines/issues/3005
     "ensure null in either computation" {
       checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
         either<String, Int> {
@@ -184,7 +169,6 @@ class EffectSpec :
       }
     }
 
-    // Fails https://github.com/Kotlin/kotlinx.coroutines/issues/3005
     "ensureNotNull in either computation" {
       fun square(i: Int): Int = i * i
 
@@ -215,16 +199,4 @@ internal suspend fun <A> A.suspend(): A = suspendCoroutineUninterceptedOrReturn 
     .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
 
   COROUTINE_SUSPENDED
-}
-
-suspend fun <A> completeOnCancellation(
-  latch: CompletableDeferred<Unit>,
-  cancelled: CompletableDeferred<Throwable?>
-): A = suspendCancellableCoroutine { cont ->
-  cont.invokeOnCancellation { cause ->
-    if (!cancelled.complete(cause)) throw AssertionError("cancelled latch was completed twice")
-    else Unit
-  }
-
-  if (!latch.complete(Unit)) throw AssertionError("latch was completed twice") else Unit
 }
