@@ -137,20 +137,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```
-allprojects {
-    repositories {
-        ...
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
-}
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -195,20 +182,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```groovy
-allprojects {
-    repositories {
-        ...
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' }
-}
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -222,7 +196,7 @@ following properties:
 ```xml
 
 <properties>
-    <kotlin.version>1.5.31</kotlin.version>
+    <kotlin.version>1.6.10</kotlin.version>
     <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
@@ -261,18 +235,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```xml
-
-<repository>
-    <snapshotss>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
-</repository>
-```
+If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>
