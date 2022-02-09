@@ -72,6 +72,8 @@ Scroll down and learn what Arrow Optics can do for you(r code)!
   - [Getter]({{ '/optics/getter/' | relative_url }}): focus on one value
   - [OptionalGetter]({{ '/optics/optional_getter/' | relative_url }}): focus on optional value
   - [Setter]({{ '/optics/setter/' | relative_url }}): modify one value
+
+[Usage with reflection]({{ '/optics/reflection/' | relative_url }})
   
 </div>
 

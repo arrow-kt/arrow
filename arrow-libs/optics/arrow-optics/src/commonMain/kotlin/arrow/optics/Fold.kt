@@ -10,6 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.foldMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
@@ -198,6 +199,13 @@ public interface Fold<S, A> {
      */
     public fun <A, B> void(): Fold<A, B> =
       POptional.void()
+
+    @JvmStatic
+    public fun <A> iterable(): Fold<Iterable<A>, A> =
+      object : Fold<Iterable<A>, A> {
+        override fun <R> foldMap(M: Monoid<R>, source: Iterable<A>, map: (focus: A) -> R): R =
+          source.foldMap(M, map)
+      }
 
     /**
      * [Traversal] for [List] that focuses in each [A] of the source [List].
