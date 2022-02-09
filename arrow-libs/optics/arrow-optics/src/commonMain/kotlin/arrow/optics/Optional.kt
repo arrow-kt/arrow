@@ -60,7 +60,7 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S, T, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   /**
    * Get the modified source of a [POptional]
@@ -70,22 +70,16 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
   /**
    * Get the focus of a [POptional] or return the original value while allowing the type to change if it does not match
    */
-  public fun getOrModify(source: S): Either<T, A>
+  override fun getOrModify(source: S): Either<T, A>
+
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+    getOrModify(source).map(map).fold({ M.empty() }, ::identity)
 
   /**
    * Modify the focus of a [POptional] with a function [map]
    */
   override fun modify(source: S, map: (focus: A) -> B): T =
     getOrModify(source).fold(::identity) { a -> set(source, map(a)) }
-
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).fold({ M.empty() }, ::identity)
-
-  /**
-   * Get the focus of a [POptional] or `null` if the is not there
-   */
-  public fun getOrNull(source: S): A? =
-    getOrModify(source).orNull()
 
   /**
    * Set the focus of a [POptional] with a value.
@@ -124,7 +118,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
   /**
    * Create a product of the [POptional] and a type [C]
    */
-  public fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
+  public override fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     POptional(
       { (source, c) -> getOrModify(source).bimap({ Pair(it, c) }, { Pair(it, c) }) },
       { (source, c2), (update, c) -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
@@ -133,7 +127,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A>, PTrave
   /**
    * Create a product of a type [C] and the [POptional]
    */
-  public fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
+  public override fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
       { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
       { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: c2 to set(s, b) }
