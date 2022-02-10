@@ -63,11 +63,17 @@ Scroll down and learn what Arrow Optics can do for you(r code)!
   - [Lens]({{ '/optics/lens/' | relative_url }}): focus and modify one value
   - [Optional]({{ '/optics/optional/' | relative_url }}): optional value
 
+###### Focus and construction
+
+  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value and build it
+
 ###### Single behavior
 
   - [Getter]({{ '/optics/getter/' | relative_url }}): focus on one value
-  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value
+  - [OptionalGetter]({{ '/optics/optional_getter/' | relative_url }}): focus on optional value
   - [Setter]({{ '/optics/setter/' | relative_url }}): modify one value
+
+[Usage with reflection]({{ '/optics/reflection/' | relative_url }})
   
 </div>
 
@@ -122,11 +128,11 @@ allprojects {
 
 #### Step 2: add the library
 
-Add the dependencies into the project's `build.gradle.kts`:
+Add the dependencies into the project's `build.gradle.kts` (change `$arrowVersion` to a specific version, or define the corresponding property in `gradle.properties`):
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-optics:1.0.1")
+    implementation("io.arrow-kt:arrow-optics:$arrowVersion")
 }
 ```
 
@@ -134,7 +140,7 @@ If you are using more than one Arrow dependency, you can avoid specifying the sa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.0.1"))
+    implementation(platform("io.arrow-kt:arrow-stack:$arrowVersion"))
 
     implementation("io.arrow-kt:arrow-core")
     implementation("io.arrow-kt:arrow-optics")
@@ -142,7 +148,7 @@ dependencies {
 }
 ```
 
-#### Step 3: add the plug-in
+#### Step 3: add the plug-in (optional)
 
 To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
@@ -152,9 +158,11 @@ plugins {
 }
 
 dependencies {
-    ksp("io.arrow-kt:arrow-optics-ksp-plugin:1.0.1")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
 }
 ```
+
+If you are using IntelliJ as your IDE of choice, you also need to [add some new paths as sources](https://kotlinlang.org/docs/ksp-quickstart.html#make-ide-aware-of-generated-code) to make it aware of the generated sources.
 
 Now you are ready to learn about the [Optics DSL]({{ '/optics/dsl/' | relative_url }})!
 
@@ -200,7 +208,7 @@ dependencies {
 }
 ```
 
-#### Step 3: add the plug-in
+#### Step 3: add the plug-in (optional)
 
 To get the most of Arrow Optics you can add out Kotlin plug-in to your build, which takes care of generating optics for your data types.
 
@@ -210,7 +218,7 @@ plugins {
 }
 
 dependencies {
-    ksp "io.arrow-kt:arrow-optics-ksp-plugin:1.0.1"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:$arrow_version"
 }
 ```
 
