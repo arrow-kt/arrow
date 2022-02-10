@@ -39,14 +39,14 @@ public interface EffectScope<R> {
    * import arrow.core.identity
    * import io.kotest.matchers.shouldBe
    *
-   * suspend fun <E, A> Either<E, A>.toCont(): Effect<E, A> = effect {
+   * suspend fun <E, A> Either<E, A>.toEffect(): Effect<E, A> = effect {
    *   fold({ e -> shift(e) }, ::identity)
    * }
    *
    * suspend fun main() {
    *   val either = Either.Left("failed")
    *   effect<String, Int> {
-   *     val x: Int = either.toCont().bind()
+   *     val x: Int = either.toEffect().bind()
    *     x
    *   }.toEither() shouldBe either
    * }

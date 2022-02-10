@@ -10,10 +10,46 @@ import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.RestrictsSuspension
 
+/**
+ * [RestrictsSuspension] version of [Effect]. This version runs eagerly, and can be used in
+ * non-suspending code.
+ * @see Effect
+ */
 public interface EagerEffect<R, A> {
+
+  /**
+   * Runs the non-suspending computation by creating a [Continuation] with an [EmptyCoroutineContext],
+   * and running the `fold` function over the computation.
+   *
+   * When the [EagerEffect] has shifted with [R] it will [recover] the shifted value to [B], and when it
+   * ran the computation to completion it will [transform] the value [A] to [B].
+   *
+   * ```kotlin
+   * import arrow.core.continuations.eagerEffect
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun main() {
+   *   val shift = eagerEffect<String, Int> {
+   *     shift("Hello, World!")
+   *   }.fold({ str: String -> str }, { int -> int.toString() })
+   *   shift shouldBe "Hello, World!"
+   *
+   *   val res = eagerEffect<String, Int> {
+   *     1000
+   *   }.fold({ str: String -> str.length }, { int -> int })
+   *   res shouldBe 1000
+   * }
+   * ```
+   * <!--- KNIT example-eager-effect-01.kt -->
+   */
   public fun <B> fold(recover: (R) -> B, transform: (A) -> B): B
 
+  /**
+   * Like `fold` but also allows folding over any unexpected [Throwable] that might have occurred.
+   * @see fold
+   */
   public fun <B> fold(
     error: (error: Throwable) -> B,
     recover: (shifted: R) -> B,
@@ -25,15 +61,35 @@ public interface EagerEffect<R, A> {
       error(e.nonFatalOrThrow())
     }
 
+  /**
+   * [fold] the [EagerEffect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
+   * result value [A] is mapped to [Ior.Right].
+   */
   public fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 
+  /**
+   * [fold] the [EagerEffect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
+   * result value [A] is mapped to [Either.Right].
+   */
   public fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
 
+  /**
+   * [fold] the [EagerEffect] into an [Validated]. Where the shifted value [R] is mapped to
+   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
+   */
   public fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
+  /**
+   * [fold] the [EagerEffect] into an [A?]. Where the shifted value [R] is mapped to
+   * [null], and result value [A].
+   */
   public fun orNull(): A? = fold({ null }, ::identity)
 
+  /**
+   * [fold] the [EagerEffect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
+   * provided function [orElse], and result value [A] is mapped to [Some].
+   */
   public fun toOption(orElse: (R) -> Option<A>): Option<A> =
     fold(orElse, ::Some)
 
@@ -73,14 +129,40 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
 }
 
 /**
- * `RestrictsSuspension` version of `Effect<R, A>`. This version runs eagerly, and can be used in
- * non-suspending code.
+ * DSL for constructing `EagerEffect<R, A>` values
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Validated
+ * import arrow.core.continuations.eagerEffect
+ * import io.kotest.assertions.fail
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main() {
+ *   eagerEffect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z = Option(3).bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
+ *
+ *   eagerEffect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z: Int = None.bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
+ * }
+ * ```
+ * <!--- KNIT example-eager-effect-02.kt -->
  */
 public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.() -> A): EagerEffect<R, A> =
   object : EagerEffect<R, A> {
     override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
       val token = Token()
-      val effect =
+      val eagerEffectScope =
         object : EagerEffectScope<R> {
           // Shift away from this Continuation by intercepting it, and completing it with
           // ShiftCancellationException
@@ -98,7 +180,7 @@ public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.
         }
 
       return try {
-        suspend { transform(f(effect)) }
+        suspend { transform(f(eagerEffectScope)) }
           .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
             result.getOrElse { throwable ->
               if (throwable is Eager && token == throwable.token) {
