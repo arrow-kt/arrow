@@ -53,6 +53,9 @@ project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 include("arrow-optics")
 project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
 
+include("arrow-optics-reflect")
+project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-optics-reflect")
+
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
 
