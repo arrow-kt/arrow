@@ -63,11 +63,17 @@ Scroll down and learn what Arrow Optics can do for you(r code)!
   - [Lens]({{ '/optics/lens/' | relative_url }}): focus and modify one value
   - [Optional]({{ '/optics/optional/' | relative_url }}): optional value
 
+###### Focus and construction
+
+  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value and build it
+
 ###### Single behavior
 
   - [Getter]({{ '/optics/getter/' | relative_url }}): focus on one value
-  - [Prism]({{ '/optics/prism/' | relative_url }}): focus on optional value
+  - [OptionalGetter]({{ '/optics/optional_getter/' | relative_url }}): focus on optional value
   - [Setter]({{ '/optics/setter/' | relative_url }}): modify one value
+
+[Usage with reflection]({{ '/optics/reflection/' | relative_url }})
   
 </div>
 

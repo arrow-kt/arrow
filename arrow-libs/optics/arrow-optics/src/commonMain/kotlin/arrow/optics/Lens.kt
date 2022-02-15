@@ -28,7 +28,7 @@ public typealias Lens<S, A> = PLens<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>, Fold<S, A>,
+public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>,
   PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
 
   override fun get(source: S): A
