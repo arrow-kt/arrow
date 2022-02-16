@@ -53,8 +53,7 @@ class EagerEffectSpec : StringSpec({
             i
           }
         shift(s2)
-      }
-        .fold(::identity) { fail("Should never come here") } shouldBe s2
+      }.fold(::identity) { fail("Should never come here") } shouldBe s2
     }
   }
 

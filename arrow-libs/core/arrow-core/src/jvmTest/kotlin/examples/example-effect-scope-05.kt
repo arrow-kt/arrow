@@ -1,15 +1,14 @@
 // This file was automatically generated from EffectScope.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffectScope05
 
+import arrow.core.Validated
 import arrow.core.continuations.effect
-import arrow.core.identity
 import io.kotest.matchers.shouldBe
 
-private val default = "failed"
 suspend fun main() {
-  val result = Result.success(1)
+  val validated = Validated.Valid(40)
   effect<String, Int> {
-    val x: Int = result.bind { _: Throwable -> default }
+    val x: Int = validated.bind()
     x
-  }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
+  }.toValidated() shouldBe validated
 }

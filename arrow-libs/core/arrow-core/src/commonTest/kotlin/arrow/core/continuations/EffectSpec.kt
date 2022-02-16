@@ -44,8 +44,7 @@ class EffectSpec :
           } catch (e: Throwable) {
             i
           }
-        }
-          .fold({ fail("Should never come here") }, ::identity) shouldBe i
+        }.fold({ fail("Should never come here") }, ::identity) shouldBe i
       }
     }
 
@@ -106,6 +105,30 @@ class EffectSpec :
           shift(s2.suspend())
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s2
+      }
+    }
+
+    "eagerEffect can be consumed within an Effect computation" {
+      checkAll(Arb.int(), Arb.int()) { a, b ->
+        val eager: EagerEffect<String, Int> =
+          eagerEffect { a }
+
+        effect<String, Int> {
+          val aa = eager.bind()
+          aa + b.suspend()
+        }.runCont() shouldBe (a + b)
+      }
+    }
+
+    "eagerEffect shift short-circuits effect computation" {
+      checkAll(Arb.string(), Arb.int()) { a, b ->
+        val eager: EagerEffect<String, Int> =
+          eagerEffect { shift(a) }
+
+        effect<String, Int> {
+          val aa = eager.bind()
+          aa + b.suspend()
+        }.runCont() shouldBe a
       }
     }
 
@@ -185,6 +208,24 @@ class EffectSpec :
 
     "low-level use-case: distinguish between concurrency error and shift exception" {
       val effect = effect<String, Int> { shift("Shift") }
+      val e = RuntimeException("test")
+      Either.catch {
+        effect<String, Int> {
+          try {
+            effect.bind()
+          } catch (eagerShiftError: Eager) {
+            fail("Should never come here")
+          } catch (shiftError: Suspend) {
+            e.suspend()
+          } catch (otherError: Throwable) {
+            fail("Should never come here")
+          }
+        }.runCont()
+      } shouldBe Either.Left(e)
+    }
+
+    "low-level use-case: eager shift exception within effect computations doesn't change shift exception" {
+      val effect = eagerEffect<String, Int> { shift("Shift") }
       val e = RuntimeException("test")
       Either.catch {
         effect<String, Int> {

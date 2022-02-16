@@ -56,7 +56,7 @@ public interface EagerEffectScope<R> {
    * ```
    * <!--- KNIT example-eager-effect-scope-02.kt -->
    */
-  public suspend fun <A> EagerEffect<R, A>.bind(): A {
+  public suspend fun <B> EagerEffect<R, B>.bind(): B {
     var left: Any? = EmptyValue
     var right: Any? = EmptyValue
     fold({ r -> left = r }, { a -> right = a })

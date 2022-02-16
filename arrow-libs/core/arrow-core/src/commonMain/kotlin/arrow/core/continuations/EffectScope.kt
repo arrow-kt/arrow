@@ -1,6 +1,7 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.EmptyValue
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -56,6 +57,39 @@ public interface EffectScope<R> {
   public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectScope::shift, ::identity)
 
   /**
+   * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
+   * bridging eager computations into suspending.
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.continuations.EagerEffect
+   * import arrow.core.continuations.eagerEffect
+   * import arrow.core.continuations.effect
+   * import arrow.core.identity
+   * import io.kotest.matchers.shouldBe
+   *
+   * suspend fun <E, A> Either<E, A>.toEagerEffect(): EagerEffect<E, A> = eagerEffect {
+   *   fold({ e -> shift(e) }, ::identity)
+   * }
+   *
+   * suspend fun main() {
+   *   val either = Either.Left("failed")
+   *   effect<String, Int> {
+   *     val x: Int = either.toEagerEffect().bind()
+   *     x
+   *   }.toEither() shouldBe either
+   * }
+   * ```
+   * <!--- KNIT example-effect-scope-03.kt -->
+   */
+  public suspend fun <B> EagerEffect<R, B>.bind(): B {
+    var left: Any? = EmptyValue
+    var right: Any? = EmptyValue
+    fold({ r -> left = r }, { a -> right = a })
+    return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
+  }
+
+  /**
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
    * ```kotlin
@@ -71,7 +105,7 @@ public interface EffectScope<R> {
    *   }.toEither() shouldBe either
    * }
    * ```
-   * <!--- KNIT example-effect-scope-03.kt -->
+   * <!--- KNIT example-effect-scope-04.kt -->
    */
   public suspend fun <B> Either<R, B>.bind(): B =
     when (this) {
@@ -95,7 +129,7 @@ public interface EffectScope<R> {
    *   }.toValidated() shouldBe validated
    * }
    * ```
-   * <!--- KNIT example-effect-scope-04.kt -->
+   * <!--- KNIT example-effect-scope-05.kt -->
    */
   public suspend fun <B> Validated<R, B>.bind(): B =
     when (this) {
@@ -121,7 +155,7 @@ public interface EffectScope<R> {
    *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-scope-05.kt -->
+   * <!--- KNIT example-effect-scope-06.kt -->
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
@@ -147,7 +181,7 @@ public interface EffectScope<R> {
    *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-effect-scope-06.kt -->
+   * <!--- KNIT example-effect-scope-07.kt -->
    */
   public suspend fun <B> Option<B>.bind(shift: () -> R): B =
     when (this) {
@@ -174,7 +208,7 @@ public interface EffectScope<R> {
    *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
    * }
    * ```
-   * <!--- KNIT example-effect-scope-07.kt -->
+   * <!--- KNIT example-effect-scope-08.kt -->
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
@@ -199,7 +233,7 @@ public interface EffectScope<R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-scope-08.kt -->
+ * <!--- KNIT example-effect-scope-09.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {

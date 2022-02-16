@@ -15,6 +15,7 @@ import kotlin.coroutines.RestrictsSuspension
 /**
  * [RestrictsSuspension] version of [Effect]. This version runs eagerly, and can be used in
  * non-suspending code.
+ * An [effect] computation interoperates with an [EagerEffect] via `bind`.
  * @see Effect
  */
 public interface EagerEffect<R, A> {
@@ -115,6 +116,8 @@ public interface EagerEffect<R, A> {
   public fun <B> redeem(f: (R) -> B, g: (A) -> B): EagerEffect<Nothing, B> = eagerEffect {
     fold(f, g)
   }
+
+  public fun toEffect(): Effect<R, A> = effect { bind() }
 
   public fun <R2, B> redeemWith(
     f: (R) -> EagerEffect<R2, B>,
