@@ -53,8 +53,6 @@ They can be used to implement a very wide range use-cases, and or *not* bound to
 
 - [Semantics of Structured Concurrency and Effect]({{ '/arrow/core/continuations/' | relative_url }})
 
-- [`transactionEither`](https://gist.github.com/nomisRev/b6aced8ce552ae718791e187ebd6cdd4) which mixes the `either { }` DSL with the `transaction { }` of [SqlDelight](https://github.com/cashapp/sqldelight)
-
 The above image is not exhaustive list of the primitives you can find in the standard library.
 For an exhaustive list check the Kotlin Standard Library API docs:
 
