@@ -47,11 +47,11 @@ together with the compiler's ability to rewrite continuation based code to a bea
 
 They can be used to implement a very wide range use-cases, and or *not* bound to asynchronous -or concurrency use-cases.
 
-- Arrow Core, offers computational DSLs build on top of Kotlin's Coroutines `either { }`, `validated { }`, etc
+- Arrow Core, offers [computational DSLs]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }}) build on top of Kotlin's Coroutines `either { }`, `effect { }`, `eagerEffect { }`, etc.
 
 - [`DeepRecursiveFunction`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-deep-recursive-function/) explained [here](https://medium.com/@elizarov/deep-recursion-with-coroutines-7c53e15993e3)
 
-- Another well-known async/concurrency implementation beside Arrow Fx Coroutines is [KotlinX Coroutines](https://github.com/Kotlin/kotlinx.coroutines).
+- [Semantics of Structured Concurrency and Effect]({{ '/arrow/core/continuations/' | relative_url }})
 
 - [`transactionEither`](https://gist.github.com/nomisRev/b6aced8ce552ae718791e187ebd6cdd4) which mixes the `either { }` DSL with the `transaction { }` of [SqlDelight](https://github.com/cashapp/sqldelight)
 
