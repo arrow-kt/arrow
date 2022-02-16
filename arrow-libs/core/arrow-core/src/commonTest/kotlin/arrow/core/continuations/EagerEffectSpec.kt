@@ -24,8 +24,7 @@ class EagerEffectSpec : StringSpec({
         } catch (e: Throwable) {
           i
         }
-      }
-        .fold({ fail("Should never come here") }, ::identity) shouldBe i
+      }.fold({ fail("Should never come here") }, ::identity) shouldBe i
     }
   }
 
@@ -90,5 +89,23 @@ class EagerEffectSpec : StringSpec({
       val expected = i?.let(::square)?.right() ?: shift.left()
       res shouldBe expected
     }
+  }
+
+  "low-level use-case: distinguish between concurrency error and shift exception" {
+    val effect = eagerEffect<String, Int> { shift("Shift") }
+    val e = RuntimeException("test")
+    Either.catch {
+      eagerEffect<String, Int> {
+        try {
+          effect.bind()
+        } catch (shiftError: Suspend) {
+          fail("Should never come here")
+        } catch (eagerShiftError: Eager) {
+          throw e
+        } catch (otherError: Throwable) {
+          fail("Should never come here")
+        }
+      }.runCont()
+    } shouldBe Either.Left(e)
   }
 })

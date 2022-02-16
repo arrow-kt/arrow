@@ -25,19 +25,19 @@ import kotlin.coroutines.resume
  *
  * <!--- TOC -->
 
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Strange edge cases](#strange-edge-cases)
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Strange edge cases](#strange-edge-cases)
 
  * <!--- END -->
  *
@@ -680,15 +680,17 @@ public interface Effect<R, A> {
  */
 public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 
-//  Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
-// `recover`.
+/**
+ * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
+ * `recover`.
+ */
 @PublishedApi
-internal class Internal(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
+internal class Suspend(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
   ShiftCancellationException() {
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
-// Class that represents a unique token by hash comparison
+/** Class that represents a unique token by hash comparison **/
 @PublishedApi
 internal class Token {
   override fun toString(): String = "Token(${hashCode().toString(16)})"
@@ -709,7 +711,7 @@ internal class FoldContinuation<B>(
 ) : Continuation<B> {
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
-      if (throwable is Internal && token == throwable.token) {
+      if (throwable is Suspend && token == throwable.token) {
         val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
         when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
           COROUTINE_SUSPENDED -> Unit
@@ -771,13 +773,13 @@ public inline fun <R, A> effect(crossinline f: suspend EffectScope<R>.() -> A): 
             // CancellationException and thus effectively recovering from the cancellation/shift.
             // This means try/catch is also capable of recovering from monadic errors.
               // See: ContSpec - try/catch tests
-              throw Internal(token, r, recover as suspend (Any?) -> Any?)
+              throw Suspend(token, r, recover as suspend (Any?) -> Any?)
           }
 
         try {
           suspend { transform(f(effectScope)) }
             .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-        } catch (e: Internal) {
+        } catch (e: Suspend) {
           if (token == e.token) {
             val f: suspend () -> B = { e.recover(e.shifted) as B }
             f.startCoroutineUninterceptedOrReturn(cont)
