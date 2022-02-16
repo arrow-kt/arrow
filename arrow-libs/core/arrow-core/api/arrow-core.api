@@ -2641,14 +2641,6 @@ public final class arrow/core/continuations/FoldContinuation : kotlin/coroutines
 	public fun resumeWith (Ljava/lang/Object;)V
 }
 
-public final class arrow/core/continuations/Internal : arrow/core/continuations/ShiftCancellationException {
-	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
-	public final fun getRecover ()Lkotlin/jvm/functions/Function2;
-	public final fun getShifted ()Ljava/lang/Object;
-	public final fun getToken ()Larrow/core/continuations/Token;
-	public fun toString ()Ljava/lang/String;
-}
-
 public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/continuations/EagerEffectScope, arrow/typeclasses/Semigroup {
 	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/EagerEffectScope;)V
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2749,6 +2741,14 @@ public final class arrow/core/continuations/OptionKt {
 }
 
 public abstract class arrow/core/continuations/ShiftCancellationException : java/util/concurrent/CancellationException {
+}
+
+public final class arrow/core/continuations/Suspend : arrow/core/continuations/ShiftCancellationException {
+	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+	public final fun getRecover ()Lkotlin/jvm/functions/Function2;
+	public final fun getShifted ()Ljava/lang/Object;
+	public final fun getToken ()Larrow/core/continuations/Token;
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class arrow/core/continuations/Token {
