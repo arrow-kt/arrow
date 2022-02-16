@@ -2530,7 +2530,6 @@ public abstract interface class arrow/core/continuations/EagerEffect {
 	public abstract fun orNull ()Ljava/lang/Object;
 	public abstract fun redeem (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
 	public abstract fun redeemWith (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun toEffect ()Larrow/core/continuations/Effect;
 	public abstract fun toEither ()Larrow/core/Either;
 	public abstract fun toIor ()Larrow/core/Ior;
 	public abstract fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
@@ -2547,7 +2546,6 @@ public final class arrow/core/continuations/EagerEffect$DefaultImpls {
 	public static fun orNull (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
 	public static fun redeem (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
 	public static fun redeemWith (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun toEffect (Larrow/core/continuations/EagerEffect;)Larrow/core/continuations/Effect;
 	public static fun toEither (Larrow/core/continuations/EagerEffect;)Larrow/core/Either;
 	public static fun toIor (Larrow/core/continuations/EagerEffect;)Larrow/core/Ior;
 	public static fun toOption (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;

@@ -117,8 +117,6 @@ public interface EagerEffect<R, A> {
     fold(f, g)
   }
 
-  public fun toEffect(): Effect<R, A> = effect { bind() }
-
   public fun <R2, B> redeemWith(
     f: (R) -> EagerEffect<R2, B>,
     g: (A) -> EagerEffect<R2, B>
