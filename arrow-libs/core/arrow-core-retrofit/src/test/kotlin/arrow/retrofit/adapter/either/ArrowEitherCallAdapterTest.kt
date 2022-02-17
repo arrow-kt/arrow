@@ -41,6 +41,22 @@ class ArrowEitherCallAdapterTest : UnitSpec() {
       body shouldBe ResponseMock("Arrow rocks").right()
     }
 
+    "should return Unit when service method returns Unit and null body received" {
+      server.enqueue(MockResponse().setResponseCode(204))
+
+      val body = service.postSomething("Sample string")
+
+      body shouldBe Unit.right()
+    }
+
+    "should return Unit when service method returns Unit and JSON body received" {
+      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+
+      val body = service.postSomething("Sample string")
+
+      body shouldBe Unit.right()
+    }
+
     "should return ErrorMock for 400 with valid JSON" {
       server.enqueue(MockResponse().setBody("""{"errorCode":666}""").setResponseCode(400))
 
