@@ -3,6 +3,7 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.compose
 import arrow.core.identity
+import arrow.core.right
 import arrow.typeclasses.Monoid
 
 /**

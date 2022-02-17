@@ -26,12 +26,14 @@ kotlin {
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)
+        api(libs.kotlin.reflect)
       }
     }
     jvmTest {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)
         implementation(libs.junitJupiterEngine)
+        implementation(libs.kotlin.reflect)
       }
     }
     jsMain {
