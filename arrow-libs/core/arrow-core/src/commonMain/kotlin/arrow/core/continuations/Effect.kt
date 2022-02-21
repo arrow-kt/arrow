@@ -772,7 +772,7 @@ public inline fun <R, A> effect(crossinline f: suspend EffectScope<R>.() -> A): 
             // This however also means that the user can try/catch shift and recover from the
             // CancellationException and thus effectively recovering from the cancellation/shift.
             // This means try/catch is also capable of recovering from monadic errors.
-              // See: ContSpec - try/catch tests
+              // See: EffectSpec - try/catch tests
               throw Suspend(token, r, recover as suspend (Any?) -> Any?)
           }
 
