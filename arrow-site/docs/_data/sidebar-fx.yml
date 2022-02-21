@@ -20,23 +20,6 @@ options:
       - title: CircuitBreaker
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/
 
-  - title: Continuations and programs
-    nested_options:
-
-      - title: arrow.core.continutions.Effect
-        url: /apidocs/arrow-core/arrow.core.continuations/-effect/
-
-      - title: arrow.core.continuations.EffectScope
-        url: /apidocs/arrow-core/arrow.core.continuations/-effect-scope/
-
-      - title: arrow.core.continuations.EagerEffect
-        url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect/
-
-      - title: arrow.core.continuations.EagerEffectScope
-        url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/
-
-      - title: Semantics of Structured Concurrency and Effect
-        url: /arrow/core/continuations/
 
   - title: Misc
     nested_options:
