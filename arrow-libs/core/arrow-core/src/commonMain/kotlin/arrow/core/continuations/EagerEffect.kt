@@ -176,7 +176,7 @@ public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.
           // This however also means that the user can try/catch shift and recover from the
           // CancellationException and thus effectively recovering from the cancellation/shift.
           // This means try/catch is also capable of recovering from monadic errors.
-            // See: ContSpec - try/catch tests
+            // See: EagerEffectSpec - try/catch tests
             throw Eager(token, r, recover as (Any?) -> Any?)
         }
 
