@@ -63,6 +63,7 @@ s [Coroutines Guide](https://kotlinlang.org/docs/coroutines-guide.html) on Kotli
   - [Pure & Referentially Transparent Functions]({{ '/fx/purity-and-referentially-transparent-functions/' | relative_url }})
   - [Kotlin's Std Coroutines package]({{ '/fx/coroutines/' | relative_url }})
   - [Why suspend over IO monad]({{ '/effects/io/' | relative_url }})
+  - [Semantics of Structured Concurrency and Effect]({{ '/arrow/core/continuations/' | relative_url }})
 </div>
 </div>
 </div>

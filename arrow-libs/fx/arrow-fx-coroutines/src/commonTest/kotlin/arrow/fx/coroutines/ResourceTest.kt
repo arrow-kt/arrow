@@ -120,7 +120,7 @@ class ResourceTest : ArrowFxSpec(
         }.use { it }
       } shouldBe "error".left()
       // Should be ExitCase.Cancelled but still Failure due to ShortCircuit
-      // Cont<R, A> will fix this issue by properly shifting and cancelling
+      // Effect<R, A> will fix this issue by properly shifting and cancelling
       exit.await().shouldBeTypeOf<ExitCase.Failure>()
     }
 
