@@ -55,7 +55,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  *
  * fun STM.withdraw(acc: TVar<Int>, amount: Int): Unit {
  *   val current = acc.read()
- *   if (current - amount >= 0) acc.write(current + amount)
+ *   if (current - amount >= 0) acc.write(current - amount)
  *   else throw IllegalStateException("Not enough money in the account!")
  * }
  * //sampleEnd
