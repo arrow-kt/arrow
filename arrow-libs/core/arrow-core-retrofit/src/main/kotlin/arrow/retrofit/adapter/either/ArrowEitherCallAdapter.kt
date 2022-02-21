@@ -23,13 +23,14 @@ internal class ArrowEitherCallAdapter<E, R>(
   private val errorConverter: Converter<ResponseBody, E> =
     retrofit.responseBodyConverter(errorType, arrayOfNulls(0))
 
-  override fun adapt(call: Call<R>): Call<Either<E, R>> = EitherCall(call, errorConverter)
+  override fun adapt(call: Call<R>): Call<Either<E, R>> = EitherCall(call, errorConverter, bodyType)
 
   override fun responseType(): Type = bodyType
 
   class EitherCall<E, R>(
     private val original: Call<R>,
-    private val errorConverter: Converter<ResponseBody, E>
+    private val errorConverter: Converter<ResponseBody, E>,
+    private val bodyType: Type
   ) : Call<Either<E, R>> {
 
     override fun enqueue(callback: Callback<Either<E, R>>) {
@@ -44,6 +45,7 @@ internal class ArrowEitherCallAdapter<E, R>(
             callback,
             this@EitherCall,
             errorConverter,
+            bodyType,
             response,
             { body, _ ->
               Response.success(response.code(), body.right())
@@ -60,7 +62,7 @@ internal class ArrowEitherCallAdapter<E, R>(
 
     override fun timeout(): Timeout = original.timeout()
 
-    override fun clone(): Call<Either<E, R>> = EitherCall(original.clone(), errorConverter)
+    override fun clone(): Call<Either<E, R>> = EitherCall(original.clone(), errorConverter, bodyType)
 
     override fun isCanceled(): Boolean = original.isCanceled
 
