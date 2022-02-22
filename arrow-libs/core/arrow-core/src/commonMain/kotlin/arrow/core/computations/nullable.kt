@@ -85,6 +85,7 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
+@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("option", "arrow.core.continuations.option"))
 @Suppress("ClassName")
 public object nullable {
   @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("option.eager(func)", "arrow.core.continuations.option"))

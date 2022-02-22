@@ -7,18 +7,23 @@ import arrow.core.identity
 /**
  * DSL Receiver Syntax for [result].
  */
+@Deprecated("$deprecateInFavorOfOptionEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
 public object ResultEffect {
 
+  @Deprecated("$deprecateInFavorOfOptionEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
   public fun <A> Result<A>.bind(): A =
     getOrThrow()
 
+  @Deprecated("$deprecateInFavorOfOptionEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
   public fun <A> Either<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
 
+  @Deprecated("$deprecateInFavorOfOptionEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
   public fun <A> Validated<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
 }
 
+@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("result", "arrow.core.continuations.result"))
 @Suppress("ClassName")
 public object result {
 
@@ -47,8 +52,9 @@ public object result {
    *   } // Result.Success(3)
    * }
    * ```
- * <!--- KNIT example-result-computations-01.kt -->
+   * <!--- KNIT example-result-computations-01.kt -->
    */
+  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("result.eager(block)", "arrow.core.continuations.result"))
   public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
     kotlin.runCatching { block(ResultEffect) }
 }
