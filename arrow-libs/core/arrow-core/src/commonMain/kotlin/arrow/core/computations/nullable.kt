@@ -7,10 +7,13 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated("NullableEffect is being replaced by arrow.core.continuations.OptionEffectScope")
 public fun interface NullableEffect<A> : Effect<A?> {
+  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(null)
 
+  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun <B> Option<B>.bind(): B =
     orNull().bind()
 
@@ -36,8 +39,9 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * // println: "ensure(true) passes"
    * // res: null
    * ```
- * <!--- KNIT example-nullable-computations-01.kt -->
+   * <!--- KNIT example-nullable-computations-01.kt -->
    */
+  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(null)
 }
@@ -67,6 +71,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * ```
  * <!--- KNIT example-nullable-computations-02.kt -->
  */
+@Deprecated(deprecateInFavorOfOptionEffectScope)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   contract {
@@ -76,14 +81,23 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   return value ?: control().shift(null)
 }
 
+@Deprecated(deprecateInFavorOfOptionEagerEffectScope)
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
 @Suppress("ClassName")
 public object nullable {
+  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("option.eager(func)", "arrow.core.continuations.option"))
   public inline fun <A> eager(crossinline func: suspend RestrictedNullableEffect<A>.() -> A?): A? =
     Effect.restricted(eff = { RestrictedNullableEffect { it } }, f = func, just = { it })
 
+  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("option(func)", "arrow.core.continuations.option"))
   public suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }
+
+internal const val deprecateInFavorOfOptionEffectScope: String =
+  "Is being replaced by arrow.core.continuations.OptionEffectScope"
+
+internal const val deprecateInFavorOfOptionEagerEffectScope: String =
+  "Is being replaced by arrow.core.continuations.OptionEagerEffectScope"
