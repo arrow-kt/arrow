@@ -40,16 +40,16 @@ options:
 
     nested_options:
 
-      - title: arrow.core.continutions.Effect
+      - title: Effect
         url: /apidocs/arrow-core/arrow.core.continuations/-effect/
 
-      - title: arrow.core.continuations.EffectScope
+      - title: EffectScope
         url: /apidocs/arrow-core/arrow.core.continuations/-effect-scope/
 
-      - title: arrow.core.continuations.EagerEffect
+      - title: EagerEffect
         url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect/
 
-      - title: arrow.core.continuations.EagerEffectScope
+      - title: EagerEffectScope
         url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/
 
       - title: Semantics of Structured Concurrency and Effect
