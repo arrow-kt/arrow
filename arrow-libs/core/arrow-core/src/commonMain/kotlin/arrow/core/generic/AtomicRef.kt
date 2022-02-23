@@ -1,6 +1,5 @@
-package arrow.continuations.generic
+package arrow.core.generic
 
-@Deprecated(deprecateArrowContinuation)
 public expect class AtomicRef<V>(initialValue: V) {
   public fun get(): V
   public fun set(value: V)
@@ -16,14 +15,12 @@ public expect class AtomicRef<V>(initialValue: V) {
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-@Deprecated(deprecateArrowContinuation)
 public inline fun <V> AtomicRef<V>.loop(action: (V) -> Unit): Nothing {
   while (true) {
     action(get())
   }
 }
 
-@Deprecated(deprecateArrowContinuation)
 public inline fun <V> AtomicRef<V>.update(function: (V) -> V) {
   while (true) {
     val cur = get()
@@ -35,7 +32,6 @@ public inline fun <V> AtomicRef<V>.update(function: (V) -> V) {
 /**
  * Updates variable atomically using the specified [function] of its value and returns its old value.
  */
-@Deprecated(deprecateArrowContinuation)
 public inline fun <V> AtomicRef<V>.getAndUpdate(function: (V) -> V): V {
   while (true) {
     val cur = get()
@@ -47,7 +43,6 @@ public inline fun <V> AtomicRef<V>.getAndUpdate(function: (V) -> V): V {
 /**
  * Updates variable atomically using the specified [function] of its value and returns its new value.
  */
-@Deprecated(deprecateArrowContinuation)
 public inline fun <V> AtomicRef<V>.updateAndGet(function: (V) -> V): V {
   while (true) {
     val cur = get()

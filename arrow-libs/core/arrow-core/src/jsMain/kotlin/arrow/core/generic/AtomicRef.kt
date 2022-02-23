@@ -1,6 +1,5 @@
-package arrow.continuations.generic
+package arrow.core.generic
 
-@Deprecated(deprecateArrowContinuation)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private var internalValue: V = initialValue
 

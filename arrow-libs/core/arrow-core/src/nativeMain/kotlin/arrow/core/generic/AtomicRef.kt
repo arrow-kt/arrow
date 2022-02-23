@@ -1,10 +1,9 @@
-package arrow.continuations.generic
+package arrow.core.generic
 
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
-@Deprecated(deprecateArrowContinuation)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private val atom = AtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value
@@ -26,5 +25,6 @@ public actual class AtomicRef<V> actual constructor(initialValue: V) {
    * Compare current value with expected and set to new if they're the same. Note, 'compare' is checking
    * the actual object id, not 'equals'.
    */
-  public actual fun compareAndSet(expected: V, new: V): Boolean = atom.compareAndSet(expected, new.freeze())
+  public actual fun compareAndSet(expected: V, new: V): Boolean =
+    atom.compareAndSet(expected, new.freeze())
 }
