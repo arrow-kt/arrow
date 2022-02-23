@@ -14,21 +14,18 @@ import kotlin.coroutines.RestrictsSuspension
 @Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
 public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
       is Left -> control().shift(this@bind)
     }
 
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
       is Validated.Invalid -> control().shift(Left(value))
     }
 
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
     fold(::identity) { throwable ->
       control().shift(transform(throwable).left())
@@ -59,7 +56,6 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
    * ```
    * <!--- KNIT example-either-computations-01.kt -->
    */
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun ensure(value: Boolean, orLeft: () -> E): Unit =
     if (value) Unit else orLeft().left().bind()
 }

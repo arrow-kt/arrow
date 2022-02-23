@@ -6,7 +6,6 @@ import kotlin.coroutines.RestrictsSuspension
 
 @Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
 public fun interface EvalEffect<A> : Effect<Eval<A>> {
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun <B> Eval<B>.bind(): B =
     value()
 }

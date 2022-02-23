@@ -9,11 +9,9 @@ import kotlin.coroutines.RestrictsSuspension
 
 @Deprecated("NullableEffect is being replaced by arrow.core.continuations.OptionEffectScope")
 public fun interface NullableEffect<A> : Effect<A?> {
-  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(null)
 
-  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun <B> Option<B>.bind(): B =
     orNull().bind()
 
@@ -41,7 +39,6 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * ```
    * <!--- KNIT example-nullable-computations-01.kt -->
    */
-  @Deprecated(deprecateInFavorOfOptionEffectScope)
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(null)
 }

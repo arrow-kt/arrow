@@ -10,7 +10,6 @@ import kotlin.coroutines.RestrictsSuspension
 
 @Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
 public fun interface OptionEffect<A> : Effect<Option<A>> {
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, ::identity)
 
@@ -38,7 +37,6 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * ```
    * <!--- KNIT example-option-computations-01.kt -->
    */
-  @Deprecated(deprecateInFavorOfEffectScope)
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(None)
 }
