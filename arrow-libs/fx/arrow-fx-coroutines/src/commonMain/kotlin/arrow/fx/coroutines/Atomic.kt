@@ -1,6 +1,6 @@
 package arrow.fx.coroutines
 
-import arrow.continuations.generic.AtomicRef
+import arrow.core.generic.AtomicRef
 
 /**
  * An [Atomic] with an initial value of [A].

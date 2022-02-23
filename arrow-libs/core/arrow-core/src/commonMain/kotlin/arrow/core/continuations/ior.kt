@@ -1,9 +1,9 @@
 package arrow.core.continuations
 
-import arrow.continuations.generic.AtomicRef
-import arrow.continuations.generic.updateAndGet
+import arrow.core.generic.AtomicRef
 import arrow.core.EmptyValue
 import arrow.core.Ior
+import arrow.core.generic.updateAndGet
 import arrow.core.identity
 import arrow.typeclasses.Semigroup
 

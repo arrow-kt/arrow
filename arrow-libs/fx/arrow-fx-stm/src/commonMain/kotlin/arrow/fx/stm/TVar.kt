@@ -1,8 +1,8 @@
 package arrow.fx.stm
 
-import arrow.continuations.generic.AtomicRef
-import arrow.continuations.generic.update
-import arrow.continuations.generic.updateAndGet
+import arrow.core.generic.AtomicRef
+import arrow.core.generic.update
+import arrow.core.generic.updateAndGet
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlin.coroutines.resume

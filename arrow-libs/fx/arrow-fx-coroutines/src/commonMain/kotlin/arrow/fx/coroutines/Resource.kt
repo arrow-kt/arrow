@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import arrow.continuations.generic.AtomicRef
-import arrow.continuations.generic.update
+import arrow.core.generic.AtomicRef
+import arrow.core.generic.update
 import arrow.core.NonEmptyList
 import arrow.core.ValidatedNel
 import arrow.core.identity
