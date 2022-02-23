@@ -1,3 +1,9 @@
+---
+layout: docs-core
+title: Semantics of Structured Concurrency + Effect<R, A>
+permalink: /arrow/core/continuations/
+---
+
 # Semantics of Structured Concurrency + Effect<R, A>
 
 KotlinX Structured Concurrency is super important for eco-system,  and thus important to us for wide-adoption of this pattern
