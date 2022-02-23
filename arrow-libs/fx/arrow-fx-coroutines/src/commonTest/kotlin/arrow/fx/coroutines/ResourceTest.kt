@@ -113,7 +113,7 @@ class ResourceTest : ArrowFxSpec(
     "Resource can close from either" {
       val exit = CompletableDeferred<ExitCase>()
       arrow.core.computations.either<String, Int> {
-        arrow.fx.coroutines.computations.resource<Int> {
+        arrow.fx.coroutines.continuations.resource<Int> {
           Resource({ 1 }) { _, ex -> require(exit.complete(ex)) }.bind()
           "error".left().bind()
           1
