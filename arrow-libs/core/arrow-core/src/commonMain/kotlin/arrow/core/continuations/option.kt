@@ -22,8 +22,11 @@ public value class OptionEffectScope(private val cont: EffectScope<None>) : Effe
   public suspend fun <B> Option<B>.bind(): B =
     bind { None }
 
-  public suspend fun <B> B?.bind(): B =
-    this ?: shift(None)
+  @OptIn(ExperimentalContracts::class)
+  public suspend fun <B> B?.bind(): B {
+    contract { returns() implies (this@bind != null) }
+    return this ?: shift(None)
+  }
 
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
@@ -50,8 +53,11 @@ public value class OptionEagerEffectScope(private val cont: EagerEffectScope<Non
   public suspend fun <B> Option<B>.bind(): B =
     bind { None }
 
-  public suspend fun <B> B?.bind(): B =
-    this ?: shift(None)
+  @OptIn(ExperimentalContracts::class)
+  public suspend fun <B> B?.bind(): B {
+    contract { returns() implies (this@bind != null) }
+    return this ?: shift(None)
+  }
 
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
