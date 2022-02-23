@@ -49,9 +49,9 @@ import arrow.fx.coroutines.Resource
  * ```
  * <!--- KNIT example-resource-computations-01.kt -->
  */
-public interface ResourceEffect {
+public interface ResourceScope {
   public suspend fun <A> Resource<A>.bind(): A
 }
 
-public fun <A> resource(f: suspend ResourceEffect.() -> A): Resource<A> =
+public fun <A> resource(f: suspend ResourceScope.() -> A): Resource<A> =
   Resource.Dsl(f)

@@ -8,7 +8,7 @@ import arrow.core.identity
 import arrow.core.invalidNel
 import arrow.core.traverseValidated
 import arrow.core.valid
-import arrow.fx.coroutines.continuations.ResourceEffect
+import arrow.fx.coroutines.continuations.ResourceScope
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -177,7 +177,7 @@ public sealed class Resource<out A> {
   public tailrec suspend infix fun <B> use(f: suspend (A) -> B): B =
     when (this) {
       is Dsl -> {
-        val effect = ResEffectImpl()
+        val effect = ResourceScopeImpl()
         val b = try {
           val a = dsl(effect)
           f(a)
@@ -499,7 +499,7 @@ public sealed class Resource<out A> {
   )
   public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
 
-  internal data class Dsl<A>(public val dsl: suspend ResourceEffect.() -> A) : Resource<A>()
+  internal data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>()
 
   public companion object {
 
@@ -713,11 +713,11 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
   traverseResource(::identity)
 
-private class ResEffectImpl : ResourceEffect {
+private class ResourceScopeImpl : ResourceScope {
   val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList())
   override suspend fun <A> Resource<A>.bind(): A =
     when (this) {
-      is Resource.Dsl -> dsl.invoke(this@ResEffectImpl)
+      is Resource.Dsl -> dsl.invoke(this@ResourceScopeImpl)
       is Resource.Allocate -> bracketCase({
         val a = acquire()
         val finalizer: suspend (ExitCase) -> Unit = { ex: ExitCase -> release(a, ex) }
@@ -733,12 +733,12 @@ private class ResEffectImpl : ResourceEffect {
         }
       })
       is Resource.Bind<*, *> -> {
-        val dsl: suspend ResourceEffect.() -> A = {
+        val dsl: suspend ResourceScope.() -> A = {
           val any = source.bind()
           val ff = f as (Any?) -> Resource<A>
           ff(any).bind()
         }
-        dsl(this@ResEffectImpl)
+        dsl(this@ResourceScopeImpl)
       }
       is Resource.Defer -> resource().bind()
     }
