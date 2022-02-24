@@ -1,4 +1,4 @@
-package arrow.core.generic
+package arrow.core.continuations
 
 public expect class AtomicRef<V>(initialValue: V) {
   public fun get(): V

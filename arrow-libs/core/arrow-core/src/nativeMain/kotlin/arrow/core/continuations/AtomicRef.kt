@@ -1,4 +1,4 @@
-package arrow.core.generic
+package arrow.core.continuations
 
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze

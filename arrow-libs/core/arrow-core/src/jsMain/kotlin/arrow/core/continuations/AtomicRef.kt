@@ -1,4 +1,4 @@
-package arrow.core.generic
+package arrow.core.continuations
 
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private var internalValue: V = initialValue

@@ -1,6 +1,6 @@
 @file:JvmName("AtomicReferenceActual")
 
-package arrow.core.generic
+package arrow.core.continuations
 
 import java.util.concurrent.atomic.AtomicReference
 
