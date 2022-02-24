@@ -87,9 +87,3 @@ public object nullable {
   public suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }
-
-internal const val deprecateInFavorOfOptionEffectScope: String =
-  "Is being replaced by arrow.core.continuations.OptionEffectScope"
-
-internal const val deprecateInFavorOfOptionEagerEffectScope: String =
-  "Is being replaced by arrow.core.continuations.OptionEagerEffectScope"
