@@ -76,7 +76,6 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   return value ?: control().shift(null)
 }
 
-@Deprecated(deprecateInFavorOfOptionEagerEffectScope)
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
