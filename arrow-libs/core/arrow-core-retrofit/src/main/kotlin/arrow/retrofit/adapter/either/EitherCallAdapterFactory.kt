@@ -1,6 +1,8 @@
 package arrow.retrofit.adapter.either
 
 import arrow.core.Either
+import arrow.retrofit.adapter.either.networkhandling.CallError
+import arrow.retrofit.adapter.either.networkhandling.NetworkEitherCallAdapter
 import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
@@ -10,28 +12,58 @@ import java.lang.reflect.Type
 /**
  * A [CallAdapter.Factory] which supports suspend + [Either] as the return type
  *
- * Adding this to [Retrofit] will enable you to return [Either] from your service methods.
+ * Adding this to [Retrofit] will enable you to return [Either] or [ResponseE] from your service
+ * methods. [ResponseE] is similar to [retrofit2.Response] but uses [Either] for the response
+ * body.
  *
  * ```kotlin
  * import arrow.core.Either
+ * import arrow.retrofit.adapter.either.ResponseE
  * import retrofit2.http.GET
  *
  * data class User(val name: String)
  * data class ErrorBody(val msg: String)
+ *
  * interface MyService {
- *   @GET("/user/me")
- *   suspend fun user(): Either<ErrorBody, User>
  *
  *   @GET("/user/me")
- *   suspend fun userResponse(): Either<ErrorBody, User>
+ *   suspend fun getUser(): Either<ErrorBody, User>
+ *
+ *   @GET("/user/me")
+ *   suspend fun getUserResponseE(): ResponseE<ErrorBody, User>
  * }
  * ```
  * <!--- KNIT example-arrow-retrofit-01.kt -->
  *
- * Using [Either] as the return type means that 200 status code and HTTP errors return a value,
- * other exceptions will throw.
+ * Using [Either] or [ResponseE] as the return type means that 200 status code and HTTP errors
+ * return a value, other exceptions will throw.
  *
- * [ResponseE] is similar to [retrofit2.Response] but uses [Either] for the response body.
+ * If you want an adapter that never throws but instead wraps all errors (including no network,
+ * timeout, malformed JSON) in a dedicated type then define [CallError] as your error type
+ * argument. Note that this adapter only supports [Either] as the response wrapper (it does not
+ * support [ResponseE]):
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.retrofit.adapter.either.networkhandling.CallError
+ * import retrofit2.http.Body
+ * import retrofit2.http.GET
+ * import retrofit2.http.POST
+ *
+ * data class User(val name: String)
+ *
+ * interface MyService {
+ *
+ *   @GET("/user/me")
+ *   suspend fun getUser(): Either<CallError, User>
+ *
+ *   // Set the expected response type as Unit if you expect a null response body
+ *   // (e.g. for 204 No Content response)
+ *   @POST("/")
+ *   suspend fun postSomething(@Body something: String): Either<CallError, Unit>
+ * }
+ * ```
+ * <!--- KNIT example-arrow-retrofit-02.kt -->
  */
 public class EitherCallAdapterFactory : CallAdapter.Factory() {
 
@@ -56,12 +88,18 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     }
   }
 
-  private fun eitherAdapter(returnType: ParameterizedType, retrofit: Retrofit): CallAdapter<Type, out Call<out Any>>? {
+  private fun eitherAdapter(
+    returnType: ParameterizedType,
+    retrofit: Retrofit
+  ): CallAdapter<Type, out Call<out Any>>? {
     val wrapperType = getParameterUpperBound(0, returnType)
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
-        ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
+        if (errorType == CallError::class.java)
+          NetworkEitherCallAdapter(bodyType)
+        else
+          ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
       }
       ResponseE::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)

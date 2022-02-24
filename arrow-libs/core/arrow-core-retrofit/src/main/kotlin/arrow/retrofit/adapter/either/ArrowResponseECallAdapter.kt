@@ -1,6 +1,5 @@
 package arrow.retrofit.adapter.either
 
-import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import okhttp3.Request
@@ -23,13 +22,14 @@ internal class ArrowResponseECallAdapter<E, R>(
   private val errorConverter: Converter<ResponseBody, E> =
     retrofit.responseBodyConverter(errorType, arrayOfNulls(0))
 
-  override fun adapt(call: Call<R>): Call<ResponseE<E, R>> = ResponseECall(call, errorConverter)
+  override fun adapt(call: Call<R>): Call<ResponseE<E, R>> = ResponseECall(call, errorConverter, bodyType)
 
   override fun responseType(): Type = bodyType
 
   class ResponseECall<E, R>(
     private val original: Call<R>,
-    private val errorConverter: Converter<ResponseBody, E>
+    private val errorConverter: Converter<ResponseBody, E>,
+    private val bodyType: Type
   ) : Call<ResponseE<E, R>> {
 
     override fun enqueue(callback: Callback<ResponseE<E, R>>) {
@@ -44,13 +44,13 @@ internal class ArrowResponseECallAdapter<E, R>(
             callback,
             this@ResponseECall,
             errorConverter,
+            bodyType,
             response,
             { body, responseT ->
-              val bodyE: Either<E, R> = body.right()
-              Response.success(responseT.code(), ResponseE(responseT.raw(), bodyE))
+              Response.success(responseT.code(), ResponseE(responseT.raw(), body.right()))
             },
             { errorBody, responseV ->
-              Response.success<ResponseE<E, R>>(ResponseE(responseV.raw(), errorBody.left()))
+              Response.success(ResponseE(responseV.raw(), errorBody.left()))
             }
           )
         }
@@ -61,7 +61,7 @@ internal class ArrowResponseECallAdapter<E, R>(
 
     override fun timeout(): Timeout = original.timeout()
 
-    override fun clone(): Call<ResponseE<E, R>> = ResponseECall(original.clone(), errorConverter)
+    override fun clone(): Call<ResponseE<E, R>> = ResponseECall(original.clone(), errorConverter, bodyType)
 
     override fun isCanceled(): Boolean = original.isCanceled
 
