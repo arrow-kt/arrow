@@ -67,7 +67,6 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * ```
  * <!--- KNIT example-nullable-computations-02.kt -->
  */
-@Deprecated(deprecateInFavorOfOptionEffectScope)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   contract {
