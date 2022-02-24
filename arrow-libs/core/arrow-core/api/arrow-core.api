@@ -2844,12 +2844,6 @@ public final class arrow/core/continuations/ior {
 	public final fun invoke (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/nullable {
-	public static final field INSTANCE Larrow/core/continuations/nullable;
-	public final fun eager (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
 public final class arrow/core/continuations/option {
 	public static final field INSTANCE Larrow/core/continuations/option;
 	public final fun eager (Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
