@@ -79,14 +79,11 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
-@Deprecated(deprecateInFavorOfEffectOrEagerEffect)
 @Suppress("ClassName")
 public object nullable {
-  @Deprecated(deprecateInFavorOfEagerEffect)
   public inline fun <A> eager(crossinline func: suspend RestrictedNullableEffect<A>.() -> A?): A? =
     Effect.restricted(eff = { RestrictedNullableEffect { it } }, f = func, just = { it })
 
-  @Deprecated(deprecateInFavorOfEffect)
   public suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }
