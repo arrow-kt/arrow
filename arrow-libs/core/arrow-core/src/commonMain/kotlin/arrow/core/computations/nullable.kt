@@ -7,7 +7,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
-@Deprecated("NullableEffect is being replaced by arrow.core.continuations.OptionEffectScope")
 public fun interface NullableEffect<A> : Effect<A?> {
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(null)
