@@ -104,3 +104,9 @@ public object either {
   public suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
     Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }
+
+internal const val deprecatedInFavorOfEagerEffectScope: String = "Deprecated in favor of Eager Effect DSL: EagerEffectScope"
+internal const val deprecateInFavorOfEffectScope: String = "Deprecated in favor of Effect DSL: EffectScope"
+internal const val deprecateInFavorOfEffect: String = "Deprecated in favor of the Effect Runtime"
+internal const val deprecateInFavorOfEagerEffect: String = "Deprecated in favor of the EagerEffect Runtime"
+internal const val deprecateInFavorOfEffectOrEagerEffect: String = "Deprecated in favor of the Effect or EagerEffect Runtime"
