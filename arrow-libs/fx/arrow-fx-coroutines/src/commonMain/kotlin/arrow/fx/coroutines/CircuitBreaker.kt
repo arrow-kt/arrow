@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import arrow.continuations.generic.AtomicRef
 import arrow.core.Either
+import arrow.core.continuations.AtomicRef
 import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen

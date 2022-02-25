@@ -3,6 +3,7 @@ package arrow.continuations.generic
 /**
  * Base interface for a continuation
  */
+@Deprecated(deprecateArrowContinuation)
 public interface DelimitedContinuation<A, R> {
   public suspend operator fun invoke(a: A): R
 }
@@ -10,6 +11,7 @@ public interface DelimitedContinuation<A, R> {
 /**
  * Base interface for our scope.
  */
+@Deprecated(deprecateArrowContinuation)
 public interface DelimitedScope<R> {
 
   /**
@@ -18,6 +20,7 @@ public interface DelimitedScope<R> {
   public suspend fun <A> shift(r: R): A
 }
 
+@Deprecated(deprecateArrowContinuation)
 public interface RestrictedScope<R> : DelimitedScope<R> {
   /**
    * Capture the continuation and pass it to [f].
@@ -27,4 +30,5 @@ public interface RestrictedScope<R> : DelimitedScope<R> {
   public override suspend fun <A> shift(r: R): A = shift { r }
 }
 
+@Deprecated(deprecateArrowContinuation)
 public interface SuspendedScope<R> : DelimitedScope<R>

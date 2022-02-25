@@ -7,6 +7,7 @@ package arrow.continuations.generic
  * and `arrow.core.NonFatal` does not catch this [Throwable].
  * Thus by extension `Either.catch` and `Validated.catch` also don't catch [ControlThrowable.kt].
  */
+@Deprecated(deprecateArrowContinuation)
 public actual open class ControlThrowable : Throwable() {
   override fun fillInStackTrace(): Throwable = this
 }
