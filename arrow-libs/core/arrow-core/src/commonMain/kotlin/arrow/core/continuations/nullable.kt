@@ -43,25 +43,25 @@ public value class NullableEagerEffectScope<R>(private val cont: EagerEffectScop
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R, B> NullableEffectScope<R?>.ensureNotNull(value: B?): B {
+public suspend fun <R : Any, B> NullableEffectScope<R?>.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R, B> NullableEagerEffectScope<R?>.ensureNotNull(value: B?): B {
+public suspend fun <R : Any, B> NullableEagerEffectScope<R?>.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
 
 @Suppress("ClassName")
 public object nullable {
-  public inline fun <R, A> eager(crossinline f: suspend NullableEagerEffectScope<R?>.() -> A): A? =
-    eagerEffect<R?, A> {
+  public inline fun <A> eager(crossinline f: suspend NullableEagerEffectScope<Any?>.() -> A): A? =
+    eagerEffect<Any?, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(NullableEagerEffectScope(this))
     }.orNull()
 
-  public suspend inline operator fun <R, A> invoke(crossinline f: suspend NullableEffectScope<R?>.() -> A): A? =
-    effect<R?, A> { f(NullableEffectScope(this)) }.orNull()
+  public suspend inline operator fun <A> invoke(crossinline f: suspend NullableEffectScope<Any?>.() -> A): A? =
+    effect<Any?, A> { f(NullableEffectScope(this)) }.orNull()
 }

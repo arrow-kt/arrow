@@ -12,7 +12,7 @@ import io.kotest.property.checkAll
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
-      nullable<Any?, Int> {
+      nullable {
         ensure(predicate)
         i
       } shouldBe if (predicate) i else null
@@ -22,7 +22,7 @@ class NullableSpec : StringSpec({
   "ensureNotNull in nullable computation" {
     fun square(i: Int): Int = i * i
     checkAll(Arb.int().orNull()) { i: Int? ->
-      nullable<Any?, Int> {
+      nullable {
         val ii = i
         ensureNotNull(ii)
         square(ii) // Smart-cast by contract
@@ -31,7 +31,7 @@ class NullableSpec : StringSpec({
   }
 
   "short circuit null" {
-    nullable<Any?, Nothing> {
+    nullable {
       val number: Int = "s".length
       val x = ensureNotNull(number.takeIf { it > 1 })
       x
@@ -40,13 +40,13 @@ class NullableSpec : StringSpec({
   }
 
   "simple case" {
-    nullable<Any?, Int> {
+    nullable {
       "s".length.bind()
     } shouldBe 1
   }
 
   "multiple types" {
-    nullable<Any?, String> {
+    nullable {
       val number = "s".length
       val string = number.toString().bind()
       string
@@ -54,7 +54,7 @@ class NullableSpec : StringSpec({
   }
 
   "binding option in nullable" {
-    nullable<Any?, String> {
+    nullable {
       val number = Some("s".length)
       val string = number.map(Int::toString).bind()
       string
@@ -62,7 +62,7 @@ class NullableSpec : StringSpec({
   }
 
   "short circuit null" {
-    nullable<Any?, Nothing> {
+    nullable {
       val number: Int = "s".length
       (number.takeIf { it > 1 }?.toString()).bind()
       throw IllegalStateException("This should not be executed")
@@ -70,7 +70,7 @@ class NullableSpec : StringSpec({
   }
 
   "short circuit option" {
-    nullable<Any?, Nothing> {
+    nullable {
       val number = Some("s".length)
       number.filter { it > 1 }.map(Int::toString).bind()
       throw IllegalStateException("This should not be executed")
@@ -78,7 +78,7 @@ class NullableSpec : StringSpec({
   }
 
   "when expression" {
-    nullable<Any?, String> {
+    nullable {
       val number = "s".length.bind()
       val string = when (number) {
         1 -> number.toString()
@@ -89,7 +89,7 @@ class NullableSpec : StringSpec({
   }
 
   "if expression" {
-    nullable<Any?, String> {
+    nullable {
       val number = "s".length.bind()
       val string = if (number == 1) {
         number.toString()
@@ -101,7 +101,7 @@ class NullableSpec : StringSpec({
   }
 
   "if expression short circuit" {
-    nullable<Any?, String> {
+    nullable {
       val number = "s".length.bind()
       val string = if (number != 1) {
         number.toString()
