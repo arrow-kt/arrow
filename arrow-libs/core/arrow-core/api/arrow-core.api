@@ -2704,8 +2704,9 @@ public final class arrow/core/continuations/NullableEagerEffectScope : arrow/cor
 	public static final fun equals-impl0 (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffectScope;)Z
 	public fun hashCode ()I
 	public static fun hashCode-impl (Larrow/core/continuations/EagerEffectScope;)I
-	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun shift (Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun shift-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/continuations/EagerEffectScope;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerEffectScope;
@@ -2736,8 +2737,9 @@ public final class arrow/core/continuations/NullableEffectScope : arrow/core/con
 	public static final fun equals-impl0 (Larrow/core/continuations/EffectScope;Larrow/core/continuations/EffectScope;)Z
 	public fun hashCode ()I
 	public static fun hashCode-impl (Larrow/core/continuations/EffectScope;)I
-	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun shift (Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun shift-impl (Larrow/core/continuations/EffectScope;Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/continuations/EffectScope;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/continuations/EffectScope;

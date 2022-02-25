@@ -6,8 +6,8 @@ import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 
 @JvmInline
-public value class NullableEffectScope(private val cont: EffectScope<Any?>) : EffectScope<Any?> {
-  override suspend fun <B> shift(r: Any?): B =
+public value class NullableEffectScope(private val cont: EffectScope<Nothing?>) : EffectScope<Nothing?> {
+  override suspend fun <B> shift(r: Nothing?): B =
     cont.shift(r)
 
   public suspend fun <B> Option<B>.bind(): B =
@@ -24,9 +24,9 @@ public value class NullableEffectScope(private val cont: EffectScope<Any?>) : Ef
 }
 
 @JvmInline
-public value class NullableEagerEffectScope(private val cont: EagerEffectScope<Any?>) : EagerEffectScope<Any?> {
+public value class NullableEagerEffectScope(private val cont: EagerEffectScope<Nothing?>) : EagerEffectScope<Nothing?> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-  override suspend fun <B> shift(r: Any?): B =
+  override suspend fun <B> shift(r: Nothing?): B =
     cont.shift(r)
 
   public suspend fun <B> Option<B>.bind(): B =
@@ -57,11 +57,11 @@ public suspend fun <B> NullableEagerEffectScope.ensureNotNull(value: B?): B {
 @Suppress("ClassName")
 public object nullable {
   public inline fun <A> eager(crossinline f: suspend NullableEagerEffectScope.() -> A): A? =
-    eagerEffect<Any?, A> {
+    eagerEffect<Nothing?, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(NullableEagerEffectScope(this))
     }.orNull()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend NullableEffectScope.() -> A): A? =
-    effect<Any?, A> { f(NullableEffectScope(this)) }.orNull()
+    effect<Nothing?, A> { f(NullableEffectScope(this)) }.orNull()
 }
