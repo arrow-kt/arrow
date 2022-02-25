@@ -36,7 +36,7 @@ class NullableSpec : StringSpec({
       val x = ensureNotNull(number.takeIf { it > 1 })
       x
       throw IllegalStateException("This should not be executed")
-    } shouldBe arrow.core.None
+    } shouldBe null
   }
 
   "simple case" {
