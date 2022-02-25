@@ -2,8 +2,8 @@
 
 package arrow.core
 
-import arrow.continuations.generic.AtomicRef
-import arrow.continuations.generic.loop
+import arrow.core.continuations.AtomicRef
+import arrow.core.continuations.loop
 import kotlin.jvm.JvmName
 
 /**
