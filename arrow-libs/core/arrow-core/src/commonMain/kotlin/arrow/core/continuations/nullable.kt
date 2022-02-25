@@ -6,8 +6,8 @@ import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 
 @JvmInline
-public value class NullableEffectScope<R>(private val cont: EffectScope<R?>) : EffectScope<R?> {
-  override suspend fun <B> shift(r: R?): B =
+public value class NullableEffectScope(private val cont: EffectScope<Any?>) : EffectScope<Any?> {
+  override suspend fun <B> shift(r: Any?): B =
     cont.shift(r)
 
   public suspend fun <B> Option<B>.bind(): B =
@@ -24,9 +24,9 @@ public value class NullableEffectScope<R>(private val cont: EffectScope<R?>) : E
 }
 
 @JvmInline
-public value class NullableEagerEffectScope<R>(private val cont: EagerEffectScope<R?>) : EagerEffectScope<R?> {
+public value class NullableEagerEffectScope(private val cont: EagerEffectScope<Any?>) : EagerEffectScope<Any?> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-  override suspend fun <B> shift(r: R?): B =
+  override suspend fun <B> shift(r: Any?): B =
     cont.shift(r)
 
   public suspend fun <B> Option<B>.bind(): B =
@@ -43,25 +43,25 @@ public value class NullableEagerEffectScope<R>(private val cont: EagerEffectScop
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R : Any, B> NullableEffectScope<R?>.ensureNotNull(value: B?): B {
+public suspend fun <B> NullableEffectScope.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R : Any, B> NullableEagerEffectScope<R?>.ensureNotNull(value: B?): B {
+public suspend fun <B> NullableEagerEffectScope.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
 
 @Suppress("ClassName")
 public object nullable {
-  public inline fun <A> eager(crossinline f: suspend NullableEagerEffectScope<Any?>.() -> A): A? =
+  public inline fun <A> eager(crossinline f: suspend NullableEagerEffectScope.() -> A): A? =
     eagerEffect<Any?, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(NullableEagerEffectScope(this))
     }.orNull()
 
-  public suspend inline operator fun <A> invoke(crossinline f: suspend NullableEffectScope<Any?>.() -> A): A? =
+  public suspend inline operator fun <A> invoke(crossinline f: suspend NullableEffectScope.() -> A): A? =
     effect<Any?, A> { f(NullableEffectScope(this)) }.orNull()
 }
