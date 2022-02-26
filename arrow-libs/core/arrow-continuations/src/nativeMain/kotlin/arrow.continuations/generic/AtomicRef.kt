@@ -4,6 +4,7 @@ import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
+@Deprecated(deprecateArrowContinuation)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private val atom = AtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value

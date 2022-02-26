@@ -6,4 +6,8 @@ package arrow.continuations.generic
  * and `arrow.core.NonFatal` does not catch this [Throwable].
  * Thus by extension `Either.catch` and `Validated.catch` also don't catch [ControlThrowable].
  */
+@Deprecated(deprecateArrowContinuation)
 public expect open class ControlThrowable() : Throwable
+
+internal const val deprecateArrowContinuation: String =
+  "arrow.continuation is being discontinued and will be removed in the next version in favor of the Effect/ EagerEffect Runtime. If you depend on low-level APIs as in arrow.continuation, feel free to write us in the Kotlin Slack channel for guidance."

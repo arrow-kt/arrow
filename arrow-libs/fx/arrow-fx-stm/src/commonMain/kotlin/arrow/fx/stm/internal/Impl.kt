@@ -1,6 +1,6 @@
 package arrow.fx.stm.internal
 
-import arrow.continuations.generic.AtomicRef
+import arrow.core.continuations.AtomicRef
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
 import kotlinx.coroutines.suspendCancellableCoroutine

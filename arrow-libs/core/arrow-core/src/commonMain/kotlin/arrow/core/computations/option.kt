@@ -34,7 +34,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
    * // println: "ensure(true) passes"
    * // res: None
    * ```
- * <!--- KNIT example-option-computations-01.kt -->
+   * <!--- KNIT example-option-computations-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(None)
@@ -73,6 +73,7 @@ public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
 
   return value ?: (this as OptionEffect<Any?>).control().shift(None)
 }
+
 @RestrictsSuspension
 public fun interface RestrictedOptionEffect<A> : OptionEffect<A>
 

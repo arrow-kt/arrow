@@ -6,9 +6,11 @@ import arrow.continuations.generic.DelimContScope
 import arrow.continuations.generic.RestrictedScope
 import arrow.continuations.generic.SuspendMonadContinuation
 import arrow.continuations.generic.SuspendedScope
+import arrow.continuations.generic.deprecateArrowContinuation
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 @PublishedApi
+@Deprecated(deprecateArrowContinuation)
 internal object Reset {
   /**
    * Allows for building suspending single-shot computation blocks.
@@ -21,6 +23,7 @@ internal object Reset {
    * use `Either.catch`, `Validated.catch` etc or `e.nonFatalOrThrow()`
    * to ensure you're not catching `ShortCircuit`.
    */
+  @Deprecated(deprecateArrowContinuation)
   public suspend fun <A> suspended(block: suspend SuspendedScope<A>.() -> A): A =
     suspendCoroutineUninterceptedOrReturn { cont ->
       SuspendMonadContinuation(cont, block)
@@ -32,6 +35,7 @@ internal object Reset {
    * For short-circuiting, or shifting, `@RestrictSuspension` state machine is used.
    * This doesn't allow nesting of computation blocks, or foreign suspension.
    */
+  @Deprecated(deprecateArrowContinuation)
   // TODO This should be @RestrictSuspension but that breaks because a superclass is not considered to be correct scope
   fun <A> restricted(block: suspend RestrictedScope<A>.() -> A): A =
     DelimContScope(block).invoke()

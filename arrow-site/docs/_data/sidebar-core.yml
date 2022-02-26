@@ -36,6 +36,25 @@ options:
       - title: Extensions
         url: /apidocs/arrow-core/arrow.core/index.html#functions
 
+  - title: Continuations and programs
+
+    nested_options:
+
+      - title: Effect
+        url: /apidocs/arrow-core/arrow.core.continuations/-effect/
+
+      - title: EffectScope
+        url: /apidocs/arrow-core/arrow.core.continuations/-effect-scope/
+
+      - title: EagerEffect
+        url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect/
+
+      - title: EagerEffectScope
+        url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/
+
+      - title: Semantics of Structured Concurrency and Effect
+        url: /arrow/core/continuations/
+
   - title: Tutorials
 
     nested_options:
