@@ -621,7 +621,12 @@ public sealed class Schedule<Input, Output> {
   /**
    * A single decision. Contains the decision to continue, the delay, the new state and the (lazy) result of a Schedule.
    */
-  public data class Decision<out A, out B>(val cont: Boolean, val delayInNanos: Double, val state: A, val finish: Eval<B>) {
+  public data class Decision<out A, out B>(
+    val cont: Boolean,
+    val delayInNanos: Double,
+    val state: A,
+    val finish: Eval<B>
+  ) {
 
     @ExperimentalTime
     val duration: Duration
@@ -749,7 +754,10 @@ public sealed class Schedule<Input, Output> {
      * Creates a Schedule that continues [n] times and collects the output along the way.
      */
     public fun <A> recursAndCollect(n: Int): Schedule<A, List<A>> =
-      recurs<A>(n).zipRight(identity<A>().collect())
+      Schedule({ emptyList<A>() }) { a: A, acc ->
+        if (acc.size < n) Decision.cont(0.0, acc + a, Eval.now(acc + a))
+        else Decision.done(0.0, acc, Eval.now(acc))
+      }
 
     /**
      * Creates a Schedule that only retries once.
