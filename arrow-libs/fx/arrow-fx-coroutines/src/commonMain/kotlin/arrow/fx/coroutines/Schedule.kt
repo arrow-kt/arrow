@@ -426,10 +426,9 @@ public sealed class Schedule<Input, Output> {
     (other pipe this)
 
   // Dependent type emulation
-  @PublishedApi
   @Suppress("UNCHECKED_CAST")
   internal class ScheduleImpl<State, Input, Output>(
-    internal val initialState: suspend () -> State,
+    val initialState: suspend () -> State,
     val update: suspend (a: Input, s: State) -> Decision<State, Output>
   ) : Schedule<Input, Output>() {
 
@@ -639,6 +638,7 @@ public sealed class Schedule<Input, Output> {
 
     public fun <D> map(g: (B) -> D): Decision<A, D> =
       bimap(::identity, g)
+
     public fun <C, D, E> combineNanos(
       other: Decision<C, D>,
       f: (Boolean, Boolean) -> Boolean,
