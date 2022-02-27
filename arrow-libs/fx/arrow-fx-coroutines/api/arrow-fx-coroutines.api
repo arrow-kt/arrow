@@ -432,6 +432,7 @@ public final class arrow/fx/coroutines/Schedule$Companion {
 	public final fun never ()Larrow/fx/coroutines/Schedule;
 	public final fun once ()Larrow/fx/coroutines/Schedule;
 	public final fun recurs (I)Larrow/fx/coroutines/Schedule;
+	public final fun recursAndCollect (I)Larrow/fx/coroutines/Schedule;
 	public final fun spaced (D)Larrow/fx/coroutines/Schedule;
 	public final fun spaced-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
 	public final fun unfold (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
@@ -469,6 +470,29 @@ public final class arrow/fx/coroutines/Schedule$Decision$Companion {
 	public final fun cont-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun done (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun done-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
+}
+
+public final class arrow/fx/coroutines/Schedule$ScheduleImpl : arrow/fx/coroutines/Schedule {
+	public fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)V
+	public fun andThen (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
+	public fun check (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public fun choose (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
+	public fun combineNanos (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
+	public fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
+	public fun foldLazy (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public fun forever ()Larrow/fx/coroutines/Schedule;
+	public final fun getUpdate ()Lkotlin/jvm/functions/Function3;
+	public fun logInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
+	public fun logOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
+	public fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
+	public fun modifyNanos (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public fun not ()Larrow/fx/coroutines/Schedule;
+	public final fun onDecision (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public fun pipe (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
+	public final fun reconsider (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public fun repeatOrElseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updated (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
+	public fun zip (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 }
 
 public final class arrow/fx/coroutines/ScheduleKt {

@@ -426,9 +426,10 @@ public sealed class Schedule<Input, Output> {
     (other pipe this)
 
   // Dependent type emulation
+  @PublishedApi
   @Suppress("UNCHECKED_CAST")
   internal class ScheduleImpl<State, Input, Output>(
-    val initialState: suspend () -> State,
+    internal val initialState: suspend () -> State,
     val update: suspend (a: Input, s: State) -> Decision<State, Output>
   ) : Schedule<Input, Output>() {
 
@@ -736,13 +737,19 @@ public sealed class Schedule<Input, Output> {
       unfold(0) { it + 1 }
 
     /**
-     * Creates a Schedule that continues n times and returns the number of iterations.
+     * Creates a Schedule that continues [n] times and returns the number of iterations.
      */
     public fun <A> recurs(n: Int): Schedule<A, Int> =
       Schedule(suspend { 0 }) { _: A, acc ->
         if (acc < n) Decision.cont(0.0, acc + 1, Eval.now(acc + 1))
         else Decision.done(0.0, acc, Eval.now(acc))
       }
+
+    /**
+     * Creates a Schedule that continues [n] times and collects the output along the way.
+     */
+    public fun <A> recursAndCollect(n: Int): Schedule<A, List<A>> =
+      recurs<A>(n).zipRight(identity<A>().collect())
 
     /**
      * Creates a Schedule that only retries once.

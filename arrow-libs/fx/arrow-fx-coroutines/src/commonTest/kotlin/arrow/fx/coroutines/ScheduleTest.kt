@@ -7,9 +7,9 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
-import kotlin.time.nanoseconds
 import kotlin.time.seconds
 
 @ExperimentalTime
@@ -55,6 +55,16 @@ class ScheduleTest : ArrowFxSpec(
     "Schedule.recurs(n: Int)" {
       val n = 500
       val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
+
+      res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
+      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
+
+      res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
+    }
+
+    "Schedule.recursAndCollect(n: Int)" {
+      val n = 500
+      val res = Schedule.recursAndCollect<Int>(n).calculateSchedule(0, n + 1)
 
       res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
       res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
