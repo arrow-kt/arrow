@@ -59,36 +59,9 @@ class ScheduleTest : ArrowFxSpec(
       checkRepeat(Schedule.recurs(1), expected = 1)
     }
 
-    "Schedule.recursAndCollect(negative number)" {
-      checkRepeat(Schedule.recursAndCollect(-500), expected = emptyList())
-    }
-
-    "Schedule.recursAndCollect(0)" {
-      checkRepeat(Schedule.recursAndCollect(0), expected = emptyList())
-    }
-
-    "Schedule.recursAndCollect(n : Int)" {
-      val n = 500
-      val res = Schedule.recursAndCollect<Int>(n).calculateSchedule(0, n + 1)
-      res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
-      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
-
-      res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now((1..n).toList()))
-    }
-
     "Schedule.recurs(n: Int)" {
       val n = 500
       val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
-
-      res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
-      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
-
-      res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
-    }
-
-    "Schedule.recursAndCollect(n: Int)" {
-      val n = 500
-      val res = Schedule.recursAndCollect<Int>(n).calculateSchedule(0, n + 1)
 
       res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
       res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
@@ -205,10 +178,6 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeat is stack-safe" {
       checkRepeat(Schedule.recurs(20_000), expected = 20_000)
-    }
-
-    "repeat is stack-safe with recurseAndCollect" {
-      checkRepeat(Schedule.recursAndCollect(20_000), expected = (1..20_000).toList())
     }
 
     "repeatAsFlow is stack-safe" {
