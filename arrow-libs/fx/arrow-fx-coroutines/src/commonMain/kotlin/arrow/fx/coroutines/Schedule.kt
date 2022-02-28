@@ -19,6 +19,10 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.nanoseconds
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retry
 
 /**
  * # Retrying and repeating effects
@@ -218,6 +222,30 @@ public sealed class Schedule<Input, Output> {
     repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
 
   /**
+   * transforms this effect
+   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
+   * Also offers a function to handle errors if they are encountered during repetition.
+   */
+  public abstract suspend fun <C> repeatAsFlow(
+    fa: suspend () -> Input,
+    orElse: suspend (Throwable) -> C
+  ): Flow<Either<C, Output>>
+
+  /**
+   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
+   * Returns the last output from the policy or raises an error if a repeat failed.
+   */
+  public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
+    repeatAsFlowOrElse(fa) { e -> throw e }
+
+  /**
+   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
+   * Also offers a function to handle errors if they are encountered during repetition.
+   */
+  public suspend fun repeatAsFlowOrElse(fa: suspend () -> Input, orElse: suspend (Throwable) -> Output): Flow<Output> =
+    repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
+
+  /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
    */
   public abstract fun <B> map(f: (output: Output) -> B): Schedule<Input, B>
@@ -292,7 +320,10 @@ public sealed class Schedule<Input, Output> {
   /**
    * Accumulates the results of a schedule by folding over them effectfully.
    */
-  public abstract fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C>
+  public abstract fun <C> foldLazy(
+    initial: suspend () -> C,
+    f: suspend (acc: C, output: Output) -> C
+  ): Schedule<Input, C>
 
   /**
    * Composes this schedule with the other schedule by piping the output of this schedule
@@ -457,6 +488,36 @@ public sealed class Schedule<Input, Output> {
         }
       }
     }
+
+    override suspend fun <C> repeatAsFlow(
+      fa: suspend () -> Input,
+      orElse: suspend (Throwable) -> C
+    ): Flow<Either<C, Output>> =
+      flow {
+        var loop = true
+        var state: State = initialState.invoke()
+
+        while (loop) {
+          coroutineContext.ensureActive()
+          try {
+            val a = fa.invoke()
+            val step = update(a, state)
+            if (!step.cont) {
+              emit(Either.Right(step.finish.value()))
+              loop = false
+            } else {
+              delay((step.delayInNanos / 1_000_000).toLong())
+
+              // Set state before looping again and emit Output
+              emit(Either.Right(step.finish.value()))
+              state = step.state
+            }
+          } catch (e: Throwable) {
+            emit(Either.Left(orElse(e.nonFatalOrThrow())))
+            loop = false
+          }
+        }
+      }
 
     override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
       ScheduleImpl(initialState) { i, s -> update(i, s).map(f) }
@@ -955,7 +1016,10 @@ public suspend fun <A, B> Schedule<Throwable, B>.retry(fa: suspend () -> A): A =
  * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
-public suspend fun <A, B> Schedule<Throwable, B>.retryOrElse(fa: suspend () -> A, orElse: suspend (Throwable, B) -> A): A =
+public suspend fun <A, B> Schedule<Throwable, B>.retryOrElse(
+  fa: suspend () -> A,
+  orElse: suspend (Throwable, B) -> A
+): A =
   retryOrElseEither(fa, orElse).fold(::identity, ::identity)
 
 /**
