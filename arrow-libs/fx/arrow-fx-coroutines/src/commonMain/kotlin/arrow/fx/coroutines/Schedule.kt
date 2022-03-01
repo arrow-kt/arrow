@@ -246,24 +246,6 @@ public sealed class Schedule<Input, Output> {
   public suspend fun repeatAsFlowOrElse(fa: suspend () -> Input, orElse: suspend (Throwable) -> Output): Flow<Output> =
     repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
 
-  public abstract suspend fun <C> repeatAsFlowValidated(
-    fa: suspend () -> Input,
-    orElse: suspend (Throwable) -> C
-  ): Flow<Validated<C, Output>>
-
-  /**
-   * similar to [repeatAsFlow], but accumulates errors along the way and continues the provided policy until the effect should not be repeated
-   */
-  public suspend fun repeatAsFlowValidated(fa: suspend () -> Input): Flow<Output> =
-    repeatAsFlowValidatedOrElse(fa) { e -> throw e }
-
-  public suspend fun repeatAsFlowValidatedOrElse(
-    fa: suspend () -> Input,
-    orElse: suspend (Throwable) -> Output
-  ): Flow<Output> =
-    repeatAsFlowValidated(fa, orElse)
-      .map { it.fold(::identity, ::identity) }
-
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
    */
@@ -534,35 +516,6 @@ public sealed class Schedule<Input, Output> {
           } catch (e: Throwable) {
             emit(Either.Left(orElse(e.nonFatalOrThrow())))
             loop.set(false)
-          }
-        }
-      }
-
-    override suspend fun <C> repeatAsFlowValidated(
-      fa: suspend () -> Input,
-      orElse: suspend (Throwable) -> C
-    ): Flow<Validated<C, Output>> =
-      flow {
-        val loop = Atomic(true)
-        var state: State = initialState.invoke()
-
-        while (loop.get()) {
-          coroutineContext.ensureActive()
-          try {
-            val a = fa.invoke()
-            val step = update(a, state)
-            if (!step.cont) {
-              emit(Validated.Valid(step.finish.value()))
-              loop.set(false)
-            } else {
-              delay((step.delayInNanos / 1_000_000).toLong())
-
-              // Set state before looping again and emit Output
-              emit(Validated.Valid(step.finish.value()))
-              state = step.state
-            }
-          } catch (e: Throwable) {
-            emit(Validated.Invalid(orElse(e.nonFatalOrThrow())))
           }
         }
       }
