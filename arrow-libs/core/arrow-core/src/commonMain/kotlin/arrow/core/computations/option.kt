@@ -8,6 +8,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
 public fun interface OptionEffect<A> : Effect<Option<A>> {
   public suspend fun <B> Option<B>.bind(): B =
     fold({ control().shift(None) }, ::identity)
@@ -65,6 +66,7 @@ public fun interface OptionEffect<A> : Effect<Option<A>> {
  * ```
  * <!--- KNIT example-option-computations-02.kt -->
  */
+@Deprecated(deprecateInFavorOfEffectScope)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
   contract {
@@ -74,14 +76,18 @@ public suspend fun <B : Any> OptionEffect<*>.ensureNotNull(value: B?): B {
   return value ?: (this as OptionEffect<Any?>).control().shift(None)
 }
 
+@Deprecated(deprecatedInFavorOfEagerEffectScope, ReplaceWith("EagerEffectScope<E>", "arrow.core.continuations.EagerEffectScope"))
 @RestrictsSuspension
 public fun interface RestrictedOptionEffect<A> : OptionEffect<A>
 
+@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("option", "arrow.core.continuations.option"))
 @Suppress("ClassName")
 public object option {
+  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("option.eager(func)", "arrow.core.continuations.option"))
   public inline fun <A> eager(crossinline func: suspend RestrictedOptionEffect<A>.() -> A): Option<A> =
     Effect.restricted(eff = { RestrictedOptionEffect { it } }, f = func, just = { Option.fromNullable(it) })
 
+  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("option(func)", "arrow.core.continuations.option"))
   public suspend inline operator fun <A> invoke(crossinline func: suspend OptionEffect<*>.() -> A?): Option<A> =
     Effect.suspended(eff = { OptionEffect { it } }, f = func, just = { Option.fromNullable(it) })
 }

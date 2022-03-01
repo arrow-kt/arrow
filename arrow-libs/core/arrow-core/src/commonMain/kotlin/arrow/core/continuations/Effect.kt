@@ -47,10 +47,10 @@ import kotlin.coroutines.resume
  * Let's write a small program to read a file from disk, and instead of having the program work exception based we want to
  * turn it into a polymorphic type-safe program.
  *
- * We'll start by defining a small function that accepts a `String`, and does some simply validation to check that the path
+ * We'll start by defining a small function that accepts a [String], and does some simply validation to check that the path
  * is not empty. If the path is empty, we want to program to result in `EmptyPath`. So we're immediately going to see how
- * we can raise an error of any arbitrary type `R` by using the function `shift`. The name `shift` comes shifting (or
- * changing, especially unexpectedly), away from the computation and finishing the `Continuation` with `R`.
+ * we can raise an error of any arbitrary type [R] by using the function `shift`. The name `shift` comes shifting (or
+ * changing, especially unexpectedly), away from the computation and finishing the `Continuation` with [R].
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
@@ -65,8 +65,8 @@ import kotlin.coroutines.resume
  * }
  * ```
  *
- * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the shift type `R`, and `Unit` for the success
- * type `A`.
+ * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the shift type [R], and `Unit` for the success
+ * type [A].
  *
  * Patterns like validating a [Boolean] is very common, and the [Effect] DSL offers utility functions like [kotlin.require]
  * and [kotlin.requireNotNull]. They're named [EffectScope.ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
@@ -110,7 +110,7 @@ import kotlin.coroutines.resume
  * }
  * ```
  *
- * We can finish our function, but we need to refactor our return value from `Unit` to `Content` and our error type from `EmptyPath` to `FileError`.
+ * We can finish our function, but we need to refactor the return type from `Unit` to `Content` and the error type from `EmptyPath` to `FileError`.
  *
  * ```kotlin
  * fun readFile(path: String?): Effect<FileError, Content> = effect {
@@ -149,7 +149,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-02.kt -->
  *
- * The functions above our available out of the box, but it's easy to define your own extension functions in terms
+ * The functions above are available out of the box, but it's easy to define your own extension functions in terms
  * of `fold`. Implementing the `toEither()` operator is as simple as:
  *
  * <!--- INCLUDE
@@ -186,11 +186,11 @@ import kotlin.coroutines.resume
  *
  * ## Handling errors
  *
- * Handling errors of type `R` is the same as handling errors for any other data type in Arrow.
+ * Handling errors of type [R] is the same as handling errors for any other data type in Arrow.
  * `Effect<R, A>` offers `handleError`, `handleErrorWith`, `redeem`, `redeemWith` and `attempt`.
  *
- * As you can see in the examples below it is possible to resolve errors of `R` or `Throwable` in `Effect<R, A>` in a generic manner.
- * There is no need to run `Effect<R, A>` into `Either<R, A>` before you can access `R`,
+ * As you can see in the examples below it is possible to resolve errors of [R] or `Throwable` in `Effect<R, A>` in a generic manner.
+ * There is no need to run `Effect<R, A>` into `Either<R, A>` before you can access [R],
  * you can simply call the same functions on `Effect<R, A>` as you would on `Either<R, A>` directly.
  *
  * <!--- INCLUDE
@@ -234,7 +234,7 @@ import kotlin.coroutines.resume
  *
  * ## Structured Concurrency
  *
- * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
+ * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type [R] inside the `Continuation` since it effectively cancels/short-circuits it.
  * For this reason `shift` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
  *
  * Let's overview below how `shift` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.

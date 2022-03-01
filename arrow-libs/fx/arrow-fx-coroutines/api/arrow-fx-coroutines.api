@@ -496,11 +496,11 @@ public final class arrow/fx/coroutines/Use {
 	public final synthetic fun unbox-impl ()Lkotlin/jvm/functions/Function1;
 }
 
-public abstract interface class arrow/fx/coroutines/computations/ResourceEffect {
-	public abstract fun bind (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public final class arrow/fx/coroutines/continuations/ResourceKt {
+	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 }
 
-public final class arrow/fx/coroutines/computations/ResourceKt {
-	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+public abstract interface class arrow/fx/coroutines/continuations/ResourceScope {
+	public abstract fun bind (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
