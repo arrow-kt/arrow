@@ -1,6 +1,6 @@
 package arrow.fx.coroutines
 
-import arrow.continuations.generic.AtomicRef
+import arrow.core.continuations.AtomicRef
 import java.util.concurrent.ThreadFactory
 import kotlin.coroutines.CoroutineContext
 

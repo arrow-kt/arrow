@@ -1,7 +1,7 @@
 // This file was automatically generated from resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResourceComputations01
 
-import arrow.fx.coroutines.computations.resource
+import arrow.fx.coroutines.continuations.resource
 import arrow.fx.coroutines.release
 
 class UserProcessor {

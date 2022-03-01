@@ -1,4 +1,4 @@
-package arrow.fx.coroutines.computations
+package arrow.fx.coroutines.continuations
 
 import arrow.fx.coroutines.Resource
 
@@ -11,7 +11,7 @@ import arrow.fx.coroutines.Resource
  *  * # Using and composing Resource
  *
  * ```kotlin
- * import arrow.fx.coroutines.computations.resource
+ * import arrow.fx.coroutines.continuations.resource
  * import arrow.fx.coroutines.release
  *
  * class UserProcessor {
@@ -49,9 +49,9 @@ import arrow.fx.coroutines.Resource
  * ```
  * <!--- KNIT example-resource-computations-01.kt -->
  */
-public interface ResourceEffect {
+public interface ResourceScope {
   public suspend fun <A> Resource<A>.bind(): A
 }
 
-public fun <A> resource(f: suspend ResourceEffect.() -> A): Resource<A> =
+public fun <A> resource(f: suspend ResourceScope.() -> A): Resource<A> =
   Resource.Dsl(f)
