@@ -232,17 +232,11 @@ public sealed class Schedule<Input, Output> {
     orElse: suspend (Throwable) -> C
   ): Flow<Either<C, Output>>
 
-  /**
-   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
-   * Returns the last output from the policy or raises an error if a repeat failed.
-   */
+
   public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
     repeatAsFlowOrElse(fa) { e -> throw e }
 
-  /**
-   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
-   * Also offers a function to handle errors if they are encountered during repetition.
-   */
+
   public suspend fun repeatAsFlowOrElse(fa: suspend () -> Input, orElse: suspend (Throwable) -> Output): Flow<Output> =
     repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
 
