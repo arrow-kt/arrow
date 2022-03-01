@@ -1,5 +1,6 @@
 package arrow.core.continuations
 
+import arrow.core.Either
 import arrow.core.Some
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -110,5 +111,12 @@ class NullableSpec : StringSpec({
       }.bind()
       string
     } shouldBe null
+  }
+
+  "Either<Nothing, A> short circuit" {
+    nullable {
+      val either: Either<Nothing, Int> = Either.Right(4)
+      either.bind() + 3
+    } shouldBe 7
   }
 })
