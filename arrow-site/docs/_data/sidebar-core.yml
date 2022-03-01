@@ -52,9 +52,6 @@ options:
       - title: EagerEffectScope
         url: /apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/
 
-      - title: Semantics of Structured Concurrency and Effect
-        url: /arrow/core/continuations/
-
   - title: Tutorials
 
     nested_options:

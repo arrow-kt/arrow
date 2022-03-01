@@ -37,7 +37,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * // println: "ensure(true) passes"
    * // res: null
    * ```
- * <!--- KNIT example-nullable-computations-01.kt -->
+   * <!--- KNIT example-nullable-computations-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(null)

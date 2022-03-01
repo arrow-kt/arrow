@@ -11,6 +11,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
 public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 
   public suspend fun <B> Either<E, B>.bind(): B =
@@ -84,6 +85,7 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  * ```
  * <!--- KNIT example-either-computations-02.kt -->
  */
+@Deprecated(deprecateInFavorOfEffectScope)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {
   contract {
@@ -93,14 +95,18 @@ public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLe
   return value ?: orLeft().left().bind()
 }
 
+@Deprecated(deprecatedInFavorOfEagerEffectScope, ReplaceWith("EagerEffectScope<E>", "arrow.core.continuations.EagerEffectScope"))
 @RestrictsSuspension
 public fun interface RestrictedEitherEffect<E, A> : EitherEffect<E, A>
 
+@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("either", "arrow.core.continuations.either"))
 @Suppress("ClassName")
 public object either {
+  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("either.eager(c)", "arrow.core.continuations.either"))
   public inline fun <E, A> eager(crossinline c: suspend RestrictedEitherEffect<E, *>.() -> A): Either<E, A> =
     Effect.restricted(eff = { RestrictedEitherEffect { it } }, f = c, just = { it.right() })
 
+  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("either(c)", "arrow.core.continuations.either"))
   public suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
     Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }
