@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
@@ -222,21 +221,22 @@ public sealed class Schedule<Input, Output> {
   public suspend fun repeatOrElse(fa: suspend () -> Input, orElse: suspend (Throwable, Output?) -> Output): Output =
     repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
 
-  /**
-   * transforms this effect
-   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
-   * Also offers a function to handle errors if they are encountered during repetition.
-   */
   public abstract suspend fun <C> repeatAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable) -> C
   ): Flow<Either<C, Output>>
 
-
+  /**
+   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
+   * This will raise an error if a repeat failed.
+   */
   public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
     repeatAsFlowOrElse(fa) { e -> throw e }
 
-
+  /**
+   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
+   * Also offers a function to handle errors if they are encountered during repetition.
+   */
   public suspend fun repeatAsFlowOrElse(fa: suspend () -> Input, orElse: suspend (Throwable) -> Output): Flow<Output> =
     repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
 

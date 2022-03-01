@@ -203,25 +203,24 @@ class ScheduleTest : ArrowFxSpec(
       l shouldBe Either.Left(stop)
     }
 
-    /* "repeatAsFlow is stack-safe" {
-       val count = Atomic(0)
-       val n = 2
-       val s = Schedule.once<Unit>()
-         .repeatAsFlow { println("KI") }.collect { i ->
-           println("end$i")
-         }
+    "repeatAsFlow" {
+      val stop = RuntimeException("WOOO")
+      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val n = 100
+      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
-       val l = Either.catch {
-         Schedule.recurs<Throwable>(20_000).retry {
-           count.updateAndGet { it + 1 }
-           throw exception
-         }
-       }
+      val eff = SideEffect()
 
-       l should leftException(exception)
-       count.get() shouldBe 20_001
-     }*/
+      val l = Either.catch {
+        schedule.repeatAsFlow {
+          if (eff.counter >= n) throw stop
+          else eff.increment()
+        }
+      }
 
+      eff.counter shouldBe 100
+      l shouldBe Either.Left(stop)
+    }
 
     "repeat fails fast on errors" {
       val ex = Throwable("Hello")
@@ -238,6 +237,11 @@ class ScheduleTest : ArrowFxSpec(
     "repeat should run the schedule with the correct input" {
       var i = 0
       (Schedule.recurs<Int>(10).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..10).toList()
+    }
+
+    "repeatAsFlow should run the schedule with the correct input" {
+      var i = 0
+      Schedule.recurs<Int>(10).repeatAsFlow { i++ } shouldBe (0..10).asFlow()
     }
 
     "retry is stack-safe" {
