@@ -16,6 +16,8 @@ import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -416,6 +418,14 @@ class ResourceTest : ArrowFxSpec(
           .use {
             r.get() shouldBe "$b$a"
           }
+      }
+    }
+
+    "resource.asFlow()" {
+      checkAll(Arb.int()) { n ->
+        val r = Resource({ n }, { _, _ -> Unit })
+
+        r.asFlow().map { it + 1 } shouldBe flowOf(n + 1)
       }
     }
   }
