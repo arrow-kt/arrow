@@ -769,7 +769,7 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
  */
 public fun <A> Resource<A>.asFlow(): Flow<A> =
   flow {
-    arrow.fx.coroutines.continuations.resource {
-      emit(bind())
+    use {
+      emit(it)
     }
   }
