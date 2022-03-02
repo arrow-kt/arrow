@@ -14,6 +14,8 @@ import kotlin.time.milliseconds
 import kotlin.time.seconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
 
 @ExperimentalTime
@@ -212,7 +214,7 @@ class ScheduleTest : ArrowFxSpec(
         schedule.repeatAsFlow {
           if (eff.counter >= n) throw stop
           else eff.increment()
-        }
+        }.collect()
       }
 
       eff.counter shouldBe 100
@@ -233,12 +235,15 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeat should run the schedule with the correct input" {
       var i = 0
-      (Schedule.recurs<Int>(10).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..10).toList()
+      val n = 10
+      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..n).toList()
     }
 
     "repeatAsFlow should run the schedule with the correct input" {
       var i = 0
-      Schedule.recurs<Int>(10).repeatAsFlow { i++ } shouldBe (0..10).asFlow()
+      val n = 10
+      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList() shouldBe
+        (0..n).map { (0..it).toList() }
     }
 
     "retry is stack-safe" {
