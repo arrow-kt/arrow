@@ -2,16 +2,15 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.identity
 import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
