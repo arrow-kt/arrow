@@ -113,7 +113,7 @@ class NullableSpec : StringSpec({
     } shouldBe null
   }
 
-  "Either<Nothing, A> short circuit" {
+"Either<Nothing, A> can be bind"
     nullable {
       val either: Either<Nothing, Int> = Either.Right(4)
       either.bind() + 3
