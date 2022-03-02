@@ -2,8 +2,8 @@ package arrow.optics.plugin.internals
 
 internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
   Snippet(
-    `package` = ele.packageName,
-    name = ele.simpleName,
+    `package` = ele.packageNameAsString,
+    name = ele.qualifiedNameOrSimpleName,
     imports =
       setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
     content = processElement(ele, target.foci)
@@ -12,9 +12,14 @@ internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
 private fun processElement(ele: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
     fun getOrModifyF(toNullable: String = "") =
-      "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
+      "{ ${ele.simpleName}: ${ele.qualifiedNameOrSimpleName} -> ${ele.simpleName}.${
+        focus.paramName.plusIfNotBlank(
+          prefix = "`",
+          postfix = "`"
+        )
+      }$toNullable?.right() ?: ${ele.simpleName}.left() }"
     fun setF(fromNullable: String = "") =
-      "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
+      "${ele.simpleName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 
     val (targetClassName, getOrModify, set) =
       when (focus) {
@@ -25,9 +30,9 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
       }
 
     """
-      |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
+      |inline val ${ele.qualifiedNameOrSimpleName}.Companion.${focus.paramName}: $Optional<${ele.qualifiedNameOrSimpleName}, $targetClassName> inline get()= $Optional(
       |  getOrModify = $getOrModify,
-      |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: $targetClassName -> $set }
+      |  set = { ${ele.simpleName}: ${ele.qualifiedNameOrSimpleName}, value: $targetClassName -> $set }
       |)
       |""".trimMargin()
   }

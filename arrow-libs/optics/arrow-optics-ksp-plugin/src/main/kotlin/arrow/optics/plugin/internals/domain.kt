@@ -4,11 +4,10 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSName
 import java.util.Locale
 
-data class ADT(val pckg: KSName, val el: KSClassDeclaration, val targets: List<Target>) {
-  val sourceClassName = el.qualifiedName?.asString() ?: el.simpleName
-  val sourceName = el.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
-  val simpleName = el.simpleName.asString()
-  val packageName = pckg.asString()
+data class ADT(val packageName: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
+  val qualifiedNameOrSimpleName = declaration.qualifiedNameOrSimpleName
+  val simpleName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
+  val packageNameAsString = packageName.asString()
 
   operator fun Snippet.plus(snippet: Snippet): Snippet =
     copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")

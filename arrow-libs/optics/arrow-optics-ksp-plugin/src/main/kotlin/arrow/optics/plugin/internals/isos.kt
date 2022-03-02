@@ -1,7 +1,7 @@
 package arrow.optics.plugin.internals
 
 internal fun generateIsos(ele: ADT, target: IsoTarget) =
-  Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target))
+  Snippet(`package` = ele.packageNameAsString, name = ele.qualifiedNameOrSimpleName, content = processElement(ele, target))
 
 inline val Target.targetNames
   inline get() = foci.map(Focus::className)
@@ -34,11 +34,11 @@ private fun processElement(iso: ADT, target: Target): String {
   )
 
   fun Focus.format(): String =
-    "${iso.sourceName}.${paramName.plusIfNotBlank(prefix = "`", postfix = "`")}"
+    "${iso.simpleName}.${paramName.plusIfNotBlank(prefix = "`", postfix = "`")}"
 
   fun tupleConstructor() =
     when (foci.size) {
-      1 -> "${iso.sourceName}.${foci.first().paramName}"
+      1 -> "${iso.simpleName}.${foci.first().paramName}"
       2 -> "$Pair(${foci[0].format()}, ${foci[1].format()})"
       3 -> "$Triple(${foci[0].format()}, ${foci[1].format()}, ${foci[2].format()})"
       else ->
@@ -55,17 +55,17 @@ private fun processElement(iso: ADT, target: Target): String {
 
   fun classConstructorFromTuple() =
     when (foci.size) {
-      1 -> "${iso.sourceClassName}(it)"
-      2 -> "pair: ${focusType()} -> ${iso.sourceClassName}(pair.first, pair.second)"
+      1 -> "${iso.qualifiedNameOrSimpleName}(it)"
+      2 -> "pair: ${focusType()} -> ${iso.qualifiedNameOrSimpleName}(pair.first, pair.second)"
       3 ->
-        "triple: ${focusType()} -> ${iso.sourceClassName}(triple.first, triple.second, triple.third)"
+        "triple: ${focusType()} -> ${iso.qualifiedNameOrSimpleName}(triple.first, triple.second, triple.third)"
       else ->
-        "tuple: ${focusType()} -> ${(foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })}"
+        "tuple: ${focusType()} -> ${(foci.indices).joinToString(prefix = "${iso.qualifiedNameOrSimpleName}(", postfix = ")", transform = { "tuple.${letters[it]}" })}"
     }
 
   return """
-        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
-        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${tupleConstructor()} },
+        |inline val ${iso.qualifiedNameOrSimpleName}.Companion.iso: $Iso<${iso.qualifiedNameOrSimpleName}, ${focusType()}> inline get()= $Iso(
+        |  get = { ${iso.simpleName}: ${iso.qualifiedNameOrSimpleName} -> ${tupleConstructor()} },
         |  reverseGet = { ${classConstructorFromTuple()} }
         |)
         |""".trimMargin()

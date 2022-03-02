@@ -4,8 +4,8 @@ import java.util.Locale
 
 internal fun generateLenses(ele: ADT, target: LensTarget) =
   Snippet(
-    `package` = ele.packageName,
-    name = ele.simpleName,
+    `package` = ele.packageNameAsString,
+    name = ele.qualifiedNameOrSimpleName,
     content = processElement(ele, target.foci)
   )
 
@@ -20,12 +20,22 @@ private fun String.toUpperCamelCase(): String =
       }
     )
 
-private fun processElement(ele: ADT, foci: List<Focus>): String =
+private fun processElement(adt: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
     """
-  |inline val ${ele.sourceClassName}.Companion.${focus.lensParamName()}: $Lens<${ele.sourceClassName}, ${focus.className}> inline get()= $Lens(
-  |  get = { ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} },
-  |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: ${focus.className} -> ${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value) }
+  |inline val ${adt.qualifiedNameOrSimpleName}.Companion.${focus.lensParamName()}: $Lens<${adt.qualifiedNameOrSimpleName}, ${focus.className}> inline get()= $Lens(
+  |  get = { ${adt.simpleName}: ${adt.qualifiedNameOrSimpleName} -> ${adt.simpleName}.${
+      focus.paramName.plusIfNotBlank(
+        prefix = "`",
+        postfix = "`"
+      )
+    } },
+  |  set = { ${adt.simpleName}: ${adt.qualifiedNameOrSimpleName}, value: ${focus.className} -> ${adt.simpleName}.copy(${
+      focus.paramName.plusIfNotBlank(
+        prefix = "`",
+        postfix = "`"
+      )
+    } = value) }
   |)
   |""".trimMargin()
   }
