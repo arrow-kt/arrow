@@ -16,8 +16,8 @@ import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -271,8 +271,8 @@ class ResourceTest : ArrowFxSpec(
             { require(started.complete(Unit)); i },
             { ii, ex -> require(released.complete(ii to ex)) }
           ).parZip(
-              Resource({ started.await(); throw throwable }) { _, _ -> }
-            ) { _, _ -> }
+            Resource({ started.await(); throw throwable }) { _, _ -> }
+          ) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
 
@@ -425,7 +425,7 @@ class ResourceTest : ArrowFxSpec(
       checkAll(Arb.int()) { n ->
         val r = Resource({ n }, { _, _ -> Unit })
 
-        r.asFlow().map { it + 1 } shouldBe flowOf(n + 1)
+        r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
       }
     }
   }
