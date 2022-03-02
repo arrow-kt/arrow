@@ -489,17 +489,17 @@ public sealed class Schedule<Input, Output> {
       orElse: suspend (Throwable) -> C
     ): Flow<Either<C, Output>> =
       flow {
-        val loop = Atomic(true)
+        var loop = true
         var state: State = initialState.invoke()
 
-        while (loop.get()) {
+        while (loop) {
           coroutineContext.ensureActive()
           try {
             val a = fa.invoke()
             val step = update(a, state)
             if (!step.cont) {
               emit(Either.Right(step.finish.value()))
-              loop.set(false)
+              loop = false
             } else {
               delay((step.delayInNanos / 1_000_000).toLong())
 
@@ -509,7 +509,7 @@ public sealed class Schedule<Input, Output> {
             }
           } catch (e: Throwable) {
             emit(Either.Left(orElse(e.nonFatalOrThrow())))
-            loop.set(false)
+            loop = false
           }
         }
       }
