@@ -38,7 +38,6 @@ class LensTests {
   fun `Lenses which mentions imported elements`() {
     """
       |$imports
-      |import kotlin.time.Duration
       |
       |@optics
       |data class OpticsTest(val time: Duration) {
