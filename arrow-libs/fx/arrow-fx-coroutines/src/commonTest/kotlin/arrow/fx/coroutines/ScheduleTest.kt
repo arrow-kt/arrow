@@ -229,7 +229,7 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeatAsFlow fails fast on errors" {
       val ex = Throwable("Hello")
-      Schedule.recurs<Int>(0).repeatAsFlow({ throw ex }, ::identity)
+      Schedule.recurs<Int>(0).repeatAsFlow({ throw ex }, { t, _ -> t })
         .collect { either -> either.fold({ it shouldBe ex }, { fail("The impossible happened") }) }
     }
 
