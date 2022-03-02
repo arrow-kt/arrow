@@ -223,7 +223,7 @@ public sealed class Schedule<Input, Output> {
 
   public abstract suspend fun <C> repeatAsFlow(
     fa: suspend () -> Input,
-    orElse: suspend (Throwable) -> C
+    orElse: suspend (Throwable, Output?) -> C
   ): Flow<Either<C, Output>>
 
   /**
@@ -231,13 +231,16 @@ public sealed class Schedule<Input, Output> {
    * This will raise an error if a repeat failed.
    */
   public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
-    repeatAsFlowOrElse(fa) { e -> throw e }
+    repeatAsFlowOrElse(fa) { e, _ -> throw e }
 
   /**
    * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
    * Also offers a function to handle errors if they are encountered during repetition.
    */
-  public suspend fun repeatAsFlowOrElse(fa: suspend () -> Input, orElse: suspend (Throwable) -> Output): Flow<Output> =
+  public suspend fun repeatAsFlowOrElse(
+    fa: suspend () -> Input,
+    orElse: suspend (Throwable, Output?) -> Output
+  ): Flow<Output> =
     repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
 
   /**
@@ -486,10 +489,11 @@ public sealed class Schedule<Input, Output> {
 
     override suspend fun <C> repeatAsFlow(
       fa: suspend () -> Input,
-      orElse: suspend (Throwable) -> C
+      orElse: suspend (Throwable, Output?) -> C
     ): Flow<Either<C, Output>> =
       flow {
         var loop = true
+        var last: (() -> Output)? = null // We haven't seen any input yet
         var state: State = initialState.invoke()
 
         while (loop) {
@@ -502,13 +506,14 @@ public sealed class Schedule<Input, Output> {
               loop = false
             } else {
               delay((step.delayInNanos / 1_000_000).toLong())
-
+              val output = step.finish.value()
               // Set state before looping again and emit Output
-              emit(Either.Right(step.finish.value()))
+              emit(Either.Right(output))
+              last = { output }
               state = step.state
             }
           } catch (e: Throwable) {
-            emit(Either.Left(orElse(e.nonFatalOrThrow())))
+            emit(Either.Left(orElse(e.nonFatalOrThrow(), last?.invoke())))
             loop = false
           }
         }
