@@ -765,7 +765,7 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
 }, { first })
 
 /**
- * binds and emits [A] of the resource
+ * runs [Resource.use] and emits [A] of the resource
  */
 public fun <A> Resource<A>.asFlow(): Flow<A> =
   flow {
