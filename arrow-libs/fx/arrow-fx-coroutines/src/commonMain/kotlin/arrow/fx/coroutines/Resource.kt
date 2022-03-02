@@ -13,6 +13,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
 /**
@@ -761,3 +763,13 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   if (first != null) Platform.composeErrors(NonEmptyList(first, it))
   else Platform.composeErrors(it)
 }, { first })
+
+/**
+ * runs [Resource.use] and emits [A] of the resource
+ */
+public fun <A> Resource<A>.asFlow(): Flow<A> =
+  flow {
+    use {
+      emit(it)
+    }
+  }
