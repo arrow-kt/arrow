@@ -40,7 +40,7 @@ class LensTests {
       |$imports
       |
       |@optics
-      |data class OpticsTest(val time: Duration) {
+      |data class OpticsTest(val time: kotlin.time.Duration) {
       |  companion object
       |}
       |

@@ -6,7 +6,6 @@ const val imports =
       import arrow.optics.*
       import arrow.optics.dsl.*
       import arrow.optics.typeclasses.*
-      import kotlin.time.Duration
       import kotlin.time.Duration.Companion.hours
       """
 
@@ -21,7 +20,7 @@ const val dslModel =
     @optics data class Company(val name: String, val address: Address) {
       companion object
     }
-    @optics data class Employee(val name: String, val company: Company?, val weeklyWorkingHours: Duration = 5.hours) {
+    @optics data class Employee(val name: String, val company: Company?, val weeklyWorkingHours: kotlin.time.Duration = 5.hours) {
       companion object
     }
     @optics data class Employees(val employees: List<Employee>) {
