@@ -44,7 +44,7 @@ class LensTests {
       |  companion object
       |}
       |
-      |val i: Lens<OpticsTest, Duration> = OpticsTest.time
+      |val i: Lens<OpticsTest, kotlin.time.Duration> = OpticsTest.time
       |val r = i != null
       """.evals("r" to true)
   }
