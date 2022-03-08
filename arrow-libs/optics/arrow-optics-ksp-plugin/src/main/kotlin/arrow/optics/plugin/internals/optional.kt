@@ -12,7 +12,12 @@ internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
 private fun processElement(ele: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
     fun getOrModifyF(toNullable: String = "") =
-      "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")}$toNullable?.right() ?: ${ele.sourceName}.left() }"
+      "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${
+        focus.paramName.plusIfNotBlank(
+          prefix = "`",
+          postfix = "`"
+        )
+      }$toNullable?.right() ?: ${ele.sourceName}.left() }"
     fun setF(fromNullable: String = "") =
       "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 

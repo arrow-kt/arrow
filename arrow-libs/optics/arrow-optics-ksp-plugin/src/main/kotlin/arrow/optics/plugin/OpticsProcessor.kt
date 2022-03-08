@@ -6,6 +6,7 @@ import arrow.optics.plugin.internals.asFileText
 import arrow.optics.plugin.internals.join
 import arrow.optics.plugin.internals.noCompanion
 import arrow.optics.plugin.internals.otherClassTypeErrorMessage
+import arrow.optics.plugin.internals.qualifiedNameOrSimpleName
 import arrow.optics.plugin.internals.snippets
 import arrow.optics.plugin.internals.typeParametersErrorMessage
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -33,19 +34,19 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
   private fun processClass(klass: KSClassDeclaration) {
     // check that it is sealed or data
     if (!klass.isSealed && !klass.isData) {
-      logger.error(klass.simpleName.asString().otherClassTypeErrorMessage, klass)
+      logger.error(klass.qualifiedNameOrSimpleName.otherClassTypeErrorMessage, klass)
       return
     }
 
     // check that it does not have type arguments
     if (klass.typeParameters.isNotEmpty()) {
-      logger.error(klass.simpleName.asString().typeParametersErrorMessage, klass)
+      logger.error(klass.qualifiedNameOrSimpleName.typeParametersErrorMessage, klass)
       return
     }
 
     // check that the companion object exists
     if (klass.companionObject == null) {
-      logger.error(klass.simpleName.asString().noCompanion, klass)
+      logger.error(klass.qualifiedNameOrSimpleName.noCompanion, klass)
       return
     }
 
