@@ -35,12 +35,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v2.5.0
+        uses: actions/setup-java@v3.0.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -61,13 +61,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.TOKEN_GITHUB_ACTION }}
 
       - name: Set up Java
-        uses: actions/setup-java@v2.5.0
+        uses: actions/setup-java@v3.0.0
         with:
           distribution: 'zulu'
           java-version: 11
