@@ -4,6 +4,7 @@ import arrow.optics.plugin.isData
 import arrow.optics.plugin.isSealed
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import java.util.Locale
@@ -15,10 +16,10 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
     c.targets().map { target ->
       when (target) {
         OpticsTarget.LENS ->
-          evalAnnotatedDataClass(c, c.simpleName.asString().lensErrorMessage, logger)
+          evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.lensErrorMessage, logger)
             .let(::LensTarget)
         OpticsTarget.OPTIONAL ->
-          evalAnnotatedDataClass(c, c.simpleName.asString().optionalErrorMessage, logger)
+          evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.optionalErrorMessage, logger)
             .let(::OptionalTarget)
         OpticsTarget.ISO -> evalAnnotatedIsoElement(c, logger).let(::IsoTarget)
         OpticsTarget.PRISM -> evalAnnotatedPrismElement(c, logger).let(::PrismTarget)
@@ -44,10 +45,13 @@ internal fun evalAnnotatedPrismElement(
         )
       }
     else -> {
-      logger.error(element.simpleName.asString().prismErrorMessage, element)
+      logger.error(element.qualifiedNameOrSimpleName.prismErrorMessage, element)
       emptyList()
     }
   }
+
+internal val KSDeclaration.qualifiedNameOrSimpleName: String
+  get() = (qualifiedName ?: simpleName).asString()
 
 internal fun KSClassDeclaration.sealedSubclassFqNameList(): List<String> =
   getSealedSubclasses().mapNotNull { it.qualifiedName?.asString() }.toList()
@@ -88,11 +92,11 @@ internal fun evalAnnotatedIsoElement(element: KSClassDeclaration, logger: KSPLog
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
         .takeIf { it.size <= 22 }
         ?: run {
-          logger.error(element.simpleName.asString().isoTooBigErrorMessage, element)
+          logger.error(element.qualifiedNameOrSimpleName.isoTooBigErrorMessage, element)
           emptyList()
         }
     else -> {
-      logger.error(element.simpleName.asString().isoErrorMessage, element)
+      logger.error(element.qualifiedNameOrSimpleName.isoErrorMessage, element)
       emptyList()
     }
   }
