@@ -3,21 +3,21 @@ package arrow.optics.plugin.internals
 fun generateLensDsl(ele: ADT, optic: DataClassDsl): Snippet =
   Snippet(
     `package` = ele.packageName,
-    name = ele.sourceClassName,
+    name = ele.simpleName,
     content = processLensSyntax(ele, optic.foci)
   )
 
 fun generateOptionalDsl(ele: ADT, optic: DataClassDsl): Snippet =
   Snippet(
     `package` = ele.packageName,
-    name = ele.sourceClassName,
+    name = ele.simpleName,
     content = processOptionalSyntax(ele, optic)
   )
 
 fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet =
   Snippet(
     `package` = ele.packageName,
-    name = ele.sourceClassName,
+    name = ele.simpleName,
     content = processPrismSyntax(ele, isoOptic)
   )
 

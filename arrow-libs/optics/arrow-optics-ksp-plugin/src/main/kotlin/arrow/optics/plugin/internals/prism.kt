@@ -3,7 +3,7 @@ package arrow.optics.plugin.internals
 internal fun generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,
-    name = ele.sourceClassName,
+    name = ele.simpleName,
     imports =
       setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
     content = processElement(ele, target.foci)
