@@ -221,7 +221,7 @@ public sealed class Schedule<Input, Output> {
   public suspend fun repeatOrElse(fa: suspend () -> Input, orElse: suspend (Throwable, Output?) -> Output): Output =
     repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
 
-  public abstract suspend fun <C> repeatAsFlow(
+  public abstract suspend fun <C> repeatOrElseEitherAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> C
   ): Flow<Either<C, Output>>
@@ -231,17 +231,17 @@ public sealed class Schedule<Input, Output> {
    * This will raise an error if a repeat failed.
    */
   public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
-    repeatAsFlowOrElse(fa) { e, _ -> throw e }
+    repeatOrElseAsFlow(fa) { e, _ -> throw e }
 
   /**
    * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
    * Also offers a function to handle errors if they are encountered during repetition.
    */
-  public suspend fun repeatAsFlowOrElse(
+  public suspend fun repeatOrElseAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> Output
   ): Flow<Output> =
-    repeatAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
+    repeatOrElseEitherAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
 
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
@@ -487,7 +487,7 @@ public sealed class Schedule<Input, Output> {
       }
     }
 
-    override suspend fun <C> repeatAsFlow(
+    override suspend fun <C> repeatOrElseEitherAsFlow(
       fa: suspend () -> Input,
       orElse: suspend (Throwable, Output?) -> C
     ): Flow<Either<C, Output>> =
