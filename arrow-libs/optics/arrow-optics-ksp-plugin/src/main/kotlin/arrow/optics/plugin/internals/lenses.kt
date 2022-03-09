@@ -5,7 +5,7 @@ import java.util.Locale
 internal fun generateLenses(ele: ADT, target: LensTarget) =
   Snippet(
     `package` = ele.packageName,
-    name = ele.sourceClassName,
+    name = ele.simpleName,
     content = processElement(ele, target.foci)
   )
 
