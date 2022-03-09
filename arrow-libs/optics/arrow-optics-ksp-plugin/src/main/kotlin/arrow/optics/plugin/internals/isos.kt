@@ -1,7 +1,7 @@
 package arrow.optics.plugin.internals
 
 internal fun generateIsos(ele: ADT, target: IsoTarget) =
-  Snippet(`package` = ele.packageName, name = ele.sourceClassName, content = processElement(ele, target))
+  Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target))
 
 inline val Target.targetNames
   inline get() = foci.map(Focus::className)
