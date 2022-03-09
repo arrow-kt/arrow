@@ -208,6 +208,7 @@ public sealed class Resource<out A> {
     arrow.fx.coroutines.continuations.resource { f(bind()) }
 
   /** Useful for setting up/configuring an acquired resource */
+  @Deprecated("use tap with the type Parameter [Nothing] for [B]", level = DeprecationLevel.HIDDEN)
   public fun <B> tap(f: suspend (A) -> Unit): Resource<A> =
     arrow.fx.coroutines.continuations.resource { bind().also { f(it) } }
 
