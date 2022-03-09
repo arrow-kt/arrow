@@ -7,10 +7,15 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.nanoseconds
-import kotlin.time.seconds
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.zip
 
 @ExperimentalTime
 class ScheduleTest : ArrowFxSpec(
@@ -173,6 +178,10 @@ class ScheduleTest : ArrowFxSpec(
       checkRepeat(Schedule.recurs(20_000), expected = 20_000)
     }
 
+    "repeatAsFlow is stack-safe" {
+      checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
+    }
+
     "repeat" {
       val stop = RuntimeException("WOOO")
       val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
@@ -192,15 +201,48 @@ class ScheduleTest : ArrowFxSpec(
       l shouldBe Either.Left(stop)
     }
 
+    "repeatAsFlow" {
+      val stop = RuntimeException("WOOO")
+      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val n = 100
+      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+
+      val eff = SideEffect()
+
+      val l = Either.catch {
+        schedule.repeatAsFlow {
+          if (eff.counter >= n) throw stop
+          else eff.increment()
+        }.collect()
+      }
+
+      eff.counter shouldBe 100
+      l shouldBe Either.Left(stop)
+    }
+
     "repeat fails fast on errors" {
       val ex = Throwable("Hello")
       Schedule.recurs<Int>(0).repeatOrElseEither({ throw ex }) { exc, _ -> exc }
         .fold({ it shouldBe ex }, { fail("The impossible happened") })
     }
 
+    "repeatAsFlow fails fast on errors" {
+      val ex = Throwable("Hello")
+      Schedule.recurs<Int>(0).repeatOrElseEitherAsFlow({ throw ex }, { t, _ -> t })
+        .collect { either -> either.fold({ it shouldBe ex }, { fail("The impossible happened") }) }
+    }
+
     "repeat should run the schedule with the correct input" {
       var i = 0
-      (Schedule.recurs<Int>(10).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..10).toList()
+      val n = 10
+      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..n).toList()
+    }
+
+    "repeatAsFlow should run the schedule with the correct input" {
+      var i = 0
+      val n = 10
+      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList() shouldBe
+        (0..n).map { (0..it).toList() }
     }
 
     "retry is stack-safe" {
@@ -289,6 +331,14 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Un
   schedule.repeat {
     count.updateAndGet { it + 1 }
   } shouldBe expected
+}
+
+private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: Flow<B>): Unit {
+  val count = Atomic(0)
+  schedule.repeatAsFlow {
+    count.updateAndGet { it + 1 }
+  }.zip(expected, ::Pair)
+    .collect { (a, b) -> a shouldBe b }
 }
 
 @ExperimentalTime
