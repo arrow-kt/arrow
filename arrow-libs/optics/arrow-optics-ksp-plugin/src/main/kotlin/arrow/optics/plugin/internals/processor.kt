@@ -29,8 +29,39 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
   )
 
 internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
-  if (isSealed) listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-  else listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+  targetsFromOpticsAnnotation().let { targets ->
+    when {
+      isSealed ->
+        if (targets.isEmpty())
+          listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
+        else targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
+      else ->
+        if (targets.isEmpty())
+          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+        else targets.filter {
+          when (it) {
+            OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
+            else -> false
+          }
+        }
+    }
+  }
+
+internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget> =
+  annotations
+    .find { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
+    ?.arguments
+    ?.flatMap { it.value as ArrayList<KSType> }
+    ?.mapNotNull {
+      when (it.qualifiedString() ) {
+        "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
+        "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
+        "arrow.optics.OpticsTarget.PRISM" -> OpticsTarget.PRISM
+        "arrow.optics.OpticsTarget.OPTIONAL" -> OpticsTarget.OPTIONAL
+        "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
+        else -> null
+      }
+    }.orEmpty().distinct()
 
 internal fun evalAnnotatedPrismElement(
   element: KSClassDeclaration,
