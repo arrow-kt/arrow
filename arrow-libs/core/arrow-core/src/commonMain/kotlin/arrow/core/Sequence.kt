@@ -624,6 +624,7 @@ public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
+@Deprecated("Deprecated legacy Api", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
   else map { generateSequence { it } }
