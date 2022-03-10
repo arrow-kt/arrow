@@ -21,6 +21,11 @@ fun String.failsWith(check: (String) -> Boolean) {
   Assertions.assertThat(check(compilationResult.messages)).isTrue
 }
 
+fun String.compilationFails() {
+  val compilationResult = compile(this)
+  Assertions.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
+}
+
 fun String.evals(thing: Pair<String, Any?>) {
   val compilationResult = compile(this)
   Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
