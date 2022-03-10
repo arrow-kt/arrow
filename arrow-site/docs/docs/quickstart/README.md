@@ -129,7 +129,7 @@ Arrow supports Android starting on API 21 and up.
 
 In your project's root `build.gradle.kts`, append this repository to your list:
 
-```
+```kotlin
 allprojects {
     repositories {
         mavenCentral()
@@ -141,7 +141,7 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ##### Arrow Core
 
-```
+```kotlin
 dependencies {
     implementation("io.arrow-kt:arrow-core:1.0.1")
 }
@@ -150,13 +150,15 @@ dependencies {
 ##### Arrow Core + Arrow Optics
 
 ```
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
 dependencies {
     implementation("io.arrow-kt:arrow-optics:1.0.1")
-    kapt("io.arrow-kt:arrow-meta:1.0.1")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
 }
 ```
+
+here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tree/optics-setup.
 
 ##### Arrow Core + Arrow Fx
 
@@ -214,14 +216,15 @@ dependencies {
 ##### Arrow Core + Arrow Optics
 
 ```groovy
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
-def arrow_version = "1.0.1"
 dependencies {
-    implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:1.0.1"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion"
 }
 ```
+
+here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tree/optics-setup.
 
 ##### Arrow Core + Arrow Fx
 
@@ -295,7 +298,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
             <scope>import</scope>
         </dependency>
     </dependencies>
-</dependencyManagement><dependencies>
+</dependencyManagement>
 ...
 </dependencies>
 ```
