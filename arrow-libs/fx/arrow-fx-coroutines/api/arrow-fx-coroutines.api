@@ -309,7 +309,7 @@ public abstract class arrow/fx/coroutines/Resource {
 	public final fun parZip (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun parZip (Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static synthetic fun parZip$default (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/CoroutineContext;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Larrow/fx/coroutines/Resource;
-	public final synthetic fun tap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+	public final fun tap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public final fun use (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun zip (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
 	public final fun zip (Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function10;)Larrow/fx/coroutines/Resource;
