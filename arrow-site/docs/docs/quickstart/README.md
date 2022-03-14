@@ -129,7 +129,7 @@ Arrow supports Android starting on API 21 and up.
 
 In your project's root `build.gradle.kts`, append this repository to your list:
 
-```
+```kotlin
 allprojects {
     repositories {
         mavenCentral()
@@ -141,7 +141,7 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ##### Arrow Core
 
-```
+```kotlin
 dependencies {
     implementation("io.arrow-kt:arrow-core:1.0.1")
 }
@@ -150,13 +150,15 @@ dependencies {
 ##### Arrow Core + Arrow Optics
 
 ```
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
 dependencies {
     implementation("io.arrow-kt:arrow-optics:1.0.1")
-    kapt("io.arrow-kt:arrow-meta:1.0.1")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
 }
 ```
+
+here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tree/optics-setup.
 
 ##### Arrow Core + Arrow Fx
 
@@ -182,20 +184,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```
-allprojects {
-    repositories {
-        ...
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
-}
-```
+If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
 
 </div>
 
@@ -227,14 +216,15 @@ dependencies {
 ##### Arrow Core + Arrow Optics
 
 ```groovy
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
-def arrow_version = "1.0.1"
 dependencies {
-    implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:1.0.1"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion"
 }
 ```
+
+here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tree/optics-setup.
 
 ##### Arrow Core + Arrow Fx
 
@@ -262,20 +252,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```groovy
-allprojects {
-    repositories {
-        ...
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-
-    // To use latest artifacts
-    configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' }
-}
-```
+If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
 
 </div>
 
@@ -289,7 +266,7 @@ following properties:
 ```xml
 
 <properties>
-    <kotlin.version>1.5.31</kotlin.version>
+    <kotlin.version>1.6.10</kotlin.version>
     <arrow.version>1.0.1</arrow.version>
 </properties>
 ```
@@ -303,58 +280,6 @@ Add the dependencies that you want to use:
     <artifactId>arrow-core</artifactId>
     <version>${arrow.version}</version>
 </dependency>
-```
-
-#### Enabling kapt for the Optics DSL
-
-For the Optics DSL, enable annotation processing using Kotlin plugin:
-
-```xml
-
-<plugin>
-    <groupId>org.jetbrains.kotlin</groupId>
-    <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
-    <executions>
-        <execution>
-            <id>kapt</id>
-            <goals>
-                <goal>kapt</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-                <annotationProcessorPaths>
-                    <annotationProcessorPath>
-                        <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-meta</artifactId>
-                        <version>${arrow.version}</version>
-                    </annotationProcessorPath>
-                </annotationProcessorPaths>
-            </configuration>
-        </execution>
-        <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-                <goal>compile</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-            </configuration>
-        </execution>
-        <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-                <goal>test-compile</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
 ```
 
 #### BOM file
@@ -373,30 +298,15 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
             <scope>import</scope>
         </dependency>
     </dependencies>
-</dependencyManagement><dependencies>
+</dependencyManagement>
 ...
 </dependencies>
 ```
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-configuration:
-
-```xml
-
-<repository>
-    <snapshotss>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        <updatePolicy>always</updatePolicy>
-    </snapshots>
-</repository>
-```
-
+If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
 </div>
 </div>
-
-</div>
-
 
 </div>
