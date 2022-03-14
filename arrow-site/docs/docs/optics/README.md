@@ -154,7 +154,7 @@ To get the most of Arrow Optics you can add out Kotlin plug-in to your build, wh
 
 ```
 plugins {
-    id("com.google.devtools.ksp") version "1.6.0-1.0.2"
+    id("com.google.devtools.ksp") version "1.6.10-1.0.4"
 }
 
 dependencies {
@@ -214,7 +214,7 @@ To get the most of Arrow Optics you can add out Kotlin plug-in to your build, wh
 
 ```groovy
 plugins {
-    id "com.google.devtools.ksp" version "1.6.0-1.0.2"
+    id "com.google.devtools.ksp" version "1.6.10-1.0.4"
 }
 
 dependencies {
