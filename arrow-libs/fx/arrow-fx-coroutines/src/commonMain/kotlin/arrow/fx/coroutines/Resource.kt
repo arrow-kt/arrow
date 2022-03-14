@@ -208,7 +208,7 @@ public sealed class Resource<out A> {
     arrow.fx.coroutines.continuations.resource { f(bind()) }
 
   /** Useful for setting up/configuring an acquired resource */
-  public fun <B> tap(f: suspend (A) -> Unit): Resource<A> =
+  public fun tap(f: suspend (A) -> Unit): Resource<A> =
     arrow.fx.coroutines.continuations.resource { bind().also { f(it) } }
 
   public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
