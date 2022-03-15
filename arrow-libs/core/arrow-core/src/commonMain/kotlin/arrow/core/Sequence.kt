@@ -4,6 +4,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 
 public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
@@ -624,8 +625,12 @@ public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   traverse(::identity).map { it.asSequence() }
 
+public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
+  traverse(semigroup, ::identity)
+
+@Deprecated("use sequence instead", ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence"))
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup).map { it.asSequence() }
 
 @Deprecated("Deprecated legacy Api", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
@@ -655,6 +660,8 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
@@ -673,6 +680,8 @@ public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, Lis
 public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
@@ -691,6 +700,8 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
 public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 public fun <E, A, B> Sequence<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>

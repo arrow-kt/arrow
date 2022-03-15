@@ -1413,6 +1413,7 @@ public final class arrow/core/SequenceKt {
 	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Option;
+	public static final fun sequence (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun sequenceEither (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequenceOption (Lkotlin/sequences/Sequence;)Larrow/core/Option;
 	public static final fun sequenceValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
