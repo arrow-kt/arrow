@@ -613,14 +613,14 @@ public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
-@Deprecated("use sequence", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
+@Deprecated("use sequence instead", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
 public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   traverse(::identity).map { it.asSequence() }
 
 public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated("use sequence", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
+@Deprecated("use sequence instead", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   traverse(::identity).map { it.asSequence() }
 
