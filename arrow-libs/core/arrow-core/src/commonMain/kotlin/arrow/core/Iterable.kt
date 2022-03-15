@@ -7,6 +7,7 @@ import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
+import kotlin.experimental.ExperimentalTypeInference
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -286,6 +287,8 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
@@ -299,23 +302,29 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
 
 @Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  traverseEither(::identity)
+  traverse(::identity)
 
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
-public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
     f(item).fold(destination::add) { throwable ->
-      return@traverseResult Result.failure(throwable)
+      return@traverse Result.failure(throwable)
     }
   }
   return success(destination)
 }
 
+@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
+  traverse(f)
+
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  traverseResult(::identity)
+  traverse(::identity)
 
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
@@ -344,6 +353,12 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
+@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
@@ -356,7 +371,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
 }
 
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  this.traverseOption { it }
+ traverse(::identity)
 
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? {
   val acc = mutableListOf<B>()

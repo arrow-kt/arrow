@@ -20,7 +20,7 @@ class IterableTest : UnitSpec() {
     "traverseEither stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverseEither { a ->
+      val res = (0..20_000).traverse { a ->
         acc.add(a)
         Either.Right(a)
       }
@@ -31,7 +31,7 @@ class IterableTest : UnitSpec() {
     "traverseEither short-circuit" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseEither {
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             Either.Right(it)
