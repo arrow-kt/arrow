@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.flatMap as _flatMap
 
@@ -122,7 +123,18 @@ public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
 ): Map<Key, I> {
   val destination = LinkedHashMap<Key, I>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh -> map(key, bb, cc, dd, ee, ff, gg, hh) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -140,7 +152,19 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
 ): Map<Key, J> {
   val destination = LinkedHashMap<Key, J>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii -> map(key, bb, cc, dd, ee, ff, gg, hh, ii) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh,
+        ii
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -159,7 +183,16 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
 ): Map<Key, K> {
   val destination = LinkedHashMap<Key, K>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key]) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -179,7 +212,17 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
 ): Map<Key, L> {
   val destination = LinkedHashMap<Key, L>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key],
+      k[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
       map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
     }?.let { l -> destination.put(key, l) }
   }
@@ -438,7 +481,7 @@ public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
 
 @Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
+  fold(Monoid.map(SG))
 
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
