@@ -282,7 +282,11 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> {
+@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
+  traverse(f)
+
+public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
     when (val res = f(item)) {
@@ -293,8 +297,12 @@ public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): 
   return destination.right()
 }
 
+@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverseEither(::identity)
+
+public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
+  traverse(::identity)
 
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
@@ -336,7 +344,7 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   traverseValidated(Semigroup.nonEmptyList(), ::identity)
 
-public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> {
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   val destination = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this) {
     when (val res = f(item)) {
