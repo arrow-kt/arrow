@@ -908,9 +908,9 @@ public fun <A> none(): Option<A> = None
 public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
   fold(Monoid.option(MA))
 
-@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
+@Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty }"))
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
-  foldLeft(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
+  getOrElse { MA.empty() }
 
 public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
   when (this) {
