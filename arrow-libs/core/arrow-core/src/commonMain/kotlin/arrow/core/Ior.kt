@@ -657,7 +657,7 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>>
     is Ior.Right -> Ior.Right(List(n) { value })
     is Ior.Left -> this
     is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
+      { List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } },
       { List(n) { rightValue } }
     )
   }
@@ -665,11 +665,11 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>>
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
   if (n <= 0) Ior.Right(MB.empty())
   else when (this) {
-    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.combineAll() })
+    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })
     is Ior.Left -> this
     is Ior.Both -> bimap(
       { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
-      { MB.run { List(n) { rightValue }.combineAll() } }
+      { MB.run { List(n) { rightValue }.fold() } }
     )
   }
 

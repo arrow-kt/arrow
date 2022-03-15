@@ -673,6 +673,7 @@ public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
 
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 
