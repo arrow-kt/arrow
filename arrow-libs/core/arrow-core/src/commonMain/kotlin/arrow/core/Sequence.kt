@@ -610,15 +610,20 @@ public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A
   return asep to bsep
 }
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
+public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
+  traverse(::identity)
+
+@Deprecated("use sequence", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
 public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
-  traverseEither(::identity)
+  traverse(::identity).map { it.asSequence() }
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
+public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
+  traverse(::identity)
+
+@Deprecated("use sequence", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
-  traverseOption(::identity)
+  traverse(::identity).map { it.asSequence() }
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   traverseValidated(semigroup, ::identity)
 
@@ -650,8 +655,7 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
-public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> {
+public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -659,14 +663,17 @@ public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<
   forEach { a ->
     when (val res = f(a)) {
       is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+      is Left -> return@traverse res
     }
   }
-  return acc.asSequence().right()
+  return acc.toList().right()
 }
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
-public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> {
+@Deprecated("use traverse instead", ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse"))
+public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
+  traverse(f).map { it.asSequence() }
+
+public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -674,28 +681,39 @@ public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequen
   forEach { a ->
     when (val res = f(a)) {
       is Some -> acc.add(res.value)
-      is None -> return@traverseOption res
+      is None -> return@traverse res
     }
   }
-  return Some(acc.asSequence())
+  return Some(acc)
 }
 
-@Deprecated("Terminal operators on Sequence are being deprecated. Please use either one of the supported terminal operators of Sequence and opt for supported [traverse] functions")
+@Deprecated("use traverse instead", ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse"))
+public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
+  traverse(f).map { it.asSequence() }
+
+public fun <E, A, B> Sequence<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> =
+  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
+    when (val res = f(a)) {
+      is Valid -> when (acc) {
+        is Valid -> acc.also { it.value.add(res.value) }
+        is Invalid -> acc
+      }
+      is Invalid -> when (acc) {
+        is Valid -> res
+        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+      }
+    }
+  }
+
+@Deprecated("traverse(semigroup, f).map { it.asSequence() }", ReplaceWith("arrow.core.traverse"))
 public fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Sequence<B>> = fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-  when (val res = f(a)) {
-    is Valid -> when (acc) {
-      is Valid -> acc.also { it.value.add(res.value) }
-      is Invalid -> acc
-    }
-    is Invalid -> when (acc) {
-      is Valid -> res
-      is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-    }
-  }
-}.map { it.asSequence() }
+): Validated<E, Sequence<B>> =
+  traverse(semigroup, f).map { it.asSequence() }
 
 /**
  * splits an union into its component parts.

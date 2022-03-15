@@ -1411,12 +1411,17 @@ public final class arrow/core/SequenceKt {
 	public static final fun salign (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun separateEither (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
+	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Option;
 	public static final fun sequenceEither (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequenceOption (Lkotlin/sequences/Sequence;)Larrow/core/Option;
 	public static final fun sequenceValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun some (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun split (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun tail (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun traverseEither (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseOption (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun traverseValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
