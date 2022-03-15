@@ -1495,7 +1495,7 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
       is Right -> Either.Right(SGB.run { this@combine.value.combine(b.value) })
     }
   }
-@Deprecated("use fold instead", ReplaceWith("fold(MA, MB)"))
+@Deprecated("use fold instead", ReplaceWith("fold(MA, MB)", "arrow.core.fold"))
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
   fold(MA, MB)
 
