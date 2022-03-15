@@ -5,9 +5,7 @@ import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.checkAll
 
 class EveryTest : UnitSpec() {
   init {

@@ -1496,10 +1496,9 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
     }
   }
 
+@Deprecated("use fold instead", ReplaceWith("fold(Monoid.either(MA, MB))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
-  fold(Right(MB.empty()) as Either<A, B>) { acc, e ->
-    acc.combine(MA, MB, e)
-  }
+  fold(Monoid.either(MA, MB))
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, B>

@@ -297,11 +297,9 @@ private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y
   }
 }
 
-public fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A = MA.run {
-  this@combineAll.fold(empty()) { acc, a ->
-    acc.combine(a)
-  }
-}
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
+public fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A =
+  fold(MA)
 
 public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequence<B>> =
   fold(emptySequence()) { bs, a ->
