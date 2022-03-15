@@ -704,7 +704,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
-@Deprecated("use fold instead", ReplaceWith("fold(MA)"))
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 

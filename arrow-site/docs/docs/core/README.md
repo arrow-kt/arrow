@@ -183,7 +183,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -236,7 +236,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>
