@@ -436,11 +436,8 @@ public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
   else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
 }
 
-@Deprecated("use fold instead", ReplaceWith("fold(SG)", "arrow.core.fold"))
+@Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(SG)
-
-public fun <K, A> Iterable<Map<K, A>>.fold(SG: Semigroup<A>): Map<K, A> =
   fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
 
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {

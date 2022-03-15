@@ -200,10 +200,10 @@ public interface Monoid<A> : Semigroup<A> {
         combine(MOL, MOR, b)
 
       override fun Collection<Either<L, R>>.fold(): Either<L, R> =
-        fold(MOL, MOR)
+        fold(either(MOL, MOR))
 
       override fun fold(elems: List<Either<L, R>>): Either<L, R> =
-        elems.fold(MOL, MOR)
+        elems.fold(either(MOL, MOR))
 
       override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
         b?.let { combine(MOL, MOR, it) } ?: this

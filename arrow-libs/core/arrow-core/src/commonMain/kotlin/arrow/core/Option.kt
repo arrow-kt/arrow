@@ -910,13 +910,11 @@ public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
     acc.combine(MA, a)
   }
 
-@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
+@Deprecated("use fold instead", ReplaceWith("fold(Monoid.option(MA))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
-  fold(MA)
-
-public fun <A> Option<A>.fold(MA: Monoid<A>): A = MA.run {
-  foldLeft(empty()) { acc, a -> acc.combine(a) }
-}
+  MA.run {
+    foldLeft(empty()) { acc, a -> acc.combine(a) }
+  }
 
 public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
   when (this) {
