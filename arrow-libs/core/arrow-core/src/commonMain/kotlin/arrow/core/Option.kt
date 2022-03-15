@@ -904,12 +904,17 @@ public fun <A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
 public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
   fold(Option(MA.empty())) { acc, a ->
     acc.combine(MA, a)
   }
 
-public fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
+public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
+  fold(MA)
+
+public fun <A> Option<A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
 

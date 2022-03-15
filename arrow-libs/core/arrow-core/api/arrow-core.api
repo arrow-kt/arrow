@@ -250,6 +250,7 @@ public final class arrow/core/EitherKt {
 	public static final fun filterOrOther (Larrow/core/Either;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun flatMap (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun flatten (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
 	public static final fun getOrElse (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun getOrHandle (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun handleError (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -628,6 +629,7 @@ public final class arrow/core/MapKt {
 	public static final fun filterMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun filterOption (Ljava/util/Map;)Ljava/util/Map;
 	public static final fun flatMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
+	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Ljava/util/Map;
 	public static final fun foldLeft (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun getOrNone (Ljava/util/Map;Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
@@ -825,6 +827,7 @@ public final class arrow/core/OptionKt {
 	public static final fun compareTo (Larrow/core/Option;Larrow/core/Option;)I
 	public static final fun ensure (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Larrow/core/Option;)Larrow/core/Option;
+	public static final fun fold (Larrow/core/Option;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun getOrElse (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun handleError (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun handleErrorWith (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
@@ -2943,6 +2946,8 @@ public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Sem
 	public static fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public abstract fun empty ()Ljava/lang/Object;
 	public static fun endo ()Larrow/typeclasses/Monoid;
+	public abstract fun fold (Ljava/util/Collection;)Ljava/lang/Object;
+	public abstract fun fold (Ljava/util/List;)Ljava/lang/Object;
 	public static fun list ()Larrow/typeclasses/Monoid;
 	public static fun map (Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Monoid;
 	public static fun option (Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Monoid;
@@ -2973,6 +2978,8 @@ public final class arrow/typeclasses/Monoid$Companion {
 public final class arrow/typeclasses/Monoid$DefaultImpls {
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/List;)Ljava/lang/Object;
+	public static fun fold (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
+	public static fun fold (Larrow/typeclasses/Monoid;Ljava/util/List;)Ljava/lang/Object;
 	public static fun maybeCombine (Larrow/typeclasses/Monoid;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun plus (Larrow/typeclasses/Monoid;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }

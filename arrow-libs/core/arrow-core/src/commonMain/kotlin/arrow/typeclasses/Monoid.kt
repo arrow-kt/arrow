@@ -7,9 +7,9 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.combine
-import arrow.core.combineAll
 import arrow.core.compose
 import arrow.core.flatten
+import arrow.core.fold
 import arrow.core.identity
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -24,13 +24,26 @@ public interface Monoid<A> : Semigroup<A> {
   /**
    * Combine an [Collection] of [A] values.
    */
+  @Deprecated("use fold instead", ReplaceWith("fold()"))
   public fun Collection<A>.combineAll(): A =
-    if (isEmpty()) empty() else reduce { a, b -> a.combine(b) }
+    fold()
 
   /**
    * Combine an array of [A] values.
    */
-  public fun combineAll(elems: List<A>): A = elems.combineAll()
+  @Deprecated("use fold instead", ReplaceWith("fold(elems)"))
+  public fun combineAll(elems: List<A>): A = fold(elems)
+
+  /**
+   * Fold an [Collection] of [A] values.
+   */
+  public fun Collection<A>.fold(): A =
+    if (isEmpty()) empty() else reduce { a, b -> a.combine(b) }
+
+  /**
+   * Fold an array of [A] values.
+   */
+  public fun fold(elems: List<A>): A = elems.fold()
 
   public companion object {
     @JvmStatic
@@ -186,14 +199,14 @@ public interface Monoid<A> : Semigroup<A> {
       override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
         combine(MOL, MOR, b)
 
-      override fun Collection<Either<L, R>>.combineAll(): Either<L, R> =
-        combineAll(MOL, MOR)
+      override fun Collection<Either<L, R>>.fold(): Either<L, R> =
+        fold(MOL, MOR)
+
+      override fun fold(elems: List<Either<L, R>>): Either<L, R> =
+        elems.fold(MOL, MOR)
 
       override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
         b?.let { combine(MOL, MOR, it) } ?: this
-
-      override fun combineAll(elems: List<Either<L, R>>): Either<L, R> =
-        elems.combineAll(MOL, MOR)
     }
 
     private class PairMonoid<A, B>(

@@ -705,11 +705,8 @@ public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List
   map(fa).unalign()
 
 @Deprecated("use fold instead", ReplaceWith("fold(MA)"))
-public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
-  this@combineAll.fold(empty()) { acc, a ->
-    acc.combine(a)
-  }
-}
+public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
+  fold(MA)
 
 /**
  * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
