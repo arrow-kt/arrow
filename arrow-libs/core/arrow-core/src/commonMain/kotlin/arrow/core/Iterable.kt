@@ -330,7 +330,7 @@ public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated("use traverse instead", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
