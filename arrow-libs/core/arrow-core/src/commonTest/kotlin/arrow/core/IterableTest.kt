@@ -2,8 +2,10 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
+import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.option
 import arrow.typeclasses.Semigroup
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -209,12 +211,19 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "traverse Nullable and sequence Either interoperate" {
+    "sequence Either traverse Nullable interoperate - and proof map + sequence equality with traverse" {
       checkAll(
-        Arb.either(Arb.string(), Arb.int()).orNull(),
-        Arb.list(Arb.int())
-      ) { either, ints ->
-        ints.traverse { i -> either?.map { it + i } }?.sequence() shouldBe either?.map { i -> ints.traverse { it + i } }
+        Arb.list(Arb.int()),
+        Arb.functionAToB<Int, Either<String, Int>?>(Arb.either(Arb.string(), Arb.int()).orNull())
+      ) { ints, f ->
+
+        val res: Either<String, List<Int>>? =
+          ints.traverse(f)?.sequence()
+
+        val expected: Either<String, List<Int>>? =
+          ints.map(f).sequence()?.sequence()
+
+        res shouldBe expected
       }
     }
 
