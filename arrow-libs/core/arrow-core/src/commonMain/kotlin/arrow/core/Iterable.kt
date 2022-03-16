@@ -398,7 +398,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   return destination.some()
 }
 
-@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
