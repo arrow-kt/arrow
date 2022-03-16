@@ -1,15 +1,19 @@
 package arrow.core
 
 import arrow.core.test.UnitSpec
+import arrow.core.test.generators.either
 import arrow.core.test.generators.option
 import arrow.typeclasses.Semigroup
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.string
 import kotlin.math.max
 import kotlin.math.min
 
@@ -198,10 +202,19 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequence Validated should be consistent with traverseValidated" {
+    "sequence Validated should be consistent with traverse Validated" {
       checkAll(Arb.list(Arb.int())) { ints ->
         ints.map { it.valid() }.sequence(Semigroup.string()) shouldBe
           ints.traverse(Semigroup.string()) { it.valid() }
+      }
+    }
+
+    "traverse Nullable and sequence Either interoperate" {
+      checkAll(
+        Arb.either(Arb.string(), Arb.int()).orNull(),
+        Arb.list(Arb.int())
+      ) { either, ints ->
+        ints.traverse { i -> either?.map { it + i } }?.sequence() shouldBe either?.map { i -> ints.traverse { it + i } }
       }
     }
 
