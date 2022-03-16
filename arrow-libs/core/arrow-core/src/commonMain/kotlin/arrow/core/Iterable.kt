@@ -323,35 +323,63 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
+@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
+  sequence()
+
+public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
+@Deprecated("use traverse instead", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, List<B>> = semigroup.run {
-  fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Validated.Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Validated.Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> Invalid(acc.value.combine(res.value))
+): Validated<E, List<B>> =
+  traverse(semigroup, f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> Iterable<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> =
+  semigroup.run {
+    fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
+      when (val res = f(a)) {
+        is Validated.Valid -> when (acc) {
+          is Valid -> acc.also { it.value.add(res.value) }
+          is Invalid -> acc
+        }
+        is Validated.Invalid -> when (acc) {
+          is Valid -> res
+          is Invalid -> Invalid(acc.value.combine(res.value))
+        }
       }
     }
   }
-}
 
+@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverseValidated(Semigroup.nonEmptyList(), f)
+  traverse(f)
 
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
+  traverse(Semigroup.nonEmptyList(), f)
+
+@Deprecated("use sequence instead", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup)
 
+public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
+  traverse(semigroup, ::identity)
+
+@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  traverseValidated(Semigroup.nonEmptyList(), ::identity)
+  sequence()
+
+public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
+  traverse(Semigroup.nonEmptyList(), ::identity)
 
 @Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
@@ -370,10 +398,20 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   return destination.some()
 }
 
+@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
- traverse(::identity)
+  sequence()
 
-public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? {
+public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
+  traverse(::identity)
+
+@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
   val acc = mutableListOf<B>()
   forEach { a ->
     val res = f(a)
@@ -386,8 +424,12 @@ public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? {
   return acc.toList()
 }
 
+@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  this.traverseNullable { it }
+  sequence()
+
+public fun <A> Iterable<A?>.sequence(): List<A>? =
+  traverse(::identity)
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }

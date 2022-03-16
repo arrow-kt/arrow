@@ -7,17 +7,15 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import kotlin.math.max
 import kotlin.math.min
 
 class IterableTest : UnitSpec() {
   init {
-    "traverseEither stack-safe" {
+    "traverse Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = (0..20_000).traverse { a ->
@@ -28,7 +26,7 @@ class IterableTest : UnitSpec() {
       res shouldBe Either.Right((0..20_000).toList())
     }
 
-    "traverseEither short-circuit" {
+    "traverse Either short-circuit" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
         val evens = ints.traverse {
@@ -45,16 +43,16 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceEither should be consistent with traverseEither" {
+    "sequenceEither should be consistent with traverse Either" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it.right() }.sequenceEither() shouldBe ints.traverseEither { it.right() }
+        ints.map { it.right() }.sequence() shouldBe ints.traverse { it.right() }
       }
     }
 
-    "traverseResult stack-safe" {
+    "traverse Result stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverseResult { a ->
+      val res = (0..20_000).traverse { a ->
         acc.add(a)
         Result.success(a)
       }
@@ -62,10 +60,10 @@ class IterableTest : UnitSpec() {
       res shouldBe Result.success((0..20_000).toList())
     }
 
-    "traverseResult short-circuit" {
+    "traverse Result short-circuit" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseResult {
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             Result.success(it)
@@ -79,16 +77,16 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceResult should be consistent with traverseResult" {
+    "sequence Result should be consistent with traverse Result" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { Result.success(it) }.sequenceResult() shouldBe ints.traverseResult { Result.success(it) }
+        ints.map { Result.success(it) }.sequence() shouldBe ints.traverse { Result.success(it) }
       }
     }
 
-    "traverseOption is stack-safe" {
+    "traverse Option is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverseOption { a ->
+      val res = (0..20_000).traverse { a: Int ->
         acc.add(a)
         Some(a)
       }
@@ -96,10 +94,10 @@ class IterableTest : UnitSpec() {
       res shouldBe Some((0..20_000).toList())
     }
 
-    "traverseOption short-circuits" {
+    "traverse Option short-circuits" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseOption {
+        val evens = ints.traverse { it: Int ->
           (it % 2 == 0).maybe {
             acc.add(it)
             it
@@ -110,23 +108,23 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceOption yields some when all entries in the list are some" {
+    "sequence Option yields some when all entries in the list are some" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
         evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
-    "sequenceOption should be consistent with traverseOption" {
+    "sequence Option should be consistent with traverse Option" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { Some(it) }.sequenceOption() shouldBe ints.traverseOption { Some(it) }
+        ints.map { Some(it) }.sequence() shouldBe ints.traverse { it: Int -> Some(it) }
       }
     }
 
-    "traverseNullable is stack-safe" {
+    "traverse Nullable is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int?>()
-      val res = (0..20_000).traverseNullable { a ->
+      val res = (0..20_000).traverse { a: Int ->
         acc.add(a)
         a
       }
@@ -134,10 +132,10 @@ class IterableTest : UnitSpec() {
       res.shouldNotBeNull() shouldBe (0..20_000).toList()
     }
 
-    "traverseNullable short-circuits" {
+    "traverse Nullable short-circuits" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseNullable {
+        val evens = ints.traverse { it: Int ->
           if (it % 2 == 0) {
             acc.add(it)
             it
@@ -157,9 +155,9 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceNullable yields some when all entries in the list are not null" {
+    "sequence Nullable yields some when all entries in the list are not null" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { if (it % 2 == 0) it else null }.sequenceNullable()
+        val evens = ints.map { if (it % 2 == 0) it else null }.sequence()
 
         val expected = ints.takeWhile { it % 2 == 0 }
         if (ints.any { it % 2 != 0 }) {
@@ -170,16 +168,16 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceNullable should be consistent with traversNullable" {
+    "sequence Nullable should be consistent with travers Nullable" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it as Int? }.sequenceNullable() shouldBe ints.traverseNullable { it as Int? }
+        ints.map { it as Int? }.sequence() shouldBe ints.traverse { it: Int -> it as Int? }
       }
     }
 
-    "traverseValidated stack-safe" {
+    "traverse Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverseValidated(Semigroup.string()) {
+      val res = (0..20_000).traverse(Semigroup.string()) {
         acc.add(it)
         Validated.Valid(it)
       }
@@ -187,11 +185,11 @@ class IterableTest : UnitSpec() {
       res shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated acumulates" {
+    "traverse Validated acumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> =
           ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
-            .sequenceValidated()
+            .sequence()
 
         val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
           .fold({ Valid(ints.filter { it % 2 == 0 }) }, { Invalid(it) })
@@ -200,10 +198,10 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "sequenceValidated should be consistent with traverseValidated" {
+    "sequence Validated should be consistent with traverseValidated" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it.valid() }.sequenceValidated(Semigroup.string()) shouldBe
-          ints.traverseValidated(Semigroup.string()) { it.valid() }
+        ints.map { it.valid() }.sequence(Semigroup.string()) shouldBe
+          ints.traverse(Semigroup.string()) { it.valid() }
       }
     }
 

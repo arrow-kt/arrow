@@ -6,7 +6,7 @@ import arrow.core.NonEmptyList
 import arrow.core.ValidatedNel
 import arrow.core.identity
 import arrow.core.invalidNel
-import arrow.core.traverseValidated
+import arrow.core.traverse
 import arrow.core.valid
 import arrow.fx.coroutines.continuations.ResourceScope
 import kotlin.coroutines.CoroutineContext
@@ -757,7 +757,7 @@ private inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
 private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   exitCase: ExitCase,
   first: Throwable? = null
-): Throwable? = traverseValidated { f ->
+): Throwable? = traverse { f ->
   catchNel { f(exitCase) }
 }.fold({
   if (first != null) Platform.composeErrors(NonEmptyList(first, it))

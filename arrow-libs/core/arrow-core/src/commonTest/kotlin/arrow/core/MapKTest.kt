@@ -7,13 +7,10 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 
 class MapKTest : UnitSpec() {
@@ -80,7 +77,7 @@ class MapKTest : UnitSpec() {
 
     "sequenceOption yields some when all entries in the list are some" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
         evens.fold({ Unit }) { it shouldBe ints }
       }
     }
