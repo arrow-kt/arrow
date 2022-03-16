@@ -319,7 +319,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
   return success(destination)
 }
 
-@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
