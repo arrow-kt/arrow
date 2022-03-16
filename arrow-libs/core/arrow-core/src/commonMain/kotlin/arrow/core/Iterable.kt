@@ -424,7 +424,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
   return acc.toList()
 }
 
-@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
