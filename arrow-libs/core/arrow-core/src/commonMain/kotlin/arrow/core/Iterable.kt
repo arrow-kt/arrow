@@ -405,7 +405,7 @@ public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated("use traverse instead", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
