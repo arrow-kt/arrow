@@ -323,7 +323,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
-@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
