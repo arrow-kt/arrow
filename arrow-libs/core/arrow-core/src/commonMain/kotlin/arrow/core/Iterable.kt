@@ -300,7 +300,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
   return destination.right()
 }
 
-@Deprecated("use sequence instead", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
