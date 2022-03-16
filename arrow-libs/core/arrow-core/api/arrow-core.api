@@ -584,6 +584,12 @@ public final class arrow/core/IterableKt {
 	public static final fun salign (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;)Ljava/lang/Iterable;
 	public static final fun separateEither (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Either;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Validated;
+	public static final fun sequence (Ljava/lang/Iterable;)Ljava/lang/Object;
+	public static final fun sequence (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun sequence (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun sequenceEither (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun sequenceNullable (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun sequenceOption (Ljava/lang/Iterable;)Larrow/core/Option;
@@ -594,6 +600,12 @@ public final class arrow/core/IterableKt {
 	public static final fun singleOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun split (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun tail (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun traverse (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun traverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseNullable (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun traverseOption (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
