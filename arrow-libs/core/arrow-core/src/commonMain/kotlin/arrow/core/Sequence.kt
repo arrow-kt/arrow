@@ -614,21 +614,30 @@ public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
-@Deprecated("use sequence instead", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceEither is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
-  traverse(::identity).map { it.asSequence() }
+  sequence().map { it.asSequence() }
 
 public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated("use sequence instead", ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceOption is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
-  traverse(::identity).map { it.asSequence() }
+  sequence().map { it.asSequence() }
 
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverse(semigroup, ::identity)
 
-@Deprecated("use sequence instead", ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   sequence(semigroup).map { it.asSequence() }
 
@@ -676,7 +685,10 @@ public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, Lis
   return acc.toList().right()
 }
 
-@Deprecated("use traverse instead", ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse"))
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
+)
 public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
@@ -696,7 +708,10 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   return Some(acc)
 }
 
-@Deprecated("use traverse instead", ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse"))
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
+)
 public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
@@ -719,7 +734,10 @@ public fun <E, A, B> Sequence<A>.traverse(
     }
   }
 
-@Deprecated("traverse(semigroup, f).map { it.asSequence() }", ReplaceWith("arrow.core.traverse"))
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(semigroup, f).map { it.asSequence() }", "arrow.core.traverse")
+)
 public fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
