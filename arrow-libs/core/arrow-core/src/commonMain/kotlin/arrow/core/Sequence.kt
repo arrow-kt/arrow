@@ -641,7 +641,7 @@ public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): V
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   sequence(semigroup).map { it.asSequence() }
 
-@Deprecated("Deprecated legacy Api", ReplaceWith("map { generateSequence { this } }"))
+@Deprecated("some is being deprecated in favor of map", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
   else map { generateSequence { it } }
