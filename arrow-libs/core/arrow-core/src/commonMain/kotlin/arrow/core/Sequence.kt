@@ -4,6 +4,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 
 public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
@@ -610,15 +611,37 @@ public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A
   return asep to bsep
 }
 
+public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
+  traverse(::identity)
+
+@Deprecated(
+  "sequenceEither is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
-  traverseEither(::identity)
+  sequence().map { it.asSequence() }
 
+public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
+  traverse(::identity)
+
+@Deprecated(
+  "sequenceOption is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
-  traverseOption(::identity)
+  sequence().map { it.asSequence() }
 
+public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
+  traverse(semigroup, ::identity)
+
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence")
+)
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup).map { it.asSequence() }
 
+@Deprecated("some is being deprecated in favor of map", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   if (none()) emptySequence()
   else map { generateSequence { it } }
@@ -646,7 +669,9 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
-public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> {
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -654,13 +679,22 @@ public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<
   forEach { a ->
     when (val res = f(a)) {
       is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+      is Left -> return@traverse res
     }
   }
-  return acc.asSequence().right()
+  return acc.toList().right()
 }
 
-public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> {
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
+)
+public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
+  traverse(f).map { it.asSequence() }
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
   //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
   //  forcing too much of the sequence to be evaluated.
@@ -668,27 +702,47 @@ public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequen
   forEach { a ->
     when (val res = f(a)) {
       is Some -> acc.add(res.value)
-      is None -> return@traverseOption res
+      is None -> return@traverse res
     }
   }
-  return Some(acc.asSequence())
+  return Some(acc)
 }
 
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
+)
+public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
+  traverse(f).map { it.asSequence() }
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public fun <E, A, B> Sequence<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> =
+  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
+    when (val res = f(a)) {
+      is Valid -> when (acc) {
+        is Valid -> acc.also { it.value.add(res.value) }
+        is Invalid -> acc
+      }
+      is Invalid -> when (acc) {
+        is Valid -> res
+        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+      }
+    }
+  }
+
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(semigroup, f).map { it.asSequence() }", "arrow.core.traverse")
+)
 public fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Sequence<B>> = fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-  when (val res = f(a)) {
-    is Valid -> when (acc) {
-      is Valid -> acc.also { it.value.add(res.value) }
-      is Invalid -> acc
-    }
-    is Invalid -> when (acc) {
-      is Valid -> res
-      is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-    }
-  }
-}.map { it.asSequence() }
+): Validated<E, Sequence<B>> =
+  traverse(semigroup, f).map { it.asSequence() }
 
 /**
  * splits an union into its component parts.
@@ -831,4 +885,5 @@ public fun <A> Sequence<A>.void(): Sequence<Unit> =
 public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
 
-public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> = this.mapNotNull { it.orNull() }
+public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> =
+  mapNotNull { it.orNull() }
