@@ -93,7 +93,7 @@ class NonEmptyListTest : UnitSpec() {
     "traverseValidated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverseValidated(Semigroup.string()) {
+      val res = (0..20_000).traverse(Semigroup.string()) {
         acc.add(it)
         Validated.Valid(it)
       }

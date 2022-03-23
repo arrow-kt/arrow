@@ -4,14 +4,13 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.invalidNel
-import arrow.core.sequenceValidated
+import arrow.core.sequence
 import arrow.core.validNel
 import arrow.typeclasses.Semigroup
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
 
@@ -61,7 +60,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
     "parTraverseValidated identity is identity" {
       checkAll(Arb.list(Arb.validatedNel(Arb.int(), Arb.int()))) { l ->
         val res: Validated<NonEmptyList<Int>, List<Int>> = l.parTraverseValidated(Semigroup.nonEmptyList()) { it }
-        res shouldBe l.sequenceValidated(Semigroup.nonEmptyList())
+        res shouldBe l.sequence(Semigroup.nonEmptyList())
       }
     }
 

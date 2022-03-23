@@ -1,14 +1,13 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.sequenceResult
+import arrow.core.sequence
 import arrow.core.test.generators.result
 import io.kotest.matchers.result.shouldBeFailureOfType
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
@@ -58,7 +57,7 @@ class ParTraverseResultTest : ArrowFxSpec(
     "parTraverseResult identity is identity" {
       checkAll(Arb.list(Arb.result(Arb.int()))) { l ->
         val res = l.parTraverseResult { it }
-        res shouldBe l.sequenceResult()
+        res shouldBe l.sequence()
       }
     }
 
