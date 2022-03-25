@@ -1062,8 +1062,8 @@ public sealed class Either<out A, out B> {
    *
    *  fun main(args: Array<String>) {
    *   //sampleStart
-   *   Either.Left("foo").isEmpty()  // Result: false
-   *   Either.Right("foo").isEmpty() // Result: true
+   *   Either.Left("foo").isNotEmpty()  // Result: false
+   *   Either.Right("foo").isNotEmpty() // Result: true
    *   //sampleEnd
    * }
    * ```
