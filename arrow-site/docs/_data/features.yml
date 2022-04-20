@@ -26,7 +26,7 @@ content:
     - title: Analysis
       description: Pre-, post-condition, and invariant checks for your Kotlin code
       icon: img/home/arrow-analysis-lines
-      url: /meta/analysis/
+      url: /analysis/
       id: analysis
 
     - title: Meta
