@@ -501,7 +501,7 @@ public sealed class Resource<out A> {
   )
   public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
 
-  internal data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>()
+  public data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>()
 
   public companion object {
 
