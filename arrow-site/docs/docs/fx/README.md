@@ -119,8 +119,8 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-fx-coroutines:1.0.1")
-    implementation("io.arrow-kt:arrow-fx-stm:1.0.1")
+    implementation("io.arrow-kt:arrow-fx-coroutines:1.1.0")
+    implementation("io.arrow-kt:arrow-fx-stm:1.1.0")
 }
 ```
 
@@ -130,7 +130,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.0.1"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.1.0"))
 
     implementation("io.arrow-kt:arrow-fx-coroutines")
     implementation("io.arrow-kt:arrow-fx-stm")
@@ -139,7 +139,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.0` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -160,7 +160,7 @@ allprojects {
 Add the dependencies into the project's `build.gradle`:
 
 ```groovy
-def arrow_version = "1.0.1"
+def arrow_version = "1.1.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
     implementation "io.arrow-kt:arrow-fx-stm:$arrow_version"
@@ -172,7 +172,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "1.0.1"
+def arrow_version = "1.1.0"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -183,7 +183,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.0` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -196,8 +196,8 @@ following properties:
 
 ```xml
 <properties>
-    <kotlin.version>1.6.10</kotlin.version>
-    <arrow.version>1.0.1</arrow.version>
+    <kotlin.version>1.6.21</kotlin.version>
+    <arrow.version>1.1.0</arrow.version>
 </properties>
 ```
 
@@ -235,7 +235,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.0` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>

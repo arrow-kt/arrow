@@ -143,18 +143,19 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("io.arrow-kt:arrow-core:1.0.1")
+    implementation("io.arrow-kt:arrow-core:1.1.0")
 }
 ```
 
 ##### Arrow Core + Arrow Optics
 
-```
-apply plugin: 'com.google.devtools.ksp'
-
+```kotlin
+plugins {
+   id("com.google.devtools.ksp") version "1.6.20-1.0.4"
+}
+ 
 dependencies {
-    implementation("io.arrow-kt:arrow-optics:1.0.1")
-    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:1.1.0")
 }
 ```
 
@@ -164,7 +165,7 @@ here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tre
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-fx-coroutines:1.0.1")
+    implementation("io.arrow-kt:arrow-fx-coroutines:1.1.0")
 }
 ```
 
@@ -174,7 +175,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.0.1"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.1.0"))
 
     implementation("io.arrow-kt:arrow-core")
     implementation("io.arrow-kt:arrow-fx-coroutines")
@@ -184,7 +185,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
+If you want to try the latest features, replace `1.1.0` with the latest `alpha` release.
 
 </div>
 
@@ -207,7 +208,7 @@ Add the dependencies into the project's `build.gradle`:
 ##### Arrow Core
 
 ```groovy
-def arrow_version = "1.0.1"
+def arrow_version = "1.1.0"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
@@ -219,9 +220,10 @@ dependencies {
 apply plugin: 'com.google.devtools.ksp'
 
 dependencies {
-    implementation "io.arrow-kt:arrow-optics:1.0.1"
-    ksp "io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion"
+    implementation "io.arrow-kt:arrow-optics:1.1.0"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:1.1.0"
 }
+
 ```
 
 here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tree/optics-setup.
@@ -229,7 +231,7 @@ here is an example repository https://github.com/arrow-kt/Arrow-JVM-Template/tre
 ##### Arrow Core + Arrow Fx
 
 ```groovy
-def arrow_version = "1.0.1"
+def arrow_version = "1.1.0"
 dependencies {
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
 }
@@ -240,7 +242,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "1.0.1"
+def arrow_version = "1.1.0"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -252,7 +254,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
+If you want to try the latest features, replace `1.1.0` with the latest `alpha` release.
 
 </div>
 
@@ -266,8 +268,8 @@ following properties:
 ```xml
 
 <properties>
-    <kotlin.version>1.6.10</kotlin.version>
-    <arrow.version>1.0.1</arrow.version>
+    <kotlin.version>1.6.21</kotlin.version>
+    <arrow.version>1.1.1</arrow.version>
 </properties>
 ```
 
@@ -305,7 +307,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with the latest `alpha` release.
+If you want to try the latest features, replace `1.1.0` with the latest `alpha` release.
 </div>
 </div>
 
