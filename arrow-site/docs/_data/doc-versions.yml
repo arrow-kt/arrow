@@ -28,7 +28,7 @@ docVersions:
     url: https://arrow-kt.io/
     previous: https://arrow-kt.io/docs/1.0.1/
 
-  - title: "v1.1.0-alpha.X"
+  - title: "v1.1.1-alpha.X"
     url: https://arrow-kt.io/docs/next/
     previous: https://arrow-kt.io/
 
