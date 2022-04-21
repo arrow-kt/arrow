@@ -187,7 +187,7 @@ allprojects {
 Add the dependencies into the project's `build.gradle`:
 
 ```groovy
-def arrow_version = "1.1.0"
+def arrow_version = "1.1.1"
 
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
@@ -197,7 +197,7 @@ dependencies {
 If you are using more than one Arrow dependency, you can avoid specifying the same version over and over by using a BOM file:
 
 ```groovy
-def arrow_version = "1.1.0"
+def arrow_version = "1.1.1"
 
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")

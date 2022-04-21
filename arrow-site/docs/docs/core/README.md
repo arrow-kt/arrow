@@ -119,7 +119,7 @@ Add the dependencies into the project's `build.gradle.kts`:
 
 ```
 dependencies {
-    implementation("io.arrow-kt:arrow-core:1.1.0")
+    implementation("io.arrow-kt:arrow-core:1.1.1")
 }
 ```
 
@@ -129,7 +129,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 ```
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:1.1.0"))
+    implementation(platform("io.arrow-kt:arrow-stack:1.1.1"))
 
     implementation("io.arrow-kt:arrow-core")
     ...
@@ -138,7 +138,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.1.0` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -161,7 +161,7 @@ Add the dependencies into the project's `build.gradle`:
 ##### Arrow Core
 
 ```groovy
-def arrow_version = "1.1.0"
+def arrow_version = "1.1.1"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
@@ -172,7 +172,7 @@ dependencies {
 To avoid specifying the Arrow version for every dependency, a BOM file is available:
 
 ```groovy
-def arrow_version = "1.1.0"
+def arrow_version = "1.1.1"
 dependencies {
     implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
 
@@ -183,7 +183,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.1.0` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -198,7 +198,7 @@ following properties:
 
 <properties>
     <kotlin.version>1.6.21</kotlin.version>
-    <arrow.version>1.1.0</arrow.version>
+    <arrow.version>1.1.1</arrow.version>
 </properties>
 ```
 
@@ -236,7 +236,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.1.0` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.1.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>
