@@ -108,7 +108,7 @@ jobs:
           !contains(needs.build.outputs.arrow-version, 'beta') &&
           !contains(needs.build.outputs.arrow-version, 'rc')
         with:
-          arguments: --full-stacktrace publishToSonatype closeSonatypeStagingRepository
+          arguments: --full-stacktrace publishToSonatype
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
