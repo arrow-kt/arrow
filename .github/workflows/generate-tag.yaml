@@ -21,7 +21,6 @@ on:
         default: 'auto'
         type: choice
         options:
-          - 'patch'
           - 'minor'
           - 'major'
           - 'auto'
