@@ -711,7 +711,11 @@ public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
 public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
   traverse(::identity)
 
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
+  sequence()
+
+public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
   traverseNullable(::identity)
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))

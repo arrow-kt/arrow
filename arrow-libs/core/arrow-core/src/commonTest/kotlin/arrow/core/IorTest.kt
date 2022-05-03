@@ -236,10 +236,10 @@ class IorTest : UnitSpec() {
       }
     }
 
-    "sequenceNullable should be consistent with traverseNullable" {
+    "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map<String?> { it }.sequenceNullable() shouldBe ior.traverseNullable { it }
-        ior.map<String?> { null }.sequenceNullable() shouldBe ior.traverseNullable { null }
+        ior.map<String?> { it }.sequence() shouldBe ior.traverseNullable { it }
+        ior.map<String?> { null }.sequence() shouldBe ior.traverseNullable { null }
       }
     }
 
