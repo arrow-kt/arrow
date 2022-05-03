@@ -25,7 +25,7 @@ class MapKTest : UnitSpec() {
 
     "traverseEither is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseEither { v ->
+      val res = (0..20_000).map { it to it }.toMap().traverse { v ->
         acc.add(v)
         Either.Right(v)
       }
@@ -36,7 +36,7 @@ class MapKTest : UnitSpec() {
     "traverseEither short-circuit" {
       checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseEither {
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             Either.Right(it)
@@ -53,7 +53,7 @@ class MapKTest : UnitSpec() {
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseOption { a ->
+      val res = (0..20_000).map { it to it }.toMap().traverse { a ->
         acc.add(a)
         Some(a)
       }
@@ -84,7 +84,7 @@ class MapKTest : UnitSpec() {
 
     "traverseValidated is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseValidated(Semigroup.string()) { v ->
+      val res = (0..20_000).map { it to it }.toMap().traverse(Semigroup.string()) { v ->
         acc.add(v)
         Validated.Valid(v)
       }
@@ -95,7 +95,7 @@ class MapKTest : UnitSpec() {
     "traverseValidated acummulates" {
       checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, Map<Int, Int>> =
           NonEmptyList.fromList(ints.values.filterNot { it % 2 == 0 })
