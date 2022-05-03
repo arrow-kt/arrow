@@ -302,7 +302,7 @@ import kotlin.jvm.JvmStatic
  * ### Computing over dependent values ignoring absence
  *
  * ```kotlin
- * import arrow.core.computations.option
+ * import arrow.core.continuations.option
  * import arrow.core.Some
  * import arrow.core.Option
  *
@@ -322,7 +322,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-17.kt -->
  *
  * ```kotlin
- * import arrow.core.computations.option
+ * import arrow.core.continuations.option
  * import arrow.core.Some
  * import arrow.core.none
  * import arrow.core.Option

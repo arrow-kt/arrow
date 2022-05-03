@@ -1,7 +1,7 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleOption17
 
-import arrow.core.computations.option
+import arrow.core.continuations.option
 import arrow.core.Some
 import arrow.core.Option
 

@@ -131,7 +131,7 @@ It's easy to work with [`Nullable types`](https://kotlinlang.org/docs/null-safet
 Nullable types are faster than boxed types like `Option`. Nonetheless `Option` is also supported by Arrow to interop with Java based libraries that use `null` as signal or interruption value like [ReactiveX RxJava](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#nulls). Additionally `Option` is useful in generic code when not constraining with generic bounds of `A : Any` and using null as a nested signal to produce values of `Option<Option<A>>` since A? can't have double nesting.
 
 ```kotlin
-import arrow.core.computations.nullable
+import arrow.core.continuations.nullable
 
 fun prepareLunch(): Salad? {
   val lettuce = takeFoodFromRefrigerator()
@@ -145,7 +145,7 @@ In addition to `let` provided by the standard library Arrow provides `nullable` 
 
 
 ```kotlin
-import arrow.core.computations.nullable
+import arrow.core.continuations.nullable
 
 suspend fun prepareLunch(): Salad? =
   nullable {
@@ -209,7 +209,7 @@ All values on the left side assume to be `Right` biased and, whenever a `Left` v
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.computations.either
+import arrow.core.continuations.either
 
 suspend fun prepareEither(): Either<CookingException, Salad> =
   either {
@@ -227,7 +227,7 @@ In this different validation example, we demonstrate how we can use `Validated` 
 ```kotlin
 import arrow.core.Nel
 import arrow.core.ValidatedNel
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.handleErrorWith
 import arrow.core.invalidNel
 import arrow.core.traverseEither

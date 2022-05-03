@@ -122,7 +122,7 @@ The `Effect` interface is itself exposed as receiver functions which projects it
 Let's see a minimal example.
 
 ```kotlin
-import arrow.core.computations.either
+import arrow.core.continuations.either
 
 //sampleStart
 suspend fun test(): Either<String, Int> =
@@ -139,7 +139,7 @@ Anything in the function inside `either` can be imperative and sequential code t
 In the case of [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}), it is strictly running and implemented in terms of fold. Let's expand the example by adding a second operation:
 
 ```kotlin
-import arrow.core.computations.either
+import arrow.core.continuations.either
 
 either {
   val one = Right(1) 
@@ -153,7 +153,7 @@ From the previous snippet, the first intuition would be to call `fold` on `one` 
 This will blow up the stack and won't be obvious to users that our method can fail with an exceptions. What we want instead is to suspend and short-circuit on Left values and continue computing over Right values.
 
 ```kotlin
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.Either.Left
 
 suspend fun test(): Either<String, Int> =
@@ -189,7 +189,7 @@ suspend fun main() {
 With this new style, we can rewrite our original example of database fetching as:
 
 ```kotlin
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right

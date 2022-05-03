@@ -121,7 +121,7 @@ suspend suspendedIOProgram(): Either<PersistenceError, ProcessedUser> =
 ##### suspend () -> Either<E, A>
 
 ```kotlin
-import arrow.core.computations.either
+import arrow.core.continuations.either
 
 suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
   either {

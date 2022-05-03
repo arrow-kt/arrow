@@ -2,9 +2,6 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.computations.EitherEffect
-import arrow.core.computations.RestrictedEitherEffect
-import arrow.core.computations.either
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.any
 import arrow.core.test.generators.either
@@ -13,7 +10,6 @@ import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
 import arrow.core.test.generators.suspendFunThatReturnsAnyRight
 import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
-import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.assertions.throwables.shouldThrow
@@ -24,10 +20,8 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
 import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 
 class EitherTest : UnitSpec() {
 

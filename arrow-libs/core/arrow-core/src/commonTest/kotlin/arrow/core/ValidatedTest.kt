@@ -9,7 +9,6 @@ import arrow.core.test.generators.validated
 import io.kotest.assertions.fail
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
