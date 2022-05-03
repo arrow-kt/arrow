@@ -64,7 +64,7 @@ class MapKTest : UnitSpec() {
     "traverseOption short-circuits" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseOption {
+        val evens = ints.traverse {
           (it % 2 == 0).maybe {
             acc.add(it)
             it
