@@ -364,8 +364,8 @@ class ValidatedTest : UnitSpec() {
       val valid = Valid("Who")
       val invalid = Invalid("Nope")
 
-      valid.traverse { it: String -> Some(it) } shouldBe Some(Valid("Who"))
-      invalid.traverse { it: Nothing -> Some(it) } shouldBe None
+      valid.traverse { Some(it) } shouldBe Some(Valid("Who"))
+      invalid.traverse { Some(it) } shouldBe None
     }
 
     "sequence for Option should yield consistent result with traverseOption" {
@@ -373,8 +373,8 @@ class ValidatedTest : UnitSpec() {
         val valid = Valid(a)
         val invalid = Invalid(b)
 
-        valid.traverse { it: String -> Some(it) } shouldBe valid.map { Some(it) }.sequence()
-        invalid.traverse { it: Nothing -> Some(it) } shouldBe invalid.map { Some(it) }.sequence()
+        valid.traverse { Some(it) } shouldBe valid.map { Some(it) }.sequence()
+        invalid.traverse { Some(it) } shouldBe invalid.map { Some(it) }.sequence()
       }
     }
 

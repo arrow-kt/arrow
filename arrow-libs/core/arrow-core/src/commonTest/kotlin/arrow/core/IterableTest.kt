@@ -103,7 +103,7 @@ class IterableTest : UnitSpec() {
     "traverse Option short-circuits" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverse { it: Int ->
+        val evens = ints.traverse {
           (it % 2 == 0).maybe {
             acc.add(it)
             it
@@ -123,7 +123,7 @@ class IterableTest : UnitSpec() {
 
     "sequence Option should be consistent with traverse Option" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { Some(it) }.sequence() shouldBe ints.traverse { it: Int -> Some(it) }
+        ints.map { Some(it) }.sequence() shouldBe ints.traverse { Some(it) }
       }
     }
 
@@ -141,7 +141,7 @@ class IterableTest : UnitSpec() {
     "traverse Nullable short-circuits" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverse { it: Int ->
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             it
@@ -176,7 +176,7 @@ class IterableTest : UnitSpec() {
 
     "sequence Nullable should be consistent with travers Nullable" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it as Int? }.sequence() shouldBe ints.traverse { it: Int -> it as Int? }
+        ints.map { it as Int? }.sequence() shouldBe ints.traverse { it as Int? }
       }
     }
 
