@@ -475,14 +475,14 @@ class EitherTest : UnitSpec() {
       left.traverseNullable { it } shouldBe null
     }
 
-    "sequenceNullable should be consistent with traverseNullable" {
+    "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { it }.sequence() shouldBe either.traverseNullable { it }
         either.map { null }.sequence() shouldBe null
       }
     }
 
-    "traverseOption should return option if either is right" {
+    "traverse for Option should return option if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
 
@@ -490,13 +490,13 @@ class EitherTest : UnitSpec() {
       left.traverse { it: Int -> Some(it) } shouldBe None
     }
 
-    "sequenceOption should be consistent with traverseOption" {
+    "sequence for Option should be consistent with traverseOption" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { Some(it) }.sequence() shouldBe either.traverse { it: Int -> Some(it) }
       }
     }
 
-    "traverseValidated should return validated of either" {
+    "traverse for Validated should return validated of either" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
 
@@ -504,7 +504,7 @@ class EitherTest : UnitSpec() {
       left.traverse { it: Int -> it.valid() } shouldBe Valid(Left("foo"))
     }
 
-    "sequenceValidated should be consistent with traverseValidated" {
+    "sequence for Validated should be consistent with traverseValidated" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { it.valid() }.sequence() shouldBe either.traverse { it: Int -> it.valid() }
       }
