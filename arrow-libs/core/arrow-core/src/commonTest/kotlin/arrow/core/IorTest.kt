@@ -7,7 +7,6 @@ import arrow.typeclasses.Semigroup
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
@@ -250,15 +249,15 @@ class IorTest : UnitSpec() {
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
 
-        iorL.traverseOption { Some(it) } shouldBe Some(Ior.Left(a))
-        iorR.traverseOption { Some(it) } shouldBe Some(Ior.Right(b))
-        iorBoth.traverseOption { Some(it) } shouldBe Some(Ior.Both(a, b))
+        iorL.traverse { Some(it) } shouldBe Some(Ior.Left(a))
+        iorR.traverse { Some(it) } shouldBe Some(Ior.Right(b))
+        iorBoth.traverse { Some(it) } shouldBe Some(Ior.Both(a, b))
       }
     }
 
     "sequenceOption should be consistent with traverseOption" {
       checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map { Some(it) }.sequenceOption() shouldBe ior.traverseOption { Some(it) }
+        ior.map { Some(it) }.sequence() shouldBe ior.traverse { Some(it) }
       }
     }
 
@@ -268,15 +267,15 @@ class IorTest : UnitSpec() {
         val iorR: Ior<Int, String> = b.rightIor()
         val iorBoth: Ior<Int, String> = (a to b).bothIor()
 
-        iorL.traverseEither { it.right() } shouldBe Either.Right(Ior.Left(a))
-        iorR.traverseEither { it.right() } shouldBe Either.Right(Ior.Right(b))
-        iorBoth.traverseEither { it.right() } shouldBe Either.Right(Ior.Both(a, b))
+        iorL.traverse { it.right() } shouldBe Either.Right(Ior.Left(a))
+        iorR.traverse { it.right() } shouldBe Either.Right(Ior.Right(b))
+        iorBoth.traverse { it.right() } shouldBe Either.Right(Ior.Both(a, b))
       }
     }
 
     "sequenceEither should be consistent with traverseEither" {
       checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map { it.right() }.sequenceEither() shouldBe ior.traverseEither { it.right() }
+        ior.map { it.right() }.sequence() shouldBe ior.traverse { it.right() }
       }
     }
 
