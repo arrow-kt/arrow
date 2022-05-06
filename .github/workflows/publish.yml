@@ -151,18 +151,6 @@ jobs:
         with:
           arguments: --full-stacktrace dokkaGfm
 
-      - name: Build landing page
-        working-directory: arrow-site
-        run: |
-          bundle exec jekyll build -b docs -s docs --config docs/_config_for_landing_page.yml
-          tree _site > $BASEDIR/logs/content.log
-
-      - name: Publish landing page
-        working-directory: arrow-site
-        run: |
-          echo ">>> Landing page" >> $BASEDIR/logs/aws_sync.log
-          ${GITHUB_WORKSPACE}/.github/scripts/sync-main-with-aws.sh
-
       - name: Build release directory (/docs)
         working-directory: arrow-site
         if: |
