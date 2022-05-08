@@ -21,62 +21,17 @@ env:
   SIGNING_KEY: '${{ secrets.SIGNING_KEY }}'
   GRADLE_PUBLISH_KEY: '${{ secrets.GRADLE_PUBLISH_KEY }}'
   GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+  AWS_DEFAULT_REGION: eu-west-1
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  JEKYLL_ENV: production
+  S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
-
-    outputs:
-      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.1.1
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: build
-        uses: gradle/gradle-build-action@v2.1.5
-        if: matrix.os != 'windows-latest'
-        with:
-          arguments: --full-stacktrace build
-
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.1.5
-        if: matrix.os == 'windows-latest'
-        with:
-          arguments: --full-stacktrace mingwX64Test
-
-      - id: get-arrow-version
-        name: Get Arrow version
-        run: echo "::set-output name=arrow-version::$(head -n 1 build/semver/version.txt)"
-
-      - name: Upload reports
-        uses: actions/upload-artifact@v3.0.0
-        with:
-          name: 'reports-${{ matrix.os }}'
-          path: '**/build/reports/**'
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
   publish:
-    needs: build
-    timeout-minutes: 120
+    timeout-minutes: 150
     runs-on: macos-latest
-
-    outputs:
-      arrow-version: ${{ steps.get-arrow-version.outputs.arrow-version }}
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -88,55 +43,38 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - id: get-arrow-version
-        name: Get Arrow version
-        run: echo "::set-output name=arrow-version::${{needs.build.outputs.arrow-version}}"
+      - name: Build
+        uses: gradle/gradle-build-action@v2.1.5
+        with:
+          arguments: build --full-stacktrace
+
+      - name: Get Arrow version
+        id: version
+        run: echo "::set-output name=arrow::$(head -n 1 build/semver/version.txt)"
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
 
       - name: Publish alpha/beta/rc version
         uses: gradle/gradle-build-action@v2.1.5
         if: |
-          contains(needs.build.outputs.arrow-version, 'alpha') ||
-          contains(needs.build.outputs.arrow-version, 'beta') ||
-          contains(needs.build.outputs.arrow-version, 'rc')
+          contains(steps.version.outputs.arrow, 'alpha') ||
+          contains(steps.version.outputs.arrow, 'beta') ||
+          contains(steps.version.outputs.arrow, 'rc')
         with:
           arguments: --full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
         uses: gradle/gradle-build-action@v2.1.5
         if: |
-          !contains(needs.build.outputs.arrow-version, 'alpha') &&
-          !contains(needs.build.outputs.arrow-version, 'beta') &&
-          !contains(needs.build.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         with:
           arguments: --full-stacktrace publishToSonatype closeSonatypeStagingRepository
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  publish_doc:
-    needs: publish
-    timeout-minutes: 60
-    runs-on: macos-latest
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
-      AWS_DEFAULT_REGION: eu-west-1
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      JEKYLL_ENV: production
-      S3_BUCKET: ${{ secrets.S3_BUCKET }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.1.1
-        with:
-          distribution: 'zulu'
-          java-version: 11
 
       - name: Prepare environment
         working-directory: arrow-site
@@ -154,19 +92,19 @@ jobs:
       - name: Build release directory (/docs)
         working-directory: arrow-site
         if: |
-          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
-          !contains(needs.publish.outputs.arrow-version, 'beta') &&
-          !contains(needs.publish.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         run: |
           bundle exec jekyll build -b docs -s docs
-          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
+          tree _site > $BASEDIR/logs/content_docs-${{ steps.version.outputs.arrow }}.log
 
       - name: Publish documentation (/docs)
         working-directory: arrow-site
         if: |
-          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
-          !contains(needs.publish.outputs.arrow-version, 'beta') &&
-          !contains(needs.publish.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         run: |
           echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
           ${GITHUB_WORKSPACE}/.github/scripts/sync-docs-with-aws.sh
@@ -174,21 +112,21 @@ jobs:
       - name: Build release directory (/docs/<major.minor>)
         working-directory: arrow-site
         if: |
-          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
-          !contains(needs.publish.outputs.arrow-version, 'beta') &&
-          !contains(needs.publish.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         run: |
-          bundle exec jekyll build -b docs/${{ needs.publish.outputs.arrow-version }} -s docs
-          tree _site > $BASEDIR/logs/content_docs-${{ needs.publish.outputs.arrow-version }}.log
+          bundle exec jekyll build -b docs/${{ steps.version.outputs.arrow }} -s docs
+          tree _site > $BASEDIR/logs/content_docs-${{ steps.version.outputs.arrow }}.log
 
       - name: Publish release directory (/docs/<major.minor>)
         working-directory: arrow-site
         if: |
-          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
-          !contains(needs.publish.outputs.arrow-version, 'beta') &&
-          !contains(needs.publish.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         run: |
-          aws s3 sync _site s3://$S3_BUCKET/docs/${{ needs.publish.outputs.arrow-version }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
+          aws s3 sync _site s3://$S3_BUCKET/docs/${{ steps.version.outputs.arrow }} --delete --exclude "/CNAME" --exclude "/code/*" --exclude "/index.html" --exclude "/redirects.json" >> $BASEDIR/logs/aws_sync.log
 
       - name: Build latest version (/docs/next)
         working-directory: arrow-site
@@ -203,9 +141,9 @@ jobs:
 
       - name: Publish sitemap.xml
         if: |
-          !contains(needs.publish.outputs.arrow-version, 'alpha') &&
-          !contains(needs.publish.outputs.arrow-version, 'beta') &&
-          !contains(needs.publish.outputs.arrow-version, 'rc')
+          !contains(steps.version.outputs.arrow, 'alpha') &&
+          !contains(steps.version.outputs.arrow, 'beta') &&
+          !contains(steps.version.outputs.arrow, 'rc')
         run: |
           ${GITHUB_WORKSPACE}/.github/scripts/create-sitemap.sh > sitemap.xml
           aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
