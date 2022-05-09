@@ -45,8 +45,8 @@ data class Employees(val employees: List<Employee>)
 ```
 ```kotlin
 val john = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
-val jane = Employee("John Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
-val employees = Employees(listOf(john, jane))
+val jane = Employee("Jane Doe", Company("Arrow", Address("Functional city", Street(23, "lambda street"))))
+val employeeData = Employees(listOf(john, jane))
 ```
 
 Without lenses, we could use the `copy` method provided on a `data class` for dealing with immutable structures.
@@ -72,8 +72,8 @@ What we actually wanted to do here is the following: focus into _every_ employee
 
 ```kotlin
 val employees: Lens<Employees, List<Employee>> = Lens(
-  get = { it.company },
-  set = { employee, company -> employee.copy(company = company) }
+        get = { it.employees },
+        set = { employee, employees -> employee.copy(employees = employees) }
 )
 
 val everyEmployee = Traversal.list<Employee>()
@@ -88,7 +88,7 @@ val companyAddress: Lens<Company, Address> = Lens(
         set = { company, address -> company.copy(address = address) }
 )
 
-val addressStrees: Lens<Address, Street> = Lens(
+val addressStreet: Lens<Address, Street> = Lens(
         get = { it.street },
         set = { address, street -> address.copy(street = street) }
 )
@@ -98,9 +98,9 @@ val streetName: Lens<Street, String> = Lens(
         set = { street, name -> street.copy(name = name) }
 )
 
-val employeesStreetName: Lens<Employee, String> = employees compose everyEmployee compose employeeCompany compose companyAddress compose addressStrees compose streetName
+val employeesStreetName: PTraversal<Employees, Employees, String, String> = employees compose everyEmployee compose employeeCompany compose companyAddress compose addressStreet compose streetName
 
-employeesStreetName.modify(employee, String::capitalize)
+employeesStreetName.modify(employeeData, String::capitalize)
 ```
 
 ## Composition
