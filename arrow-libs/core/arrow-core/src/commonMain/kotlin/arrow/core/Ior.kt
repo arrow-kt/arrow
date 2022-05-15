@@ -553,7 +553,7 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)"))
+  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
     traverse(fa)
 
@@ -575,7 +575,7 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)"))
+  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Ior<A, C>> =
     traverse(fa)
 
@@ -595,7 +595,7 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)"))
+  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
     traverse(fa)
 
