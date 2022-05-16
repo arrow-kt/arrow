@@ -18,7 +18,7 @@ import kotlin.coroutines.RestrictsSuspension
  * An [effect] computation interoperates with an [EagerEffect] via `bind`.
  * @see Effect
  */
-public interface EagerEffect<R, A> {
+public interface EagerEffect<out R, A> {
 
   /**
    * Runs the non-suspending computation by creating a [Continuation] with an [EmptyCoroutineContext],
@@ -96,7 +96,7 @@ public interface EagerEffect<R, A> {
 
   public fun <B> map(f: (A) -> B): EagerEffect<R, B> = flatMap { a -> eagerEffect { f(a) } }
 
-  public fun <B> flatMap(f: (A) -> EagerEffect<R, B>): EagerEffect<R, B> = eagerEffect {
+  public fun <B> flatMap(f: (A) -> EagerEffect<@UnsafeVariance R, B>): EagerEffect<R, B> = eagerEffect {
     f(bind()).bind()
   }
 

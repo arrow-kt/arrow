@@ -568,7 +568,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public interface Effect<R, A> {
+public interface Effect<out R, A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
