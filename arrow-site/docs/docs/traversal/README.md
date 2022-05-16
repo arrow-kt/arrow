@@ -98,7 +98,7 @@ val streetName: Lens<Street, String> = Lens(
         set = { street, name -> street.copy(name = name) }
 )
 
-val employeesStreetName: PTraversal<Employees, Employees, String, String> = employees compose everyEmployee compose employeeCompany compose companyAddress compose addressStreet compose streetName
+val employeesStreetName: Traversal<Employees, String> = employees compose everyEmployee compose employeeCompany compose companyAddress compose addressStreet compose streetName
 
 employeesStreetName.modify(employeeData, String::capitalize)
 ```
