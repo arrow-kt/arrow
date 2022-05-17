@@ -18,7 +18,7 @@ import kotlin.coroutines.RestrictsSuspension
  * An [effect] computation interoperates with an [EagerEffect] via `bind`.
  * @see Effect
  */
-public interface EagerEffect<out R, A> {
+public interface EagerEffect<out R, out A> {
 
   /**
    * Runs the non-suspending computation by creating a [Continuation] with an [EmptyCoroutineContext],
@@ -91,7 +91,7 @@ public interface EagerEffect<out R, A> {
    * [fold] the [EagerEffect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
    * provided function [orElse], and result value [A] is mapped to [Some].
    */
-  public fun toOption(orElse: (R) -> Option<A>): Option<A> =
+  public fun toOption(orElse: (R) -> Option<@UnsafeVariance A>): Option<A> =
     fold(orElse, ::Some)
 
   public fun <B> map(f: (A) -> B): EagerEffect<R, B> = flatMap { a -> eagerEffect { f(a) } }
@@ -104,11 +104,11 @@ public interface EagerEffect<out R, A> {
     kotlin.runCatching { bind() }
   }
 
-  public fun handleError(f: (R) -> A): EagerEffect<Nothing, A> = eagerEffect {
+  public fun handleError(f: (R) -> @UnsafeVariance A): EagerEffect<Nothing, A> = eagerEffect {
     fold(f, ::identity)
   }
 
-  public fun <R2> handleErrorWith(f: (R) -> EagerEffect<R2, A>): EagerEffect<R2, A> =
+  public fun <R2> handleErrorWith(f: (R) -> EagerEffect<R2, @UnsafeVariance A>): EagerEffect<R2, A> =
     eagerEffect {
       toEither().fold({ r -> f(r).bind() }, ::identity)
     }
