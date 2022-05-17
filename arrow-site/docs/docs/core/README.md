@@ -38,6 +38,13 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 #### Quick Start
   - [Gradle Setup]({{ '/core/#Gradle-kotlin' | relative_url }})
   - [Maven Setup]({{ '/core/#Maven' | relative_url }})
+
+#### Continuations and programs
+  - [Effect]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }})
+  - [EffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect-scope/' | relative_url }})
+  - [EagerEffect]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect/' | relative_url }})
+  - [EagerEffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/' | relative_url }})
+
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
@@ -52,14 +59,6 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
   - [Semiring]({{ '/apidocs/arrow-core/arrow.typeclasses/-semiring/' | relative_url }})
   - [Extensions]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' | relative_url }})
 
-</div>
-
-<div class="quickstart-coroutines-item" markdown="1">
-#### Continuations and programs
- - [Effect]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }})
- - [EffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect-scope/' | relative_url }})
- - [EagerEffect]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect/' | relative_url }})
- - [EagerEffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/' | relative_url }})
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
