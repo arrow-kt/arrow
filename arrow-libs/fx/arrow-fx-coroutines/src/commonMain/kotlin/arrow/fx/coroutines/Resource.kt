@@ -6,6 +6,7 @@ import arrow.core.NonEmptyList
 import arrow.core.ValidatedNel
 import arrow.core.identity
 import arrow.core.invalidNel
+import arrow.core.prependTo
 import arrow.core.traverse
 import arrow.core.valid
 import arrow.fx.coroutines.continuations.ResourceScope
@@ -723,7 +724,7 @@ private class ResourceScopeImpl : ResourceScope {
       is Resource.Allocate -> bracketCase({
         val a = acquire()
         val finalizer: suspend (ExitCase) -> Unit = { ex: ExitCase -> release(a, ex) }
-        finalizers.update { it + finalizer }
+        finalizers.update(finalizer::prependTo)
         a
       }, ::identity, { a, ex ->
         // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
