@@ -55,6 +55,14 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
+#### Continuations and programs
+ - [Effect]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }})
+ - [EffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect-scope/' | relative_url }})
+ - [EagerEffect]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect/' | relative_url }})
+ - [EagerEffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/' | relative_url }})
+</div>
+
+<div class="quickstart-coroutines-item" markdown="1">
 #### Tutorials 
   - [Error Handling]({{ '/patterns/error_handling/' | relative_url }})
   - [Monads]({{ '/patterns/monads/' | relative_url }})
