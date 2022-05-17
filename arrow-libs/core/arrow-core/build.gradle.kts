@@ -40,3 +40,8 @@ kotlin {
     }
   }
 }
+
+// enables context receivers for Jvm Tests
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlinJvm") {
+  kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+}
