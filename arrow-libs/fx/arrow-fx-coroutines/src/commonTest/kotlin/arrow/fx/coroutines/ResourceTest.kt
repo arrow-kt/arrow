@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
 import io.kotest.assertions.fail
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -12,6 +13,8 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.negativeInt
+import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -27,6 +30,18 @@ class ResourceTest : ArrowFxSpec(
         val r = Resource({ n }, { _, _ -> Unit })
 
         r.use { it + 1 } shouldBe n + 1
+      }
+    }
+
+    "flatMap resource is released first" {
+      checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
+        val l = mutableListOf<Int>()
+        fun r(n: Int) = Resource({ n.also(l::add) }, { it, _ -> l.add(-it) })
+
+        r(a).flatMap { r(it + b) }
+          .use { it + 1 } shouldBe (a + b) + 1
+
+        l.shouldContainExactly(a, a + b, - a - b, -a)
       }
     }
 
