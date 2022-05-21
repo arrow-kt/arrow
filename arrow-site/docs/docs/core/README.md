@@ -39,7 +39,7 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
   - [Gradle Setup]({{ '/core/#Gradle-kotlin' | relative_url }})
   - [Maven Setup]({{ '/core/#Maven' | relative_url }})
 
-#### Continuations and programs
+#### Effects & Continuations
   - [Effect]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }})
   - [EffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect-scope/' | relative_url }})
   - [EagerEffect]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect/' | relative_url }})
