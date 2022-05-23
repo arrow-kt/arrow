@@ -3,6 +3,7 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -408,22 +409,47 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
     }
   }
 
-public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
   val acc = mutableListOf<B>()
   forEach { a ->
     when (val res = f(a)) {
       is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+      is Left -> return@traverse res
     }
   }
   // Safe due to traverse laws
   return NonEmptyList.fromListUnsafe(acc).right()
 }
 
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
-  traverseEither(::identity)
+  sequence()
 
+public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
+  traverse(::identity)
+
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+)
 public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, NonEmptyList<B>> =
+  traverse(semigroup, f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> NonEmptyList<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
@@ -440,20 +466,37 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
     }
   }.map { NonEmptyList.fromListUnsafe(it) }
 
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup)
 
-public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> {
+public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
+  traverse(semigroup, ::identity)
+
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> {
   val acc = mutableListOf<B>()
   forEach { a ->
     when (val res = f(a)) {
       is Some -> acc.add(res.value)
-      is None -> return@traverseOption res
+      is None -> return@traverse res
     }
   }
   // Safe due to traverse laws
   return NonEmptyList.fromListUnsafe(acc).some()
 }
 
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
-  traverseOption { it }
+  sequence()
+
+public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
+  traverse(::identity)
