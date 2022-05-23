@@ -94,8 +94,10 @@ public interface EagerEffect<R, A> {
   public fun toOption(orElse: (R) -> Option<A>): Option<A> =
     fold(orElse, ::Some)
 
+  @Deprecated(deprecateMonadAppFunctorOperators, ReplaceWith("flatMap { a -> eagerEffect { f(a) } }"))
   public fun <B> map(f: (A) -> B): EagerEffect<R, B> = flatMap { a -> eagerEffect { f(a) } }
 
+  @Deprecated(deprecateMonadAppFunctorOperators, ReplaceWith("eagerEffect { f(bind()).bind() }"))
   public fun <B> flatMap(f: (A) -> EagerEffect<R, B>): EagerEffect<R, B> = eagerEffect {
     f(bind()).bind()
   }
@@ -195,3 +197,5 @@ public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.
       }
     }
   }
+
+private const val deprecateMonadAppFunctorOperators: String = "Operators related to Functor, Applicative or Monad hierarchies are being deprecated in favor of bind"
