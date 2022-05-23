@@ -13,7 +13,7 @@ import kotlin.coroutines.RestrictsSuspension
 
 /** Context of the [EagerEffect] DSL. */
 @RestrictsSuspension
-public interface EagerEffectScope<R> {
+public interface EagerEffectScope<in R> {
 
   /** Short-circuit the [EagerEffect] computation with value [R].
    *
