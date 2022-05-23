@@ -94,10 +94,10 @@ public interface EagerEffect<R, A> {
   public fun toOption(orElse: (R) -> Option<A>): Option<A> =
     fold(orElse, ::Some)
 
-  @Deprecated(deprecateMonadAppFunctorOperators, ReplaceWith("flatMap { a -> eagerEffect { f(a) } }"))
+  @Deprecated(deprecateMonadAppFunctorOperators, ReplaceWith("flatMap { eagerEffect { f(it) } }"))
   public fun <B> map(f: (A) -> B): EagerEffect<R, B> = flatMap { a -> eagerEffect { f(a) } }
 
-  @Deprecated(deprecateMonadAppFunctorOperators, ReplaceWith("eagerEffect { f(bind()).bind() }"))
+  @Deprecated(deprecateMonadAppFunctorOperators)
   public fun <B> flatMap(f: (A) -> EagerEffect<R, B>): EagerEffect<R, B> = eagerEffect {
     f(bind()).bind()
   }
