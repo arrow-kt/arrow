@@ -2,9 +2,6 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.computations.EitherEffect
-import arrow.core.computations.RestrictedEitherEffect
-import arrow.core.computations.either
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.any
 import arrow.core.test.generators.either
@@ -13,7 +10,6 @@ import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
 import arrow.core.test.generators.suspendFunThatReturnsAnyRight
 import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
-import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.assertions.throwables.shouldThrow
@@ -24,10 +20,8 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInts
 import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 
 class EitherTest : UnitSpec() {
 
@@ -481,38 +475,38 @@ class EitherTest : UnitSpec() {
       left.traverseNullable { it } shouldBe null
     }
 
-    "sequenceNullable should be consistent with traverseNullable" {
+    "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { it }.sequenceNullable() shouldBe either.traverseNullable { it }
-        either.map { null }.sequenceNullable() shouldBe null
+        either.map { it }.sequence() shouldBe either.traverseNullable { it }
+        either.map { null }.sequence() shouldBe null
       }
     }
 
-    "traverseOption should return option if either is right" {
+    "traverse for Option should return option if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
 
-      right.traverseOption { Some(it) } shouldBe Some(Right(1))
-      left.traverseOption { Some(it) } shouldBe None
+      right.traverse { Some(it) } shouldBe Some(Right(1))
+      left.traverse { Some(it) } shouldBe None
     }
 
-    "sequenceOption should be consistent with traverseOption" {
+    "sequence for Option should be consistent with traverseOption" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { Some(it) }.sequenceOption() shouldBe either.traverseOption { Some(it) }
+        either.map { Some(it) }.sequence() shouldBe either.traverse { Some(it) }
       }
     }
 
-    "traverseValidated should return validated of either" {
+    "traverse for Validated should return validated of either" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
 
-      right.traverseValidated { it.valid() } shouldBe Valid(Right(1))
-      left.traverseValidated { it.valid() } shouldBe Valid(Left("foo"))
+      right.traverse { it.valid() } shouldBe Valid(Right(1))
+      left.traverse { it.valid() } shouldBe Valid(Left("foo"))
     }
 
-    "sequenceValidated should be consistent with traverseValidated" {
+    "sequence for Validated should be consistent with traverseValidated" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { it.valid() }.sequenceValidated() shouldBe either.traverseValidated { it.valid() }
+        either.map { it.valid() }.sequence() shouldBe either.traverse { it.valid() }
       }
     }
 

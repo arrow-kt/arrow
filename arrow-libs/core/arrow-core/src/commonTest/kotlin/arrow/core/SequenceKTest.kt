@@ -21,7 +21,7 @@ class SequenceKTest : UnitSpec() {
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "traverseEither stack-safe" {
+    "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = generateSequence(0) { it + 1 }.traverse { a ->
@@ -36,7 +36,7 @@ class SequenceKTest : UnitSpec() {
       res shouldBe Either.Left(Unit)
     }
 
-    "traverseOption stack-safe" {
+    "traverse for Option stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = generateSequence(0) { it + 1 }.traverse { a ->
@@ -49,7 +49,7 @@ class SequenceKTest : UnitSpec() {
       res shouldBe None
     }
 
-    "traverseValidated stack-safe" {
+    "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
@@ -60,7 +60,7 @@ class SequenceKTest : UnitSpec() {
       res shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated acummulates" {
+    "traverse for Validated acummulates" {
       checkAll(Arb.sequence(Arb.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequence(Semigroup.nonEmptyList())

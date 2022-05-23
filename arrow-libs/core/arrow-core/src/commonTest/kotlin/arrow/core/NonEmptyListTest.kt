@@ -4,7 +4,6 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
@@ -16,10 +15,10 @@ class NonEmptyListTest : UnitSpec() {
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
 
-    "traverseEither stack-safe" {
+    "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverseEither { a ->
+      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverse { a ->
         acc.add(a)
         Either.Right(a)
       }
@@ -27,10 +26,10 @@ class NonEmptyListTest : UnitSpec() {
       res shouldBe Either.Right(NonEmptyList.fromListUnsafe((0..20_000).toList()))
     }
 
-    "traverseEither short-circuit" {
+    "traverse for Either short-circuit" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseEither {
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             Either.Right(it)
@@ -44,17 +43,17 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
-    "sequenceEither should be consistent with traverseEither" {
+    "sequence for Either should be consistent with traverseEither" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequenceEither() shouldBe
-          ints.traverseEither { Either.conditionally(it % 2 == 0, { it }, { it }) }
+        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequence() shouldBe
+          ints.traverse { Either.conditionally(it % 2 == 0, { it }, { it }) }
       }
     }
 
-    "traverseOption is stack-safe" {
+    "traverse for Option is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverseOption { a ->
+      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverse { a ->
         acc.add(a)
         Some(a)
       }
@@ -62,10 +61,10 @@ class NonEmptyListTest : UnitSpec() {
       res shouldBe Some(NonEmptyList.fromListUnsafe((0..20_000).toList()))
     }
 
-    "traverseOption short-circuits" {
+    "traverse for Option short-circuits" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseOption {
+        val evens = ints.traverse {
           (it % 2 == 0).maybe {
             acc.add(it)
             it
@@ -76,21 +75,21 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
-    "sequenceOption yields some when all entries in the list are some" {
+    "sequence for Option yields some when all entries in the list are some" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
         evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
-    "sequenceOption should be consistent with traverseOption" {
+    "sequence for Option should be consistent with traverseOption" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { (it % 2 == 0).maybe { it } }.sequenceOption() shouldBe
-          ints.traverseOption { (it % 2 == 0).maybe { it } }
+        ints.map { (it % 2 == 0).maybe { it } }.sequence() shouldBe
+          ints.traverse { (it % 2 == 0).maybe { it } }
       }
     }
 
-    "traverseValidated stack-safe" {
+    "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = (0..20_000).traverse(Semigroup.string()) {
@@ -101,10 +100,10 @@ class NonEmptyListTest : UnitSpec() {
       res shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated acummulates" {
+    "traverse for Validated acummulates" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val res: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, NonEmptyList<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
           .fold({ NonEmptyList.fromListUnsafe(ints.filter { it % 2 == 0 }).validNel() }, { it.invalid() })
@@ -113,10 +112,10 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
-    "sequenceValidated should be consistent with traverseValidated" {
+    "sequence for Validated should be consistent with traverseValidated" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequenceValidated(Semigroup.int()) shouldBe
-          ints.traverseValidated(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
+        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
+          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
       }
     }
 
