@@ -568,7 +568,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public interface Effect<R, A> {
+public interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
@@ -637,7 +637,7 @@ public interface Effect<R, A> {
    * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
    * provided function [orElse], and result value [A] is mapped to [Some].
    */
-  public suspend fun toOption(orElse: suspend (R) -> Option<A>): Option<A> = fold(orElse, ::Some)
+  public suspend fun toOption(orElse: suspend (R) -> Option<@UnsafeVariance A>): Option<A> = fold(orElse, ::Some)
 
   /**
    * [fold] the [Effect] into an [A?]. Where the shifted value [R] is mapped to
@@ -654,11 +654,11 @@ public interface Effect<R, A> {
     }
   }
 
-  public fun handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
+  public fun handleError(recover: suspend (R) -> @UnsafeVariance A): Effect<Nothing, A> = effect {
     fold(recover, ::identity)
   }
 
-  public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, A>): Effect<R2, A> = effect {
+  public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> = effect {
     fold({ recover(it).bind() }, ::identity)
   }
 
