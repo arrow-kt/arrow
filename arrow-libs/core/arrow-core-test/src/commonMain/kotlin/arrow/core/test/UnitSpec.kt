@@ -1,8 +1,6 @@
 package arrow.core.test
 
-import arrow.core.NonEmptyList
-import arrow.core.Tuple4
-import arrow.core.Tuple5
+import arrow.core.*
 import arrow.core.test.generators.unit
 import arrow.core.test.laws.Law
 import io.kotest.core.names.TestName
@@ -15,8 +13,8 @@ import io.kotest.core.test.TestType
 import io.kotest.property.Arb
 import io.kotest.property.Gen
 import io.kotest.property.PropertyContext
-import io.kotest.property.arbitrary.bind
-import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.*
+import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.list as KList
 import io.kotest.property.arbitrary.map as KMap
@@ -38,8 +36,12 @@ public abstract class UnitSpec(
   public fun <A> Arb.Companion.list(gen: Gen<A>, range: IntRange = 0..maxDepth): Arb<List<A>> =
     Arb.KList(gen, range)
 
-  public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, depth: Int = maxDepth): Arb<NonEmptyList<A>> =
-    Arb.list(arb, 1..max(1, depth)).filter(List<A>::isNotEmpty).map(NonEmptyList.Companion::fromListUnsafe)
+  public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, depth: Int = maxDepth): Arb<NonEmptyList<A>> {
+    return Arb.list(arb, 1..max(1, depth))
+      .map { Option.fromNullable(it.toNonEmptyListOrNull()) }
+      .filterIsInstance<Option<NonEmptyList<A>>, Some<NonEmptyList<A>>>()
+      .map { it.value }
+  }
 
   public fun <A> Arb.Companion.sequence(arbA: Arb<A>, range: IntRange = 0..maxDepth): Arb<Sequence<A>> =
     Arb.list(arbA, range).map { it.asSequence() }

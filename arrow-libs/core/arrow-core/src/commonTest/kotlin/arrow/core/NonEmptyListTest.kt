@@ -18,12 +18,12 @@ class NonEmptyListTest : UnitSpec() {
     "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverse { a ->
+      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
         acc.add(a)
         Either.Right(a)
       }
-      res shouldBe Either.Right(NonEmptyList.fromListUnsafe(acc))
-      res shouldBe Either.Right(NonEmptyList.fromListUnsafe((0..20_000).toList()))
+      res shouldBe Either.Right(acc.toNonEmptyListOrNull())
+      res shouldBe Either.Right((0..20_000).toNonEmptyListOrNull())
     }
 
     "traverse for Either short-circuit" {
@@ -53,12 +53,12 @@ class NonEmptyListTest : UnitSpec() {
     "traverse for Option is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = NonEmptyList.fromListUnsafe((0..20_000).toList()).traverse { a ->
+      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
         acc.add(a)
         Some(a)
       }
-      res shouldBe Some(NonEmptyList.fromListUnsafe(acc))
-      res shouldBe Some(NonEmptyList.fromListUnsafe((0..20_000).toList()))
+      res shouldBe Some(acc.toNonEmptyListOrNull())
+      res shouldBe Some((0..20_000).toNonEmptyListOrNull())
     }
 
     "traverse for Option short-circuits" {
@@ -105,8 +105,8 @@ class NonEmptyListTest : UnitSpec() {
         val res: ValidatedNel<Int, NonEmptyList<Int>> =
           ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
-        val expected: ValidatedNel<Int, NonEmptyList<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
-          .fold({ NonEmptyList.fromListUnsafe(ints.filter { it % 2 == 0 }).validNel() }, { it.invalid() })
+        val expected: ValidatedNel<Int, NonEmptyList<Int>> =
+          ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
 
         res shouldBe expected
       }
@@ -134,7 +134,7 @@ class NonEmptyListTest : UnitSpec() {
     "zip2" {
       checkAll(Arb.nonEmptyList(Arb.int()), Arb.nonEmptyList(Arb.int())) { a, b ->
         val result = a.zip(b)
-        val expected = a.all.zip(b.all).let(NonEmptyList.Companion::fromListUnsafe)
+        val expected = a.all.zip(b.all).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -146,7 +146,7 @@ class NonEmptyListTest : UnitSpec() {
         Arb.nonEmptyList(Arb.int())
       ) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
-        val expected = a.all.zip(b.all, c.all, ::Triple).let(NonEmptyList.Companion::fromListUnsafe)
+        val expected = a.all.zip(b.all, c.all, ::Triple).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -159,7 +159,7 @@ class NonEmptyListTest : UnitSpec() {
         Arb.nonEmptyList(Arb.int())
       ) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
-        val expected = a.all.zip(b.all, c.all, d.all, ::Tuple4).let(NonEmptyList.Companion::fromListUnsafe)
+        val expected = a.all.zip(b.all, c.all, d.all, ::Tuple4).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -173,7 +173,7 @@ class NonEmptyListTest : UnitSpec() {
         Arb.nonEmptyList(Arb.int())
       ) { a, b, c, d, e ->
         val result = a.zip(b, c, d, e, ::Tuple5)
-        val expected = a.all.zip(b.all, c.all, d.all, e.all, ::Tuple5).let(NonEmptyList.Companion::fromListUnsafe)
+        val expected = a.all.zip(b.all, c.all, d.all, e.all, ::Tuple5).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -189,7 +189,7 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f ->
         val result = a.zip(b, c, d, e, f, ::Tuple6)
         val expected =
-          a.all.zip(b.all, c.all, d.all, e.all, f.all, ::Tuple6).let(NonEmptyList.Companion::fromListUnsafe)
+          a.all.zip(b.all, c.all, d.all, e.all, f.all, ::Tuple6).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -206,7 +206,7 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f, g ->
         val result = a.zip(b, c, d, e, f, g, ::Tuple7)
         val expected =
-          a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, ::Tuple7).let(NonEmptyList.Companion::fromListUnsafe)
+          a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, ::Tuple7).toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -224,7 +224,7 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f, g, h ->
         val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, ::Tuple8)
-          .let(NonEmptyList.Companion::fromListUnsafe)
+          .toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -243,7 +243,7 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f, g, h, i ->
         val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, ::Tuple9)
-          .let(NonEmptyList.Companion::fromListUnsafe)
+          .toNonEmptyListOrNull()
         result shouldBe expected
       }
     }
@@ -263,7 +263,7 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f, g, h, i, j ->
         val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
-          .let(NonEmptyList.Companion::fromListUnsafe)
+          .toNonEmptyListOrNull()
         result shouldBe expected
       }
     }

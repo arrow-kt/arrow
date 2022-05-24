@@ -98,7 +98,7 @@ class MapKTest : UnitSpec() {
           ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, Map<Int, Int>> =
-          NonEmptyList.fromList(ints.values.filterNot { it % 2 == 0 })
+          Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
             .fold(
               { ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() },
               { it.invalid() })

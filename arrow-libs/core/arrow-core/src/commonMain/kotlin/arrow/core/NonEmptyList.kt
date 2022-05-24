@@ -10,25 +10,27 @@ public typealias Nel<A> = NonEmptyList<A>
 
 /**
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
- * `NonEmptyList` is available in the `arrow-core` module under the `import arrow.core.NonEmptyList`
  *
- * ## nonEmptyListOf
+ * ## Constructing NonEmptyList
  *
  * A `NonEmptyList` guarantees the list always has at least 1 element.
  *
  * ```kotlin
  * import arrow.core.nonEmptyListOf
+ * import arrow.core.toNonEmptyListOrNull()
  *
- * val value =
- * //sampleStart
- *  // nonEmptyListOf() // does not compile
- *  nonEmptyListOf(1, 2, 3, 4, 5) // NonEmptyList<Int>
- * //sampleEnd
  * fun main() {
- *  println(value)
+ *  println(nonEmptyListOf(1, 2, 3, 4, 5))
+ *  println(listOf(1, 2, 3).toNonEmptyListOrNull())
+ *  println(emptyList<Int>().toNonEmptyListOrNull())
  * }
  * ```
  * <!--- KNIT example-nonemptylist-01.kt -->
+ * ```text
+ * NonEmptyList(1, 2, 3, 4, 5)
+ * NonEmptyList(1, 2, 3)
+ * null
+ * ```
  *
  * ## head
  *
@@ -232,10 +234,26 @@ public class NonEmptyList<out A>(
 
   public companion object {
 
+    @Deprecated(
+      "Use toNonEmptyListOrNull instead",
+      ReplaceWith(
+        "Option.fromNullable<NonEmptyList<A>>(l.toNonEmptyListOrNull())",
+        "import arrow.core.toNonEmptyListOrNull",
+        "import arrow.core.Option",
+        "import arrow.core.NonEmptyList"
+      )
+    )
     @JvmStatic
     public fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
       if (l.isEmpty()) None else Some(NonEmptyList(l))
 
+    @Deprecated(
+      "Use toNonEmptyListOrNull instead",
+      ReplaceWith(
+        "l.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException(\"Empty list doesn't contain element at index 0.\")",
+        "import arrow.core.toNonEmptyListOrNull"
+      )
+    )
     @JvmStatic
     public fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
       NonEmptyList(l)
@@ -243,26 +261,6 @@ public class NonEmptyList<out A>(
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
       nonEmptyListOf(Unit)
-
-    @Suppress("UNCHECKED_CAST")
-    private tailrec fun <A, B> go(
-      buf: ArrayList<B>,
-      f: (A) -> NonEmptyList<Either<A, B>>,
-      v: NonEmptyList<Either<A, B>>
-    ) {
-      val head: Either<A, B> = v.head
-      when (head) {
-        is Either.Right -> {
-          buf += head.value
-          val x = fromList(v.tail)
-          when (x) {
-            is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
-            is None -> Unit
-          }
-        }
-        is Either.Left -> go(buf, f, f(head.value) + v.tail)
-      }
-    }
   }
 
   public fun <B> zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
@@ -427,7 +425,8 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Ei
     }
   }
   // Safe due to traverse laws
-  return NonEmptyList.fromListUnsafe(acc).right()
+  return (acc.toNonEmptyListOrNull()
+    ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")).right()
 }
 
 @Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
@@ -464,7 +463,9 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
         is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
       }
     }
-  }.map { NonEmptyList.fromListUnsafe(it) }
+  }.map {
+    it.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
+  }
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
@@ -491,7 +492,8 @@ public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<N
     }
   }
   // Safe due to traverse laws
-  return NonEmptyList.fromListUnsafe(acc).some()
+  return (acc.toNonEmptyListOrNull()
+    ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")).some()
 }
 
 @Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
@@ -500,3 +502,6 @@ public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>>
 
 public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
   traverse(::identity)
+
+public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
+  firstOrNull()?.let { NonEmptyList(it, drop(1)) }
