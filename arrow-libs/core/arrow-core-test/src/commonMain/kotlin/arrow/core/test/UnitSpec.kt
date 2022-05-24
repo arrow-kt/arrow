@@ -4,17 +4,14 @@ import arrow.core.*
 import arrow.core.test.generators.unit
 import arrow.core.test.laws.Law
 import io.kotest.core.names.TestName
-import io.kotest.core.source.SourceRef
-import io.kotest.core.spec.RootTest
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.spec.style.scopes.StringSpecScope
 import io.kotest.core.spec.style.scopes.addTest
-import io.kotest.core.test.TestType
 import io.kotest.property.Arb
 import io.kotest.property.Gen
 import io.kotest.property.PropertyContext
-import io.kotest.property.arbitrary.*
-import io.kotest.property.arbitrary.flatMap
+import io.kotest.property.arbitrary.bind
+import io.kotest.property.arbitrary.filterIsInstance
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.list as KList
 import io.kotest.property.arbitrary.map as KMap
