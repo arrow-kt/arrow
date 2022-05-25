@@ -416,18 +416,17 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverse res
+public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> acc.add(res.value)
+        is Left -> return@traverse res
+      }
     }
+    NonEmptyList(newHead, acc)
   }
-  // Safe due to traverse laws
-  return (acc.toNonEmptyListOrNull()
-    ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")).right()
-}
 
 @Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
@@ -452,7 +451,7 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
+  fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
     when (val res = f(a)) {
       is Valid -> when (acc) {
         is Valid -> acc.also { it.value.add(res.value) }
@@ -463,9 +462,7 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
         is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
       }
     }
-  }.map {
-    it.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
-  }
+  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
@@ -483,18 +480,17 @@ public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Op
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverse res
+public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Some -> acc.add(res.value)
+        is None -> return@traverse res
+      }
     }
+    NonEmptyList(newHead, acc)
   }
-  // Safe due to traverse laws
-  return (acc.toNonEmptyListOrNull()
-    ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")).some()
-}
 
 @Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
