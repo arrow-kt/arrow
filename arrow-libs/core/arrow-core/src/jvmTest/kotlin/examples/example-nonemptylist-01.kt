@@ -2,7 +2,7 @@
 package arrow.core.examples.exampleNonemptylist01
 
 import arrow.core.nonEmptyListOf
-import arrow.core.toNonEmptyListOrNull()
+import arrow.core.toNonEmptyListOrNull
 
 fun main() {
  println(nonEmptyListOf(1, 2, 3, 4, 5))
