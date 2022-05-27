@@ -65,8 +65,9 @@ class SequenceKTest : UnitSpec() {
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
           .sequence(Semigroup.nonEmptyList())
 
-        val expected: ValidatedNel<Int, Sequence<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 }.toList())
-          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+        val expected: ValidatedNel<Int, Sequence<Int>> =
+          ints.filterNot { it % 2 == 0 }.toList()
+            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
 
         res.map { it.toList() } shouldBe expected.map { it.toList() }
       }

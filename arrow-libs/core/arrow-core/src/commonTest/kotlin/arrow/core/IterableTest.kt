@@ -197,8 +197,8 @@ class IterableTest : UnitSpec() {
           ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
             .sequence()
 
-        val expected: ValidatedNel<Int, List<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 })
-          .fold({ Valid(ints.filter { it % 2 == 0 }) }, { Invalid(it) })
+        val expected: ValidatedNel<Int, List<Int>> = ints.filterNot { it % 2 == 0 }
+          .toNonEmptyListOrNull()?.invalid() ?: Valid(ints.filter { it % 2 == 0 })
 
         res shouldBe expected
       }

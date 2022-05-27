@@ -2,10 +2,10 @@
 package arrow.core.examples.exampleNonemptylist01
 
 import arrow.core.nonEmptyListOf
+import arrow.core.toNonEmptyListOrNull
 
-val value =
- // nonEmptyListOf() // does not compile
- nonEmptyListOf(1, 2, 3, 4, 5) // NonEmptyList<Int>
 fun main() {
- println(value)
+ println(nonEmptyListOf(1, 2, 3, 4, 5))
+ println(listOf(1, 2, 3).toNonEmptyListOrNull())
+ println(emptyList<Int>().toNonEmptyListOrNull())
 }
