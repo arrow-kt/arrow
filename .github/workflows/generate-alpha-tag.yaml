@@ -21,7 +21,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.1.1
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Gradle build
@@ -48,7 +48,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.1.1
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Generate Tag
