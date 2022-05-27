@@ -18,5 +18,6 @@ public class NonEmptyListUsage {
         ));
         Option<NonEmptyList<Integer>> nonEmptyListOption = NonEmptyList.fromList(Arrays.asList(1, 2, 3));
         NonEmptyList<Integer> integers1 = NonEmptyList.fromListUnsafe(Arrays.asList(1, 2, 3));
+        NonEmptyList<Integer> integers2 = NonEmptyListKt.toNonEmptyListOrNull(Arrays.asList(1, 2, 3));
     }
 }
