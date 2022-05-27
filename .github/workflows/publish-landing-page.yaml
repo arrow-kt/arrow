@@ -30,6 +30,7 @@ jobs:
         run: |
           mkdir logs
           brew install tree
+          gem install bundler
           bundle config set --local path 'vendor/bundle'
           bundle install --gemfile Gemfile
 
