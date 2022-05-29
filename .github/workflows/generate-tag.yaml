@@ -2,7 +2,7 @@ name: generate-tag
 
 on:
   workflow_dispatch:
-    if: github.ref == 'refs/heads/main'
+    branches: [main]
     inputs:
       stage:
         description: 'Stage'
@@ -21,7 +21,6 @@ on:
         default: 'auto'
         type: choice
         options:
-          - 'patch'
           - 'minor'
           - 'major'
           - 'auto'
