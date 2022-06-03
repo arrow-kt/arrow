@@ -214,6 +214,9 @@ public sealed class Validated<out E, out A> {
       is Invalid -> (fe(value))
     }
 
+  public inline fun <A> Validated<A, A>.merge(): A =
+    fold(::identity, ::identity)
+
   public val isValid: Boolean =
     fold({ false }, { true })
   public val isInvalid: Boolean =
