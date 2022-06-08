@@ -34,6 +34,14 @@ class NullableSpec : StringSpec({
   "short circuit null" {
     nullable {
       val number: Int = "s".length
+      (number.takeIf { it > 1 }?.toString()).bind()
+      throw IllegalStateException("This should not be executed")
+    } shouldBe null
+  }
+
+  "ensureNotNull short circuit" {
+    nullable {
+      val number: Int = "s".length
       val x = ensureNotNull(number.takeIf { it > 1 })
       x
       throw IllegalStateException("This should not be executed")
@@ -60,14 +68,6 @@ class NullableSpec : StringSpec({
       val string = number.map(Int::toString).bind()
       string
     } shouldBe "1"
-  }
-
-  "short circuit null" {
-    nullable {
-      val number: Int = "s".length
-      (number.takeIf { it > 1 }?.toString()).bind()
-      throw IllegalStateException("This should not be executed")
-    } shouldBe null
   }
 
   "short circuit option" {
