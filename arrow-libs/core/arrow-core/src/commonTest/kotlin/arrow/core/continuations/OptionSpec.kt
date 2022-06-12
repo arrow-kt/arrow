@@ -24,8 +24,7 @@ class OptionSpec : StringSpec({
   "short circuit option" {
     option {
       val number: Int = "s".length
-      val x = ensureNotNull(number.takeIf { it > 1 })
-      x
+      ensureNotNull(number.takeIf { it > 1 })
       throw IllegalStateException("This should not be executed")
     } shouldBe None
   }
@@ -44,8 +43,7 @@ class OptionSpec : StringSpec({
   "eager short circuit null" {
     option.eager {
       val number: Int = "s".length
-      val x = ensureNotNull(number.takeIf { it > 1 })
-      x
+      ensureNotNull(number.takeIf { it > 1 })
       throw IllegalStateException("This should not be executed")
     } shouldBe None
   }

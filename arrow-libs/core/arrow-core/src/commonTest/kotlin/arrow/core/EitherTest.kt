@@ -310,7 +310,7 @@ class EitherTest : UnitSpec() {
 
     "replicate should return Right(empty list) when n <= 0" {
       checkAll(
-        Arb.choice(Arb.negativeInts(), Arb.constant(0)),
+        Arb.nonPositiveInt(),
         Arb.int(0..100)
       ) { n: Int, a: Int ->
         val expected: Either<Int, List<Int>> = Right(emptyList())

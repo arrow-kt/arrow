@@ -165,7 +165,6 @@ class IterableTest : UnitSpec() {
       checkAll(Arb.list(Arb.int())) { ints ->
         val evens = ints.map { if (it % 2 == 0) it else null }.sequence()
 
-        val expected = ints.takeWhile { it % 2 == 0 }
         if (ints.any { it % 2 != 0 }) {
           evens.shouldBeNull()
         } else {
