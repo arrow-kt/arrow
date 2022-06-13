@@ -204,7 +204,7 @@ class ValidatedTest : UnitSpec() {
             ) { a, b -> a + b }
           })
           else Invalid(
-            all.filterIsInstance<Invalid<Long?>>().map { it.value }.combineAll(nullableLongSemigroup)
+            all.filterIsInstance<Invalid<Long?>>().map { it.value }.fold(nullableLongSemigroup)
           )
 
         res shouldBe expected
@@ -458,15 +458,7 @@ class ValidatedTest : UnitSpec() {
       }
     }
 
-    "bitraverseNullable should wrap valid or invalid in a nullable" {
-      val valid = Valid("Who")
-      val invalid = Invalid("Nope")
-
-      valid.bitraverseNullable({ it }, { it }) shouldBe Valid("Who")
-      invalid.bitraverseNullable({ it }, { it }) shouldBe Invalid("Nope")
-    }
-
-    "bisequenceOption should yield consistent result with bitraverseOption" {
+    "bisequenceNullable should yield consistent result with bitraverseNullable" {
       checkAll(Arb.string().orNull(), Arb.string().orNull()) { a: String?, b: String? ->
         val valid: Validated<String?, String?> = Valid(a)
         val invalid: Validated<String?, String?> = Invalid(b)
@@ -476,6 +468,14 @@ class ValidatedTest : UnitSpec() {
         invalid.bimap({ it }, { it }).bisequenceNullable() shouldBe
           invalid.bitraverseNullable({ it }, { it })
       }
+    }
+
+    "bitraverseNullable should wrap valid or invalid in a nullable" {
+      val valid = Valid("Who")
+      val invalid = Invalid("Nope")
+
+      valid.bitraverseNullable({ it }, { it }) shouldBe Valid("Who")
+      invalid.bitraverseNullable({ it }, { it }) shouldBe Invalid("Nope")
     }
 
     "bitraverseEither should wrap valid or invalid in an either" {
