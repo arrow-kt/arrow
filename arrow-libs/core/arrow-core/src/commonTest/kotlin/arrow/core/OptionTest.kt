@@ -64,8 +64,7 @@ class OptionTest : UnitSpec() {
     "short circuit null" {
       option {
         val number: Int = "s".length
-        val x = ensureNotNull(number.takeIf { it > 1 })
-        x
+        ensureNotNull(number.takeIf { it > 1 })
         throw IllegalStateException("This should not be executed")
       } shouldBe None
     }
@@ -120,8 +119,8 @@ class OptionTest : UnitSpec() {
     }
 
     "map" {
-      some.map(String::toUpperCase) shouldBe Some("KOTLIN")
-      none.map(String::toUpperCase) shouldBe None
+      some.map(String::uppercase) shouldBe Some("KOTLIN")
+      none.map(String::uppercase) shouldBe None
     }
 
     "zip" {
@@ -410,15 +409,15 @@ class OptionTest : UnitSpec() {
       Option.catch(recover) { 1 } shouldBe Some(1)
     }
 
+    "catch with default recover should return Some(result) when f does not throw" {
+      Option.catch { 1 } shouldBe Some(1)
+    }
+
     "catch should return Some(recoverValue) when f throws" {
       val exception = Exception("Boom!")
       val recoverValue = 10
       val recover: (Throwable) -> Option<Int> = { _ -> Some(recoverValue) }
       Option.catch(recover) { throw exception } shouldBe Some(recoverValue)
-    }
-
-    "catch should return Some(result) when f does not throw" {
-      Option.catch { 1 } shouldBe Some(1)
     }
 
     "catch should return None when f throws" {
