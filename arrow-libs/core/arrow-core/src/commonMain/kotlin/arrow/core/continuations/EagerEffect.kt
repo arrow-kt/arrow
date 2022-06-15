@@ -161,41 +161,42 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
  * ```
  * <!--- KNIT example-eager-effect-02.kt -->
  */
-public inline fun <R, A> eagerEffect(crossinline f: suspend EagerEffectScope<R>.() -> A): EagerEffect<R, A> =
-  object : EagerEffect<R, A> {
-    override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
-      val token = Token()
-      val eagerEffectScope =
-        object : EagerEffectScope<R> {
-          // Shift away from this Continuation by intercepting it, and completing it with
-          // ShiftCancellationException
-          // This is needed because this function will never yield a result,
-          // so it needs to be cancelled to properly support coroutine cancellation
-          override suspend fun <B> shift(r: R): B =
-          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-          // We have to throw CancellationException to signal the Continuation was cancelled, and we
-          // shifted away.
-          // This however also means that the user can try/catch shift and recover from the
-          // CancellationException and thus effectively recovering from the cancellation/shift.
-          // This means try/catch is also capable of recovering from monadic errors.
-            // See: EagerEffectSpec - try/catch tests
-            throw Eager(token, r, recover as (Any?) -> Any?)
-        }
+public fun <R, A> eagerEffect(f: suspend EagerEffectScope<R>.() -> A): EagerEffect<R, A> = DefaultEagerEffect(f)
 
-      return try {
-        suspend { transform(f(eagerEffectScope)) }
-          .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
-            result.getOrElse { throwable ->
-              if (throwable is Eager && token == throwable.token) {
-                throwable.recover(throwable.shifted) as B
-              } else throw throwable
-            }
-          }) as B
-      } catch (e: Eager) {
-        if (token == e.token) e.recover(e.shifted) as B
-        else throw e
+private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R>.() -> A) : EagerEffect<R, A> {
+  override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
+    val token = Token()
+    val eagerEffectScope =
+      object : EagerEffectScope<R> {
+        // Shift away from this Continuation by intercepting it, and completing it with
+        // ShiftCancellationException
+        // This is needed because this function will never yield a result,
+        // so it needs to be cancelled to properly support coroutine cancellation
+        override suspend fun <B> shift(r: R): B =
+        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we
+        // shifted away.
+        // This however also means that the user can try/catch shift and recover from the
+        // CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
+          // See: EagerEffectSpec - try/catch tests
+          throw Eager(token, r, recover as (Any?) -> Any?)
       }
+
+    return try {
+      suspend { transform(f(eagerEffectScope)) }
+        .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
+          result.getOrElse { throwable ->
+            if (throwable is Eager && token == throwable.token) {
+              throwable.recover(throwable.shifted) as B
+            } else throw throwable
+          }
+        }) as B
+    } catch (e: Eager) {
+      if (token == e.token) e.recover(e.shifted) as B
+      else throw e
     }
   }
+}
 
 private const val deprecateMonadAppFunctorOperators: String = "Operators related to Functor, Applicative or Monad hierarchies are being deprecated in favor of bind"
