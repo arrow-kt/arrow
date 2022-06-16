@@ -752,38 +752,39 @@ internal class FoldContinuation<B>(
  * ```
  * <!--- KNIT example-effect-02.kt -->
  */
-public inline fun <R, A> effect(crossinline f: suspend EffectScope<R>.() -> A): Effect<R, A> =
-  object : Effect<R, A> {
-    // We create a `Token` for fold Continuation, so we can properly differentiate between nested
-    // folds
-    override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-      suspendCoroutineUninterceptedOrReturn { cont ->
-        val token = Token()
-        val effectScope =
-          object : EffectScope<R> {
-            // Shift away from this Continuation by intercepting it, and completing it with
-            // ShiftCancellationException
-            // This is needed because this function will never yield a result,
-            // so it needs to be cancelled to properly support coroutine cancellation
-            override suspend fun <B> shift(r: R): B =
-            // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-            // We have to throw CancellationException to signal the Continuation was cancelled, and we
-            // shifted away.
-            // This however also means that the user can try/catch shift and recover from the
-            // CancellationException and thus effectively recovering from the cancellation/shift.
-            // This means try/catch is also capable of recovering from monadic errors.
-              // See: EffectSpec - try/catch tests
-              throw Suspend(token, r, recover as suspend (Any?) -> Any?)
-          }
+public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
-        try {
-          suspend { transform(f(effectScope)) }
-            .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-        } catch (e: Suspend) {
-          if (token == e.token) {
-            val f: suspend () -> B = { e.recover(e.shifted) as B }
-            f.startCoroutineUninterceptedOrReturn(cont)
-          } else throw e
+private class DefaultEffect<R, A>(private val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
+  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
+  // folds
+  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
+    suspendCoroutineUninterceptedOrReturn { cont ->
+      val token = Token()
+      val effectScope =
+        object : EffectScope<R> {
+          // Shift away from this Continuation by intercepting it, and completing it with
+          // ShiftCancellationException
+          // This is needed because this function will never yield a result,
+          // so it needs to be cancelled to properly support coroutine cancellation
+          override suspend fun <B> shift(r: R): B =
+          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+          // We have to throw CancellationException to signal the Continuation was cancelled, and we
+          // shifted away.
+          // This however also means that the user can try/catch shift and recover from the
+          // CancellationException and thus effectively recovering from the cancellation/shift.
+          // This means try/catch is also capable of recovering from monadic errors.
+            // See: EffectSpec - try/catch tests
+            throw Suspend(token, r, recover as suspend (Any?) -> Any?)
         }
+
+      try {
+        suspend { transform(f(effectScope)) }
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+      } catch (e: Suspend) {
+        if (token == e.token) {
+          val f: suspend () -> B = { e.recover(e.shifted) as B }
+          f.startCoroutineUninterceptedOrReturn(cont)
+        } else throw e
       }
-  }
+    }
+}

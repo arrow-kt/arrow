@@ -2398,6 +2398,7 @@ public final class arrow/core/ValidatedKt {
 	public static final fun invalid (Ljava/lang/Object;)Larrow/core/Validated;
 	public static final fun invalidNel (Ljava/lang/Object;)Larrow/core/Validated;
 	public static final fun leftWiden (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun merge (Larrow/core/Validated;)Ljava/lang/Object;
 	public static final fun orElse (Larrow/core/Validated;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
 	public static final fun orNone (Larrow/core/Validated;)Larrow/core/Option;
 	public static final fun orNull (Larrow/core/Validated;)Ljava/lang/Object;
