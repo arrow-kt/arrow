@@ -812,6 +812,9 @@ public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): 
 public fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
+public inline fun <A> Validated<A, A>.merge(): A =
+  fold(::identity, ::identity)
+
 public fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,
   SA: Semigroup<A>,
