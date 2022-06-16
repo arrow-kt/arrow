@@ -18,11 +18,12 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.nanoseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retry
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.DurationUnit.NANOSECONDS
 
 /**
  * # Retrying and repeating effects
@@ -48,14 +49,14 @@ import kotlinx.coroutines.flow.retry
  * A more complex schedule
  *
  * ```kotlin
- * import kotlin.time.seconds
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
+ * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
  * @ExperimentalTime
  * fun <A> complexPolicy(): Schedule<A, List<A>> =
- *   Schedule.exponential<A>(10.milliseconds).whileOutput { it.inNanoseconds < 60.seconds.inNanoseconds }
+ *   Schedule.exponential<A>(10.milliseconds).whileOutput { it < 60.seconds }
  *     .andThen(Schedule.spaced<A>(60.seconds) and Schedule.recurs(100)).jittered()
  *     .zipRight(Schedule.identity<A>().collect())
  * ```
@@ -273,7 +274,7 @@ public sealed class Schedule<Input, Output> {
     zipDuration: (duration: Duration, otherDuration: Duration) -> Duration,
     zip: (Output, B) -> C
   ): Schedule<A, C> =
-    combineNanos(other, zipContinue, { a, b -> zipDuration(a.nanoseconds, b.nanoseconds).inNanoseconds }, zip)
+    combineNanos(other, zipContinue, { a, b -> zipDuration(a.nanoseconds, b.nanoseconds).toDouble(NANOSECONDS) }, zip)
 
   /**
    * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [zipContinue], [zipDuration] and a [zip] function
@@ -301,7 +302,7 @@ public sealed class Schedule<Input, Output> {
    */
   @ExperimentalTime
   public fun modify(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
-    modifyNanos { output, d -> f(output, d.nanoseconds).inNanoseconds }
+    modifyNanos { output, d -> f(output, d.nanoseconds).toDouble(NANOSECONDS) }
 
   public abstract fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output>
 
@@ -424,7 +425,7 @@ public sealed class Schedule<Input, Output> {
   public fun jittered(genRand: suspend () -> Duration): Schedule<Input, Output> =
     modify { _, duration ->
       val n = genRand.invoke()
-      duration.times(n.inNanoseconds)
+      duration.times(n.toDouble(NANOSECONDS))
     }
 
   /**
@@ -725,7 +726,7 @@ public sealed class Schedule<Input, Output> {
       zip: (B, D) -> E
     ): Decision<Pair<A, C>, E> = Decision(
       f(cont, other.cont),
-      g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).inNanoseconds,
+      g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).toDouble(NANOSECONDS),
       Pair(state, other.state),
       finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
     )
@@ -746,11 +747,11 @@ public sealed class Schedule<Input, Output> {
 
       @ExperimentalTime
       public fun <A, B> cont(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
-        cont(d.inNanoseconds, a, b)
+        cont(d.toDouble(NANOSECONDS), a, b)
 
       @ExperimentalTime
       public fun <A, B> done(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
-        done(d.inNanoseconds, a, b)
+        done(d.toDouble(NANOSECONDS), a, b)
     }
   }
 
@@ -937,7 +938,7 @@ public sealed class Schedule<Input, Output> {
      */
     @ExperimentalTime
     public fun <A> spaced(interval: Duration): Schedule<A, Int> =
-      forever<A>().delayedNanos { d -> d + interval.inNanoseconds }
+      forever<A>().delayedNanos { d -> d + interval.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule that continues with increasing delay by adding the last two delays.

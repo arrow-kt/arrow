@@ -10,9 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit.NANOSECONDS
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
-import kotlin.time.minutes
 
 @ExperimentalTime
 class CircuitBreakerTest : ArrowFxSpec(
@@ -24,7 +25,7 @@ class CircuitBreakerTest : ArrowFxSpec(
     val maxTimeout = 600.milliseconds
 
     "should work for successful async tasks" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
+      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
       var effect = 0
       Schedule.recurs<Unit>(10_000).repeat {
         cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
@@ -33,7 +34,7 @@ class CircuitBreakerTest : ArrowFxSpec(
     }
 
     "should work for successful immediate tasks" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
+      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
       var effect = 0
       Schedule.recurs<Unit>(10_000).repeat {
         cb.protectOrThrow { effect += 1 }
@@ -42,7 +43,7 @@ class CircuitBreakerTest : ArrowFxSpec(
     }
 
     "Circuit breaker stays closed after less than maxFailures" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
+      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
 
       recurAndCollect<Either<Throwable, Unit>>(3).repeat {
         Either.catch { cb.protectOrThrow { throw dummy } }
@@ -52,7 +53,7 @@ class CircuitBreakerTest : ArrowFxSpec(
     }
 
     "Closed circuit breaker resets failure count after success" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
+      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
 
       recurAndCollect<Either<Throwable, Unit>>(3).repeat {
         Either.catch { cb.protectOrThrow { throw dummy } }
@@ -66,7 +67,7 @@ class CircuitBreakerTest : ArrowFxSpec(
     }
 
     "Circuit breaker opens after max failures" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
+      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
 
       recurAndCollect<Either<Throwable, Unit>>(3).repeat {
         Either.catch { cb.protectOrThrow { throw dummy } }
@@ -78,7 +79,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -95,7 +96,7 @@ class CircuitBreakerTest : ArrowFxSpec(
         resetTimeout = resetTimeout,
         exponentialBackoffFactor = exponentialBackoffFactor,
         maxResetTimeout = maxTimeout
-      )!!.doOnOpen { openedCount += 1 }
+      ).doOnOpen { openedCount += 1 }
         .doOnClosed { closedCount += 1 }
         .doOnHalfOpen { halfOpenCount += 1 }
         .doOnRejectedTask { rejectedCount += 1 }
@@ -105,7 +106,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -120,7 +121,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -129,6 +130,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       val delayProtectLatch = CompletableDeferred<Unit>()
       val stateAssertionLatch = CompletableDeferred<Unit>()
 
+      @Suppress("DeferredResultUnused")
       async { // Successful tasks puts circuit breaker back in HalfOpen
         cb.protectOrThrow {
           checkHalfOpen.complete(Unit)
@@ -141,7 +143,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -150,7 +152,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
       shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
-      // Once we complete `protect`, the circuitbreaker will go back to closer state
+      // Once we complete `protect`, the circuit breaker will go back to closer state
       delayProtectLatch.complete(Unit)
       stateAssertionLatch.await()
 
@@ -174,7 +176,7 @@ class CircuitBreakerTest : ArrowFxSpec(
         resetTimeout = resetTimeout,
         exponentialBackoffFactor = 2.0,
         maxResetTimeout = maxTimeout
-      )!!.doOnOpen { openedCount += 1 }
+      ).doOnOpen { openedCount += 1 }
         .doOnClosed { closedCount += 1 }
         .doOnHalfOpen { halfOpenCount += 1 }
         .doOnRejectedTask { rejectedCount += 1 }
@@ -184,7 +186,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -199,7 +201,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -208,6 +210,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       val delayProtectLatch = CompletableDeferred<Unit>()
       val stateAssertionLatch = CompletableDeferred<Unit>()
 
+      @Suppress("DeferredResultUnused")
       async { // Successful tasks puts circuit breaker back in HalfOpen
         // Delay protect, to inspect HalfOpen state.
         Either.catch {
@@ -223,7 +226,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.inNanoseconds
+          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -232,7 +235,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
       shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
-      // Once we complete `protect`, the circuitbreaker will go back to closer state
+      // Once we complete `protect`, the circuit breaker will go back to closer state
       delayProtectLatch.complete(Unit)
       stateAssertionLatch.await()
 
@@ -240,7 +243,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       // resetTimeout should've applied
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe (resetTimeout * exponentialBackoffFactor).inNanoseconds
+          s.resetTimeoutNanos shouldBe (resetTimeout * exponentialBackoffFactor).toDouble(NANOSECONDS)
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -253,14 +256,14 @@ class CircuitBreakerTest : ArrowFxSpec(
 
     "should be stack safe for successful async tasks" {
       stackSafeSuspend(
-        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes)!!,
+        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes),
         stackSafeIteration(), 0
       ) shouldBe stackSafeIteration()
     }
 
     "should be stack safe for successful immediate tasks" {
       stackSafeImmediate(
-        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes)!!,
+        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes),
         stackSafeIteration(), 0
       ) shouldBe stackSafeIteration()
     }
