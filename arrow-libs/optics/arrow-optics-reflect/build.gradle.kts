@@ -7,14 +7,26 @@ plugins {
 apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
+if (enableCompatibilityMetadataVariant) {
+  tasks.withType<Test>().configureEach {
+    enabled = false
+  }
+}
+
 dependencies {
   api(projects.arrowCore)
   api(projects.arrowOptics)
   api(libs.kotlin.reflect)
   implementation(libs.kotlin.stdlibJDK8)
 
-  testImplementation(projects.arrowOpticsTest)
-  testImplementation(libs.kotlin.stdlibJDK8)
-  testImplementation(libs.junitJupiterEngine)
-  testImplementation(libs.kotlin.reflect)
+  if(!enableCompatibilityMetadataVariant) {
+    testImplementation(project(":arrow-optics-test"))
+    testImplementation(libs.kotlin.stdlibJDK8)
+    testImplementation(libs.junitJupiterEngine)
+    testImplementation(libs.kotlin.reflect)
+  }
 }
