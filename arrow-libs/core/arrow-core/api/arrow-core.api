@@ -2694,6 +2694,7 @@ public final class arrow/core/continuations/EffectScope$DefaultImpls {
 }
 
 public final class arrow/core/continuations/EffectScopeKt {
+	public static final fun catch (Larrow/core/continuations/EffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ensureNotNull (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
