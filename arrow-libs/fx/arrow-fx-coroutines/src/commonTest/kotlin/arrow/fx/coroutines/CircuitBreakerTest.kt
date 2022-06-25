@@ -79,7 +79,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -106,7 +106,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -121,7 +121,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -143,7 +143,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -186,7 +186,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -201,7 +201,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -226,7 +226,7 @@ class CircuitBreakerTest : ArrowFxSpec(
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -243,7 +243,7 @@ class CircuitBreakerTest : ArrowFxSpec(
       // resetTimeout should've applied
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe (resetTimeout * exponentialBackoffFactor).toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout * exponentialBackoffFactor
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
