@@ -46,7 +46,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.2.0
         with:
-          arguments: build --full-stacktrace
+          arguments: assemble --full-stacktrace
 
       - name: Get Arrow version
         id: version

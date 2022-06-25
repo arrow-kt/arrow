@@ -47,7 +47,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2.2.0
         with:
-          arguments: --full-stacktrace build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+          arguments: --full-stacktrace assemble "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
