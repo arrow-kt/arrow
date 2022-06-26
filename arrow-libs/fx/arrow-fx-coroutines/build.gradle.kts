@@ -7,6 +7,16 @@ plugins {
 apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
+if (enableCompatibilityMetadataVariant) {
+  tasks.withType<Test>().configureEach {
+    enabled = false
+  }
+}
+
 kotlin {
   sourceSets {
     commonMain {
@@ -16,20 +26,23 @@ kotlin {
         implementation(libs.kotlin.stdlibCommon)
       }
     }
-    commonTest {
-      dependencies {
-        implementation(projects.arrowFxCoroutinesTest)
+
+    if (!enableCompatibilityMetadataVariant) {
+      commonTest {
+        dependencies {
+          implementation(project(":arrow-fx-coroutines-test"))
+        }
+      }
+      jvmTest {
+        dependencies {
+          runtimeOnly(libs.kotest.runnerJUnit5)
+          implementation(libs.coroutines.test)
+        }
       }
     }
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)
-      }
-    }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-        implementation(libs.coroutines.test)
       }
     }
     jsMain {
