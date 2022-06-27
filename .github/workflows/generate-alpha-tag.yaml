@@ -27,7 +27,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2.2.0
         with:
-          arguments: --full-stacktrace build "-Psemver.stage=alpha"
+          arguments: --full-stacktrace assemble "-Psemver.stage=alpha"
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
