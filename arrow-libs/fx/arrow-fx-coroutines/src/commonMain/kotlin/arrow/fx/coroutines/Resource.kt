@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmName
-import kotlin.jvm.JvmOverloads
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
@@ -709,7 +707,7 @@ public inline fun <A, B> Iterable<A>.traverse(crossinline transform: (A) -> Reso
  */
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
-  traverse { it }
+  traverse(::identity)
 
 /**
  * Runs [Resource.use] and emits [A] of the resource
