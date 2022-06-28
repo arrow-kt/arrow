@@ -14,7 +14,7 @@ val enableCompatibilityMetadataVariant =
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
-    enabled = false
+    exclude("**/*")
   }
 }
 
@@ -30,7 +30,7 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-coroutines-fx-test"))
+          implementation(project(":arrow-fx-coroutines-test"))
         }
       }
       jvmTest {

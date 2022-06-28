@@ -29,13 +29,13 @@ jobs:
         uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os != 'windows-latest'
         with:
-          arguments: --full-stacktrace assemble
+          arguments: --full-stacktrace build
 
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os == 'windows-latest'
         with:
-          arguments: --full-stacktrace assemble
+          arguments: --full-stacktrace mingwX64Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
