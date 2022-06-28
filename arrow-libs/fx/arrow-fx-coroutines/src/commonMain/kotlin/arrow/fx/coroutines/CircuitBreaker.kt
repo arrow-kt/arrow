@@ -552,6 +552,13 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
+    @Deprecated(
+      "Prefer the kotlin.time.Duration constructor instead",
+      ReplaceWith(
+        "of(maxFailures, resetTimeoutNanos.nanoseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)",
+        "import kotlin.time.Duration.Companion.nanoseconds"
+      )
+    )
     public suspend fun of(
       maxFailures: Int,
       resetTimeoutNanos: Double,
@@ -562,8 +569,7 @@ private constructor(
       onHalfOpen: suspend () -> Unit = { },
       onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
-      CircuitBreaker(
-        state = AtomicRef(Closed(0)),
+      of(
         maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
         resetTimeout = requireNotNull(resetTimeoutNanos.takeIf { it > 0 }) { "resetTimeoutNanos expected to be higher than 0" }.nanoseconds,
         exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
@@ -603,7 +609,6 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
-    @ExperimentalTime
     public suspend fun of(
       maxFailures: Int,
       resetTimeout: Duration,
@@ -614,15 +619,16 @@ private constructor(
       onHalfOpen: suspend () -> Unit = suspend { },
       onOpen: suspend () -> Unit = suspend { }
     ): CircuitBreaker =
-      of(
-        maxFailures,
-        resetTimeout.toDouble(DurationUnit.NANOSECONDS),
-        exponentialBackoffFactor,
-        maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
-        onRejected,
-        onClosed,
-        onHalfOpen,
-        onOpen
+      CircuitBreaker(
+        state = AtomicRef(Closed(0)),
+        maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
+        resetTimeout = requireNotNull(resetTimeout.takeIf { it.isPositive() }) { "resetTimeoutNanos expected to be higher than 0" },
+        exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
+        maxResetTimeout = requireNotNull(maxResetTimeout.takeIf { it.isPositive() }) { "maxResetTimeout expected to be higher than 0" },
+        onRejected = onRejected,
+        onClosed = onClosed,
+        onHalfOpen = onHalfOpen,
+        onOpen = onOpen
       )
   }
 }
