@@ -8,6 +8,17 @@ apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 apply(plugin = "io.kotest.multiplatform")
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
+
+if (enableCompatibilityMetadataVariant) {
+  tasks.withType<Test>().configureEach {
+    exclude("**/*")
+  }
+}
+
 kotlin {
   sourceSets {
     commonMain {
@@ -15,19 +26,21 @@ kotlin {
         implementation(libs.kotlin.stdlibCommon)
       }
     }
-    commonTest {
-      dependencies {
-        implementation(projects.arrowCoreTest)
+    if(!enableCompatibilityMetadataVariant) {
+      commonTest {
+        dependencies {
+          implementation(project(":arrow-core-test"))
+        }
+      }
+      jvmTest {
+        dependencies {
+          runtimeOnly(libs.kotest.runnerJUnit5)
+        }
       }
     }
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)
-      }
-    }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
     jsMain {
