@@ -46,6 +46,10 @@ allprojects {
   group = property("projects.group").toString()
 }
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
 tasks {
   val generateDoc by creating(Exec::class) {
     group = "documentation"
@@ -57,12 +61,16 @@ tasks {
     dependsOn(generateDoc)
   }
 
-  val undocumentedProjects = listOf(
-    project(":arrow-core-test"),
-    project(":arrow-fx-coroutines-test"),
-    project(":arrow-optics-test"),
-    project(":arrow-optics-ksp-plugin"),
-  )
+  val undocumentedProjects = if (!enableCompatibilityMetadataVariant) {
+    listOf(
+      project(":arrow-core-test"),
+      project(":arrow-fx-coroutines-test"),
+      project(":arrow-optics-test"),
+      project(":arrow-optics-ksp-plugin"),
+    )
+  } else {
+    listOf(project(":arrow-optics-ksp-plugin"))
+  }
 
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
@@ -70,5 +78,11 @@ tasks {
 }
 
 apiValidation {
-  ignoredProjects.addAll(listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site"))
+  val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
+    listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site")
+  } else {
+    listOf("arrow-optics-ksp-plugin")
+  }
+
+  ignoredProjects.addAll(ignoreApiValidation)
 }

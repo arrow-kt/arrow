@@ -46,7 +46,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.2.0
         with:
-          arguments: build --full-stacktrace
+          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --full-stacktrace
 
       - name: Get Arrow version
         id: version
@@ -65,7 +65,7 @@ jobs:
           contains(steps.version.outputs.arrow, 'beta') ||
           contains(steps.version.outputs.arrow, 'rc')
         with:
-          arguments: --full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository
+          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
         uses: gradle/gradle-build-action@v2.2.0
@@ -74,7 +74,7 @@ jobs:
           !contains(steps.version.outputs.arrow, 'beta') &&
           !contains(steps.version.outputs.arrow, 'rc')
         with:
-          arguments: --full-stacktrace publishToSonatype closeSonatypeStagingRepository
+          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeSonatypeStagingRepository
 
       - name: Prepare environment
         working-directory: arrow-site
@@ -87,7 +87,7 @@ jobs:
       - name: Create API doc
         uses: gradle/gradle-build-action@v2.2.0
         with:
-          arguments: --full-stacktrace dokkaGfm
+          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true dokkaGfm
 
       - name: Build release directory (/docs)
         working-directory: arrow-site
@@ -160,4 +160,4 @@ jobs:
           path: arrow-libs/logs.
 
       - name: Stop Gradle daemons
-        run: ./gradlew --stop
+        run: ./gradlew -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --stop
