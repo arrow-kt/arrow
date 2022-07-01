@@ -249,8 +249,8 @@ public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: (
  * simulate re-throwing of exceptions.
  */
 public suspend fun<E, R, A> EffectScope<E>.catch(
-  action: suspend EffectScope<R>.() -> A,
-  handler: suspend EffectScope<E>.(R) -> A
-): A = effect(action).fold(
-    recover = { handler(it) }, transform = { x -> x }
+  f: suspend EffectScope<R>.() -> A,
+  recover: suspend EffectScope<E>.(R) -> A
+): A = effect(f).fold(
+    recover = { recover(it) }, transform = { x -> x }
   )

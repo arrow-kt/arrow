@@ -214,3 +214,17 @@ public suspend fun <R, B : Any> EagerEffectScope<R>.ensureNotNull(value: B?, shi
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
+
+/**
+ * Catch any possible `shift`ed outcome from [action], and transform it with [handler].
+ * This reads like a `catch` block, but for `EagerEffectScope`.
+ *
+ * The [handler] may `shift` into a different `EagerErrorScope`, which is useful to
+ * simulate re-throwing of exceptions.
+ */
+public fun<E, R, A> EagerEffectScope<E>.catch(
+  f: suspend EagerEffectScope<R>.() -> A,
+  recover: EagerEffectScope<E>.(R) -> A
+): A = eagerEffect(f).fold(
+  recover = { recover(it) }, transform = { x -> x }
+)
