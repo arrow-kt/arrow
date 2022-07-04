@@ -1516,7 +1516,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
   fold(Monoid.either(MA, MB))
 
 /**
- * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, B>
+ * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>
  *
  * ```kotlin
  * import arrow.core.*
