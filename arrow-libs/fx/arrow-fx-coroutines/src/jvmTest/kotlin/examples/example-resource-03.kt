@@ -29,7 +29,9 @@ val dataSource = resource {
 } release DataSource::close
 
 suspend fun main(): Unit {
-  userProcessor.parZip(dataSource) { userProcessor, ds ->
+  resource {
+    parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
       Service(ds, userProcessor)
-    }.use { service -> service.processData() }
+    }
+  }.use { service -> service.processData() }
 }
