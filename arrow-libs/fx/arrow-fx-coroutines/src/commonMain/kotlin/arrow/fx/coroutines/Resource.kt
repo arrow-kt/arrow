@@ -628,7 +628,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
   }
 
 /**
- * Traverse this [Iterable] and collects the resulting `Resource<B>` of [transform] into a `Resource<List<B>>`.
+ * Traverse this [Iterable] and collects the resulting `Resource<B>` of [f] into a `Resource<List<B>>`.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -663,10 +663,10 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(crossinline transform: (A) -> Resource<B>): Resource<List<B>> =
+public inline fun <A, B> Iterable<A>.traverse(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
   arrow.fx.coroutines.continuations.resource {
     map { a ->
-      transform(a).bind()
+      f(a).bind()
     }
   }
 
