@@ -788,3 +788,5 @@ private class DefaultEffect<R, A>(private val f: suspend EffectScope<R>.() -> A)
       }
     }
 }
+
+public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
