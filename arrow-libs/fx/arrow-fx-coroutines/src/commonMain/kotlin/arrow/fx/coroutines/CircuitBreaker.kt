@@ -569,20 +569,10 @@ private constructor(
       onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
       of(
-        maxFailures = maxFailures
-          .takeIf { it >= 0 }
-          .let { requireNotNull(it) { "maxFailures expected to be higher than 0" } },
-        resetTimeout = resetTimeoutNanos
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "resetTimeoutNanos expected to be higher than 0" } }
-          .nanoseconds,
-        exponentialBackoffFactor = exponentialBackoffFactor
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be higher than 0" } },
-        maxResetTimeout = maxResetTimeout
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be higher than 0" } }
-          .nanoseconds,
+        maxFailures = maxFailures,
+        resetTimeout = resetTimeoutNanos.nanoseconds,
+        exponentialBackoffFactor = exponentialBackoffFactor,
+        maxResetTimeout = maxResetTimeout.nanoseconds,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
