@@ -528,7 +528,7 @@ private constructor(
      * @param maxFailures is the maximum count for failures before
      *        opening the circuit breaker.
      *
-     * @param resetTimeout is the timeout to wait in the `Open` state
+     * @param resetTimeoutNanos is the timeout to wait in the `Open` state
      *        before attempting a close of the circuit breaker (but without
      *        the backoff factor applied) in nanoseconds.
      *
@@ -625,7 +625,7 @@ private constructor(
           .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
         resetTimeout = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeoutNanos expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
+          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
         exponentialBackoffFactor = exponentialBackoffFactor
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
