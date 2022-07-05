@@ -15,6 +15,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -283,6 +284,15 @@ class CircuitBreakerTest : ArrowFxSpec(
         value.asClue { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
           shouldThrow<IllegalArgumentException> {
             CircuitBreaker.of(maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout)
+          }
+
+          shouldThrow<IllegalArgumentException> {
+            CircuitBreaker.of(
+              maxFailures,
+              resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+              exponentialBackoffFactor,
+              maxResetTimeout.toDouble(DurationUnit.NANOSECONDS)
+            )
           }
         }
       }
