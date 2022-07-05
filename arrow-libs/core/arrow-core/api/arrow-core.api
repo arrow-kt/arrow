@@ -2614,6 +2614,7 @@ public final class arrow/core/continuations/EagerEffect$DefaultImpls {
 
 public final class arrow/core/continuations/EagerEffectKt {
 	public static final fun eagerEffect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/EagerEffect;
+	public static final fun merge (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/core/continuations/EagerEffectScope {
@@ -2670,6 +2671,7 @@ public final class arrow/core/continuations/Effect$DefaultImpls {
 
 public final class arrow/core/continuations/EffectKt {
 	public static final fun effect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
+	public static final fun merge (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/core/continuations/EffectScope {
