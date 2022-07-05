@@ -11,7 +11,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 
 /**
  * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
@@ -570,10 +569,20 @@ private constructor(
       onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
       of(
-        maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
-        resetTimeout = requireNotNull(resetTimeoutNanos.takeIf { it > 0 }) { "resetTimeoutNanos expected to be higher than 0" }.nanoseconds,
-        exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
-        maxResetTimeout = requireNotNull(maxResetTimeout.takeIf { it > 0 }) { "maxResetTimeout expected to be higher than 0" }.nanoseconds,
+        maxFailures = maxFailures
+          .takeIf { it >= 0 }
+          .let { requireNotNull(it) { "maxFailures expected to be higher than 0" } },
+        resetTimeout = resetTimeoutNanos
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "resetTimeoutNanos expected to be higher than 0" } }
+          .nanoseconds,
+        exponentialBackoffFactor = exponentialBackoffFactor
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be higher than 0" } },
+        maxResetTimeout = maxResetTimeout
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "maxResetTimeout expected to be higher than 0" } }
+          .nanoseconds,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
@@ -621,10 +630,18 @@ private constructor(
     ): CircuitBreaker =
       CircuitBreaker(
         state = AtomicRef(Closed(0)),
-        maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
-        resetTimeout = requireNotNull(resetTimeout.takeIf { it.isPositive() }) { "resetTimeoutNanos expected to be higher than 0" },
-        exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
-        maxResetTimeout = requireNotNull(maxResetTimeout.takeIf { it.isPositive() }) { "maxResetTimeout expected to be higher than 0" },
+        maxFailures = maxFailures
+          .takeIf { it >= 0 }
+          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
+        resetTimeout = resetTimeout
+          .takeIf { it.isPositive() && it != Duration.ZERO }
+          .let { requireNotNull(it) { "resetTimeoutNanos expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
+        exponentialBackoffFactor = exponentialBackoffFactor
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
+        maxResetTimeout = maxResetTimeout
+          .takeIf { it.isPositive() && it != Duration.ZERO }
+          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } },
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
