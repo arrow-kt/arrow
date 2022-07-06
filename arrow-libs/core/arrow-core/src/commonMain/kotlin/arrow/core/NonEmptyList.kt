@@ -3,31 +3,34 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
 
 /**
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
- * `NonEmptyList` is available in the `arrow-core` module under the `import arrow.core.NonEmptyList`
  *
- * ## nonEmptyListOf
+ * ## Constructing NonEmptyList
  *
  * A `NonEmptyList` guarantees the list always has at least 1 element.
  *
  * ```kotlin
  * import arrow.core.nonEmptyListOf
+ * import arrow.core.toNonEmptyListOrNull
  *
- * val value =
- * //sampleStart
- *  // nonEmptyListOf() // does not compile
- *  nonEmptyListOf(1, 2, 3, 4, 5) // NonEmptyList<Int>
- * //sampleEnd
  * fun main() {
- *  println(value)
+ *  println(nonEmptyListOf(1, 2, 3, 4, 5))
+ *  println(listOf(1, 2, 3).toNonEmptyListOrNull())
+ *  println(emptyList<Int>().toNonEmptyListOrNull())
  * }
  * ```
  * <!--- KNIT example-nonemptylist-01.kt -->
+ * ```text
+ * NonEmptyList(1, 2, 3, 4, 5)
+ * NonEmptyList(1, 2, 3)
+ * null
+ * ```
  *
  * ## head
  *
@@ -231,10 +234,26 @@ public class NonEmptyList<out A>(
 
   public companion object {
 
+    @Deprecated(
+      "Use toNonEmptyListOrNull instead",
+      ReplaceWith(
+        "Option.fromNullable<NonEmptyList<A>>(l.toNonEmptyListOrNull())",
+        "import arrow.core.toNonEmptyListOrNull",
+        "import arrow.core.Option",
+        "import arrow.core.NonEmptyList"
+      )
+    )
     @JvmStatic
     public fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
       if (l.isEmpty()) None else Some(NonEmptyList(l))
 
+    @Deprecated(
+      "Use toNonEmptyListOrNull instead",
+      ReplaceWith(
+        "l.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException(\"Empty list doesn't contain element at index 0.\")",
+        "import arrow.core.toNonEmptyListOrNull"
+      )
+    )
     @JvmStatic
     public fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
       NonEmptyList(l)
@@ -242,26 +261,6 @@ public class NonEmptyList<out A>(
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
       nonEmptyListOf(Unit)
-
-    @Suppress("UNCHECKED_CAST")
-    private tailrec fun <A, B> go(
-      buf: ArrayList<B>,
-      f: (A) -> NonEmptyList<Either<A, B>>,
-      v: NonEmptyList<Either<A, B>>
-    ) {
-      val head: Either<A, B> = v.head
-      when (head) {
-        is Either.Right -> {
-          buf += head.value
-          val x = fromList(v.tail)
-          when (x) {
-            is Some<NonEmptyList<Either<A, B>>> -> go(buf, f, x.value)
-            is None -> Unit
-          }
-        }
-        is Either.Left -> go(buf, f, f(head.value) + v.tail)
-      }
-    }
   }
 
   public fun <B> zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
@@ -420,26 +419,51 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
     }
   }
 
-public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverseEither res
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> acc.add(res.value)
+        is Left -> return@traverse res
+      }
     }
+    NonEmptyList(newHead, acc)
   }
-  // Safe due to traverse laws
-  return NonEmptyList.fromListUnsafe(acc).right()
-}
 
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
-  traverseEither(::identity)
+  sequence()
 
+public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
+  traverse(::identity)
+
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+)
 public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
+  traverse(semigroup, f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> NonEmptyList<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, NonEmptyList<B>> =
+  fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
     when (val res = f(a)) {
       is Valid -> when (acc) {
         is Valid -> acc.also { it.value.add(res.value) }
@@ -450,22 +474,42 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
         is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
       }
     }
-  }.map { NonEmptyList.fromListUnsafe(it) }
+  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
 
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup)
 
-public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverseOption res
+public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
+  traverse(semigroup, ::identity)
+
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Some -> acc.add(res.value)
+        is None -> return@traverse res
+      }
     }
+    NonEmptyList(newHead, acc)
   }
-  // Safe due to traverse laws
-  return NonEmptyList.fromListUnsafe(acc).some()
-}
 
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
-  traverseOption { it }
+  sequence()
+
+public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
+  traverse(::identity)
+
+public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
+  firstOrNull()?.let { NonEmptyList(it, drop(1)) }

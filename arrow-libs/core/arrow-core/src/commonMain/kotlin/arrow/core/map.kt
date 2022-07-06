@@ -2,7 +2,9 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 
 /**
@@ -122,7 +124,18 @@ public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
 ): Map<Key, I> {
   val destination = LinkedHashMap<Key, I>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh -> map(key, bb, cc, dd, ee, ff, gg, hh) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -140,7 +153,19 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
 ): Map<Key, J> {
   val destination = LinkedHashMap<Key, J>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii -> map(key, bb, cc, dd, ee, ff, gg, hh, ii) }
+    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii ->
+      map(
+        key,
+        bb,
+        cc,
+        dd,
+        ee,
+        ff,
+        gg,
+        hh,
+        ii
+      )
+    }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -159,7 +184,16 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
 ): Map<Key, K> {
   val destination = LinkedHashMap<Key, K>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key]) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
       ?.let { l -> destination.put(key, l) }
   }
   return destination
@@ -179,7 +213,17 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
 ): Map<Key, L> {
   val destination = LinkedHashMap<Key, L>(size)
   for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+    Nullable.zip(
+      c[key],
+      d[key],
+      e[key],
+      f[key],
+      g[key],
+      h[key],
+      i[key],
+      j[key],
+      k[key]
+    ) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
       map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
     }?.let { l -> destination.put(key, l) }
   }
@@ -191,25 +235,42 @@ public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
   val acc = mutableMapOf<K, B>()
   forEach { (k, v) ->
     when (val res = f(v)) {
       is Right -> acc[k] = res.value
-      is Left -> return@traverseEither res
+      is Left -> return@traverse res
     }
   }
   return acc.right()
 }
 
-public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
-  traverseEither(::identity)
+@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
+  traverse(f)
 
+public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
+  traverse(::identity)
+
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
+  sequence()
+
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> {
-  return foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
+): Validated<E, Map<K, B>> =
+  traverse(semigroup, f)
+
+public inline fun <K, E, A, B> Map<K, A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, Map<K, B>> =
+  foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
     when (val res = f(v)) {
       is Valid -> when (acc) {
         is Valid -> acc.also { it.value[k] = res.value }
@@ -221,24 +282,37 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
       }
     }
   }
-}
 
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  traverseValidated(semigroup, ::identity)
+  sequence(semigroup)
 
-public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> {
+public fun <K, E, A> Map<K, Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
+  traverse(semigroup, ::identity)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> {
   val acc = mutableMapOf<K, B>()
   forEach { (k, v) ->
     when (val res = f(v)) {
       is Some -> acc[k] = res.value
-      is None -> return@traverseOption res
+      is None -> return@traverse res
     }
   }
   return acc.some()
 }
 
+@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
+  traverse(f)
+
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
-  traverseOption { it }
+  sequence()
+
+public fun <K, V> Map<K, Option<V>>.sequence(): Option<Map<K, V>> =
+  traverse(::identity)
 
 public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
@@ -436,8 +510,9 @@ public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
   else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
 }
 
+@Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(emptyMap()) { acc, map -> acc.combine(SG, map) }
+  fold(Monoid.map(SG))
 
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b

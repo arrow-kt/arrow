@@ -1,12 +1,9 @@
 package arrow.core
 
-import arrow.core.computations.OptionEffect
-import arrow.core.computations.RestrictedOptionEffect
-import arrow.core.computations.ensureNotNull
-import arrow.core.computations.option
+import arrow.core.continuations.ensureNotNull
+import arrow.core.continuations.option
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
-import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
@@ -15,10 +12,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 
 class OptionTest : UnitSpec() {
 
@@ -70,8 +64,7 @@ class OptionTest : UnitSpec() {
     "short circuit null" {
       option {
         val number: Int = "s".length
-        val x = ensureNotNull(number.takeIf { it > 1 })
-        x
+        ensureNotNull(number.takeIf { it > 1 })
         throw IllegalStateException("This should not be executed")
       } shouldBe None
     }
@@ -126,8 +119,8 @@ class OptionTest : UnitSpec() {
     }
 
     "map" {
-      some.map(String::toUpperCase) shouldBe Some("KOTLIN")
-      none.map(String::toUpperCase) shouldBe None
+      some.map(String::uppercase) shouldBe Some("KOTLIN")
+      none.map(String::uppercase) shouldBe None
     }
 
     "zip" {
@@ -141,7 +134,7 @@ class OptionTest : UnitSpec() {
 
     "mapNotNull" {
       some.mapNotNull { it.toIntOrNull() } shouldBe None
-      some.mapNotNull { it.toUpperCase() } shouldBe Some("KOTLIN")
+      some.mapNotNull { it.uppercase() } shouldBe Some("KOTLIN")
     }
 
     "fold" {
@@ -150,8 +143,8 @@ class OptionTest : UnitSpec() {
     }
 
     "flatMap" {
-      some.flatMap { Some(it.toUpperCase()) } shouldBe Some("KOTLIN")
-      none.flatMap { Some(it.toUpperCase()) } shouldBe None
+      some.flatMap { Some(it.uppercase()) } shouldBe Some("KOTLIN")
+      none.flatMap { Some(it.uppercase()) } shouldBe None
     }
 
     "align" {
@@ -388,26 +381,26 @@ class OptionTest : UnitSpec() {
     "traverseEither should yield either of option" {
       val some: Option<String> = Some("value")
       val none: Option<String> = None
-      some.traverseEither { it.right() } shouldBe some.right()
-      none.traverseEither { it.right() } shouldBe none.right()
+      some.traverse { it.right() } shouldBe some.right()
+      none.traverse { it.right() } shouldBe none.right()
     }
 
     "sequenceEither should be consistent with traverseEither" {
       checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.right() }.sequenceEither() shouldBe option.traverseEither { it.right() }
+        option.map { it.right() }.sequence() shouldBe option.traverse{ it.right() }
       }
     }
 
     "traverseValidated should yield validated of option" {
       val some: Option<String> = Some("value")
       val none: Option<String> = None
-      some.traverseValidated { it.valid() } shouldBe some.valid()
-      none.traverseValidated { it.valid() } shouldBe none.valid()
+      some.traverse { it.valid() } shouldBe some.valid()
+      none.traverse { it.valid() } shouldBe none.valid()
     }
 
     "sequenceValidated should be consistent with traverseValidated" {
       checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.valid() }.sequenceValidated() shouldBe option.traverseValidated { it.valid() }
+        option.map { it.valid() }.sequence() shouldBe option.traverse { it.valid() }
       }
     }
 
@@ -416,15 +409,15 @@ class OptionTest : UnitSpec() {
       Option.catch(recover) { 1 } shouldBe Some(1)
     }
 
+    "catch with default recover should return Some(result) when f does not throw" {
+      Option.catch { 1 } shouldBe Some(1)
+    }
+
     "catch should return Some(recoverValue) when f throws" {
       val exception = Exception("Boom!")
       val recoverValue = 10
       val recover: (Throwable) -> Option<Int> = { _ -> Some(recoverValue) }
       Option.catch(recover) { throw exception } shouldBe Some(recoverValue)
-    }
-
-    "catch should return Some(result) when f does not throw" {
-      Option.catch { 1 } shouldBe Some(1)
     }
 
     "catch should return None when f throws" {

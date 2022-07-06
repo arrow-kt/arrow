@@ -7,13 +7,10 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 
 class MapKTest : UnitSpec() {
@@ -28,7 +25,7 @@ class MapKTest : UnitSpec() {
 
     "traverseEither is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseEither { v ->
+      val res = (0..20_000).map { it to it }.toMap().traverse { v ->
         acc.add(v)
         Either.Right(v)
       }
@@ -39,7 +36,7 @@ class MapKTest : UnitSpec() {
     "traverseEither short-circuit" {
       checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseEither {
+        val evens = ints.traverse {
           if (it % 2 == 0) {
             acc.add(it)
             Either.Right(it)
@@ -56,7 +53,7 @@ class MapKTest : UnitSpec() {
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseOption { a ->
+      val res = (0..20_000).map { it to it }.toMap().traverse { a ->
         acc.add(a)
         Some(a)
       }
@@ -67,7 +64,7 @@ class MapKTest : UnitSpec() {
     "traverseOption short-circuits" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverseOption {
+        val evens = ints.traverse {
           (it % 2 == 0).maybe {
             acc.add(it)
             it
@@ -80,14 +77,14 @@ class MapKTest : UnitSpec() {
 
     "sequenceOption yields some when all entries in the list are some" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequenceOption()
+        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
         evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
     "traverseValidated is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverseValidated(Semigroup.string()) { v ->
+      val res = (0..20_000).map { it to it }.toMap().traverse(Semigroup.string()) { v ->
         acc.add(v)
         Validated.Valid(v)
       }
@@ -98,10 +95,10 @@ class MapKTest : UnitSpec() {
     "traverseValidated acummulates" {
       checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverseValidated(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, Map<Int, Int>> =
-          NonEmptyList.fromList(ints.values.filterNot { it % 2 == 0 })
+          Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
             .fold(
               { ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() },
               { it.invalid() })

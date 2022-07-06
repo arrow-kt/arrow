@@ -97,8 +97,9 @@ public interface Fold<S, A> {
   /**
    * Alias for fold.
    */
+  @Deprecated("use fold instead", ReplaceWith("fold(M, source)"))
   public fun combineAll(M: Monoid<A>, source: S): A =
-    foldMap(M, source, ::identity)
+    fold(M, source)
 
   /**
    * Get all targets of the [Fold]

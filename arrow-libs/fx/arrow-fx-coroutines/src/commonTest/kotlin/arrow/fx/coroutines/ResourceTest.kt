@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
 import io.kotest.assertions.fail
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -12,10 +13,14 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.negativeInt
+import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -25,6 +30,18 @@ class ResourceTest : ArrowFxSpec(
         val r = Resource({ n }, { _, _ -> Unit })
 
         r.use { it + 1 } shouldBe n + 1
+      }
+    }
+
+    "flatMap resource is released first" {
+      checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
+        val l = mutableListOf<Int>()
+        fun r(n: Int) = Resource({ n.also(l::add) }, { it, _ -> l.add(-it) })
+
+        r(a).flatMap { r(it + b) }
+          .use { it + 1 } shouldBe (a + b) + 1
+
+        l.shouldContainExactly(a, a + b, - a - b, -a)
       }
     }
 
@@ -113,7 +130,7 @@ class ResourceTest : ArrowFxSpec(
     "Resource can close from either" {
       val exit = CompletableDeferred<ExitCase>()
       arrow.core.computations.either<String, Int> {
-        arrow.fx.coroutines.computations.resource<Int> {
+        arrow.fx.coroutines.continuations.resource<Int> {
           Resource({ 1 }) { _, ex -> require(exit.complete(ex)) }.bind()
           "error".left().bind()
           1
@@ -269,8 +286,8 @@ class ResourceTest : ArrowFxSpec(
             { require(started.complete(Unit)); i },
             { ii, ex -> require(released.complete(ii to ex)) }
           ).parZip(
-              Resource({ started.await(); throw throwable }) { _, _ -> }
-            ) { _, _ -> }
+            Resource({ started.await(); throw throwable }) { _, _ -> }
+          ) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
 
@@ -416,6 +433,14 @@ class ResourceTest : ArrowFxSpec(
           .use {
             r.get() shouldBe "$b$a"
           }
+      }
+    }
+
+    "resource.asFlow()" {
+      checkAll(Arb.int()) { n ->
+        val r = Resource({ n }, { _, _ -> Unit })
+
+        r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
       }
     }
   }

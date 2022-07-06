@@ -10,8 +10,7 @@ import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlin.math.max
 import kotlin.math.min
@@ -22,10 +21,10 @@ class SequenceKTest : UnitSpec() {
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "traverseEither stack-safe" {
+    "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverseEither { a ->
+      val res = generateSequence(0) { it + 1 }.traverse { a ->
         if (a > 20_000) {
           Either.Left(Unit)
         } else {
@@ -37,10 +36,10 @@ class SequenceKTest : UnitSpec() {
       res shouldBe Either.Left(Unit)
     }
 
-    "traverseOption stack-safe" {
+    "traverse for Option stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverseOption { a ->
+      val res = generateSequence(0) { it + 1 }.traverse { a ->
         (a <= 20_000).maybe {
           acc.add(a)
           a
@@ -50,10 +49,10 @@ class SequenceKTest : UnitSpec() {
       res shouldBe None
     }
 
-    "traverseValidated stack-safe" {
+    "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverseValidated(Semigroup.string()) {
+      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
         acc.add(it)
         Validated.Valid(it)
       }.map { it.toList() }
@@ -61,13 +60,14 @@ class SequenceKTest : UnitSpec() {
       res shouldBe Validated.Valid((0..20_000).toList())
     }
 
-    "traverseValidated acummulates" {
+    "traverse for Validated acummulates" {
       checkAll(Arb.sequence(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, Sequence<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequenceValidated(Semigroup.nonEmptyList())
+        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          .sequence(Semigroup.nonEmptyList())
 
-        val expected: ValidatedNel<Int, Sequence<Int>> = NonEmptyList.fromList(ints.filterNot { it % 2 == 0 }.toList())
-          .fold({ ints.filter { it % 2 == 0 }.validNel() }, { it.invalid() })
+        val expected: ValidatedNel<Int, Sequence<Int>> =
+          ints.filterNot { it % 2 == 0 }.toList()
+            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
 
         res.map { it.toList() } shouldBe expected.map { it.toList() }
       }
@@ -273,7 +273,7 @@ class SequenceKTest : UnitSpec() {
 
       val seq2 = generateSequence(0) { it + 1 }
 
-      checkAll(10, Arb.positiveInts(max = 10_000)) { idx: Int ->
+      checkAll(10, Arb.positiveInt(max = 10_000)) { idx: Int ->
         val element = seq1.align(seq2).drop(idx).first()
 
         element shouldBe Ior.Both("A", idx)

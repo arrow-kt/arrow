@@ -4,7 +4,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Validated
-import arrow.core.sequenceValidated
+import arrow.core.sequence
 import arrow.typeclasses.Semigroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -206,5 +206,5 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
 ): Validated<E, List<B>> =
   coroutineScope {
     map { async(ctx) { f.invoke(this, it) } }.awaitAll()
-      .sequenceValidated(semigroup)
+      .sequence(semigroup)
   }

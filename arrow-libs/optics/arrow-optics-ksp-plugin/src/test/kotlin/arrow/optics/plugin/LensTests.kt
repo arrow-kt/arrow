@@ -38,14 +38,13 @@ class LensTests {
   fun `Lenses which mentions imported elements`() {
     """
       |$imports
-      |import kotlin.time.Duration
       |
       |@optics
-      |data class OpticsTest(val time: Duration) {
+      |data class OpticsTest(val time: kotlin.time.Duration) {
       |  companion object
       |}
       |
-      |val i: Lens<OpticsTest, Duration> = OpticsTest.time
+      |val i: Lens<OpticsTest, kotlin.time.Duration> = OpticsTest.time
       |val r = i != null
       """.evals("r" to true)
   }

@@ -5,6 +5,7 @@ import arrow.core.Ior.Left
 import arrow.core.Ior.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
 public typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -543,6 +544,8 @@ public sealed class Ior<out A, out B> {
 
   public fun isNotEmpty(): Boolean = !isLeft
 
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
       { a -> listOf(Left(a)) },
@@ -550,19 +553,31 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
+  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
+    traverse(fa)
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <AA, C> traverse(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
     fold(
       { a -> Either.Right(Left(a)) },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
 
-  public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Ior<A, C>> =
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Ior<A, C>> =
     fold(
       { a -> Some(Left(a)) },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
+
+  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
+  public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Ior<A, C>> =
+    traverse(fa)
 
   public inline fun <C> traverseNullable(fa: (B) -> C?): Ior<A, C>? =
     fold(
@@ -571,12 +586,18 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b)?.let { Both(a, it) } }
     )
 
-  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
     fold(
       { a -> Valid(Left(a)) },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
+
+  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
+  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
+    traverse(fa)
 
   public fun void(): Ior<A, Unit> =
     map { Unit }
@@ -657,7 +678,7 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>>
     is Ior.Right -> Ior.Right(List(n) { value })
     is Ior.Left -> this
     is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
+      { List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } },
       { List(n) { rightValue } }
     )
   }
@@ -665,28 +686,44 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>>
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
   if (n <= 0) Ior.Right(MB.empty())
   else when (this) {
-    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.combineAll() })
+    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })
     is Ior.Left -> this
     is Ior.Both -> bimap(
       { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
-      { MB.run { List(n) { rightValue }.combineAll() } }
+      { MB.run { List(n) { rightValue }.fold() } }
     )
   }
 
 public fun <A, B> Ior<A, Iterable<B>>.sequence(): List<Ior<A, B>> =
   traverse(::identity)
 
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>> =
-  traverseEither(::identity)
+  sequence()
 
+public fun <A, B, C> Ior<A, Either<B, C>>.sequence(): Either<B, Ior<A, C>> =
+  traverse(::identity)
+
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
-  traverseOption(::identity)
+  sequence()
 
+public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
+  traverse(::identity)
+
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
+  sequence()
+
+public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
   traverseNullable(::identity)
 
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, Ior<A, C>> =
-  traverseValidated(::identity)
+  sequence()
+
+public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>> =
+  traverse(::identity)
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>

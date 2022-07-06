@@ -21,7 +21,7 @@ fun STM.deposit(acc: TVar<Int>, amount: Int): Unit {
 
 fun STM.withdraw(acc: TVar<Int>, amount: Int): Unit {
   val current = acc.read()
-  if (current - amount >= 0) acc.write(current + amount)
+  if (current - amount >= 0) acc.write(current - amount)
   else retry() // we now retry if there is not enough money in the account
   // this can also be achieved by using `check(current - amount >= 0); acc.write(it + amount)`
 }

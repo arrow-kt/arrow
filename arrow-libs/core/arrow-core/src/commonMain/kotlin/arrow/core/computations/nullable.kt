@@ -7,6 +7,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated(deprecateInFavorOfEffectScope)
 public fun interface NullableEffect<A> : Effect<A?> {
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(null)
@@ -36,7 +37,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
    * // println: "ensure(true) passes"
    * // res: null
    * ```
- * <!--- KNIT example-nullable-computations-01.kt -->
+   * <!--- KNIT example-nullable-computations-01.kt -->
    */
   public suspend fun ensure(value: Boolean): Unit =
     if (value) Unit else control().shift(null)
@@ -67,6 +68,7 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * ```
  * <!--- KNIT example-nullable-computations-02.kt -->
  */
+@Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("ensureNotNull", "arrow.core.continuations.ensureNotNull"))
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   contract {
@@ -76,14 +78,18 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   return value ?: control().shift(null)
 }
 
+@Deprecated(deprecatedInFavorOfEagerEffectScope)
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
+@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("nullable", "arrow.core.continuations.nullable"))
 @Suppress("ClassName")
 public object nullable {
+  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("nullable.eager(func)", "arrow.core.continuations.nullable"))
   public inline fun <A> eager(crossinline func: suspend RestrictedNullableEffect<A>.() -> A?): A? =
     Effect.restricted(eff = { RestrictedNullableEffect { it } }, f = func, just = { it })
 
+  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("nullable(func)", "arrow.core.continuations.nullable"))
   public suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }

@@ -3,7 +3,7 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.sequenceResult
+import arrow.core.sequence
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -132,5 +132,5 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
   coroutineScope {
-    map { async(ctx) { f.invoke(this, it) } }.awaitAll().sequenceResult()
+    map { async(ctx) { f.invoke(this, it) } }.awaitAll().sequence()
   }

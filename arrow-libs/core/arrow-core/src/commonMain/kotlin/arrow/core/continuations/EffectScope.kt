@@ -11,7 +11,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 /** Context of the [Effect] DSL. */
-public interface EffectScope<R> {
+public interface EffectScope<in R> {
   /**
    * Short-circuit the [Effect] computation with value [R].
    *

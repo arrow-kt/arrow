@@ -18,7 +18,12 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.nanoseconds
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retry
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.DurationUnit.NANOSECONDS
 
 /**
  * # Retrying and repeating effects
@@ -44,14 +49,14 @@ import kotlin.time.nanoseconds
  * A more complex schedule
  *
  * ```kotlin
- * import kotlin.time.seconds
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
+ * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
  * @ExperimentalTime
  * fun <A> complexPolicy(): Schedule<A, List<A>> =
- *   Schedule.exponential<A>(10.milliseconds).whileOutput { it.inNanoseconds < 60.seconds.inNanoseconds }
+ *   Schedule.exponential<A>(10.milliseconds).whileOutput { it < 60.seconds }
  *     .andThen(Schedule.spaced<A>(60.seconds) and Schedule.recurs(100)).jittered()
  *     .zipRight(Schedule.identity<A>().collect())
  * ```
@@ -217,6 +222,28 @@ public sealed class Schedule<Input, Output> {
   public suspend fun repeatOrElse(fa: suspend () -> Input, orElse: suspend (Throwable, Output?) -> Output): Output =
     repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
 
+  public abstract suspend fun <C> repeatOrElseEitherAsFlow(
+    fa: suspend () -> Input,
+    orElse: suspend (Throwable, Output?) -> C
+  ): Flow<Either<C, Output>>
+
+  /**
+   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
+   * This will raise an error if a repeat failed.
+   */
+  public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
+    repeatOrElseAsFlow(fa) { e, _ -> throw e }
+
+  /**
+   * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
+   * Also offers a function to handle errors if they are encountered during repetition.
+   */
+  public suspend fun repeatOrElseAsFlow(
+    fa: suspend () -> Input,
+    orElse: suspend (Throwable, Output?) -> Output
+  ): Flow<Output> =
+    repeatOrElseEitherAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
+
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
    */
@@ -247,7 +274,7 @@ public sealed class Schedule<Input, Output> {
     zipDuration: (duration: Duration, otherDuration: Duration) -> Duration,
     zip: (Output, B) -> C
   ): Schedule<A, C> =
-    combineNanos(other, zipContinue, { a, b -> zipDuration(a.nanoseconds, b.nanoseconds).inNanoseconds }, zip)
+    combineNanos(other, zipContinue, { a, b -> zipDuration(a.nanoseconds, b.nanoseconds).toDouble(NANOSECONDS) }, zip)
 
   /**
    * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [zipContinue], [zipDuration] and a [zip] function
@@ -275,7 +302,7 @@ public sealed class Schedule<Input, Output> {
    */
   @ExperimentalTime
   public fun modify(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
-    modifyNanos { output, d -> f(output, d.nanoseconds).inNanoseconds }
+    modifyNanos { output, d -> f(output, d.nanoseconds).toDouble(NANOSECONDS) }
 
   public abstract fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output>
 
@@ -292,7 +319,10 @@ public sealed class Schedule<Input, Output> {
   /**
    * Accumulates the results of a schedule by folding over them effectfully.
    */
-  public abstract fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C>
+  public abstract fun <C> foldLazy(
+    initial: suspend () -> C,
+    f: suspend (acc: C, output: Output) -> C
+  ): Schedule<Input, C>
 
   /**
    * Composes this schedule with the other schedule by piping the output of this schedule
@@ -395,7 +425,7 @@ public sealed class Schedule<Input, Output> {
   public fun jittered(genRand: suspend () -> Duration): Schedule<Input, Output> =
     modify { _, duration ->
       val n = genRand.invoke()
-      duration.times(n.inNanoseconds)
+      duration.times(n.toDouble(NANOSECONDS))
     }
 
   /**
@@ -457,6 +487,38 @@ public sealed class Schedule<Input, Output> {
         }
       }
     }
+
+    override suspend fun <C> repeatOrElseEitherAsFlow(
+      fa: suspend () -> Input,
+      orElse: suspend (Throwable, Output?) -> C
+    ): Flow<Either<C, Output>> =
+      flow {
+        var loop = true
+        var last: (() -> Output)? = null // We haven't seen any input yet
+        var state: State = initialState.invoke()
+
+        while (loop) {
+          coroutineContext.ensureActive()
+          try {
+            val a = fa.invoke()
+            val step = update(a, state)
+            if (!step.cont) {
+              emit(Either.Right(step.finish.value()))
+              loop = false
+            } else {
+              delay((step.delayInNanos / 1_000_000).toLong())
+              val output = step.finish.value()
+              // Set state before looping again and emit Output
+              emit(Either.Right(output))
+              last = { output }
+              state = step.state
+            }
+          } catch (e: Throwable) {
+            emit(Either.Left(orElse(e.nonFatalOrThrow(), last?.invoke())))
+            loop = false
+          }
+        }
+      }
 
     override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
       ScheduleImpl(initialState) { i, s -> update(i, s).map(f) }
@@ -621,7 +683,12 @@ public sealed class Schedule<Input, Output> {
   /**
    * A single decision. Contains the decision to continue, the delay, the new state and the (lazy) result of a Schedule.
    */
-  public data class Decision<out A, out B>(val cont: Boolean, val delayInNanos: Double, val state: A, val finish: Eval<B>) {
+  public data class Decision<out A, out B>(
+    val cont: Boolean,
+    val delayInNanos: Double,
+    val state: A,
+    val finish: Eval<B>
+  ) {
 
     @ExperimentalTime
     val duration: Duration
@@ -638,6 +705,7 @@ public sealed class Schedule<Input, Output> {
 
     public fun <D> map(g: (B) -> D): Decision<A, D> =
       bimap(::identity, g)
+
     public fun <C, D, E> combineNanos(
       other: Decision<C, D>,
       f: (Boolean, Boolean) -> Boolean,
@@ -658,7 +726,7 @@ public sealed class Schedule<Input, Output> {
       zip: (B, D) -> E
     ): Decision<Pair<A, C>, E> = Decision(
       f(cont, other.cont),
-      g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).inNanoseconds,
+      g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).toDouble(NANOSECONDS),
       Pair(state, other.state),
       finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
     )
@@ -679,11 +747,11 @@ public sealed class Schedule<Input, Output> {
 
       @ExperimentalTime
       public fun <A, B> cont(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
-        cont(d.inNanoseconds, a, b)
+        cont(d.toDouble(NANOSECONDS), a, b)
 
       @ExperimentalTime
       public fun <A, B> done(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
-        done(d.inNanoseconds, a, b)
+        done(d.toDouble(NANOSECONDS), a, b)
     }
   }
 
@@ -736,7 +804,7 @@ public sealed class Schedule<Input, Output> {
       unfold(0) { it + 1 }
 
     /**
-     * Creates a Schedule that continues n times and returns the number of iterations.
+     * Creates a Schedule that continues [n] times and returns the number of iterations.
      */
     public fun <A> recurs(n: Int): Schedule<A, Int> =
       Schedule(suspend { 0 }) { _: A, acc ->
@@ -870,7 +938,7 @@ public sealed class Schedule<Input, Output> {
      */
     @ExperimentalTime
     public fun <A> spaced(interval: Duration): Schedule<A, Int> =
-      forever<A>().delayedNanos { d -> d + interval.inNanoseconds }
+      forever<A>().delayedNanos { d -> d + interval.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule that continues with increasing delay by adding the last two delays.
@@ -940,7 +1008,10 @@ public suspend fun <A, B> Schedule<Throwable, B>.retry(fa: suspend () -> A): A =
  * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
-public suspend fun <A, B> Schedule<Throwable, B>.retryOrElse(fa: suspend () -> A, orElse: suspend (Throwable, B) -> A): A =
+public suspend fun <A, B> Schedule<Throwable, B>.retryOrElse(
+  fa: suspend () -> A,
+  orElse: suspend (Throwable, B) -> A
+): A =
   retryOrElseEither(fa, orElse).fold(::identity, ::identity)
 
 /**

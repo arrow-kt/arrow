@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -1000,20 +1001,34 @@ public sealed class Either<out A, out B> {
       is Right -> List(n) { this.value }.right()
     }
 
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
-    fold({ emptyList() }, { fa(it).map { Right(it) } })
+    fold({ emptyList() }, { fa(it).map(::Right) })
 
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Either<A, C>> =
+    fold({ None }, { right -> fa(right).map(::Right) })
+
+  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
-    fold({ None }, { right -> fa(right).map { Right(it) } })
+    traverse(fa)
 
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
-    fold({ null }, { right -> fa(right)?.let { Right(it) } })
+    fold({ null }, { right -> fa(right)?.let(::Right) })
 
-  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     when (this) {
-      is Right -> fa(this.value).map { Right(it) }
+      is Right -> fa(this.value).map(::Right)
       is Left -> this.valid()
     }
+
+  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
+  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
+    traverse(fa)
 
   public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
@@ -1062,8 +1077,8 @@ public sealed class Either<out A, out B> {
    *
    *  fun main(args: Array<String>) {
    *   //sampleStart
-   *   Either.Left("foo").isEmpty()  // Result: false
-   *   Either.Right("foo").isEmpty() // Result: true
+   *   Either.Left("foo").isNotEmpty()  // Result: false
+   *   Either.Right("foo").isNotEmpty() // Result: true
    *   //sampleEnd
    * }
    * ```
@@ -1496,13 +1511,12 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
     }
   }
 
+@Deprecated("use fold instead", ReplaceWith("fold(Monoid.either(MA, MB))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
-  fold(Right(MB.empty()) as Either<A, B>) { acc, e ->
-    acc.combine(MA, MB, e)
-  }
+  fold(Monoid.either(MA, MB))
 
 /**
- * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, B>
+ * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>
  *
  * ```kotlin
  * import arrow.core.*
@@ -1711,14 +1725,26 @@ public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, 
 public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   traverse(::identity)
 
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
-  traverseOption(::identity)
+  sequence()
 
+public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
+  traverse(::identity)
+
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
+  sequence()
+
+public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
   traverseNullable(::identity)
 
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
-  traverseValidated(::identity)
+  sequence()
+
+public fun <A, B, C> Either<A, Validated<B, C>>.sequence(): Validated<B, Either<A, C>> =
+  traverse(::identity)
 
 public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)

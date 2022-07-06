@@ -4,6 +4,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -118,20 +119,34 @@ public sealed class Validated<out E, out A> {
   public fun void(): Validated<E, Unit> =
     map { Unit }
 
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
-  public inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <EE, B> traverse(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> this.right()
     }
 
-  public inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
+  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
+  public inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
+    traverse(fa)
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  public inline fun <B> traverse(fa: (A) -> Option<B>): Option<Validated<E, B>> =
     when (this) {
       is Valid -> fa(this.value).map { Valid(it) }
       is Invalid -> None
     }
+
+  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
+  public inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
+    traverse(fa)
 
   public inline fun <B> traverseNullable(fa: (A) -> B?): Validated<E, B>? =
     when (this) {
@@ -673,19 +688,32 @@ public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
 
+@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 
 public fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
-  traverseEither(::identity)
+  sequence()
 
+public fun <E, A, B> Validated<A, Either<E, B>>.sequence(): Either<E, Validated<A, B>> =
+  traverse(::identity)
+
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
-  traverseOption(::identity)
+  sequence()
 
+public fun <A, B> Validated<A, Option<B>>.sequence(): Option<Validated<A, B>> =
+  traverse(::identity)
+
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Validated<A, B?>.sequenceNullable(): Validated<A, B>? =
+  sequence()
+
+public fun <A, B> Validated<A, B?>.sequence(): Validated<A, B>? =
   traverseNullable(::identity)
 
 public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
@@ -783,6 +811,9 @@ public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): 
 
 public fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
+
+public inline fun <A> Validated<A, A>.merge(): A =
+  fold(::identity, ::identity)
 
 public fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,

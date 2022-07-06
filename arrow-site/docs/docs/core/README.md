@@ -38,6 +38,13 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 #### Quick Start
   - [Gradle Setup]({{ '/core/#Gradle-kotlin' | relative_url }})
   - [Maven Setup]({{ '/core/#Maven' | relative_url }})
+
+#### Effects & Continuations
+  - [Effect]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect/' | relative_url }})
+  - [EffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-effect-scope/' | relative_url }})
+  - [EagerEffect]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect/' | relative_url }})
+  - [EagerEffectScope]({{ '/apidocs/arrow-core/arrow.core.continuations/-eager-effect-scope/' | relative_url }})
+
 </div>
 
 <div class="quickstart-coroutines-item" markdown="1">
@@ -183,7 +190,7 @@ dependencies {
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 
@@ -236,7 +243,7 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
 
 #### Next development version
 
-If you want to try the latest features, replace `1.0.1` with on of the latest `alpha`, `beta` or `rc` publications.
+If you want to try the latest features, replace `1.0.1` with one of the latest `alpha`, `beta` or `rc` publications.
 
 </div>
 </div>

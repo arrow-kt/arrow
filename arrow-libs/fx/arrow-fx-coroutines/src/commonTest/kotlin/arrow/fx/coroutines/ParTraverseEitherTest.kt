@@ -3,12 +3,11 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import arrow.core.sequenceEither
+import arrow.core.sequence
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CompletableDeferred
 
@@ -61,7 +60,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val res = l.parTraverseEither { it }
 
         if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
-        else res shouldBe l.sequenceEither()
+        else res shouldBe l.sequence()
       }
     }
 
