@@ -382,12 +382,6 @@ public class NonEmptyList<out A>(
       map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
       tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail, map)
     )
-
-  public inline fun <B : Comparable<B>> minBy(selector: (A) -> B): A =
-    minByOrNull(selector) ?: head
-
-  public inline fun <B : Comparable<B>> maxBy(selector: (A) -> B): A =
-    maxByOrNull(selector) ?: head
 }
 
 public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
@@ -402,11 +396,17 @@ public operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmpt
 public fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
   this.flatMap(::identity)
 
+public inline fun <A, B : Comparable<B>> NonEmptyList<A>.minBy(selector: (A) -> B): A =
+  minByOrNull(selector)!!
+
+public inline fun <A, B : Comparable<B>> NonEmptyList<A>.maxBy(selector: (A) -> B): A =
+  maxByOrNull(selector)!!
+
 public inline fun <T : Comparable<T>> NonEmptyList<T>.min(): T =
-  minOrNull() ?: head
+  minOrNull()!!
 
 public inline fun <T : Comparable<T>> NonEmptyList<T>.max(): T =
-  maxOrNull() ?: head
+  maxOrNull()!!
 
 public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
