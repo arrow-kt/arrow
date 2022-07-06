@@ -206,7 +206,7 @@ public interface EagerEffectScope<in R> {
   public suspend fun <E, A> attempt(
     @BuilderInference
     f: suspend EagerEffectScope<E>.() -> A,
-  ): AttemptEager<E, A> = AttemptEager(f)
+  ): suspend EagerEffectScope<E>.() -> A = f
 
   /**
    * Finishes an "attempt block" by providing the way in which to [recover]
@@ -217,13 +217,10 @@ public interface EagerEffectScope<in R> {
    * attempt { ... } catch { ... }
    * ```
    */
-  public infix fun <E, A> AttemptEager<E, A>.catch(
+  public infix fun <E, A> (suspend EagerEffectScope<E>.() -> A).catch(
     recover: EagerEffectScope<R>.(E) -> A,
-  ): A = eagerEffect(f).fold({ recover(it) }, ::identity)
+  ): A = eagerEffect(this).fold({ recover(it) }, ::identity)
 }
-
-@JvmInline
-public value class AttemptEager<E, A>(public val f: suspend EagerEffectScope<E>.() -> A)
 
 /**
  * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's

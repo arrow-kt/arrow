@@ -232,7 +232,7 @@ public interface EffectScope<in R> {
   public suspend fun <E, A> attempt(
     @BuilderInference
     f: suspend EffectScope<E>.() -> A,
-  ): Attempt<E, A> = Attempt(f)
+  ): suspend EffectScope<E>.() -> A = f
 
   /**
    * Finishes an "attempt block" by providing the way in which to [recover]
@@ -243,13 +243,10 @@ public interface EffectScope<in R> {
    * attempt { ... } catch { ... }
    * ```
    */
-  public suspend infix fun <E, A> Attempt<E, A>.catch(
+  public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
     recover: EffectScope<R>.(E) -> A,
-  ): A = effect(f).fold({ recover(it) }, ::identity)
+  ): A = effect(this).fold({ recover(it) }, ::identity)
 }
-
-@JvmInline
-public value class Attempt<E, A>(public val f: suspend EffectScope<E>.() -> A)
 
 /**
  * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
