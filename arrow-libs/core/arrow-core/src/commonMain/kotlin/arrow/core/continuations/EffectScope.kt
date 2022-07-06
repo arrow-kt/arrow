@@ -9,6 +9,8 @@ import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmInline
 
 /** Context of the [Effect] DSL. */
 public interface EffectScope<in R> {
@@ -212,7 +214,42 @@ public interface EffectScope<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
+
+  /**
+   * Initializes an "attempt block", which encloses an action for which
+   * you want to catch any possible `shift`ed outcome. This should be used
+   * in combination with `catch`.
+   *
+   * ```
+   * attempt { ... } catch { ... }
+   * ```
+   *
+   * The [effect] may `shift` into a different `ErrorScope`, giving
+   * the change to a later `recover` to change the shifted value.
+   * This is useful to simulate re-throwing of exceptions.
+   */
+  @OptIn(ExperimentalTypeInference::class)
+  public suspend fun <E, A> attempt(
+    @BuilderInference
+    f: suspend EffectScope<E>.() -> A,
+  ): Attempt<E, A> = Attempt(f)
+
+  /**
+   * Finishes an "attempt block" by providing the way in which to [recover]
+   * from a `shift`ed outcome. This function should be used in combination
+   * with `attempt`.
+   *
+   * ```
+   * attempt { ... } catch { ... }
+   * ```
+   */
+  public suspend infix fun <E, A> Attempt<E, A>.catch(
+    recover: EffectScope<R>.(E) -> A,
+  ): A = effect(f).fold({ recover(it) }, ::identity)
 }
+
+@JvmInline
+public value class Attempt<E, A>(public val f: suspend EffectScope<E>.() -> A)
 
 /**
  * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
@@ -241,16 +278,3 @@ public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: (
   return value ?: shift(shift())
 }
 
-/**
- * Catch any possible `shift`ed outcome from [action], and transform it with [handler].
- * This reads like a `catch` block, but for `EffectScope`.
- *
- * The [handler] may `shift` into a different `ErrorScope`, which is useful to
- * simulate re-throwing of exceptions.
- */
-public suspend fun<E, R, A> EffectScope<E>.catch(
-  f: suspend EffectScope<R>.() -> A,
-  recover: suspend EffectScope<E>.(R) -> A
-): A = effect(f).fold(
-    recover = { recover(it) }, transform = { x -> x }
-  )
