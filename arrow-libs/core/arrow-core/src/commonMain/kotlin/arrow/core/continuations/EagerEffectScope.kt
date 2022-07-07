@@ -190,16 +190,15 @@ public interface EagerEffectScope<in R> {
     if (condition) Unit else shift(shift())
 
   /**
-   * Initializes an "attempt block", which encloses an action for which
-   * you want to catch any possible `shift`ed outcome. This should be used
-   * in combination with `catch`.
+   * Encloses an action for which you want to catch any `shift`.
+   * [attempt] is used in combination with [catch].
    *
    * ```
    * attempt { ... } catch { ... }
    * ```
    *
-   * The [effect] may `shift` into a different `ErrorScope`, giving
-   * the change to a later `recover` to change the shifted value.
+   * The [f] may `shift` into a different `EagerEffectScope`, giving
+   * the chance for a later [catch] to change the shifted value.
    * This is useful to simulate re-throwing of exceptions.
    */
   @OptIn(ExperimentalTypeInference::class)
@@ -208,14 +207,32 @@ public interface EagerEffectScope<in R> {
     f: suspend EagerEffectScope<E>.() -> A,
   ): suspend EagerEffectScope<E>.() -> A = f
 
+
   /**
-   * Finishes an "attempt block" by providing the way in which to [recover]
-   * from a `shift`ed outcome. This function should be used in combination
-   * with `attempt`.
+   * When the [EagerEffect] has shifted with [R] it will [recover]
+   * the shifted value to [A], and when it ran the computation to
+   * completion it will return the value [A].
+   * [catch] is used in combination with [attempt].
    *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.None
+   * import arrow.core.Option
+   * import arrow.core.Validated
+   * import arrow.core.continuations.eagerEffect
+   * import io.kotest.assertions.fail
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun main() {
+   *   eagerEffect<String, Int> {
+   *     val x = Either.Right(1).bind()
+   *     val y = Validated.Valid(2).bind()
+   *     val z =
+   *      attempt { None.bind { "Option was empty" } } catch { 0 }
+   *     x + y + z
+   *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
    * ```
-   * attempt { ... } catch { ... }
-   * ```
+   * <!--- KNIT example-eager-effect-scope-catch.kt -->
    */
   public infix fun <E, A> (suspend EagerEffectScope<E>.() -> A).catch(
     recover: EagerEffectScope<R>.(E) -> A,
