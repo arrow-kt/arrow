@@ -337,6 +337,7 @@ public final class arrow/fx/coroutines/Resource$Bind : arrow/fx/coroutines/Resou
 
 public final class arrow/fx/coroutines/Resource$Companion {
 	public final fun defer (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public final fun getUnit ()Larrow/fx/coroutines/Resource;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public final fun just (Ljava/lang/Object;)Larrow/fx/coroutines/Resource;
 }

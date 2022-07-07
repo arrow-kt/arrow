@@ -220,6 +220,7 @@ public final class arrow/core/Either$Left : arrow/core/Either {
 }
 
 public final class arrow/core/Either$Left$Companion {
+	public final fun getLeftUnit ()Larrow/core/Either;
 }
 
 public final class arrow/core/Either$Right : arrow/core/Either {
@@ -235,6 +236,7 @@ public final class arrow/core/Either$Right : arrow/core/Either {
 }
 
 public final class arrow/core/Either$Right$Companion {
+	public final fun getUnit ()Larrow/core/Either;
 }
 
 public final class arrow/core/EitherKt {
@@ -391,6 +393,7 @@ public final class arrow/core/Eval$Now : arrow/core/Eval {
 }
 
 public final class arrow/core/Eval$Now$Companion {
+	public final fun getUnit ()Larrow/core/Eval;
 }
 
 public final class arrow/core/EvalKt {
@@ -520,6 +523,7 @@ public final class arrow/core/Ior$Right : arrow/core/Ior {
 }
 
 public final class arrow/core/Ior$Right$Companion {
+	public final fun getUnit ()Larrow/core/Ior;
 }
 
 public final class arrow/core/IorKt {
@@ -578,6 +582,7 @@ public final class arrow/core/IterableKt {
 	public static final fun flattenOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun foldMap (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun getListUnit ()Ljava/util/List;
 	public static final fun ifThen (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Iterable;
 	public static final fun interleave (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun lastOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
@@ -738,6 +743,7 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 public final class arrow/core/NonEmptyList$Companion {
 	public final fun fromList (Ljava/util/List;)Larrow/core/Option;
 	public final fun fromListUnsafe (Ljava/util/List;)Larrow/core/NonEmptyList;
+	public final fun getUnit ()Larrow/core/NonEmptyList;
 }
 
 public final class arrow/core/NonEmptyListKt {
@@ -1417,6 +1423,7 @@ public final class arrow/core/PredefKt {
 public final class arrow/core/ResultKt {
 	public static final fun composeErrors ([Ljava/lang/Throwable;)Ljava/lang/Throwable;
 	public static final fun flatMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun getUnitResult ()Ljava/lang/Object;
 	public static final fun handleErrorWith (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun redeemWith (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zip (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function10;)Ljava/lang/Object;
@@ -1504,6 +1511,7 @@ public final class arrow/core/Some : arrow/core/Option {
 }
 
 public final class arrow/core/Some$Companion {
+	public final fun getUnit ()Larrow/core/Option;
 }
 
 public final class arrow/core/SortedMapKKt {
@@ -2381,6 +2389,7 @@ public final class arrow/core/Validated$Valid : arrow/core/Validated {
 }
 
 public final class arrow/core/Validated$Valid$Companion {
+	public final fun getUnit ()Larrow/core/Validated;
 }
 
 public final class arrow/core/ValidatedKt {
@@ -2719,8 +2728,10 @@ public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/con
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getLeftState ()Ljava/util/concurrent/atomic/AtomicReference;
 	public fun maybeCombine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun setLeftState (Ljava/util/concurrent/atomic/AtomicReference;)V
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2735,8 +2746,10 @@ public final class arrow/core/continuations/IorEffectScope : arrow/core/continua
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getLeftState ()Ljava/util/concurrent/atomic/AtomicReference;
 	public fun maybeCombine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun setLeftState (Ljava/util/concurrent/atomic/AtomicReference;)V
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
