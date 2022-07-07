@@ -2,6 +2,7 @@ package arrow.optics.test.laws
 
 import arrow.core.compose
 import arrow.core.identity
+import arrow.core.test.concurrency.deprecateArrowTestModules
 import arrow.optics.Optional
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
@@ -10,8 +11,10 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
+@Deprecated(deprecateArrowTestModules)
 public object OptionalLaws {
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <A, B> laws(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -31,6 +34,7 @@ public object OptionalLaws {
   /**
    * Warning: Use only when a `Gen.constant()` applies
    */
+  @Deprecated(deprecateArrowTestModules)
   public fun <A, B> laws(
     optional: Optional<A, B>,
     aGen: Arb<A>,
@@ -40,6 +44,7 @@ public object OptionalLaws {
     eqb: (B?, B?) -> Boolean = { a, b -> a == b }
   ): List<Law> = laws(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> getOptionSet(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -52,6 +57,7 @@ public object OptionalLaws {
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> setGetOption(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -65,6 +71,7 @@ public object OptionalLaws {
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> setIdempotent(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -78,6 +85,7 @@ public object OptionalLaws {
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> modifyIdentity(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -90,6 +98,7 @@ public object OptionalLaws {
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> composeModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
@@ -103,6 +112,7 @@ public object OptionalLaws {
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> consistentSetModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,

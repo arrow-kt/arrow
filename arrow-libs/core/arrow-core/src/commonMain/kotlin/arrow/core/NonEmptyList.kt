@@ -396,6 +396,18 @@ public operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmpt
 public fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
   this.flatMap(::identity)
 
+public inline fun <A, B : Comparable<B>> NonEmptyList<A>.minBy(selector: (A) -> B): A =
+  minByOrNull(selector)!!
+
+public inline fun <A, B : Comparable<B>> NonEmptyList<A>.maxBy(selector: (A) -> B): A =
+  maxByOrNull(selector)!!
+
+public inline fun <T : Comparable<T>> NonEmptyList<T>.min(): T =
+  minOrNull()!!
+
+public inline fun <T : Comparable<T>> NonEmptyList<T>.max(): T =
+  maxOrNull()!!
+
 public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
 
