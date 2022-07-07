@@ -743,6 +743,10 @@ public final class arrow/core/NonEmptyList$Companion {
 public final class arrow/core/NonEmptyListKt {
 	public static final fun compareTo (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)I
 	public static final fun flatten (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public static final fun max (Larrow/core/NonEmptyList;)Ljava/lang/Comparable;
+	public static final fun maxBy (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun min (Larrow/core/NonEmptyList;)Ljava/lang/Comparable;
+	public static final fun minBy (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun nel (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public static final fun nonEmptyListOf (Ljava/lang/Object;[Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public static final fun sequence (Larrow/core/NonEmptyList;)Larrow/core/Either;
