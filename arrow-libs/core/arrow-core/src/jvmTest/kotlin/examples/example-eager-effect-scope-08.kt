@@ -17,3 +17,4 @@ fun main() {
      attempt { None.bind { "Option was empty" } } catch { 0 }
     x + y + z
   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
+}

@@ -248,7 +248,7 @@ public interface EffectScope<in R> {
    * import io.kotest.assertions.fail
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * suspend fun main() {
    *   effect<String, Int> {
    *     val x = Either.Right(1).bind()
    *     val y = Validated.Valid(2).bind()
@@ -256,6 +256,7 @@ public interface EffectScope<in R> {
    *      attempt { None.bind { "Option was empty" } } catch { 0 }
    *     x + y + z
    *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
+   * }
    * ```
    * <!--- KNIT example-effect-scope-09.kt -->
    */
