@@ -257,7 +257,7 @@ public interface EffectScope<in R> {
    *     x + y + z
    *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
    * ```
-   * <!--- KNIT example-effect-scope-catch.kt -->
+   * <!--- KNIT example-effect-scope-09.kt -->
    */
   public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
     recover: EffectScope<R>.(E) -> A,
@@ -283,7 +283,7 @@ public interface EffectScope<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-scope-09.kt -->
+ * <!--- KNIT example-effect-scope-10.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
