@@ -17,7 +17,7 @@ val enableCompatibilityMetadataVariant =
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
-    enabled = false
+    exclude("**/*")
   }
 }
 
