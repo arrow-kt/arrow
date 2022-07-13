@@ -97,6 +97,7 @@ import kotlin.experimental.ExperimentalTypeInference
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.continuations.resource
  *
  * class UserProcessor {
  *   fun start(): Unit = println("Creating UserProcessor")
@@ -656,7 +657,8 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  *     }
  *   }.use { files ->
  *     files.map { fileToString(it) }
- *   }.forEach(::println)
+ *   }
+ *   res.forEach(::println)
  * }
  * ```
  * <!--- KNIT example-resource-10.kt -->
@@ -700,7 +702,8 @@ public inline fun <A, B> Iterable<A>.traverse(crossinline f: (A) -> Resource<B>)
  *     }
  *   }.sequence().use { files ->
  *     files.map { fileToString(it) }
- *   }.forEach(::println)
+ *   }
+ *   res.forEach(::println)
  * }
  * ```
  * <!--- KNIT example-resource-11.kt -->

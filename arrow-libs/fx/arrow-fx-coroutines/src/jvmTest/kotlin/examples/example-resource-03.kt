@@ -2,6 +2,7 @@
 package arrow.fx.coroutines.examples.exampleResource03
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.continuations.resource
 
 class UserProcessor {
   fun start(): Unit = println("Creating UserProcessor")

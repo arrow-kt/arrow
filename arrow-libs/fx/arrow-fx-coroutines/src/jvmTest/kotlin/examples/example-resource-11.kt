@@ -26,5 +26,6 @@ suspend fun main(): Unit {
     }
   }.sequence().use { files ->
     files.map { fileToString(it) }
-  }.forEach(::println)
+  }
+  res.forEach(::println)
 }
