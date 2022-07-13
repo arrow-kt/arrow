@@ -14,7 +14,6 @@ suspend fun closeFile(file: File): Unit = file.close()
 suspend fun fileToString(file: File): String = file.toString()
 
 suspend fun main(): Unit {
-  //sampleStart
   val res: List<String> = listOf(
     "data.json",
     "user.json",
@@ -28,6 +27,5 @@ suspend fun main(): Unit {
   }.sequence().use { files ->
     files.map { fileToString(it) }
   }
-  //sampleEnd
   res.forEach(::println)
 }
