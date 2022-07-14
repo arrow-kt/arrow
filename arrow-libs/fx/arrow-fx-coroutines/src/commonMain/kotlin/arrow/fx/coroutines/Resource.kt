@@ -2,13 +2,8 @@ package arrow.fx.coroutines
 
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
-import arrow.core.NonEmptyList
-import arrow.core.ValidatedNel
 import arrow.core.identity
-import arrow.core.invalidNel
 import arrow.core.prependTo
-import arrow.core.traverse
-import arrow.core.valid
 import arrow.fx.coroutines.continuations.ResourceScope
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
@@ -17,6 +12,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
@@ -48,7 +44,6 @@ import kotlinx.coroutines.withContext
  *   suspend fun processData(): List<String> = throw RuntimeException("I'm going to leak resources by not closing them")
  * }
  *
- * //sampleStart
  * suspend fun main(): Unit {
  *   val userProcessor = UserProcessor().also { it.start() }
  *   val dataSource = DataSource().also { it.connect() }
@@ -59,11 +54,10 @@ import kotlinx.coroutines.withContext
  *   dataSource.close()
  *   userProcessor.shutdown()
  * }
- * //sampleEnd
  * ```
  * <!--- KNIT example-resource-01.kt -->
  * In the following example, we are creating and using a service that has a dependency on two resources: A database and a processor. All resources need to be closed in the correct order at the end.
- * However this program is not safe because it is prone to leaking `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
+ * However, this program is not safe because it is prone to leak `dataSource` and `userProcessor` when an exception or cancellation signal occurs whilst using the service.
  * As a consequence of the resource leak, this program does not guarantee the correct release of resources if something fails while acquiring or using the resource. Additionally manually keeping track of acquisition effects is an unnecessary overhead.
  *
  * We can split the above program into 3 different steps:
@@ -99,8 +93,11 @@ import kotlinx.coroutines.withContext
  *
  * # Using and composing Resource
  *
+ * Arrow offers the same elegant `bind` DSL for Resource as you might be familiar with from Arrow Core.
+ *
  * ```kotlin
  * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.continuations.resource
  *
  * class UserProcessor {
  *   fun start(): Unit = println("Creating UserProcessor")
@@ -119,7 +116,6 @@ import kotlinx.coroutines.withContext
  *   suspend fun processData(): List<String> = userProcessor.process(db)
  * }
  *
- * //sampleStart
  * val userProcessor = resource {
  *   UserProcessor().also(UserProcessor::start)
  * } release UserProcessor::shutdown
@@ -129,11 +125,12 @@ import kotlinx.coroutines.withContext
  * } release DataSource::close
  *
  * suspend fun main(): Unit {
- *   userProcessor.parZip(dataSource) { userProcessor, ds ->
+ *   resource {
+ *     parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
  *       Service(ds, userProcessor)
- *     }.use { service -> service.processData() }
+ *     }
+ *   }.use { service -> service.processData() }
  * }
- * //sampleEnd
  * ```
  * <!--- KNIT example-resource-03.kt -->
  *
@@ -163,7 +160,6 @@ public sealed class Resource<out A> {
    * }
    *
    * suspend fun main(): Unit {
-   *   //sampleStart
    *   val dataSource = resource {
    *     DataSource().also { it.connect() }
    *   } release DataSource::close
@@ -171,7 +167,6 @@ public sealed class Resource<out A> {
    *   val res = dataSource
    *     .use { ds -> "Using data source: ${ds.users()}" }
    *     .also(::println)
-   *   //sampleEnd
    * }
    * ```
    * <!--- KNIT example-resource-04.kt -->
@@ -196,12 +191,14 @@ public sealed class Resource<out A> {
         }
         b
       }
+
       is Allocate -> bracketCase(acquire, f, release)
       is Bind<*, *> -> Dsl {
         val any = source.bind()
         val ff = this@Resource.f as (Any?) -> Resource<A>
         ff(any).bind()
       }.use(f)
+
       is Defer -> resource().use(f)
     }
 
@@ -240,7 +237,6 @@ public sealed class Resource<out A> {
    * }
    *
    * suspend fun main(): Unit {
-   *   //sampleStart
    *   val dataSource = resource {
    *     DataSource().also { it.connect() }
    *   } release DataSource::close
@@ -252,7 +248,6 @@ public sealed class Resource<out A> {
    *
    *   dataSource.flatMap(::database)
    *     .use { println("Using database which uses dataSource") }
-   *   //sampleEnd
    * }
    * ```
    * <!--- KNIT example-resource-05.kt -->
@@ -301,7 +296,6 @@ public sealed class Resource<out A> {
    *   suspend fun processData(): List<String> = userProcessor.process(db)
    * }
    *
-   * //sampleStart
    * val userProcessor = resource {
    *   UserProcessor().also(UserProcessor::start)
    * } release UserProcessor::shutdown
@@ -315,7 +309,6 @@ public sealed class Resource<out A> {
    *       Service(ds, userProcessor)
    *     }.use { service -> service.processData() }
    * }
-   * //sampleEnd
    * ```
    * <!--- KNIT example-resource-06.kt -->
    *
@@ -325,7 +318,7 @@ public sealed class Resource<out A> {
   public inline fun <B, C, D> zip(
     b: Resource<B>,
     c: Resource<C>,
-    crossinline map: (A, B, C) -> D
+    crossinline map: (A, B, C) -> D,
   ): Resource<D> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind())
@@ -335,18 +328,18 @@ public sealed class Resource<out A> {
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
-    crossinline map: (A, B, C, D) -> E
+    crossinline map: (A, B, C, D) -> E,
   ): Resource<E> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind())
     }
 
-  public inline fun <B, C, D, E, F, G> zip(
+  public inline fun <B, C, D, E, G> zip(
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
     e: Resource<E>,
-    crossinline map: (A, B, C, D, E) -> G
+    crossinline map: (A, B, C, D, E) -> G,
   ): Resource<G> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind())
@@ -358,7 +351,7 @@ public sealed class Resource<out A> {
     d: Resource<D>,
     e: Resource<E>,
     f: Resource<F>,
-    crossinline map: (A, B, C, D, E, F) -> G
+    crossinline map: (A, B, C, D, E, F) -> G,
   ): Resource<G> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind())
@@ -371,7 +364,7 @@ public sealed class Resource<out A> {
     e: Resource<E>,
     f: Resource<F>,
     g: Resource<G>,
-    crossinline map: (A, B, C, D, E, F, G) -> H
+    crossinline map: (A, B, C, D, E, F, G) -> H,
   ): Resource<H> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind())
@@ -385,7 +378,7 @@ public sealed class Resource<out A> {
     f: Resource<F>,
     g: Resource<G>,
     h: Resource<H>,
-    crossinline map: (A, B, C, D, E, F, G, H) -> I
+    crossinline map: (A, B, C, D, E, F, G, H) -> I,
   ): Resource<I> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind())
@@ -400,7 +393,7 @@ public sealed class Resource<out A> {
     g: Resource<G>,
     h: Resource<H>,
     i: Resource<I>,
-    crossinline map: (A, B, C, D, E, F, G, H, I) -> J
+    crossinline map: (A, B, C, D, E, F, G, H, I) -> J,
   ): Resource<J> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind())
@@ -416,7 +409,7 @@ public sealed class Resource<out A> {
     h: Resource<H>,
     i: Resource<I>,
     j: Resource<J>,
-    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K
+    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K,
   ): Resource<K> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind())
@@ -452,7 +445,6 @@ public sealed class Resource<out A> {
    *   suspend fun processData(): List<String> = userProcessor.process(db)
    * }
    *
-   * //sampleStart
    * val userProcessor = resource {
    *   UserProcessor().also { it.start() }
    * } release UserProcessor::shutdown
@@ -466,14 +458,13 @@ public sealed class Resource<out A> {
    *       Service(ds, userProcessor)
    *     }.use { service -> service.processData() }
    * }
-   * //sampleEnd
    * ```
    * <!--- KNIT example-resource-07.kt -->
    */
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
     fb: Resource<B>,
-    f: suspend (A, B) -> C
+    f: suspend (A, B) -> C,
   ): Resource<C> =
     arrow.fx.coroutines.continuations.resource {
       parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
@@ -490,7 +481,7 @@ public sealed class Resource<out A> {
 
   public class Allocate<A>(
     public val acquire: suspend () -> A,
-    public val release: suspend (A, ExitCase) -> Unit
+    public val release: suspend (A, ExitCase) -> Unit,
   ) : Resource<A>()
 
   @Deprecated(
@@ -507,6 +498,7 @@ public sealed class Resource<out A> {
   public companion object {
 
     @PublishedApi
+    @Deprecated("This will be removed from the binary in Arrow 2.0", level = DeprecationLevel.ERROR)
     internal val unit: Resource<Unit> = just(Unit)
 
     /**
@@ -519,19 +511,17 @@ public sealed class Resource<out A> {
      * suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
      *
      * suspend fun main(): Unit {
-     *   //sampleStart
      *   val resource = Resource(::acquireResource, ::releaseResource)
      *   resource.use {
      *     println("Expensive resource under use! $it")
      *   }
-     *   //sampleEnd
      * }
      * ```
      * <!--- KNIT example-resource-08.kt -->
      */
     public operator fun <A> invoke(
       acquire: suspend () -> A,
-      release: suspend (A, ExitCase) -> Unit
+      release: suspend (A, ExitCase) -> Unit,
     ): Resource<A> = Allocate(acquire, release)
 
     /**
@@ -630,6 +620,14 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
     Resource({ a }, { _, ex -> release(a, ex) }).bind()
   }
 
+@Deprecated("traverseResource is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)"))
+public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
+  arrow.fx.coroutines.continuations.resource {
+    map { a ->
+      f(a).bind()
+    }
+  }
+
 /**
  * Traverse this [Iterable] and collects the resulting `Resource<B>` of [f] into a `Resource<List<B>>`.
  *
@@ -647,12 +645,11 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  * suspend fun fileToString(file: File): String = file.toString()
  *
  * suspend fun main(): Unit {
- *   //sampleStart
  *   val res: List<String> = listOf(
  *     "data.json",
  *     "user.json",
  *     "resource.json"
- *   ).traverseResource { uri ->
+ *   ).traverse { uri ->
  *     resource {
  *      openFile(uri)
  *     } release { file ->
@@ -661,13 +658,14 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  *   }.use { files ->
  *     files.map { fileToString(it) }
  *   }
- *   //sampleEnd
  *   res.forEach(::println)
  * }
  * ```
  * <!--- KNIT example-resource-10.kt -->
  */
-public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> Iterable<A>.traverse(crossinline f: (A) -> Resource<B>): Resource<List<B>> =
   arrow.fx.coroutines.continuations.resource {
     map { a ->
       f(a).bind()
@@ -676,7 +674,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
 
 /**
  * Sequences this [Iterable] of [Resource]s.
- * [Iterable.map] and [sequence] is equivalent to [traverseResource].
+ * [Iterable.map] and [sequence] is equivalent to [traverse].
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -692,7 +690,6 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  * suspend fun fileToString(file: File): String = file.toString()
  *
  * suspend fun main(): Unit {
- *   //sampleStart
  *   val res: List<String> = listOf(
  *     "data.json",
  *     "user.json",
@@ -706,7 +703,6 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  *   }.sequence().use { files ->
  *     files.map { fileToString(it) }
  *   }
- *   //sampleEnd
  *   res.forEach(::println)
  * }
  * ```
@@ -714,7 +710,35 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  */
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =
-  traverseResource(::identity)
+  traverse(::identity)
+
+/**
+ * Runs [Resource.use] and emits [A] of the resource
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
+ * fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
+ *   Resource.fromCloseable { path.toFile().outputStream() }
+ *     .asFlow()
+ *     .flatMapConcat { writer -> byteFlow.map { writer.write(it) } }
+ *     .flowOn(Dispatchers.IO)
+ *
+ * fun Path.readAll(): Flow<String> = flow {
+ *   path.useLines { lines -> emitAll(lines) }
+ * }
+ *
+ * Path("example.kt")
+ *   .readAll()
+ *   .
+ * ```
+ */
+public fun <A> Resource<A>.asFlow(): Flow<A> =
+  flow {
+    use {
+      emit(it)
+    }
+  }
 
 private class ResourceScopeImpl : ResourceScope {
   val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList())
@@ -735,6 +759,7 @@ private class ResourceScopeImpl : ResourceScope {
           Platform.composeErrors(e, e2)?.let { throw it }
         }
       })
+
       is Resource.Bind<*, *> -> {
         val dsl: suspend ResourceScope.() -> A = {
           val any = source.bind()
@@ -743,34 +768,17 @@ private class ResourceScopeImpl : ResourceScope {
         }
         dsl(this@ResourceScopeImpl)
       }
+
       is Resource.Defer -> resource().bind()
     }
 }
 
-// Version that doesn't rethrow `CancellationException` because we need to run all finalizers regardless of CancellationException
-private inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
-  try {
-    f().valid()
-  } catch (e: Throwable) {
-    e.invalidNel()
-  }
-
 private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   exitCase: ExitCase,
-  first: Throwable? = null
-): Throwable? = traverse { f ->
-  catchNel { f(exitCase) }
-}.fold({
-  if (first != null) Platform.composeErrors(NonEmptyList(first, it))
-  else Platform.composeErrors(it)
-}, { first })
-
-/**
- * runs [Resource.use] and emits [A] of the resource
- */
-public fun <A> Resource<A>.asFlow(): Flow<A> =
-  flow {
-    use {
-      emit(it)
-    }
-  }
+  first: Throwable? = null,
+): Throwable? = fold(first) { acc, finalizer ->
+  val other = kotlin.runCatching { finalizer(exitCase) }.exceptionOrNull()
+  other?.let {
+    acc?.apply { addSuppressed(other) } ?: other
+  } ?: acc
+}

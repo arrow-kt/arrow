@@ -2,6 +2,7 @@
 package arrow.fx.coroutines.examples.exampleResource03
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.continuations.resource
 
 class UserProcessor {
   fun start(): Unit = println("Creating UserProcessor")
@@ -29,7 +30,9 @@ val dataSource = resource {
 } release DataSource::close
 
 suspend fun main(): Unit {
-  userProcessor.parZip(dataSource) { userProcessor, ds ->
+  resource {
+    parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
       Service(ds, userProcessor)
-    }.use { service -> service.processData() }
+    }
+  }.use { service -> service.processData() }
 }
