@@ -9,6 +9,8 @@ import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 /** Context of the [Effect] DSL. */
 public interface EffectScope<in R> {
@@ -29,7 +31,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
-
+  
   /**
    * Runs the [Effect] to finish, returning [B] or [shift] in case of [R].
    *
@@ -54,8 +56,11 @@ public interface EffectScope<in R> {
    * ```
    * <!--- KNIT example-effect-scope-02.kt -->
    */
-  public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectScope::shift, ::identity)
-
+  public suspend fun <B> Effect<R, B>.bind(): B =
+    when (this) {
+      is DefaultEffect -> f(this@EffectScope)
+    }
+  
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
    * bridging eager computations into suspending.
@@ -88,7 +93,7 @@ public interface EffectScope<in R> {
     fold({ r -> left = r }, { a -> right = a })
     return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
-
+  
   /**
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
@@ -112,7 +117,7 @@ public interface EffectScope<in R> {
       is Either.Left -> shift(value)
       is Either.Right -> value
     }
-
+  
   /**
    * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
    *
@@ -136,7 +141,7 @@ public interface EffectScope<in R> {
       is Validated.Valid -> value
       is Validated.Invalid -> shift(value)
     }
-
+  
   /**
    * Folds [Result] into [Effect], by returning [B] or a transforming [Throwable] into [R] and
    * shifting the result.
@@ -159,7 +164,7 @@ public interface EffectScope<in R> {
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
-
+  
   /**
    * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
    * result.
@@ -188,7 +193,7 @@ public interface EffectScope<in R> {
       None -> shift(shift())
       is Some -> value
     }
-
+  
   /**
    * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
    * Monadic version of [kotlin.require].
@@ -239,4 +244,71 @@ public interface EffectScope<in R> {
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
+}
+
+/**
+ * DSL for constructing Effect<R, A> values
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Validated
+ * import arrow.core.continuations.effect
+ * import io.kotest.assertions.fail
+ * import io.kotest.matchers.shouldBe
+ *
+ * suspend fun main() {
+ *   effect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z = Option(3).bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
+ *
+ *   effect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z: Int = None.bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
+ * }
+ * ```
+ * <!--- KNIT example-effect-02.kt -->
+ */
+public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
+
+private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
+  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
+  // folds
+  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
+    suspendCoroutineUninterceptedOrReturn { cont ->
+      val token = Token()
+      val effectScope =
+        object : EffectScope<R> {
+          // Shift away from this Continuation by intercepting it, and completing it with
+          // ShiftCancellationException
+          // This is needed because this function will never yield a result,
+          // so it needs to be cancelled to properly support coroutine cancellation
+          override suspend fun <B> shift(r: R): B =
+          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+          // We have to throw CancellationException to signal the Continuation was cancelled, and we
+          // shifted away.
+          // This however also means that the user can try/catch shift and recover from the
+          // CancellationException and thus effectively recovering from the cancellation/shift.
+          // This means try/catch is also capable of recovering from monadic errors.
+            // See: EffectSpec - try/catch tests
+            throw Suspend(token, r, recover as suspend (Any?) -> Any?)
+        }
+      
+      try {
+        suspend { transform(f(effectScope)) }
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+      } catch (e: Suspend) {
+        if (token == e.token) {
+          val f: suspend () -> B = { e.recover(e.shifted) as B }
+          f.startCoroutineUninterceptedOrReturn(cont)
+        } else throw e
+      }
+    }
 }

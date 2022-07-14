@@ -2683,7 +2683,6 @@ public final class arrow/core/continuations/Effect$DefaultImpls {
 }
 
 public final class arrow/core/continuations/EffectKt {
-	public static final fun effect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public static final fun merge (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2709,6 +2708,7 @@ public final class arrow/core/continuations/EffectScope$DefaultImpls {
 }
 
 public final class arrow/core/continuations/EffectScopeKt {
+	public static final fun effect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/Effect;
 	public static final fun ensureNotNull (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

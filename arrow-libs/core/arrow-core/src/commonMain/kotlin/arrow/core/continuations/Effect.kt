@@ -568,7 +568,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public interface Effect<out R, out A> {
+public sealed interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
@@ -704,6 +704,10 @@ internal class Token {
  * the result.
  */
 @PublishedApi
+@Deprecated(
+  "This will become private in Arrow 2.0, and is not going to be visible from binary anymore",
+  level = DeprecationLevel.WARNING
+)
 internal class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
@@ -720,73 +724,6 @@ internal class FoldContinuation<B>(
       } else parent.resumeWith(result)
     }
   }
-}
-
-/**
- * DSL for constructing Effect<R, A> values
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Validated
- * import arrow.core.continuations.effect
- * import io.kotest.assertions.fail
- * import io.kotest.matchers.shouldBe
- *
- * suspend fun main() {
- *   effect<String, Int> {
- *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z = Option(3).bind { "Option was empty" }
- *     x + y + z
- *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
- *
- *   effect<String, Int> {
- *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z: Int = None.bind { "Option was empty" }
- *     x + y + z
- *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
- * }
- * ```
- * <!--- KNIT example-effect-02.kt -->
- */
-public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
-
-private class DefaultEffect<R, A>(private val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
-  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
-  // folds
-  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-    suspendCoroutineUninterceptedOrReturn { cont ->
-      val token = Token()
-      val effectScope =
-        object : EffectScope<R> {
-          // Shift away from this Continuation by intercepting it, and completing it with
-          // ShiftCancellationException
-          // This is needed because this function will never yield a result,
-          // so it needs to be cancelled to properly support coroutine cancellation
-          override suspend fun <B> shift(r: R): B =
-          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-          // We have to throw CancellationException to signal the Continuation was cancelled, and we
-          // shifted away.
-          // This however also means that the user can try/catch shift and recover from the
-          // CancellationException and thus effectively recovering from the cancellation/shift.
-          // This means try/catch is also capable of recovering from monadic errors.
-            // See: EffectSpec - try/catch tests
-            throw Suspend(token, r, recover as suspend (Any?) -> Any?)
-        }
-
-      try {
-        suspend { transform(f(effectScope)) }
-          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-      } catch (e: Suspend) {
-        if (token == e.token) {
-          val f: suspend () -> B = { e.recover(e.shifted) as B }
-          f.startCoroutineUninterceptedOrReturn(cont)
-        } else throw e
-      }
-    }
 }
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
