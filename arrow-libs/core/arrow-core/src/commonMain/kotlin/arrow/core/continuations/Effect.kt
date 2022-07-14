@@ -726,8 +726,6 @@ internal class FoldContinuation<B>(
   }
 }
 
-public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
-
 /**
  * DSL for constructing Effect<R, A> values
  *
@@ -798,3 +796,5 @@ internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effe
       }
     }
 }
+
+public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
