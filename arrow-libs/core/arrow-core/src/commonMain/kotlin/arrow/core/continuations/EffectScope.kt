@@ -9,8 +9,6 @@ import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 /** Context of the [Effect] DSL. */
 public interface EffectScope<in R> {
@@ -31,7 +29,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
-  
+
   /**
    * Runs the [Effect] to finish, returning [B] or [shift] in case of [R].
    *
@@ -60,7 +58,7 @@ public interface EffectScope<in R> {
     when (this) {
       is DefaultEffect -> f(this@EffectScope)
     }
-  
+
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
    * bridging eager computations into suspending.
@@ -93,7 +91,7 @@ public interface EffectScope<in R> {
     fold({ r -> left = r }, { a -> right = a })
     return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
-  
+
   /**
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
@@ -117,7 +115,7 @@ public interface EffectScope<in R> {
       is Either.Left -> shift(value)
       is Either.Right -> value
     }
-  
+
   /**
    * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
    *
@@ -141,7 +139,7 @@ public interface EffectScope<in R> {
       is Validated.Valid -> value
       is Validated.Invalid -> shift(value)
     }
-  
+
   /**
    * Folds [Result] into [Effect], by returning [B] or a transforming [Throwable] into [R] and
    * shifting the result.
@@ -164,7 +162,7 @@ public interface EffectScope<in R> {
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
-  
+
   /**
    * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
    * result.
@@ -193,7 +191,7 @@ public interface EffectScope<in R> {
       None -> shift(shift())
       is Some -> value
     }
-  
+
   /**
    * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
    * Monadic version of [kotlin.require].
