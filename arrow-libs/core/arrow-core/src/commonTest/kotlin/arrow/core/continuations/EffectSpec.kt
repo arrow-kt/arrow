@@ -243,7 +243,7 @@ class EffectSpec :
       } shouldBe Either.Left(e)
     }
     
-    "Dispatching in nested Effect causes incorrect behavior" {
+    "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
