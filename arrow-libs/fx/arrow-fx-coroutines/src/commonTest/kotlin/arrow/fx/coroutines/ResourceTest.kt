@@ -41,7 +41,7 @@ class ResourceTest : ArrowFxSpec(
         r(a).flatMap { r(it + b) }
           .use { it + 1 } shouldBe (a + b) + 1
 
-        l.shouldContainExactly(a, a + b, - a - b, -a)
+        l.shouldContainExactly(a, a + b, -a - b, -a)
       }
     }
 
@@ -90,39 +90,39 @@ class ResourceTest : ArrowFxSpec(
         Arb.list(Arb.int()),
         Arb.functionAToB<Int, String>(Arb.string())
       ) { list, f ->
-        list.traverseResource { Resource.just(f(it)) } resourceShouldBe Resource.just(list.map(f))
+        list.traverse { Resource.just(f(it)) } resourceShouldBe Resource.just(list.map(f))
       }
     }
 
-    "traverseResource: map + sequence == traverse" {
+    "traverse: map + sequence == traverse" {
       checkAll(
         Arb.list(Arb.int()),
         Arb.string().map { { _: Int -> Resource.just(it) } }
       ) { list, f ->
-        list.traverseResource(f) resourceShouldBe list.map(f).sequence()
+        list.traverse(f) resourceShouldBe list.map(f).sequence()
       }
     }
-    "traverseResource: parallelComposition" {
+    "traverse: parallelComposition" {
       checkAll(
         Arb.list(Arb.int()),
         Arb.functionAToB<Int, String>(Arb.string()),
         Arb.functionAToB<Int, String>(Arb.string())
       ) { list, f, g ->
 
-        val ff = list.traverseResource { Resource.just(f(it)) }
-        val gg = list.traverseResource { Resource.just(g(it)) }
+        val ff = list.traverse { Resource.just(f(it)) }
+        val gg = list.traverse { Resource.just(g(it)) }
 
         val result = ff.zip(gg).map { (a, b) ->
           a.zip(b)
         }
 
-        list.traverseResource { Resource.just(f(it) to g(it)) } resourceShouldBe result
+        list.traverse { Resource.just(f(it) to g(it)) } resourceShouldBe result
       }
     }
 
-    "traverseResource: leftToRight" {
+    "traverse: leftToRight" {
       checkAll(Arb.list(Arb.int())) { list ->
-        list.traverseResource { Resource.just(it) }
+        list.traverse { Resource.just(it) }
           .use(::identity) shouldBe list
       }
     }
@@ -154,8 +154,8 @@ class ResourceTest : ArrowFxSpec(
       Resource({ CheckableAutoClose() }) { a, _ -> a.close() }
 
     "parZip - success" {
-      val all = (1..depth).traverseResource { closeable() }.parZip(
-        (1..depth).traverseResource { closeable() }
+      val all = (1..depth).traverse { closeable() }.parZip(
+        (1..depth).traverse { closeable() }
       ) { a, b -> a + b }.use { all ->
         all.also { all.forEach { it.started shouldBe true } }
       }

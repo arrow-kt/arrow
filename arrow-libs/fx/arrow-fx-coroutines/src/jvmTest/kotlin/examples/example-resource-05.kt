@@ -16,7 +16,6 @@ class Database(private val database: DataSource) {
 }
 
 suspend fun main(): Unit {
-  //sampleStart
   val dataSource = resource {
     DataSource().also { it.connect() }
   } release DataSource::close
@@ -28,5 +27,4 @@ suspend fun main(): Unit {
 
   dataSource.flatMap(::database)
     .use { println("Using database which uses dataSource") }
-  //sampleEnd
 }
