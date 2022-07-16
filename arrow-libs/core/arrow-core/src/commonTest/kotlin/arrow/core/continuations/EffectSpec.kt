@@ -21,6 +21,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class EffectSpec :
   StringSpec({
@@ -241,7 +242,26 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
+    
+    "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
+      checkAll(Arb.string()) { msg ->
+        fun failure(): Effect<Failure, String> = effect {
+          withContext(Dispatchers.Default) {}
+          shift(Failure(msg))
+        }
+        
+        effect<Failure, Int> {
+          failure().bind()
+          1
+        }.fold(
+          recover = { it },
+          transform = { fail("Should never come here") },
+        ) shouldBe Failure(msg)
+      }
+    }
   })
+
+private data class Failure(val msg: String)
 
 suspend fun currentContext(): CoroutineContext = kotlin.coroutines.coroutineContext
 

@@ -54,7 +54,10 @@ public interface EffectScope<in R> {
    * ```
    * <!--- KNIT example-effect-scope-02.kt -->
    */
-  public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectScope::shift, ::identity)
+  public suspend fun <B> Effect<R, B>.bind(): B =
+    when (this) {
+      is DefaultEffect -> f(this@EffectScope)
+    }
 
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
