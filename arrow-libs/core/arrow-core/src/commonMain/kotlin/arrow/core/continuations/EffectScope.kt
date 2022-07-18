@@ -261,7 +261,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-09.kt -->
    */
   public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
-    recover: EffectScope<R>.(E) -> A,
+    recover: suspend EffectScope<R>.(E) -> A,
   ): A = effect(this).fold({ recover(it) }, ::identity)
 }
 
