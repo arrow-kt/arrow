@@ -236,7 +236,7 @@ public interface EagerEffectScope<in R> {
    * <!--- KNIT example-eager-effect-scope-08.kt -->
    */
   public infix fun <E, A> (suspend EagerEffectScope<E>.() -> A).catch(
-    recover: EagerEffectScope<R>.(E) -> A,
+    recover: suspend EagerEffectScope<R>.(E) -> A,
   ): A = eagerEffect(this).fold({ recover(it) }, ::identity)
 }
 
