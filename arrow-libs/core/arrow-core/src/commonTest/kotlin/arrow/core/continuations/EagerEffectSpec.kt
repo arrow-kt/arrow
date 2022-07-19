@@ -57,6 +57,14 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
+  "can map over left value" {
+    checkAll(Arb.string()) { a ->
+      eagerEffect<String, Nothing> { shift(a) }
+        .mapLeft { a.length }
+        .fold(::identity) { fail("Should never come here") } shouldBe a.length
+    }
+  }
+
   "immediate values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
 
   "immediate short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }

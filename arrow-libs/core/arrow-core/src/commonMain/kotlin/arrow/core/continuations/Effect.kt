@@ -662,6 +662,11 @@ public sealed interface Effect<out R, out A> {
     fold({ recover(it).bind() }, ::identity)
   }
 
+  public fun <R2> mapLeft(f: (R) -> R2): Effect<R2, A> =
+    handleErrorWith {
+      effect { shift(f(it)) }
+    }
+
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
     effect {
       fold(recover, transform)

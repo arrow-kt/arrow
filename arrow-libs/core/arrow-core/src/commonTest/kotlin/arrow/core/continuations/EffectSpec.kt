@@ -133,6 +133,14 @@ class EffectSpec :
       }
     }
 
+    "can map over left value" {
+      checkAll(Arb.string()) { a ->
+        effect<String, Nothing> { shift(a) }
+          .mapLeft { a.length }
+          .fold(::identity) { fail("Should never come here") } shouldBe a.length
+      }
+    }
+
     "immediate values" { effect<Nothing, Int> { 1 }.value() shouldBe 1 }
 
     "suspended value" { effect<Nothing, Int> { 1.suspend() }.value() shouldBe 1 }
@@ -242,14 +250,14 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
-    
+
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
-        
+
         effect<Failure, Int> {
           failure().bind()
           1
