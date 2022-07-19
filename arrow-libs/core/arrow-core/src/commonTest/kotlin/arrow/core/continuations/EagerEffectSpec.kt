@@ -60,7 +60,7 @@ class EagerEffectSpec : StringSpec({
   "can map over left value" {
     checkAll(Arb.string()) { a ->
       eagerEffect<String, Nothing> { shift(a) }
-        .mapLeft { a.length }
+        .mapLeft { it.length }
         .fold(::identity) { fail("Should never come here") } shouldBe a.length
     }
   }

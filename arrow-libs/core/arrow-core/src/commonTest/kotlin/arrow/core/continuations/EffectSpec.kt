@@ -136,7 +136,7 @@ class EffectSpec :
     "can map over left value" {
       checkAll(Arb.string()) { a ->
         effect<String, Nothing> { shift(a) }
-          .mapLeft { a.length }
+          .mapLeft { it.length }
           .fold(::identity) { fail("Should never come here") } shouldBe a.length
       }
     }
