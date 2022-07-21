@@ -17,7 +17,7 @@
         {% assign stable_base_doc_link = site.data.commons.stable_version | append: 'docs/' %}
         <a href="{{ stable_base_doc_link | append: doc-link }}">
           <span>
-            {{ stable_version.title }} - {{ site.data.doc-versions.stable }}
+            {{ site.data.doc-versions.stable }} - {{ stable_version.title }}
           </span>
         </a>
       </li>
@@ -25,29 +25,13 @@
       <li>
         <a href="{{ next_version.url | append: doc-link }}">
           <span>
-            {{ next_version.title }} - {{ site.data.doc-versions.next }}
+            {{ next_version.title }}
           </span>
-        </a>
-      </li>
-
-      <li>
-        <a href="{{ previous_version.url | append: doc-link }}">
-          <span>
-            {{ previous_version.title }} - {{ site.data.doc-versions.previous }}
-          </span>
-        </a>
-      </li>
-
-      <li>
-        <a href="https://arrow-kt.io/docs/0.9/">
-          <span>v0.9.0</span>
         </a>
       </li>
 
       {% for item in site.data.doc-versions.docVersions %}
-      {% if item.url != stable_version.url
-            and item.url != next_version.url
-            and item.url != previous_version.url %}
+      {% if item.url != stable_version.url and item.url != next_version.url %}
       <li>
         <a href="{{ item.url | append: doc-link }}">
           <span>{{ item.title }}</span>
