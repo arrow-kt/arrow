@@ -664,7 +664,7 @@ public sealed interface Effect<out R, out A> {
 
   public fun <R2> mapLeft(f: (R) -> R2): Effect<R2, A> =
     effect {
-      fold({ shift(f(it)) }, { it })
+      fold({ shift(f(it)) }, ::identity)
     }
 
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =

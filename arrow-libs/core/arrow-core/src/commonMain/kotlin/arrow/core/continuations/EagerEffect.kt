@@ -117,7 +117,7 @@ public interface EagerEffect<out R, out A> {
 
   public fun <R2> mapLeft(f: (R) -> R2): EagerEffect<R2, A> =
     eagerEffect {
-      toEither().fold({ shift(f(it)) }, { it })
+      toEither().fold({ shift(f(it)) }, ::identity)
     }
 
   public fun <B> redeem(f: (R) -> B, g: (A) -> B): EagerEffect<Nothing, B> = eagerEffect {
