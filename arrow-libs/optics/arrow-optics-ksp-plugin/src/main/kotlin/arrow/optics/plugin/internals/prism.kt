@@ -12,7 +12,7 @@ internal fun generatePrisms(ele: ADT, target: PrismTarget) =
 private fun processElement(ele: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n\n") { focus ->
     """
-  |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()= $Prism(
+  |${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()= $Prism(
   |  getOrModify = { ${ele.sourceName}: ${ele.sourceClassName} ->
   |    when (${ele.sourceName}) {
   |      is ${focus.className} -> ${ele.sourceName}.right()
