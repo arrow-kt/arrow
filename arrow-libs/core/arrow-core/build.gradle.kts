@@ -58,6 +58,11 @@ kotlin {
   }
 }
 
+// enables Opt in annotations for Maybe
+tasks.withType<KotlinCompile>().configureEach {
+  kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+}
+
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
