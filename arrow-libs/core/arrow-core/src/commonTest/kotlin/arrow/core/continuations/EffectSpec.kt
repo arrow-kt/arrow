@@ -10,6 +10,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -106,6 +107,32 @@ class EffectSpec :
           shift(s2.suspend())
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s2
+      }
+    }
+
+    "attempt - catch" {
+      checkAll(Arb.int(), Arb.long()) { i, l ->
+        effect<String, Int> {
+          attempt<Long, Int> {
+            shift(l)
+          } catch { ll ->
+            ll shouldBe l
+            i
+          }
+        }.runCont() shouldBe i
+      }
+    }
+
+    "attempt - no catch" {
+      checkAll(Arb.int(), Arb.long()) { i, l ->
+        effect<String, Int> {
+          attempt<Long, Int> {
+            i
+          } catch { ll ->
+            ll shouldBe l
+            i + 1
+          }
+        }.runCont() shouldBe i
       }
     }
 
