@@ -25,7 +25,7 @@ jobs:
           java-version: 11
 
       - name: Gradle build
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@v2.2.2
         with:
           arguments: --full-stacktrace build "-Psemver.stage=alpha"
 
@@ -52,7 +52,7 @@ jobs:
           java-version: 11
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@v2.2.2
         with:
           arguments: --full-stacktrace createSemverTag "-Psemver.stage=alpha"
 
