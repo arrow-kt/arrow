@@ -2,6 +2,7 @@ package arrow.core.test.laws
 
 import arrow.continuations.Effect
 import arrow.core.Either
+import arrow.core.test.concurrency.deprecateArrowTestModules
 import arrow.core.test.generators.throwable
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
@@ -17,8 +18,10 @@ import kotlin.coroutines.startCoroutine
 private typealias EagerFxBlock<Eff, F, A> = (suspend Eff.() -> A) -> F
 private typealias SuspendFxBlock<Eff, F, A> = suspend (suspend Eff.() -> A) -> F
 
+@Deprecated(deprecateArrowTestModules)
 public object FxLaws {
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <Eff : Effect<*>, F, A> suspended(
     pureArb: Arb<F>,
     G: Arb<F>,
@@ -44,6 +47,7 @@ public object FxLaws {
     }
   )
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <Eff : Effect<*>, F, A> eager(
     pureArb: Arb<F>,
     G: Arb<F>,
@@ -157,6 +161,7 @@ public object FxLaws {
 }
 
 // TODO expose for tests
+@Deprecated(deprecateArrowTestModules)
 internal suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { throw this }.startCoroutine(
@@ -168,6 +173,7 @@ internal suspend fun Throwable.suspend(): Nothing =
     COROUTINE_SUSPENDED
   }
 
+@Deprecated(deprecateArrowTestModules)
 internal suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { this }.startCoroutine(

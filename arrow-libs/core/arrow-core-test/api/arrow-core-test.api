@@ -55,6 +55,10 @@ public final class arrow/core/test/concurrency/SideEffect {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/core/test/concurrency/SideEffectKt {
+	public static final field deprecateArrowTestModules Ljava/lang/String;
+}
+
 public final class arrow/core/test/generators/GeneratorsJvmKt {
 	public static final fun fatalThrowable (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun suspendFunThatThrowsFatalThrowable (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;

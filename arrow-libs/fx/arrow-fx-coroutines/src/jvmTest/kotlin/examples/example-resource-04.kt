@@ -10,7 +10,6 @@ class DataSource {
 }
 
 suspend fun main(): Unit {
-  //sampleStart
   val dataSource = resource {
     DataSource().also { it.connect() }
   } release DataSource::close
@@ -18,5 +17,4 @@ suspend fun main(): Unit {
   val res = dataSource
     .use { ds -> "Using data source: ${ds.users()}" }
     .also(::println)
-  //sampleEnd
 }

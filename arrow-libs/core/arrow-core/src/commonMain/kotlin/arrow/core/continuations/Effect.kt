@@ -568,7 +568,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public interface Effect<out R, out A> {
+public sealed interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
@@ -704,6 +704,10 @@ internal class Token {
  * the result.
  */
 @PublishedApi
+@Deprecated(
+  "This will become private in Arrow 2.0, and is not going to be visible from binary anymore",
+  level = DeprecationLevel.WARNING
+)
 internal class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
@@ -754,7 +758,11 @@ internal class FoldContinuation<B>(
  */
 public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
-private class DefaultEffect<R, A>(private val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
+@Deprecated(
+  "This will be removed in Arrow 2.0",
+  level = DeprecationLevel.WARNING
+)
+internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested
   // folds
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
@@ -788,3 +796,5 @@ private class DefaultEffect<R, A>(private val f: suspend EffectScope<R>.() -> A)
       }
     }
 }
+
+public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)

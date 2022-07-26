@@ -267,5 +267,46 @@ class NonEmptyListTest : UnitSpec() {
         result shouldBe expected
       }
     }
+
+    "max element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.max()
+        val expected = a.maxOrNull()
+        result shouldBe expected
+      }
+    }
+
+    "maxBy element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.maxBy(::identity)
+        val expected = a.maxByOrNull(::identity)
+        result shouldBe expected
+      }
+    }
+
+    "min element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.min()
+        val expected = a.minOrNull()
+        result shouldBe expected
+      }
+    }
+
+
+    "minBy element" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.minBy(::identity)
+        val expected = a.minByOrNull(::identity)
+        result shouldBe expected
+      }
+    }
   }
 }

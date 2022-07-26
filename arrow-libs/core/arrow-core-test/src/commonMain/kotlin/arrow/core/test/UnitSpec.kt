@@ -1,6 +1,7 @@
 package arrow.core.test
 
 import arrow.core.*
+import arrow.core.test.concurrency.deprecateArrowTestModules
 import arrow.core.test.generators.unit
 import arrow.core.test.laws.Law
 import io.kotest.core.names.TestName
@@ -22,17 +23,21 @@ import kotlin.math.max
 /**
  * Base class for unit tests
  */
+@Deprecated(deprecateArrowTestModules)
 public abstract class UnitSpec(
   public val iterations: Int = 250,
   public val maxDepth: Int = 15,
   spec: UnitSpec.() -> Unit = {}
 ) : StringSpec() {
 
+  @Deprecated(deprecateArrowTestModules)
   public constructor(spec: UnitSpec.() -> Unit) : this(250, 15, spec)
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <A> Arb.Companion.list(gen: Gen<A>, range: IntRange = 0..maxDepth): Arb<List<A>> =
     Arb.KList(gen, range)
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, depth: Int = maxDepth): Arb<NonEmptyList<A>> {
     return Arb.list(arb, 1..max(1, depth))
       .map { Option.fromNullable(it.toNonEmptyListOrNull()) }
@@ -40,13 +45,16 @@ public abstract class UnitSpec(
       .map { it.value }
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <A> Arb.Companion.sequence(arbA: Arb<A>, range: IntRange = 0..maxDepth): Arb<Sequence<A>> =
     Arb.list(arbA, range).map { it.asSequence() }
 
   @JvmOverloads
+  @Deprecated(deprecateArrowTestModules)
   public inline fun <reified A> Arb.Companion.array(gen: Arb<A>, range: IntRange = 0..maxDepth): Arb<Array<A>> =
     Arb.list(gen, range).map { it.toTypedArray() }
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <K, V> Arb.Companion.map(
     keyArb: Arb<K>,
     valueArb: Arb<V>,
@@ -59,6 +67,7 @@ public abstract class UnitSpec(
     spec()
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public fun testLaws(vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
@@ -68,6 +77,7 @@ public abstract class UnitSpec(
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public fun testLaws(prefix: String, vararg laws: List<Law>): Unit = laws
     .flatMap { list: List<Law> -> list.asIterable() }
     .distinctBy { law: Law -> law.name }
@@ -77,9 +87,11 @@ public abstract class UnitSpec(
       }
     }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
     checkAll(iterations, Arb.unit()) { property() }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A> checkAll(
     genA: Arb<A>,
     property: suspend PropertyContext.(A) -> Unit
@@ -90,6 +102,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
@@ -102,6 +115,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
@@ -116,6 +130,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
@@ -132,6 +147,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
@@ -150,6 +166,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E, F> checkAll(
     genA: Arb<A>,
     genB: Arb<B>,
@@ -170,6 +187,7 @@ public abstract class UnitSpec(
       property
     )
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E, F, G> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
@@ -185,6 +203,7 @@ public abstract class UnitSpec(
     }
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E, F, G, H> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
@@ -201,6 +220,7 @@ public abstract class UnitSpec(
     }
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E, F, G, H, I> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
@@ -218,6 +238,7 @@ public abstract class UnitSpec(
     }
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B, C, D, E, F, G, H, I, J> checkAll(
     gena: Arb<A>,
     genb: Arb<B>,
@@ -243,6 +264,7 @@ public abstract class UnitSpec(
     }
   }
 
+  @Deprecated(deprecateArrowTestModules)
   public suspend fun forFew(
     iterations: Int,
     property: suspend PropertyContext.(Unit) -> Unit

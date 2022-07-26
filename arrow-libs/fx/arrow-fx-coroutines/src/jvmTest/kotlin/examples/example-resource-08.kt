@@ -7,10 +7,8 @@ suspend fun acquireResource(): Int = 42.also { println("Getting expensive resour
 suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
 
 suspend fun main(): Unit {
-  //sampleStart
   val resource = Resource(::acquireResource, ::releaseResource)
   resource.use {
     println("Expensive resource under use! $it")
   }
-  //sampleEnd
 }

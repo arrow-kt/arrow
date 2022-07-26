@@ -39,13 +39,13 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3.3.0
+        uses: actions/setup-java@v3.4.0
         with:
           distribution: 'zulu'
           java-version: 11
 
       - name: Gradle build
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           arguments: --full-stacktrace build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
@@ -66,13 +66,13 @@ jobs:
           token: ${{ secrets.TOKEN_GITHUB_ACTION }}
 
       - name: Set up Java
-        uses: actions/setup-java@v3.3.0
+        uses: actions/setup-java@v3.4.0
         with:
           distribution: 'zulu'
           java-version: 11
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           arguments: --full-stacktrace createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 

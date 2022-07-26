@@ -64,7 +64,7 @@ private fun processElement(iso: ADT, target: Target): String {
     }
 
   return """
-        |inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
+        |${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
         |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${tupleConstructor()} },
         |  reverseGet = { ${classConstructorFromTuple()} }
         |)

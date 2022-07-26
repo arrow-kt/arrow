@@ -1,13 +1,16 @@
 package arrow.core.test.laws
 
+import arrow.core.test.concurrency.deprecateArrowTestModules
 import arrow.typeclasses.Semiring
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.PropertyContext
 
+@Deprecated(deprecateArrowTestModules)
 public object SemiringLaws {
 
+  @Deprecated(deprecateArrowTestModules)
   public fun <F> laws(SG: Semiring<F>, GEN: Arb<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
     listOf(
       Law("Semiring: Additive commutativity") { SG.semiringAdditiveCommutativity(GEN, eq) },

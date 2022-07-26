@@ -200,3 +200,5 @@ private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R
 }
 
 private const val deprecateMonadAppFunctorOperators: String = "Operators related to Functor, Applicative or Monad hierarchies are being deprecated in favor of bind"
+
+public fun <A> EagerEffect<A, A>.merge(): A = fold(::identity, ::identity)

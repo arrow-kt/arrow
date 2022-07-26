@@ -23,7 +23,7 @@ private fun String.toUpperCamelCase(): String =
 private fun processElement(adt: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
     """
-  |inline val ${adt.sourceClassName}.Companion.${focus.lensParamName()}: $Lens<${adt.sourceClassName}, ${focus.className}> inline get()= $Lens(
+  |${adt.visibilityModifierName} inline val ${adt.sourceClassName}.Companion.${focus.lensParamName()}: $Lens<${adt.sourceClassName}, ${focus.className}> inline get()= $Lens(
   |  get = { ${adt.sourceName}: ${adt.sourceClassName} -> ${adt.sourceName}.${
       focus.paramName.plusIfNotBlank(
         prefix = "`",

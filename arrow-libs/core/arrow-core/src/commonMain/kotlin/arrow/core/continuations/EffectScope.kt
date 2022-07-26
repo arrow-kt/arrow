@@ -9,6 +9,8 @@ import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmInline
 
 /** Context of the [Effect] DSL. */
 public interface EffectScope<in R> {
@@ -54,7 +56,10 @@ public interface EffectScope<in R> {
    * ```
    * <!--- KNIT example-effect-scope-02.kt -->
    */
-  public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectScope::shift, ::identity)
+  public suspend fun <B> Effect<R, B>.bind(): B =
+    when (this) {
+      is DefaultEffect -> f(this@EffectScope)
+    }
 
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
@@ -212,6 +217,55 @@ public interface EffectScope<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
+
+  /**
+   * Encloses an action for which you want to catch any `shift`.
+   * [attempt] is used in combination with [catch].
+   *
+   * ```
+   * attempt { ... } catch { ... }
+   * ```
+   *
+   * The [f] may `shift` into a different `EffectScope`, giving
+   * the chance for a later [catch] to change the shifted value.
+   * This is useful to simulate re-throwing of exceptions.
+   */
+  @OptIn(ExperimentalTypeInference::class)
+  public suspend fun <E, A> attempt(
+    @BuilderInference
+    f: suspend EffectScope<E>.() -> A,
+  ): suspend EffectScope<E>.() -> A = f
+
+  /**
+   * When the [Effect] has shifted with [R] it will [recover]
+   * the shifted value to [A], and when it ran the computation to
+   * completion it will return the value [A].
+   * [catch] is used in combination with [attempt].
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.None
+   * import arrow.core.Option
+   * import arrow.core.Validated
+   * import arrow.core.continuations.effect
+   * import io.kotest.assertions.fail
+   * import io.kotest.matchers.shouldBe
+   *
+   * suspend fun main() {
+   *   effect<String, Int> {
+   *     val x = Either.Right(1).bind()
+   *     val y = Validated.Valid(2).bind()
+   *     val z =
+   *      attempt { None.bind { "Option was empty" } } catch { 0 }
+   *     x + y + z
+   *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
+   * }
+   * ```
+   * <!--- KNIT example-effect-scope-09.kt -->
+   */
+  public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
+    recover: suspend EffectScope<R>.(E) -> A,
+  ): A = effect(this).fold({ recover(it) }, ::identity)
 }
 
 /**
@@ -233,10 +287,11 @@ public interface EffectScope<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-effect-scope-09.kt -->
+ * <!--- KNIT example-effect-scope-10.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
+
