@@ -44,7 +44,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.2.2
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --full-stacktrace
 
@@ -59,7 +59,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish alpha/beta/rc version
-        uses: gradle/gradle-build-action@v2.2.2
+        uses: gradle/gradle-build-action@v2.2.0
         if: |
           contains(steps.version.outputs.arrow, 'alpha') ||
           contains(steps.version.outputs.arrow, 'beta') ||
@@ -68,7 +68,7 @@ jobs:
           arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        uses: gradle/gradle-build-action@v2.2.2
+        uses: gradle/gradle-build-action@v2.2.0
         if: |
           !contains(steps.version.outputs.arrow, 'alpha') &&
           !contains(steps.version.outputs.arrow, 'beta') &&
@@ -85,7 +85,7 @@ jobs:
           bundle install --gemfile Gemfile
 
       - name: Create API doc
-        uses: gradle/gradle-build-action@v2.2.2
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true dokkaGfm
 
