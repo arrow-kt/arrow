@@ -88,7 +88,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string()) { a ->
       eagerEffect<String, Nothing> { shift(a) }
         .mapLeft { it.length }
-        .fold(::identity) { fail("Should never come here") } shouldBe a.length
+        .runCont() shouldBe a.length
     }
   }
 

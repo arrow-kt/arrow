@@ -164,7 +164,7 @@ class EffectSpec :
       checkAll(Arb.string()) { a ->
         effect<String, Nothing> { shift(a) }
           .mapLeft { it.length }
-          .fold(::identity) { fail("Should never come here") } shouldBe a.length
+          .runCont() shouldBe a.length
       }
     }
 
