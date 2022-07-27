@@ -1,6 +1,8 @@
 package arrow.core.continuations
 
+import arrow.core.Maybe
 import arrow.core.Option
+import arrow.core.bind
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
@@ -12,6 +14,10 @@ public value class NullableEffectScope(private val cont: EffectScope<Nothing?>) 
 
   public suspend fun <B> Option<B>.bind(): B =
     bind { null }
+  public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
+    bind(this) { null }
+  public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
+    bind(this) { null }
 
   @OptIn(ExperimentalContracts::class)
   public suspend fun <B> B?.bind(): B {
@@ -31,6 +37,11 @@ public value class NullableEagerEffectScope(private val cont: EagerEffectScope<N
 
   public suspend fun <B> Option<B>.bind(): B =
     bind { null }
+
+  public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
+    bind(this) { null }
+  public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
+    bind(this) { null }
 
   @OptIn(ExperimentalContracts::class)
   public suspend fun <B> B?.bind(): B {

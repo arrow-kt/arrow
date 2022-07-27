@@ -55,12 +55,11 @@ kotlin {
         implementation(libs.kotlin.stdlibJS)
       }
     }
+    all {
+      // enables Opt in annotations for Maybe
+      languageSettings.optIn("kotlin.RequiresOptIn")
+    }
   }
-}
-
-// enables Opt in annotations for Maybe
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
 }
 
 // enables context receivers for Jvm Tests
