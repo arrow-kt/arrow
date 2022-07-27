@@ -26,13 +26,13 @@ jobs:
           java-version: 11
 
       - name: build
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os != 'windows-latest'
         with:
           arguments: --full-stacktrace build
 
       - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os == 'windows-latest'
         with:
           arguments: --full-stacktrace mingwX64Test
@@ -62,7 +62,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.2.1
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           arguments: apiDump
 
