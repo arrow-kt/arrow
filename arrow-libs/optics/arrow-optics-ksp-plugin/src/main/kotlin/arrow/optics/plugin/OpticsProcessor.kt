@@ -39,10 +39,10 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
     }
 
     // check that it does not have type arguments
-    if (klass.typeParameters.isNotEmpty()) {
+    /* if (klass.typeParameters.isNotEmpty()) {
       logger.error(klass.qualifiedNameOrSimpleName.typeParametersErrorMessage, klass)
       return
-    }
+    } */
 
     // check that the companion object exists
     if (klass.companionObject == null) {

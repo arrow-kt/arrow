@@ -3,10 +3,7 @@ package arrow.optics.plugin.internals
 import arrow.optics.plugin.isData
 import arrow.optics.plugin.isSealed
 import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSDeclaration
-import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.*
 import java.util.Locale
 
 internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
@@ -69,12 +66,13 @@ internal fun evalAnnotatedPrismElement(
 ): List<Focus> =
   when {
     element.isSealed ->
-      element.sealedSubclassFqNameList().map {
+      element.getSealedSubclasses().map {
         Focus(
-          it,
-          it.substringAfterLast(".").replaceFirstChar { c -> c.lowercase(Locale.getDefault()) }
+          it.primaryConstructor?.returnType?.resolve()?.qualifiedString() ?: it.qualifiedNameOrSimpleName,
+          it.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
+          it.superTypes.first().resolve()
         )
-      }
+      }.toList()
     else -> {
       logger.error(element.qualifiedNameOrSimpleName.prismErrorMessage, element)
       emptyList()
@@ -135,14 +133,20 @@ internal fun evalAnnotatedIsoElement(element: KSClassDeclaration, logger: KSPLog
 internal fun KSClassDeclaration.getConstructorTypesNames(): List<String> =
   primaryConstructor?.parameters?.map { it.type.resolve().qualifiedString() }.orEmpty()
 
-internal fun KSType.qualifiedString(): String = when (val qname = declaration.qualifiedName?.asString()) {
-  null -> toString()
-  else -> {
-    val withArgs = when {
-      arguments.isEmpty() -> qname
-      else -> "$qname<${arguments.joinToString(separator = ", ") { it.qualifiedString() }}>"
+internal fun KSType.qualifiedString(): String = when (declaration) {
+  is KSTypeParameter -> {
+    val n = declaration.simpleName.asString()
+    if (isMarkedNullable) "$n?" else n
+  }
+  else -> when (val qname = declaration.qualifiedName?.asString()) {
+    null -> toString()
+    else -> {
+      val withArgs = when {
+        arguments.isEmpty() -> qname
+        else -> "$qname<${arguments.joinToString(separator = ", ") { it.qualifiedString() }}>"
+      }
+      if (isMarkedNullable) "$withArgs?" else withArgs
     }
-    if (isMarkedNullable) "$withArgs?" else withArgs
   }
 }
 
