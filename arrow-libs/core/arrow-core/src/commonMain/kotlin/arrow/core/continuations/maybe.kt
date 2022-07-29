@@ -18,6 +18,8 @@ public value class MaybeEffectScope(private val cont: EffectScope<Maybe<Nothing>
 
   public suspend inline fun <reified B: Any> Maybe<B>.bind(): B =
     bind(this) { Maybe.Nothing }
+  public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
+    bind(this) { Maybe.Nothing }
 
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { Maybe.Nothing }
@@ -42,6 +44,8 @@ public value class MaybeEagerEffectScope(private val cont: EagerEffectScope<Mayb
     cont.shift(r)
 
   public suspend inline fun <reified B: Any> Maybe<B>.bind(): B =
+    bind(this) { Maybe.Nothing }
+  public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
     bind(this) { Maybe.Nothing }
 
   public suspend fun ensure(value: Boolean): Unit =

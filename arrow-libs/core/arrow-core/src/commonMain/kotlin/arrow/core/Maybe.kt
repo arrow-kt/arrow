@@ -597,11 +597,6 @@ public inline fun <reified A : Any, R> Maybe<A>.fold(ifEmpty: () -> R, ifJust: (
 }
 
 @PublishedApi
-internal inline fun <T, R, A> T.invokeBlock(block: (A) -> R): R {
-  return block(this as A)
-}
-
-@PublishedApi
 internal inline fun <R, A> Maybe<*>.invokeBlockOnMaybe(block: (A) -> R): R {
   return block(this as A)
 }
@@ -983,7 +978,6 @@ public inline fun <reified A : Any> Iterable<Maybe<A>>.combineAll(MA: Monoid<A>)
 @Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
 public inline fun <reified A : Any> Maybe<A>.combineAll(MA: Monoid<A>): A = getOrElse { MA.empty() }
 
-@Suppress("UNCHECKED_CAST")
 @JvmName("maybeCombineAll")
 @Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
 public fun <A : Any> Maybe<Maybe<A>>.combineAll(MA: Monoid<Maybe<A>>): Maybe<A> = getOrElse { MA.emptyMaybe() }
@@ -1172,13 +1166,23 @@ public inline fun <reified A : Any> Maybe<A>.combine(SGA: Semigroup<A>, b: Maybe
 internal inline fun <A : Any> Semigroup<A>.combineToMaybe(
   first: A,
   second: A
-): Maybe<A> = //TODO: This is sometimes unoptimized
-  when (this) {
-    is MaybeMonoid<*> -> (this as MaybeMonoid<Any>).run {
+): Maybe<A> =
+  when {
+    this is MaybeMonoid<*> -> (this as MaybeMonoid<Any>).run {
       Just((first as Maybe<*>).combine(second as Maybe<*>)) as Maybe<A>
+    }
+    first is Maybe<*> || second is Maybe<*> -> (this as Semigroup<Maybe<*>>).run {
+      Just((first as Maybe<*>).rebox().combine((second as Maybe<*>).rebox()) as A)
     }
     else -> Just(first.combine(second))
   }
+
+/**
+ * Purposefully NOT inline because, as the name suggests, this will cause the [this]
+ * to be reboxed, which convinces the compiler that [this] Maybe is not being used in an Any or generic context
+ */
+@PublishedApi
+internal fun <A: Any> Maybe<A>.rebox(): Maybe<A> = this
 
 public inline operator fun <reified A : Comparable<A>> Maybe<A>.compareTo(other: Maybe<A>): Int =
   fold({ other.fold({ 0 }, { -1 }) }, { a1 ->
