@@ -29,7 +29,7 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
     internal fun <A : Any> construct(value: Any): Maybe<A> = Maybe(value)
 
     @OptIn(MaybeInternals::class)
-    public val Nothing: Maybe<Nothing> = construct(Nil(0))
+    public val Nothing: Maybe<Nothing> = construct(NestedNothing(0))
 
     @JvmStatic
     public inline fun <A : Any> fromNullable(a: A?): Maybe<A> = if (a != null) Just(a) else Nothing
@@ -93,7 +93,7 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
   /**
    * alias for [isEmpty]
    */
-  public val isNil: Boolean get() = isEmpty()
+  public val isNothing: Boolean get() = isEmpty()
 
   /**
    * alias for [isDefined]
@@ -116,7 +116,7 @@ internal inline fun <reified T> isTypeMaybe(): Boolean =
 @MaybeInternals
 internal val <A : Any> Maybe<A>.value: A
   get() = when (underlying) {
-    is Nil -> Nil(underlying.nesting - 1).also { if (it.nesting < 0) error("Unexpected nesting value for Nil") }
+    is NestedNothing -> NestedNothing(underlying.nesting - 1).also { if (it.nesting < 0) error("Cannot unpack the value of a Maybe.Nothing") }
     else -> underlying
   } as A
 
@@ -309,7 +309,7 @@ public inline fun <reified A : Any, B : Any> Maybe<A>.crosswalkNull(f: (A) -> B?
 
 /**
  * Returns this $maybe if it is nonempty '''and''' applying the predicate $p to
- * this $maybe's value returns true. Otherwise, return $nil.
+ * this $maybe's value returns true. Otherwise, return $nothing.
  *
  *  @param predicate the predicate used for testing.
  */
@@ -318,7 +318,7 @@ public inline fun <reified A : Any> Maybe<A>.filter(predicate: (A) -> Boolean): 
 
 /**
  * Returns this $maybe if it is nonempty '''and''' applying the predicate $p to
- * this $maybe's value returns false. Otherwise, return $nil.
+ * this $maybe's value returns false. Otherwise, return $nothing.
  *
  * @param predicate the predicate used for testing.
  */
@@ -420,10 +420,10 @@ public infix fun <A : Any, X : Any> Maybe<A>.and(value: Maybe<X>): Maybe<X> = if
 }
 
 @PublishedApi
-internal data class Nil private constructor(val nesting: Int) {
+internal data class NestedNothing private constructor(val nesting: Int) {
   companion object {
-    private val cache = Array(22) { Nil(it) }
-    operator fun invoke(nesting: Int) = cache.getOrElse(nesting, ::Nil)
+    private val cache = Array(22) { NestedNothing(it) }
+    operator fun invoke(nesting: Int) = cache.getOrElse(nesting, ::NestedNothing)
   }
 
   override fun toString(): String = buildString("Maybe.Just()".length * nesting + "Maybe.Nothing".length) {
@@ -442,7 +442,7 @@ public inline fun <T : Any> Just(value: T): Maybe<T> {
 @MaybeInternals
 @PublishedApi
 internal fun <T : Any> _Just(trueValue: Any): Maybe<T> =
-  Maybe.construct(if (trueValue is Nil) Nil(trueValue.nesting + 1) else trueValue)
+  Maybe.construct(if (trueValue is NestedNothing) NestedNothing(trueValue.nesting + 1) else trueValue)
 
 @PublishedApi
 internal val justUnit: Maybe<Unit> = Just(Unit)
