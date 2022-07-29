@@ -10,6 +10,8 @@ import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
+import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmInline
 
 /** Context of the [EagerEffect] DSL. */
 @RestrictsSuspension
@@ -186,6 +188,56 @@ public interface EagerEffectScope<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
+
+  /**
+   * Encloses an action for which you want to catch any `shift`.
+   * [attempt] is used in combination with [catch].
+   *
+   * ```
+   * attempt { ... } catch { ... }
+   * ```
+   *
+   * The [f] may `shift` into a different `EagerEffectScope`, giving
+   * the chance for a later [catch] to change the shifted value.
+   * This is useful to simulate re-throwing of exceptions.
+   */
+  @OptIn(ExperimentalTypeInference::class)
+  public suspend fun <E, A> attempt(
+    @BuilderInference
+    f: suspend EagerEffectScope<E>.() -> A,
+  ): suspend EagerEffectScope<E>.() -> A = f
+
+
+  /**
+   * When the [EagerEffect] has shifted with [R] it will [recover]
+   * the shifted value to [A], and when it ran the computation to
+   * completion it will return the value [A].
+   * [catch] is used in combination with [attempt].
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.None
+   * import arrow.core.Option
+   * import arrow.core.Validated
+   * import arrow.core.continuations.eagerEffect
+   * import io.kotest.assertions.fail
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun main() {
+   *   eagerEffect<String, Int> {
+   *     val x = Either.Right(1).bind()
+   *     val y = Validated.Valid(2).bind()
+   *     val z =
+   *      attempt { None.bind { "Option was empty" } } catch { 0 }
+   *     x + y + z
+   *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
+   * }
+   * ```
+   * <!--- KNIT example-eager-effect-scope-08.kt -->
+   */
+  public infix fun <E, A> (suspend EagerEffectScope<E>.() -> A).catch(
+    recover: EagerEffectScope<R>.(E) -> A,
+  ): A = eagerEffect(this).fold({ recover(it) }, ::identity)
 }
 
 /**
@@ -207,10 +259,11 @@ public interface EagerEffectScope<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-eager-effect-scope-08.kt -->
+ * <!--- KNIT example-eager-effect-scope-09.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EagerEffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
+

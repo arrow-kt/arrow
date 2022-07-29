@@ -10,6 +10,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -21,6 +22,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class EffectSpec :
   StringSpec({
@@ -105,6 +107,32 @@ class EffectSpec :
           shift(s2.suspend())
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s2
+      }
+    }
+
+    "attempt - catch" {
+      checkAll(Arb.int(), Arb.long()) { i, l ->
+        effect<String, Int> {
+          attempt<Long, Int> {
+            shift(l)
+          } catch { ll ->
+            ll shouldBe l
+            i
+          }
+        }.runCont() shouldBe i
+      }
+    }
+
+    "attempt - no catch" {
+      checkAll(Arb.int(), Arb.long()) { i, l ->
+        effect<String, Int> {
+          attempt<Long, Int> {
+            i
+          } catch { ll ->
+            ll shouldBe l
+            i + 1
+          }
+        }.runCont() shouldBe i
       }
     }
 
@@ -241,7 +269,26 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
+    
+    "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
+      checkAll(Arb.string()) { msg ->
+        fun failure(): Effect<Failure, String> = effect {
+          withContext(Dispatchers.Default) {}
+          shift(Failure(msg))
+        }
+        
+        effect<Failure, Int> {
+          failure().bind()
+          1
+        }.fold(
+          recover = { it },
+          transform = { fail("Should never come here") },
+        ) shouldBe Failure(msg)
+      }
+    }
   })
+
+private data class Failure(val msg: String)
 
 suspend fun currentContext(): CoroutineContext = kotlin.coroutines.coroutineContext
 

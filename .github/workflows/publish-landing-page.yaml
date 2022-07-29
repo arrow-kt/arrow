@@ -25,6 +25,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Ruby Setup
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+
       - name: Prepare documentation environment
         working-directory: arrow-site
         run: |

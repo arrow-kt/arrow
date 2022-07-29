@@ -14,12 +14,11 @@ suspend fun closeFile(file: File): Unit = file.close()
 suspend fun fileToString(file: File): String = file.toString()
 
 suspend fun main(): Unit {
-  //sampleStart
   val res: List<String> = listOf(
     "data.json",
     "user.json",
     "resource.json"
-  ).traverseResource { uri ->
+  ).traverse { uri ->
     resource {
      openFile(uri)
     } release { file ->
@@ -28,6 +27,5 @@ suspend fun main(): Unit {
   }.use { files ->
     files.map { fileToString(it) }
   }
-  //sampleEnd
   res.forEach(::println)
 }

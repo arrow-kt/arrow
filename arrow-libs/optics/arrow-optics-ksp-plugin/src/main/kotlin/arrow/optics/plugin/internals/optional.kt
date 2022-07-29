@@ -30,7 +30,7 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
       }
 
     """
-      |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
+      |${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
       |  getOrModify = $getOrModify,
       |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: $targetClassName -> $set }
       |)
