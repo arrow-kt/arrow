@@ -14,348 +14,6 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-/**
- *
- *
- * If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
- * Kotlin tries to solve the problem by getting rid of `null` values altogether, and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
- *
- * Arrow models the absence of values through the `Maybe` datatype similar to how Scala, Haskell, and other FP languages handle optional values.
- *
- * `Maybe<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Maybe<A>` is an instance of `Just<A>`, containing the present value of type `A`. If the value is absent, the `Maybe<A>` is the object `Nil`.
- *
- * ```kotlin
- * import arrow.core.Maybe
- * import arrow.core.Just
- * import arrow.core.nil
- *
- * //sampleStart
- * val someValue: Maybe<String> = Just("I am wrapped in something")
- * val emptyValue: Maybe<String> = nil()
- * //sampleEnd
- * fun main() {
- *  println("value = $someValue")
- *  println("emptyValue = $emptyValue")
- * }
- * ```
- * <!--- KNIT example-maybe-01.kt -->
- *
- * Let's write a function that may or may not give us a string, thus returning `Maybe<String>`:
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * //sampleStart
- * fun maybeItWillReturnSomething(flag: Boolean): Maybe<String> =
- *  if (flag) Just("Found value") else Nil
- * //sampleEnd
- * ```
- * <!--- KNIT example-maybe-02.kt -->
- *
- * Using `getOrElse`, we can provide a default value `"No value"` when the optional argument `Nil` does not exist:
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- * import arrow.core.getOrElse
- *
- * fun maybeItWillReturnSomething(flag: Boolean): Maybe<String> =
- *  if (flag) Just("Found value") else Nil
- *
- * val value1 =
- * //sampleStart
- *  maybeItWillReturnSomething(true)
- *     .getOrElse { "No value" }
- * //sampleEnd
- * fun main() {
- *  println(value1)
- * }
- * ```
- * <!--- KNIT example-maybe-03.kt -->
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- * import arrow.core.getOrElse
- *
- * fun maybeItWillReturnSomething(flag: Boolean): Maybe<String> =
- *  if (flag) Just("Found value") else Nil
- *
- * val value2 =
- * //sampleStart
- *  maybeItWillReturnSomething(false)
- *   .getOrElse { "No value" }
- * //sampleEnd
- * fun main() {
- *  println(value2)
- * }
- * ```
- * <!--- KNIT example-maybe-04.kt -->
- *
- * Checking whether maybe has value:
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * fun maybeItWillReturnSomething(flag: Boolean): Maybe<String> =
- *  if (flag) Just("Found value") else Nil
- *
- *  //sampleStart
- * val valueJust = maybeItWillReturnSomething(true) is Nil
- * val valueNil = maybeItWillReturnSomething(false) is Nil
- * //sampleEnd
- * fun main() {
- *  println("valueJust = $valueJust")
- *  println("valueNil = $valueNil")
- * }
- * ```
- * <!--- KNIT example-maybe-05.kt -->
- * Creating a `Maybe<T>` of a `T?`. Useful for working with values that can be nullable:
- *
- * ```kotlin
- * import arrow.core.Maybe
- *
- * //sampleStart
- * val myString: String? = "Nullable string"
- * val maybe: Maybe<String> = Maybe.fromNullable(myString)
- * //sampleEnd
- * fun main () {
- *  println("maybe = $maybe")
- * }
- * ```
- * <!--- KNIT example-maybe-06.kt -->
- *
- * Maybe can also be used with when statements:
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * //sampleStart
- * val justValue: Maybe<Double> = Just(20.0)
- * val value = when(justValue) {
- *  isJust -> justValue.value
- *  is Nil -> 0.0
- * }
- * //sampleEnd
- * fun main () {
- *  println("value = $value")
- * }
- * ```
- * <!--- KNIT example-maybe-07.kt -->
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * //sampleStart
- * val noValue: Maybe<Double> = Nil
- * val value = when(noValue) {
- *  isJust -> noValue.value
- *  is Nil -> 0.0
- * }
- * //sampleEnd
- * fun main () {
- *  println("value = $value")
- * }
- * ```
- * <!--- KNIT example-maybe-08.kt -->
- *
- * An alternative for pattern matching is folding. This is possible because an maybe could be looked at as a collection or foldable structure with either one or zero elements.
- *
- * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the maybe:
- *
- * ```kotlin
- * import arrow.core.Nil
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * //sampleStart
- * val number: Maybe<Int> = Just(3)
- * val noNumber: Maybe<Int> = Nil
- * val mappedResult1 = number.map { it * 1.5 }
- * val mappedResult2 = noNumber.map { it * 1.5 }
- * //sampleEnd
- * fun main () {
- *  println("number = $number")
- *  println("noNumber = $noNumber")
- *  println("mappedResult1 = $mappedResult1")
- *  println("mappedResult2 = $mappedResult2")
- * }
- * ```
- * <!--- KNIT example-maybe-09.kt -->
- * Another operation is `fold`. This operation will extract the value from the maybe, or provide a default if the value is `Nil`
- *
- * ```kotlin
- * import arrow.core.Maybe
- * import arrow.core.Just
- *
- * val fold =
- * //sampleStart
- *  Just(3).fold({ 1 }, { it * 3 })
- * //sampleEnd
- * fun main () {
- *  println(fold)
- * }
- * ```
- * <!--- KNIT example-maybe-10.kt -->
- *
- * ```kotlin
- * import arrow.core.Maybe
- * import arrow.core.nil
- *
- * val fold =
- * //sampleStart
- *  nil<Int>().fold({ 1 }, { it * 3 })
- * //sampleEnd
- * fun main () {
- *  println(fold)
- * }
- * ```
- * <!--- KNIT example-maybe-11.kt -->
- *
- * Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Maybe` where needed.
- *
- * ```kotlin
- * import arrow.core.just
- * import arrow.core.nil
- *
- * //sampleStart
- *  val just = 1.just()
- *  val nil = nil<String>()
- * //sampleEnd
- * fun main () {
- *  println("just = $just")
- *  println("nil = $nil")
- * }
- * ```
- * <!--- KNIT example-maybe-12.kt -->
- *
- * ```kotlin
- * import arrow.core.toMaybe
- *
- * //sampleStart
- * val nullString: String? = null
- * val valueFromNull = nullString.toMaybe()
- *
- * val helloString: String? = "Hello"
- * val valueFromStr = helloString.toMaybe()
- * //sampleEnd
- * fun main () {
- *  println("valueFromNull = $valueFromNull")
- *  println("valueFromStr = $valueFromStr")
- * }
- * ```
- * <!--- KNIT example-maybe-13.kt -->
- *
- * You can easily convert between `A?` and `Maybe<A>` by using the `toMaybe()` extension or `Maybe.fromNullable` constructor.
- *
- * ```kotlin
- * import arrow.core.firstOrNil
- * import arrow.core.toMaybe
- * import arrow.core.Maybe
- *
- * //sampleStart
- * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
- *
- * val empty = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toMaybe()
- * val filled = Maybe.fromNullable(foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() })
- *
- * //sampleEnd
- * fun main() {
- *  println("empty = $empty")
- *  println("filled = $filled")
- * }
- * ```
- * <!--- KNIT example-maybe-14.kt -->
- *
- * ### Transforming the inner contents
- *
- * ```kotlin
- * import arrow.core.Just
- *
- * fun main() {
- * val value =
- *  //sampleStart
- *    Just(1).map { it + 1 }
- *  //sampleEnd
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-maybe-15.kt -->
- *
- * ### Computing over independent values
- *
- * ```kotlin
- * import arrow.core.Just
- *
- *  val value =
- * //sampleStart
- *  Just(1).zip(Just("Hello"), Just(20.0), ::Triple)
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-maybe-16.kt -->
- *
- * ### Computing over dependent values ignoring absence
- *
- * ```kotlin
- * import arrow.core.computations.maybe
- * import arrow.core.Just
- * import arrow.core.Maybe
- *
- * suspend fun value(): Maybe<Int> =
- * //sampleStart
- *  maybe {
- *    val a = Just(1).bind()
- *    val b = Just(1 + a).bind()
- *    val c = Just(1 + b).bind()
- *    a + b + c
- * }
- * //sampleEnd
- * suspend fun main() {
- *  println(value())
- * }
- * ```
- * <!--- KNIT example-maybe-17.kt -->
- *
- * ```kotlin
- * import arrow.core.computations.maybe
- * import arrow.core.Just
- * import arrow.core.nil
- * import arrow.core.Maybe
- *
- * suspend fun value(): Maybe<Int> =
- * //sampleStart
- *  maybe {
- *    val x = nil<Int>().bind()
- *    val y = Just(1 + x).bind()
- *    val z = Just(1 + y).bind()
- *    x + y + z
- *  }
- * //sampleEnd
- * suspend fun main() {
- *  println(value())
- * }
- * ```
- * <!--- KNIT example-maybe-18.kt -->
- *
- * ## Credits
- *
- * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
- * Originally based on the Scala Koans.
- */
-
 @RequiresOptIn(message = "This declaration is part of the internals of Maybe. Great caution must be taken to avoid ClassCastExceptions")
 internal annotation class MaybeInternals
 
@@ -418,24 +76,6 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
     public inline fun <reified A : Any, B : Any> lift(crossinline f: (A) -> B): (Maybe<A>) -> Maybe<B> = { it.map(f) }
   }
 
-  /**
-   * The given function is applied as a fire and forget effect
-   * if this is a `Nil`.
-   * When applied the result is ignored and the original
-   * Nil value is returned
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Just
-   * import arrow.core.nil
-   *
-   * fun main() {
-   *   Just(12).tapNil { println("flower") } // Result: Just(12)
-   *   nil<Int>().tapNil { println("flower") }  // Result: prints "flower" and returns: Nil
-   * }
-   * ```
-   * <!--- KNIT example-maybe-19.kt -->
-   */
   public inline fun tapNothing(f: () -> Unit): Maybe<A> = this.also { if (isEmpty()) f() }
 
   /**
@@ -462,7 +102,6 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
 
   /**
    * Returns true if the maybe is an instance of [Just], false otherwise.
-   * @note Used only for performance instead of fold.
    */
   public fun isDefined(): Boolean = isNotEmpty()
 
@@ -577,11 +216,11 @@ public inline fun <reified A : Any, reified B : Any, reified C : Any, reified D 
 }
 
 /**
- * Returns the result of applying $f to this $maybe's value if
+ * Returns the result of applying [f] to this $maybe's value if
  * this $maybe is nonempty.
- * Returns $nil if this $maybe is empty.
+ * Returns $nothing if this $maybe is empty.
  * Slightly different from `map` in that $f is expected to
- * return an $maybe (which could be $nil).
+ * return a $maybe (which could be $nothing).
  *
  * @param f the function to apply
  * @see map
@@ -601,24 +240,6 @@ internal inline fun <R, A> Maybe<*>.invokeBlockOnMaybe(block: (A) -> R): R {
   return block(this as A)
 }
 
-/**
- * The given function is applied as a fire and forget effect
- * if this is a `just`.
- * When applied the result is ignored and the original
- * Just value is returned
- *
- * Example:
- * ```kotlin
- * import arrow.core.Just
- * import arrow.core.nil
- *
- * fun main() {
- *   Just(12).tap { println("flower") } // Result: prints "flower" and returns: Just(12)
- *   nil<Int>().tap { println("flower") }  // Result: Nil
- * }
- * ```
- * <!--- KNIT example-maybe-20.kt -->
- */
 public inline fun <reified A : Any> Maybe<A>.tap(f: (A) -> Unit): Maybe<A> = this.also { fold({}, f) }
 
 public inline fun <reified A : Any> Maybe<A>.orNull(): A? = fold({ return null }, ::identity)
@@ -628,7 +249,7 @@ public fun <A : Any> Maybe<Maybe<A>>.orNull(): Maybe<A>? = fold({ return null },
 
 /**
  * Returns a [Just<$B>] containing the result of applying $f to this $maybe's
- * value if this $maybe is nonempty. Otherwise return $nil.
+ * value if this $maybe is nonempty. Otherwise return $nothing.
  *
  * @note This is similar to `flatMap` except here,
  * $f does not need to wrap its result in a $maybe.
@@ -639,7 +260,7 @@ public fun <A : Any> Maybe<Maybe<A>>.orNull(): Maybe<A>? = fold({ return null },
 public inline fun <reified A : Any, B : Any> Maybe<A>.map(f: (A) -> B): Maybe<B> = flatMap { a -> Just(f(a)) }
 
 /**
- * Returns $nil if the result of applying $f to this $maybe's value is null.
+ * Returns $nothing if the result of applying $f to this $maybe's value is null.
  * Otherwise returns the result.
  *
  * @note This is similar to `.flatMap { Maybe.fromNullable(null)) }`
@@ -704,76 +325,11 @@ public inline fun <reified A : Any> Maybe<A>.filter(predicate: (A) -> Boolean): 
 public inline fun <reified A : Any> Maybe<A>.filterNot(predicate: (A) -> Boolean): Maybe<A> =
   flatMap { a -> if (!predicate(a)) Just(a) else Nothing }
 
-/**
- * Returns true if this maybe is nonempty '''and''' the predicate
- * $p returns true when applied to this $maybe's value.
- * Otherwise, returns false.
- *
- * Example:
- * ```kotlin
- * import arrow.core.Just
- * import arrow.core.Nil
- * import arrow.core.Maybe
- *
- * fun main() {
- *   Just(12).exists { it > 10 } // Result: true
- *   Just(7).exists { it > 10 }  // Result: false
- *
- *   val nil: Maybe<Int> = Nil
- *   nil.exists { it > 10 }      // Result: false
- * }
- * ```
- * <!--- KNIT example-maybe-21.kt -->
- *
- * @param predicate the predicate to test
- */
 public inline fun <reified A : Any> Maybe<A>.exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
 
-/**
- * Returns the $maybe's value if this maybe is nonempty '''and''' the predicate
- * $p returns true when applied to this $maybe's value.
- * Otherwise, returns null.
- *
- * Example:
- * ```kotlin
- * import arrow.core.Just
- * import arrow.core.Nil
- * import arrow.core.Maybe
- *
- * fun main() {
- *   Just(12).exists { it > 10 } // Result: 12
- *   Just(7).exists { it > 10 }  // Result: null
- *
- *   val nil: Maybe<Int> = Nil
- *   nil.exists { it > 10 }      // Result: null
- * }
- * ```
- * <!--- KNIT example-maybe-22.kt -->
- */
 public inline fun <reified A : Any> Maybe<A>.findOrNull(predicate: (A) -> Boolean): A? =
   fold({ return null }, { return if (predicate(it)) it else null })
 
-/**
- * Returns the $maybe's value if this maybe is nonempty '''and''' the predicate
- * $p returns true when applied to this $maybe's value.
- * Otherwise, returns null.
- *
- * Example:
- * ```kotlin
- * import arrow.core.Just
- * import arrow.core.Nil
- * import arrow.core.Maybe
- *
- * fun main() {
- *   Just(12).exists { it > 10 } // Result: 12
- *   Just(7).exists { it > 10 }  // Result: null
- *
- *   val nil: Maybe<Int> = Nil
- *   nil.exists { it > 10 }      // Result: null
- * }
- * ```
- * <!--- KNIT example-maybe-22.kt -->
- */
 
 @JvmName("maybeFindOrNull")
 public inline fun <A : Any> Maybe<Maybe<A>>.findOrNull(predicate: (Maybe<A>) -> Boolean): Maybe<A>? =
@@ -1131,26 +687,6 @@ public fun <A : Any, B : Any> Maybe<Pair<A, B>>.unzip(): Pair<Maybe<A>, Maybe<B>
 public inline fun <A : Any, B : Any, reified C : Any> Maybe<C>.unzip(f: (C) -> Pair<A, B>): Pair<Maybe<A>, Maybe<B>> =
   fold({ Nothing to Nothing }, { f(it).let { pair -> Just(pair.first) to Just(pair.second) } })
 
-/**
- *  Given [A] is a sub type of [B], re-type this value from Maybe<A> to Maybe<B>
- *
- *  Maybe<A> -> Maybe<B>
- *
- *  ```kotlin
- *  import arrow.core.Maybe
- *  import arrow.core.just
- *  import arrow.core.widen
- *
- *  fun main(args: Array<String>) {
- *   val result: Maybe<CharSequence> =
- *   //sampleStart
- *   "Hello".just().map({ "$it World" }).widen()
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- * <!--- KNIT example-maybe-23.kt -->
- */
 public fun <B : Any, A : B> Maybe<A>.widen(): Maybe<B> = this
 
 public fun <K, V> Maybe<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
@@ -1452,55 +988,9 @@ public suspend inline fun <R, A : Any> Effect<R, A>.toMaybe(crossinline orElse: 
   return Maybe.construct(fold({ orElse(it).underlying }, { Just(it).underlying }))
 }
 
-/**
- * Folds [Option] into [EagerEffect], by returning [B] or a transforming [None] into [R] and shifting the
- * result.
- *
- * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.continuations.eagerEffect
- * import arrow.core.getOrElse
- * import arrow.core.identity
- * import io.kotest.matchers.shouldBe
- *
- * private val default = "failed"
- * fun main() {
- *   val option: Option<Int> = None
- *   eagerEffect<String, Int> {
- *     val x: Int = option.bind { default }
- *     x
- *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
- * }
- * ```
- * <!--- KNIT example-eager-effect-scope-06.kt -->
- */
 public suspend inline fun <R, reified B : Any> EagerEffectScope<R>.bind(maybe: Maybe<B>, shift: () -> R): B =
   maybe.fold({ shift(shift()) }, { it })
 
-/**
- * Folds [Option] into [EagerEffect], by returning [B] or a transforming [None] into [R] and shifting the
- * result.
- *
- * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.continuations.eagerEffect
- * import arrow.core.getOrElse
- * import arrow.core.identity
- * import io.kotest.matchers.shouldBe
- *
- * private val default = "failed"
- * fun main() {
- *   val option: Option<Int> = None
- *   eagerEffect<String, Int> {
- *     val x: Int = option.bind { default }
- *     x
- *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
- * }
- * ```
- * <!--- KNIT example-eager-effect-scope-06.kt -->
- */
 @JvmName("bindMaybe")
 public suspend fun <R, B : Any> EagerEffectScope<R>.bind(maybe: Maybe<Maybe<B>>, shift: () -> R): Maybe<B> {
   // Similar in spirit to EagerEffectScope.bind(shift)
@@ -1510,56 +1000,9 @@ public suspend fun <R, B : Any> EagerEffectScope<R>.bind(maybe: Maybe<Maybe<B>>,
   return maybe.orNull() ?: shift(shift())
 }
 
-
-/**
- * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
- * result.
- *
- * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.continuations.effect
- * import arrow.core.getOrElse
- * import arrow.core.identity
- * import io.kotest.matchers.shouldBe
- *
- * private val default = "failed"
- * suspend fun main() {
- *   val option: Option<Int> = None
- *   effect<String, Int> {
- *     val x: Int = option.bind { default }
- *     x
- *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
- * }
- * ```
- * <!--- KNIT example-effect-scope-07.kt -->
- */
 public suspend inline fun <R, reified B : Any> EffectScope<R>.bind(maybe: Maybe<B>, shift: () -> R): B =
   maybe.fold({ shift(shift()) }, { it })
 
-/**
- * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
- * result.
- *
- * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.continuations.effect
- * import arrow.core.getOrElse
- * import arrow.core.identity
- * import io.kotest.matchers.shouldBe
- *
- * private val default = "failed"
- * suspend fun main() {
- *   val option: Option<Int> = None
- *   effect<String, Int> {
- *     val x: Int = option.bind { default }
- *     x
- *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
- * }
- * ```
- * <!--- KNIT example-effect-scope-07.kt -->
- */
 @JvmName("bindMaybe")
 public suspend fun <R, B : Any> EffectScope<R>.bind(maybe: Maybe<Maybe<B>>, shift: () -> R): Maybe<B> {
   // Similar in spirit to EagerEffectScope.bind(shift)
