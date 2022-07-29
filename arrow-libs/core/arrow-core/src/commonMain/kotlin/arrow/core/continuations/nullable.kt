@@ -14,8 +14,10 @@ public value class NullableEffectScope(private val cont: EffectScope<Nothing?>) 
 
   public suspend fun <B> Option<B>.bind(): B =
     bind { null }
+
   public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
     bind(this) { null }
+
   public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
     bind(this) { null }
 
@@ -40,6 +42,7 @@ public value class NullableEagerEffectScope(private val cont: EagerEffectScope<N
 
   public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
     bind(this) { null }
+
   public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
     bind(this) { null }
 

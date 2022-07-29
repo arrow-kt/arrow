@@ -338,10 +338,12 @@ public inline fun <A : Any> Maybe<Maybe<A>>.findOrNull(predicate: (Maybe<A>) -> 
 public inline fun <reified A : Any, B> Maybe<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   foldLeft(empty()) { b, a -> b.combine(f(a)) }
 }
+
 @JvmName("foldMapMaybe")
-public inline fun <reified A : Any, B: Any> Maybe<A>.foldMap(MB: Monoid<Maybe<B>>, f: (A) -> Maybe<B>): Maybe<B> = MB.run {
-  foldLeft(emptyMaybe()) { b, a -> combineToMaybe(b, f(a)).flatten() }
-}
+public inline fun <reified A : Any, B : Any> Maybe<A>.foldMap(MB: Monoid<Maybe<B>>, f: (A) -> Maybe<B>): Maybe<B> =
+  MB.run {
+    foldLeft(emptyMaybe()) { b, a -> combineToMaybe(b, f(a)).flatten() }
+  }
 
 public inline fun <reified A : Any, B> Maybe<A>.foldLeft(initial: B, operation: (B, A) -> B): B =
   fold({ initial }, { operation(initial, it) })
@@ -588,6 +590,7 @@ public inline fun <reified A : Any> Maybe<A>.replicate(n: Int, MA: Monoid<A>): M
     result
   }
 }
+
 @JvmName("replicateMaybe")
 public fun <A : Any> Maybe<Maybe<A>>.replicate(n: Int, MA: Monoid<Maybe<A>>): Maybe<Maybe<A>> = MA.run {
   if (n <= 0) Just(emptyMaybe())
@@ -601,11 +604,10 @@ public fun <A : Any> Maybe<Maybe<A>>.replicate(n: Int, MA: Monoid<Maybe<A>>): Ma
 }
 
 @PublishedApi
-internal inline fun <A: Any> Monoid<Maybe<A>>.emptyMaybe(): Maybe<A> =
-  when(this){
-    is MaybeMonoid<*> -> (this as MaybeMonoid<*>).empty()
-    else -> this.empty()
-  } as Maybe<A>
+internal inline fun <A : Any> Monoid<Maybe<A>>.emptyMaybe(): Maybe<A> = when (this) {
+  is MaybeMonoid<*> -> (this as MaybeMonoid<*>).empty()
+  else -> this.empty()
+} as Maybe<A>
 
 
 public fun <A : Any> Maybe<Either<Unit, A>>.rethrow(): Maybe<A> = flatMap { it.fold({ Nothing }, { a -> Just(a) }) }
@@ -700,25 +702,25 @@ public inline fun <reified A : Any> Maybe<A>.combine(SGA: Semigroup<A>, b: Maybe
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
 internal inline fun <A : Any> Semigroup<A>.combineToMaybe(
-  first: A,
-  second: A
-): Maybe<A> =
-  when {
-    this is MaybeMonoid<*> -> (this as MaybeMonoid<Any>).run {
-      Just((first as Maybe<*>).combine(second as Maybe<*>)) as Maybe<A>
-    }
-    first is Maybe<*> || second is Maybe<*> -> (this as Semigroup<Maybe<*>>).run {
-      Just((first as Maybe<*>).rebox().combine((second as Maybe<*>).rebox()) as A)
-    }
-    else -> Just(first.combine(second))
+  first: A, second: A
+): Maybe<A> = when {
+  this is MaybeMonoid<*> -> (this as MaybeMonoid<Any>).run {
+    Just((first as Maybe<*>).combine(second as Maybe<*>)) as Maybe<A>
   }
+
+  first is Maybe<*> || second is Maybe<*> -> (this as Semigroup<Maybe<*>>).run {
+    Just((first as Maybe<*>).rebox().combine((second as Maybe<*>).rebox()) as A)
+  }
+
+  else -> Just(first.combine(second))
+}
 
 /**
  * Purposefully NOT inline because, as the name suggests, this will cause the [this]
  * to be reboxed, which convinces the compiler that [this] Maybe is not being used in an Any or generic context
  */
 @PublishedApi
-internal fun <A: Any> Maybe<A>.rebox(): Maybe<A> = this
+internal fun <A : Any> Maybe<A>.rebox(): Maybe<A> = this
 
 public inline operator fun <reified A : Comparable<A>> Maybe<A>.compareTo(other: Maybe<A>): Int =
   fold({ other.fold({ 0 }, { -1 }) }, { a1 ->
@@ -778,6 +780,7 @@ public fun <T : Any> Iterable<T>.firstOrNothing(): Maybe<T> = when (this) {
   } else {
     Nothing
   }
+
   else -> {
     iterator().nextOrNothing()
   }
@@ -809,6 +812,7 @@ public fun <T : Any> Iterable<T>.singleOrNothing(): Maybe<T> = when (this) {
     1 -> firstOrNothing()
     else -> Nothing
   }
+
   else -> {
     iterator().run { nextOrNothing().filter<Any> { !hasNext() } as Maybe<T> }
   }
@@ -839,6 +843,7 @@ public fun <T : Any> Iterable<T>.lastOrNothing(): Maybe<T> = when (this) {
   } else {
     Nothing
   }
+
   else -> iterator().run {
     if (hasNext()) {
       var last: T
@@ -872,6 +877,7 @@ public fun <T : Any> Iterable<T>.elementAtOrNothing(index: Int): Maybe<T> = when
     in indices -> Just(elementAt(index))
     else -> Nothing
   }
+
   else -> iterator().skip(index).nextOrNothing()
 }
 
@@ -880,6 +886,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> = when {
     next()
     skip(count - 1)
   }
+
   else -> this
 }
 

@@ -1,14 +1,17 @@
 package arrow.core.continuations
 
-import arrow.core.*
+import arrow.core.Just
+import arrow.core.Maybe
+import arrow.core.bind
+import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 
-public suspend fun <A: Any> Effect<Maybe<Nothing>, A>.toMaybe(): Maybe<A> =
+public suspend fun <A : Any> Effect<Maybe<Nothing>, A>.toMaybe(): Maybe<A> =
   fold(::identity) { Just(it) }
 
-public fun <A: Any> EagerEffect<Maybe<Nothing>, A>.toMaybe(): Maybe<A> =
+public fun <A : Any> EagerEffect<Maybe<Nothing>, A>.toMaybe(): Maybe<A> =
   fold(::identity) { Just(it) }
 
 @JvmInline
@@ -16,8 +19,9 @@ public value class MaybeEffectScope(private val cont: EffectScope<Maybe<Nothing>
   override suspend fun <B> shift(r: Maybe<Nothing>): B =
     cont.shift(r)
 
-  public suspend inline fun <reified B: Any> Maybe<B>.bind(): B =
+  public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
     bind(this) { Maybe.Nothing }
+
   public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
     bind(this) { Maybe.Nothing }
 
@@ -38,13 +42,15 @@ public suspend fun <B> MaybeEagerEffectScope.ensureNotNull(value: B?): B {
 }
 
 @JvmInline
-public value class MaybeEagerEffectScope(private val cont: EagerEffectScope<Maybe<Nothing>>) : EagerEffectScope<Maybe<Nothing>> {
+public value class MaybeEagerEffectScope(private val cont: EagerEffectScope<Maybe<Nothing>>) :
+  EagerEffectScope<Maybe<Nothing>> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: Maybe<Nothing>): B =
     cont.shift(r)
 
-  public suspend inline fun <reified B: Any> Maybe<B>.bind(): B =
+  public suspend inline fun <reified B : Any> Maybe<B>.bind(): B =
     bind(this) { Maybe.Nothing }
+
   public suspend fun <B : Any> Maybe<Maybe<B>>.bind(): Maybe<B> =
     bind(this) { Maybe.Nothing }
 
@@ -54,12 +60,12 @@ public value class MaybeEagerEffectScope(private val cont: EagerEffectScope<Mayb
 
 @Suppress("ClassName")
 public object maybe {
-  public inline fun <A: Any> eager(crossinline f: suspend MaybeEagerEffectScope.() -> A): Maybe<A> =
+  public inline fun <A : Any> eager(crossinline f: suspend MaybeEagerEffectScope.() -> A): Maybe<A> =
     eagerEffect<Maybe<Nothing>, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(MaybeEagerEffectScope(this))
     }.toMaybe()
 
-  public suspend inline operator fun <A: Any> invoke(crossinline f: suspend MaybeEffectScope.() -> A): Maybe<A> =
+  public suspend inline operator fun <A : Any> invoke(crossinline f: suspend MaybeEffectScope.() -> A): Maybe<A> =
     effect<Maybe<Nothing>, A> { f(MaybeEffectScope(this)) }.toMaybe()
 }
