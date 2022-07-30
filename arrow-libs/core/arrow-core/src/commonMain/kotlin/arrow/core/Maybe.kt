@@ -35,7 +35,7 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
     public inline fun <A : Any> fromNullable(a: A?): Maybe<A> = if (a != null) Just(a) else Nothing
 
     @JvmStatic
-    public inline fun <A : Any> fromNullable(a: Maybe<A>?): Maybe<Maybe<A>> = fromNullable<Maybe<A>>(a)
+    public inline fun <A : Any> fromNullable(a: Maybe<A>?): Maybe<Maybe<A>> = if (a != null) Just(a) else Nothing
 
     @JvmStatic
     public inline operator fun <A : Any> invoke(a: A): Maybe<A> = Just(a)
@@ -50,27 +50,12 @@ public value class Maybe<out A : Any> @MaybeInternals private constructor(
     }
 
     @JvmStatic
-    @JvmName("tryCatchOrNothingMaybe")
-    /**
-     * Ignores exceptions and returns Nothing if one is thrown
-     */
-    public inline fun <A : Any> catchMaybe(f: () -> Maybe<A>): Maybe<Maybe<A>> {
-      return catch(f)
-    }
-
-    @JvmStatic
     @JvmName("tryCatch")
     public inline fun <A : Any> catch(recover: (Throwable) -> Maybe<A>, f: () -> A): Maybe<A> = try {
       Just(f())
     } catch (t: Throwable) {
       recover(t.nonFatalOrThrow())
     }
-
-    @JvmStatic
-    @JvmName("tryCatchMaybe")
-    public inline fun <A : Any> catchMaybe(
-      recover: (Throwable) -> Maybe<Maybe<A>>, f: () -> Maybe<A>
-    ): Maybe<Maybe<A>> = catch(recover, f)
 
     @JvmStatic
     public inline fun <reified A : Any, B : Any> lift(crossinline f: (A) -> B): (Maybe<A>) -> Maybe<B> = { it.map(f) }
