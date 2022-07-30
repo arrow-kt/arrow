@@ -35,6 +35,7 @@ private constructor(@property:MaybeInternals @PublishedApi internal val underlyi
 
     @JvmStatic
     public inline fun <A : Any> fromNullable(a: A?): Maybe<A> = if (a != null) Just(a) else Nothing
+    @JvmStatic public inline fun fromNullable(a: Nothing?): Maybe<Nothing> = Nothing
 
     @JvmStatic
     public inline fun <A : Any> fromNullable(a: Maybe<A>?): Maybe<Maybe<A>> =
@@ -660,6 +661,8 @@ public infix fun <T : Any> Maybe<T>.or(value: Maybe<T>): Maybe<T> =
   }
 
 public inline fun <T : Any> T?.toMaybe(): Maybe<T> = this?.let { Just(it) } ?: Nothing
+
+public inline fun Nothing?.toMaybe(): Maybe<Nothing> = Nothing
 
 public fun <T : Any> Maybe<T>?.toMaybe(): Maybe<Maybe<T>> = this?.let { Just(it) } ?: Nothing
 

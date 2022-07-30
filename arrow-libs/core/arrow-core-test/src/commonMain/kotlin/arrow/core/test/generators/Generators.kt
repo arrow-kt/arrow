@@ -1,23 +1,7 @@
 package arrow.core.test.generators
 
-import arrow.core.Const
-import arrow.core.Either
-import arrow.core.Endo
-import arrow.core.Eval
-import arrow.core.Ior
-import arrow.core.Option
-import arrow.core.Tuple10
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
-import arrow.core.Validated
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import arrow.core.test.concurrency.deprecateArrowTestModules
-import arrow.core.toOption
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
@@ -209,6 +193,10 @@ public fun <A> Arb.Companion.endo(arb: Arb<A>): Arb<Endo<A>> = arb.map { a: A ->
 @Deprecated(deprecateArrowTestModules)
 public fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
+
+@Deprecated(deprecateArrowTestModules)
+public fun <B : Any> Arb.Companion.maybe(arb: Arb<B>): Arb<Maybe<B>> =
+  arb.orNull().map { it.toMaybe() }
 
 @Deprecated(deprecateArrowTestModules)
 public fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
