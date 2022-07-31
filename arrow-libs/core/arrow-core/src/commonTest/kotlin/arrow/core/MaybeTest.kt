@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.continuations.ensureNotNull
 import arrow.core.continuations.maybe
-import arrow.core.traverse
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.maybe
 import arrow.core.test.laws.MonoidLaws
@@ -29,7 +28,7 @@ class MaybeTest : UnitSpec() {
         maybe {
           ensure(predicate)
           i
-        } shouldBe if (predicate) Just(i) else Maybe.Nothing
+        } shouldBeMaybe if (predicate) Just(i) else Maybe.Nothing
       }
     }
 
@@ -40,7 +39,7 @@ class MaybeTest : UnitSpec() {
           val ii = i
           ensureNotNull(ii)
           square(ii) // Smart-cast by contract
-        } shouldBe i.toMaybe().map(::square)
+        } shouldBeMaybe i.toMaybe().map(::square)
       }
     }
 
@@ -49,7 +48,7 @@ class MaybeTest : UnitSpec() {
         val number: Int = "s".length
         ensureNotNull(number.takeIf { it > 1 })
         throw IllegalStateException("This should not be executed")
-      } shouldBe Maybe.Nothing
+      } shouldBeMaybe Maybe.Nothing
     }
 
     "tap applies effects returning the original value" {
@@ -59,7 +58,7 @@ class MaybeTest : UnitSpec() {
         val res = maybe.tap { effect += 1 }
         val expected = maybe.fold({ 0 }, { 1 })
         effect shouldBe expected
-        res shouldBe maybe
+        res shouldBeMaybe maybe
       }
     }
 
@@ -70,7 +69,7 @@ class MaybeTest : UnitSpec() {
         val res = maybe.tapNothing { effect += 1 }
         val expected = maybe.fold({ 1 }, { 0 })
         effect shouldBe expected
-        res shouldBe maybe
+        res shouldBeMaybe maybe
       }
     }
 
@@ -78,13 +77,13 @@ class MaybeTest : UnitSpec() {
       checkAll(Arb.int().orNull()) { a: Int? ->
         // This seems to be generating only non-null values, so it is complemented by the next test
         val o: Maybe<Int> = Maybe.fromNullable(a)
-        if (a == null) o shouldBe Maybe.Nothing else o shouldBe Just(a)
+        if (a == null) o shouldBeMaybe Maybe.Nothing else o shouldBeMaybe Just(a)
       }
     }
 
     "fromNullable should return maybe.Nothing for null values of nullable types" {
       val a: Int? = null
-      Maybe.fromNullable(a) shouldBe Maybe.Nothing
+      Maybe.fromNullable(a) shouldBeMaybe Maybe.Nothing
     }
 
     "getOrElse" {
@@ -98,22 +97,22 @@ class MaybeTest : UnitSpec() {
     }
 
     "map" {
-      just.map(String::uppercase) shouldBe Just("KOTLIN")
-      nothing.map(String::uppercase) shouldBe Maybe.Nothing
+      just.map(String::uppercase) shouldBeMaybe Just("KOTLIN")
+      nothing.map(String::uppercase) shouldBeMaybe Maybe.Nothing
     }
 
     "zip" {
       checkAll(Arb.int()) { a: Int ->
         val op: Maybe<Int> = a.just()
-        just.zip(op) { a, b -> a + b } shouldBe Just("kotlin$a")
-        nothing.zip(op) { a, b -> a + b } shouldBe Maybe.Nothing
-        just.zip(op) shouldBe Just(Pair("kotlin", a))
+        just.zip(op) { a, b -> a + b } shouldBeMaybe Just("kotlin$a")
+        nothing.zip(op) { a, b -> a + b } shouldBeMaybe Maybe.Nothing
+        just.zip(op) shouldBeMaybe Just(Pair("kotlin", a))
       }
     }
 
     "mapNotNull" {
-      just.mapNotNull { it.toIntOrNull() } shouldBe Maybe.Nothing
-      just.mapNotNull { it.uppercase() } shouldBe Just("KOTLIN")
+      just.mapNotNull { it.toIntOrNull() } shouldBeMaybe Maybe.Nothing
+      just.mapNotNull { it.uppercase() } shouldBeMaybe Just("KOTLIN")
     }
 
     "fold" {
@@ -122,51 +121,55 @@ class MaybeTest : UnitSpec() {
     }
 
     "flatMap" {
-      just.flatMap { Just(it.uppercase()) } shouldBe Just("KOTLIN")
-      nothing.flatMap { Just(it.uppercase()) } shouldBe Maybe.Nothing
+      just.flatMap { Just(it.uppercase()) } shouldBeMaybe Just("KOTLIN")
+      nothing.flatMap { Just(it.uppercase()) } shouldBeMaybe Maybe.Nothing
     }
 
     "align" {
-      just align just shouldBe Just(Ior.Both("kotlin", "kotlin"))
-      just align nothing shouldBe Just(Ior.Left("kotlin"))
-      nothing align just shouldBe Just(Ior.Right("kotlin"))
-      nothing align nothing shouldBe Maybe.Nothing
+      just align just shouldBeMaybe Just(Ior.Both("kotlin", "kotlin"))
+      just align nothing shouldBeMaybe Just(Ior.Left("kotlin"))
+      nothing align just shouldBeMaybe Just(Ior.Right("kotlin"))
+      nothing align nothing shouldBeMaybe Maybe.Nothing
 
-      just.align(just) { "$it" } shouldBe Just("Ior.Both(kotlin, kotlin)")
-      just.align(nothing) { "$it" } shouldBe Just("Ior.Left(kotlin)")
-      nothing.align(just) { "$it" } shouldBe Just("Ior.Right(kotlin)")
-      nothing.align(nothing) { "$it" } shouldBe Maybe.Nothing
+      just.align(just) { "$it" } shouldBeMaybe Just("Ior.Both(kotlin, kotlin)")
+      just.align(nothing) { "$it" } shouldBeMaybe Just("Ior.Left(kotlin)")
+      nothing.align(just) { "$it" } shouldBeMaybe Just("Ior.Right(kotlin)")
+      nothing.align(nothing) { "$it" } shouldBeMaybe Maybe.Nothing
 
-      val nullable = Just(Maybe.fromNullable(null))
-      just align nullable shouldBe Just(Ior.Both("kotlin", Maybe.Nothing))
-      nullable align just shouldBe Just(Ior.Both(Maybe.Nothing, "kotlin"))
-      nullable align nullable shouldBe Just(Ior.Both(Maybe.Nothing, Maybe.Nothing))
+      val nullable = null.just<Any?>()
+      just align nullable shouldBeMaybe Just(Ior.Both("kotlin", null))
+      nullable align just shouldBeMaybe Just(Ior.Both(null, "kotlin"))
+      nullable align nullable shouldBeMaybe Just(Ior.Both(null, null))
 
-      just.align(nullable) { "$it" } shouldBe Just("Ior.Both(kotlin, Maybe.Nothing)")
-      nullable.align(just) { "$it" } shouldBe Just("Ior.Both(Maybe.Nothing, kotlin)")
-      nullable.align(nullable) { "$it" } shouldBe Just("Ior.Both(Maybe.Nothing, Maybe.Nothing)")
+      just.align(nullable) { "$it" } shouldBeMaybe Just("Ior.Both(kotlin, null)")
+      nullable.align(just) { "$it" } shouldBeMaybe Just("Ior.Both(null, kotlin)")
+      nullable.align(nullable) { "$it" } shouldBeMaybe Just("Ior.Both(null, null)")
     }
 
     "filter" {
-      just.filter { it == "java" } shouldBe Maybe.Nothing
-      nothing.filter { it == "java" } shouldBe Maybe.Nothing
-      just.filter { it.startsWith('k') } shouldBe Just("kotlin")
+      just.filter { it == "java" } shouldBeMaybe Maybe.Nothing
+      nothing.filter { it == "java" } shouldBeMaybe Maybe.Nothing
+      just.filter { it.startsWith('k') } shouldBeMaybe Just("kotlin")
     }
 
     "filterNot" {
-      just.filterNot { it == "java" } shouldBe Just("kotlin")
-      nothing.filterNot { it == "java" } shouldBe Maybe.Nothing
-      just.filterNot { it.startsWith('k') } shouldBe Maybe.Nothing
+      just.filterNot { it == "java" } shouldBeMaybe Just("kotlin")
+      nothing.filterNot { it == "java" } shouldBeMaybe Maybe.Nothing
+      just.filterNot { it.startsWith('k') } shouldBeMaybe Maybe.Nothing
     }
 
     "filterIsInstance" {
       val justAny: Maybe<Any> = just
-      justAny.filterIsInstance<String>() shouldBe Just("kotlin")
-      justAny.filterIsInstance<Int>() shouldBe Maybe.Nothing
+      justAny.filterIsInstance<String>() shouldBeMaybe Just("kotlin")
+      justAny.filterIsInstance<Int>() shouldBeMaybe Maybe.Nothing
+
+      val someNullableAny: Maybe<Any?> = null.just()
+      someNullableAny.filterIsInstance<String?>() shouldBeMaybe Just(null)
+      someNullableAny.filterIsInstance<String>() shouldBeMaybe Maybe.Nothing
 
       val nothingAny: Maybe<Any> = nothing
-      nothingAny.filterIsInstance<String>() shouldBe Maybe.Nothing
-      nothingAny.filterIsInstance<Int>() shouldBe Maybe.Nothing
+      nothingAny.filterIsInstance<String>() shouldBeMaybe Maybe.Nothing
+      nothingAny.filterIsInstance<Int>() shouldBeMaybe Maybe.Nothing
     }
 
     "exists" {
@@ -182,8 +185,8 @@ class MaybeTest : UnitSpec() {
     }
 
     "orElse" {
-      just.orElse { Just("java") } shouldBe Just("kotlin")
-      nothing.orElse { Just("java") } shouldBe Just("java")
+      just.orElse { Just("java") } shouldBeMaybe Just("kotlin")
+      nothing.orElse { Just("java") } shouldBeMaybe Just("java")
     }
 
     "toList" {
@@ -193,124 +196,124 @@ class MaybeTest : UnitSpec() {
 
     "Iterable.firstOrNothing" {
       val iterable = iterableOf(1, 2, 3, 4, 5, 6)
-      iterable.firstOrNothing() shouldBe Just(1)
-      iterable.firstOrNothing { it > 2 } shouldBe Just(3)
-      iterable.firstOrNothing { it > 7 } shouldBe Maybe.Nothing
+      iterable.firstOrNothing() shouldBeMaybe Just(1)
+      iterable.firstOrNothing { it > 2 } shouldBeMaybe Just(3)
+      iterable.firstOrNothing { it > 7 } shouldBeMaybe Maybe.Nothing
 
       val emptyIterable = iterableOf<Int>()
-      emptyIterable.firstOrNothing() shouldBe Maybe.Nothing
+      emptyIterable.firstOrNothing() shouldBeMaybe Maybe.Nothing
 
-      val nullableIterable1 = iterableOf(null, 2, 3, 4, 5, 6).map { it.toMaybe() }
-      nullableIterable1.firstOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableIterable1 = iterableOf(null, 2, 3, 4, 5, 6)
+      nullableIterable1.firstOrNothing() shouldBeMaybe Just(null)
 
-      val nullableIterable2 = iterableOf(1, 2, 3, null, 5, null).map { it.toMaybe() }
-      nullableIterable2.firstOrNothing { it == Maybe.Nothing } shouldBe Just(Maybe.Nothing)
+      val nullableIterable2 = iterableOf(1, 2, 3, null, 5, null)
+      nullableIterable2.firstOrNothing { it == null } shouldBeMaybe Just(null)
     }
 
     "Collection.firstOrNothing" {
       val list = listOf(1, 2, 3, 4, 5, 6)
-      list.firstOrNothing() shouldBe Just(1)
+      list.firstOrNothing() shouldBeMaybe Just(1)
 
       val emptyList = emptyList<Int>()
-      emptyList.firstOrNothing() shouldBe Maybe.Nothing
+      emptyList.firstOrNothing() shouldBeMaybe Maybe.Nothing
 
-      val nullableList = listOf(null, 2, 3, 4, 5, 6).map { it.toMaybe() }
-      nullableList.firstOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableList = listOf(null, 2, 3, 4, 5, 6)
+      nullableList.firstOrNothing() shouldBeMaybe Just(null)
     }
 
     "Iterable.singleOrNothing" {
       val iterable = iterableOf(1, 2, 3, 4, 5, 6)
-      iterable.singleOrNothing() shouldBe Maybe.Nothing
-      iterable.singleOrNothing { it > 2 } shouldBe Maybe.Nothing
+      iterable.singleOrNothing() shouldBeMaybe Maybe.Nothing
+      iterable.singleOrNothing { it > 2 } shouldBeMaybe Maybe.Nothing
 
       val singleIterable = iterableOf(3)
-      singleIterable.singleOrNothing() shouldBe Just(3)
-      singleIterable.singleOrNothing { it == 3 } shouldBe Just(3)
+      singleIterable.singleOrNothing() shouldBeMaybe Just(3)
+      singleIterable.singleOrNothing { it == 3 } shouldBeMaybe Just(3)
 
-      val nullableSingleIterable1 = iterableOf<Int?>(null).map { it.toMaybe() }
-      nullableSingleIterable1.singleOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableSingleIterable1 = iterableOf<Int?>(null)
+      nullableSingleIterable1.singleOrNothing() shouldBeMaybe Just(null)
 
-      val nullableSingleIterable2 = iterableOf(1, 2, 3, null, 5, 6).map { it.toMaybe() }
-      nullableSingleIterable2.singleOrNothing { it == Maybe.Nothing } shouldBe Just(Maybe.Nothing)
+      val nullableSingleIterable2 = iterableOf(1, 2, 3, null, 5, 6)
+      nullableSingleIterable2.singleOrNothing { it == null } shouldBeMaybe Just(null)
 
-      val nullableSingleIterable3 = iterableOf(1, 2, 3, null, 5, null).map { it.toMaybe() }
-      nullableSingleIterable3.singleOrNothing { it == Maybe.Nothing } shouldBe Maybe.Nothing
+      val nullableSingleIterable3 = iterableOf(1, 2, 3, null, 5, null)
+      nullableSingleIterable3.singleOrNothing { it == null } shouldBeMaybe Maybe.Nothing
     }
 
     "Collection.singleOrNothing" {
       val list = listOf(1, 2, 3, 4, 5, 6)
-      list.singleOrNothing() shouldBe Maybe.Nothing
+      list.singleOrNothing() shouldBeMaybe Maybe.Nothing
 
       val singleList = listOf(3)
-      singleList.singleOrNothing() shouldBe Just(3)
+      singleList.singleOrNothing() shouldBeMaybe Just(3)
 
-      val nullableSingleList = listOf(null).map { it.toMaybe() }
-      nullableSingleList.singleOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableSingleList = listOf(null)
+      nullableSingleList.singleOrNothing() shouldBeMaybe Just(null)
     }
 
     "Iterable.lastOrNothing" {
       val iterable = iterableOf(1, 2, 3, 4, 5, 6)
-      iterable.lastOrNothing() shouldBe Just(6)
-      iterable.lastOrNothing { it < 4 } shouldBe Just(3)
-      iterable.lastOrNothing { it > 7 } shouldBe Maybe.Nothing
+      iterable.lastOrNothing() shouldBeMaybe Just(6)
+      iterable.lastOrNothing { it < 4 } shouldBeMaybe Just(3)
+      iterable.lastOrNothing { it > 7 } shouldBeMaybe Maybe.Nothing
 
       val emptyIterable = iterableOf<Int>()
-      emptyIterable.lastOrNothing() shouldBe Maybe.Nothing
+      emptyIterable.lastOrNothing() shouldBeMaybe Maybe.Nothing
 
-      val nullableIterable1 = iterableOf(1, 2, 3, 4, 5, null).map { it.toMaybe() }
-      nullableIterable1.lastOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableIterable1 = iterableOf(1, 2, 3, 4, 5, null)
+      nullableIterable1.lastOrNothing() shouldBeMaybe Just(null)
 
-      val nullableIterable2 = iterableOf(null, 2, 3, null, 5, 6).map { it.toMaybe() }
-      nullableIterable2.lastOrNothing { it == Maybe.Nothing } shouldBe Just(Maybe.Nothing)
+      val nullableIterable2 = iterableOf(null, 2, 3, null, 5, 6)
+      nullableIterable2.lastOrNothing { it == null } shouldBeMaybe Just(null)
     }
 
     "Collection.lastOrNothing" {
       val list = listOf(1, 2, 3, 4, 5, 6)
-      list.lastOrNothing() shouldBe Just(6)
+      list.lastOrNothing() shouldBeMaybe Just(6)
 
       val emptyList = emptyList<Int>()
-      emptyList.lastOrNothing() shouldBe Maybe.Nothing
+      emptyList.lastOrNothing() shouldBeMaybe Maybe.Nothing
 
-      val nullableList = listOf(1, 2, 3, 4, 5, null).map { it.toMaybe() }
-      nullableList.lastOrNothing() shouldBe Just(Maybe.Nothing)
+      val nullableList = listOf(1, 2, 3, 4, 5, null)
+      nullableList.lastOrNothing() shouldBeMaybe Just(null)
     }
 
     "Iterable.elementAtOrNothing" {
       val iterable = iterableOf(1, 2, 3, 4, 5, 6)
-      iterable.elementAtOrNothing(index = 3 - 1) shouldBe Just(3)
-      iterable.elementAtOrNothing(index = -1) shouldBe Maybe.Nothing
-      iterable.elementAtOrNothing(index = 100) shouldBe Maybe.Nothing
+      iterable.elementAtOrNothing(index = 3 - 1) shouldBeMaybe Just(3)
+      iterable.elementAtOrNothing(index = -1) shouldBeMaybe Maybe.Nothing
+      iterable.elementAtOrNothing(index = 100) shouldBeMaybe Maybe.Nothing
 
-      val nullableIterable = iterableOf(1, 2, null, 4, 5, 6).map { it.toMaybe() }
-      nullableIterable.elementAtOrNothing(index = 3 - 1) shouldBe Just(Maybe.Nothing)
+      val nullableIterable = iterableOf(1, 2, null, 4, 5, 6)
+      nullableIterable.elementAtOrNothing(index = 3 - 1) shouldBeMaybe Just(null)
     }
 
     "Collection.elementAtOrNothing" {
       val list = listOf(1, 2, 3, 4, 5, 6)
-      list.elementAtOrNothing(index = 3 - 1) shouldBe Just(3)
-      list.elementAtOrNothing(index = -1) shouldBe Maybe.Nothing
-      list.elementAtOrNothing(index = 100) shouldBe Maybe.Nothing
+      list.elementAtOrNothing(index = 3 - 1) shouldBeMaybe Just(3)
+      list.elementAtOrNothing(index = -1) shouldBeMaybe Maybe.Nothing
+      list.elementAtOrNothing(index = 100) shouldBeMaybe Maybe.Nothing
 
-      val nullableList = listOf(1, 2, null, 4, 5, 6).map { it.toMaybe() }
-      nullableList.elementAtOrNothing(index = 3 - 1) shouldBe Just(Maybe.Nothing)
+      val nullableList = listOf(1, 2, null, 4, 5, 6)
+      nullableList.elementAtOrNothing(index = 3 - 1) shouldBeMaybe Just(null)
     }
 
     "and" {
       val x = Just(2)
       val y = Just("Foo")
-      x and y shouldBe Just("Foo")
-      x and Maybe.Nothing shouldBe Maybe.Nothing
-      Maybe.Nothing and x shouldBe Maybe.Nothing
-      Maybe.Nothing and Maybe.Nothing shouldBe Maybe.Nothing
+      x and y shouldBeMaybe Just("Foo")
+      x and Maybe.Nothing shouldBeMaybe Maybe.Nothing
+      Maybe.Nothing and x shouldBeMaybe Maybe.Nothing
+      Maybe.Nothing and Maybe.Nothing shouldBeMaybe Maybe.Nothing
     }
 
     "or" {
       val x = Just(2)
       val y = Just(100)
-      x or y shouldBe Just(2)
-      x or Maybe.Nothing shouldBe Just(2)
-      Maybe.Nothing or x shouldBe Just(2)
-      Maybe.Nothing or Maybe.Nothing shouldBe Maybe.Nothing
+      x or y shouldBeMaybe Just(2)
+      x or Maybe.Nothing shouldBeMaybe Just(2)
+      Maybe.Nothing or x shouldBeMaybe Just(2)
+      Maybe.Nothing or Maybe.Nothing shouldBeMaybe Maybe.Nothing
     }
 
     "toLeftMaybe" {
@@ -322,15 +325,15 @@ class MaybeTest : UnitSpec() {
     "pairLeft" {
       val just: Maybe<Int> = Just(2)
       val nothing: Maybe<Int> = Maybe.Nothing
-      just.pairLeft("key") shouldBe Just("key" to 2)
-      nothing.pairLeft("key") shouldBe Maybe.Nothing
+      just.pairLeft("key") shouldBeMaybe Just("key" to 2)
+      nothing.pairLeft("key") shouldBeMaybe Maybe.Nothing
     }
 
     "pairRight" {
       val just: Maybe<Int> = Just(2)
       val nothing: Maybe<Int> = Maybe.Nothing
-      just.pairRight("right") shouldBe Just(2 to "right")
-      nothing.pairRight("right") shouldBe Maybe.Nothing
+      just.pairRight("right") shouldBeMaybe Just(2 to "right")
+      nothing.pairRight("right") shouldBeMaybe Maybe.Nothing
     }
 
     "Maybe<Pair<L, R>>.toMap()" {
@@ -384,23 +387,23 @@ class MaybeTest : UnitSpec() {
 
     "catch should return Just(result) when f does not throw" {
       val recover: (Throwable) -> Maybe<Int> = { _ -> Maybe.Nothing }
-      Maybe.catch(recover) { 1 } shouldBe Just(1)
+      Maybe.catch(recover) { 1 } shouldBeMaybe Just(1)
     }
 
     "catch with default recover should return Just(result) when f does not throw" {
-      Maybe.catch { 1 } shouldBe Just(1)
+      Maybe.catch { 1 } shouldBeMaybe Just(1)
     }
 
     "catch should return Just(recoverValue) when f throws" {
       val exception = Exception("Boom!")
       val recoverValue = 10
       val recover: (Throwable) -> Maybe<Int> = { _ -> Just(recoverValue) }
-      Maybe.catch(recover) { throw exception } shouldBe Just(recoverValue)
+      Maybe.catch(recover) { throw exception } shouldBeMaybe Just(recoverValue)
     }
 
     "catch should return Maybe.Nothing when f throws" {
       val exception = Exception("Boom!")
-      Maybe.catch { throw exception } shouldBe Maybe.Nothing
+      Maybe.catch { throw exception } shouldBeMaybe Maybe.Nothing
     }
   }
 }
@@ -409,3 +412,8 @@ class MaybeTest : UnitSpec() {
 private fun <T> iterableOf(vararg elements: T): Iterable<T> = Iterable {
   iterator { yieldAll(elements.toList()) }
 }
+
+// Doesn't box, which makes it easier to inspect decompiled bytecode
+@OptIn(MaybeInternals::class)
+private infix fun <T, U : T> Maybe<T>?.shouldBeMaybe(expected: Maybe<U>?): Unit =
+  this?.underlying shouldBe expected?.underlying
