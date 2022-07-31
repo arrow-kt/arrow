@@ -98,9 +98,8 @@ internal val <A> Maybe<A>.value: A
     when (underlying) {
       is NestedNull -> if (underlying.nesting == 0U) null else NestedNull(underlying.nesting - 1U)
       is NestedNothing ->
-        NestedNothing(underlying.nesting - 1U).also {
-          if (it.nesting < 0U) error("Cannot unpack the value of a Maybe.Nothing")
-        }
+        if (underlying.nesting == 0U) error("Cannot unpack the value of a Maybe.Nothing")
+        else NestedNothing(underlying.nesting - 1U)
       else -> underlying
     }
       as A
