@@ -52,12 +52,7 @@ public class IorEffectScope<E>(semigroup: Semigroup<E>, private val effect: Effe
         rightValue
       }
     }
-  
-  override suspend fun <B> Effect<E, B>.bind(): B =
-    when(this) {
-      is DefaultEffect -> f(effect)
-    }
-  
+
   override suspend fun <B> shift(r: E): B = effect.shift(combine(r))
 }
 

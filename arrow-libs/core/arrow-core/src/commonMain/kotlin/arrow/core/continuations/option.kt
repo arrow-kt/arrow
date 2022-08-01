@@ -18,15 +18,10 @@ public fun <A> EagerEffect<None, A>.toOption(): Option<A> =
 public value class OptionEffectScope(private val cont: EffectScope<None>) : EffectScope<None> {
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
-  
+
   public suspend fun <B> Option<B>.bind(): B =
     bind { None }
-  
-  override suspend fun <B> Effect<None, B>.bind(): B =
-    when (this) {
-      is DefaultEffect -> f(cont)
-    }
-  
+
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
 }
@@ -48,10 +43,10 @@ public value class OptionEagerEffectScope(private val cont: EagerEffectScope<Non
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
-  
+
   public suspend fun <B> Option<B>.bind(): B =
     bind { None }
-  
+
   public suspend fun ensure(value: Boolean): Unit =
     ensure(value) { None }
 }
@@ -63,7 +58,7 @@ public object option {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(OptionEagerEffectScope(this))
     }.toOption()
-  
+
   public suspend inline operator fun <A> invoke(crossinline f: suspend OptionEffectScope.() -> A): Option<A> =
     effect<None, A> { f(OptionEffectScope(this)) }.toOption()
 }

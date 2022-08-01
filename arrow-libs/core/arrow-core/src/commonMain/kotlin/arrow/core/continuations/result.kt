@@ -13,14 +13,9 @@ public fun <A> EagerEffect<Throwable, A>.toResult(): Result<A> =
 public value class ResultEffectScope(private val cont: EffectScope<Throwable>) : EffectScope<Throwable> {
   override suspend fun <B> shift(r: Throwable): B =
     cont.shift(r)
-  
+
   public suspend fun <B> Result<B>.bind(): B =
     fold(::identity) { shift(it) }
-  
-  override suspend fun <B> Effect<Throwable, B>.bind(): B =
-    when (this) {
-      is DefaultEffect -> f(cont)
-    }
 }
 
 @JvmInline
@@ -28,7 +23,7 @@ public value class ResultEagerEffectScope(private val cont: EagerEffectScope<Thr
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: Throwable): B =
     cont.shift(r)
-  
+
   public suspend fun <B> Result<B>.bind(): B =
     fold(::identity) { shift(it) }
 }
@@ -40,7 +35,7 @@ public object result {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(ResultEagerEffectScope(this))
     }.toResult()
-  
+
   public suspend inline operator fun <A> invoke(crossinline f: suspend ResultEffectScope.() -> A): Result<A> =
     effect<Throwable, A> { f(ResultEffectScope(this)) }.toResult()
 }
