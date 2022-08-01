@@ -11,7 +11,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 
 /** Context of the [EagerEffect] DSL. */
 @RestrictsSuspension
@@ -191,7 +190,7 @@ public interface EagerEffectScope<in R> {
 
   /**
    * Encloses an action for which you want to catch any `shift`.
-   * [attempt] is used in combination with [catch].
+   * [effect] is used in combination with [catch].
    *
    * ```
    * attempt { ... } catch { ... }
@@ -212,7 +211,7 @@ public interface EagerEffectScope<in R> {
    * When the [EagerEffect] has shifted with [R] it will [recover]
    * the shifted value to [A], and when it ran the computation to
    * completion it will return the value [A].
-   * [catch] is used in combination with [attempt].
+   * [catch] is used in combination with [effect].
    *
    * ```kotlin
    * import arrow.core.Either

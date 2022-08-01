@@ -113,7 +113,7 @@ class EffectSpec :
     "attempt - catch" {
       checkAll(Arb.int(), Arb.long()) { i, l ->
         effect<String, Int> {
-          attempt<Long, Int> {
+          effect<Long, Int> {
             shift(l)
           } catch { ll ->
             ll shouldBe l
@@ -126,7 +126,7 @@ class EffectSpec :
     "attempt - no catch" {
       checkAll(Arb.int(), Arb.long()) { i, l ->
         effect<String, Int> {
-          attempt<Long, Int> {
+          effect<Long, Int> {
             i
           } catch { ll ->
             ll shouldBe l

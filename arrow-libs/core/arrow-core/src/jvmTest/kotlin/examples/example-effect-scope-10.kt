@@ -1,4 +1,4 @@
-// This file was automatically generated from EffectScope.kt by Knit tool. Do not edit.
+// This file was automatically generated from Shift.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffectScope10
 
 import arrow.core.continuations.effect

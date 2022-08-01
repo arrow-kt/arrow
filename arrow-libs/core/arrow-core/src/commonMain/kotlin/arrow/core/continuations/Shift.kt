@@ -11,6 +11,17 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 
+/**
+ * Marks functions that are running in DSL mode.
+ *
+ * For example,
+ *  the function `catch` exists as an extension on `Effect<E, A>` but it also exists as a DSL inside `Shift`.
+ *  To make it visually more clear, we mark it as a DSL inside Kotlin / IDEA.
+ *  This way `catch` will appear as a keyword when inside the `Shift` DSL.
+ */
+@DslMarker
+public annotation class ShiftMarker
+
 /** Context of the [Effect] DSL. */
 public interface Shift<in R> {
   /**
@@ -31,7 +42,7 @@ public interface Shift<in R> {
    * <!--- KNIT example-effect-scope-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
-
+  
   /**
    * Runs the [Effect] to finish, returning [B] or [shift] in case of [R].
    *
@@ -60,7 +71,7 @@ public interface Shift<in R> {
    */
   public suspend fun <B> Effect<R, B>.bind(): B =
     invoke(this@Shift)
-
+  
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
    * bridging eager computations into suspending.
@@ -94,7 +105,7 @@ public interface Shift<in R> {
     fold({ r -> left = r }, { a -> right = a })
     return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
-
+  
   /**
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
@@ -119,7 +130,7 @@ public interface Shift<in R> {
       is Either.Left -> shift(value)
       is Either.Right -> value
     }
-
+  
   /**
    * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
    *
@@ -144,7 +155,7 @@ public interface Shift<in R> {
       is Validated.Valid -> value
       is Validated.Invalid -> shift(value)
     }
-
+  
   /**
    * Folds [Result] into [Effect], by returning [B] or a transforming [Throwable] into [R] and
    * shifting the result.
@@ -168,7 +179,7 @@ public interface Shift<in R> {
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
-
+  
   /**
    * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
    * result.
@@ -198,7 +209,7 @@ public interface Shift<in R> {
       None -> shift(shift())
       is Some -> value
     }
-
+  
   /**
    * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
    * Monadic version of [kotlin.require].
@@ -223,30 +234,20 @@ public interface Shift<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
-
+  
+  // TODO we can also have effect turn op as a keyword when used nested in the DSL.
+  //      There is no "strong" reason to do this, since `effect` now just exists as a synthetic builder for Shift receiver lambdas.
+  // @OptIn(ExperimentalTypeInference::class)
+  // @ShiftMarker
+  // public fun <E, A> effect(
+  //   @BuilderInference block: suspend Shift<E>.() -> A
+  // ): Effect<E, A> = block
+  
   /**
-   * Encloses an action for which you want to catch any `shift`.
-   * [attempt] is used in combination with [catch].
-   *
-   * ```
-   * attempt { ... } catch { ... }
-   * ```
-   *
-   * The [f] may `shift` into a different `EffectScope`, giving
-   * the chance for a later [catch] to change the shifted value.
-   * This is useful to simulate re-throwing of exceptions.
-   */
-  @OptIn(ExperimentalTypeInference::class)
-  public suspend fun <E, A> attempt(
-    @BuilderInference
-    f: suspend Shift<E>.() -> A,
-  ): suspend Shift<E>.() -> A = f
-
-  /**
-   * When the [Effect] has shifted with [R] it will [recover]
+   * When the [Effect] has shifted with [R] it will [resolve]
    * the shifted value to [A], and when it ran the computation to
    * completion it will return the value [A].
-   * [catch] is used in combination with [attempt].
+   * [catch] is used in combination with [effect].
    *
    * ```kotlin
    * import arrow.core.Either
@@ -263,16 +264,23 @@ public interface Shift<in R> {
    *     val x = Either.Right(1).bind()
    *     val y = Validated.Valid(2).bind()
    *     val z =
-   *      attempt { None.bind { "Option was empty" } } catch { 0 }
+   *      effect { None.bind { "Option was empty" } } catch { 0 }
    *     x + y + z
    *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
    * }
    * ```
    * <!--- KNIT example-effect-scope-09.kt -->
    */
+  @ShiftMarker
   public suspend infix fun <E, A> (suspend Shift<E>.() -> A).catch(
-    recover: suspend Shift<R>.(E) -> A,
-  ): A = effect(this).fold({ recover(it) }, ::identity)
+    resolve: suspend Shift<R>.(E) -> A,
+  ): A = catch<E, R, A>(resolve).bind()
+  
+  @ShiftMarker
+  public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
+    recover: suspend Shift<R>.(Throwable) -> A,
+    resolve: suspend Shift<R>.(E) -> A,
+  ): A = catch<E, R, A>(recover, resolve).bind()
 }
 
 /**

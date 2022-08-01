@@ -15,6 +15,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * [Effect] represents a function of `suspend () -> A`, that short-circuit with a value of [R] (and [Throwable]),
@@ -24,21 +25,21 @@ import kotlin.coroutines.resume
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
- 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
- 
+
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Strange edge cases](#strange-edge-cases)
+
  * <!--- END -->
  *
  *
@@ -192,23 +193,20 @@ import kotlin.coroutines.resume
  *
  * ## Handling errors
  *
- * Handling errors of type [R] is the same as handling errors for any other data type in Arrow.
+ * Handling errors of type `R` is the same as handling errors for any other data type in Arrow.
  * `Effect<R, A>` offers `handleError`, `handleErrorWith`, `redeem`, `redeemWith` and `attempt`.
  *
- * As you can see in the examples below it is possible to resolve errors of [R] or `Throwable` in `Effect<R, A>` in a generic manner.
- * There is no need to run `Effect<R, A>` into `Either<R, A>` before you can access [R],
+ * As you can see in the examples below it is possible to resolve errors of `R` or `Throwable` in `Effect<R, A>` in a generic manner.
+ * There is no need to run `Effect<R, A>` into `Either<R, A>` before you can access `R`,
  * you can simply call the same functions on `Effect<R, A>` as you would on `Either<R, A>` directly.
  *
  * <!--- INCLUDE
  * import arrow.core.Either
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.handleError
- * import arrow.core.continuations.handleErrorWith
- * import arrow.core.continuations.redeem
+ * import arrow.core.continuations.catch
  * import arrow.core.continuations.attempt
  * import arrow.core.continuations.toEither
- * import arrow.core.identity
  * import io.kotest.matchers.shouldBe
  * -->
  * ```kotlin
@@ -216,15 +214,15 @@ import kotlin.coroutines.resume
  *   effect { shift("failed") }
  *
  * val resolved: Effect<Nothing, Int> =
- *   failed.handleError { it.length }
+ *   failed.catch { it.length }
  *
  * val newError: Effect<List<Char>, Int> =
- *   failed.handleErrorWith { str ->
- *     effect { shift(str.reversed().toList()) }
+ *   failed.catch { str ->
+ *     shift(str.reversed().toList())
  *   }
  *
  * val redeemed: Effect<Nothing, Int> =
- *   failed.redeem({ str -> str.length }, ::identity)
+ *   failed.catch { str -> str.length }
  *
  * val captured: Effect<String, Result<Int>> =
  *   effect<String, Int> { 1 }.attempt()
@@ -245,7 +243,7 @@ import kotlin.coroutines.resume
  *
  * ## Structured Concurrency
  *
- * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type [R] inside the `Continuation` since it effectively cancels/short-circuits it.
+ * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
  * For this reason `shift` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
  *
  * Let's overview below how `shift` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
@@ -588,6 +586,40 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
+/**
+ * DSL for constructing Effect<R, A> values
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Validated
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
+ * import io.kotest.assertions.fail
+ * import io.kotest.matchers.shouldBe
+ *
+ * suspend fun main() {
+ *   effect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z = Option(3).bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
+ *
+ *   effect<String, Int> {
+ *     val x = Either.Right(1).bind()
+ *     val y = Validated.Valid(2).bind()
+ *     val z: Int = None.bind { "Option was empty" }
+ *     x + y + z
+ *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
+ * }
+ * ```
+ * <!--- KNIT example-effect-01.kt -->
+ */
+@OptIn(ExperimentalTypeInference::class)
+public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<R, A> = f
+
 public typealias Effect<R, A> = suspend Shift<R>.() -> A
 
 public suspend fun <R, A, B> Effect<R, A>.fold(
@@ -611,6 +643,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
         // CancellationException and thus effectively recovering from the cancellation/shift.
         // This means try/catch is also capable of recovering from monadic errors.
           // See: EffectSpec - try/catch tests
+          @Suppress("UNCHECKED_CAST")
           throw Suspend(token, r, recover as suspend (Any?) -> Any?)
       }
     
@@ -619,6 +652,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
         .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
     } catch (e: Suspend) {
       if (token == e.token) {
+        @Suppress("UNCHECKED_CAST")
         val f: suspend () -> B = { e.recover(e.shifted) as B }
         f.startCoroutineUninterceptedOrReturn(cont)
       } else throw e
@@ -628,40 +662,10 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
     }
   }
 
-/**
- * Runs the suspending computation by creating a [Continuation], and running the `fold` function
- * over the computation.
- *
- * When the [Effect] has shifted with [R] it will [recover] the shifted value to [B], and when it
- * ran the computation to completion it will [transform] the value [A] to [B].
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
- * import io.kotest.matchers.shouldBe
- *
- * suspend fun main() {
- *   val shift = effect<String, Int> {
- *     shift("Hello, World!")
- *   }.fold({ str: String -> str }, { int -> int.toString() })
- *   shift shouldBe "Hello, World!"
- *
- *   val res = effect<String, Int> {
- *     1000
- *   }.fold({ str: String -> str.length }, { int -> int })
- *   res shouldBe 1000
- * }
- * ```
- * <!--- KNIT example-effect-01.kt -->
- */
 public suspend fun <R, A, B> Effect<R, A>.fold(
   recover: suspend (shifted: R) -> B,
   transform: suspend (value: A) -> B,
-): B = fold(
-  { throw it },
-  recover,
-  transform
-)
+): B = fold({ throw it }, recover, transform)
 
 /**
  * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
@@ -686,7 +690,7 @@ public suspend fun <R, A> Effect<R, A>.toValidated(): Validated<R, A> =
  * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
  * provided function [orElse], and result value [A] is mapped to [Some].
  */
-public suspend fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Option<A>): Option<A> =
+public suspend infix fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Option<A>): Option<A> =
   fold(orElse, ::Some)
 
 /**
@@ -705,24 +709,23 @@ public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
   }
 }
 
-public fun <R, A> Effect<R, A>.handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
-  fold(recover, ::identity)
+@OptIn(ExperimentalTypeInference::class)
+@BuilderInference
+public fun <E, E2, A> Effect<E, A>.catch(
+  recover: suspend Shift<E2>.(Throwable) -> A,
+  resolve: suspend Shift<E2>.(E) -> A,
+): Effect<E2, A> = effect {
+  fold(
+    { recover(it) },
+    { resolve(it) },
+    { it }
+  )
 }
 
-public fun <R2, R, A> Effect<R, A>.handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> =
-  effect {
-    fold({ r -> recover(r).bind() }, ::identity)
-  }
+public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
+  catch({ throw it }, resolve)
 
-public fun <R, A, B> Effect<R, A>.redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
-  effect {
-    fold(recover, transform)
-  }
-
-public fun <R2, R, A, B> Effect<R, A>.redeemWith(
-  recover: suspend (R) -> Effect<R2, B>,
-  transform: suspend (A) -> Effect<R2, B>,
-): Effect<R2, B> = effect { fold(recover, transform).bind() }
+public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 
 /**
  * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level
@@ -759,6 +762,7 @@ private class FoldContinuation<B>(
   override val context: CoroutineContext,
   private val parent: Continuation<B>,
 ) : Continuation<B> {
+  @Suppress("UNCHECKED_CAST")
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
       if (throwable is Suspend && token == throwable.token) {
@@ -771,38 +775,3 @@ private class FoldContinuation<B>(
     }
   }
 }
-
-/**
- * DSL for constructing Effect<R, A> values
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Validated
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
- * import io.kotest.assertions.fail
- * import io.kotest.matchers.shouldBe
- *
- * suspend fun main() {
- *   effect<String, Int> {
- *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z = Option(3).bind { "Option was empty" }
- *     x + y + z
- *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
- *
- *   effect<String, Int> {
- *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z: Int = None.bind { "Option was empty" }
- *     x + y + z
- *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
- * }
- * ```
- * <!--- KNIT example-effect-02.kt -->
- */
-public fun <R, A> effect(f: suspend Shift<R>.() -> A): Effect<R, A> = f
-
-public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)

@@ -35,23 +35,23 @@ class StructuredConcurrencySpec :
       val cancelled = CompletableDeferred<Throwable?>()
 
       effect<String, Nothing> {
-          coroutineScope {
-            val never = async {
-              suspendCancellableCoroutine<Nothing> { cont ->
-                cont.invokeOnCancellation { cause ->
-                  require(cancelled.complete(cause)) { "cancelled latch was completed twice" }
-                }
-                require(started.complete(Unit))
+        coroutineScope {
+          val never = async {
+            suspendCancellableCoroutine<Nothing> { cont ->
+              cont.invokeOnCancellation { cause ->
+                require(cancelled.complete(cause)) { "cancelled latch was completed twice" }
               }
+              require(started.complete(Unit))
             }
-            async<Int> {
-                started.await()
-                shift("hello")
-              }
-              .await()
-            never.await()
           }
+          async<Int> {
+            started.await()
+            shift("hello")
+          }
+            .await()
+          never.await()
         }
+      }
         .runCont() shouldBe "hello"
 
       withTimeout(2.seconds) {
@@ -67,12 +67,12 @@ class StructuredConcurrencySpec :
     "Concurrent shift - async await" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
-            coroutineScope {
-              val fa = async<String> { shift(a) }
-              val fb = async<String> { shift(b) }
-              fa.await() + fb.await()
-            }
+          coroutineScope {
+            val fa = async<String> { shift(a) }
+            val fb = async<String> { shift(b) }
+            fa.await() + fb.await()
           }
+        }
           .runCont() shouldBeIn listOf(a, b)
       }
     }
@@ -95,23 +95,23 @@ class StructuredConcurrencySpec :
         }
 
         effect<Int, String> {
-            guaranteeCase({
-              coroutineScope {
-                val fa =
-                  async<Unit> {
-                    startLatches.drop(1).zip(nestedExits) { start, promise ->
-                      asyncTask(start, promise)
-                    }
-                    startLatches.awaitAll()
-                    shift(a)
+          guaranteeCase({
+            coroutineScope {
+              val fa =
+                async<Unit> {
+                  startLatches.drop(1).zip(nestedExits) { start, promise ->
+                    asyncTask(start, promise)
                   }
-                val fb = asyncTask(startLatches.first(), fbExit)
-                fa.await()
-                fb.await()
-              }
-            }) { case -> require(scopeExit.complete(case)) }
-            fail("Should never come here")
-          }
+                  startLatches.awaitAll()
+                  shift(a)
+                }
+              val fb = asyncTask(startLatches.first(), fbExit)
+              fa.await()
+              fb.await()
+            }
+          }) { case -> require(scopeExit.complete(case)) }
+          fail("Should never come here")
+        }
           .runCont() shouldBe a
         withTimeout(2.seconds) {
           scopeExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
@@ -124,12 +124,12 @@ class StructuredConcurrencySpec :
     "Concurrent shift - async" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
-            coroutineScope {
-              val fa = async<Nothing> { shift(a) }
-              val fb = async<Nothing> { shift(b) }
-              "I will be overwritten by shift - coroutineScope waits until all async are finished"
-            }
+          coroutineScope {
+            val fa = async<Nothing> { shift(a) }
+            val fb = async<Nothing> { shift(b) }
+            "I will be overwritten by shift - coroutineScope waits until all async are finished"
           }
+        }
           .fold({ fail("Async is never awaited, and thus ignored.") }, ::identity) shouldBe
           "I will be overwritten by shift - coroutineScope waits until all async are finished"
       }
@@ -152,18 +152,18 @@ class StructuredConcurrencySpec :
         }
 
         effect<Int, String> {
-            guaranteeCase({
-              coroutineScope {
-                val fa =
-                  async<Unit> {
-                    startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
-                    startLatches.awaitAll()
-                    shift(a)
-                  }
-                str
-              }
-            }) { case -> require(exitScope.complete(case)) }
-          }
+          guaranteeCase({
+            coroutineScope {
+              val fa =
+                async<Unit> {
+                  startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
+                  startLatches.awaitAll()
+                  shift(a)
+                }
+              str
+            }
+          }) { case -> require(exitScope.complete(case)) }
+        }
           .runCont() shouldBe str
 
         withTimeout(2.seconds) {
@@ -175,12 +175,12 @@ class StructuredConcurrencySpec :
     "Concurrent shift - launch" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
-            coroutineScope {
-              launch { shift(a) }
-              launch { shift(b) }
-              "shift does not escape `launch`"
-            }
+          coroutineScope {
+            launch { shift(a) }
+            launch { shift(b) }
+            "shift does not escape `launch`"
           }
+        }
           .runCont() shouldBe "shift does not escape `launch`"
       }
     }
@@ -202,17 +202,17 @@ class StructuredConcurrencySpec :
         }
 
         effect<Int, String> {
-            guaranteeCase({
-              coroutineScope {
-                val fa = launch {
-                  startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
-                  startLatches.awaitAll()
-                  shift(a)
-                }
-                str
+          guaranteeCase({
+            coroutineScope {
+              val fa = launch {
+                startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
+                startLatches.awaitAll()
+                shift(a)
               }
-            }) { case -> require(scopeExit.complete(case)) }
-          }
+              str
+            }
+          }) { case -> require(scopeExit.complete(case)) }
+        }
           .runCont() shouldBe str
         withTimeout(2.seconds) {
           scopeExit.await().shouldBeTypeOf<ExitCase.Completed>()
@@ -229,9 +229,9 @@ class StructuredConcurrencySpec :
             coroutineScope {
               val shiftedAsync =
                 effect<Int, Deferred<String>> {
-                    val fa = async<Int> { shift(a) }
-                    async { shift(b) }
-                  }
+                  val fa = async<Int> { shift(a) }
+                  async { shift(b) }
+                }
                   .fold({ fail("shift was never awaited, so it never took effect") }, ::identity)
               shiftedAsync.await()
             }
