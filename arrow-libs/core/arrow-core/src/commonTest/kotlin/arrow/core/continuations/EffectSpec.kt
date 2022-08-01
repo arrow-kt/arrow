@@ -301,6 +301,25 @@ class EffectSpec :
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
+  
+    "#2779 - bind nested in fold does not make nested Continuations hang" {
+      checkAll(Arb.string()) { error ->
+        val failed: Effect<String, Int> = effect {
+          shift(error)
+        }
+      
+        val newError: Effect<List<Char>, Int> =
+          effect {
+            failed.fold({ r ->
+              effect<List<Char>, Int> {
+                shift(r.reversed().toList())
+              }.bind()
+            }, ::identity)
+          }
+      
+        newError.toEither() shouldBe Either.Left(error.reversed().toList())
+      }
+    }
   })
 
 private data class Failure(val msg: String)
