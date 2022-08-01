@@ -12,6 +12,11 @@ public value class NullableEffectScope(private val cont: EffectScope<Nothing?>) 
 
   public suspend fun <B> Option<B>.bind(): B =
     bind { null }
+  
+  override suspend fun <B> Effect<Nothing?, B>.bind(): B =
+    when(this) {
+      is DefaultEffect -> f(cont)
+    }
 
   @OptIn(ExperimentalContracts::class)
   public suspend fun <B> B?.bind(): B {
