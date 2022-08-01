@@ -11,7 +11,6 @@ import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -25,21 +24,21 @@ import kotlin.coroutines.resume
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
- 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
- 
+
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Strange edge cases](#strange-edge-cases)
+
  * <!--- END -->
  *
  *
@@ -597,9 +596,9 @@ public interface Effect<out R, out A> {
    */
   public suspend fun <B> fold(
     recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B,
+    transform: suspend (value: A) -> B
   ): B
-  
+
   /**
    * Like [fold] but also allows folding over any unexpected [Throwable] that might have occurred.
    * @see fold
@@ -607,45 +606,45 @@ public interface Effect<out R, out A> {
   public suspend fun <B> fold(
     error: suspend (error: Throwable) -> B,
     recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B,
+    transform: suspend (value: A) -> B
   ): B =
     try {
       fold(recover, transform)
     } catch (e: Throwable) {
       error(e.nonFatalOrThrow())
     }
-  
+
   /**
    * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
    * result value [A] is mapped to [Either.Right].
    */
   public suspend fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
-  
+
   /**
    * [fold] the [Effect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
    * result value [A] is mapped to [Ior.Right].
    */
   public suspend fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-  
+
   /**
    * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
    * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
    */
   public suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-  
+
   /**
    * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
    * provided function [orElse], and result value [A] is mapped to [Some].
    */
   public suspend fun toOption(orElse: suspend (R) -> Option<@UnsafeVariance A>): Option<A> = fold(orElse, ::Some)
-  
+
   /**
    * [fold] the [Effect] into an [A?]. Where the shifted value [R] is mapped to
    * [null], and result value [A].
    */
   public suspend fun orNull(): A? = fold({ null }, ::identity)
-  
+
   /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
   public fun attempt(): Effect<R, Result<A>> = effect {
     try {
@@ -654,23 +653,23 @@ public interface Effect<out R, out A> {
       Result.failure(e.nonFatalOrThrow())
     }
   }
-  
+
   public fun handleError(recover: suspend (R) -> @UnsafeVariance A): Effect<Nothing, A> = effect {
     fold(recover, ::identity)
   }
-  
+
   public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> = effect {
     fold({ recover(it).bind() }, ::identity)
   }
-  
+
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
     effect {
       fold(recover, transform)
     }
-  
+
   public fun <R2, B> redeemWith(
     recover: suspend (R) -> Effect<R2, B>,
-    transform: suspend (A) -> Effect<R2, B>,
+    transform: suspend (A) -> Effect<R2, B>
   ): Effect<R2, B> = effect { fold(recover, transform).bind() }
 }
 
@@ -712,7 +711,7 @@ internal class Token {
 internal class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
-  private val parent: Continuation<B>,
+  private val parent: Continuation<B>
 ) : Continuation<B> {
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
@@ -778,7 +777,7 @@ private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effec
             // See: EffectSpec - try/catch tests
             throw Suspend(token, r, recover as suspend (Any?) -> Any?)
         }
-      
+
       try {
         suspend { transform(f(effectScope)) }
           .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
