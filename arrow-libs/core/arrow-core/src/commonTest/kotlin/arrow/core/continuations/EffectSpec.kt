@@ -291,6 +291,7 @@ class EffectSpec :
     "#2779 - bind nested in fold (old handleErrorWith impl) does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
+          withContext(Dispatchers.Default) {}
           shift(error)
         }
         
@@ -306,6 +307,7 @@ class EffectSpec :
     "#2779 - bind nested in fold (old handleErrorWith impl) within runBlocking doesn't hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
+          withContext(Dispatchers.Default) {}
           shift(error)
         }
         
@@ -323,6 +325,7 @@ class EffectSpec :
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
+          withContext(Dispatchers.Default) {}
           shift(error)
         }
         
