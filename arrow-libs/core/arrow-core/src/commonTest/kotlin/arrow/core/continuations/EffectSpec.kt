@@ -322,7 +322,7 @@ class EffectSpec :
       }
     }
     
-    "#2779 - bind nested in fold does not make nested Continuations hang" {
+    "#2779 - bind nested in fold does not make nested Continuations hang".config(enabled = false) {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}

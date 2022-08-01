@@ -659,7 +659,7 @@ public sealed interface Effect<out R, out A> {
   }
   
   public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> = effect {
-    fold({ recover(it).bind() }, ::identity)
+    fold({ r -> recover(r) }, { a -> effect<Nothing, A> { a } }).bind()
   }
 
   public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
