@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectScope10
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.toEither
 import arrow.core.continuations.ensureNotNull
 import arrow.core.left
 import arrow.core.right

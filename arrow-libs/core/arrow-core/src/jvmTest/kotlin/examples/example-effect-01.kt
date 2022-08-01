@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffect01
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import io.kotest.matchers.shouldBe
 
 suspend fun main() {

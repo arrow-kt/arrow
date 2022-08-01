@@ -4,6 +4,7 @@ package arrow.core.examples.exampleEffectScope07
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.core.getOrElse
 import arrow.core.identity
 import io.kotest.matchers.shouldBe

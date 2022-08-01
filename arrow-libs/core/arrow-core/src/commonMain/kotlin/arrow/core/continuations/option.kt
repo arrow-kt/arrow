@@ -15,7 +15,7 @@ public fun <A> EagerEffect<None, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }
 
 @JvmInline
-public value class OptionEffectScope(private val cont: EffectScope<None>) : EffectScope<None> {
+public value class OptionShift(private val cont: Shift<None>) : Shift<None> {
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
 
@@ -27,7 +27,7 @@ public value class OptionEffectScope(private val cont: EffectScope<None>) : Effe
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <B> OptionEffectScope.ensureNotNull(value: B?): B {
+public suspend fun <B> OptionShift.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { None }
 }
@@ -59,6 +59,6 @@ public object option {
       f(OptionEagerEffectScope(this))
     }.toOption()
 
-  public suspend inline operator fun <A> invoke(crossinline f: suspend OptionEffectScope.() -> A): Option<A> =
-    effect<None, A> { f(OptionEffectScope(this)) }.toOption()
+  public suspend inline operator fun <A> invoke(crossinline f: suspend OptionShift.() -> A): Option<A> =
+    effect<None, A> { f(OptionShift(this)) }.toOption()
 }

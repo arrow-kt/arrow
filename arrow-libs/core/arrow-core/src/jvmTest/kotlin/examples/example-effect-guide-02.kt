@@ -7,6 +7,11 @@ import arrow.core.None
 import arrow.core.Validated
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
+import arrow.core.continuations.toEither
+import arrow.core.continuations.toValidated
+import arrow.core.continuations.toIor
+import arrow.core.continuations.toOption
 import arrow.core.continuations.ensureNotNull
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe

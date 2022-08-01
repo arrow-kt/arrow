@@ -10,7 +10,7 @@ public fun <A> EagerEffect<Throwable, A>.toResult(): Result<A> =
   fold({ Result.failure(it) }, { Result.success(it) })
 
 @JvmInline
-public value class ResultEffectScope(private val cont: EffectScope<Throwable>) : EffectScope<Throwable> {
+public value class ResultShift(private val cont: Shift<Throwable>) : Shift<Throwable> {
   override suspend fun <B> shift(r: Throwable): B =
     cont.shift(r)
 
@@ -36,6 +36,6 @@ public object result {
       f(ResultEagerEffectScope(this))
     }.toResult()
 
-  public suspend inline operator fun <A> invoke(crossinline f: suspend ResultEffectScope.() -> A): Result<A> =
-    effect<Throwable, A> { f(ResultEffectScope(this)) }.toResult()
+  public suspend inline operator fun <A> invoke(crossinline f: suspend ResultShift.() -> A): Result<A> =
+    effect<Throwable, A> { f(ResultShift(this)) }.toResult()
 }

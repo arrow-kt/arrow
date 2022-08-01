@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectScope06
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 

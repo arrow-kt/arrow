@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectGuide13
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

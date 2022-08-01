@@ -6,7 +6,7 @@ import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 
 @JvmInline
-public value class NullableEffectScope(private val cont: EffectScope<Nothing?>) : EffectScope<Nothing?> {
+public value class NullableShift(private val cont: Shift<Nothing?>) : Shift<Nothing?> {
   override suspend fun <B> shift(r: Nothing?): B =
     cont.shift(r)
 
@@ -43,7 +43,7 @@ public value class NullableEagerEffectScope(private val cont: EagerEffectScope<N
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <B> NullableEffectScope.ensureNotNull(value: B?): B {
+public suspend fun <B> NullableShift.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
@@ -62,6 +62,6 @@ public object nullable {
       f(NullableEagerEffectScope(this))
     }.orNull()
 
-  public suspend inline operator fun <A> invoke(crossinline f: suspend NullableEffectScope.() -> A): A? =
-    effect<Nothing?, A> { f(NullableEffectScope(this)) }.orNull()
+  public suspend inline operator fun <A> invoke(crossinline f: suspend NullableShift.() -> A): A? =
+    effect<Nothing?, A> { f(NullableShift(this)) }.orNull()
 }

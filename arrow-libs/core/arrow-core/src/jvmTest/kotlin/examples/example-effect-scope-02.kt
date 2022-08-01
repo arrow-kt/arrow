@@ -4,6 +4,8 @@ package arrow.core.examples.exampleEffectScope02
 import arrow.core.Either
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
+import arrow.core.continuations.toEither
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 

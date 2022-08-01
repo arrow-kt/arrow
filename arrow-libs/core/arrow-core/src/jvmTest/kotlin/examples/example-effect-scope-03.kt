@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.eagerEffect
 import arrow.core.continuations.effect
+import arrow.core.continuations.toEither
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 

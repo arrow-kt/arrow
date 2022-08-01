@@ -3,6 +3,7 @@ package arrow.core.examples.exampleEffectScope05
 
 import arrow.core.Validated
 import arrow.core.continuations.effect
+import arrow.core.continuations.toValidated
 import io.kotest.matchers.shouldBe
 
 suspend fun main() {

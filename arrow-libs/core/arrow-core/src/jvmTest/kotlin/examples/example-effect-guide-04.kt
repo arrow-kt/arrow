@@ -4,6 +4,11 @@ package arrow.core.examples.exampleEffectGuide04
 import arrow.core.Either
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
+import arrow.core.continuations.handleError
+import arrow.core.continuations.handleErrorWith
+import arrow.core.continuations.redeem
+import arrow.core.continuations.attempt
+import arrow.core.continuations.toEither
 import arrow.core.identity
 import io.kotest.matchers.shouldBe
 

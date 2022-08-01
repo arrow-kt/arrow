@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectGuide08
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
 import io.kotest.assertions.fail

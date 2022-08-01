@@ -3,6 +3,7 @@ package arrow.core.examples.exampleEffectGuide10
 
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.core.continuations.ensureNotNull
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase

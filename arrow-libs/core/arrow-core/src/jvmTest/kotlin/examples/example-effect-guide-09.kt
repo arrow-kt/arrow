@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectGuide09
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.fromAutoCloseable

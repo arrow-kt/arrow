@@ -24,21 +24,21 @@ import kotlin.coroutines.resume
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
-
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Strange edge cases](#strange-edge-cases)
-
+ 
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Strange edge cases](#strange-edge-cases)
+ 
  * <!--- END -->
  *
  *
@@ -69,7 +69,7 @@ import kotlin.coroutines.resume
  * type [A].
  *
  * Patterns like validating a [Boolean] is very common, and the [Effect] DSL offers utility functions like [kotlin.require]
- * and [kotlin.requireNotNull]. They're named [EffectScope.ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
+ * and [kotlin.requireNotNull]. They're named [Shift.ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
  * So let's rewrite the function from above to use the DSL instead.
  *
  * ```kotlin
@@ -91,6 +91,11 @@ import kotlin.coroutines.resume
  * import arrow.core.Validated
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
+ * import arrow.core.continuations.toEither
+ * import arrow.core.continuations.toValidated
+ * import arrow.core.continuations.toIor
+ * import arrow.core.continuations.toOption
  * import arrow.core.continuations.ensureNotNull
  * import io.kotest.matchers.collections.shouldNotBeEmpty
  * import io.kotest.matchers.shouldBe
@@ -158,6 +163,7 @@ import kotlin.coroutines.resume
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.continuations.Effect
+ * import arrow.core.continuations.fold
  * import arrow.core.identity
  * -->
  * ```kotlin
@@ -197,6 +203,11 @@ import kotlin.coroutines.resume
  * import arrow.core.Either
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.handleError
+ * import arrow.core.continuations.handleErrorWith
+ * import arrow.core.continuations.redeem
+ * import arrow.core.continuations.attempt
+ * import arrow.core.continuations.toEither
  * import arrow.core.identity
  * import io.kotest.matchers.shouldBe
  * -->
@@ -245,6 +256,7 @@ import kotlin.coroutines.resume
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parZip
@@ -281,6 +293,7 @@ import kotlin.coroutines.resume
  * #### parTraverse
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parTraverse
@@ -318,6 +331,7 @@ import kotlin.coroutines.resume
  * #### raceN
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.core.merge
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
@@ -355,6 +369,7 @@ import kotlin.coroutines.resume
  * #### bracketCase / Resource
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.bracketCase
  * import io.kotest.assertions.fail
@@ -385,6 +400,7 @@ import kotlin.coroutines.resume
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.Resource
  * import arrow.fx.coroutines.fromAutoCloseable
@@ -423,6 +439,7 @@ import kotlin.coroutines.resume
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import arrow.core.continuations.ensureNotNull
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
@@ -485,6 +502,7 @@ import kotlin.coroutines.resume
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.collections.shouldBeIn
  * import kotlinx.coroutines.async
@@ -509,6 +527,7 @@ import kotlin.coroutines.resume
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  * import kotlinx.coroutines.coroutineScope
@@ -538,6 +557,7 @@ import kotlin.coroutines.resume
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import kotlinx.coroutines.Deferred
  * import kotlinx.coroutines.async
  * import kotlinx.coroutines.coroutineScope
@@ -568,110 +588,141 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public sealed interface Effect<out R, out A> {
-  /**
-   * Runs the suspending computation by creating a [Continuation], and running the `fold` function
-   * over the computation.
-   *
-   * When the [Effect] has shifted with [R] it will [recover] the shifted value to [B], and when it
-   * ran the computation to completion it will [transform] the value [A] to [B].
-   *
-   * ```kotlin
-   * import arrow.core.continuations.effect
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   val shift = effect<String, Int> {
-   *     shift("Hello, World!")
-   *   }.fold({ str: String -> str }, { int -> int.toString() })
-   *   shift shouldBe "Hello, World!"
-   *
-   *   val res = effect<String, Int> {
-   *     1000
-   *   }.fold({ str: String -> str.length }, { int -> int })
-   *   res shouldBe 1000
-   * }
-   * ```
-   * <!--- KNIT example-effect-01.kt -->
-   */
-  public suspend fun <B> fold(
-    recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B
-  ): B
+public typealias Effect<R, A> = suspend Shift<R>.() -> A
 
-  /**
-   * Like [fold] but also allows folding over any unexpected [Throwable] that might have occurred.
-   * @see fold
-   */
-  public suspend fun <B> fold(
-    error: suspend (error: Throwable) -> B,
-    recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B
-  ): B =
+public suspend fun <R, A, B> Effect<R, A>.fold(
+  error: suspend (error: Throwable) -> B,
+  recover: suspend (shifted: R) -> B,
+  transform: suspend (value: A) -> B,
+): B =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val token = Token()
+    val shift =
+      object : Shift<R> {
+        // Shift away from this Continuation by intercepting it, and completing it with
+        // ShiftCancellationException
+        // This is needed because this function will never yield a result,
+        // so it needs to be cancelled to properly support coroutine cancellation
+        override suspend fun <B> shift(r: R): B =
+        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we
+        // shifted away.
+        // This however also means that the user can try/catch shift and recover from the
+        // CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
+          // See: EffectSpec - try/catch tests
+          throw Suspend(token, r, recover as suspend (Any?) -> Any?)
+      }
+    
     try {
-      fold(recover, transform)
+      suspend { transform(invoke(shift)) }
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+    } catch (e: Suspend) {
+      if (token == e.token) {
+        val f: suspend () -> B = { e.recover(e.shifted) as B }
+        f.startCoroutineUninterceptedOrReturn(cont)
+      } else throw e
     } catch (e: Throwable) {
-      error(e.nonFatalOrThrow())
-    }
-
-  /**
-   * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
-   * result value [A] is mapped to [Either.Right].
-   */
-  public suspend fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
-
-  /**
-   * [fold] the [Effect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
-   * result value [A] is mapped to [Ior.Right].
-   */
-  public suspend fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-
-  /**
-   * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
-   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
-   */
-  public suspend fun toValidated(): Validated<R, A> =
-    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-
-  /**
-   * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
-   * provided function [orElse], and result value [A] is mapped to [Some].
-   */
-  public suspend fun toOption(orElse: suspend (R) -> Option<@UnsafeVariance A>): Option<A> = fold(orElse, ::Some)
-
-  /**
-   * [fold] the [Effect] into an [A?]. Where the shifted value [R] is mapped to
-   * [null], and result value [A].
-   */
-  public suspend fun orNull(): A? = fold({ null }, ::identity)
-
-  /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
-  public fun attempt(): Effect<R, Result<A>> = effect {
-    try {
-      Result.success(bind())
-    } catch (e: Throwable) {
-      Result.failure(e.nonFatalOrThrow())
+      val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
+      f.startCoroutineUninterceptedOrReturn(cont)
     }
   }
 
-  public fun handleError(recover: suspend (R) -> @UnsafeVariance A): Effect<Nothing, A> = effect {
-    fold(recover, ::identity)
+/**
+ * Runs the suspending computation by creating a [Continuation], and running the `fold` function
+ * over the computation.
+ *
+ * When the [Effect] has shifted with [R] it will [recover] the shifted value to [B], and when it
+ * ran the computation to completion it will [transform] the value [A] to [B].
+ *
+ * ```kotlin
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
+ * import io.kotest.matchers.shouldBe
+ *
+ * suspend fun main() {
+ *   val shift = effect<String, Int> {
+ *     shift("Hello, World!")
+ *   }.fold({ str: String -> str }, { int -> int.toString() })
+ *   shift shouldBe "Hello, World!"
+ *
+ *   val res = effect<String, Int> {
+ *     1000
+ *   }.fold({ str: String -> str.length }, { int -> int })
+ *   res shouldBe 1000
+ * }
+ * ```
+ * <!--- KNIT example-effect-01.kt -->
+ */
+public suspend fun <R, A, B> Effect<R, A>.fold(
+  recover: suspend (shifted: R) -> B,
+  transform: suspend (value: A) -> B,
+): B = fold(
+  { throw it },
+  recover,
+  transform
+)
+
+/**
+ * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
+ * result value [A] is mapped to [Either.Right].
+ */
+public suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
+
+/**
+ * [fold] the [Effect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
+ * result value [A] is mapped to [Ior.Right].
+ */
+public suspend fun <R, A> Effect<R, A>.toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
+
+/**
+ * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
+ * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
+ */
+public suspend fun <R, A> Effect<R, A>.toValidated(): Validated<R, A> =
+  fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+
+/**
+ * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
+ * provided function [orElse], and result value [A] is mapped to [Some].
+ */
+public suspend fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Option<A>): Option<A> =
+  fold(orElse, ::Some)
+
+/**
+ * [fold] the [Effect] into an [A?].
+ * Where the shifted value [R] is mapped to [null], and result value [A].
+ */
+public suspend fun <R, A> Effect<R, A>.orNull(): A? =
+  fold({ null }, ::identity)
+
+/** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
+public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
+  try {
+    Result.success(bind())
+  } catch (e: Throwable) {
+    Result.failure(e.nonFatalOrThrow())
   }
-
-  public fun <R2> handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> = effect {
-    fold({ recover(it).bind() }, ::identity)
-  }
-
-  public fun <B> redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
-    effect {
-      fold(recover, transform)
-    }
-
-  public fun <R2, B> redeemWith(
-    recover: suspend (R) -> Effect<R2, B>,
-    transform: suspend (A) -> Effect<R2, B>
-  ): Effect<R2, B> = effect { fold(recover, transform).bind() }
 }
+
+public fun <R, A> Effect<R, A>.handleError(recover: suspend (R) -> A): Effect<Nothing, A> = effect {
+  fold(recover, ::identity)
+}
+
+public fun <R2, R, A> Effect<R, A>.handleErrorWith(recover: suspend (R) -> Effect<R2, @UnsafeVariance A>): Effect<R2, A> =
+  effect {
+    fold({ r -> recover(r).bind() }, ::identity)
+  }
+
+public fun <R, A, B> Effect<R, A>.redeem(recover: suspend (R) -> B, transform: suspend (A) -> B): Effect<Nothing, B> =
+  effect {
+    fold(recover, transform)
+  }
+
+public fun <R2, R, A, B> Effect<R, A>.redeemWith(
+  recover: suspend (R) -> Effect<R2, B>,
+  transform: suspend (A) -> Effect<R2, B>,
+): Effect<R2, B> = effect { fold(recover, transform).bind() }
 
 /**
  * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level
@@ -703,15 +754,10 @@ internal class Token {
  * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
  * the result.
  */
-@PublishedApi
-@Deprecated(
-  "This will become private in Arrow 2.0, and is not going to be visible from binary anymore",
-  level = DeprecationLevel.WARNING
-)
-internal class FoldContinuation<B>(
+private class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
-  private val parent: Continuation<B>
+  private val parent: Continuation<B>,
 ) : Continuation<B> {
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
@@ -735,6 +781,7 @@ internal class FoldContinuation<B>(
  * import arrow.core.Option
  * import arrow.core.Validated
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  *
@@ -756,45 +803,6 @@ internal class FoldContinuation<B>(
  * ```
  * <!--- KNIT example-effect-02.kt -->
  */
-public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
-
-@Deprecated(
-  "This will be removed in Arrow 2.0",
-  level = DeprecationLevel.WARNING
-)
-internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
-  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
-  // folds
-  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
-    suspendCoroutineUninterceptedOrReturn { cont ->
-      val token = Token()
-      val effectScope =
-        object : EffectScope<R> {
-          // Shift away from this Continuation by intercepting it, and completing it with
-          // ShiftCancellationException
-          // This is needed because this function will never yield a result,
-          // so it needs to be cancelled to properly support coroutine cancellation
-          override suspend fun <B> shift(r: R): B =
-          // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-          // We have to throw CancellationException to signal the Continuation was cancelled, and we
-          // shifted away.
-          // This however also means that the user can try/catch shift and recover from the
-          // CancellationException and thus effectively recovering from the cancellation/shift.
-          // This means try/catch is also capable of recovering from monadic errors.
-            // See: EffectSpec - try/catch tests
-            throw Suspend(token, r, recover as suspend (Any?) -> Any?)
-        }
-
-      try {
-        suspend { transform(f(effectScope)) }
-          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-      } catch (e: Suspend) {
-        if (token == e.token) {
-          val f: suspend () -> B = { e.recover(e.shifted) as B }
-          f.startCoroutineUninterceptedOrReturn(cont)
-        } else throw e
-      }
-    }
-}
+public fun <R, A> effect(f: suspend Shift<R>.() -> A): Effect<R, A> = f
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)

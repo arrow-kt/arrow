@@ -10,15 +10,15 @@ import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 
 /** Context of the [Effect] DSL. */
-public interface EffectScope<in R> {
+public interface Shift<in R> {
   /**
    * Short-circuit the [Effect] computation with value [R].
    *
    * ```kotlin
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.fold
    * import io.kotest.assertions.fail
    * import io.kotest.matchers.shouldBe
    *
@@ -39,6 +39,8 @@ public interface EffectScope<in R> {
    * import arrow.core.Either
    * import arrow.core.continuations.Effect
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.fold
+   * import arrow.core.continuations.toEither
    * import arrow.core.identity
    * import io.kotest.matchers.shouldBe
    *
@@ -57,9 +59,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-02.kt -->
    */
   public suspend fun <B> Effect<R, B>.bind(): B =
-    when (this) {
-      is DefaultEffect -> f(this@EffectScope)
-    }
+    invoke(this@Shift)
 
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
@@ -70,6 +70,7 @@ public interface EffectScope<in R> {
    * import arrow.core.continuations.EagerEffect
    * import arrow.core.continuations.eagerEffect
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.toEither
    * import arrow.core.identity
    * import io.kotest.matchers.shouldBe
    *
@@ -100,6 +101,7 @@ public interface EffectScope<in R> {
    * ```kotlin
    * import arrow.core.Either
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.toEither
    * import io.kotest.matchers.shouldBe
    *
    * suspend fun main() {
@@ -124,6 +126,7 @@ public interface EffectScope<in R> {
    * ```kotlin
    * import arrow.core.Validated
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.toValidated
    * import io.kotest.matchers.shouldBe
    *
    * suspend fun main() {
@@ -148,6 +151,7 @@ public interface EffectScope<in R> {
    *
    * ```kotlin
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.fold
    * import arrow.core.identity
    * import io.kotest.matchers.shouldBe
    *
@@ -173,6 +177,7 @@ public interface EffectScope<in R> {
    * import arrow.core.None
    * import arrow.core.Option
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.fold
    * import arrow.core.getOrElse
    * import arrow.core.identity
    * import io.kotest.matchers.shouldBe
@@ -201,6 +206,7 @@ public interface EffectScope<in R> {
    * ```kotlin
    * import arrow.core.Either
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.toEither
    * import io.kotest.matchers.shouldBe
    *
    * suspend fun main() {
@@ -233,8 +239,8 @@ public interface EffectScope<in R> {
   @OptIn(ExperimentalTypeInference::class)
   public suspend fun <E, A> attempt(
     @BuilderInference
-    f: suspend EffectScope<E>.() -> A,
-  ): suspend EffectScope<E>.() -> A = f
+    f: suspend Shift<E>.() -> A,
+  ): suspend Shift<E>.() -> A = f
 
   /**
    * When the [Effect] has shifted with [R] it will [recover]
@@ -248,6 +254,7 @@ public interface EffectScope<in R> {
    * import arrow.core.Option
    * import arrow.core.Validated
    * import arrow.core.continuations.effect
+   * import arrow.core.continuations.fold
    * import io.kotest.assertions.fail
    * import io.kotest.matchers.shouldBe
    *
@@ -263,8 +270,8 @@ public interface EffectScope<in R> {
    * ```
    * <!--- KNIT example-effect-scope-09.kt -->
    */
-  public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
-    recover: suspend EffectScope<R>.(E) -> A,
+  public suspend infix fun <E, A> (suspend Shift<E>.() -> A).catch(
+    recover: suspend Shift<R>.(E) -> A,
   ): A = effect(this).fold({ recover(it) }, ::identity)
 }
 
@@ -274,6 +281,7 @@ public interface EffectScope<in R> {
  *
  * ```kotlin
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.toEither
  * import arrow.core.continuations.ensureNotNull
  * import arrow.core.left
  * import arrow.core.right
@@ -290,7 +298,7 @@ public interface EffectScope<in R> {
  * <!--- KNIT example-effect-scope-10.kt -->
  */
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
+public suspend fun <R, B : Any> Shift<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }

@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffectGuide11
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import io.kotest.assertions.fail
 import io.kotest.matchers.collections.shouldBeIn
 import kotlinx.coroutines.async

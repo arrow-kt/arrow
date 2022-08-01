@@ -6,6 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 

@@ -21,18 +21,18 @@ public object ior {
 
   public suspend inline operator fun <E, A> invoke(
     semigroup: Semigroup<E>,
-    crossinline f: suspend IorEffectScope<E>.() -> A
+    crossinline f: suspend IorShift<E>.() -> A
   ): Ior<E, A> =
     effect<E, Ior<E, A>> {
-      val effect = IorEffectScope(semigroup, this)
+      val effect = IorShift(semigroup, this)
       val res = f(effect)
       val leftState = effect.leftState.get()
       if (leftState === EmptyValue) Ior.Right(res) else Ior.Both(EmptyValue.unbox(leftState), res)
     }.fold({ Ior.Left(it) }, ::identity)
 }
 
-public class IorEffectScope<E>(semigroup: Semigroup<E>, private val effect: EffectScope<E>) :
-  EffectScope<E>, Semigroup<E> by semigroup {
+public class IorShift<E>(semigroup: Semigroup<E>, private val effect: Shift<E>) :
+  Shift<E>, Semigroup<E> by semigroup {
 
   @PublishedApi
   internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)
