@@ -68,4 +68,4 @@ private class CopyImpl<A>(var current: A): Copy<A> {
  * ```
  */
 public fun <A> A.copy(f: Copy<A>.() -> Unit): A =
-  CopyImpl(this).also { f(it) }.run { current }
+  CopyImpl(this).also(f).current
