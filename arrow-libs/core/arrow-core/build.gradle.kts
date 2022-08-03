@@ -4,9 +4,9 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.kotest.multiplatform)
 }
 
-apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
@@ -40,11 +40,6 @@ kotlin {
       }
       jvmTest {
         dependencies {
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-          implementation(libs.kotest.arrowAssertions)
-          implementation(libs.kotest.arrowProperty)
           implementation(projects.arrowFxCoroutines)
           runtimeOnly(libs.kotest.runnerJUnit5)
         }
