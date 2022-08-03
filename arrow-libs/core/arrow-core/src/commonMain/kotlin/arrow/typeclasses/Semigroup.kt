@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Ior
@@ -66,14 +65,6 @@ public fun interface Semigroup<A> {
     public fun <A> endo(): Semigroup<Endo<A>> =
       object : Semigroup<Endo<A>> {
         override fun Endo<A>.combine(g: Endo<A>): Endo<A> = Endo(f.compose(g.f))
-      }
-
-    @JvmStatic
-    @JvmName("constant")
-    public fun <A, T> const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
-      object : Semigroup<Const<A, T>> {
-        override fun Const<A, T>.combine(b: Const<A, T>): Const<A, T> =
-          this.combine(SA, b)
       }
 
     @JvmStatic

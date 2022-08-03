@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Tuple10
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -318,12 +317,5 @@ public interface Fold<S, A> {
     @JvmStatic
     public fun <A> tuple9(): Fold<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
       Every.tuple9()
-
-    /**
-     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
-     */
-    @JvmStatic
-    public fun <A> tuple10(): Fold<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
-      Every.tuple10()
   }
 }

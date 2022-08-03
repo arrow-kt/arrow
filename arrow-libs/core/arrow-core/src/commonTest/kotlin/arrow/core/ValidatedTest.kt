@@ -2,11 +2,10 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.core.test.generators.validated
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
@@ -14,9 +13,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.validated
 
 @Suppress("RedundantSuspendModifier")
-class ValidatedTest : UnitSpec() {
+class ValidatedTest : StringSpec() {
 
   init {
 

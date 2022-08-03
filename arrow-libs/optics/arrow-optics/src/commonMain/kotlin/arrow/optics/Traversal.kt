@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Tuple10
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -427,31 +426,6 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     public fun <A> tuple9(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> =
       pTuple9()
 
-    /**
-     * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
-     */
-    @JvmStatic
-    public fun <A, B> pTuple10(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> =
-      PTraversal(
-        get1 = { it.first },
-        get2 = { it.second },
-        get3 = { it.third },
-        get4 = { it.fourth },
-        get5 = { it.fifth },
-        get6 = { it.sixth },
-        get7 = { it.seventh },
-        get8 = { it.eighth },
-        get9 = { it.ninth },
-        get10 = { it.tenth },
-        set = { a, b, c, d, e, f, g, h, i, j, _ -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
-      )
-
-    /**
-     * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
-     */
-    @JvmStatic
-    public fun <A> tuple10(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
-      pTuple10()
   }
 
   /**

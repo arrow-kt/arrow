@@ -10,6 +10,7 @@ jUnitJupiter = "5.8.2"
 jUnitVintage = "5.8.2"
 kotest = "5.3.1"
 kotestGradle = "5.3.1"
+kotestArrow = "1.2.5"
 kotlin = "1.6.21"
 kotlinBinaryCompatibilityValidator = "0.10.1"
 kotlinCompileTesting = "1.4.8"
@@ -32,6 +33,9 @@ kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.r
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-arrowAssertions = { module = "io.kotest.extensions:kotest-assertions-arrow", version.ref = "kotestArrow" }
+kotest-arrowProperty = { module = "io.kotest.extensions:kotest-property-arrow", version.ref = "kotestArrow" }
+kotest-arrowOpticsProperty = { module = "io.kotest.extensions:kotest-property-arrow-optics", version.ref = "kotestArrow" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlibJDK8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }

@@ -1,10 +1,10 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
@@ -15,7 +15,7 @@ import io.kotest.property.arbitrary.string
 import kotlin.math.max
 import kotlin.math.min
 
-class SequenceKTest : UnitSpec() {
+class SequenceKTest : StringSpec() {
 
   init {
 

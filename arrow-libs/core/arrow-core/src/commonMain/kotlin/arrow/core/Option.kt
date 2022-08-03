@@ -801,15 +801,6 @@ public sealed class Option<out A> {
       is Some -> operation(initial(value), value)
     }
 
-  public inline fun <B> reduceRightEvalOrNull(
-    initial: (A) -> B,
-    operation: (A, acc: Eval<B>) -> Eval<B>
-  ): Eval<B?> =
-    when (this) {
-      is None -> Eval.now(null)
-      is Some -> operation(value, Eval.now(initial(value)))
-    }
-
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 

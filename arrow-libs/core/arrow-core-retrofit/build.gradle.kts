@@ -26,7 +26,6 @@ dependencies {
   if (!enableCompatibilityMetadataVariant) {
     testCompileOnly(libs.kotlin.reflect)
     testRuntimeOnly(libs.kotest.runnerJUnit5)
-    testImplementation(project(":arrow-core-test"))
     testImplementation(libs.squareup.okhttpMockWebServer)
     testImplementation(libs.squareup.retrofitConverterGson)
     testImplementation(libs.squareup.retrofitConverterMoshi)

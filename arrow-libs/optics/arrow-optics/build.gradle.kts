@@ -31,7 +31,10 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-optics-test"))
+          implementation(libs.kotest.runnerJUnit5)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
+          implementation(libs.kotest.arrowOpticsProperty)
         }
       }
       jvmTest {

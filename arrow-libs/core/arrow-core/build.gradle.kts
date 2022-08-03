@@ -24,7 +24,6 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(projects.arrowContinuations)
         api(projects.arrowAnnotations)
         api(libs.kotlin.stdlibCommon)
       }
@@ -32,11 +31,14 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-core-test"))
-          implementation(project(":arrow-fx-coroutines"))
+          implementation(libs.kotest.runnerJUnit5)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
+          implementation(libs.kotest.arrowAssertions)
+          implementation(libs.kotest.arrowProperty)
+          implementation(projects.arrowFxCoroutines)
         }
       }
-
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
@@ -61,4 +63,9 @@ kotlin {
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+}
+dependencies {
+  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
+  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
+  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
 }

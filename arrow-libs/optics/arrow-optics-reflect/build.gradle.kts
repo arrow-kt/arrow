@@ -24,7 +24,10 @@ dependencies {
   implementation(libs.kotlin.stdlibJDK8)
 
   if(!enableCompatibilityMetadataVariant) {
-    testImplementation(project(":arrow-optics-test"))
+    testImplementation(libs.kotest.runnerJUnit5)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.property)
+    testImplementation(libs.kotest.arrowOpticsProperty)
     testImplementation(libs.kotlin.stdlibJDK8)
     testImplementation(libs.junitJupiterEngine)
     testImplementation(libs.kotlin.reflect)
