@@ -1,18 +1,21 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
 import arrow.optics.Iso
 import arrow.optics.Optional
-import arrow.optics.test.laws.IsoLaws
-import arrow.optics.test.laws.OptionalLaws
-import arrow.optics.test.laws.SetterLaws
-import arrow.optics.test.laws.TraversalLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arrow.core.functionAToB
+import io.kotest.property.arrow.core.nonEmptyList
+import io.kotest.property.arrow.core.option
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.arrow.optics.IsoLaws
+import io.kotest.property.arrow.optics.OptionalLaws
+import io.kotest.property.arrow.optics.SetterLaws
+import io.kotest.property.arrow.optics.TraversalLaws
 
-class ListTest : UnitSpec() {
+class ListTest : StringSpec() {
 
   init {
 

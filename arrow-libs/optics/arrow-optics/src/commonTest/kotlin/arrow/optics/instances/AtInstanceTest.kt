@@ -1,8 +1,5 @@
 package arrow.optics.instances
 
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
-import arrow.optics.test.laws.LensLaws
 import arrow.optics.typeclasses.At
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
@@ -11,7 +8,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.functionAToB
+import io.kotest.property.arrow.core.option
 import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.arrow.optics.LensLaws
 
 class AtInstanceTest : StringSpec() {
   init {

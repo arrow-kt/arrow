@@ -1,15 +1,16 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
 import arrow.optics.Iso
-import arrow.optics.test.laws.IsoLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.arrow.optics.IsoLaws
 
-class StringTest : UnitSpec() {
+class StringTest : StringSpec() {
 
   init {
 

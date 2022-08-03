@@ -1,15 +1,14 @@
 package arrow.optics
 
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
-import arrow.optics.test.laws.SetterLaws
-import arrow.optics.test.laws.TraversalLaws
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.char
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.*
+import io.kotest.property.arrow.core.functionAToB
+import io.kotest.property.arrow.core.nonEmptyList
+import io.kotest.property.arrow.core.option
 import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.arrow.optics.SetterLaws
+import io.kotest.property.arrow.optics.TraversalLaws
 
 class TraversalTest : StringSpec() {
 
@@ -46,7 +45,7 @@ class TraversalTest : StringSpec() {
       "Traversal sequence - ",
       TraversalLaws.laws(
         traversal = Traversal.sequence(),
-        aGen = Arb.sequence(Arb.string()),
+        aGen = Arb.list(Arb.string()).map { it.asSequence() },
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
         eq = { a, b -> a.toList() == b.toList() }

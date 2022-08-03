@@ -1,16 +1,17 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.validated
 import arrow.optics.Iso
-import arrow.optics.test.laws.IsoLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.either
+import io.kotest.property.arrow.core.functionAToB
+import io.kotest.property.arrow.core.validated
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.arrow.optics.IsoLaws
 
-class ValidatedTest : UnitSpec() {
+class ValidatedTest : StringSpec() {
 
   init {
 
