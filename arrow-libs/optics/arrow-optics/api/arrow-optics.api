@@ -28,7 +28,6 @@ public abstract interface class arrow/optics/Fold {
 	public abstract fun size (Ljava/lang/Object;)I
 	public static fun string ()Larrow/optics/Fold;
 	public static fun triple ()Larrow/optics/Fold;
-	public static fun tuple10 ()Larrow/optics/Fold;
 	public static fun tuple4 ()Larrow/optics/Fold;
 	public static fun tuple5 ()Larrow/optics/Fold;
 	public static fun tuple6 ()Larrow/optics/Fold;
@@ -51,7 +50,6 @@ public final class arrow/optics/Fold$Companion {
 	public final fun sequence ()Larrow/optics/Fold;
 	public final fun string ()Larrow/optics/Fold;
 	public final fun triple ()Larrow/optics/Fold;
-	public final fun tuple10 ()Larrow/optics/Fold;
 	public final fun tuple4 ()Larrow/optics/Fold;
 	public final fun tuple5 ()Larrow/optics/Fold;
 	public final fun tuple6 ()Larrow/optics/Fold;
@@ -166,7 +164,6 @@ public abstract interface class arrow/optics/PEvery : arrow/optics/Fold, arrow/o
 	public static fun sequence ()Larrow/optics/PEvery;
 	public static fun string ()Larrow/optics/PEvery;
 	public static fun triple ()Larrow/optics/PEvery;
-	public static fun tuple10 ()Larrow/optics/PEvery;
 	public static fun tuple4 ()Larrow/optics/PEvery;
 	public static fun tuple5 ()Larrow/optics/PEvery;
 	public static fun tuple6 ()Larrow/optics/PEvery;
@@ -186,7 +183,6 @@ public final class arrow/optics/PEvery$Companion {
 	public final fun sequence ()Larrow/optics/PEvery;
 	public final fun string ()Larrow/optics/PEvery;
 	public final fun triple ()Larrow/optics/PEvery;
-	public final fun tuple10 ()Larrow/optics/PEvery;
 	public final fun tuple4 ()Larrow/optics/PEvery;
 	public final fun tuple5 ()Larrow/optics/PEvery;
 	public final fun tuple6 ()Larrow/optics/PEvery;
@@ -702,7 +698,6 @@ public abstract interface class arrow/optics/PTraversal : arrow/optics/PSetter {
 	public static fun option ()Larrow/optics/PTraversal;
 	public static fun pPair ()Larrow/optics/PTraversal;
 	public static fun pTriple ()Larrow/optics/PTraversal;
-	public static fun pTuple10 ()Larrow/optics/PTraversal;
 	public static fun pTuple4 ()Larrow/optics/PTraversal;
 	public static fun pTuple5 ()Larrow/optics/PTraversal;
 	public static fun pTuple6 ()Larrow/optics/PTraversal;
@@ -714,7 +709,6 @@ public abstract interface class arrow/optics/PTraversal : arrow/optics/PSetter {
 	public static fun sequence ()Larrow/optics/PTraversal;
 	public static fun string ()Larrow/optics/PTraversal;
 	public static fun triple ()Larrow/optics/PTraversal;
-	public static fun tuple10 ()Larrow/optics/PTraversal;
 	public static fun tuple4 ()Larrow/optics/PTraversal;
 	public static fun tuple5 ()Larrow/optics/PTraversal;
 	public static fun tuple6 ()Larrow/optics/PTraversal;
@@ -742,7 +736,6 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun option ()Larrow/optics/PTraversal;
 	public final fun pPair ()Larrow/optics/PTraversal;
 	public final fun pTriple ()Larrow/optics/PTraversal;
-	public final fun pTuple10 ()Larrow/optics/PTraversal;
 	public final fun pTuple4 ()Larrow/optics/PTraversal;
 	public final fun pTuple5 ()Larrow/optics/PTraversal;
 	public final fun pTuple6 ()Larrow/optics/PTraversal;
@@ -753,7 +746,6 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun sequence ()Larrow/optics/PTraversal;
 	public final fun string ()Larrow/optics/PTraversal;
 	public final fun triple ()Larrow/optics/PTraversal;
-	public final fun tuple10 ()Larrow/optics/PTraversal;
 	public final fun tuple4 ()Larrow/optics/PTraversal;
 	public final fun tuple5 ()Larrow/optics/PTraversal;
 	public final fun tuple6 ()Larrow/optics/PTraversal;

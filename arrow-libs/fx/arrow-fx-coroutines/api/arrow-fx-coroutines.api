@@ -458,21 +458,21 @@ public final class arrow/fx/coroutines/Schedule$Companion {
 
 public final class arrow/fx/coroutines/Schedule$Decision {
 	public static final field Companion Larrow/fx/coroutines/Schedule$Decision$Companion;
-	public fun <init> (ZDLjava/lang/Object;Larrow/core/Eval;)V
+	public fun <init> (ZDLjava/lang/Object;Lkotlin/jvm/functions/Function0;)V
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun combine (Larrow/fx/coroutines/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun combineNanos (Larrow/fx/coroutines/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule$Decision;
 	public final fun component1 ()Z
 	public final fun component2 ()D
 	public final fun component3 ()Ljava/lang/Object;
-	public final fun component4 ()Larrow/core/Eval;
-	public final fun copy (ZDLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public static synthetic fun copy$default (Larrow/fx/coroutines/Schedule$Decision;ZDLjava/lang/Object;Larrow/core/Eval;ILjava/lang/Object;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun component4 ()Lkotlin/jvm/functions/Function0;
+	public final fun copy (ZDLjava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/fx/coroutines/Schedule$Decision;
+	public static synthetic fun copy$default (Larrow/fx/coroutines/Schedule$Decision;ZDLjava/lang/Object;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/fx/coroutines/Schedule$Decision;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCont ()Z
 	public final fun getDelayInNanos ()D
 	public final fun getDuration-UwyO8pc ()J
-	public final fun getFinish ()Larrow/core/Eval;
+	public final fun getFinish ()Lkotlin/jvm/functions/Function0;
 	public final fun getState ()Ljava/lang/Object;
 	public fun hashCode ()I
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule$Decision;
@@ -482,10 +482,10 @@ public final class arrow/fx/coroutines/Schedule$Decision {
 }
 
 public final class arrow/fx/coroutines/Schedule$Decision$Companion {
-	public final fun cont (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun cont-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun done (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun done-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun cont (DLjava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun cont-KLykuaI (JLjava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun done (DLjava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/fx/coroutines/Schedule$Decision;
+	public final fun done-KLykuaI (JLjava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/fx/coroutines/Schedule$Decision;
 }
 
 public final class arrow/fx/coroutines/ScheduleKt {
