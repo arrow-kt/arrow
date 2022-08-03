@@ -34,10 +34,10 @@ kotlin {
           implementation(libs.kotest.frameworkApi)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-          implementation("io.kotest.extensions:kotest-assertions-arrow:1.2.5") {
+          implementation(libs.kotest.arrowAssertions.get().toString()) {
             exclude(group = "io.arrow-kt", module = "arrow-core")
           }
-          implementation("io.kotest.extensions:kotest-property-arrow:1.2.5") {
+          implementation(libs.kotest.arrowProperty.get().toString()) {
             exclude(group = "io.arrow-kt", module = "arrow-core")
           }
         }
