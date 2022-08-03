@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.continuations.effect
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
@@ -1040,4 +1041,8 @@ public suspend fun <A, B, C> Schedule<Throwable, B>.retryOrElseEither(
       else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish.value()))
     }
   }
+}
+
+fun main() {
+  val x = effect<String, Int> { 1 }
 }

@@ -622,6 +622,9 @@ public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<
 
 public typealias Effect<R, A> = suspend Shift<R>.() -> A
 
+/**
+ *
+ */
 public suspend fun <R, A, B> Effect<R, A>.fold(
   error: suspend (error: Throwable) -> B,
   recover: suspend (shifted: R) -> B,
@@ -700,15 +703,29 @@ public suspend infix fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Opt
 public suspend fun <R, A> Effect<R, A>.orNull(): A? =
   fold({ null }, ::identity)
 
-/** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
-public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
-  try {
-    Result.success(bind())
-  } catch (e: Throwable) {
-    Result.failure(e.nonFatalOrThrow())
-  }
-}
-
+/**
+ * Catch both exceptions, or the shifted value [E] of the `Effect`.
+ * In both [recover], and [resolve] you can either return a value a new value of [A],
+ * short-circuit the effect by shifting with a value of [E],
+ * or raise an exception into [suspend].
+ *
+ * Some examples:
+ *
+ * ```kotlin
+ * object User
+ * object Error
+ *
+ * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+ * error.catch({ -1 }) { it.length } // Success(5)
+ * error.catch({ -1 }) { error -> shift("other-failure") } // Shift(other-failure)
+ * error.catch({ -1 }) { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ *
+ * val exception = effect<String, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
+ * exception.catch({ error -> error.message?.length ?: -1 }) { -1 } // Success(5)
+ * exception.catch({ shift(Error) }) { -1 }  // Shift(error))
+ * exception.catch({ throw  RuntimeException("other-failure") }) { -1 } // Exception(other-failure)
+ * ```
+ */
 @OptIn(ExperimentalTypeInference::class)
 @BuilderInference
 public fun <E, E2, A> Effect<E, A>.catch(
@@ -722,8 +739,81 @@ public fun <E, E2, A> Effect<E, A>.catch(
   )
 }
 
+/**
+ * Catch the shifted value [E] of the `Effect`.
+ * You can either return a value a new value of [A],
+ * or short-circuit the effect by shifting with a value of [E],
+ * or raise an exception into [suspend].
+ *
+ * ```kotlin
+ * object User
+ * object Error
+ *
+ * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+ *
+ * error.catch { error -> error.length } // Success(5)
+ * error.catch { error -> shift("other-failure") } // Shift(other-failure)
+ * error.catch { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * ```
+ */
 public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
   catch({ throw it }, resolve)
+
+/**
+ * Attempt to run the effect, and [recover] from any unexpected exceptions.
+ * You can either return a value a new value of [A],
+ * or short-circuit the effect by shifting with a value of [E],
+ * or raise an exception into [suspend].
+ *
+ * ```kotlin
+ * object User
+ * object Error
+ *
+ * val exception = effect<String, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
+ *
+ * exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
+ * exception.attempt { shift(Error) } // Shift(error)
+ * exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
+ * ```
+ */
+public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
+  catch(recover) { e -> shift(e) }
+
+/**
+ * A version of [attempt] that refines the [Throwable] to [T].
+ * This is useful for wrapping foreign code, such as database, network calls, etc.
+ *
+ * ```kotlin
+ * object User
+ * object Error
+ *
+ * effect<Error, User> {
+ *   throw IllegalArgumentException("builder missed args")
+ * }.attempt<IllegalArgumentException> { shift(Error) }
+ * ```
+ *
+ * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
+ *
+ * ```kotlin
+ * object User
+ * object Error
+ *
+ * effect<Nothing, User> {
+ *   throw IllegalArgumentException("builder missed args")
+ * }.attempt<IllegalArgumentException> { shift(Error) }
+ * ```
+ */
+public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
+  catch({ e -> if (e is T) recover(e) else throw e }) { e -> shift(e) }
+
+/** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
+public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
+  try {
+    Result.success(bind())
+  } catch (e: Throwable) {
+    Result.failure(e.nonFatalOrThrow())
+  }
+}
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 

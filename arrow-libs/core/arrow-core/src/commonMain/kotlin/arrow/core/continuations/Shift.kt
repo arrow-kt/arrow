@@ -235,14 +235,6 @@ public interface Shift<in R> {
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
   
-  // TODO we can also have effect turn op as a keyword when used nested in the DSL.
-  //      There is no "strong" reason to do this, since `effect` now just exists as a synthetic builder for Shift receiver lambdas.
-  // @OptIn(ExperimentalTypeInference::class)
-  // @ShiftMarker
-  // public fun <E, A> effect(
-  //   @BuilderInference block: suspend Shift<E>.() -> A
-  // ): Effect<E, A> = block
-  
   /**
    * When the [Effect] has shifted with [R] it will [resolve]
    * the shifted value to [A], and when it ran the computation to
@@ -281,7 +273,18 @@ public interface Shift<in R> {
     recover: suspend Shift<R>.(Throwable) -> A,
     resolve: suspend Shift<R>.(E) -> A,
   ): A = catch<E, R, A>(recover, resolve).bind()
+  
+  @ShiftMarker
+  public suspend fun <A> (suspend Shift<R>.() -> A).attempt(
+    recover: suspend Shift<R>.(Throwable) -> A,
+  ): A = catch(recover) { e -> shift(e) }
 }
+
+// @ShiftMarker
+// context(Shift<R>)
+// public suspend inline fun <reified T : Throwable, R, A> (suspend Shift<R>.() -> A).attempt(
+//   recover: suspend Shift<R>.(Throwable) -> A
+// ): A = TODO()
 
 /**
  * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
