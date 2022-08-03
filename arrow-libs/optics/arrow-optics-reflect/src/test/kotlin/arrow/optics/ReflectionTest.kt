@@ -1,10 +1,12 @@
 package arrow.optics
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 data class Person(val name: String, val friends: List<String>)
 
@@ -12,7 +14,7 @@ sealed interface Cutlery
 object Fork: Cutlery
 object Spoon: Cutlery
 
-object ReflectionTest: UnitSpec() {
+object ReflectionTest: StringSpec() {
   init {
     "optional for function" {
       checkAll(Arb.list(Arb.int())) { ints ->
