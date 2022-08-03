@@ -69,8 +69,3 @@ kotlin {
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
-dependencies {
-  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
-  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
-  testImplementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
-}
