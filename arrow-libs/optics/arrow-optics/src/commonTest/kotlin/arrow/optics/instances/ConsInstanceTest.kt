@@ -1,17 +1,18 @@
 package arrow.optics.instances
 
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.typeclasses.Cons
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.laws.testLaws
 
-class ConsInstanceTest : UnitSpec() {
+class ConsInstanceTest : StringSpec() {
   init {
     testLaws(
       "Const list - ",

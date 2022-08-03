@@ -4,11 +4,11 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.toOption
 import arrow.optics.test.laws.OptionalLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -17,8 +17,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.checkAll
 
-class OptionalTest : UnitSpec() {
+class OptionalTest : StringSpec() {
 
   init {
 

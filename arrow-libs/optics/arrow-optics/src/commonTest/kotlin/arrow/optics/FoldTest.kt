@@ -1,14 +1,16 @@
 package arrow.optics
 
-import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class FoldTest : UnitSpec() {
+class FoldTest : StringSpec() {
 
   init {
 
