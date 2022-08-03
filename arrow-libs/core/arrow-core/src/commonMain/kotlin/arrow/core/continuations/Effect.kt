@@ -11,7 +11,7 @@ import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
@@ -568,7 +568,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public sealed interface Effect<out R, out A> {
+public interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
@@ -717,10 +717,7 @@ internal class FoldContinuation<B>(
     result.fold(parent::resume) { throwable ->
       if (throwable is Suspend && token == throwable.token) {
         val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
-        when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
-          COROUTINE_SUSPENDED -> Unit
-          else -> parent.resume(res as B)
-        }
+        f.createCoroutineUnintercepted(parent).resume(Unit)
       } else parent.resumeWith(result)
     }
   }
@@ -758,11 +755,7 @@ internal class FoldContinuation<B>(
  */
 public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
-@Deprecated(
-  "This will be removed in Arrow 2.0",
-  level = DeprecationLevel.WARNING
-)
-internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
+private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested
   // folds
   override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =

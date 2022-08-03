@@ -1277,8 +1277,9 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * ```
  * <!--- KNIT example-either-46.kt -->
  */
+@Deprecated("Duplicated API. Please use Either's member function orNull. This will be removed towards Arrow 2.0", ReplaceWith("orNull()"))
 public fun <B> Either<*, B>.orNull(): B? =
-  getOrElse { null }
+  orNull()
 
 /**
  * Returns the value from this [Right] or allows clients to transform [Left] to [Right] while providing access to
