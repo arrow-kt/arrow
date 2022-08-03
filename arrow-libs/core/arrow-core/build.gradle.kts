@@ -31,16 +31,21 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(libs.kotest.runnerJUnit5)
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
+          implementation(libs.kotest.arrowAssertions)
+          implementation(libs.kotest.arrowProperty)
+        }
+      }
+      jvmTest {
+        dependencies {
+          implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
           implementation(libs.kotest.arrowAssertions)
           implementation(libs.kotest.arrowProperty)
           implementation(projects.arrowFxCoroutines)
-        }
-      }
-      jvmTest {
-        dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
         }
       }

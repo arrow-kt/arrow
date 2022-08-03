@@ -300,49 +300,6 @@ import kotlin.jvm.JvmStatic
  * ```
  * <!--- KNIT example-option-16.kt -->
  *
- * ### Computing over dependent values ignoring absence
- *
- * ```kotlin
- * import arrow.core.computations.option
- * import arrow.core.Some
- * import arrow.core.Option
- *
- * suspend fun value(): Option<Int> =
- * //sampleStart
- *  option {
- *    val a = Some(1).bind()
- *    val b = Some(1 + a).bind()
- *    val c = Some(1 + b).bind()
- *    a + b + c
- * }
- * //sampleEnd
- * suspend fun main() {
- *  println(value())
- * }
- * ```
- * <!--- KNIT example-option-17.kt -->
- *
- * ```kotlin
- * import arrow.core.computations.option
- * import arrow.core.Some
- * import arrow.core.none
- * import arrow.core.Option
- *
- * suspend fun value(): Option<Int> =
- * //sampleStart
- *  option {
- *    val x = none<Int>().bind()
- *    val y = Some(1 + x).bind()
- *    val z = Some(1 + y).bind()
- *    x + y + z
- *  }
- * //sampleEnd
- * suspend fun main() {
- *  println(value())
- * }
- * ```
- * <!--- KNIT example-option-18.kt -->
- *
  * ## Credits
  *
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
@@ -434,7 +391,7 @@ public sealed class Option<out A> {
    *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
    * }
    * ```
-   * <!--- KNIT example-option-19.kt -->
+   * <!--- KNIT example-option-17.kt -->
    */
   public inline fun tapNone(f: () -> Unit): Option<A> =
     when (this) {
@@ -461,7 +418,7 @@ public sealed class Option<out A> {
    *   none<Int>().tap { println("flower") }  // Result: None
    * }
    * ```
-   * <!--- KNIT example-option-20.kt -->
+   * <!--- KNIT example-option-18.kt -->
    */
   public inline fun tap(f: (A) -> Unit): Option<A> =
     when (this) {
@@ -734,7 +691,7 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-option-21.kt -->
+   * <!--- KNIT example-option-19.kt -->
    *
    * @param predicate the predicate to test
    */
@@ -759,7 +716,7 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: null
    * }
    * ```
-   * <!--- KNIT example-option-22.kt -->
+   * <!--- KNIT example-option-20.kt -->
    */
   public inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
@@ -1066,7 +1023,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
- * <!--- KNIT example-option-23.kt -->
+ * <!--- KNIT example-option-21.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this

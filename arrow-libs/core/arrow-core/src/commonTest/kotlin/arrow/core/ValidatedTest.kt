@@ -14,6 +14,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arrow.core.validated
+import io.kotest.property.checkAll
 
 @Suppress("RedundantSuspendModifier")
 class ValidatedTest : StringSpec() {

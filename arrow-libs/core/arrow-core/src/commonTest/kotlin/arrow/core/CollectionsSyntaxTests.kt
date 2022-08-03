@@ -16,10 +16,10 @@
 
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class CollectionsSyntaxTests : UnitSpec() {
+class CollectionsSyntaxTests : StringSpec() {
 
   init {
 

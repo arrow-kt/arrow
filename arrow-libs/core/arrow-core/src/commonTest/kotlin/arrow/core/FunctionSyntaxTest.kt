@@ -1,9 +1,9 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class FunctionSyntaxTest : UnitSpec() {
+class FunctionSyntaxTest : StringSpec() {
 
   val f = { prefix: String, numericPostfix: Int, values: List<String> ->
     values.map { "$prefix$it$numericPostfix" }

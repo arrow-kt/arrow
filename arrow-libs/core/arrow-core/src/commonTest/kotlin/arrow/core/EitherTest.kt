@@ -2,17 +2,9 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.any
-import arrow.core.test.generators.either
-import arrow.core.test.generators.intSmall
-import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
-import arrow.core.test.generators.suspendFunThatReturnsAnyRight
-import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
-import arrow.core.test.generators.suspendFunThatThrows
-import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -20,30 +12,18 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
+import io.kotest.property.arrow.core.MonoidLaws
+import io.kotest.property.arrow.core.either
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.checkAll
 
-class EitherTest : UnitSpec() {
+class EitherTest : StringSpec() {
 
   private val ARB = Arb.either(Arb.string(), Arb.int())
 
   init {
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
-      /*FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(
-        Arb.int().map(::Right),
-        ARB.map { it },
-        Either<String, Int>::equals,
-        either::invoke
-      ) {
-        it.bind()
-      },
-      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(
-        Arb.int().map(::Right),
-        ARB.map { it },
-        Either<String, Int>::equals,
-        either::eager
-      ) {
-        it.bind()
-      }*/
     )
 
     "isLeft should return true if Left and false if Right" {

@@ -27,7 +27,5 @@ public class MonoidUsageTest {
         Monoid<Option<Integer>> option = Monoid.option(Semigroup.Integer());
         Monoid<Validated<Integer, Boolean>> validated = Monoid.validated(Semigroup.Integer(), Monoid.Boolean());
         Monoid<Pair<Boolean, Integer>> pair = Monoid.pair(Monoid.Boolean(), Monoid.Integer());
-
-        Monoid.constant(Monoid.Integer());
     }
 }

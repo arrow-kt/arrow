@@ -1,25 +1,21 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
 import arrow.typeclasses.Semigroup
-import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.*
+import io.kotest.property.arrow.core.either
+import io.kotest.property.arrow.core.functionAToB
+import io.kotest.property.arrow.core.option
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class IterableTest : UnitSpec() {
+class IterableTest : StringSpec() {
   init {
     "traverse Either stack-safe" {
       // also verifies result order and execution order (l to r)
@@ -350,34 +346,6 @@ class IterableTest : UnitSpec() {
           .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
           .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
           .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int()),
-        Arb.list(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
 
         result shouldBe expected
       }

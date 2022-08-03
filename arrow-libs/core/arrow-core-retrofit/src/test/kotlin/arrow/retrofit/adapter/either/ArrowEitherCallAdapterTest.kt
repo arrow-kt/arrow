@@ -2,10 +2,10 @@ package arrow.retrofit.adapter.either
 
 import arrow.core.left
 import arrow.core.right
-import arrow.core.test.UnitSpec
 import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import arrow.retrofit.adapter.retrofit.SuspendApiTestClient
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -13,7 +13,7 @@ import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ArrowEitherCallAdapterTest : UnitSpec() {
+class ArrowEitherCallAdapterTest : StringSpec() {
 
   private lateinit var server: MockWebServer
   private lateinit var service: SuspendApiTestClient

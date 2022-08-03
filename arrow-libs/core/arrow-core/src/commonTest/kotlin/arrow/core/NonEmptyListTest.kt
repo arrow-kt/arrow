@@ -1,16 +1,19 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arrow.core.SemigroupLaws
+import io.kotest.property.arrow.core.nonEmptyList
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class NonEmptyListTest : UnitSpec() {
+class NonEmptyListTest : StringSpec() {
   init {
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
@@ -243,26 +246,6 @@ class NonEmptyListTest : UnitSpec() {
       ) { a, b, c, d, e, f, g, h, i ->
         val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, ::Tuple9)
-          .toNonEmptyListOrNull()
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
           .toNonEmptyListOrNull()
         result shouldBe expected
       }

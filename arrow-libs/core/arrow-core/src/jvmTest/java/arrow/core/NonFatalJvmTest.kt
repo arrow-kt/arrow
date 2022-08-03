@@ -1,10 +1,10 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.matchers.shouldBe
 
-class NonFatalJvmTest : UnitSpec({
+class NonFatalJvmTest : StringSpec({
   val fatals: List<Throwable> =
     listOf(
       InterruptedException(),

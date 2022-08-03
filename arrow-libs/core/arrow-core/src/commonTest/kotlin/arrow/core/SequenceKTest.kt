@@ -1,7 +1,5 @@
 package arrow.core
 
-import arrow.core.test.generators.option
-import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
@@ -10,8 +8,12 @@ import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.option
+import io.kotest.property.arrow.core.MonoidLaws
+import io.kotest.property.arrow.laws.testLaws
 import kotlin.math.max
 import kotlin.math.min
 
@@ -202,34 +204,6 @@ class SequenceKTest : StringSpec() {
           .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
           .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
           .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-
-        result.toList() shouldBe expected.toList()
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
 
         result.toList() shouldBe expected.toList()
       }

@@ -1,19 +1,17 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.intSmall
-import arrow.core.test.generators.longSmall
-import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.*
+import io.kotest.property.arrow.core.MonoidLaws
+import io.kotest.property.arrow.core.nonEmptyList
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.checkAll
 
-class MapKTest : UnitSpec() {
+class MapKTest : StringSpec() {
 
   init {
     testLaws(
@@ -265,34 +263,6 @@ class MapKTest : UnitSpec() {
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.map(Arb.intSmall(), Arb.intSmall()),
-        Arb.map(Arb.intSmall(), Arb.intSmall())
-      ) { a, b ->
-        val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-
-        val expected = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
           .toMap()
 
         result shouldBe expected

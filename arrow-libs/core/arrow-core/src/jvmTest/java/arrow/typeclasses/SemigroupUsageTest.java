@@ -23,7 +23,6 @@ public class SemigroupUsageTest {
         Semigroup<Validated<Boolean, Integer>> validated = Semigroup.validated(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<NonEmptyList<Integer>> nonEmptyList = Semigroup.nonEmptyList();
         Semigroup<Pair<Boolean, Integer>> pair = Semigroup.pair(Semigroup.Boolean(), Semigroup.Integer());
-        Semigroup<Const<Integer, Object>> constant = Semigroup.constant(Semigroup.Integer());
         Semigroup<Byte> aByte = Semigroup.Byte();
         Semigroup<Short> aShort = Semigroup.Short();
     }

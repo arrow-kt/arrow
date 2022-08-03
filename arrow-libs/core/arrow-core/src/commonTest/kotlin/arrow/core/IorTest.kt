@@ -1,9 +1,7 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.ior
-import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.property.Arb
@@ -12,8 +10,11 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.SemigroupLaws
+import io.kotest.property.arrow.laws.testLaws
+import io.kotest.property.checkAll
 
-class IorTest : UnitSpec() {
+class IorTest : StringSpec() {
 
   init {
 
