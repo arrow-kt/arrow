@@ -17,11 +17,11 @@ class ParMap5JvmTest : ArrowFxSpec(
     val threadName: suspend CoroutineScope.() -> String =
       { Thread.currentThread().name }
 
+    val mapCtxName = "parMap5"
+    
     "parMapN 5 returns to original context" {
-      val mapCtxName = "parMap5"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(5, NamedThreadFactory { mapCtxName }) }
       checkAll {
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        parallelCtx(5, mapCtxName).use { (_single, _mapCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 
@@ -41,11 +41,8 @@ class ParMap5JvmTest : ArrowFxSpec(
     }
 
     "parMapN 5 returns to original context on failure" {
-      val mapCtxName = "parMap5"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(5, NamedThreadFactory { mapCtxName }) }
-
       checkAll(Arb.int(1..5), Arb.throwable()) { choose, e ->
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        parallelCtx(5, mapCtxName).use { (_single, _mapCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 

@@ -23,7 +23,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
     checkAll {
       val t = AutoCloseableTest()
 
-      Resource.fromAutoCloseable { t }
+      Resource.autoCloseable { t }
         .use {}
 
       t.didClose.get() shouldBe true
@@ -35,7 +35,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       val t = AutoCloseableTest()
 
       shouldThrow<Exception> {
-        Resource.fromAutoCloseable { t }
+        Resource.autoCloseable { t }
           .use { throw throwable }
       } shouldBe throwable
 
@@ -47,7 +47,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
     checkAll() {
       val t = CloseableTest()
 
-      Resource.fromCloseable { t }
+      Resource.closeable { t }
         .use {}
 
       t.didClose.get() shouldBe true
@@ -59,7 +59,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       val t = CloseableTest()
 
       shouldThrow<Exception> {
-        Resource.fromCloseable { t }
+        Resource.closeable { t }
           .use { throw throwable }
       } shouldBe throwable
 

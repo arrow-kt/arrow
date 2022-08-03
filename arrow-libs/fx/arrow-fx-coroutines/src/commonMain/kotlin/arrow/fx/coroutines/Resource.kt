@@ -11,13 +11,14 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.jvm.JvmInline
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
  *  need to be acquired and later released in reverse order.
  * Or when you want to load independent resources in parallel.
  *
- * When a resource is created we can call [use] to run a suspend computation with the resource. The finalizers are then
+ * When a resource is created we can call [use] to run a suspending computation with the resource. The finalizers are then
  *  guaranteed to run afterwards in reverse order of acquisition.
  *
  * Consider the following use case:
@@ -72,6 +73,7 @@ import kotlinx.coroutines.withContext
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.continuations.resource
  *
  * val resourceA = resource {
  *   "A"
@@ -114,17 +116,17 @@ import kotlinx.coroutines.withContext
  *   suspend fun processData(): List<String> = userProcessor.process(db)
  * }
  *
- * val userProcessor = resource {
- *   UserProcessor().also(UserProcessor::start)
- * } release UserProcessor::shutdown
- *
- * val dataSource = resource {
- *   DataSource().also { it.connect() }
- * } release DataSource::close
- *
  * suspend fun main(): Unit {
  *   resource {
- *     parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
+ *     parZip({
+ *       resource {
+ *         UserProcessor().also(UserProcessor::start)
+ *       } release UserProcessor::shutdown
+ *     }, {
+ *       resource {
+ *         DataSource().also { it.connect() }
+ *       } release DataSource::close
+ *     }) { userProcessor, ds ->
  *       Service(ds, userProcessor)
  *     }
  *   }.use { service -> service.processData() }
@@ -132,7 +134,6 @@ import kotlinx.coroutines.withContext
  * ```
  * <!--- KNIT example-resource-03.kt -->
  *
- * [Resource]s are immutable and can be composed using [zip] or [parZip].
  * [Resource]s guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the context where the program is running gets canceled.
  *
  * To achieve this [Resource] ensures that the `acquire` & `release` step are [NonCancellable].
@@ -142,7 +143,7 @@ import kotlinx.coroutines.withContext
  * If you don't need a data-type like [Resource] but want a function alternative to `try/catch/finally` with automatic error composition,
  * and automatic [NonCancellable] `acquire` and `release` steps use [bracketCase] or [bracket].
  **/
-public sealed class Resource<out A> {
+public sealed interface Resource<out A> {
   
   /**
    * Use the created resource
@@ -150,6 +151,7 @@ public sealed class Resource<out A> {
    *
    * ```kotlin
    * import arrow.fx.coroutines.*
+   * import arrow.fx.coroutines.continuations.*
    *
    * class DataSource {
    *   fun connect(): Unit = println("Connecting dataSource")
@@ -191,26 +193,12 @@ public sealed class Resource<out A> {
       }
     }
   
-  public fun <B> map(f: suspend (A) -> B): Resource<B> =
-    resource { f(bind()) }
-  
-  /** Useful for setting up/configuring an acquired resource */
-  public fun tap(f: suspend (A) -> Unit): Resource<A> =
-    resource { bind().also { f(it) } }
-  
-  /**
-   * Chain two [Resource] in sequence.
-   * Shorthand for `resource { f(bind()).bind() }`
-   */
-  public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
-    resource { f(bind()).bind() }
-  
   public class Allocate<A>(
     public val acquire: suspend () -> A,
     public val release: suspend (A, ExitCase) -> Unit,
-  ) : Resource<A>()
+  ) : Resource<A>
   
-  public data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>()
+  public data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>
   
   public companion object
 }
@@ -221,30 +209,32 @@ public sealed class Resource<out A> {
  * ```kotlin
  * import arrow.fx.coroutines.*
  *
- * suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
- * suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
- *
- * suspend fun main(): Unit {
- *   val resource = Resource(::acquireResource, ::releaseResource)
- *   resource.use {
- *     println("Expensive resource under use! $it")
- *   }
- * }
+ * val resource = resource(
+ *   { 42.also { println("Getting expensive resource") } },
+ *   { r, exitCase -> println("Releasing expensive resource: $r, exit: $exitCase") }
+ * )
+ * 
+ * suspend fun main(): Unit =
+ *   resource.use { println("Expensive resource under use! $it") }
  * ```
- * <!--- KNIT example-resource-08.kt -->
+ * <!--- KNIT example-resource-05.kt -->
  */
-public fun <A> Resource(
+public fun <A> resource(
   acquire: suspend () -> A,
   release: suspend (A, ExitCase) -> Unit,
 ): Resource<A> = Resource.Allocate(acquire, release)
+
+public fun <A> resource(
+  acquire: suspend () -> A,
+  release: suspend (A) -> Unit,
+): Resource<A> = Resource.Allocate(acquire) { a,_ -> release(a) }
 
 /**
  * Composes a [release] action to a [Resource.use] action creating a [Resource].
  */
 public infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): Resource<A> =
   resource {
-    val a = bind()
-    Resource({ a }, { _, _ -> release(a) }).bind()
+    resource({ bind() }, { a, _ -> release(a) })
   }
 
 /**
@@ -252,8 +242,7 @@ public infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): Resource
  */
 public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): Resource<A> =
   resource {
-    val a = bind()
-    Resource({ a }, { _, ex -> release(a, ex) }).bind()
+    resource({ bind() }, { a, ex -> release(a, ex) })
   }
 
 /**
@@ -261,6 +250,7 @@ public infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> U
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.continuations.*
  *
  * fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
  *   Resource.fromCloseable { path.toFile().outputStream() }
@@ -284,8 +274,10 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
     }
   }
 
-private class ResourceScopeImpl : ResourceScope {
-  val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList())
+@JvmInline
+private value class ResourceScopeImpl(
+  val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList()),
+) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A =
     when (this) {
       is Resource.Dsl -> dsl.invoke(this@ResourceScopeImpl)
@@ -299,7 +291,7 @@ private class ResourceScopeImpl : ResourceScope {
         // Otherwise we've saved the finalizer, and it will be called from somewhere else.
         if (ex != ExitCase.Completed) {
           val e = finalizers.get().cancelAll(ex)
-          val e2 = runCatching { release(a, ex) }.exceptionOrNull()
+          val e2 = kotlin.runCatching { release(a, ex) }.exceptionOrNull()
           Platform.composeErrors(e, e2)?.let { throw it }
         }
       })

@@ -13,11 +13,11 @@ import java.util.concurrent.Executors
 
 class ParMap4JvmTest : ArrowFxSpec(
   spec = {
+    val mapCtxName = "parMap4"
+    
     "parMapN 4 returns to original context" {
-      val mapCtxName = "parMap4"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { mapCtxName }) }
       checkAll {
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        parallelCtx(4, mapCtxName).use { (_single, _mapCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 
@@ -40,11 +40,8 @@ class ParMap4JvmTest : ArrowFxSpec(
     }
 
     "parMapN 4 returns to original context on failure" {
-      val mapCtxName = "parMap4"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { mapCtxName }) }
-
       checkAll(Arb.int(1..4), Arb.throwable()) { choose, e ->
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        parallelCtx(4, mapCtxName).use { (_single, _mapCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 

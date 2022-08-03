@@ -1,6 +1,6 @@
 package arrow.fx.coroutines
 
-import arrow.core.Either
+import arrow.fx.coroutines.continuations.resource
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -35,9 +35,9 @@ class PredefTest : ArrowFxSpec(
       checkAll(Arb.string(), Arb.string()) { a, b ->
         val t0 = threadName.invoke()
 
-        Resource.singleThreadContext(a)
-          .zip(Resource.singleThreadContext(b))
-          .use { (ui, io) ->
+        resource {
+          Pair(singleThreadContext(a), singleThreadContext(b))
+        }.use { (ui, io) ->
             t0 shouldBe threadName.invoke()
 
             ui.shift()

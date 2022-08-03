@@ -13,14 +13,13 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap8JvmTest : ArrowFxSpec(spec = {
+  val mapCtxName = "parMap8"
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
   "parMapN 8 returns to original context" {
-    val mapCtxName = "parMap8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
     checkAll {
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      parallelCtx(8, mapCtxName).use { (_single, _mapCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
@@ -45,11 +44,8 @@ class ParMap8JvmTest : ArrowFxSpec(spec = {
   }
 
   "parMapN 8 returns to original context on failure" {
-    val mapCtxName = "parMap8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
-
     checkAll(Arb.int(1..8), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      parallelCtx(8, mapCtxName).use { (_single, _mapCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 

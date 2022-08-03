@@ -2,6 +2,7 @@
 package arrow.fx.coroutines.examples.exampleResource04
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.continuations.*
 
 class DataSource {
   fun connect(): Unit = println("Connecting dataSource")

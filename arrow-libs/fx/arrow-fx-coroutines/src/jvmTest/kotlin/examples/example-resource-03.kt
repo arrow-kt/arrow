@@ -21,17 +21,17 @@ class Service(val db: DataSource, val userProcessor: UserProcessor) {
   suspend fun processData(): List<String> = userProcessor.process(db)
 }
 
-val userProcessor = resource {
-  UserProcessor().also(UserProcessor::start)
-} release UserProcessor::shutdown
-
-val dataSource = resource {
-  DataSource().also { it.connect() }
-} release DataSource::close
-
 suspend fun main(): Unit {
   resource {
-    parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
+    parZip({
+      resource {
+        UserProcessor().also(UserProcessor::start)
+      } release UserProcessor::shutdown
+    }, {
+      resource {
+        DataSource().also { it.connect() }
+      } release DataSource::close
+    }) { userProcessor, ds ->
       Service(ds, userProcessor)
     }
   }.use { service -> service.processData() }

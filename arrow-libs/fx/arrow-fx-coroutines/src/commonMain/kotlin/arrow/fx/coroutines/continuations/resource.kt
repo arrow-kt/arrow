@@ -1,6 +1,13 @@
 package arrow.fx.coroutines.continuations
 
+import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.resource
+import arrow.fx.coroutines.releaseCase
+
+// TODO Should we just have EffectDSL as a DslMarker in Arrow Core?
+@DslMarker
+public annotation class ResourceDSL
 
 /**
  * Computation block for the [Resource] type.
@@ -31,26 +38,50 @@ import arrow.fx.coroutines.Resource
  *   suspend fun processData(): List<String> = userProcessor.process(db)
  * }
  *
- * //sampleStart
- * val userProcessor = resource {
- *   UserProcessor().also(UserProcessor::start)
- * } release UserProcessor::shutdown
- *
- * val dataSource = resource {
- *   DataSource().also { it.connect() }
- * } release DataSource::close
- *
  * suspend fun main(): Unit {
  *   resource<Service> {
- *     Service(dataSource.bind(), userProcessor.bind())
+ *     val dataSource = resource {
+ *       DataSource().also { it.connect() }
+ *     } release DataSource::close
+ *
+ *     val userProcessor = resource {
+ *       UserProcessor().also(UserProcessor::start)
+ *     } release UserProcessor::shutdown
+ *
+ *     Service(dataSource, userProcessor)
  *   }.use { service -> service.processData() }
  * }
- * //sampleEnd
  * ```
  * <!--- KNIT example-resource-computations-01.kt -->
  */
 public interface ResourceScope {
   public suspend fun <A> Resource<A>.bind(): A
+  
+  @ResourceDSL
+  public suspend fun <A> resource(
+    acquire: suspend () -> A,
+    release: suspend (A, ExitCase) -> Unit,
+  ): A = arrow.fx.coroutines.resource(acquire, release).bind()
+  
+  @ResourceDSL
+  public suspend fun <A> resource(
+    acquire: suspend () -> A,
+    release: suspend (A) -> Unit,
+  ): A = arrow.fx.coroutines.resource(acquire, release).bind()
+  
+  /**
+   * Composes a [release] action to a [Resource.use] action creating a [Resource].
+   */
+  @ResourceDSL
+  public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A =
+    resource({ bind() }, release)
+  
+  /**
+   * Composes a [releaseCase] action to a [Resource.use] action creating a [Resource].
+   */
+  @ResourceDSL
+  public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A =
+    resource({ bind() }, { a, ex -> release(a, ex) })
 }
 
 public fun <A> resource(f: suspend ResourceScope.() -> A): Resource<A> =

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
 suspend fun main(): Unit {
-  val pool = Resource.fromExecutor {
+  val pool = Resource.executor {
     val ctr = AtomicInteger(0)
     val size = max(2, Runtime.getRuntime().availableProcessors())
     Executors.newFixedThreadPool(size) { r ->

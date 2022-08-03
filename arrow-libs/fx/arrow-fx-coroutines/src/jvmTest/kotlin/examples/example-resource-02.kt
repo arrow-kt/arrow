@@ -2,6 +2,7 @@
 package arrow.fx.coroutines.examples.exampleResource02
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.continuations.resource
 
 val resourceA = resource {
   "A"

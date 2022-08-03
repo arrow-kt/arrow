@@ -13,110 +13,109 @@ class RaceNJvmTest : ArrowFxSpec(
   spec = {
     "race2 returns to original context" {
       val racerName = "race2"
-      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
-
       checkAll(Arb.int(1..2)) { choose ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(2, racerName).use { (single, raceCtx) ->
           withContext(single) {
             threadName() shouldStartWith singleThreadName
-
+            
             val racedOn = when (choose) {
               1 -> raceN(raceCtx, { threadName() }, { never<Nothing>() }).swap().orNull()
               else -> raceN(raceCtx, { never<Nothing>() }, { threadName() }).orNull()
             }
-
+            
             racedOn shouldStartWith racerName
             threadName() shouldStartWith singleThreadName
           }
         }
       }
     }
-
+    
     "race2 returns to original context on failure" {
       val racerName = "race2"
-      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
-
+      
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(2, racerName).use { (single, raceCtx) ->
           withContext(single) {
             threadName() shouldStartWith singleThreadName
-
+            
             Either.catch {
               when (choose) {
                 1 -> raceN(raceCtx, { e.suspend() }, { never<Nothing>() }).swap().orNull()
                 else -> raceN(raceCtx, { never<Nothing>() }, { e.suspend() }).orNull()
               }
             } should leftException(e)
-
+            
             threadName() shouldStartWith singleThreadName
           }
         }
       }
     }
-
+    
     "first racer out of 2 always wins on a single thread" {
       single.use { ctx ->
         raceN(ctx, { threadName() }, { threadName() })
       }.swap().orNull() shouldStartWith "single"
     }
-
+    
     "race3 returns to original context" {
       val racerName = "race3"
-      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
-
+      
       checkAll(Arb.int(1..3)) { choose ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(3, racerName).use { (single, raceCtx) ->
           withContext(single) {
             threadName() shouldStartWith singleThreadName
-
+            
             val racedOn = when (choose) {
               1 ->
                 raceN(raceCtx, { threadName() }, { never<Nothing>() }, { never<Nothing>() })
                   .fold(::identity, { null }, { null })
+              
               2 ->
                 raceN(raceCtx, { never<Nothing>() }, { threadName() }, { never<Nothing>() })
                   .fold({ null }, ::identity, { null })
+              
               else ->
                 raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { threadName() })
                   .fold({ null }, { null }, ::identity)
             }
-
+            
             racedOn shouldStartWith racerName
             threadName() shouldStartWith singleThreadName
           }
         }
       }
     }
-
+    
     "race3 returns to original context on failure" {
       val racerName = "race3"
-      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
-
+      
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(3, racerName).use { (single, raceCtx) ->
           withContext(single) {
             threadName() shouldStartWith singleThreadName
-
+            
             Either.catch {
               when (choose) {
                 1 ->
                   raceN(raceCtx, { e.suspend() }, { never<Nothing>() }, { never<Nothing>() })
                     .fold(::identity, { null }, { null })
+                
                 2 ->
                   raceN(raceCtx, { never<Nothing>() }, { e.suspend() }, { never<Nothing>() })
                     .fold({ null }, ::identity, { null })
+                
                 else ->
                   raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { e.suspend() })
                     .fold({ null }, { null }, ::identity)
               }
             } should leftException(e)
-
+            
             threadName() shouldStartWith singleThreadName
           }
         }
       }
     }
-
+    
     "first racer out of 3 always wins on a single thread" {
       (single.use { ctx ->
         raceN(ctx, { threadName() }, { threadName() }, { threadName() })
