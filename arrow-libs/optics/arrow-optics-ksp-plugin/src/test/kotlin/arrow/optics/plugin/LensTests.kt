@@ -58,8 +58,54 @@ class LensTests {
       |  companion object
       |}
       |
-      |val i: Lens<OpticsTest, Int> = OpticsTest<Int>.time
+      |val i: Lens<OpticsTest<Int>, Int> = OpticsTest.field()
       |val r = i != null
-      """.failsWith { it.contains("OpticsTest".typeParametersErrorMessage) }
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses for nested classes`() {
+    """
+      |$imports
+      |@optics
+      |data class LensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object 
+      |}
+      |
+      |val i: Lens<LensData.InnerLensData, String> = LensData.InnerLensData.field2
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses for nested classes with repeated names (#2718)`() {
+    """
+      |$imports
+      |@optics
+      |data class LensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object 
+      |}
+      |
+      |@optics
+      |data class OtherLensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object 
+      |}
+      |
+      |val i: Lens<LensData.InnerLensData, String> = LensData.InnerLensData.field2
+      |val j: Lens<OtherLensData.InnerLensData, String> = OtherLensData.InnerLensData.field2
+      |val r = i != null && j != null
+      """.evals("r" to true)
   }
 }
