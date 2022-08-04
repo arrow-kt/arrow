@@ -1,5 +1,7 @@
 package arrow.optics.plugin.internals
 
+import com.google.devtools.ksp.symbol.KSTypeParameter
+
 internal fun generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,
@@ -9,11 +11,24 @@ internal fun generatePrisms(ele: ADT, target: PrismTarget) =
     content = processElement(ele, target.foci)
   )
 
-private fun processElement(ele: ADT, foci: List<Focus>): String =
-  foci.joinToString(separator = "\n\n") { focus ->
+private fun processElement(ele: ADT, foci: List<Focus>): String {
+  return foci.joinToString(separator = "\n\n") { focus ->
+    val sourceClassNameWithParams =
+      focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
+    val angledTypeParameters = when {
+      focus.refinedArguments.isEmpty() -> ""
+      else -> focus.refinedArguments.joinToString(prefix = "<", separator = ",", postfix = ">")
+    }
+    val firstLine = when {
+      ele.typeParameters.isEmpty() ->
+        "${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()"
+      else ->
+        "${ele.visibilityModifierName} inline fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
+    }
+
     """
-  |${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()= $Prism(
-  |  getOrModify = { ${ele.sourceName}: ${ele.sourceClassName} ->
+  |$firstLine = $Prism(
+  |  getOrModify = { ${ele.sourceName}: $sourceClassNameWithParams ->
   |    when (${ele.sourceName}) {
   |      is ${focus.className} -> ${ele.sourceName}.right()
   |      else -> ${ele.sourceName}.left()
@@ -23,3 +38,4 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
   |)
   |""".trimMargin()
   }
+}
