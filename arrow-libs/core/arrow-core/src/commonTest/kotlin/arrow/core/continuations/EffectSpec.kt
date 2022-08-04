@@ -278,7 +278,7 @@ class EffectSpec :
           shift(Failure(msg))
         }
         
-        effect<Failure, Int> {
+        effect {
           failure().bind()
           1
         }.fold(
@@ -296,8 +296,8 @@ class EffectSpec :
         }
       
         val newError: Effect<List<Char>, Int> =
-          failed.handleErrorWith { str ->
-            effect { shift(str.reversed().toList()) }
+          failed.catch { str ->
+            shift(str.reversed().toList())
           }
       
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
