@@ -29,6 +29,8 @@ import kotlin.jvm.JvmName
 
       * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
       * [Handling errors](#handling-errors)
+        * [catch](#catch)
+        * [attempt](#attempt)
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
@@ -194,12 +196,20 @@ import kotlin.jvm.JvmName
  *
  * ## Handling errors
  *
- * Handling errors of type `R` is the same as handling errors for any other data type in Arrow.
- * `Effect<R, A>` offers `handleError`, `handleErrorWith`, `redeem`, `redeemWith` and `attempt`.
+ * An Effect<R, A> has 2 error channels: `Throwable` and `R`
+ * There are two separate handlers to transform either of the error channels.
  *
- * As you can see in the examples below it is possible to resolve errors of `R` or `Throwable` in `Effect<R, A>` in a generic manner.
- * There is no need to run `Effect<R, A>` into `Either<R, A>` before you can access `R`,
- * you can simply call the same functions on `Effect<R, A>` as you would on `Either<R, A>` directly.
+ * - `catch` to handle, and transform any error of type `R`.
+ * - `attempt` to handle, and transform and error of type `Throwable`.
+ *
+ * ### catch
+ *
+ * `catch` handles the error of type `R`,
+ * by providing a new value of type `A`, raising a different error of type `E`, or throwing an exception.
+ *
+ * Let's take a look at some examples:
+ *
+ * We define a `val failed` of type `Effect<String, Int>`, that represents a failed effect with value "failed".
  *
  * <!--- INCLUDE
  * import arrow.core.Either
@@ -213,29 +223,108 @@ import kotlin.jvm.JvmName
  * ```kotlin
  * val failed: Effect<String, Int> =
  *   effect { shift("failed") }
+ * ```
+ *
+ * We can `catch` the failure, and resolve it by providing a default value of `-1` or the length of the `error: String`.
+ *
+ * ```kotlin
+ * val default: Effect<Nothing, Int> =
+ *   failed.catch { -1 }
  *
  * val resolved: Effect<Nothing, Int> =
  *   failed.catch { it.length }
+ * ```
  *
+ * As you can see the resulting `error` is now of type `Nothing`, since we did not raise any new errors.
+ * So our `Effect` knows that no short-circuiting will occur during execution. Awesome!
+ * But it can also infer to any other error type that you might want instead, because it's never going to occur.
+ * So as you see below, we can even assign our `Effect<Nothing, A>` to `Effect<E, A>`, where `E` can be any type.
+ *
+ * ```kotlin
+ * val default2: Effect<Double, Int> = default
+ * val resolved2: Effect<Unit, Int> = resolved
+ * ```
+ *
+ * `catch` also allows us to _change_ the error type when we resolve the error of type `R`.
+ * Below we handle our error of `String` and turn it into `List<Char>` using `reversed().toList()`.
+ * This is a powerful operation, since it allows us to transform our error types across boundaries or layers.
+ *
+ * ```kotlin
  * val newError: Effect<List<Char>, Int> =
  *   failed.catch { str ->
  *     shift(str.reversed().toList())
  *   }
+ * ```
  *
- * val redeemed: Effect<Nothing, Int> =
- *   failed.catch { str -> str.length }
+ * Finally, since `catch` supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
+ * This is typically undesired, since you should prefer lifting `Throwable` into typed values of `R` to make them compile-time tracked.
  *
- * val captured: Effect<String, Result<Int>> =
- *   effect<String, Int> { 1 }.attempt()
+ * ```kotlin
+ * val newException: Effect<Nothing, Int> =
+ *   failed.catch { str -> throw RuntimeException(str) }
+ * ```
  *
- * suspend fun main() {
- *   failed.toEither() shouldBe Either.Left("failed")
- *   resolved.toEither() shouldBe Either.Right(6)
- *   newError.toEither() shouldBe Either.Left(listOf('d', 'e', 'l', 'i', 'a', 'f'))
- *   redeemed.toEither() shouldBe Either.Right(6)
- *   captured.toEither() shouldBe Either.Right(Result.success(1))
+ * ### attempt
+ *
+ * `attempt` gives us the same powers as `catch`, but instead of resolving `R` we're recovering from any unexpected `Throwable`.
+ * Unexpected, because the expectation is that all `Throwable` get turned into `R` unless it's a fatal/unexpected.
+ * This operator is useful when you need to work/wrap foreign code, especially Java SDKs or any code that is heavily based on exceptions.
+ *
+ * Below we've defined a `foreign` value that represents wrapping a foreign API which might throw `RuntimeException`.
+ *
+ * ```kotlin
+ * val foreign = effect<String, Int> {
+ *   throw RuntimeException("BOOM!")
  * }
  * ```
+ *
+ * We can `attempt` to run the effect recovering from any exception,
+ * and recover it by providing a default value of `-1` or the length of the [Throwable.message].
+ *
+ * ```kotlin
+ * val default3: Effect<String, Int> =
+ *   foreign.attempt { -1 }
+ *
+ * val resolved3: Effect<String, Int> =
+ *   foreign.attempt { it.message?.length ?: -1 }
+ * ```
+ *
+ * A big difference with `catch` is that `attempt` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
+ * You can however compose `catch`, and `attempt` to resolve the error type **and** recover the exception.
+ *
+ * ```kotlin
+ * val default4: Effect<Nothing, Int> =
+ *   foreign
+ *     .catch<String, Nothing, Int> { -1 }
+ *     .attempt { -2 }
+ * ```
+ *
+ * `attempt` however offers an overload that can _refine the exception_.
+ * Let's say you're wrapping some database interactions that might throw `java.sql.SqlException`, or `org.postgresql.util.PSQLException`,
+ * then you might only be interested in those exceptions and not `Throwable`. `attempt` allows you to install multiple handlers for specific exceptions.
+ * If the desired exception is not matched, then it stays in the `suspend` exception channel and will be thrown or recovered at a later point.
+ *
+ * ```kotlin
+ * val default5: Effect<String, Int> =
+ *   foreign
+ *     .attempt { ex: RuntimeException -> -1 }
+ *     .attempt { ex: java.sql.SQLException -> -2 }
+ * ```
+ *
+ * Finally, since `attempt` also supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
+ * This can be useful if refinement of exceptions is not sufficient, for example in the case of `org.postgresql.util.PSQLException` you might want to
+ * check the `SQLState` to check for a `foreign key violation` and rethrow the exception if not matched.
+ *
+ * ```kotlin
+ * suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
+ *
+ * val rethrown: Effect<String, Int> =
+ *   failed.attempt { ex: java.sql.SQLException ->
+ *     if(ex.isForeignKeyViolation()) shift("foreign key violation")
+ *     else throw ex
+ *   }
+ * ```
+ *
  * <!--- KNIT example-effect-guide-04.kt -->
  *
  * Note:

@@ -12,24 +12,47 @@ import io.kotest.matchers.shouldBe
 val failed: Effect<String, Int> =
   effect { shift("failed") }
 
+val default: Effect<Nothing, Int> =
+  failed.catch { -1 }
+
 val resolved: Effect<Nothing, Int> =
   failed.catch { it.length }
+
+val default2: Effect<Double, Int> = default
+val resolved2: Effect<Unit, Int> = resolved
 
 val newError: Effect<List<Char>, Int> =
   failed.catch { str ->
     shift(str.reversed().toList())
   }
 
-val redeemed: Effect<Nothing, Int> =
-  failed.catch { str -> str.length }
+val newException: Effect<Nothing, Int> =
+  failed.catch { str -> throw RuntimeException(str) }
 
-val captured: Effect<String, Result<Int>> =
-  effect<String, Int> { 1 }.attempt()
-
-suspend fun main() {
-  failed.toEither() shouldBe Either.Left("failed")
-  resolved.toEither() shouldBe Either.Right(6)
-  newError.toEither() shouldBe Either.Left(listOf('d', 'e', 'l', 'i', 'a', 'f'))
-  redeemed.toEither() shouldBe Either.Right(6)
-  captured.toEither() shouldBe Either.Right(Result.success(1))
+val foreign = effect<String, Int> {
+  throw RuntimeException("BOOM!")
 }
+
+val default3: Effect<String, Int> =
+  foreign.attempt { -1 }
+
+val resolved3: Effect<String, Int> =
+  foreign.attempt { it.message?.length ?: -1 }
+
+val default4: Effect<Nothing, Int> =
+  foreign
+    .catch<String, Nothing, Int> { -1 }
+    .attempt { -2 }
+
+val default5: Effect<String, Int> =
+  foreign
+    .attempt { ex: RuntimeException -> -1 }
+    .attempt { ex: java.sql.SQLException -> -2 }
+
+suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
+
+val rethrown: Effect<String, Int> =
+  failed.attempt { ex: java.sql.SQLException ->
+    if(ex.isForeignKeyViolation()) shift("foreign key violation")
+    else throw ex
+  }
