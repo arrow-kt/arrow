@@ -5,16 +5,23 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import io.kotest.property.exhaustive.exhaustive
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -270,14 +277,14 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
-    
+
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
-        
+
         effect {
           failure().bind()
           1
@@ -287,30 +294,30 @@ class EffectSpec :
         ) shouldBe Failure(msg)
       }
     }
-  
+
     "#2779 - handleErrorWith does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           failed.catch { str ->
             shift(str.reversed().toList())
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
@@ -319,8 +326,87 @@ class EffectSpec :
               }.bind()
             }, ::identity)
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
+      }
+    }
+
+    "catch - happy path" {
+      checkAll(Arb.string().suspend()) { str ->
+        effect<Int, String> {
+          str()
+        }.catch<Int, Nothing, String> { fail("It should never catch a success value") }
+          .runCont() shouldBe str()
+      }
+    }
+
+    "catch - error path and recover" {
+      checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
+        effect<Int, String> {
+          shift<String>(int())
+          fail("It should never reach this point")
+        }.catch<Int, Nothing, String> { fallback() }
+          .runCont() shouldBe fallback()
+      }
+    }
+
+    "catch - error path and re-shift" {
+      checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
+        effect<Int, Unit> {
+          shift<String>(int())
+          fail("It should never reach this point")
+        }.catch<Int, String, Unit> { shift(fallback()) }
+          .runCont() shouldBe fallback()
+      }
+    }
+
+    "catch - error path and throw" {
+      checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
+        shouldThrow<RuntimeException> {
+          effect<Int, String> {
+            shift<String>(int())
+            fail("It should never reach this point")
+          }.catch<Int, Nothing, String> { throw RuntimeException(msg()) }
+            .runCont()
+        }.message.shouldNotBeNull() shouldBe msg()
+      }
+    }
+
+    "attempt - happy path" {
+      checkAll(Arb.string().suspend()) { str ->
+        effect<Int, String> {
+          str()
+        }.attempt { fail("It should never catch a success value") }
+          .runCont() shouldBe str()
+      }
+    }
+
+    "attempt - error path and recover" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<Int, String> {
+          throw RuntimeException(msg())
+        }.attempt { fallback() }
+          .runCont() shouldBe fallback()
+      }
+    }
+  
+    "attempt - error path and re-shift" {
+      checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
+        effect<Int, Unit> {
+          throw RuntimeException(msg())
+        }.attempt { shift(fallback()) }
+          .runCont() shouldBe fallback()
+      }
+    }
+
+    "attempt - error path and throw" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, msg2 ->
+        shouldThrow<RuntimeException> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.attempt { throw RuntimeException(msg2()) }
+            .runCont()
+        }.message.shouldNotBeNull() shouldBe msg2()
       }
     }
   })
@@ -332,13 +418,22 @@ suspend fun currentContext(): CoroutineContext = kotlin.coroutines.coroutineCont
 internal suspend fun Throwable.suspend(): Nothing = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { throw this }
     .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
-
+  
   COROUTINE_SUSPENDED
 }
+
+// Turn `A` into `suspend () -> A` which tests both the `immediate` and `COROUTINE_SUSPENDED` path.
+private fun <A> Arb<A>.suspend(): Arb<suspend () -> A> =
+  flatMap { a ->
+    arbitrary(listOf(
+      { a },
+      suspend { a.suspend() }
+    )) { suspend { a.suspend() } }
+  }
 
 internal suspend fun <A> A.suspend(): A = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { this }
     .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
-
+  
   COROUTINE_SUSPENDED
 }

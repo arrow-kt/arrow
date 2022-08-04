@@ -11,10 +11,11 @@ import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 
@@ -26,23 +27,23 @@ import kotlin.jvm.JvmName
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
-
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-        * [catch](#catch)
-        * [attempt](#attempt)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Strange edge cases](#strange-edge-cases)
-
+ 
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [catch](#catch)
+ * [attempt](#attempt)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Strange edge cases](#strange-edge-cases)
+ 
  * <!--- END -->
  *
  *
@@ -747,7 +748,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
     
     try {
       suspend { transform(invoke(shift)) }
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, error, cont))
     } catch (e: Suspend) {
       if (token == e.token) {
         @Suppress("UNCHECKED_CAST")
@@ -927,6 +928,7 @@ internal class Token {
 private class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
+  private val recover: suspend (Throwable) -> B,
   private val parent: Continuation<B>,
 ) : Continuation<B> {
   @Suppress("UNCHECKED_CAST")
@@ -934,7 +936,24 @@ private class FoldContinuation<B>(
     result.fold(parent::resume) { throwable ->
       if (throwable is Suspend && token == throwable.token) {
         val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
-        f.createCoroutineUnintercepted(parent).resume(Unit)
+        try {
+          when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
+            COROUTINE_SUSPENDED -> Unit
+            else -> parent.resume(res as B)
+          }
+        } catch (e: Throwable) {
+          parent.resumeWithException(e)
+        }
+      } else if (throwable !is Suspend) {
+        val f: suspend () -> B = { recover(throwable) }
+        try {
+          when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
+            COROUTINE_SUSPENDED -> Unit
+            else -> parent.resume(res as B)
+          }
+        } catch (e: Throwable) {
+          parent.resumeWithException(e)
+        }
       } else parent.resumeWith(result)
     }
   }
