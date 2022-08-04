@@ -16,6 +16,7 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 /**
@@ -587,7 +588,179 @@ import kotlin.jvm.JvmName
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public typealias Effect<R, A> = suspend Shift<R>.() -> A
+/*@JvmInline*/ // Does not work with `@JvmName`
+public /*value*/ class Effect<out R, out A>(
+  public val action: suspend Shift<R>.() -> A
+) : suspend Shift<R>.() -> A {
+  
+  override suspend fun invoke(p1: Shift<R>): A = action.invoke(p1)
+  
+  /**
+   * Invoke the [Effect] and [fold] and transform the `result` to a value of [B].
+   * The [Effect] can `result` in an error of [Throwable], short-circuit value of[R],
+   * or a value of [A].
+   *
+   * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+   * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+   */
+  public suspend fun <B> fold(
+    error: suspend (error: Throwable) -> B,
+    recover: suspend (shifted: R) -> B,
+    transform: suspend (value: A) -> B,
+  ): B = foldImpl(error, recover, transform)
+  
+  public suspend fun <B> fold(
+    recover: suspend (shifted: R) -> B,
+    transform: suspend (value: A) -> B,
+  ): B = fold({ throw it }, recover, transform)
+  
+  /**
+   * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
+   * result value [A] is mapped to [Either.Right].
+   */
+  public suspend fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
+  
+  /**
+   * [fold] the [Effect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
+   * result value [A] is mapped to [Ior.Right].
+   */
+  public suspend fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
+  
+  /**
+   * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
+   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
+   */
+  public suspend fun toValidated(): Validated<R, A> =
+    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+  
+  /**
+   * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
+   * provided function [orElse], and result value [A] is mapped to [Some].
+   */
+  public suspend infix fun toOption(orElse: suspend (R) -> Option<@UnsafeVariance A>): Option<A> =
+    fold(orElse, ::Some)
+  
+  /**
+   * [fold] the [Effect] into an [A?].
+   * Where the shifted value [R] is mapped to [null], and result value [A].
+   */
+  public suspend fun orNull(): A? =
+    fold({ null }, ::identity)
+  
+  /**
+   * Catch both exceptions, or the shifted value [E] of the `Effect`.
+   * In both [recover], and [resolve] you can either return a value a new value of [A],
+   * short-circuit the effect by shifting with a value of [E],
+   * or raise an exception into [suspend].
+   *
+   * Some examples:
+   *
+   * ```kotlin
+   * import arrow.core.continuations.effect
+   *
+   * object User
+   * object Error
+   *
+   * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+   * val a = error.catch({ shift(-1) }) { User } // Success(User)
+   * val b = error.catch({ User }) { shift(5) } // Shift(5)
+   * val c = error.catch({ User }) { throw RuntimeException("5") } // Exception(5)
+   *
+   * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
+   * val d = exception.catch({ User }) { shift(-1) } // Success(User)
+   * val e = exception.catch({ shift(5) }) { User }  // Shift(5)
+   * val f = exception.catch({ throw RuntimeException("5") }) { User } // Exception(5)
+   * ```
+   *
+   * <!--- KNIT example-effect-01.kt -->
+   */
+  @OptIn(ExperimentalTypeInference::class)
+  @BuilderInference
+  public fun <E2> catch(
+    recover: suspend Shift<E2>.(Throwable) -> @UnsafeVariance A,
+    resolve: suspend Shift<E2>.(R) -> @UnsafeVariance A,
+  ): Effect<E2, A> =
+    // TODO this avoids 1 allocation in comparison with `catch(resolve).attempt(recover)`
+    //      Worth it to have?
+    effect { fold({ recover(it) }, { resolve(it) }, { it }) }
+  
+  /**
+   * Catch the shifted value [E] of the `Effect`.
+   * You can either return a value a new value of [A],
+   * or short-circuit the effect by shifting with a value of [E],
+   * or raise an exception into [suspend].
+   *
+   * ```kotlin
+   * import arrow.core.continuations.effect
+   *
+   * object User
+   * object Error
+   *
+   * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+   *
+   * val a = error.catch { _ -> User } // Success(User)
+   * val b = error.catch { _ -> shift("other-failure") } // Shift(other-failure)
+   * val c = error.catch { _ -> throw RuntimeException("BOOM") } // Exception(BOOM)
+   * ```
+   * <!--- KNIT example-effect-02.kt -->
+   */
+  @OptIn(ExperimentalTypeInference::class)
+  @BuilderInference
+  public infix fun <E2> catch(resolve: suspend Shift<E2>.(R) -> @UnsafeVariance A): Effect<E2, A> =
+    effect { fold({ resolve(it) }, { it }) }
+  
+  /**
+   * Attempt to run the effect, and [recover] from any unexpected exceptions.
+   * You can either return a value a new value of [A],
+   * or short-circuit the effect by shifting with a value of [E],
+   * or raise an exception into [suspend].
+   *
+   * ```kotlin
+   * import arrow.core.continuations.effect
+   *
+   * object User
+   * object Error
+   *
+   * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
+   *
+   * val a = exception.attempt { _ -> User } // Success(User)
+   * val b = exception.attempt { _ -> shift(Error) } // Shift(error)
+   * val c = exception.attempt { _ -> throw  RuntimeException("other-failure") } // Exception(other-failure)
+   * ```
+   * <!--- KNIT example-effect-03.kt -->
+   */
+  public infix fun attempt(recover: suspend Shift<@UnsafeVariance R>.(Throwable) -> @UnsafeVariance A): Effect<R, A> =
+    effect { fold({ recover(it) }, { shift(it) }, { it }) }
+  
+  /**
+   * A version of [attempt] that refines the [Throwable] to [T].
+   * This is useful for wrapping foreign code, such as database, network calls, etc.
+   *
+   * ```kotlin
+   * import arrow.core.continuations.effect
+   *
+   * object User
+   * object Error
+   *
+   * val x = effect<Error, User> {
+   *   throw IllegalArgumentException("builder missed args")
+   * }.attempt { _: IllegalArgumentException -> shift(Error) }
+   * ```
+   * <!--- KNIT example-effect-04.kt -->
+   */
+  @JvmName("attemptOrThrow")
+  public inline infix fun <reified T : Throwable> attempt(crossinline recover: suspend Shift<@UnsafeVariance R>.(T) -> @UnsafeVariance A): Effect<R, A> =
+    catch({ e -> if (e is T) recover(e) else throw e }) { e -> shift(e) }
+  
+  /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
+  public fun attempt(): Effect<R, Result<A>> = effect {
+    try {
+      Result.success(bind())
+    } catch (e: Throwable) {
+      Result.failure(e.nonFatalOrThrow())
+    }
+  }
+}
 
 /**
  * DSL for constructing Effect<R, A> values
@@ -598,7 +771,6 @@ public typealias Effect<R, A> = suspend Shift<R>.() -> A
  * import arrow.core.Option
  * import arrow.core.Validated
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  *
@@ -618,225 +790,11 @@ public typealias Effect<R, A> = suspend Shift<R>.() -> A
  *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
  * }
  * ```
- * <!--- KNIT example-effect-01.kt -->
- */
-@OptIn(ExperimentalTypeInference::class)
-public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<R, A> = f
-
-/**
- * Invoke the [Effect] and [fold] and transform the `result` to a value of [B].
- * The [Effect] can `result` in an error of [Throwable], short-circuit value of[R],
- * or a value of [A].
- *
- * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
- * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
- */
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  error: suspend (error: Throwable) -> B,
-  recover: suspend (shifted: R) -> B,
-  transform: suspend (value: A) -> B,
-): B =
-  suspendCoroutineUninterceptedOrReturn { cont ->
-    val token = Token()
-    val shift =
-      object : Shift<R> {
-        // Shift away from this Continuation by intercepting it, and completing it with
-        // ShiftCancellationException
-        // This is needed because this function will never yield a result,
-        // so it needs to be cancelled to properly support coroutine cancellation
-        override suspend fun <B> shift(r: R): B =
-        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-        // We have to throw CancellationException to signal the Continuation was cancelled, and we
-        // shifted away.
-        // This however also means that the user can try/catch shift and recover from the
-        // CancellationException and thus effectively recovering from the cancellation/shift.
-        // This means try/catch is also capable of recovering from monadic errors.
-          // See: EffectSpec - try/catch tests
-          @Suppress("UNCHECKED_CAST")
-          throw Suspend(token, r, recover as suspend (Any?) -> Any?)
-      }
-    
-    try {
-      suspend { transform(invoke(shift)) }
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
-    } catch (e: Suspend) {
-      if (token == e.token) {
-        @Suppress("UNCHECKED_CAST")
-        val f: suspend () -> B = { e.recover(e.shifted) as B }
-        f.startCoroutineUninterceptedOrReturn(cont)
-      } else throw e
-    } catch (e: Throwable) {
-      val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
-      f.startCoroutineUninterceptedOrReturn(cont)
-    }
-  }
-
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  recover: suspend (shifted: R) -> B,
-  transform: suspend (value: A) -> B,
-): B = fold({ throw it }, recover, transform)
-
-/**
- * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
- * result value [A] is mapped to [Either.Right].
- */
-public suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
-
-/**
- * [fold] the [Effect] into an [Ior]. Where the shifted value [R] is mapped to [Ior.Left], and
- * result value [A] is mapped to [Ior.Right].
- */
-public suspend fun <R, A> Effect<R, A>.toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-
-/**
- * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
- * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
- */
-public suspend fun <R, A> Effect<R, A>.toValidated(): Validated<R, A> =
-  fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-
-/**
- * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
- * provided function [orElse], and result value [A] is mapped to [Some].
- */
-public suspend infix fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Option<A>): Option<A> =
-  fold(orElse, ::Some)
-
-/**
- * [fold] the [Effect] into an [A?].
- * Where the shifted value [R] is mapped to [null], and result value [A].
- */
-public suspend fun <R, A> Effect<R, A>.orNull(): A? =
-  fold({ null }, ::identity)
-
-/**
- * Catch both exceptions, or the shifted value [E] of the `Effect`.
- * In both [recover], and [resolve] you can either return a value a new value of [A],
- * short-circuit the effect by shifting with a value of [E],
- * or raise an exception into [suspend].
- *
- * Some examples:
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
- *
- * object User
- * object Error
- *
- * val error = effect<Error, User> { shift(Error) } // // Shift(error)
- * val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
- * val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
- * val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
- *
- * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
- * val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
- * val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
- * val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
- * ```
- *
- * <!--- KNIT example-effect-02.kt -->
- */
-@OptIn(ExperimentalTypeInference::class)
-@BuilderInference
-public fun <E, E2, A> Effect<E, A>.catch(
-  recover: suspend Shift<E2>.(Throwable) -> A,
-  resolve: suspend Shift<E2>.(E) -> A,
-): Effect<E2, A> = effect {
-  fold(
-    { recover(it) },
-    { resolve(it) },
-    { it }
-  )
-}
-
-/**
- * Catch the shifted value [E] of the `Effect`.
- * You can either return a value a new value of [A],
- * or short-circuit the effect by shifting with a value of [E],
- * or raise an exception into [suspend].
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
- *
- * object User
- * object Error
- *
- * val error = effect<Error, User> { shift(Error) } // // Shift(error)
- *
- * val a = error.catch<Error, Error, User> { error -> User } // Success(User)
- * val b = error.catch<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
- * val c = error.catch<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
- * ```
- * <!--- KNIT example-effect-03.kt -->
- */
-@OptIn(ExperimentalTypeInference::class)
-@BuilderInference
-public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
-  catch({ throw it }, resolve)
-
-/**
- * Attempt to run the effect, and [recover] from any unexpected exceptions.
- * You can either return a value a new value of [A],
- * or short-circuit the effect by shifting with a value of [E],
- * or raise an exception into [suspend].
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.attempt
- *
- * object User
- * object Error
- *
- * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
- *
- * val a = exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
- * val b = exception.attempt { shift(Error) } // Shift(error)
- * val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
- * ```
- * <!--- KNIT example-effect-04.kt -->
- */
-public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
-  catch(recover) { e -> shift(e) }
-
-/**
- * A version of [attempt] that refines the [Throwable] to [T].
- * This is useful for wrapping foreign code, such as database, network calls, etc.
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.attempt
- *
- * object User
- * object Error
- *
- * val x = effect<Error, User> {
- *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
- * ```
- *
- * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
- *
- * ```kotlin
- * val y = effect<Nothing, User> {
- *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
- * ```
  * <!--- KNIT example-effect-05.kt -->
  */
-@JvmName("attemptOrThrow")
-public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
-  catch({ e -> if (e is T) recover(e) else throw e }) { e -> shift(e) }
-
-/** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
-public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
-  try {
-    Result.success(bind())
-  } catch (e: Throwable) {
-    Result.failure(e.nonFatalOrThrow())
-  }
-}
+@OptIn(ExperimentalTypeInference::class)
+public fun <R, A> effect(@BuilderInference action: suspend Shift<R>.() -> A): Effect<R, A> =
+  Effect(action)
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 
@@ -862,6 +820,45 @@ internal class Suspend(val token: Token, val shifted: Any?, val recover: suspend
 internal class Token {
   override fun toString(): String = "Token(${hashCode().toString(16)})"
 }
+
+private suspend fun <R, A, B> Effect<R, A>.foldImpl(
+  error: suspend (error: Throwable) -> B,
+  recover: suspend (shifted: R) -> B,
+  transform: suspend (value: A) -> B,
+): B = suspendCoroutineUninterceptedOrReturn { cont ->
+    val token = Token()
+    val shift =
+      object : Shift<R> {
+        // Shift away from this Continuation by intercepting it, and completing it with
+        // ShiftCancellationException
+        // This is needed because this function will never yield a result,
+        // so it needs to be cancelled to properly support coroutine cancellation
+        override suspend fun <B> shift(r: R): B =
+        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+        // We have to throw CancellationException to signal the Continuation was cancelled, and we
+        // shifted away.
+        // This however also means that the user can try/catch shift and recover from the
+        // CancellationException and thus effectively recovering from the cancellation/shift.
+        // This means try/catch is also capable of recovering from monadic errors.
+          // See: EffectSpec - try/catch tests
+          @Suppress("UNCHECKED_CAST")
+          throw Suspend(token, r, recover as suspend (Any?) -> Any?)
+      }
+    
+    try {
+      suspend { transform(action.invoke(shift)) }
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+    } catch (e: Suspend) {
+      if (token == e.token) {
+        @Suppress("UNCHECKED_CAST")
+        val f: suspend () -> B = { e.recover(e.shifted) as B }
+        f.startCoroutineUninterceptedOrReturn(cont)
+      } else throw e
+    } catch (e: Throwable) {
+      val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
+      f.startCoroutineUninterceptedOrReturn(cont)
+    }
+  }
 
 /**
  * Continuation that runs the `recover` function, after attempting to calculate [B]. In case we

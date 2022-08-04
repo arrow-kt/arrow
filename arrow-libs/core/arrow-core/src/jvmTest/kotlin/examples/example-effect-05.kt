@@ -1,16 +1,26 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect05
 
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Validated
 import arrow.core.continuations.effect
-import arrow.core.continuations.attempt
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
 
-object User
-object Error
+suspend fun main() {
+  effect<String, Int> {
+    val x = Either.Right(1).bind()
+    val y = Validated.Valid(2).bind()
+    val z = Option(3).bind { "Option was empty" }
+    x + y + z
+  }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
 
-val x = effect<Error, User> {
-  throw IllegalArgumentException("builder missed args")
-}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
-
-val y = effect<Nothing, User> {
-  throw IllegalArgumentException("builder missed args")
-}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
+  effect<String, Int> {
+    val x = Either.Right(1).bind()
+    val y = Validated.Valid(2).bind()
+    val z: Int = None.bind { "Option was empty" }
+    x + y + z
+  }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
+}

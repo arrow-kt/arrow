@@ -264,20 +264,20 @@ public interface Shift<in R> {
    * <!--- KNIT example-effect-scope-09.kt -->
    */
   @ShiftMarker
-  public suspend infix fun <E, A> (suspend Shift<E>.() -> A).catch(
+  public suspend infix fun <E, A> Effect<E, A>.catch(
     resolve: suspend Shift<R>.(E) -> A,
-  ): A = catch<E, R, A>(resolve).bind()
+  ): A = catch(resolve).bind()
   
   @ShiftMarker
-  public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
+  public suspend fun <E, A> Effect<E, A>.catch(
     recover: suspend Shift<R>.(Throwable) -> A,
     resolve: suspend Shift<R>.(E) -> A,
-  ): A = catch<E, R, A>(recover, resolve).bind()
+  ): A = catch(recover, resolve).bind()
   
   @ShiftMarker
-  public suspend fun <A> (suspend Shift<R>.() -> A).attempt(
+  public suspend fun <A> Effect<R, A>.attempt(
     recover: suspend Shift<R>.(Throwable) -> A,
-  ): A = catch(recover) { e -> shift(e) }
+  ): A = attempt(recover).bind()
 }
 
 // @ShiftMarker
