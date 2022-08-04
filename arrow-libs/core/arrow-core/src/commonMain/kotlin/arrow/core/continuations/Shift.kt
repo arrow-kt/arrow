@@ -268,16 +268,16 @@ public interface Shift<in R> {
     resolve: suspend Shift<R>.(E) -> A,
   ): A = catch<E, R, A>(resolve).bind()
   
-  @ShiftMarker
-  public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
-    recover: suspend Shift<R>.(Throwable) -> A,
-    resolve: suspend Shift<R>.(E) -> A,
-  ): A = catch<E, R, A>(recover, resolve).bind()
+  // @ShiftMarker
+  // public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
+  //   recover: suspend Shift<R>.(Throwable) -> A,
+  //   resolve: suspend Shift<R>.(E) -> A,
+  // ): A = catch<E, R, A>(resolve).attempt(recover)
   
   @ShiftMarker
   public suspend fun <A> (suspend Shift<R>.() -> A).attempt(
     recover: suspend Shift<R>.(Throwable) -> A,
-  ): A = catch(recover) { e -> shift(e) }
+  ): A = attempt<R, A>(recover).bind()
 }
 
 // @ShiftMarker

@@ -709,46 +709,41 @@ public suspend infix fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Opt
 public suspend fun <R, A> Effect<R, A>.orNull(): A? =
   fold({ null }, ::identity)
 
-/**
- * Catch both exceptions, or the shifted value [E] of the `Effect`.
- * In both [recover], and [resolve] you can either return a value a new value of [A],
- * short-circuit the effect by shifting with a value of [E],
- * or raise an exception into [suspend].
- *
- * Some examples:
- *
- * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
- *
- * object User
- * object Error
- *
- * val error = effect<Error, User> { shift(Error) } // // Shift(error)
- * val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
- * val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
- * val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
- *
- * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
- * val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
- * val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
- * val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
- * ```
- *
- * <!--- KNIT example-effect-02.kt -->
- */
-@OptIn(ExperimentalTypeInference::class)
-@BuilderInference
-public fun <E, E2, A> Effect<E, A>.catch(
-  recover: suspend Shift<E2>.(Throwable) -> A,
-  resolve: suspend Shift<E2>.(E) -> A,
-): Effect<E2, A> = effect {
-  fold(
-    { recover(it) },
-    { resolve(it) },
-    { it }
-  )
-}
+// /**
+//  * Catch both exceptions, or the shifted value [E] of the `Effect`.
+//  * In both [recover], and [resolve] you can either return a value a new value of [A],
+//  * short-circuit the effect by shifting with a value of [E],
+//  * or raise an exception into [suspend].
+//  *
+//  * Some examples:
+//  *
+//  * ```kotlin
+//  * import arrow.core.continuations.effect
+//  * import arrow.core.continuations.catch
+//  *
+//  * object User
+//  * object Error
+//  *
+//  * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+//  * val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
+//  * val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
+//  * val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
+//  *
+//  * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
+//  * val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
+//  * val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
+//  * val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
+//  * ```
+//  *
+//  * <!--- KNIT example-effect-02.kt -->
+//  */
+// @OptIn(ExperimentalTypeInference::class)
+// @BuilderInference
+// public fun <E, E2, A> Effect<E, A>.catch(
+//   recover: suspend Shift<E2>.(Throwable) -> A,
+//   resolve: suspend Shift<E2>.(E) -> A,
+// ): Effect<E2, A> =
+//   catch(resolve).attempt(recover)
 
 /**
  * Catch the shifted value [E] of the `Effect`.
@@ -774,7 +769,7 @@ public fun <E, E2, A> Effect<E, A>.catch(
 @OptIn(ExperimentalTypeInference::class)
 @BuilderInference
 public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
-  catch({ throw it }, resolve)
+  effect { fold({ resolve(it) }, { it }) }
 
 /**
  * Attempt to run the effect, and [recover] from any unexpected exceptions.
@@ -798,7 +793,13 @@ public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) ->
  * <!--- KNIT example-effect-04.kt -->
  */
 public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
-  catch(recover) { e -> shift(e) }
+  effect {
+    fold(
+      { recover(it) },
+      { shift(it) },
+      { it }
+    )
+  }
 
 /**
  * A version of [attempt] that refines the [Throwable] to [T].
@@ -827,7 +828,7 @@ public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwabl
  */
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
-  catch({ e -> if (e is T) recover(e) else throw e }) { e -> shift(e) }
+  attempt { e -> if (e is T) recover(e) else throw e }
 
 /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */
 public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
