@@ -728,7 +728,7 @@ public suspend fun <R, A> Effect<R, A>.orNull(): A? =
  * val b = error.catch<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
  * val c = error.catch<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
- * <!--- KNIT example-effect-03.kt -->
+ * <!--- KNIT example-effect-02.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
 @BuilderInference
@@ -754,7 +754,7 @@ public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) ->
  * val b = exception.attempt { shift(Error) } // Shift(error)
  * val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
  * ```
- * <!--- KNIT example-effect-04.kt -->
+ * <!--- KNIT example-effect-03.kt -->
  */
 public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
   effect {
@@ -788,7 +788,7 @@ public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwabl
  *   throw IllegalArgumentException("builder missed args")
  * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
  * ```
- * <!--- KNIT example-effect-05.kt -->
+ * <!--- KNIT example-effect-04.kt -->
  */
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =

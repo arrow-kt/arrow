@@ -7,8 +7,10 @@ import arrow.core.continuations.attempt
 object User
 object Error
 
-val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
+val x = effect<Error, User> {
+  throw IllegalArgumentException("builder missed args")
+}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
 
-val a = exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
-val b = exception.attempt { shift(Error) } // Shift(error)
-val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
+val y = effect<Nothing, User> {
+  throw IllegalArgumentException("builder missed args")
+}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
