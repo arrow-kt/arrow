@@ -709,42 +709,6 @@ public suspend infix fun <R, A> Effect<R, A>.toOption(orElse: suspend (R) -> Opt
 public suspend fun <R, A> Effect<R, A>.orNull(): A? =
   fold({ null }, ::identity)
 
-// /**
-//  * Catch both exceptions, or the shifted value [E] of the `Effect`.
-//  * In both [recover], and [resolve] you can either return a value a new value of [A],
-//  * short-circuit the effect by shifting with a value of [E],
-//  * or raise an exception into [suspend].
-//  *
-//  * Some examples:
-//  *
-//  * ```kotlin
-//  * import arrow.core.continuations.effect
-//  * import arrow.core.continuations.catch
-//  *
-//  * object User
-//  * object Error
-//  *
-//  * val error = effect<Error, User> { shift(Error) } // // Shift(error)
-//  * val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
-//  * val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
-//  * val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
-//  *
-//  * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
-//  * val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
-//  * val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
-//  * val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
-//  * ```
-//  *
-//  * <!--- KNIT example-effect-02.kt -->
-//  */
-// @OptIn(ExperimentalTypeInference::class)
-// @BuilderInference
-// public fun <E, E2, A> Effect<E, A>.catch(
-//   recover: suspend Shift<E2>.(Throwable) -> A,
-//   resolve: suspend Shift<E2>.(E) -> A,
-// ): Effect<E2, A> =
-//   catch(resolve).attempt(recover)
-
 /**
  * Catch the shifted value [E] of the `Effect`.
  * You can either return a value a new value of [A],

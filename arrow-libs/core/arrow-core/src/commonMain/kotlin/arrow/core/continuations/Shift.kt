@@ -9,18 +9,20 @@ import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 
 /**
- * Marks functions that are running in DSL mode.
+ * Marks functions that are running in `DSL mode`.
  *
  * For example,
  *  the function `catch` exists as an extension on `Effect<E, A>` but it also exists as a DSL inside `Shift`.
  *  To make it visually more clear, we mark it as a DSL inside Kotlin / IDEA.
  *  This way `catch` will appear as a keyword when inside the `Shift` DSL.
+ *
+ * Similarly, Arrow Fx Resource might utilise this for it's `ResourceScope` DSL as well,
+ * where `resource({ a }, { a, exitCase -> a.close() }` automatically binds in `DSL mode`.
  */
 @DslMarker
-public annotation class ShiftMarker
+public annotation class EffectDSL
 
 /** Context of the [Effect] DSL. */
 public interface Shift<in R> {
@@ -177,7 +179,7 @@ public interface Shift<in R> {
    * ```
    * <!--- KNIT example-effect-scope-06.kt -->
    */
-  public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
+  public suspend fun <B> Result<B>.bind(transform: suspend (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
   
   /**
@@ -204,7 +206,7 @@ public interface Shift<in R> {
    * ```
    * <!--- KNIT example-effect-scope-07.kt -->
    */
-  public suspend fun <B> Option<B>.bind(shift: () -> R): B =
+  public suspend fun <B> Option<B>.bind(shift: suspend () -> R): B =
     when (this) {
       None -> shift(shift())
       is Some -> value
@@ -232,7 +234,7 @@ public interface Shift<in R> {
    * ```
    * <!--- KNIT example-effect-scope-08.kt -->
    */
-  public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
+  public suspend fun ensure(condition: Boolean, shift: suspend () -> R): Unit =
     if (condition) Unit else shift(shift())
   
   /**
@@ -263,28 +265,22 @@ public interface Shift<in R> {
    * ```
    * <!--- KNIT example-effect-scope-09.kt -->
    */
-  @ShiftMarker
+  @EffectDSL
   public suspend infix fun <E, A> (suspend Shift<E>.() -> A).catch(
     resolve: suspend Shift<R>.(E) -> A,
   ): A = catch<E, R, A>(resolve).bind()
   
-  // @ShiftMarker
-  // public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
-  //   recover: suspend Shift<R>.(Throwable) -> A,
-  //   resolve: suspend Shift<R>.(E) -> A,
-  // ): A = catch<E, R, A>(resolve).attempt(recover)
+  @EffectDSL
+  public suspend fun <E, A> (suspend Shift<E>.() -> A).catch(
+    recover: suspend Shift<R>.(Throwable) -> A,
+    resolve: suspend Shift<R>.(E) -> A,
+  ): A = catch<E, R, A>(resolve).attempt(recover)
   
-  @ShiftMarker
+  @EffectDSL
   public suspend fun <A> (suspend Shift<R>.() -> A).attempt(
     recover: suspend Shift<R>.(Throwable) -> A,
   ): A = attempt<R, A>(recover).bind()
 }
-
-// @ShiftMarker
-// context(Shift<R>)
-// public suspend inline fun <reified T : Throwable, R, A> (suspend Shift<R>.() -> A).attempt(
-//   recover: suspend Shift<R>.(Throwable) -> A
-// ): A = TODO()
 
 /**
  * Ensure that [value] is not `null`. if it's non-null it will be smart-casted and returned if it's
@@ -309,8 +305,7 @@ public interface Shift<in R> {
  * <!--- KNIT example-effect-scope-10.kt -->
  */
 @OptIn(ExperimentalContracts::class)
-public suspend fun <R, B : Any> Shift<R>.ensureNotNull(value: B?, shift: () -> R): B {
+public suspend fun <R, B : Any> Shift<R>.ensureNotNull(value: B?, shift: suspend () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
-
