@@ -11,7 +11,7 @@ import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
@@ -881,10 +881,7 @@ private class FoldContinuation<B>(
     result.fold(parent::resume) { throwable ->
       if (throwable is Suspend && token == throwable.token) {
         val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
-        when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
-          COROUTINE_SUSPENDED -> Unit
-          else -> parent.resume(res as B)
-        }
+        f.createCoroutineUnintercepted(parent).resume(Unit)
       } else parent.resumeWith(result)
     }
   }

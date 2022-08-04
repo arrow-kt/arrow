@@ -63,9 +63,17 @@ private fun processElement(iso: ADT, target: Target): String {
         "tuple: ${focusType()} -> ${(foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })}"
     }
 
+  val sourceClassNameWithParams = "${iso.sourceClassName}${iso.angledTypeParameters}"
+  val firstLine = when {
+    iso.typeParameters.isEmpty() ->
+      "${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()"
+    else ->
+      "${iso.visibilityModifierName} inline fun ${iso.angledTypeParameters} ${iso.sourceClassName}.Companion.iso(): $Iso<$sourceClassNameWithParams, ${focusType()}>"
+  }
+
   return """
-        |${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()= $Iso(
-        |  get = { ${iso.sourceName}: ${iso.sourceClassName} -> ${tupleConstructor()} },
+        |$firstLine = $Iso(
+        |  get = { ${iso.sourceName}: $sourceClassNameWithParams -> ${tupleConstructor()} },
         |  reverseGet = { ${classConstructorFromTuple()} }
         |)
         |""".trimMargin()

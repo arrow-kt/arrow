@@ -5,6 +5,7 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -284,6 +285,42 @@ class EffectSpec :
           recover = { it },
           transform = { fail("Should never come here") },
         ) shouldBe Failure(msg)
+      }
+    }
+  
+    "#2779 - handleErrorWith does not make nested Continuations hang" {
+      checkAll(Arb.string()) { error ->
+        val failed: Effect<String, Int> = effect {
+          withContext(Dispatchers.Default) {}
+          shift(error)
+        }
+      
+        val newError: Effect<List<Char>, Int> =
+          failed.handleErrorWith { str ->
+            effect { shift(str.reversed().toList()) }
+          }
+      
+        newError.toEither() shouldBe Either.Left(error.reversed().toList())
+      }
+    }
+    
+    "#2779 - bind nested in fold does not make nested Continuations hang" {
+      checkAll(Arb.string()) { error ->
+        val failed: Effect<String, Int> = effect {
+          withContext(Dispatchers.Default) {}
+          shift(error)
+        }
+      
+        val newError: Effect<List<Char>, Int> =
+          effect {
+            failed.fold({ r ->
+              effect<List<Char>, Int> {
+                shift(r.reversed().toList())
+              }.bind()
+            }, ::identity)
+          }
+      
+        newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
   })

@@ -11,8 +11,23 @@ internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
 
 private fun processElement(ele: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
+
+    val targetClassName = when (focus) {
+      is NullableFocus -> focus.nonNullClassName
+      is OptionFocus -> focus.nestedClassName
+      is NonNullFocus -> return@joinToString ""
+    }
+
+    val sourceClassNameWithParams = "${ele.sourceClassName}${ele.angledTypeParameters}"
+    val firstLine = when {
+      ele.typeParameters.isEmpty() ->
+        "${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()"
+      else ->
+        "${ele.visibilityModifierName} inline fun ${ele.angledTypeParameters} ${ele.sourceClassName}.Companion.${focus.paramName}(): $Optional<$sourceClassNameWithParams, $targetClassName>"
+    }
+
     fun getOrModifyF(toNullable: String = "") =
-      "{ ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${
+      "{ ${ele.sourceName}: $sourceClassNameWithParams -> ${ele.sourceName}.${
         focus.paramName.plusIfNotBlank(
           prefix = "`",
           postfix = "`"
@@ -21,18 +36,17 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
     fun setF(fromNullable: String = "") =
       "${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value$fromNullable)"
 
-    val (targetClassName, getOrModify, set) =
+    val (getOrModify, set) =
       when (focus) {
-        is NullableFocus -> Triple(focus.nonNullClassName, getOrModifyF(), setF())
-        is OptionFocus ->
-          Triple(focus.nestedClassName, getOrModifyF(".orNull()"), setF(".toOption()"))
+        is NullableFocus -> Pair(getOrModifyF(), setF())
+        is OptionFocus -> Pair(getOrModifyF(".orNull()"), setF(".toOption()"))
         is NonNullFocus -> return@joinToString ""
       }
 
     """
-      |${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
+      |$firstLine = $Optional(
       |  getOrModify = $getOrModify,
-      |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: $targetClassName -> $set }
+      |  set = { ${ele.sourceName}: $sourceClassNameWithParams, value: $targetClassName -> $set }
       |)
       |""".trimMargin()
   }
