@@ -27,23 +27,23 @@ import kotlin.jvm.JvmName
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
- 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [catch](#catch)
- * [attempt](#attempt)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
- 
+
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+        * [catch](#catch)
+        * [attempt](#attempt)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Strange edge cases](#strange-edge-cases)
+
  * <!--- END -->
  *
  *
