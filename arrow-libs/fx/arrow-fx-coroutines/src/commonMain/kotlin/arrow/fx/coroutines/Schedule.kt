@@ -1042,7 +1042,3 @@ public suspend fun <A, B, C> Schedule<Throwable, B>.retryOrElseEither(
     }
   }
 }
-
-fun main() {
-  val x = effect<String, Int> { 1 }
-}

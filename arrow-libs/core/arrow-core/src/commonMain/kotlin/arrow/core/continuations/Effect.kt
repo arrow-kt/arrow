@@ -16,6 +16,7 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmName
 
 /**
  * [Effect] represents a function of `suspend () -> A`, that short-circuit with a value of [R] (and [Throwable]),
@@ -586,6 +587,8 @@ import kotlin.experimental.ExperimentalTypeInference
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
+public typealias Effect<R, A> = suspend Shift<R>.() -> A
+
 /**
  * DSL for constructing Effect<R, A> values
  *
@@ -620,10 +623,13 @@ import kotlin.experimental.ExperimentalTypeInference
 @OptIn(ExperimentalTypeInference::class)
 public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<R, A> = f
 
-public typealias Effect<R, A> = suspend Shift<R>.() -> A
-
 /**
+ * Invoke the [Effect] and [fold] and transform the `result` to a value of [B].
+ * The [Effect] can `result` in an error of [Throwable], short-circuit value of[R],
+ * or a value of [A].
  *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
  */
 public suspend fun <R, A, B> Effect<R, A>.fold(
   error: suspend (error: Throwable) -> B,
@@ -712,19 +718,24 @@ public suspend fun <R, A> Effect<R, A>.orNull(): A? =
  * Some examples:
  *
  * ```kotlin
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.catch
+ *
  * object User
  * object Error
  *
  * val error = effect<Error, User> { shift(Error) } // // Shift(error)
- * error.catch({ -1 }) { it.length } // Success(5)
- * error.catch({ -1 }) { error -> shift("other-failure") } // Shift(other-failure)
- * error.catch({ -1 }) { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
+ * val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
+ * val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
  *
- * val exception = effect<String, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
- * exception.catch({ error -> error.message?.length ?: -1 }) { -1 } // Success(5)
- * exception.catch({ shift(Error) }) { -1 }  // Shift(error))
- * exception.catch({ throw  RuntimeException("other-failure") }) { -1 } // Exception(other-failure)
+ * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
+ * val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
+ * val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
+ * val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
  * ```
+ *
+ * <!--- KNIT example-effect-02.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
 @BuilderInference
@@ -746,16 +757,22 @@ public fun <E, E2, A> Effect<E, A>.catch(
  * or raise an exception into [suspend].
  *
  * ```kotlin
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.catch
+ *
  * object User
  * object Error
  *
  * val error = effect<Error, User> { shift(Error) } // // Shift(error)
  *
- * error.catch { error -> error.length } // Success(5)
- * error.catch { error -> shift("other-failure") } // Shift(other-failure)
- * error.catch { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * val a = error.catch<Error, Error, User> { error -> User } // Success(User)
+ * val b = error.catch<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
+ * val c = error.catch<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
+ * <!--- KNIT example-effect-03.kt -->
  */
+@OptIn(ExperimentalTypeInference::class)
+@BuilderInference
 public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
   catch({ throw it }, resolve)
 
@@ -766,15 +783,19 @@ public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) ->
  * or raise an exception into [suspend].
  *
  * ```kotlin
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.attempt
+ *
  * object User
  * object Error
  *
- * val exception = effect<String, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
+ * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
  *
- * exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
- * exception.attempt { shift(Error) } // Shift(error)
- * exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
+ * val a = exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
+ * val b = exception.attempt { shift(Error) } // Shift(error)
+ * val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
  * ```
+ * <!--- KNIT example-effect-04.kt -->
  */
 public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
   catch(recover) { e -> shift(e) }
@@ -784,25 +805,27 @@ public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwabl
  * This is useful for wrapping foreign code, such as database, network calls, etc.
  *
  * ```kotlin
+ * import arrow.core.continuations.effect
+ * import arrow.core.continuations.attempt
+ *
  * object User
  * object Error
  *
- * effect<Error, User> {
+ * val x = effect<Error, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException> { shift(Error) }
+ * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
  * ```
  *
  * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
  *
  * ```kotlin
- * object User
- * object Error
- *
- * effect<Nothing, User> {
+ * val y = effect<Nothing, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException> { shift(Error) }
+ * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
  * ```
+ * <!--- KNIT example-effect-05.kt -->
  */
+@JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
   catch({ e -> if (e is T) recover(e) else throw e }) { e -> shift(e) }
 

@@ -1,27 +1,18 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect02
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.continuations.effect
-import arrow.core.continuations.fold
-import io.kotest.assertions.fail
-import io.kotest.matchers.shouldBe
+import arrow.core.continuations.catch
 
-suspend fun main() {
-  effect<String, Int> {
-    val x = Either.Right(1).bind()
-    val y = Validated.Valid(2).bind()
-    val z = Option(3).bind { "Option was empty" }
-    x + y + z
-  }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
+object User
+object Error
 
-  effect<String, Int> {
-    val x = Either.Right(1).bind()
-    val y = Validated.Valid(2).bind()
-    val z: Int = None.bind { "Option was empty" }
-    x + y + z
-  }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
-}
+val error = effect<Error, User> { shift(Error) } // // Shift(error)
+val a = error.catch<Error, Int, User>({ shift(-1) }) { _: Error -> User } // Success(User)
+val b = error.catch<Error, Int, User>({ User }) { _: Error -> shift(5) } // Shift(5)
+val c = error.catch<Error, Int, User>({ User }) { _: Error -> throw RuntimeException("5") } // Exception(5)
+
+val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)*
+val d = exception.catch<Error, Int, User>({ _: Throwable -> User }) { shift(-1) } // Success(User)
+val e = exception.catch<Error, Int, User>({ _: Throwable -> shift(5) }) { User }  // Shift(5)
+val f = exception.catch<Error, Int, User>({ throw RuntimeException("5") }) { User } // Exception(5)
