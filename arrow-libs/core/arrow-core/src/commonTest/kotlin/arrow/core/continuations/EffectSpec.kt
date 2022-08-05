@@ -5,6 +5,7 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -334,6 +335,34 @@ class EffectSpec :
           ::identity,
           ::identity
         ) shouldBe fallback()
+      }
+    }
+    
+    "Can shift from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<String, Int> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { shift(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.runCont() shouldBe fallback()
+      }
+    }
+  
+    "Can throw from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        shouldThrow<IllegalStateException> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { throw IllegalStateException(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.message shouldBe fallback()
       }
     }
   })
