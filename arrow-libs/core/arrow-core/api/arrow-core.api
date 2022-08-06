@@ -2584,77 +2584,46 @@ public final class arrow/core/continuations/AtomicRefKt {
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/Eager : arrow/core/continuations/ShiftCancellationException {
-	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
-	public final fun getRecover ()Lkotlin/jvm/functions/Function1;
-	public final fun getShifted ()Ljava/lang/Object;
-	public final fun getToken ()Larrow/core/continuations/Token;
-	public fun toString ()Ljava/lang/String;
-}
-
-public abstract interface class arrow/core/continuations/EagerEffect {
-	public abstract fun attempt ()Larrow/core/continuations/EagerEffect;
-	public abstract fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun handleError (Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun handleErrorWith (Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun orNull ()Ljava/lang/Object;
-	public abstract fun redeem (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun redeemWith (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public abstract fun toEither ()Larrow/core/Either;
-	public abstract fun toIor ()Larrow/core/Ior;
-	public abstract fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
-	public abstract fun toValidated ()Larrow/core/Validated;
-}
-
-public final class arrow/core/continuations/EagerEffect$DefaultImpls {
-	public static fun attempt (Larrow/core/continuations/EagerEffect;)Larrow/core/continuations/EagerEffect;
-	public static fun flatMap (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun fold (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun handleError (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun handleErrorWith (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun map (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun orNull (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
-	public static fun redeem (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun redeemWith (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/EagerEffect;
-	public static fun toEither (Larrow/core/continuations/EagerEffect;)Larrow/core/Either;
-	public static fun toIor (Larrow/core/continuations/EagerEffect;)Larrow/core/Ior;
-	public static fun toOption (Larrow/core/continuations/EagerEffect;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
-	public static fun toValidated (Larrow/core/continuations/EagerEffect;)Larrow/core/Validated;
-}
-
 public final class arrow/core/continuations/EagerEffectKt {
-	public static final fun eagerEffect (Lkotlin/jvm/functions/Function2;)Larrow/core/continuations/EagerEffect;
-	public static final fun merge (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
+	public static final fun attempt (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun eagerEffect (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun merge (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun orNull (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun toEither (Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun toIor (Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
+	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun toValidated (Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 }
 
-public abstract interface class arrow/core/continuations/EagerEffectScope {
+public abstract interface class arrow/core/continuations/EagerShift {
 	public abstract fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/EagerEffectScope$DefaultImpls {
-	public static fun attempt (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EagerEffectScope;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EagerEffectScope;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun ensure (Larrow/core/continuations/EagerEffectScope;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public final class arrow/core/continuations/EagerShift$DefaultImpls {
+	public static fun attempt (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/EagerShift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/EagerShift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun catch (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun ensure (Larrow/core/continuations/EagerShift;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/EagerEffectScopeKt {
-	public static final fun ensureNotNull (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public final class arrow/core/continuations/EagerShiftKt {
+	public static final fun ensureNotNull (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/core/continuations/EffectDSL : java/lang/annotation/Annotation {
@@ -2675,15 +2644,15 @@ public final class arrow/core/continuations/EffectKt {
 	public static final fun toValidated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/continuations/EagerEffectScope, arrow/typeclasses/Semigroup {
-	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/EagerEffectScope;)V
+public final class arrow/core/continuations/IorEagerShift : arrow/core/continuations/EagerShift, arrow/typeclasses/Semigroup {
+	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/EagerShift;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2701,7 +2670,6 @@ public final class arrow/core/continuations/IorShift : arrow/core/continuations/
 	public final fun bind (Larrow/core/Ior;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2709,50 +2677,51 @@ public final class arrow/core/continuations/IorShift : arrow/core/continuations/
 	public fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun ensure (ZLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getLeftState ()Ljava/util/concurrent/atomic/AtomicReference;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun maybeCombine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun setLeftState (Ljava/util/concurrent/atomic/AtomicReference;)V
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/NullableEagerEffectScope : arrow/core/continuations/EagerEffectScope {
+public final class arrow/core/continuations/NullableEagerShift : arrow/core/continuations/EagerShift {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun attempt-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/NullableEagerEffectScope;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/NullableEagerShift;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/EagerEffectScope;
+	public static fun catch-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/EagerShift;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun ensure-impl (Larrow/core/continuations/EagerEffectScope;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun ensure-impl (Larrow/core/continuations/EagerEffectScope;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun ensure-impl (Larrow/core/continuations/EagerShift;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun ensure-impl (Larrow/core/continuations/EagerShift;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffectScope;)Z
+	public static fun equals-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/EagerShift;Larrow/core/continuations/EagerShift;)Z
 	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/EagerEffectScope;)I
+	public static fun hashCode-impl (Larrow/core/continuations/EagerShift;)I
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun shift-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/EagerEffectScope;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerEffectScope;
+	public static fun toString-impl (Larrow/core/continuations/EagerShift;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerShift;
 }
 
 public final class arrow/core/continuations/NullableKt {
-	public static final fun ensureNotNull-7s8y1X8 (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ensureNotNull-URlivhc (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun ensureNotNull-in6rpMw (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/continuations/NullableShift : arrow/core/continuations/Shift {
@@ -2761,14 +2730,12 @@ public final class arrow/core/continuations/NullableShift : arrow/core/continuat
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2786,6 +2753,8 @@ public final class arrow/core/continuations/NullableShift : arrow/core/continuat
 	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
 	public fun hashCode ()I
 	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun shift-impl (Larrow/core/continuations/Shift;Ljava/lang/Void;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2794,44 +2763,44 @@ public final class arrow/core/continuations/NullableShift : arrow/core/continuat
 	public final synthetic fun unbox-impl ()Larrow/core/continuations/Shift;
 }
 
-public final class arrow/core/continuations/OptionEagerEffectScope : arrow/core/continuations/EagerEffectScope {
+public final class arrow/core/continuations/OptionEagerShift : arrow/core/continuations/EagerShift {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun attempt-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/OptionEagerEffectScope;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/OptionEagerShift;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/EagerEffectScope;
+	public static fun catch-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/EagerShift;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun ensure-impl (Larrow/core/continuations/EagerEffectScope;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun ensure-impl (Larrow/core/continuations/EagerEffectScope;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun ensure-impl (Larrow/core/continuations/EagerShift;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun ensure-impl (Larrow/core/continuations/EagerShift;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffectScope;)Z
+	public static fun equals-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/EagerShift;Larrow/core/continuations/EagerShift;)Z
 	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/EagerEffectScope;)I
+	public static fun hashCode-impl (Larrow/core/continuations/EagerShift;)I
 	public fun shift (Larrow/core/None;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/None;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun shift-impl (Larrow/core/continuations/EagerShift;Larrow/core/None;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/EagerEffectScope;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerEffectScope;
+	public static fun toString-impl (Larrow/core/continuations/EagerShift;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerShift;
 }
 
 public final class arrow/core/continuations/OptionKt {
+	public static final fun ensureNotNull-ODt02bg (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ensureNotNull-PYjzcDI (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun ensureNotNull-dxZa7OQ (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toOption (Larrow/core/continuations/EagerEffect;)Larrow/core/Option;
+	public static final fun toOption (Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2841,14 +2810,12 @@ public final class arrow/core/continuations/OptionShift : arrow/core/continuatio
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final synthetic fun box-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/OptionShift;
@@ -2865,6 +2832,8 @@ public final class arrow/core/continuations/OptionShift : arrow/core/continuatio
 	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
 	public fun hashCode ()I
 	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Larrow/core/None;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun shift-impl (Larrow/core/continuations/Shift;Larrow/core/None;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2873,41 +2842,41 @@ public final class arrow/core/continuations/OptionShift : arrow/core/continuatio
 	public final synthetic fun unbox-impl ()Larrow/core/continuations/Shift;
 }
 
-public final class arrow/core/continuations/ResultEagerEffectScope : arrow/core/continuations/EagerEffectScope {
+public final class arrow/core/continuations/ResultEagerShift : arrow/core/continuations/EagerShift {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun attempt-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/ResultEagerEffectScope;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/ResultEagerShift;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/EagerEffectScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/EagerEffectScope;)Larrow/core/continuations/EagerEffectScope;
+	public static fun catch-impl (Larrow/core/continuations/EagerShift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/EagerShift;)Larrow/core/continuations/EagerShift;
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun ensure-impl (Larrow/core/continuations/EagerEffectScope;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun ensure-impl (Larrow/core/continuations/EagerShift;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/EagerEffectScope;Larrow/core/continuations/EagerEffectScope;)Z
+	public static fun equals-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/EagerShift;Larrow/core/continuations/EagerShift;)Z
 	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/EagerEffectScope;)I
+	public static fun hashCode-impl (Larrow/core/continuations/EagerShift;)I
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun shift-impl (Larrow/core/continuations/EagerShift;Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/EagerEffectScope;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerEffectScope;
+	public static fun toString-impl (Larrow/core/continuations/EagerShift;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/EagerShift;
 }
 
 public final class arrow/core/continuations/ResultKt {
-	public static final fun toResult (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
+	public static final fun toResult (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2917,13 +2886,11 @@ public final class arrow/core/continuations/ResultShift : arrow/core/continuatio
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2940,6 +2907,8 @@ public final class arrow/core/continuations/ResultShift : arrow/core/continuatio
 	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
 	public fun hashCode ()I
 	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun shift-impl (Larrow/core/continuations/Shift;Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2953,12 +2922,12 @@ public abstract interface class arrow/core/continuations/Shift {
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2967,12 +2936,12 @@ public final class arrow/core/continuations/Shift$DefaultImpls {
 	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun catch (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun catch (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/continuations/Shift;ZLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class arrow/core/continuations/ShiftCancellationException : java/util/concurrent/CancellationException {
@@ -2980,19 +2949,6 @@ public abstract class arrow/core/continuations/ShiftCancellationException : java
 
 public final class arrow/core/continuations/ShiftKt {
 	public static final fun ensureNotNull (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/core/continuations/Suspend : arrow/core/continuations/ShiftCancellationException {
-	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
-	public final fun getRecover ()Lkotlin/jvm/functions/Function2;
-	public final fun getShifted ()Ljava/lang/Object;
-	public final fun getToken ()Larrow/core/continuations/Token;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/core/continuations/Token {
-	public fun <init> ()V
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class arrow/core/continuations/either {
