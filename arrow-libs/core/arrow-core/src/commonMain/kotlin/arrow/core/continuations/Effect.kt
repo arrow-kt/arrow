@@ -27,23 +27,23 @@ import kotlin.jvm.JvmName
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
-
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-        * [catch](#catch)
-        * [attempt](#attempt)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Strange edge cases](#strange-edge-cases)
-
+ 
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [catch](#catch)
+ * [attempt](#attempt)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Strange edge cases](#strange-edge-cases)
+ 
  * <!--- END -->
  *
  *
@@ -726,35 +726,42 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
   recover: suspend (shifted: R) -> B,
   transform: suspend (value: A) -> B,
 ): B =
+  /*
+   * Grab the `Continuation` but without intercepting/scheduling a dispatch on returning.
+   * We are not a concurrent builder, so we don't have to intercept upon returning for safety.
+   * Normally in concurrent operators the Continuation is intercepted before returning to preserve the caller context/Thread.
+   */
   suspendCoroutineUninterceptedOrReturn { cont ->
-    val token = Token()
-    val shift =
-      object : Shift<R> {
-        // Shift away from this Continuation by intercepting it, and completing it with
-        // ShiftCancellationException
-        // This is needed because this function will never yield a result,
-        // so it needs to be cancelled to properly support coroutine cancellation
-        override suspend fun <B> shift(r: R): B =
-        // Some interesting consequences of how Continuation Cancellation works in Kotlin.
-        // We have to throw CancellationException to signal the Continuation was cancelled, and we
-        // shifted away.
-        // This however also means that the user can try/catch shift and recover from the
-        // CancellationException and thus effectively recovering from the cancellation/shift.
-        // This means try/catch is also capable of recovering from monadic errors.
-          // See: EffectSpec - try/catch tests
-          @Suppress("UNCHECKED_CAST")
-          throw Suspend(token, r, recover as suspend (Any?) -> Any?)
-      }
+    @Suppress("UNCHECKED_CAST")
+    val shift = DefaultShift<R>(recover as suspend (Any?) -> Any?)
     
     try {
       suspend { transform(invoke(shift)) }
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, error, cont))
+        /*
+         * FAST-PATH #1: startCoroutineUninterceptedOrReturn _immediately_ returns COROUTINE_SUSPENDED | B | Suspend | Throwable.
+         * COROUTINE_SUSPENDED | B are returned immediately to `suspendCoroutineUninterceptedOrReturn`,
+         * where `COROUTINE_SUSPENDED` signals to the _coroutine system_ that our program has suspended and will `resume` through the `FoldContinuation`.
+         *
+         * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
+         */
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(shift.token, cont.context, error, cont))
     } catch (e: Suspend) {
-      if (token == e.token) {
+      /*
+       * FAST-PATH #1: Immediate call to `shift`
+       * We have to check that the detected Suspend is for _our Shift.token_.
+       * If it's our token, then we run the recover handler using startCoroutineUninterceptedOrReturn,
+       * and we can return the immediately returned COROUTINE_SUSPENDED | B | Suspend | Throwable directly to suspendCoroutineUninterceptedOrReturn.
+       * If not then it belongs to an outer `effect#fold` block, so we have to propagate the Suspend exception.
+       */
+      if (shift.token == e.token) {
         @Suppress("UNCHECKED_CAST")
         val f: suspend () -> B = { e.recover(e.shifted) as B }
         f.startCoroutineUninterceptedOrReturn(cont)
       } else throw e
+      /*
+       * FAST-PATH #1: Immediate Throwable thrown
+       * We always have to run the error handler on Throwable, but only for NonFatal exceptions.
+       */
     } catch (e: Throwable) {
       val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
       f.startCoroutineUninterceptedOrReturn(cont)
@@ -896,26 +903,45 @@ public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 
 /**
- * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level
- * code, you can use this type to differentiate between a foreign [CancellationException] and the
- * one from [Effect].
+ * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level code,
+ * you can use this type to differentiate between a foreign [CancellationException] such as JobCancellationException, and the one from [Effect].
  */
 public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 
-/**
- * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
- * `recover`.
+/*
+ * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute `recover`.
  */
-@PublishedApi
-internal class Suspend(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
+private class Suspend(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
   ShiftCancellationException() {
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
-/** Class that represents a unique token by hash comparison **/
-@PublishedApi
-internal class Token {
+/* Type to check if a check the correct scope of Shift **/
+private class Token {
   override fun toString(): String = "Token(${hashCode().toString(16)})"
+}
+
+/* The default impl for `Shift` which raises a `ShiftCancellationException` for the appropriate strategy */
+private class DefaultShift<R>(private val recover: suspend (shifted: Any?) -> Any?) : Shift<R> {
+  val token: Token = Token()
+  
+  /*
+   * Shift away from this Continuation by intercepting it, and completing it with `ShiftCancellationException`
+   * CancellationException is used because then shift short-circuiting also works as a cancel signal for Structured Concurrency.
+   * This is needed because this function will never yield a result, so it needs to be cancelled to properly support coroutine cancellation.
+   */
+  override suspend fun <B> shift(r: R): B =
+    /*
+     * We have to throw CancellationException to signal the Continuation was cancelled, and we shifted away.
+     * This however also means that the user can try/catch shift and recover from th
+     * CancellationException and thus effectively recovering from the cancellation/shift.
+     *
+     * This means try/catch is also capable of recovering from monadic errors,
+     * but should be avoided because it can also recover from nested shifts.
+     *
+     * See: EffectSpec - try/catch tests
+     */
+    throw Suspend(token, r, recover)
 }
 
 /**
@@ -931,30 +957,38 @@ private class FoldContinuation<B>(
   private val recover: suspend (Throwable) -> B,
   private val parent: Continuation<B>,
 ) : Continuation<B> {
+  /*
+   * In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl but simply invokes `(this as Function1<Continuation<T>, Any?>).invoke(cont)`
+   * https://github.com/JetBrains/kotlin/blob/f2fa748a5f336361719b49461a7b8ada558494e6/libraries/stdlib/jvm/src/kotlin/coroutines/intrinsics/IntrinsicsJvm.kt#L51
+   *
+   * When we are inside `FoldContinuation` we already signaled `COROUTINE_SUSPENDED` to `startCoroutineUninterceptedOrReturn` from `fold`.
+   * So we need to wire the `FAST PATH` created by `startCoroutineUninterceptedOrReturn` to `parent#resume`.
+   */
+  private fun (suspend () -> B).startCoroutineUnintercepted() {
+    try {
+      when (val res = startCoroutineUninterceptedOrReturn(parent)) {
+        COROUTINE_SUSPENDED -> Unit
+        else -> parent.resume(res as B)
+      }
+    } catch (e: Throwable) {
+      parent.resumeWithException(e)
+    }
+  }
+  
   @Suppress("UNCHECKED_CAST")
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
-      if (throwable is Suspend && token == throwable.token) {
-        val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
-        try {
-          when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
-            COROUTINE_SUSPENDED -> Unit
-            else -> parent.resume(res as B)
-          }
-        } catch (e: Throwable) {
-          parent.resumeWithException(e)
-        }
-      } else if (throwable !is Suspend) {
-        val f: suspend () -> B = { recover(throwable) }
-        try {
-          when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
-            COROUTINE_SUSPENDED -> Unit
-            else -> parent.resume(res as B)
-          }
-        } catch (e: Throwable) {
-          parent.resumeWithException(e)
-        }
-      } else parent.resumeWith(result)
+      /*
+       * If `Suspend` we need to check if it's our token, if so then we need to run the shift-recover handler.
+       * When the token is not ours, we need to pass it to our parent since it's a nested shift call.
+       * In the case that the `Throwable` is not `Suspend` we need to run the throwable-recover handler.
+       */
+      when {
+        throwable is Suspend && token == throwable.token ->
+          suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted()
+        throwable is Suspend -> parent.resumeWith(result)
+        else -> suspend { recover(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
+      }
     }
   }
 }
