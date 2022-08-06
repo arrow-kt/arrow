@@ -5,11 +5,13 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
-import io.kotest.common.runBlocking
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
@@ -323,11 +325,60 @@ class EffectSpec :
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
+    
+    "Can handle thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<Int, String> {
+          throw RuntimeException(msg())
+        }.fold(
+          { fallback() },
+          ::identity,
+          ::identity
+        ) shouldBe fallback()
+      }
+    }
+    
+    "Can shift from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<String, Int> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { shift(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.runCont() shouldBe fallback()
+      }
+    }
+  
+    "Can throw from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        shouldThrow<IllegalStateException> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { throw IllegalStateException(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.message shouldBe fallback()
+      }
+    }
   })
 
 private data class Failure(val msg: String)
 
 suspend fun currentContext(): CoroutineContext = kotlin.coroutines.coroutineContext
+
+// Turn `A` into `suspend () -> A` which tests both the `immediate` and `COROUTINE_SUSPENDED` path.
+private fun <A> Arb<A>.suspend(): Arb<suspend () -> A> =
+  flatMap { a ->
+    arbitrary(listOf(
+      { a },
+      suspend { a.suspend() }
+    )) { suspend { a.suspend() } }
+  }
 
 internal suspend fun Throwable.suspend(): Nothing = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { throw this }
