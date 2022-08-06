@@ -733,19 +733,19 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
    * Normally in concurrent operators the Continuation is intercepted before returning to preserve the caller context/Thread.
    */
   suspendCoroutineUninterceptedOrReturn { cont ->
-    @Suppress("UNCHECKED_CAST")
-    val shift = DefaultShift<R>(recover as suspend (Any?) -> Any?)
+    val shift: FoldContinuation<R, B> = FoldContinuation(cont.context, error, recover, cont)
     
     try {
-      suspend { transform(invoke(shift)) }
-        /*
-         * FAST-PATH #1: startCoroutineUninterceptedOrReturn _immediately_ returns COROUTINE_SUSPENDED | B | Suspend | Throwable.
-         * COROUTINE_SUSPENDED | B are returned immediately to `suspendCoroutineUninterceptedOrReturn`,
-         * where `COROUTINE_SUSPENDED` signals to the _coroutine system_ that our program has suspended and will `resume` through the `FoldContinuation`.
-         *
-         * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
-         */
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(shift, cont.context, error, cont))
+      val fold: suspend Shift<R>.() -> B = { transform(invoke(this)) }
+      
+      /*
+       * FAST-PATH #1: startCoroutineUninterceptedOrReturn _immediately_ returns COROUTINE_SUSPENDED | B | Suspend | Throwable.
+       * COROUTINE_SUSPENDED | B are returned immediately to `suspendCoroutineUninterceptedOrReturn`,
+       * where `COROUTINE_SUSPENDED` signals to the _coroutine system_ that our program has suspended and will `resume` through the `FoldContinuation`.
+       *
+       * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
+       */
+      fold.startCoroutineUninterceptedOrReturn(shift, shift)
     } catch (e: Suspend) {
       /*
        * FAST-PATH #1: Immediate call to `shift`
@@ -755,8 +755,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
        * If not then it belongs to an outer `effect#fold` block, so we have to propagate the Suspend exception.
        */
       if (shift == e.shift) {
-        @Suppress("UNCHECKED_CAST")
-        val f: suspend () -> B = { e.recover(e.shifted) as B }
+        val f: suspend () -> B = { e.recover(e.shifted) }
         f.startCoroutineUninterceptedOrReturn(cont)
       } else throw e
       /*
@@ -919,11 +918,11 @@ private class Suspend(
    * If fold.shift.token === Suspend.token, then this is your scope,
    * if not then the exceptions is from an outer scope and this exception needs to be rethrown.
    */
-  val shift: DefaultShift<Any?>,
+  val shift: FoldContinuation<Any?, Any?>,
 ) : ShiftCancellationException() {
   
   @Suppress("UNCHECKED_CAST")
-  suspend fun <B> recover(shifted: Any?): B = shift.recover(shifted) as B
+  suspend fun <B> recover(shifted: Any?): B = shift.resolve(shifted) as B
   
   override fun toString(): String = "ShiftCancellationException($message)"
 }
@@ -935,9 +934,19 @@ private class Eager(val shifted: Any?, val eagerShift: DefaultEagerShift<Any?>) 
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
-/* The default impl for `Shift` which raises a `ShiftCancellationException` for the appropriate strategy */
-private class DefaultShift<R>(val recover: suspend (shifted: R) -> Any?) : Shift<R> {
-  
+/**
+ * Continuation that runs the `recover` function, after attempting to calculate [B]. In case we
+ * encounter a `shift` after suspension, we will receive [Result.failure] with
+ * [ShiftCancellationException]. In that case we still need to run `suspend (R) -> B`, which is what
+ * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
+ * the result.
+ */
+private class FoldContinuation<R, B>(
+  override val context: CoroutineContext,
+  private val recover: suspend (Throwable) -> B,
+  val resolve: suspend (shifted: R) -> Any?,
+  private val parent: Continuation<B>,
+) : Continuation<B>, Shift<R> {
   /*
    * Shift away from this Continuation by intercepting it, and completing it with `ShiftCancellationException`
    * CancellationException is used because then shift short-circuiting also works as a cancel signal for Structured Concurrency.
@@ -954,22 +963,9 @@ private class DefaultShift<R>(val recover: suspend (shifted: R) -> Any?) : Shift
      *
      * See: EffectSpec - try/catch tests
      */
-    throw Suspend(r, this as DefaultShift<Any?>)
-}
-
-/**
- * Continuation that runs the `recover` function, after attempting to calculate [B]. In case we
- * encounter a `shift` after suspension, we will receive [Result.failure] with
- * [ShiftCancellationException]. In that case we still need to run `suspend (R) -> B`, which is what
- * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
- * the result.
- */
-private class FoldContinuation<R, B>(
-  private val shift: DefaultShift<R>,
-  override val context: CoroutineContext,
-  private val recover: suspend (Throwable) -> B,
-  private val parent: Continuation<B>,
-) : Continuation<B> {
+    @Suppress("UNCHECKED_CAST")
+    throw Suspend(r, this as FoldContinuation<Any?, Any?>)
+  
   /*
    * In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl but simply invokes `(this as Function1<Continuation<T>, Any?>).invoke(cont)`
    * https://github.com/JetBrains/kotlin/blob/f2fa748a5f336361719b49461a7b8ada558494e6/libraries/stdlib/jvm/src/kotlin/coroutines/intrinsics/IntrinsicsJvm.kt#L51
@@ -996,7 +992,7 @@ private class FoldContinuation<R, B>(
        * In the case that the `Throwable` is not `Suspend` we need to run the throwable-recover handler.
        */
       when {
-        throwable is Suspend && shift == throwable.shift ->
+        throwable is Suspend && this === throwable.shift ->
           suspend { throwable.recover<B>(throwable.shifted) }.startCoroutineUnintercepted()
         
         throwable is Suspend -> parent.resumeWith(result)
@@ -1026,7 +1022,7 @@ public fun <R, A, B> EagerEffect<R, A>.fold(
        *
        * So we only have to handle immediate B | Eager | Throwable
        */
-      .startCoroutineUninterceptedOrReturn(EagerEmptyContinuation) as B
+      .startCoroutineUninterceptedOrReturn(eagerShift) as B
   } catch (e: Eager) {
     if (eagerShift == e.eagerShift) e.recover<B>(e.shifted)
     else throw e
@@ -1035,7 +1031,8 @@ public fun <R, A, B> EagerEffect<R, A>.fold(
   }
 }
 
-private class DefaultEagerShift<R>(val recover: (shifted: R) -> Any?) : EagerShift<R> {
+private class DefaultEagerShift<R>(val recover: (shifted: R) -> Any?) : EagerShift<R>, Continuation<Any?> {
+  
   // Shift away from this Continuation by intercepting it, and completing it with
   // ShiftCancellationException
   // This is needed because this function will never yield a result,
@@ -1049,10 +1046,9 @@ private class DefaultEagerShift<R>(val recover: (shifted: R) -> Any?) : EagerShi
   // This means try/catch is also capable of recovering from monadic errors.
     // See: EagerEffectSpec - try/catch tests
     throw Eager(r, this as DefaultEagerShift<Any?>)
-}
-
-private object EagerEmptyContinuation : Continuation<Any?> {
+  
   override val context: CoroutineContext = EmptyCoroutineContext
+  
   override fun resumeWith(result: Result<Any?>) {
     error("The state machine can never go into the COROUTINE_SUSPEND slow-path")
   }
