@@ -911,7 +911,16 @@ public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 
 /* Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute `recover`. */
-private class Suspend(val shifted: Any?, val shift: DefaultShift<Any?>) : ShiftCancellationException() {
+private class Suspend(
+  /* Shifted value of R */
+  val shifted: Any?,
+  /*
+   * Scope toke, use === to check if this is your scope.
+   * If fold.shift.token === Suspend.token, then this is your scope,
+   * if not then the exceptions is from an outer scope and this exception needs to be rethrown.
+   */
+  val shift: DefaultShift<Any?>,
+) : ShiftCancellationException() {
   
   @Suppress("UNCHECKED_CAST")
   suspend fun <B> recover(shifted: Any?): B = shift.recover(shifted) as B
