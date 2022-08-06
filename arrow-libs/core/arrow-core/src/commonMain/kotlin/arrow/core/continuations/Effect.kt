@@ -10,6 +10,7 @@ import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
@@ -909,14 +910,18 @@ public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
  */
 public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
 
-/*
- * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute `recover`.
- */
+/* Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute `recover`. */
 private class Suspend(val shifted: Any?, val shift: DefaultShift<Any?>) : ShiftCancellationException() {
   
   @Suppress("UNCHECKED_CAST")
-  suspend fun <B> recover(shifted: Any?): B =
-    shift.recover(shifted) as B
+  suspend fun <B> recover(shifted: Any?): B = shift.recover(shifted) as B
+  
+  override fun toString(): String = "ShiftCancellationException($message)"
+}
+
+private class Eager(val shifted: Any?, val eagerShift: DefaultEagerShift<Any?>) : ShiftCancellationException() {
+  @Suppress("UNCHECKED_CAST")
+  fun <B> recover(shifted: Any?): B = eagerShift.recover(shifted) as B
   
   override fun toString(): String = "ShiftCancellationException($message)"
 }
@@ -989,5 +994,57 @@ private class FoldContinuation<R, B>(
         else -> suspend { recover(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
       }
     }
+  }
+}
+
+/**
+ * Like `fold` but also allows folding over any unexpected [Throwable] that might have occurred.
+ * @see fold
+ */
+public fun <R, A, B> EagerEffect<R, A>.fold(
+  error: (error: Throwable) -> B,
+  recover: (shifted: R) -> B,
+  transform: (value: A) -> B,
+): B {
+  val eagerShift = DefaultEagerShift(recover)
+  
+  return try {
+    suspend { transform(invoke(eagerShift)) }
+      /*
+       * In comparison to Effect, EagerEffect only goes through FAST-PATH #1.
+       * This is because DefaultEagerShift never returns COROUTINE_SUSPENDED but throws the CancellationException immediately.
+       * This means we can never receive `COROUTINE_SUSPENDED`, since foreign suspension is forbidden.
+       *
+       * So we only have to handle immediate B | Eager | Throwable
+       */
+      .startCoroutineUninterceptedOrReturn(EagerEmptyContinuation) as B
+  } catch (e: Eager) {
+    if (eagerShift == e.eagerShift) e.recover<B>(e.shifted)
+    else throw e
+  } catch (e: Throwable) {
+    error(e.nonFatalOrThrow())
+  }
+}
+
+private class DefaultEagerShift<R>(val recover: (shifted: R) -> Any?) : EagerShift<R> {
+  // Shift away from this Continuation by intercepting it, and completing it with
+  // ShiftCancellationException
+  // This is needed because this function will never yield a result,
+  // so it needs to be cancelled to properly support coroutine cancellation
+  override suspend fun <B> shift(r: R): B =
+  // Some interesting consequences of how Continuation Cancellation works in Kotlin.
+  // We have to throw CancellationException to signal the Continuation was cancelled, and we
+  // shifted away.
+  // This however also means that the user can try/catch shift and recover from the
+  // CancellationException and thus effectively recovering from the cancellation/shift.
+  // This means try/catch is also capable of recovering from monadic errors.
+    // See: EagerEffectSpec - try/catch tests
+    throw Eager(r, this as DefaultEagerShift<Any?>)
+}
+
+private object EagerEmptyContinuation : Continuation<Any?> {
+  override val context: CoroutineContext = EmptyCoroutineContext
+  override fun resumeWith(result: Result<Any?>) {
+    error("The state machine can never go into the COROUTINE_SUSPEND slow-path")
   }
 }

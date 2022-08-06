@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.continuations.effect
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.nonFatalOrThrow

@@ -1,7 +1,6 @@
 package arrow.core.continuations
 
 import arrow.core.Either
-import arrow.core.EmptyValue
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -43,7 +42,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * <!--- KNIT example-eager-shift-01.kt -->
  */
 @RestrictsSuspension
-public sealed interface EagerShift<in R> {
+public interface EagerShift<in R> {
 
   /** Short-circuit the [EagerEffect] computation with value [R].
    *
@@ -214,20 +213,23 @@ public sealed interface EagerShift<in R> {
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
   
+  @OptIn(ExperimentalTypeInference::class)
   @EffectDSL
   public suspend infix fun <E, A> (suspend EagerShift<E>.() -> A).catch(
-    resolve: suspend EagerShift<R>.(E) -> A,
+    @BuilderInference resolve: suspend EagerShift<R>.(E) -> A,
   ): A = catch<E, R, A>(resolve).bind()
   
+  @OptIn(ExperimentalTypeInference::class)
   @EffectDSL
   public suspend fun <E, A> (suspend EagerShift<E>.() -> A).catch(
-    recover: suspend EagerShift<R>.(Throwable) -> A,
-    resolve: suspend EagerShift<R>.(E) -> A,
+    @BuilderInference recover: suspend EagerShift<R>.(Throwable) -> A,
+    @BuilderInference resolve: suspend EagerShift<R>.(E) -> A,
   ): A = catch<E, R, A>(resolve).attempt(recover)
   
+  @OptIn(ExperimentalTypeInference::class)
   @EffectDSL
   public suspend fun <A> (suspend EagerShift<R>.() -> A).attempt(
-    recover: suspend EagerShift<R>.(Throwable) -> A,
+    @BuilderInference recover: suspend EagerShift<R>.(Throwable) -> A,
   ): A = attempt<R, A>(recover).bind()
 }
 
@@ -258,4 +260,3 @@ public suspend fun <R, B : Any> EagerShift<R>.ensureNotNull(value: B?, shift: ()
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
-

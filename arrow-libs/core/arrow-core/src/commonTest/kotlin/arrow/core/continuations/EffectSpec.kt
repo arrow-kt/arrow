@@ -6,22 +6,18 @@ import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import io.kotest.property.exhaustive.exhaustive
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -56,8 +52,8 @@ class EffectSpec :
             require(promise.complete(i()))
           }
         }
-          .fold(::identity) { fail("Should never come here") } shouldBe s
-        promise.await() shouldBe i
+          .fold(::identity) { fail("Should never come here") } shouldBe s()
+        promise.await() shouldBe i()
       }
     }
     
@@ -71,7 +67,7 @@ class EffectSpec :
           }
           shift(s2())
         }
-          .fold(::identity) { fail("Should never come here") } shouldBe s2
+          .fold(::identity) { fail("Should never come here") } shouldBe s2()
       }
     }
     

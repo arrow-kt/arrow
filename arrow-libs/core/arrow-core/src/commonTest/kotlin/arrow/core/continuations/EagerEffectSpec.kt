@@ -90,7 +90,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
-          i
+          shift(l)
         } catch { ll ->
           ll shouldBe l
           shift(error)
