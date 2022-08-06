@@ -19,7 +19,7 @@ public value class ResultShift(private val cont: Shift<Throwable>) : Shift<Throw
 }
 
 @JvmInline
-public value class ResultEagerEffectScope(private val cont: EagerEffectScope<Throwable>) : EagerEffectScope<Throwable> {
+public value class ResultEagerShift(private val cont: EagerShift<Throwable>) : EagerShift<Throwable> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: Throwable): B =
     cont.shift(r)
@@ -30,10 +30,10 @@ public value class ResultEagerEffectScope(private val cont: EagerEffectScope<Thr
 
 @Suppress("ClassName")
 public object result {
-  public inline fun <A> eager(crossinline f: suspend ResultEagerEffectScope.() -> A): Result<A> =
+  public inline fun <A> eager(crossinline f: suspend ResultEagerShift.() -> A): Result<A> =
     eagerEffect<Throwable, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-      f(ResultEagerEffectScope(this))
+      f(ResultEagerShift(this))
     }.toResult()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend ResultShift.() -> A): Result<A> =

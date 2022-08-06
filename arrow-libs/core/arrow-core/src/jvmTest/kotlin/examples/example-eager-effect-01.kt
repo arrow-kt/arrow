@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEagerEffect01
 
 import arrow.core.continuations.eagerEffect
+import arrow.core.continuations.fold
 import io.kotest.matchers.shouldBe
 
 fun main() {

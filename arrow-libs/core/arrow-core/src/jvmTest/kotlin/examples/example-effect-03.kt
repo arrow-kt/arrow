@@ -1,14 +1,16 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect03
 
-import arrow.core.continuations.effect
-import arrow.core.continuations.attempt
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.continuations.Effect
+import arrow.core.continuations.fold
+import arrow.core.identity
 
-object User
-object Error
+suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> =
+  fold({ Either.Left(it) }) { Either.Right(it) }
 
-val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
-
-val a = exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
-val b = exception.attempt { shift(Error) } // Shift(error)
-val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
+suspend fun <A> Effect<None, A>.toOption(): Option<A> =
+  fold(::identity) { Some(it) }

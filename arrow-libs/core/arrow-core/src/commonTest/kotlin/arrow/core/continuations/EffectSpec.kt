@@ -149,8 +149,8 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { a }
 
-        effect<String, Int> {
-          val aa = eager.bind()
+        effect {
+          val aa = eager()
           aa + b.suspend()
         }.runCont() shouldBe (a + b)
       }
@@ -161,8 +161,8 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { shift(a) }
 
-        effect<String, Int> {
-          val aa = eager.bind()
+        effect {
+          val aa = eager()
           aa + b.suspend()
         }.runCont() shouldBe a
       }
@@ -241,43 +241,7 @@ class EffectSpec :
         res shouldBe expected
       }
     }
-
-    "low-level use-case: distinguish between concurrency error and shift exception" {
-      val effect = effect<String, Int> { shift("Shift") }
-      val e = RuntimeException("test")
-      Either.catch {
-        effect<String, Int> {
-          try {
-            effect.bind()
-          } catch (eagerShiftError: Eager) {
-            fail("Should never come here")
-          } catch (shiftError: Suspend) {
-            e.suspend()
-          } catch (otherError: Throwable) {
-            fail("Should never come here")
-          }
-        }.runCont()
-      } shouldBe Either.Left(e)
-    }
-
-    "low-level use-case: eager shift exception within effect computations doesn't change shift exception" {
-      val effect = eagerEffect<String, Int> { shift("Shift") }
-      val e = RuntimeException("test")
-      Either.catch {
-        effect<String, Int> {
-          try {
-            effect.bind()
-          } catch (eagerShiftError: Eager) {
-            fail("Should never come here")
-          } catch (shiftError: Suspend) {
-            e.suspend()
-          } catch (otherError: Throwable) {
-            fail("Should never come here")
-          }
-        }.runCont()
-      } shouldBe Either.Left(e)
-    }
-
+    
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {

@@ -27,23 +27,23 @@ import kotlin.jvm.JvmName
  * to map both values of [R] and [A] to a value of `B`.
  *
  * <!--- TOC -->
- 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [catch](#catch)
- * [attempt](#attempt)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
- 
+
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+        * [catch](#catch)
+        * [attempt](#attempt)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Strange edge cases](#strange-edge-cases)
+
  * <!--- END -->
  *
  *
@@ -83,7 +83,7 @@ import kotlin.jvm.JvmName
  *   ensure(path.isEmpty()) { EmptyPath }
  * }
  * ```
- * <!--- KNIT example-effect-guide-01.kt -->
+ * <!--- KNIT example-effect-01.kt -->
  *
  * Now that we have the path, we can read from the `File` and return it as a domain model `Content`.
  * We also want to take a look at what exceptions reading from a file might occur `FileNotFoundException` & `SecurityError`,
@@ -157,7 +157,7 @@ import kotlin.jvm.JvmName
  *       .body.shouldNotBeEmpty()
  * }
  * ```
- * <!--- KNIT example-effect-guide-02.kt -->
+ * <!--- KNIT example-effect-02.kt -->
  *
  * The functions above are available out of the box, but it's easy to define your own extension functions in terms
  * of `fold`. Implementing the `toEither()` operator is as simple as:
@@ -178,7 +178,7 @@ import kotlin.jvm.JvmName
  * suspend fun <A> Effect<None, A>.toOption(): Option<A> =
  *   fold(::identity) { Some(it) }
  * ```
- * <!--- KNIT example-effect-guide-03.kt -->
+ * <!--- KNIT example-effect-03.kt -->
  *
  * Adding your own syntax to `EffectScope<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
  *
@@ -326,7 +326,7 @@ import kotlin.jvm.JvmName
  *   }
  * ```
  *
- * <!--- KNIT example-effect-guide-04.kt -->
+ * <!--- KNIT example-effect-04.kt -->
  *
  * Note:
  *  Handling errors can also be done with `try/catch` but this is **not recommended**, it uses `CancellationException` which is used to cancel `Coroutine`s and is advised not to capture in Kotlin.
@@ -377,7 +377,7 @@ import kotlin.jvm.JvmName
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
  * ```
- * <!--- KNIT example-effect-guide-05.kt -->
+ * <!--- KNIT example-effect-05.kt -->
  *
  * #### parTraverse
  * <!--- INCLUDE
@@ -412,7 +412,7 @@ import kotlin.jvm.JvmName
  *   exits.forEach { exit -> exit.getOrNull()?.shouldBeTypeOf<ExitCase.Cancelled>() }
  * }
  * ```
- * <!--- KNIT example-effect-guide-06.kt -->
+ * <!--- KNIT example-effect-06.kt -->
  *
  * `parTraverse` will launch 5 tasks, for every element in `1..5`.
  * The last task to get scheduled will `shift` with "error", and it will cancel the other launched tasks before returning.
@@ -449,7 +449,7 @@ import kotlin.jvm.JvmName
  *   exit.getOrNull()?.shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-guide-07.kt -->
+ * <!--- KNIT example-effect-07.kt -->
  *
  * `raceN` races `n` suspend functions in parallel, and cancels all participating functions when a winner is found.
  * We can consider the function that `shift`s the winner of the race, except with a shifted value instead of a successful one.
@@ -485,7 +485,7 @@ import kotlin.jvm.JvmName
  *   exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-guide-08.kt -->
+ * <!--- KNIT example-effect-08.kt -->
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -518,7 +518,7 @@ import kotlin.jvm.JvmName
  *   exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-guide-09.kt -->
+ * <!--- KNIT example-effect-09.kt -->
  *
  * ### KotlinX
  * #### withContext
@@ -583,7 +583,7 @@ import kotlin.jvm.JvmName
  *   exit.await().shouldBeInstanceOf<ExitCase>()
  * }
  * ```
- * <!--- KNIT example-effect-guide-10.kt -->
+ * <!--- KNIT example-effect-10.kt -->
  *
  * #### async
  *
@@ -610,7 +610,7 @@ import kotlin.jvm.JvmName
  *   }
  * }
  * ```
- * <!--- KNIT example-effect-guide-11.kt -->
+ * <!--- KNIT example-effect-11.kt -->
  *
  * #### launch
  *
@@ -636,7 +636,7 @@ import kotlin.jvm.JvmName
  *   }.fold({ fail("Shift can never finish") }, { it shouldBe int })
  * }
  * ```
- * <!--- KNIT example-effect-guide-12.kt -->
+ * <!--- KNIT example-effect-12.kt -->
  *
  * #### Strange edge cases
  *
@@ -675,7 +675,7 @@ import kotlin.jvm.JvmName
  *
  *   leakedAsync.invoke().await()
  * ```
- * <!--- KNIT example-effect-guide-13.kt -->
+ * <!--- KNIT example-effect-13.kt -->
  */
 public typealias Effect<R, A> = suspend Shift<R>.() -> A
 
@@ -708,7 +708,7 @@ public typealias Effect<R, A> = suspend Shift<R>.() -> A
  *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
  * }
  * ```
- * <!--- KNIT example-effect-01.kt -->
+ * <!--- KNIT example-effect-14.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<R, A> = f
@@ -744,7 +744,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
          *
          * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
          */
-        .startCoroutineUninterceptedOrReturn(FoldContinuation(shift.token, cont.context, error, cont))
+        .startCoroutineUninterceptedOrReturn(FoldContinuation(shift, cont.context, error, cont))
     } catch (e: Suspend) {
       /*
        * FAST-PATH #1: Immediate call to `shift`
@@ -753,7 +753,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
        * and we can return the immediately returned COROUTINE_SUSPENDED | B | Suspend | Throwable directly to suspendCoroutineUninterceptedOrReturn.
        * If not then it belongs to an outer `effect#fold` block, so we have to propagate the Suspend exception.
        */
-      if (shift.token == e.token) {
+      if (shift == e.shift) {
         @Suppress("UNCHECKED_CAST")
         val f: suspend () -> B = { e.recover(e.shifted) as B }
         f.startCoroutineUninterceptedOrReturn(cont)
@@ -825,11 +825,10 @@ public suspend fun <R, A> Effect<R, A>.orNull(): A? =
  * val b = error.catch<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
  * val c = error.catch<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
- * <!--- KNIT example-effect-02.kt -->
+ * <!--- KNIT example-effect-15.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
-@BuilderInference
-public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
+public infix fun <E, E2, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
   effect { fold({ resolve(it) }, { it }) }
 
 /**
@@ -851,9 +850,10 @@ public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(E) ->
  * val b = exception.attempt { shift(Error) } // Shift(error)
  * val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
  * ```
- * <!--- KNIT example-effect-03.kt -->
+ * <!--- KNIT example-effect-16.kt -->
  */
-public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
+@OptIn(ExperimentalTypeInference::class)
+public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
   effect {
     fold(
       { recover(it) },
@@ -885,7 +885,7 @@ public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(Throwabl
  *   throw IllegalArgumentException("builder missed args")
  * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
  * ```
- * <!--- KNIT example-effect-04.kt -->
+ * <!--- KNIT example-effect-17.kt -->
  */
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
@@ -911,19 +911,17 @@ public sealed class ShiftCancellationException : CancellationException("Shifted 
 /*
  * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute `recover`.
  */
-private class Suspend(val token: Token, val shifted: Any?, val recover: suspend (Any?) -> Any?) :
-  ShiftCancellationException() {
+private class Suspend(val shifted: Any?, val shift: DefaultShift<Any?>) : ShiftCancellationException() {
+  
+  @Suppress("UNCHECKED_CAST")
+  suspend fun <B> recover(shifted: Any?): B =
+    shift.recover(shifted) as B
+  
   override fun toString(): String = "ShiftCancellationException($message)"
 }
 
-/* Type to check if a check the correct scope of Shift **/
-private class Token {
-  override fun toString(): String = "Token(${hashCode().toString(16)})"
-}
-
 /* The default impl for `Shift` which raises a `ShiftCancellationException` for the appropriate strategy */
-private class DefaultShift<R>(private val recover: suspend (shifted: Any?) -> Any?) : Shift<R> {
-  val token: Token = Token()
+private class DefaultShift<R>(val recover: suspend (shifted: R) -> Any?) : Shift<R> {
   
   /*
    * Shift away from this Continuation by intercepting it, and completing it with `ShiftCancellationException`
@@ -941,7 +939,7 @@ private class DefaultShift<R>(private val recover: suspend (shifted: Any?) -> An
      *
      * See: EffectSpec - try/catch tests
      */
-    throw Suspend(token, r, recover)
+    throw Suspend(r, this as DefaultShift<Any?>)
 }
 
 /**
@@ -951,8 +949,8 @@ private class DefaultShift<R>(private val recover: suspend (shifted: Any?) -> An
  * we do inside the body of this `Continuation`, and we complete the [parent] [Continuation] with
  * the result.
  */
-private class FoldContinuation<B>(
-  private val token: Token,
+private class FoldContinuation<R, B>(
+  private val shift: DefaultShift<R>,
   override val context: CoroutineContext,
   private val recover: suspend (Throwable) -> B,
   private val parent: Continuation<B>,
@@ -975,7 +973,6 @@ private class FoldContinuation<B>(
     }
   }
   
-  @Suppress("UNCHECKED_CAST")
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
       /*
@@ -984,8 +981,9 @@ private class FoldContinuation<B>(
        * In the case that the `Throwable` is not `Suspend` we need to run the throwable-recover handler.
        */
       when {
-        throwable is Suspend && token == throwable.token ->
-          suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted()
+        throwable is Suspend && shift == throwable.shift ->
+          suspend { throwable.recover<B>(throwable.shifted) }.startCoroutineUnintercepted()
+        
         throwable is Suspend -> parent.resumeWith(result)
         else -> suspend { recover(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
       }

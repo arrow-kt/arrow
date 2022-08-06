@@ -5,7 +5,9 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -116,22 +118,83 @@ class EagerEffectSpec : StringSpec({
       res shouldBe expected
     }
   }
-
-  "low-level use-case: distinguish between concurrency error and shift exception" {
-    val effect = eagerEffect<String, Int> { shift("Shift") }
-    val e = RuntimeException("test")
-    Either.catch {
-      eagerEffect<String, Int> {
-        try {
-          effect.bind()
-        } catch (shiftError: Suspend) {
-          fail("Should never come here")
-        } catch (eagerShiftError: Eager) {
-          throw e
-        } catch (otherError: Throwable) {
-          fail("Should never come here")
-        }
-      }.runCont()
-    } shouldBe Either.Left(e)
+  
+  "catch - happy path" {
+    checkAll(Arb.string()) { str ->
+      eagerEffect<Int, String> {
+        str
+      }.catch<Int, Nothing, String> { fail("It should never catch a success value") }
+        .runCont() shouldBe str
+    }
+  }
+  
+  "catch - error path and recover" {
+    checkAll(Arb.int(), Arb.string()) { int, fallback ->
+      eagerEffect<Int, String> {
+        shift<String>(int)
+        fail("It should never reach this point")
+      }.catch<Int, Nothing, String> { fallback }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "catch - error path and re-shift" {
+    checkAll(Arb.int(), Arb.string()) { int, fallback ->
+      eagerEffect<Int, Unit> {
+        shift<String>(int)
+        fail("It should never reach this point")
+      }.catch { shift(fallback) }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "catch - error path and throw" {
+    checkAll(Arb.int(), Arb.string()) { int, msg ->
+      shouldThrow<RuntimeException> {
+        eagerEffect<Int, String> {
+          shift<String>(int)
+          fail("It should never reach this point")
+        }.catch<Int, Nothing, String> { throw RuntimeException(msg) }
+          .runCont()
+      }.message.shouldNotBeNull() shouldBe msg
+    }
+  }
+  
+  "attempt - happy path" {
+    checkAll(Arb.string()) { str ->
+      eagerEffect<Int, String> {
+        str
+      }.attempt { fail("It should never catch a success value") }
+        .runCont() shouldBe str
+    }
+  }
+  
+  "attempt - error path and recover" {
+    checkAll(Arb.string(), Arb.string()) { msg, fallback ->
+      eagerEffect<Int, String> {
+        throw RuntimeException(msg)
+      }.attempt { fallback }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "attempt - error path and re-shift" {
+    checkAll(Arb.string(), Arb.int()) { msg, fallback ->
+      eagerEffect<Int, Unit> {
+        throw RuntimeException(msg)
+      }.attempt { shift(fallback) }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "attempt - error path and throw" {
+    checkAll(Arb.string(), Arb.string()) { msg, msg2 ->
+      shouldThrow<RuntimeException> {
+        eagerEffect<Int, String> {
+          throw RuntimeException(msg)
+        }.attempt { throw RuntimeException(msg2) }
+          .runCont()
+      }.message.shouldNotBeNull() shouldBe msg2
+    }
   }
 })

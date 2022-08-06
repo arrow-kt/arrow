@@ -9,10 +9,10 @@ import arrow.typeclasses.Semigroup
 public object ior {
   public inline fun <E, A> eager(
     semigroup: Semigroup<E>,
-    crossinline f: suspend IorEagerEffectScope<E>.() -> A
+    crossinline f: suspend IorEagerShift<E>.() -> A
   ): Ior<E, A> =
     eagerEffect<E, Ior<E, A>> {
-      val effect = IorEagerEffectScope(semigroup, this)
+      val effect = IorEagerShift(semigroup, this)
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       val res = f(effect)
       val leftState = effect.leftState.get()
@@ -56,8 +56,8 @@ public class IorShift<E>(semigroup: Semigroup<E>, private val effect: Shift<E>) 
   override suspend fun <B> shift(r: E): B = effect.shift(combine(r))
 }
 
-public class IorEagerEffectScope<E>(semigroup: Semigroup<E>, private val effect: EagerEffectScope<E>) :
-  EagerEffectScope<E>, Semigroup<E> by semigroup {
+public class IorEagerShift<E>(semigroup: Semigroup<E>, private val effect: EagerShift<E>) :
+  EagerShift<E>, Semigroup<E> by semigroup {
 
   @PublishedApi
   internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)

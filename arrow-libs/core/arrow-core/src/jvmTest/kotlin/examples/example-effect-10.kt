@@ -1,21 +1,20 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffect02
+package arrow.core.examples.exampleEffect10
 
-import arrow.core.Either
-import arrow.core.Ior
-import arrow.core.None
-import arrow.core.Validated
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
 import arrow.core.continuations.fold
-import arrow.core.continuations.toEither
-import arrow.core.continuations.toValidated
-import arrow.core.continuations.toIor
-import arrow.core.continuations.toOption
 import arrow.core.continuations.ensureNotNull
-import io.kotest.matchers.collections.shouldNotBeEmpty
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -42,13 +41,18 @@ fun readFile(path: String?): Effect<FileError, Content> = effect {
   }
 }
 
-suspend fun main() {
-   readFile("").toEither() shouldBe Either.Left(EmptyPath)
-   readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
-   readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
-   readFile("README.MD").toOption { None } shouldBe None
+suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
+  guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
 
-   readFile("build.gradle.kts").fold({ _: FileError -> null }, { it })
-     .shouldBeInstanceOf<Content>()
-      .body.shouldNotBeEmpty()
+suspend fun main() {
+  val exit = CompletableDeferred<ExitCase>()
+  effect<FileError, Int> {
+    withContext(Dispatchers.IO) {
+      val job = launch { awaitExitCase(exit) }
+      val content = readFile("failure").bind()
+      job.join()
+      content.body.size
+    }
+  }.fold({ e -> e shouldBe FileNotFound("failure") }, { fail("Int can never be the result") })
+  exit.await().shouldBeInstanceOf<ExitCase>()
 }

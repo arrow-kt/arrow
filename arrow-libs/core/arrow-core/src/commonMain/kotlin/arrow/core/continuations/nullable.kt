@@ -24,7 +24,7 @@ public value class NullableShift(private val cont: Shift<Nothing?>) : Shift<Noth
 }
 
 @JvmInline
-public value class NullableEagerEffectScope(private val cont: EagerEffectScope<Nothing?>) : EagerEffectScope<Nothing?> {
+public value class NullableEagerShift(private val cont: EagerShift<Nothing?>) : EagerShift<Nothing?> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: Nothing?): B =
     cont.shift(r)
@@ -49,17 +49,17 @@ public suspend fun <B> NullableShift.ensureNotNull(value: B?): B {
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <B> NullableEagerEffectScope.ensureNotNull(value: B?): B {
+public suspend fun <B> NullableEagerShift.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { null }
 }
 
 @Suppress("ClassName")
 public object nullable {
-  public inline fun <A> eager(crossinline f: suspend NullableEagerEffectScope.() -> A): A? =
+  public inline fun <A> eager(crossinline f: suspend NullableEagerShift.() -> A): A? =
     eagerEffect<Nothing?, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-      f(NullableEagerEffectScope(this))
+      f(NullableEagerShift(this))
     }.orNull()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend NullableShift.() -> A): A? =

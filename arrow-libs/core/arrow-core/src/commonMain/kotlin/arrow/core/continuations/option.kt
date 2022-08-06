@@ -33,13 +33,13 @@ public suspend fun <B> OptionShift.ensureNotNull(value: B?): B {
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun <B> OptionEagerEffectScope.ensureNotNull(value: B?): B {
+public suspend fun <B> OptionEagerShift.ensureNotNull(value: B?): B {
   contract { returns() implies (value != null) }
   return ensureNotNull(value) { None }
 }
 
 @JvmInline
-public value class OptionEagerEffectScope(private val cont: EagerEffectScope<None>) : EagerEffectScope<None> {
+public value class OptionEagerShift(private val cont: EagerShift<None>) : EagerShift<None> {
   @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
   override suspend fun <B> shift(r: None): B =
     cont.shift(r)
@@ -53,10 +53,10 @@ public value class OptionEagerEffectScope(private val cont: EagerEffectScope<Non
 
 @Suppress("ClassName")
 public object option {
-  public inline fun <A> eager(crossinline f: suspend OptionEagerEffectScope.() -> A): Option<A> =
+  public inline fun <A> eager(crossinline f: suspend OptionEagerShift.() -> A): Option<A> =
     eagerEffect<None, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
-      f(OptionEagerEffectScope(this))
+      f(OptionEagerShift(this))
     }.toOption()
 
   public suspend inline operator fun <A> invoke(crossinline f: suspend OptionShift.() -> A): Option<A> =
