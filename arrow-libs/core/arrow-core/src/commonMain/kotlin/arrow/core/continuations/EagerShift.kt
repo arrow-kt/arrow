@@ -213,57 +213,22 @@ public sealed interface EagerShift<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
-
-  /**
-   * Encloses an action for which you want to catch any `shift`.
-   * [effect] is used in combination with [catch].
-   *
-   * ```
-   * attempt { ... } catch { ... }
-   * ```
-   *
-   * The [f] may `shift` into a different `EagerEffectScope`, giving
-   * the chance for a later [catch] to change the shifted value.
-   * This is useful to simulate re-throwing of exceptions.
-   */
-  @OptIn(ExperimentalTypeInference::class)
-  public suspend fun <E, A> attempt(
-    @BuilderInference
-    f: suspend EagerShift<E>.() -> A,
-  ): suspend EagerShift<E>.() -> A = f
-
-
-  /**
-   * When the [EagerEffect] has shifted with [R] it will [recover]
-   * the shifted value to [A], and when it ran the computation to
-   * completion it will return the value [A].
-   * [catch] is used in combination with [effect].
-   *
-   * ```kotlin
-   * import arrow.core.Either
-   * import arrow.core.None
-   * import arrow.core.Option
-   * import arrow.core.Validated
-   * import arrow.core.continuations.eagerEffect
-   * import arrow.core.continuations.fold
-   * import io.kotest.assertions.fail
-   * import io.kotest.matchers.shouldBe
-   *
-   * fun main() {
-   *   eagerEffect<String, Int> {
-   *     val x = Either.Right(1).bind()
-   *     val y = Validated.Valid(2).bind()
-   *     val z =
-   *      attempt { None.bind { "Option was empty" } } catch { 0 }
-   *     x + y + z
-   *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
-   * }
-   * ```
-   * <!--- KNIT example-eager-shift-09.kt -->
-   */
-  public infix fun <E, A> (suspend EagerShift<E>.() -> A).catch(
-    recover: EagerShift<R>.(E) -> A,
-  ): A = eagerEffect(this).fold({ recover(it) }, ::identity)
+  
+  @EffectDSL
+  public suspend infix fun <E, A> (suspend EagerShift<E>.() -> A).catch(
+    resolve: suspend EagerShift<R>.(E) -> A,
+  ): A = catch<E, R, A>(resolve).bind()
+  
+  @EffectDSL
+  public suspend fun <E, A> (suspend EagerShift<E>.() -> A).catch(
+    recover: suspend EagerShift<R>.(Throwable) -> A,
+    resolve: suspend EagerShift<R>.(E) -> A,
+  ): A = catch<E, R, A>(resolve).attempt(recover)
+  
+  @EffectDSL
+  public suspend fun <A> (suspend EagerShift<R>.() -> A).attempt(
+    recover: suspend EagerShift<R>.(Throwable) -> A,
+  ): A = attempt<R, A>(recover).bind()
 }
 
 /**
@@ -286,7 +251,7 @@ public sealed interface EagerShift<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-eager-shift-10.kt -->
+ * <!--- KNIT example-eager-shift-09.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EagerShift<R>.ensureNotNull(value: B?, shift: () -> R): B {

@@ -149,7 +149,8 @@ public fun <R, A> EagerEffect<R, A>.attempt(): EagerEffect<R, Result<A>> = eager
  * ```
  * <!--- KNIT example-eager-effect-02.kt -->
  */
-public fun <R, A> eagerEffect(f: suspend EagerShift<R>.() -> A): EagerEffect<R, A> = f
+@OptIn(ExperimentalTypeInference::class)
+public fun <R, A> eagerEffect(@BuilderInference f: suspend EagerShift<R>.() -> A): EagerEffect<R, A> = f
 
 public fun <A> EagerEffect<A, A>.merge(): A = fold(::identity, ::identity)
 
@@ -244,8 +245,9 @@ public infix fun <E, A> EagerEffect<E, A>.attempt(@BuilderInference recover: sus
  * ```
  * <!--- KNIT example-eager-03.kt -->
  */
+@OptIn(ExperimentalTypeInference::class)
 @JvmName("attemptOrThrow")
-public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.attempt(crossinline recover: suspend EagerShift<E>.(T) -> A): EagerEffect<E, A> =
+public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.attempt(@BuilderInference crossinline recover: suspend EagerShift<E>.(T) -> A): EagerEffect<E, A> =
   attempt { e -> if (e is T) recover(e) else throw e }
 
 private class Eager(val shifted: Any?, val eagerShift: DefaultEagerShift<Any?>) : ShiftCancellationException() {

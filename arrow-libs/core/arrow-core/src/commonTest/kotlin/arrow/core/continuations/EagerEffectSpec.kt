@@ -21,7 +21,7 @@ import kotlinx.coroutines.CompletableDeferred
 class EagerEffectSpec : StringSpec({
   "try/catch - can recover from shift" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
           shift(s)
         } catch (e: Throwable) {
@@ -34,9 +34,9 @@ class EagerEffectSpec : StringSpec({
   "try/catch - finally works" {
     checkAll(Arb.string(), Arb.int()) { s, i ->
       val promise = CompletableDeferred<Int>()
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
-          shift(s)
+          shift<Int>(s)
         } finally {
           require(promise.complete(i))
         }
@@ -63,7 +63,7 @@ class EagerEffectSpec : StringSpec({
   "attempt - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
-        attempt<Long, Int> {
+        eagerEffect<Long, Int> {
           shift(l)
         } catch { ll ->
           ll shouldBe l
@@ -76,7 +76,7 @@ class EagerEffectSpec : StringSpec({
   "attempt - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
-        attempt<Long, Int> {
+        eagerEffect<Long, Int> {
           i
         } catch { ll ->
           ll shouldBe l
@@ -85,12 +85,25 @@ class EagerEffectSpec : StringSpec({
       }.runCont() shouldBe i
     }
   }
+  
+  "attempt - shift from catch" {
+    checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
+      eagerEffect {
+        eagerEffect<Long, Int> {
+          i
+        } catch { ll ->
+          ll shouldBe l
+          shift(error)
+        }
+      }.runCont() shouldBe error
+    }
+  }
 
-  "immediate values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
+  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
 
-  "immediate short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
+  "short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
 
-  "Rethrows immediate exceptions" {
+  "Rethrows exceptions" {
     val e = RuntimeException("test")
     Either.catch { eagerEffect<Nothing, Nothing> { throw e }.runCont() } shouldBe Either.Left(e)
   }

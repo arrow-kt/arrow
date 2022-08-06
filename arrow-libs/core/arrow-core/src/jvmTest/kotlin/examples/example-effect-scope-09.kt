@@ -1,5 +1,5 @@
 // This file was automatically generated from Shift.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleShift09
+package arrow.core.examples.exampleEffectScope09
 
 import arrow.core.Either
 import arrow.core.None

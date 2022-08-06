@@ -35,209 +35,168 @@ import kotlinx.coroutines.withContext
 class EffectSpec :
   StringSpec({
     "try/catch - can recover from shift" {
-      checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
+      checkAll(Arb.int().suspend(), Arb.string().suspend()) { i, s ->
+        effect {
           try {
-            shift(s)
+            shift(s())
           } catch (e: Throwable) {
-            i
+            i()
           }
-        }.fold({ fail("Should never come here") }, ::identity) shouldBe i
+        }.fold({ fail("Should never come here") }, ::identity) shouldBe i()
       }
     }
-
-    "try/catch - can recover from shift suspended" {
-      checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
-          try {
-            shift(s.suspend())
-          } catch (e: Throwable) {
-            i
-          }
-        }.fold({ fail("Should never come here") }, ::identity) shouldBe i
-      }
-    }
-
+    
     "try/catch - finally works" {
-      checkAll(Arb.string(), Arb.int()) { s, i ->
+      checkAll(Arb.string().suspend(), Arb.int().suspend()) { s, i ->
         val promise = CompletableDeferred<Int>()
-        effect<String, Int> {
+        effect {
           try {
-            shift(s)
+            shift<Int>(s().suspend())
           } finally {
-            require(promise.complete(i))
+            require(promise.complete(i()))
           }
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s
         promise.await() shouldBe i
       }
     }
-
-    "try/catch - finally works suspended" {
-      checkAll(Arb.string(), Arb.int()) { s, i ->
-        val promise = CompletableDeferred<Int>()
-        effect<String, Int> {
-          try {
-            shift(s.suspend())
-          } finally {
-            require(promise.complete(i))
-          }
-        }
-          .fold(::identity) { fail("Should never come here") } shouldBe s
-        promise.await() shouldBe i
-      }
-    }
-
+    
     "try/catch - First shift is ignored and second is returned" {
-      checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
+      checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
         effect<String, Int> {
-          val x: Int =
-            try {
-              shift(s)
-            } catch (e: Throwable) {
-              i
-            }
-          shift(s2)
+          val x: Int = try {
+            shift(s())
+          } catch (e: Throwable) {
+            i()
+          }
+          shift(s2())
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s2
       }
     }
-
-    "try/catch - First shift is ignored and second is returned suspended" {
-      checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
-        effect<String, Int> {
-          val x: Int =
-            try {
-              shift(s.suspend())
-            } catch (e: Throwable) {
-              i
-            }
-          shift(s2.suspend())
-        }
-          .fold(::identity) { fail("Should never come here") } shouldBe s2
-      }
-    }
-
+    
     "attempt - catch" {
-      checkAll(Arb.int(), Arb.long()) { i, l ->
+      checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
         effect<String, Int> {
           effect<Long, Int> {
-            shift(l)
+            shift(l())
           } catch { ll ->
-            ll shouldBe l
-            i
+            ll shouldBe l()
+            i()
           }
-        }.runCont() shouldBe i
+        }.runCont() shouldBe i()
       }
     }
-
+    
     "attempt - no catch" {
-      checkAll(Arb.int(), Arb.long()) { i, l ->
+      checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
         effect<String, Int> {
           effect<Long, Int> {
-            i
+            i()
           } catch { ll ->
-            ll shouldBe l
-            i + 1
+            ll shouldBe l()
+            i() + 1
           }
-        }.runCont() shouldBe i
+        }.runCont() shouldBe i()
       }
     }
-
+    
     "eagerEffect can be consumed within an Effect computation" {
-      checkAll(Arb.int(), Arb.int()) { a, b ->
+      checkAll(Arb.int(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
           eagerEffect { a }
-
+        
         effect {
+          val bb = b()
           val aa = eager()
-          aa + b.suspend()
-        }.runCont() shouldBe (a + b)
+          aa + bb
+        }.runCont() shouldBe (a + b())
       }
     }
-
+    
     "eagerEffect shift short-circuits effect computation" {
-      checkAll(Arb.string(), Arb.int()) { a, b ->
+      checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
           eagerEffect { shift(a) }
-
+        
         effect {
+          val bb = b()
           val aa = eager()
-          aa + b.suspend()
+          aa + bb
         }.runCont() shouldBe a
       }
     }
-
-    "immediate values" { effect<Nothing, Int> { 1 }.value() shouldBe 1 }
-
-    "suspended value" { effect<Nothing, Int> { 1.suspend() }.value() shouldBe 1 }
-
-    "immediate short-circuit" {
-      effect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello"
-    }
-
-    "suspended short-circuit" {
-      effect<String, Nothing> { shift("hello".suspend()) }.runCont() shouldBe "hello"
-    }
-
-    "Rethrows immediate exceptions" {
-      val e = RuntimeException("test")
-      Either.catch { effect<Nothing, Nothing> { throw e }.runCont() } shouldBe Either.Left(e)
-    }
-
-    "Rethrows suspended exceptions" {
-      val e = RuntimeException("test")
-      Either.catch { effect<Nothing, Nothing> { e.suspend() }.runCont() } shouldBe Either.Left(e)
-    }
-
-    "Can short-circuit immediately from nested blocks" {
-      effect<String, Int> {
-        effect<Nothing, Long> { shift("test") }.runCont()
-        fail("Should never reach this point")
+    
+    "success" {
+      checkAll(Arb.int().suspend()) { i ->
+        effect<Nothing, Int> { i() }.value() shouldBe i()
       }
-        .runCont() shouldBe "test"
     }
-
-    "Can short-circuit suspended from nested blocks" {
-      effect<String, Int> {
-        effect<Nothing, Long> { shift("test".suspend()) }.runCont()
-        fail("Should never reach this point")
+    
+    "short-circuit" {
+      checkAll(Arb.string().suspend()) { msg ->
+        effect {
+          shift<Int>(msg())
+        }.runCont() shouldBe msg()
       }
-        .runCont() shouldBe "test"
     }
-
-    "Can short-circuit immediately after suspending from nested blocks" {
-      effect<String, Int> {
-        effect<Nothing, Long> {
-          1L.suspend()
-          shift("test".suspend())
+    
+    "Rethrows exceptions" {
+      checkAll(Arb.string().suspend()) { msg ->
+        shouldThrow<RuntimeException> {
+          effect<String, Int> {
+            throw RuntimeException(msg())
+          }.toEither()
+        }.message shouldBe msg()
+      }
+    }
+    
+    "Can short-circuit from nested blocks" {
+      checkAll(Arb.string().suspend()) { msg ->
+        effect<String, Int> {
+          effect<Nothing, Long> { shift(msg()) }.runCont()
+          fail("Should never reach this point")
         }
-          .runCont()
-        fail("Should never reach this point")
+          .runCont() shouldBe msg()
       }
-        .runCont() shouldBe "test"
     }
-
+    
+    "Can short-circuit immediately after suspending from nested blocks" {
+      checkAll(Arb.string().suspend()) { msg ->
+        effect<String, Int> {
+          effect<Nothing, Long> {
+            1L.suspend()
+            shift(msg())
+          }.runCont()
+          fail("Should never reach this point")
+        }.runCont() shouldBe msg()
+      }
+    }
+    
     "ensure null in either computation" {
-      checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
-        either<String, Int> {
-          ensure(predicate) { shift }
-          success
-        } shouldBe if (predicate) success.right() else shift.left()
+      checkAll(
+        Arb.boolean().suspend(),
+        Arb.int().suspend(),
+        Arb.string().suspend()
+      ) { predicate, success, shift ->
+        either {
+          ensure(predicate()) { shift() }
+          success()
+        } shouldBe if (predicate()) success().right() else shift().left()
       }
     }
-
+    
     "ensureNotNull in either computation" {
       fun square(i: Int): Int = i * i
-
-      checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
+      
+      checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, shift->
         val res =
           either<String, Int> {
-            val ii = i
-            ensureNotNull(ii) { shift }
+            val ii = i()
+            ensureNotNull(ii) { shift() }
             square(ii) // Smart-cast by contract
           }
-        val expected = i?.let(::square)?.right() ?: shift.left()
+        val expected = i()?.let(::square)?.right() ?: shift().left()
         res shouldBe expected
       }
     }
@@ -248,7 +207,7 @@ class EffectSpec :
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
-
+        
         effect {
           failure().bind()
           1
@@ -258,30 +217,30 @@ class EffectSpec :
         ) shouldBe Failure(msg)
       }
     }
-
+    
     "#2779 - handleErrorWith does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-
+        
         val newError: Effect<List<Char>, Int> =
           failed.catch { str ->
             shift(str.reversed().toList())
           }
-
+        
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-
+    
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-
+        
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
@@ -290,11 +249,11 @@ class EffectSpec :
               }.bind()
             }, ::identity)
           }
-
+        
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-
+    
     "catch - happy path" {
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
@@ -303,7 +262,7 @@ class EffectSpec :
           .runCont() shouldBe str()
       }
     }
-
+    
     "catch - error path and recover" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, String> {
@@ -313,17 +272,17 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-
+    
     "catch - error path and re-shift" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, Unit> {
           shift<String>(int())
           fail("It should never reach this point")
-        }.catch<Int, String, Unit> { shift(fallback()) }
+        }.catch { shift(fallback()) }
           .runCont() shouldBe fallback()
       }
     }
-
+    
     "catch - error path and throw" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
         shouldThrow<RuntimeException> {
@@ -335,7 +294,7 @@ class EffectSpec :
         }.message.shouldNotBeNull() shouldBe msg()
       }
     }
-
+    
     "attempt - happy path" {
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
@@ -344,7 +303,7 @@ class EffectSpec :
           .runCont() shouldBe str()
       }
     }
-
+    
     "attempt - error path and recover" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
@@ -353,7 +312,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-  
+    
     "attempt - error path and re-shift" {
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
         effect<Int, Unit> {
@@ -362,7 +321,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-
+    
     "attempt - error path and throw" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, msg2 ->
         shouldThrow<RuntimeException> {

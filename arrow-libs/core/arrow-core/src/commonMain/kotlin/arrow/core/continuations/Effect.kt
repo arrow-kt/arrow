@@ -887,8 +887,9 @@ public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend 
  * ```
  * <!--- KNIT example-effect-17.kt -->
  */
+@OptIn(ExperimentalTypeInference::class)
 @JvmName("attemptOrThrow")
-public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
+public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(@BuilderInference crossinline recover: suspend Shift<E>.(T) -> A): Effect<E, A> =
   attempt { e -> if (e is T) recover(e) else throw e }
 
 /** Runs the [Effect] and captures any [NonFatal] exception into [Result]. */

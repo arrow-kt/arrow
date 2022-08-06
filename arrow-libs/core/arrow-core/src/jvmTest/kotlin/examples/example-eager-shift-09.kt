@@ -1,21 +1,17 @@
 // This file was automatically generated from EagerShift.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEagerShift09
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.continuations.eagerEffect
-import arrow.core.continuations.fold
-import io.kotest.assertions.fail
+import arrow.core.continuations.toEither
+import arrow.core.continuations.ensureNotNull
+import arrow.core.left
+import arrow.core.right
 import io.kotest.matchers.shouldBe
 
 fun main() {
+  val failure = "failed"
+  val int: Int? = null
   eagerEffect<String, Int> {
-    val x = Either.Right(1).bind()
-    val y = Validated.Valid(2).bind()
-    val z =
-     attempt { None.bind { "Option was empty" } } catch { 0 }
-    x + y + z
-  }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
+    ensureNotNull(int) { failure }
+  }.toEither() shouldBe (int?.right() ?: failure.left())
 }

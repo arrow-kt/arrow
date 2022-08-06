@@ -43,7 +43,7 @@ public interface Shift<in R> {
    *   }.fold({ it shouldBe "SHIFT ME" }, { fail("Computation never finishes") })
    * }
    * ```
-   * <!--- KNIT example-shift-01.kt -->
+   * <!--- KNIT example-effect-scope-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
   
@@ -71,7 +71,7 @@ public interface Shift<in R> {
    *   }.toEither() shouldBe either
    * }
    * ```
-   * <!--- KNIT example-shift-02.kt -->
+   * <!--- KNIT example-effect-scope-02.kt -->
    */
   public suspend fun <B> Effect<R, B>.bind(): B =
     invoke(this@Shift)
@@ -102,7 +102,7 @@ public interface Shift<in R> {
    *   }.toEither() shouldBe Either.Left("error")
    * }
    * ```
-   * <!--- KNIT example-shift-03.kt -->
+   * <!--- KNIT example-effect-scope-03.kt -->
    */
   public suspend operator fun <B> EagerEffect<R, B>.invoke(): B {
     var left: Any? = EmptyValue
@@ -128,7 +128,7 @@ public interface Shift<in R> {
    *   }.toEither() shouldBe either
    * }
    * ```
-   * <!--- KNIT example-shift-04.kt -->
+   * <!--- KNIT example-effect-scope-04.kt -->
    */
   public suspend fun <B> Either<R, B>.bind(): B =
     when (this) {
@@ -153,7 +153,7 @@ public interface Shift<in R> {
    *   }.toValidated() shouldBe validated
    * }
    * ```
-   * <!--- KNIT example-shift-05.kt -->
+   * <!--- KNIT example-effect-scope-05.kt -->
    */
   public suspend fun <B> Validated<R, B>.bind(): B =
     when (this) {
@@ -180,7 +180,7 @@ public interface Shift<in R> {
    *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-shift-06.kt -->
+   * <!--- KNIT example-effect-scope-06.kt -->
    */
   public suspend fun <B> Result<B>.bind(transform: suspend (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
@@ -207,7 +207,7 @@ public interface Shift<in R> {
    *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-shift-07.kt -->
+   * <!--- KNIT example-effect-scope-07.kt -->
    */
   public suspend fun <B> Option<B>.bind(shift: suspend () -> R): B =
     when (this) {
@@ -235,7 +235,7 @@ public interface Shift<in R> {
    *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
    * }
    * ```
-   * <!--- KNIT example-shift-08.kt -->
+   * <!--- KNIT example-effect-scope-08.kt -->
    */
   public suspend fun ensure(condition: Boolean, shift: suspend () -> R): Unit =
     if (condition) Unit else shift(shift())
@@ -266,7 +266,7 @@ public interface Shift<in R> {
    *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
    * }
    * ```
-   * <!--- KNIT example-shift-09.kt -->
+   * <!--- KNIT example-effect-scope-09.kt -->
    */
   @EffectDSL
   public suspend infix fun <E, A> (suspend Shift<E>.() -> A).catch(
@@ -305,7 +305,7 @@ public interface Shift<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-shift-10.kt -->
+ * <!--- KNIT example-effect-scope-10.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> Shift<R>.ensureNotNull(value: B?, shift: suspend () -> R): B {
