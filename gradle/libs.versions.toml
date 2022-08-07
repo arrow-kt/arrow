@@ -10,6 +10,7 @@ jUnitJupiter = "5.8.2"
 jUnitVintage = "5.8.2"
 kotest = "5.3.1"
 kotestGradle = "5.3.1"
+koverGradle = "0.6.0-Beta"
 kotlin = "1.6.21"
 kotlinBinaryCompatibilityValidator = "0.10.1"
 kotlinCompileTesting = "1.4.8"
@@ -63,5 +64,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
+kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "koverGradle" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
