@@ -76,7 +76,7 @@ import kotlin.coroutines.resumeWithException
  * ```kotlin
  * fun readFile2(path: String?): Effect<EmptyPath, Unit> = effect {
  *   ensureNotNull(path) { EmptyPath }
- *   ensure(path.isEmpty()) { EmptyPath }
+ *   ensure(path.isNotEmpty()) { EmptyPath }
  * }
  * ```
  * <!--- KNIT example-effect-guide-01.kt -->
