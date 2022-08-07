@@ -816,7 +816,7 @@ public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend 
  *
  * val x = effect<Error, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
+ * }.attempt { shift(Error) }
  * ```
  *
  * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
@@ -927,7 +927,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
  *   res shouldBe 1000
  * }
  * ```
- * <!--- KNIT example-eager-effect-01.kt -->
+ * <!--- KNIT example-effect-18.kt -->
  */
 public fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B =
   fold({ throw it }, recover, transform)

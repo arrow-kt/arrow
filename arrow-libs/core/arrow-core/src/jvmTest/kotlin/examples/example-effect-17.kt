@@ -9,7 +9,7 @@ object Error
 
 val x = effect<Error, User> {
   throw IllegalArgumentException("builder missed args")
-}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
+}.attempt { shift(Error) }
 
 val y = effect<Nothing, User> {
   throw IllegalArgumentException("builder missed args")
