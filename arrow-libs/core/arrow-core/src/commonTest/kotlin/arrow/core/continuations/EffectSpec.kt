@@ -249,6 +249,46 @@ class EffectSpec :
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
+  
+    "Can handle thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<Int, String> {
+          throw RuntimeException(msg())
+        }.fold(
+          { fallback() },
+          ::identity,
+          ::identity
+        ) shouldBe fallback()
+      }
+    }
+  
+    "Can shift from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        effect<String, Int> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { shift(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.runCont() shouldBe fallback()
+      }
+    }
+  
+    "Can throw from thrown exceptions" {
+      checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+        shouldThrow<IllegalStateException> {
+          effect<Int, String> {
+            throw RuntimeException(msg())
+          }.fold(
+            { throw IllegalStateException(fallback()) },
+            ::identity,
+            { it.length }
+          )
+        }.message shouldBe fallback()
+      }
+    }
     
     "catch - happy path" {
       checkAll(Arb.string().suspend()) { str ->
@@ -334,13 +374,6 @@ private data class Failure(val msg: String)
 
 suspend fun currentContext(): CoroutineContext = kotlin.coroutines.coroutineContext
 
-internal suspend fun Throwable.suspend(): Nothing = suspendCoroutineUninterceptedOrReturn { cont ->
-  suspend { throw this }
-    .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
-  
-  COROUTINE_SUSPENDED
-}
-
 // Turn `A` into `suspend () -> A` which tests both the `immediate` and `COROUTINE_SUSPENDED` path.
 private fun <A> Arb<A>.suspend(): Arb<suspend () -> A> =
   flatMap { a ->
@@ -349,6 +382,13 @@ private fun <A> Arb<A>.suspend(): Arb<suspend () -> A> =
       suspend { a.suspend() }
     )) { suspend { a.suspend() } }
   }
+
+internal suspend fun Throwable.suspend(): Nothing = suspendCoroutineUninterceptedOrReturn { cont ->
+  suspend { throw this }
+    .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
+  
+  COROUTINE_SUSPENDED
+}
 
 internal suspend fun <A> A.suspend(): A = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { this }

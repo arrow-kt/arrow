@@ -13,5 +13,5 @@ fun readFile(path: String): Effect<EmptyPath, Unit> = effect {
 
 fun readFile2(path: String?): Effect<EmptyPath, Unit> = effect {
   ensureNotNull(path) { EmptyPath }
-  ensure(path.isEmpty()) { EmptyPath }
+  ensure(path.isNotEmpty()) { EmptyPath }
 }
