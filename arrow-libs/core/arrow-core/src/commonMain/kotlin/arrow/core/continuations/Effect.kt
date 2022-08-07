@@ -715,65 +715,6 @@ public typealias Effect<R, A> = suspend Shift<R>.() -> A
 public fun <R, A> effect(@BuilderInference f: suspend Shift<R>.() -> A): Effect<R, A> = f
 
 /**
- * Invoke the [Effect] and [fold] and transform the `result` to a value of [B].
- * The [Effect] can `result` in an error of [Throwable], short-circuit value of[R],
- * or a value of [A].
- *
- * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
- * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
- */
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  error: suspend (error: Throwable) -> B,
-  recover: suspend (shifted: R) -> B,
-  transform: suspend (value: A) -> B,
-): B =
-  /*
-   * Grab the `Continuation` but without intercepting/scheduling a dispatch on returning.
-   * We are not a concurrent builder, so we don't have to intercept upon returning for safety.
-   * Normally in concurrent operators the Continuation is intercepted before returning to preserve the caller context/Thread.
-   */
-  suspendCoroutineUninterceptedOrReturn { cont ->
-    val shift: FoldContinuation<R, B> = FoldContinuation(cont.context, error, recover, cont)
-    
-    try {
-      val fold: suspend Shift<R>.() -> B = { transform(invoke(this)) }
-      
-      /*
-       * FAST-PATH #1: startCoroutineUninterceptedOrReturn _immediately_ returns COROUTINE_SUSPENDED | B | Suspend | Throwable.
-       * COROUTINE_SUSPENDED | B are returned immediately to `suspendCoroutineUninterceptedOrReturn`,
-       * where `COROUTINE_SUSPENDED` signals to the _coroutine system_ that our program has suspended and will `resume` through the `FoldContinuation`.
-       *
-       * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
-       */
-      fold.startCoroutineUninterceptedOrReturn(shift, shift)
-    } catch (e: Suspend) {
-      /*
-       * FAST-PATH #1: Immediate call to `shift`
-       * We have to check that the detected Suspend is for _our Shift.token_.
-       * If it's our token, then we run the recover handler using startCoroutineUninterceptedOrReturn,
-       * and we can return the immediately returned COROUTINE_SUSPENDED | B | Suspend | Throwable directly to suspendCoroutineUninterceptedOrReturn.
-       * If not then it belongs to an outer `effect#fold` block, so we have to propagate the Suspend exception.
-       */
-      if (shift == e.shift) {
-        val f: suspend () -> B = { e.recover(e.shifted) }
-        f.startCoroutineUninterceptedOrReturn(cont)
-      } else throw e
-      /*
-       * FAST-PATH #1: Immediate Throwable thrown
-       * We always have to run the error handler on Throwable, but only for NonFatal exceptions.
-       */
-    } catch (e: Throwable) {
-      val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
-      f.startCoroutineUninterceptedOrReturn(cont)
-    }
-  }
-
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  recover: suspend (shifted: R) -> B,
-  transform: suspend (value: A) -> B,
-): B = fold({ throw it }, recover, transform)
-
-/**
  * [fold] the [Effect] into an [Either]. Where the shifted value [R] is mapped to [Either.Left], and
  * result value [A] is mapped to [Either.Right].
  */
@@ -904,6 +845,123 @@ public fun <R, A> Effect<R, A>.attempt(): Effect<R, Result<A>> = effect {
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 
 /**
+ * Invoke the [Effect] and [fold] and transform the `result` to a value of [B].
+ * The [Effect] can `result` in an error of [Throwable], short-circuit value of[R],
+ * or a value of [A].
+ *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+ */
+public suspend fun <R, A, B> Effect<R, A>.fold(
+  error: suspend (error: Throwable) -> B,
+  recover: suspend (shifted: R) -> B,
+  transform: suspend (value: A) -> B,
+): B =
+  /*
+   * Grab the `Continuation` but without intercepting/scheduling a dispatch on returning.
+   * We are not a concurrent builder, so we don't have to intercept upon returning for safety.
+   * Normally in concurrent operators the Continuation is intercepted before returning to preserve the caller context/Thread.
+   */
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val shift: FoldContinuation<R, B> = FoldContinuation(cont.context, error, recover, cont)
+    
+    try {
+      val fold: suspend Shift<R>.() -> B = { transform(invoke(this)) }
+      
+      /*
+       * FAST-PATH #1: startCoroutineUninterceptedOrReturn _immediately_ returns COROUTINE_SUSPENDED | B | Suspend | Throwable.
+       * COROUTINE_SUSPENDED | B are returned immediately to `suspendCoroutineUninterceptedOrReturn`,
+       * where `COROUTINE_SUSPENDED` signals to the _coroutine system_ that our program has suspended and will `resume` through the `FoldContinuation`.
+       *
+       * Before we return from Suspend | Throwable we first need to run the appropriate handlers below.
+       */
+      fold.startCoroutineUninterceptedOrReturn(shift, shift)
+    } catch (e: Suspend) {
+      /*
+       * FAST-PATH #1: Immediate call to `shift`
+       * We have to check that the detected Suspend is for _our Shift.token_.
+       * If it's our token, then we run the recover handler using startCoroutineUninterceptedOrReturn,
+       * and we can return the immediately returned COROUTINE_SUSPENDED | B | Suspend | Throwable directly to suspendCoroutineUninterceptedOrReturn.
+       * If not then it belongs to an outer `effect#fold` block, so we have to propagate the Suspend exception.
+       */
+      if (shift == e.shift) {
+        val f: suspend () -> B = { e.recover(e.shifted) }
+        f.startCoroutineUninterceptedOrReturn(cont)
+      } else throw e
+      /*
+       * FAST-PATH #1: Immediate Throwable thrown
+       * We always have to run the error handler on Throwable, but only for NonFatal exceptions.
+       */
+    } catch (e: Throwable) {
+      val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
+      f.startCoroutineUninterceptedOrReturn(cont)
+    }
+  }
+
+public suspend fun <R, A, B> Effect<R, A>.fold(
+  recover: suspend (shifted: R) -> B,
+  transform: suspend (value: A) -> B,
+): B = fold({ throw it }, recover, transform)
+
+/**
+ * Runs the non-suspending computation by creating a [Continuation] with an [EmptyCoroutineContext],
+ * and running the `fold` function over the computation.
+ *
+ * When the [EagerEffect] has shifted with [R] it will [recover] the shifted value to [B], and when it
+ * ran the computation to completion it will [transform] the value [A] to [B].
+ *
+ * ```kotlin
+ * import arrow.core.continuations.eagerEffect
+ * import arrow.core.continuations.fold
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main() {
+ *   val shift = eagerEffect<String, Int> {
+ *     shift("Hello, World!")
+ *   }.fold({ str: String -> str }, { int -> int.toString() })
+ *   shift shouldBe "Hello, World!"
+ *
+ *   val res = eagerEffect<String, Int> {
+ *     1000
+ *   }.fold({ str: String -> str.length }, { int -> int })
+ *   res shouldBe 1000
+ * }
+ * ```
+ * <!--- KNIT example-eager-effect-01.kt -->
+ */
+public fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B =
+  fold({ throw it }, recover, transform)
+
+/**
+ * Like `fold` but also allows folding over any unexpected [Throwable] that might have occurred.
+ * @see fold
+ */
+public fun <R, A, B> EagerEffect<R, A>.fold(
+  error: (error: Throwable) -> B,
+  recover: (shifted: R) -> B,
+  transform: (value: A) -> B,
+): B {
+  val eagerShift = DefaultEagerShift(recover)
+  
+  return try {
+    suspend { transform(invoke(eagerShift)) }
+      /*
+       * In comparison to Effect, EagerEffect only goes through FAST-PATH #1.
+       * This is because DefaultEagerShift never returns COROUTINE_SUSPENDED but throws the CancellationException immediately.
+       * This means we can never receive `COROUTINE_SUSPENDED`, since foreign suspension is forbidden.
+       *
+       * So we only have to handle immediate B | Eager | Throwable
+       */
+      .startCoroutineUninterceptedOrReturn(eagerShift) as B
+  } catch (e: Eager) {
+    if (eagerShift == e.eagerShift) e.recover<B>(e.shifted)
+    else throw e
+  } catch (e: Throwable) {
+    error(e.nonFatalOrThrow())
+  }
+}
+
+/**
  * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level code,
  * you can use this type to differentiate between a foreign [CancellationException] such as JobCancellationException, and the one from [Effect].
  */
@@ -999,35 +1057,6 @@ private class FoldContinuation<R, B>(
         else -> suspend { recover(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
       }
     }
-  }
-}
-
-/**
- * Like `fold` but also allows folding over any unexpected [Throwable] that might have occurred.
- * @see fold
- */
-public fun <R, A, B> EagerEffect<R, A>.fold(
-  error: (error: Throwable) -> B,
-  recover: (shifted: R) -> B,
-  transform: (value: A) -> B,
-): B {
-  val eagerShift = DefaultEagerShift(recover)
-  
-  return try {
-    suspend { transform(invoke(eagerShift)) }
-      /*
-       * In comparison to Effect, EagerEffect only goes through FAST-PATH #1.
-       * This is because DefaultEagerShift never returns COROUTINE_SUSPENDED but throws the CancellationException immediately.
-       * This means we can never receive `COROUTINE_SUSPENDED`, since foreign suspension is forbidden.
-       *
-       * So we only have to handle immediate B | Eager | Throwable
-       */
-      .startCoroutineUninterceptedOrReturn(eagerShift) as B
-  } catch (e: Eager) {
-    if (eagerShift == e.eagerShift) e.recover<B>(e.shifted)
-    else throw e
-  } catch (e: Throwable) {
-    error(e.nonFatalOrThrow())
   }
 }
 

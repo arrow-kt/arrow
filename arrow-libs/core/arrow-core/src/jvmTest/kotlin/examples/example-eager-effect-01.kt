@@ -1,4 +1,4 @@
-// This file was automatically generated from EagerEffect.kt by Knit tool. Do not edit.
+// This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEagerEffect01
 
 import arrow.core.continuations.eagerEffect
