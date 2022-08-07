@@ -758,8 +758,8 @@ internal class FoldContinuation<R, B>(
         throwable is Suspend && this === throwable.token ->
           suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted()
         
-        throwable !is Suspend -> suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
-        else -> parent.resumeWith(result)
+        throwable is Suspend -> parent.resumeWith(result)
+        else -> suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
       }
     }
   }
