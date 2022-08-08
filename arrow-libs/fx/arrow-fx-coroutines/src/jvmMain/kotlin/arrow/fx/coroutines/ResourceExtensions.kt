@@ -1,11 +1,12 @@
 package arrow.fx.coroutines
 
-import arrow.fx.coroutines.continuations.ResourceDSL
-import arrow.fx.coroutines.continuations.ResourceScope
-import arrow.fx.coroutines.continuations.resource
+import arrow.fx.coroutines.ResourceDSL
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.Closeable
@@ -20,8 +21,12 @@ public suspend fun ResourceScope.executor(
   timeout: Duration = Duration.INFINITE,
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
   create: suspend () -> ExecutorService,
-): CoroutineContext =
-  Resource.executor(timeout, closingDispatcher, create).bind()
+): CoroutineContext = resource({ create() }) { s, _ ->
+  s.shutdown()
+  runInterruptible(closingDispatcher) {
+    s.awaitTermination(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+  }
+}.asCoroutineDispatcher()
 
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].
@@ -29,13 +34,15 @@ public suspend fun ResourceScope.executor(
  * tasks are executed, but no new tasks will be accepted.
  *
  * ```kotlin
- * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.executor
+ * import arrow.fx.coroutines.use
+ * import arrow.fx.coroutines.parTraverse
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
  * import kotlin.math.max
  *
  * suspend fun main(): Unit {
- *   val pool = Resource.executor {
+ *   val pool = executor {
  *     val ctr = AtomicInteger(0)
  *     val size = max(2, Runtime.getRuntime().availableProcessors())
  *     Executors.newFixedThreadPool(size) { r ->
@@ -53,26 +60,22 @@ public suspend fun ResourceScope.executor(
  * ```
  * <!--- KNIT example-resourceextensions-01.kt -->
  */
-public fun Resource.Companion.executor(
+public fun executor(
   timeout: Duration = Duration.INFINITE,
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
   create: suspend () -> ExecutorService,
 ): Resource<CoroutineContext> =
   resource {
-    resource({ create() }) { s ->
-      s.shutdown()
-      runInterruptible(closingDispatcher) {
-        s.awaitTermination(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-      }
-    }.asCoroutineDispatcher()
+    executor(timeout, closingDispatcher, create)
   }
 
 /**
  * Creates a [Resource] from an [Closeable], which uses [Closeable.close] for releasing.
  *
  * ```kotlin
- * import arrow.fx.coroutines.*
- * import arrow.fx.coroutines.continuations.*
+ * import arrow.fx.coroutines.resource
+ * import arrow.fx.coroutines.closeable
+ * import arrow.fx.coroutines.use
  * import java.io.FileInputStream
  *
  * suspend fun copyFile(src: String, dest: String): Unit =
@@ -90,22 +93,24 @@ public fun Resource.Companion.executor(
 @ResourceDSL
 public suspend fun <A : Closeable> ResourceScope.closeable(
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  f: suspend () -> A,
-): A =
-  Resource.closeable(closingDispatcher, f).bind()
+  closeable: suspend () -> A,
+): A = resource(closeable) { s, _ -> withContext(closingDispatcher) { s.close() } }
 
-public fun <A : Closeable> Resource.Companion.closeable(
+public fun <A : Closeable> closeable(
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  f: suspend () -> A,
-): Resource<A> =
-  resource(f) { s, _ -> withContext(closingDispatcher) { s.close() } }
+  closeable: suspend () -> A,
+): Resource<A> = resource {
+  closeable(closingDispatcher, closeable)
+}
+
 
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *
  * ```kotlin
- * import arrow.fx.coroutines.*
- * import arrow.fx.coroutines.continuations.*
+ * import arrow.fx.coroutines.resource
+ * import arrow.fx.coroutines.autoCloseable
+ * import arrow.fx.coroutines.use
  * import java.io.FileInputStream
  *
  * suspend fun copyFile(src: String, dest: String): Unit =
@@ -123,19 +128,25 @@ public fun <A : Closeable> Resource.Companion.closeable(
 @ResourceDSL
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  f: suspend () -> A,
-): A =
-  Resource.autoCloseable(closingDispatcher, f).bind()
+  autoCloseable: suspend () -> A,
+): A = resource(autoCloseable) { s, _ -> withContext(closingDispatcher) { s.close() } }
 
-public fun <A : AutoCloseable> Resource.Companion.autoCloseable(
+public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  f: suspend () -> A,
-): Resource<A> =
-  resource(f) { s, _ -> withContext(closingDispatcher) { s.close() } }
+  autoCloseable: suspend () -> A,
+): Resource<A> = resource {
+  autoCloseable(closingDispatcher, autoCloseable)
+}
 
 @ResourceDSL
 public suspend fun ResourceScope.singleThreadContext(name: String): CoroutineContext =
-  Resource.singleThreadContext(name).bind()
+  executor {
+    Executors.newSingleThreadExecutor { r ->
+      Thread(r, name).apply {
+        isDaemon = true
+      }
+    }
+  }
 
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].
@@ -143,10 +154,11 @@ public suspend fun ResourceScope.singleThreadContext(name: String): CoroutineCon
  * tasks are executed, but no new tasks will be accepted.
  *
  * ```kotlin
- * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.singleThreadContext
+ * import arrow.fx.coroutines.use
  * import kotlinx.coroutines.withContext
  *
- * val singleCtx = Resource.singleThreadContext("single")
+ * val singleCtx = singleThreadContext("single")
  *
  * suspend fun main(): Unit =
  *   singleCtx.use { ctx ->
@@ -157,11 +169,5 @@ public suspend fun ResourceScope.singleThreadContext(name: String): CoroutineCon
  * ```
  * <!--- KNIT example-resourceextensions-04.kt -->
  */
-public fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
-  executor {
-    Executors.newSingleThreadExecutor { r ->
-      Thread(r, name).apply {
-        isDaemon = true
-      }
-    }
-  }
+public fun singleThreadContext(name: String): Resource<CoroutineContext> =
+  resource { singleThreadContext(name) }

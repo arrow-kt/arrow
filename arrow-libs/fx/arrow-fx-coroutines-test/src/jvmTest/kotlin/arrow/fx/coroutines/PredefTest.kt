@@ -1,6 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.fx.coroutines.continuations.resource
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int

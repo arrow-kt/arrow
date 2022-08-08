@@ -389,6 +389,7 @@ import kotlin.coroutines.resume
  * import arrow.fx.coroutines.Resource
  * import arrow.fx.coroutines.autoCloseable
  * import arrow.fx.coroutines.releaseCase
+ * import arrow.fx.coroutines.use
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  * import io.kotest.matchers.types.shouldBeTypeOf
@@ -402,7 +403,7 @@ import kotlin.coroutines.resume
  *   val exit = CompletableDeferred<ExitCase>()
  *
  *   fun bufferedReader(path: String): Resource<BufferedReader> =
- *     Resource.autoCloseable { File(path).bufferedReader() }
+ *     autoCloseable { File(path).bufferedReader() }
  *       .releaseCase { _, exitCase -> exit.complete(exitCase) }
  *
  *   effect<String, Int> {

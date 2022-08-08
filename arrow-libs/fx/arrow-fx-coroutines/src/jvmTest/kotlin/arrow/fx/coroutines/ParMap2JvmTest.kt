@@ -2,8 +2,8 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.continuations.AtomicRef
-import arrow.fx.coroutines.continuations.ResourceScope
-import arrow.fx.coroutines.continuations.resource
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resource
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith

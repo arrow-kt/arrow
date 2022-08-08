@@ -1,8 +1,9 @@
 // This file was automatically generated from ResourceExtensions.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResourceextensions02
 
-import arrow.fx.coroutines.*
-import arrow.fx.coroutines.continuations.*
+import arrow.fx.coroutines.resource
+import arrow.fx.coroutines.closeable
+import arrow.fx.coroutines.use
 import java.io.FileInputStream
 
 suspend fun copyFile(src: String, dest: String): Unit =

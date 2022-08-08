@@ -1,21 +1,30 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource04
 
-import arrow.fx.coroutines.*
-import arrow.fx.coroutines.continuations.*
+import arrow.fx.coroutines.resource
+import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.release
+import arrow.fx.coroutines.releaseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class DataSource {
-  fun connect(): Unit = println("Connecting dataSource")
-  fun users(): List<String> = listOf("User-1", "User-2", "User-3")
-  fun close(): Unit = println("Closed dataSource")
+class UserProcessor {
+  suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
+  suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
+    println("Shutting down UserProcessor")
+  }
 }
 
-suspend fun main(): Unit {
-  val dataSource = resource {
-    DataSource().also { it.connect() }
-  } release DataSource::close
+val userProcessor: Resource<UserProcessor> =
+  resource(
+    {  UserProcessor().also { it.start() } },
+    { processor, _ -> processor.shutdown() }
+  )
 
-  val res = dataSource
-    .use { ds -> "Using data source: ${ds.users()}" }
-    .also(::println)
+val userProcessor2: Resource<UserProcessor> = resource {
+  UserProcessor().also { it.start() }
+} release UserProcessor::shutdown
+
+val userProcessor3 = userProcessor2 releaseCase { _, exitCase ->
+  println("Composed finalizer to log exitCase: $exitCase")
 }

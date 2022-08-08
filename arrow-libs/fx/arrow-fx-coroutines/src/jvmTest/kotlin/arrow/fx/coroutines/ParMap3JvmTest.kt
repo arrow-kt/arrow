@@ -36,7 +36,6 @@ class ParMap3JvmTest : ArrowFxSpec(spec = {
 
   "parMapN 3 returns to original context on failure" {
     val mapCtxName = "parMap3"
-    val mapCtx = Resource.executor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       parallelCtx(3, mapCtxName).use { (_single, _mapCtx) ->

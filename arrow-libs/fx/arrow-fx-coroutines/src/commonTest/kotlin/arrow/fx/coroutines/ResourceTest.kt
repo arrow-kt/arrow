@@ -3,8 +3,8 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
-import arrow.fx.coroutines.continuations.ResourceScope
-import arrow.fx.coroutines.continuations.resource
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resource
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
