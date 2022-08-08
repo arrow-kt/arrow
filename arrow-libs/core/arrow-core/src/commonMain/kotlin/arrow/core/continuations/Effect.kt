@@ -15,6 +15,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * [Effect] represents a function of `suspend () -> A`, that short-circuit with a value of [R] (and [Throwable]),
@@ -75,7 +76,7 @@ import kotlin.coroutines.resume
  * ```kotlin
  * fun readFile2(path: String?): Effect<EmptyPath, Unit> = effect {
  *   ensureNotNull(path) { EmptyPath }
- *   ensure(path.isEmpty()) { EmptyPath }
+ *   ensure(path.isNotEmpty()) { EmptyPath }
  * }
  * ```
  * <!--- KNIT example-effect-guide-01.kt -->
@@ -569,7 +570,7 @@ import kotlin.coroutines.resume
  * ```
  * <!--- KNIT example-effect-guide-13.kt -->
  */
-public sealed interface Effect<out R, out A> {
+public interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
    * over the computation.
@@ -712,17 +713,34 @@ internal class Token {
 internal class FoldContinuation<B>(
   private val token: Token,
   override val context: CoroutineContext,
+  private val error: suspend (Throwable) -> B,
   private val parent: Continuation<B>
 ) : Continuation<B> {
+  
+  constructor(token: Token, context: CoroutineContext, parent: Continuation<B>) : this(token, context, { throw it  }, parent)
+  
+  // In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl
+  private fun <A> (suspend () -> A).startCoroutineUnintercepted(cont: Continuation<A>): Unit {
+    try {
+      when (val res = startCoroutineUninterceptedOrReturn(cont)) {
+        COROUTINE_SUSPENDED -> Unit
+        else -> cont.resume(res as A)
+      }
+      // We need to wire all immediately throw exceptions to the parent Continuation
+    } catch (e: Throwable) {
+      cont.resumeWithException(e)
+    }
+  }
+  
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
-      if (throwable is Suspend && token == throwable.token) {
-        val f: suspend () -> B = { throwable.recover(throwable.shifted) as B }
-        when (val res = f.startCoroutineUninterceptedOrReturn(parent)) {
-          COROUTINE_SUSPENDED -> Unit
-          else -> parent.resume(res as B)
-        }
-      } else parent.resumeWith(result)
+      when {
+        throwable is Suspend && token == throwable.token ->
+          suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted(parent)
+        
+        throwable !is Suspend -> suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted(parent)
+        else -> parent.resumeWith(result)
+      }
     }
   }
 }
@@ -759,14 +777,19 @@ internal class FoldContinuation<B>(
  */
 public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
-@Deprecated(
-  "This will be removed in Arrow 2.0",
-  level = DeprecationLevel.WARNING
-)
-internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
-  // We create a `Token` for fold Continuation, so we can properly differentiate between nested
-  // folds
-  override suspend fun <B> fold(recover: suspend (R) -> B, transform: suspend (A) -> B): B =
+private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
+  
+  override suspend fun <B> fold(
+    recover: suspend (shifted: R) -> B,
+    transform: suspend (value: A) -> B,
+  ): B = fold({ throw it }, recover, transform)
+  
+  // We create a `Token` for fold Continuation, so we can properly differentiate between nested folds
+  override suspend fun <B> fold(
+    error: suspend (error: Throwable) -> B,
+    recover: suspend (shifted: R) -> B,
+    transform: suspend (value: A) -> B,
+  ): B =
     suspendCoroutineUninterceptedOrReturn { cont ->
       val token = Token()
       val effectScope =
@@ -788,12 +811,15 @@ internal class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effe
 
       try {
         suspend { transform(f(effectScope)) }
-          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, cont))
+          .startCoroutineUninterceptedOrReturn(FoldContinuation(token, cont.context, error, cont))
       } catch (e: Suspend) {
         if (token == e.token) {
           val f: suspend () -> B = { e.recover(e.shifted) as B }
           f.startCoroutineUninterceptedOrReturn(cont)
         } else throw e
+      } catch (e: Throwable) {
+        val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
+        f.startCoroutineUninterceptedOrReturn(cont)
       }
     }
 }

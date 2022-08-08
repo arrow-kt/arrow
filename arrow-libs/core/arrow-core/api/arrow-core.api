@@ -2722,6 +2722,7 @@ public final class arrow/core/continuations/EffectScopeKt {
 
 public final class arrow/core/continuations/FoldContinuation : kotlin/coroutines/Continuation {
 	public fun <init> (Larrow/core/continuations/Token;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)V
+	public fun <init> (Larrow/core/continuations/Token;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)V
 	public fun getContext ()Lkotlin/coroutines/CoroutineContext;
 	public fun resumeWith (Ljava/lang/Object;)V
 }

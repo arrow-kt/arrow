@@ -21,6 +21,20 @@ class IsoTests {
   }
 
   @Test
+  fun `Isos will be generated for generic data class`() {
+    """
+      |$imports
+      |@optics
+      |data class IsoData<A>(
+      |  val field1: A
+      |) { companion object }
+      |
+      |val i: Iso<IsoData<String>, String> = IsoData.iso()
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
   fun `Isos will be generated for data class with secondary constructors`() {
     """
       |$imports
