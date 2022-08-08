@@ -155,8 +155,11 @@ public annotation class ResourceDSL
  *
  * ## Resource constructors
  *
- * [Resource] only has a single constructors, and its DSL.
- * The [Resource] constructor takes `acquire: suspend () -> A` and `releaseCase: suspend (A, ExitCase) -> Unit`, which we see used in the example above.
+ * [Resource] works entirely through a DSL,
+ * which allows _binding_ a `Resource` through the `suspend fun <A> resource(acquire: suspend () -> A, release: suspend (A, ExitCase) -> Unit): A` function.
+ *
+ * `acquire` is used to _allocate_ the `Resource`,
+ * and before returning the resource `A` it also install the `release` handler into the `ResourceScope`.
  *
  * <!--- INCLUDE
  * import arrow.fx.coroutines.resource
@@ -174,14 +177,16 @@ public annotation class ResourceDSL
  * }
  * -->
  * ```kotlin
- * val userProcessor: Resource<UserProcessor> =
- *   resource(
+ * val userProcessor = resource {
+ *   val x: UserProcessor = resource(
  *     {  UserProcessor().also { it.start() } },
  *     { processor, _ -> processor.shutdown() }
  *   )
+ *   x
+ * }
  * ```
  *
- * We can also create a [Resource] using the [resource] DSL, and then attaching a [release] or [releaseCase] function.
+ * We can also create a [Resource] using the [resource] DSL, and then attaching a one or multiple [release] or [releaseCase] function.
  *
  * ```kotlin
  * val userProcessor2: Resource<UserProcessor> = resource {

@@ -15,11 +15,13 @@ class UserProcessor {
   }
 }
 
-val userProcessor: Resource<UserProcessor> =
-  resource(
+val userProcessor = resource {
+  val x: UserProcessor = resource(
     {  UserProcessor().also { it.start() } },
     { processor, _ -> processor.shutdown() }
   )
+  x
+}
 
 val userProcessor2: Resource<UserProcessor> = resource {
   UserProcessor().also { it.start() }
