@@ -20,10 +20,6 @@ if (enableCompatibilityMetadataVariant) {
   }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-  kotlinOptions.freeCompilerArgs += listOf("-Xenable-builder-inference")
-}
-
 kotlin {
   sourceSets {
     commonMain {
