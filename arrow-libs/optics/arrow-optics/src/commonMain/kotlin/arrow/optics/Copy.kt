@@ -1,5 +1,11 @@
 package arrow.optics
 
+import kotlin.experimental.ExperimentalTypeInference
+
+@DslMarker
+public annotation class OpticsCopyMarker
+
+@OpticsCopyMarker
 public interface Copy<A> {
   /**
    * Changes the value of the element(s) pointed by the [Setter].
@@ -33,7 +39,8 @@ public interface Copy<A> {
    * }
    * ```
    */
-  public fun <B> inside(field: Traversal<A, B>, f: Copy<B>.() -> Unit): Unit =
+  @OptIn(ExperimentalTypeInference::class)
+  public fun <B> inside(field: Traversal<A, B>, @BuilderInference f: Copy<B>.() -> Unit): Unit =
     field.transform { it.copy(f) }
 }
 
@@ -67,5 +74,6 @@ private class CopyImpl<A>(var current: A): Copy<A> {
  * }
  * ```
  */
-public fun <A> A.copy(f: Copy<A>.() -> Unit): A =
+@OptIn(ExperimentalTypeInference::class)
+public fun <A> A.copy(@BuilderInference f: Copy<A>.() -> Unit): A =
   CopyImpl(this).also(f).current

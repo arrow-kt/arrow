@@ -151,6 +151,9 @@ public final class arrow/optics/ListKt {
 	public static final fun unsnoc (Ljava/util/List;)Lkotlin/Pair;
 }
 
+public abstract interface annotation class arrow/optics/OpticsCopyMarker : java/lang/annotation/Annotation {
+}
+
 public final class arrow/optics/OptionalGetterKt {
 	public static final fun OptionalGetter (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptionalGetter;
 }
