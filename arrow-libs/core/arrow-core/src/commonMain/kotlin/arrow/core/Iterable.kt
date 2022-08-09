@@ -330,57 +330,6 @@ public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  traverse(semigroup, f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  semigroup.run {
-    fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-      when (val res = f(a)) {
-        is Validated.Valid -> when (acc) {
-          is Valid -> acc.also { it.value.add(res.value) }
-          is Invalid -> acc
-        }
-        is Validated.Invalid -> when (acc) {
-          is Valid -> res
-          is Invalid -> Invalid(acc.value.combine(res.value))
-        }
-      }
-    }
-  }
-
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(Semigroup.nonEmptyList(), f)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
-public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  sequence(semigroup)
-
-public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  sequence()
-
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  traverse(Semigroup.nonEmptyList(), ::identity)
-
 @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
   traverse(f)
@@ -988,11 +937,6 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
     either.fold({ emptyList() }, { b -> listOf(b) })
   }
 
-public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
-  flatMap { validated ->
-    validated.fold({ emptyList() }, { b -> listOf(b) })
-  }
-
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
@@ -1000,18 +944,6 @@ public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
-  val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return asep to bsep
-}
-
-/**
- * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
- *
- * @receiver Iterable of Validated
- * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
- */
-public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
   val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
   return asep to bsep

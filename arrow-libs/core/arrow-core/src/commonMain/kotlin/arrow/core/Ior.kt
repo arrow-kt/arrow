@@ -353,25 +353,6 @@ public sealed class Ior<out A, out B> {
   public fun leftOrNull(): A? =
     fold({ it }, { null }, { a, _ -> a })
 
-  /**
-   * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]
-   * and [Validated.Invalid] if this is a [Left].
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Ior
-   *
-   * fun main() {
-   *   Ior.Right(12).toValidated() // Result: Valid(12)
-   *   Ior.Left(12).toValidated()  // Result: Invalid(12)
-   *   Ior.Both(12, "power").toValidated()  // Result: Valid("power")
-   * }
-   * ```
- * <!--- KNIT example-ior-12.kt -->
-   */
-  public fun toValidated(): Validated<A, B> =
-    fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
-
   public data class Left<out A>(val value: A) : Ior<A, Nothing>() {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = true
@@ -477,17 +458,6 @@ public sealed class Ior<out A, out B> {
       { a, b -> Nullable.zip(fa(a), fb(b)) { aa, c -> Both(aa, c) } }
     )
 
-  public inline fun <AA, C, D> bitraverseValidated(
-    SA: Semigroup<AA>,
-    fa: (A) -> Validated<AA, C>,
-    fb: (B) -> Validated<AA, D>
-  ): Validated<AA, Ior<C, D>> =
-    fold(
-      { a -> fa(a).map { Left(it) } },
-      { b -> fb(b).map { Right(it) } },
-      { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Both(aa, c) } }
-    )
-
   public inline fun <C> crosswalk(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
       { emptyList() },
@@ -586,19 +556,6 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b)?.let { Both(a, it) } }
     )
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
-    fold(
-      { a -> Valid(Left(a)) },
-      { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) } }
-    )
-
-  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
-    traverse(fa)
-
   public fun void(): Ior<A, Unit> =
     map { Unit }
 }
@@ -641,9 +598,6 @@ public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>
 
 public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
   bitraverseNullable(::identity, ::identity)
-
-public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
-  bitraverseValidated(SA, ::identity, ::identity)
 
 public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
   with(SA) {
@@ -717,13 +671,6 @@ public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
 
 public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
   traverseNullable(::identity)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, Ior<A, C>> =
-  sequence()
-
-public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>> =
-  traverse(::identity)
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>

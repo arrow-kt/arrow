@@ -2,14 +2,32 @@
 package arrow.core.examples.exampleEffectGuide03
 
 import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import arrow.core.continuations.Effect
+import arrow.core.continuations.effect
 import arrow.core.identity
+import io.kotest.matchers.shouldBe
 
-suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> =
-  fold({ Either.Left(it) }) { Either.Right(it) }
+val failed: Effect<String, Int> =
+  effect { shift("failed") }
 
-suspend fun <A> Effect<None, A>.toOption(): Option<A> =
-  fold(::identity) { Some(it) }
+val resolved: Effect<Nothing, Int> =
+  failed.handleError { it.length }
+
+val newError: Effect<List<Char>, Int> =
+  failed.handleErrorWith { str ->
+    effect { shift(str.reversed().toList()) }
+  }
+
+val redeemed: Effect<Nothing, Int> =
+  failed.redeem({ str -> str.length }, ::identity)
+
+val captured: Effect<String, Result<Int>> =
+  effect<String, Int> { 1 }.attempt()
+
+suspend fun main() {
+  failed.toEither() shouldBe Either.Left("failed")
+  resolved.toEither() shouldBe Either.Right(6)
+  newError.toEither() shouldBe Either.Left(listOf('d', 'e', 'l', 'i', 'a', 'f'))
+  redeemed.toEither() shouldBe Either.Right(6)
+  captured.toEither() shouldBe Either.Right(Result.success(1))
+}

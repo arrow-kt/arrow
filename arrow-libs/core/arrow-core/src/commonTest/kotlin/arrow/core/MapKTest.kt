@@ -82,30 +82,6 @@ class MapKTest : UnitSpec() {
       }
     }
 
-    "traverseValidated is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse(Semigroup.string()) { v ->
-        acc.add(v)
-        Validated.Valid(v)
-      }
-      res shouldBe acc.map { it to it }.toMap().valid()
-      res shouldBe (0..20_000).map { it to it }.toMap().valid()
-    }
-
-    "traverseValidated acummulates" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, Map<Int, Int>> =
-          Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
-            .fold(
-              { ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() },
-              { it.invalid() })
-
-        res shouldBe expected
-      }
-    }
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys

@@ -599,18 +599,6 @@ public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Seq
   return asep to bsep
 }
 
-/**
- * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
- *
- * @receiver Iterable of Validated
- * @return a tuple containing Sequence with [Validated.Invalid] and another Sequence with its [Validated.Valid] values.
- */
-public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> {
-  val asep = flatMap { gab -> gab.fold({ sequenceOf(it) }, { emptySequence() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptySequence() }, { sequenceOf(it) }) }
-  return asep to bsep
-}
-
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
@@ -630,16 +618,6 @@ public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
 )
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   sequence().map { it.asSequence() }
-
-public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
-
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence")
-)
-public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
-  sequence(semigroup).map { it.asSequence() }
 
 @Deprecated("some is being deprecated in favor of map", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
@@ -715,35 +693,6 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
 public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public fun <E, A, B> Sequence<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-      }
-    }
-  }
-
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f).map { it.asSequence() }", "arrow.core.traverse")
-)
-public fun <E, A, B> Sequence<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, Sequence<B>> =
-  traverse(semigroup, f).map { it.asSequence() }
-
 /**
  * splits an union into its component parts.
  *
@@ -792,11 +741,6 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
 public fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
   flatMap { either ->
     either.fold({ emptySequence() }, { b -> sequenceOf(b) })
-  }
-
-public fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
-  flatMap { validated ->
-    validated.fold({ emptySequence() }, { b -> sequenceOf(b) })
   }
 
 /**

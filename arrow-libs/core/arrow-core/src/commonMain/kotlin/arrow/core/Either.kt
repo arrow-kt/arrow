@@ -1018,18 +1018,6 @@ public sealed class Either<out A, out B> {
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     fold({ null }, { right -> fa(right)?.let(::Right) })
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    when (this) {
-      is Right -> fa(this.value).map(::Right)
-      is Left -> this.valid()
-    }
-
-  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    traverse(fa)
-
   public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
@@ -1038,12 +1026,6 @@ public sealed class Either<out A, out B> {
 
   public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
     fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
-
-  public inline fun <AA, C, D> bitraverseValidated(
-    fe: (A) -> Validated<AA, C>,
-    fa: (B) -> Validated<AA, D>
-  ): Validated<AA, Either<C, D>> =
-    fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
   public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
@@ -1121,12 +1103,6 @@ public sealed class Either<out A, out B> {
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-
-  public fun toValidatedNel(): ValidatedNel<A, B> =
-    fold({ Validated.invalidNel(it) }, ::Valid)
-
-  public fun toValidated(): Validated<A, B> =
-    fold({ it.invalid() }, { it.valid() })
 
   public companion object {
 
@@ -1740,13 +1716,6 @@ public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
 public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
   traverseNullable(::identity)
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
-  sequence()
-
-public fun <A, B, C> Either<A, Validated<B, C>>.sequence(): Validated<B, Either<A, C>> =
-  traverse(::identity)
-
 public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)
 
@@ -1755,6 +1724,3 @@ public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either
 
 public fun <A, B> Either<A?, B?>.bisequenceNullable(): Either<A, B>? =
   bitraverseNullable(::identity, ::identity)
-
-public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
-  bitraverseValidated(::identity, ::identity)

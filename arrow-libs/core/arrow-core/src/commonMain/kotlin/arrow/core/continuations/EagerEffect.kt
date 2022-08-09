@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -73,13 +72,6 @@ public interface EagerEffect<out R, out A> {
    * result value [A] is mapped to [Either.Right].
    */
   public fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
-
-  /**
-   * [fold] the [EagerEffect] into an [Validated]. Where the shifted value [R] is mapped to
-   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
-   */
-  public fun toValidated(): Validated<R, A> =
-    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
   /**
    * [fold] the [EagerEffect] into an [A?]. Where the shifted value [R] is mapped to

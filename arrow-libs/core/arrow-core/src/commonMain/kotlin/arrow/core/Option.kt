@@ -830,18 +830,6 @@ public sealed class Option<out A> {
   public inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
     traverse(fa)
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, B> traverse(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
-    when (this) {
-      is Some -> fa(value).map { Some(it) }
-      is None -> Valid(this)
-    }
-
-  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, B> traverseValidated(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
-    traverse(fa)
-
   public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
@@ -991,18 +979,6 @@ public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<
   return asep to bsep
 }
 
-/**
- * Separate the inner [Validated] value into the [Validated.Invalid] and [Validated.Valid].
- *
- * @receiver Option of Either
- * @return a tuple containing Option of [Validated.Invalid] and another Option of its [Validated.Valid] value.
- */
-public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> {
-  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
-  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
-  return asep to bsep
-}
-
 public fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
   traverse(::identity)
 
@@ -1011,13 +987,6 @@ public fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   sequence()
 
 public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
-  traverse(::identity)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
-  sequence()
-
-public fun <A, B> Option<Validated<A, B>>.sequence(): Validated<A, Option<B>> =
   traverse(::identity)
 
 public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
@@ -1041,11 +1010,6 @@ public fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
 public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
   flatMap { either ->
     either.fold({ None }, { b -> Some(b) })
-  }
-
-public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
-  flatMap { validated ->
-    validated.fold({ None }, { b -> Some(b) })
   }
 
 public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =

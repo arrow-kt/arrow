@@ -1,16 +1,16 @@
 // This file was automatically generated from EagerEffectScope.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEagerEffectScope07
 
-import arrow.core.Either
 import arrow.core.continuations.eagerEffect
+import arrow.core.continuations.ensureNotNull
+import arrow.core.left
+import arrow.core.right
 import io.kotest.matchers.shouldBe
 
 fun main() {
-  val condition = true
   val failure = "failed"
-  val int = 4
+  val int: Int? = null
   eagerEffect<String, Int> {
-    ensure(condition) { failure }
-    int
-  }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
+    ensureNotNull(int) { failure }
+  }.toEither() shouldBe (int?.right() ?: failure.left())
 }

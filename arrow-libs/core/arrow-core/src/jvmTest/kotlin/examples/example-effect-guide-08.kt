@@ -3,7 +3,9 @@ package arrow.core.examples.exampleEffectGuide08
 
 import arrow.core.continuations.effect
 import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.bracketCase
+import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.fromAutoCloseable
+import arrow.fx.coroutines.releaseCase
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -14,15 +16,15 @@ import java.io.File
 suspend fun main() {
   val error = "Error"
   val exit = CompletableDeferred<ExitCase>()
+
+  fun bufferedReader(path: String): Resource<BufferedReader> =
+    Resource.fromAutoCloseable { File(path).bufferedReader() }
+      .releaseCase { _, exitCase -> exit.complete(exitCase) }
+
   effect<String, Int> {
-    bracketCase(
-      acquire = { File("build.gradle.kts").bufferedReader() },
-      use = { reader: BufferedReader -> shift(error) },
-      release = { reader, exitCase ->
-        reader.close()
-        exit.complete(exitCase)
-      }
-    )
+    val lineCount = bufferedReader("build.gradle.kts")
+      .use { reader -> shift<Int>(error) }
+    lineCount
   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
   exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
 }

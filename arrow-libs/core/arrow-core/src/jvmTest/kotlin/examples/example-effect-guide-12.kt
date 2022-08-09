@@ -2,20 +2,23 @@
 package arrow.core.examples.exampleEffectGuide12
 
 import arrow.core.continuations.effect
-import io.kotest.assertions.fail
-import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 suspend fun main() {
-  val errorA = "ErrorA"
-  val errorB = "ErrorB"
-  val int = 45
-  effect<String, Int> {
-    coroutineScope<Int> {
-      launch { shift(errorA) }
-      launch { shift(errorB) }
-      int
+
+  effect<String, suspend () -> Unit> {
+    suspend { shift("error") }
+  }.fold({ }, { leakedShift -> leakedShift.invoke() })
+
+  val leakedAsync = coroutineScope<suspend () -> Deferred<Unit>> {
+    suspend {
+      async {
+        println("I am never going to run, until I get called invoked from outside")
+      }
     }
-  }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+  }
+
+  leakedAsync.invoke().await()
 }

@@ -5,7 +5,6 @@ import arrow.core.Ior
 import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -626,13 +625,6 @@ public interface Effect<out R, out A> {
    * result value [A] is mapped to [Ior.Right].
    */
   public suspend fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-
-  /**
-   * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
-   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
-   */
-  public suspend fun toValidated(): Validated<R, A> =
-    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
   /**
    * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the

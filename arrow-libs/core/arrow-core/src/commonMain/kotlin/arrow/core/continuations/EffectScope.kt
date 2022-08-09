@@ -5,7 +5,6 @@ import arrow.core.EmptyValue
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -113,30 +112,6 @@ public interface EffectScope<in R> {
     when (this) {
       is Either.Left -> shift(value)
       is Either.Right -> value
-    }
-
-  /**
-   * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
-   *
-   * ```kotlin
-   * import arrow.core.Validated
-   * import arrow.core.continuations.effect
-   * import io.kotest.matchers.shouldBe
-   *
-   * suspend fun main() {
-   *   val validated = Validated.Valid(40)
-   *   effect<String, Int> {
-   *     val x: Int = validated.bind()
-   *     x
-   *   }.toValidated() shouldBe validated
-   * }
-   * ```
-   * <!--- KNIT example-effect-scope-05.kt -->
-   */
-  public suspend fun <B> Validated<R, B>.bind(): B =
-    when (this) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> shift(value)
     }
 
   /**
