@@ -9,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
 public val singleThreadName: String = "single"
 
 @Deprecated(deprecateArrowTestModules)
-public val single: Resource<CoroutineContext> = singleThreadContext(singleThreadName)
+public val single: Resource<CoroutineContext> = singleThreadContext("single")
 
 @Deprecated(deprecateArrowTestModules)
 public val threadName: suspend () -> String =

@@ -10,7 +10,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 class ParMap6JvmTest : ArrowFxSpec(spec = {
   val mapCtxName = "parMap6"
@@ -19,23 +18,23 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
 
   "parMapN 6 returns to original context" {
     checkAll {
-      parallelCtx(6, mapCtxName).use { (_single, _mapCtx) ->
+      parallelCtx(6, mapCtxName) { _single, _mapCtx ->
         withContext(_single) {
-          threadName() shouldStartWith singleThreadName
-
+          threadName() shouldStartWith "single"
+  
           val (s1, s2, s3, s4, s5, s6) = parZip(
             _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName
           ) { a, b, c, d, e, f ->
             Tuple6(a, b, c, d, e, f)
           }
-
+  
           s1 shouldStartWith mapCtxName
           s2 shouldStartWith mapCtxName
           s3 shouldStartWith mapCtxName
           s4 shouldStartWith mapCtxName
           s5 shouldStartWith mapCtxName
           s6 shouldStartWith mapCtxName
-          threadName() shouldStartWith singleThreadName
+          threadName() shouldStartWith "single"
         }
       }
     }
@@ -43,10 +42,10 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
 
   "parMapN 6 returns to original context on failure" {
     checkAll(Arb.int(1..6), Arb.throwable()) { choose, e ->
-      parallelCtx(6, mapCtxName).use { (_single, _mapCtx) ->
+      parallelCtx(6, mapCtxName) { _single, _mapCtx ->
         withContext(_single) {
-          threadName() shouldStartWith singleThreadName
-
+          threadName() shouldStartWith "single"
+  
           Either.catch {
             when (choose) {
               1 -> parZip(
@@ -58,6 +57,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
                 { never<Nothing>() },
                 { never<Nothing>() }
               ) { _, _, _, _, _, _ -> Unit }
+      
               2 -> parZip(
                 _mapCtx,
                 { never<Nothing>() },
@@ -67,6 +67,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
                 { never<Nothing>() },
                 { never<Nothing>() }
               ) { _, _, _, _, _, _ -> Unit }
+      
               3 -> parZip(
                 _mapCtx,
                 { never<Nothing>() },
@@ -76,6 +77,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
                 { never<Nothing>() },
                 { never<Nothing>() }
               ) { _, _, _, _, _, _ -> Unit }
+      
               4 -> parZip(
                 _mapCtx,
                 { never<Nothing>() },
@@ -85,6 +87,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
                 { never<Nothing>() },
                 { never<Nothing>() }
               ) { _, _, _, _, _, _ -> Unit }
+      
               5 -> parZip(
                 _mapCtx,
                 { never<Nothing>() },
@@ -94,6 +97,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
                 { e.suspend() },
                 { never<Nothing>() }
               ) { _, _, _, _, _, _ -> Unit }
+      
               else -> parZip(
                 _mapCtx,
                 { never<Nothing>() },
@@ -105,7 +109,7 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
               ) { _, _, _, _, _, _ -> Unit }
             }
           } should leftException(e)
-          threadName() shouldStartWith singleThreadName
+          threadName() shouldStartWith "single"
         }
       }
     }
@@ -113,7 +117,8 @@ class ParMap6JvmTest : ArrowFxSpec(spec = {
 
   "parMapN 6 finishes on single thread" {
     checkAll(Arb.string()) {
-      val res = single.use { ctx ->
+      val res = resourceScope {
+        val ctx = singleThreadContext("single")
         parZip(ctx, threadName, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e, f ->
           listOf(a, b, c, d, e, f)
         }

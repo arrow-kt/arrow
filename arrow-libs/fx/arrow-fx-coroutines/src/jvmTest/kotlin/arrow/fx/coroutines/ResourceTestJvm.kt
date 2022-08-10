@@ -8,61 +8,67 @@ import java.io.Closeable
 import io.kotest.property.Arb
 
 class ResourceTestJvm : ArrowFxSpec(spec = {
-
+  
   class AutoCloseableTest() : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
-
+  
   class CloseableTest() : Closeable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
-
+  
   "AutoCloseable closes" {
     checkAll {
       val t = AutoCloseableTest()
-
-      autoCloseable { t }
-        .use {}
-
+      
+      resourceScope {
+        autoCloseable { t }
+      }
+      
       t.didClose.get() shouldBe true
     }
   }
-
+  
   "AutoCloseable closes on error" {
     checkAll(Arb.throwable()) { throwable ->
       val t = AutoCloseableTest()
-
+      
       shouldThrow<Exception> {
-        autoCloseable { t }
-          .use { throw throwable }
+        resourceScope {
+          autoCloseable { t }
+          throw throwable
+        }
       } shouldBe throwable
-
+      
       t.didClose.get() shouldBe true
     }
   }
-
+  
   "Closeable closes" {
     checkAll() {
       val t = CloseableTest()
-
-      closeable { t }
-        .use {}
-
+      
+      resourceScope {
+        closeable { t }
+      }
+      
       t.didClose.get() shouldBe true
     }
   }
-
+  
   "Closeable closes on error" {
     checkAll(Arb.throwable()) { throwable ->
       val t = CloseableTest()
-
+      
       shouldThrow<Exception> {
-        closeable { t }
-          .use { throw throwable }
+        resourceScope {
+          closeable { t }
+          throw throwable
+        }
       } shouldBe throwable
-
+      
       t.didClose.get() shouldBe true
     }
   }

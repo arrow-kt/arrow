@@ -13,38 +13,38 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
 class PredefTest : ArrowFxSpec(
   spec = {
-
+    
     "suspended always suspends" {
       checkAll(Arb.int()) { i ->
         val promise = CompletableDeferred<Int>()
-
+        
         val x = i.suspended()
           .startCoroutineUninterceptedOrReturn(
             Continuation(EmptyCoroutineContext) {
               promise.completeWith(it)
             }
           )
-
+        
         x shouldBe COROUTINE_SUSPENDED
         promise.await() shouldBe i
       }
     }
-
+    
     "shift" {
       checkAll(Arb.string(), Arb.string()) { a, b ->
-        val t0 = threadName.invoke()
-
-        resource {
-          Pair(singleThreadContext(a), singleThreadContext(b))
-        }.use { (ui, io) ->
-            t0 shouldBe threadName.invoke()
-
-            ui.shift()
-            threadName.invoke() shouldBe a
-
-            io.shift()
-            threadName.invoke() shouldBe b
-          }
+        val t0 = Thread.currentThread().name
+        
+        resourceScope {
+          val ui = singleThreadContext(a)
+          val io = singleThreadContext(b)
+          t0 shouldBe Thread.currentThread().name
+          
+          ui.shift()
+          Thread.currentThread().name shouldBe a
+          
+          io.shift()
+          Thread.currentThread().name shouldBe b
+        }
       }
     }
   }

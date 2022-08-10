@@ -41,63 +41,67 @@ class FlowJvmTest : ArrowFxSpec(spec = {
             .collect()
         }
         timestamps.size shouldBe 3
-
+        
         // total run should be between start time + delay * 3 AND start + tolerance %
         val min = start + (delayMs * 2)
         val max = min + delayMs / 10
-
+        
         timestamps.last() shouldBeGreaterThanOrEqual min
         timestamps.last() shouldBeLessThan max
       }
     }
   }
-
+  
   "parMap - single thread - identity" {
-    single.use { ctx ->
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { it }.flowOn(ctx)
           .toList() shouldBe flow.toList()
       }
     }
   }
-
+  
   "parMap - flowOn" {
-    single.use { ctx ->
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { Thread.currentThread().name }.flowOn(ctx)
           .toList().forEach {
-            it shouldContain singleThreadName
+            it shouldContain "single"
           }
       }
     }
   }
-
+  
   "parMapUnordered - single thread - identity" {
-    single.use { ctx ->
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMapUnordered { it }.flowOn(ctx)
           .toSet() shouldBe flow.toSet()
       }
     }
   }
-
+  
   "parMapUnordered - flowOn" {
-    single.use { ctx ->
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { Thread.currentThread().name }.flowOn(ctx)
           .toList().forEach {
-            it shouldContain singleThreadName
+            it shouldContain "single"
           }
       }
     }
   }
-
+  
   "fixedDelay" {
     runBlockingTest {
       checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
         val emissionDuration = waitPeriod / 10L
         var state: Long? = null
-
+        
         val rate = flow { emit(delay(Duration.milliseconds(waitPeriod))) }.repeat()
           .map {
             val now = state ?: currentTime
@@ -109,7 +113,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
           }
           .take(n)
           .toList()
-
+        
         rate.first() shouldBe 0 // First element is immediately
         rate.drop(1).forEach { act ->
           act shouldBe (waitPeriod + emissionDuration) // Remaining elements all take delay + emission duration
@@ -117,13 +121,13 @@ class FlowJvmTest : ArrowFxSpec(spec = {
       }
     }
   }
-
+  
   "fixedRate" {
     runBlockingTest {
       checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
         val emissionDuration = waitPeriod / 10
         var state: Long? = null
-
+        
         val rate = fixedRate(Duration.milliseconds(waitPeriod)) { currentTime }
           .map {
             val now = state ?: currentTime
@@ -135,7 +139,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
           }
           .take(n)
           .toList()
-
+        
         rate.first() shouldBe 0 // First element is immediately
         rate.drop(1).forEach { act ->
           // Remaining elements all take total of waitPeriod, emissionDuration is correctly taken into account.
@@ -144,13 +148,13 @@ class FlowJvmTest : ArrowFxSpec(spec = {
       }
     }
   }
-
+  
   "fixedRate(dampen = true)" {
     val waitPeriod = 1000L
     val n = 3
     val timeout = (n + 1) * waitPeriod + 500
     val buffer = mutableListOf<Unit>()
-
+    
     withTimeoutOrNull(timeout) {
       fixedRate(Duration.milliseconds(waitPeriod), true) { timeInMillis() }
         .mapIndexed { index, _ ->
@@ -158,16 +162,16 @@ class FlowJvmTest : ArrowFxSpec(spec = {
         }
         .collect(buffer::add)
     }
-
+    
     buffer.size shouldBe 2
   }
-
+  
   "fixedRate(dampen = false)" {
     val waitPeriod = 1000L
     val n = 3
     val timeout = (n + 1) * waitPeriod + 500
     val buffer = mutableListOf<Unit>()
-
+    
     withTimeoutOrNull(timeout) {
       fixedRate(Duration.milliseconds(waitPeriod), false) { timeInMillis() }
         .mapIndexed { index, _ ->
@@ -175,7 +179,7 @@ class FlowJvmTest : ArrowFxSpec(spec = {
         }
         .collect(buffer::add)
     }
-
+    
     buffer.size shouldBe n + 1
   }
 })

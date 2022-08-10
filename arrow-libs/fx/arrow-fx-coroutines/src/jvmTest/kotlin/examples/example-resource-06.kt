@@ -1,9 +1,7 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource06
 
-import arrow.fx.coroutines.resource
-import arrow.fx.coroutines.release
-import arrow.fx.coroutines.use
+import arrow.fx.coroutines.resourceScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -13,12 +11,10 @@ class DataSource {
   suspend fun users(): List<String> = listOf("User-1", "User-2", "User-3")
 }
 
-suspend fun main(): Unit {
-  val dataSource = resource {
+suspend fun main(): Unit = resourceScope {
+  val dataSource = install({
     DataSource().also { it.connect() }
-  } release DataSource::close
+  }) { ds, _ -> ds.close() }
 
-  val res = dataSource
-    .use { ds -> "Using data source: ${ds.users()}" }
-    .also(::println)
+  println("Using data source: ${dataSource.users()}")
 }

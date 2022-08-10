@@ -1,10 +1,9 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource04
 
-import arrow.fx.coroutines.resource
+import arrow.fx.coroutines.ResourceScope
 import arrow.fx.coroutines.Resource
-import arrow.fx.coroutines.release
-import arrow.fx.coroutines.releaseCase
+import arrow.fx.coroutines.resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,18 +14,21 @@ class UserProcessor {
   }
 }
 
-val userProcessor = resource {
-  val x: UserProcessor = resource(
+suspend fun ResourceScope.userProcessor(): UserProcessor =
+  install({  UserProcessor().also { it.start() } }) { processor, _ ->
+    processor.shutdown()
+  }
+
+val userProcessor: Resource<UserProcessor> = resource {
+  val x: UserProcessor = install(
     {  UserProcessor().also { it.start() } },
     { processor, _ -> processor.shutdown() }
   )
   x
 }
 
-val userProcessor2: Resource<UserProcessor> = resource {
+val userProcessor2: Resource<UserProcessor> = resource({
   UserProcessor().also { it.start() }
-} release UserProcessor::shutdown
+}) { processor, _ -> processor.shutdown() }
 
-val userProcessor3 = userProcessor2 releaseCase { _, exitCase ->
-  println("Composed finalizer to log exitCase: $exitCase")
-}
+val userProcessor3: Resource<UserProcessor> = ResourceScope::userProcessor

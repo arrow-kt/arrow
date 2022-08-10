@@ -1,10 +1,10 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource05
 
-import arrow.fx.coroutines.resource
-import arrow.fx.coroutines.release
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resourceScope
 import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.use
+import arrow.fx.coroutines.resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -21,23 +21,19 @@ class DataSource {
 }
 
 class Service(val db: DataSource, val userProcessor: UserProcessor) {
-  suspend fun processData(): List<String> = throw RuntimeException("I'm going to leak resources by not closing them")
+  suspend fun processData(): List<String> = (0..10).map { "Processed : $it" }
 }
 
-val userProcessor = resource {
-  UserProcessor().also { it.start() }
-} release UserProcessor::shutdown
+suspend fun ResourceScope.userProcessor(): UserProcessor =
+  install({ UserProcessor().also { it.start() } }){ p,_ -> p.shutdown() }
 
-val dataSource = resource {
-  DataSource().also { it.connect() }
-} release DataSource::close
+suspend fun ResourceScope.dataSource(): DataSource =
+  install({ DataSource().also { it.connect() } }) { ds, _ -> ds.close() }
 
-val service = resource {
-  parZip({ userProcessor.bind() }, { dataSource.bind() }) { userProcessor, ds ->
+suspend fun main(): Unit = resourceScope {
+  val service = parZip({ userProcessor() }, { dataSource() }) { userProcessor, ds ->
     Service(ds, userProcessor)
   }
-}
-
-suspend fun main(): Unit {
-  service.use(Service::processData)
+  val data = service.processData()
+  println(data)
 }
