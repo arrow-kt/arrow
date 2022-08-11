@@ -19,8 +19,7 @@ permalink: /core/
 # Arrow Core. Functional companion to Kotlin’s Standard Library
 
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' |
-relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }})
-and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' |
+relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' |
 relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 
 Core also includes the base continuation effects system, which includes patterns to remove callbacks
