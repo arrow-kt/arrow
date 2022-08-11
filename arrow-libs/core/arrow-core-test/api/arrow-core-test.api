@@ -101,7 +101,6 @@ public final class arrow/core/test/generators/GeneratorsKt {
 	public static final fun tuple8 (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun tuple9 (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 	public static final fun unit (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
-	public static final fun validated (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 }
 
 public final class arrow/core/test/generators/UtilsKt {
