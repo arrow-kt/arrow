@@ -498,7 +498,7 @@ public sealed class Ior<out A, out B> {
    *   left.exists { it > 10 }      // Result: false
    * }
    * ```
- * <!--- KNIT example-ior-13.kt -->
+ * <!--- KNIT example-ior-12.kt -->
    */
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate, { _, b -> predicate(b) })
@@ -687,7 +687,7 @@ public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-ior-14.kt -->
+ * <!--- KNIT example-ior-13.kt -->
  */
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this

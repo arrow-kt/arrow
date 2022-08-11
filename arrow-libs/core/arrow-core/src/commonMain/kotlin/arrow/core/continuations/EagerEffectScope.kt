@@ -106,7 +106,7 @@ public interface EagerEffectScope<in R> {
    *   }.fold({ default }, ::identity) shouldBe result.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-eager-effect-scope-05.kt -->
+   * <!--- KNIT example-eager-effect-scope-04.kt -->
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
@@ -132,7 +132,7 @@ public interface EagerEffectScope<in R> {
    *   }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
    * }
    * ```
-   * <!--- KNIT example-eager-effect-scope-06.kt -->
+   * <!--- KNIT example-eager-effect-scope-05.kt -->
    */
   public suspend fun <B> Option<B>.bind(shift: () -> R): B =
     when (this) {
@@ -159,7 +159,7 @@ public interface EagerEffectScope<in R> {
    *   }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
    * }
    * ```
-   * <!--- KNIT example-eager-effect-scope-07.kt -->
+   * <!--- KNIT example-eager-effect-scope-06.kt -->
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
@@ -193,7 +193,6 @@ public interface EagerEffectScope<in R> {
    * import arrow.core.Either
    * import arrow.core.None
    * import arrow.core.Option
-   * import arrow.core.Validated
    * import arrow.core.continuations.eagerEffect
    * import io.kotest.assertions.fail
    * import io.kotest.matchers.shouldBe
@@ -201,14 +200,14 @@ public interface EagerEffectScope<in R> {
    * fun main() {
    *   eagerEffect<String, Int> {
    *     val x = Either.Right(1).bind()
-   *     val y = Validated.Valid(2).bind()
+   *     val y = Either.Right(2).bind()
    *     val z =
    *      attempt { None.bind { "Option was empty" } } catch { 0 }
    *     x + y + z
    *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
    * }
    * ```
-   * <!--- KNIT example-eager-effect-scope-08.kt -->
+   * <!--- KNIT example-eager-effect-scope-07.kt -->
    */
   public infix fun <E, A> (suspend EagerEffectScope<E>.() -> A).catch(
     recover: EagerEffectScope<R>.(E) -> A,
@@ -234,7 +233,7 @@ public interface EagerEffectScope<in R> {
  *   }.toEither() shouldBe (int?.right() ?: failure.left())
  * }
  * ```
- * <!--- KNIT example-eager-effect-scope-09.kt -->
+ * <!--- KNIT example-eager-effect-scope-08.kt -->
  */
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EagerEffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
