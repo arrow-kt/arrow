@@ -590,7 +590,7 @@ public fun <A> Sequence<A>.salign(
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
- * @receiver Iterable of Validated
+ * @receiver Iterable of Either
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
 public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> {

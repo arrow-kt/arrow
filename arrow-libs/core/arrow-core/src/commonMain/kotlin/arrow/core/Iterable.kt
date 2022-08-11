@@ -940,7 +940,7 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
- * @receiver Iterable of Validated
+ * @receiver Iterable of Either
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
