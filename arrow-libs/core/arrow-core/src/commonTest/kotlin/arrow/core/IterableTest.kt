@@ -179,36 +179,6 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "traverse Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse Validated acumulates" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> =
-          ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
-            .sequence()
-
-        val expected: ValidatedNel<Int, List<Int>> = ints.filterNot { it % 2 == 0 }
-          .toNonEmptyListOrNull()?.invalid() ?: Valid(ints.filter { it % 2 == 0 })
-
-        res shouldBe expected
-      }
-    }
-
-    "sequence Validated should be consistent with traverse Validated" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it.valid() }.sequence(Semigroup.string()) shouldBe
-          ints.traverse(Semigroup.string()) { it.valid() }
-      }
-    }
 
     "sequence Either traverse Nullable interoperate - and proof map + sequence equality with traverse" {
       checkAll(

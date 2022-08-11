@@ -49,30 +49,6 @@ class SequenceKTest : UnitSpec() {
       res shouldBe None
     }
 
-    "traverse for Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }.map { it.toList() }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.sequence(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequence(Semigroup.nonEmptyList())
-
-        val expected: ValidatedNel<Int, Sequence<Int>> =
-          ints.filterNot { it % 2 == 0 }.toList()
-            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
-
-        res.map { it.toList() } shouldBe expected.map { it.toList() }
-      }
-    }
-
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
