@@ -3,6 +3,7 @@ package arrow.core.computations
 import arrow.core.Eval
 import arrow.core.Tuple10
 import arrow.core.composeErrors
+import arrow.core.computations.ResultEffect.result
 import arrow.core.flatMap
 import arrow.core.handleErrorWith
 import arrow.core.redeemWith
