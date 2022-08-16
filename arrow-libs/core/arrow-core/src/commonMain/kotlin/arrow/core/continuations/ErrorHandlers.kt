@@ -11,7 +11,7 @@ import kotlin.jvm.JvmName
 
 @BuilderInference
 public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
-  effect { catch({ invoke() }) { e -> resolve(e) } }
+  effect { catch { e -> resolve(e) } }
 
 @BuilderInference
 public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
@@ -29,7 +29,7 @@ public  fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
 
 @BuilderInference
 public infix fun <E, E2, A> EagerEffect<E, A>.catch(resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
-  eagerEffect { catch({ invoke() }) { e -> resolve(e) } }
+  eagerEffect { catch { e -> resolve(e) } }
 
 @BuilderInference
 public infix fun <E, A> EagerEffect<E, A>.attempt(recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =

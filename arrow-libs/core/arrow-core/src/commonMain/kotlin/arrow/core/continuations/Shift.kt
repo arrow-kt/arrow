@@ -39,6 +39,26 @@ public interface Shift<in R> {
   // TODO can be inlined with context receivers, and top-level
   public fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
+  
+  @EffectDSL
+  public suspend infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<R>.(E) -> A): A =
+    catch({ invoke() }) { resolve(it) }
+  
+  @EffectDSL
+  public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference resolve: Shift<R>.(E) -> A): A =
+    catch({ invoke() }, resolve)
+  
+  @EffectDSL
+  public suspend fun <E, A> Effect<E, A>.catch(
+    @BuilderInference action: suspend Shift<E>.() -> A,
+    @BuilderInference resolve: suspend Shift<R>.(E) -> A,
+    @BuilderInference recover: suspend Shift<R>.(Throwable) -> A,
+  ): A = fold({ action(this) }, { recover(it) }, { resolve(it) }, { it })
+  
+  @EffectDSL
+  public suspend fun <A> Effect<R, A>.attempt(
+    @BuilderInference recover: Shift<R>.(Throwable) -> A,
+  ): A = fold({ recover(it) }, { shift(it) }, { it })
 }
 
 @EffectDSL

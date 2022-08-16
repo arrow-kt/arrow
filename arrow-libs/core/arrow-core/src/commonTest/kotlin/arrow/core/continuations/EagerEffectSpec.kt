@@ -61,9 +61,9 @@ class EagerEffectSpec : StringSpec({
   "attempt - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
-        catch({
+        eagerEffect<Long, Int> {
           shift(l)
-        }) { ll ->
+        } catch { ll ->
           ll shouldBe l
           i
         }
@@ -73,10 +73,10 @@ class EagerEffectSpec : StringSpec({
 
   "attempt - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
-      eagerEffect {
-        catch<String, Long, Int>({
+      eagerEffect<String, Int> {
+        eagerEffect<Long, Int> {
           i
-        }) { ll ->
+        } catch { ll ->
           ll shouldBe l
           i + 1
         }
