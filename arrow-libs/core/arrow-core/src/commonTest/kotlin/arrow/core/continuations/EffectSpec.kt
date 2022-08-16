@@ -116,9 +116,9 @@ class EffectSpec :
     "attempt - catch" {
       checkAll(Arb.int(), Arb.long()) { i, l ->
         effect<String, Int> {
-          attempt<Long, Int> {
+          catch({
             shift(l)
-          } catch { ll ->
+          }) { ll ->
             ll shouldBe l
             i
           }
@@ -128,10 +128,10 @@ class EffectSpec :
 
     "attempt - no catch" {
       checkAll(Arb.int(), Arb.long()) { i, l ->
-        effect<String, Int> {
-          attempt<Long, Int> {
+        effect {
+          catch<String, Long, Int>({
             i
-          } catch { ll ->
+          }) { ll ->
             ll shouldBe l
             i + 1
           }
@@ -241,12 +241,10 @@ class EffectSpec :
       val effect = effect<String, Int> { shift("Shift") }
       val e = RuntimeException("test")
       Either.catch {
-        effect<String, Int> {
+        effect {
           try {
             effect.bind()
-          } catch (eagerShiftError: Eager) {
-            fail("Should never come here")
-          } catch (shiftError: Suspend) {
+          } catch (shiftError: ShiftCancellationException) {
             e.suspend()
           } catch (otherError: Throwable) {
             fail("Should never come here")
@@ -262,9 +260,7 @@ class EffectSpec :
         effect<String, Int> {
           try {
             effect.bind()
-          } catch (eagerShiftError: Eager) {
-            fail("Should never come here")
-          } catch (shiftError: Suspend) {
+          } catch (eagerShiftError: ShiftCancellationException) {
             e.suspend()
           } catch (otherError: Throwable) {
             fail("Should never come here")
@@ -298,8 +294,8 @@ class EffectSpec :
         }
       
         val newError: Effect<List<Char>, Int> =
-          failed.handleErrorWith { str ->
-            effect { shift(str.reversed().toList()) }
+          failed.catch { str ->
+            shift(str.reversed().toList())
           }
       
         newError.toEither() shouldBe Either.Left(error.reversed().toList())

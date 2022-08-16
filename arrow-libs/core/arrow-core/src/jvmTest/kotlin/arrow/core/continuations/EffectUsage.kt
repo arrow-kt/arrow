@@ -9,15 +9,15 @@ sealed interface OtherError : MyError {
   object Actual : OtherError
 }
 
-context(EffectScope<SubError>)
+context(Shift<SubError>)
   suspend fun subprogram(): Unit =
   println("Hello SubProgram!")
 
-context(EffectScope<OtherError>)
+context(Shift<OtherError>)
   suspend fun otherprogram(): Unit =
   println("Hello OtherProgram!")
 
-context(EffectScope<OtherError>)
+context(Shift<OtherError>)
   suspend fun fail(): MyResponse =
   shift(OtherError.Actual)
 
@@ -38,11 +38,11 @@ object EmptyResponse : MyResponse
 data class ErrorResponse(val error: Throwable) : MyResponse
 data class BodyResponse(val body: String) : MyResponse
 
-context(EffectScope<SubError>)
+context(Shift<SubError>)
   suspend fun respondWithBody(): BodyResponse =
   BodyResponse("Hello Program!")
 
-context(EffectScope<OtherError>)
+context(Shift<OtherError>)
   suspend fun attemptOrError(): MyResponse =
   ErrorResponse(RuntimeException("Oh no!"))
 

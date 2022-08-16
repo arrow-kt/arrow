@@ -47,12 +47,10 @@ class StructuredConcurrencySpec :
             async<Int> {
                 started.await()
                 shift("hello")
-              }
-              .await()
+              }.await()
             never.await()
           }
-        }
-        .runCont() shouldBe "hello"
+        }.runCont() shouldBe "hello"
 
       withTimeout(2.seconds) {
         cancelled.await().shouldNotBeNull().message shouldBe "Shifted Continuation"

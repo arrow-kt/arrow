@@ -61,9 +61,9 @@ class EagerEffectSpec : StringSpec({
   "attempt - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
-        attempt<Long, Int> {
+        catch({
           shift(l)
-        } catch { ll ->
+        }) { ll ->
           ll shouldBe l
           i
         }
@@ -73,10 +73,10 @@ class EagerEffectSpec : StringSpec({
 
   "attempt - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
-      eagerEffect<String, Int> {
-        attempt<Long, Int> {
+      eagerEffect {
+        catch<String, Long, Int>({
           i
-        } catch { ll ->
+        }) { ll ->
           ll shouldBe l
           i + 1
         }
@@ -95,7 +95,7 @@ class EagerEffectSpec : StringSpec({
 
   "ensure null in eager either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
-      either.eager<String, Int> {
+      either<String, Int> {
         ensure(predicate) { shift }
         success
       } shouldBe if (predicate) success.right() else shift.left()
@@ -107,7 +107,7 @@ class EagerEffectSpec : StringSpec({
 
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
       val res =
-        either.eager<String, Int> {
+        either<String, Int> {
           val ii = i
           ensureNotNull(ii) { shift }
           square(ii) // Smart-cast by contract
@@ -124,9 +124,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         try {
           effect.bind()
-        } catch (shiftError: Suspend) {
-          fail("Should never come here")
-        } catch (eagerShiftError: Eager) {
+        } catch (eagerShiftError: ShiftCancellationException) {
           throw e
         } catch (otherError: Throwable) {
           fail("Should never come here")
