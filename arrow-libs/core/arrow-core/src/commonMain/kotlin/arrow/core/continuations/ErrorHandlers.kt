@@ -1,48 +1,42 @@
 @file:JvmMultifileClass
 @file:JvmName("Effect")
+@file:OptIn(ExperimentalTypeInference::class)
 
 package arrow.core.continuations
 
+import arrow.core.nonFatalOrThrow
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-@OptIn(ExperimentalTypeInference::class)
-public infix fun <E, E2, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E2>.(E) -> A): Effect<E2, A> =
-  effect {
-    catch({ bind() }) { e -> resolve(e) }
-  }
+@BuilderInference
+public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
+  effect { catch({ invoke() }) { e -> resolve(e) } }
 
-@OptIn(ExperimentalTypeInference::class)
-public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend Shift<E>.(Throwable) -> A): Effect<E, A> =
-  effect {
-    attempt({ bind() }) { t -> recover(t) }
-  }
+@BuilderInference
+public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
+  effect { attempt({ invoke() }) { t -> recover(t) } }
 
-@OptIn(ExperimentalTypeInference::class)
+@BuilderInference
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(
-  @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
-): Effect<E, A> = effect {
-  attempt({ bind() }) { t: T -> recover(t) }
-}
+  crossinline recover: suspend Shift<E>.(T) -> A,
+): Effect<E, A> =
+  effect { attempt({ invoke() }) { t: T -> recover(t) } }
 
-@OptIn(ExperimentalTypeInference::class)
-public infix fun <E, E2, A> EagerEffect<E, A>.catch(@BuilderInference resolve: Shift<E2>.(E) -> A): EagerEffect<E2, A> =
-  eagerEffect {
-    catch({ bind() }) { e -> resolve(e) }
-  }
+public  fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
+  effect{ kotlin.runCatching { invoke() }.onFailure { it.nonFatalOrThrow() } }
 
-@OptIn(ExperimentalTypeInference::class)
-public infix fun <E, A> EagerEffect<E, A>.attempt(@BuilderInference recover: Shift<E>.(Throwable) -> A): EagerEffect<E, A> =
-  eagerEffect {
-    attempt({ bind() }) { t -> recover(t) }
-  }
+@BuilderInference
+public infix fun <E, E2, A> EagerEffect<E, A>.catch(resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+  eagerEffect { catch({ invoke() }) { e -> resolve(e) } }
 
-@OptIn(ExperimentalTypeInference::class)
+@BuilderInference
+public infix fun <E, A> EagerEffect<E, A>.attempt(recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
+  eagerEffect { attempt({ invoke() }) { t -> recover(t) } }
+
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.attempt(
   @BuilderInference crossinline recover: Shift<E>.(T) -> A,
-): EagerEffect<E, A> = eagerEffect {
-  attempt({ bind() }) { t: T -> recover(t) }
-}
+): EagerEffect<E, A> =
+  eagerEffect { attempt({ invoke() }) { t: T -> recover(t) } }

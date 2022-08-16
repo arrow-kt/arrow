@@ -31,7 +31,7 @@ class EffectSpec :
   StringSpec({
     "try/catch - can recover from shift" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
+        effect {
           try {
             shift(s)
           } catch (e: Throwable) {
@@ -43,7 +43,7 @@ class EffectSpec :
 
     "try/catch - can recover from shift suspended" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
+        effect {
           try {
             shift(s.suspend())
           } catch (e: Throwable) {
@@ -144,8 +144,8 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { a }
 
-        effect<String, Int> {
-          val aa = eager.bind()
+        effect {
+          val aa = eager()
           aa + b.suspend()
         }.runCont() shouldBe (a + b)
       }
@@ -156,8 +156,8 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { shift(a) }
 
-        effect<String, Int> {
-          val aa = eager.bind()
+        effect {
+          val aa = eager()
           aa + b.suspend()
         }.runCont() shouldBe a
       }
@@ -243,7 +243,7 @@ class EffectSpec :
       Either.catch {
         effect {
           try {
-            effect.bind()
+            effect()
           } catch (shiftError: ShiftCancellationException) {
             e.suspend()
           } catch (otherError: Throwable) {
@@ -257,9 +257,9 @@ class EffectSpec :
       val effect = eagerEffect<String, Int> { shift("Shift") }
       val e = RuntimeException("test")
       Either.catch {
-        effect<String, Int> {
+        effect {
           try {
-            effect.bind()
+            effect()
           } catch (eagerShiftError: ShiftCancellationException) {
             e.suspend()
           } catch (otherError: Throwable) {
@@ -271,13 +271,13 @@ class EffectSpec :
     
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
-        fun failure(): Effect<Failure, String> = effect {
+        val failure: Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
         
-        effect<Failure, Int> {
-          failure().bind()
+        effect {
+          failure()
           1
         }.fold(
           recover = { it },
@@ -314,7 +314,7 @@ class EffectSpec :
             failed.fold({ r ->
               effect<List<Char>, Int> {
                 shift(r.reversed().toList())
-              }.bind()
+              }.invoke()
             }, ::identity)
           }
       
@@ -336,7 +336,7 @@ class EffectSpec :
     
     "Can shift from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
-        effect<String, Int> {
+        effect {
           effect<Int, String> {
             throw RuntimeException(msg())
           }.fold(

@@ -123,7 +123,7 @@ class EagerEffectSpec : StringSpec({
     Either.catch {
       eagerEffect<String, Int> {
         try {
-          effect.bind()
+          effect()
         } catch (eagerShiftError: ShiftCancellationException) {
           throw e
         } catch (otherError: Throwable) {

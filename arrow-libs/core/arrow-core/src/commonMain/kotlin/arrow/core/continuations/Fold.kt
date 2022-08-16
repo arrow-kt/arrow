@@ -1,5 +1,6 @@
 @file:JvmMultifileClass
 @file:JvmName("Effect")
+@file:OptIn(ExperimentalTypeInference::class)
 
 package arrow.core.continuations
 
@@ -18,12 +19,7 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
   error: suspend (error: Throwable) -> B,
   recover: suspend (shifted: R) -> B,
   transform: suspend (value: A) -> B,
-): B = fold(
-  { bind() },
-  { error(it) },
-  { recover(it) },
-  { transform(it) }
-)
+): B = fold({ invoke() }, { error(it) }, { recover(it) }, { transform(it) })
 
 public fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B =
   fold({ throw it }, recover, transform)
@@ -34,7 +30,13 @@ public inline fun <R, A, B> EagerEffect<R, A>.fold(
   transform: (value: A) -> B,
 ): B = fold({ invoke(this) }, error, recover, transform)
 
-@OptIn(ExperimentalTypeInference::class)
+@JvmName("_foldOrThrow")
+public inline fun <R, A, B> fold(
+  @BuilderInference program: Shift<R>.() -> A,
+  recover: (shifted: R) -> B,
+  transform: (value: A) -> B,
+): B = fold(program, { throw it }, recover, transform)
+
 @JvmName("_fold")
 public inline fun <R, A, B> fold(
   @BuilderInference program: Shift<R>.() -> A,
@@ -46,14 +48,14 @@ public inline fun <R, A, B> fold(
   return try {
     transform(program(shift))
   } catch (e: ShiftCancellationException) {
+    @Suppress("UNCHECKED_CAST")
     if (shift === e.shift) recover(e.shifted as R) else throw e
   } catch (e: Throwable) {
     error(e.nonFatalOrThrow())
   }
 }
 
-@PublishedApi
-internal class ShiftCancellationException(
+public class ShiftCancellationException(
   @PublishedApi
   internal val shifted: Any?,
   @PublishedApi
@@ -62,6 +64,7 @@ internal class ShiftCancellationException(
 
 @PublishedApi
 internal class DefaultShift<R> : Shift<R> {
+  @Suppress("UNCHECKED_CAST")
   override fun <B> shift(r: R): B =
     throw ShiftCancellationException(r, this as DefaultShift<Any?>)
 }

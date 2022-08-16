@@ -1,5 +1,6 @@
 @file:JvmMultifileClass
 @file:JvmName("Effect")
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 
 package arrow.core.continuations
 
@@ -22,56 +23,42 @@ public typealias EagerEffect<R, A> = Shift<R>.() -> A
 
 public typealias Effect<R, A> = suspend Shift<R>.() -> A
 
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <R, A> eagerEffect(@BuilderInference noinline f: Shift<R>.() -> A): EagerEffect<R, A> = f
+public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Shift<R>.() -> A): EagerEffect<R, A> = block
 
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <R, A> effect(@BuilderInference noinline f: suspend Shift<R>.() -> A): Effect<R, A> = f
+public inline fun <R, A> effect(@BuilderInference noinline block: suspend Shift<R>.() -> A): Effect<R, A> = block
 
-public inline fun <E, A> either(action: Shift<E>.() -> A): Either<E, A> =
-  fold<E, A, Either<E, A>>(
-    { action() },
-    { throw it },
-    { Either.Left(it) },
-    { Either.Right(it) }
-  )
+public inline fun <E, A> either(@BuilderInference block: Shift<E>.() -> A): Either<E, A> =
+  fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
-public inline fun <A> nullable(f: NullableShift.() -> A): A? =
-  fold<Nothing?, A, A?>(
-    { f(NullableShift(this)) },
-    { throw it },
-    { null },
-    { it }
-  )
+public inline fun <A> nullable(@BuilderInference block: NullableShift.() -> A): A? =
+  fold({ block(NullableShift(this)) }, { null }, ::identity)
+
+public inline fun <A> result(@BuilderInference action: ResultShift.() -> A): Result<A> =
+  fold({ action(ResultShift(this)) }, Result.Companion::failure, Result.Companion::success)
+
+public inline fun <A> option(@BuilderInference action: OptionShift.() -> A): Option<A> =
+  fold({ action(OptionShift(this)) }, ::identity, ::Some)
+
+public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorShift<E>.() -> A): Ior<E, A> =
+  fold({ IorShift(semigroup, this).invoke(action) }, { Ior.Left(it) }, ::identity)
 
 @JvmInline
 public value class NullableShift(private val cont: Shift<Nothing?>) : Shift<Nothing?> {
   @EffectDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
   override fun <B> shift(r: Nothing?): B = cont.shift(r)
-  
   public fun <B> Option<B>.bind(): B = bind { shift(null) }
   
-  @OptIn(ExperimentalContracts::class)
   public fun <B> B?.bind(): B {
     contract { returns() implies (this@bind != null) }
     return this ?: shift(null)
   }
   
-  @OptIn(ExperimentalContracts::class)
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
-
-public inline fun <A> result(action: ResultShift.() -> A): Result<A> =
-  fold<Throwable, A, Result<A>>(
-    { action(ResultShift(this)) },
-    { throw it },
-    { Result.failure(it) },
-    { Result.success(it) }
-  )
 
 @JvmInline
 public value class ResultShift(private val cont: Shift<Throwable>) : Shift<Throwable> {
@@ -79,55 +66,25 @@ public value class ResultShift(private val cont: Shift<Throwable>) : Shift<Throw
   public fun <B> Result<B>.bind(): B = fold(::identity) { shift(it) }
 }
 
-public inline fun <A> option(action: OptionShift.() -> A): Option<A> =
-  fold<None, A, Option<A>>(
-    { action(OptionShift(this)) },
-    { throw it },
-    { None },
-    { Some(it) }
-  )
-
 @JvmInline
 public value class OptionShift(private val cont: Shift<None>) : Shift<None> {
-  override fun <B> shift(r: None): B =
-    cont.shift(r)
+  override fun <B> shift(r: None): B = cont.shift(r)
+  public fun <B> Option<B>.bind(): B = bind { shift(None) }
+  public fun ensure(value: Boolean): Unit = ensure(value) { None }
   
-  // public fun <B> Option<B>.bind(): B = bind { None }
-  
-  public fun ensure(value: Boolean): Unit =
-    ensure(value) { None }
-  
-  @OptIn(ExperimentalContracts::class)
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
   }
 }
 
-public inline fun <E, A> ior(
-  semigroup: Semigroup<E>,
-  action: IorShift<E>.() -> A,
-): Ior<E, A> = fold<E, Ior<E, A>, Ior<E, A>>(
-  {
-    val effect = IorShift(semigroup, this)
-    val res = action(effect)
-    val leftState = effect.leftState.get()
-    if (leftState === EmptyValue) Ior.Right(res) else Ior.Both(EmptyValue.unbox(leftState), res)
-  },
-  { throw it },
-  { Ior.Left(it) },
-  { it }
-)
-
-public class IorShift<E>(semigroup: Semigroup<E>, private val effect: Shift<E>) : Shift<E>, Semigroup<E> by semigroup {
+public class IorShift<E> @PublishedApi internal constructor(semigroup: Semigroup<E>, private val effect: Shift<E>) :
+  Shift<E>, Semigroup<E> by semigroup {
   
+  // TODO this is a mess...
   @PublishedApi
   internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)
-  
-  private fun combine(other: E): E =
-    leftState.updateAndGet { state ->
-      if (state === EmptyValue) other else EmptyValue.unbox<E>(state).combine(other)
-    } as E
+  override fun <B> shift(r: E): B = effect.shift(combine(r))
   
   public fun <B> Ior<E, B>.bind(): B =
     when (this) {
@@ -139,5 +96,17 @@ public class IorShift<E>(semigroup: Semigroup<E>, private val effect: Shift<E>) 
       }
     }
   
-  override fun <B> shift(r: E): B = effect.shift(combine(r))
+  @PublishedApi
+  internal inline operator fun <A> invoke(action: IorShift<E>.() -> A): Ior<E, A> {
+    val res = action(this)
+    val leftState = leftState.get()
+    return if (leftState === EmptyValue) Ior.Right(res)
+    else Ior.Both(EmptyValue.unbox(leftState), res)
+  }
+  
+  @Suppress("UNCHECKED_CAST")
+  private fun combine(other: E): E =
+    leftState.updateAndGet { state ->
+      if (state === EmptyValue) other else EmptyValue.unbox<E>(state).combine(other)
+    } as E
 }
