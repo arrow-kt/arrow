@@ -4,15 +4,29 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.Validated
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 public suspend fun <E, A> Effect<E, A>.toEither(): Either<E, A> = either { invoke() }
 
 public fun <E, A> EagerEffect<E, A>.toEither(): Either<E, A> = either { invoke() }
+
+public suspend fun <E, A> Effect<E, A>.toValidated(): Validated<E, A> =
+  fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+
+public fun <E, A> EagerEffect<E, A>.toValidated(): Validated<E, A> =
+  fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+
+public suspend fun <E, A> Effect<E, A>.toIor(): Ior<E, A> =
+  fold({ Ior.Left(it) }) { Ior.Right(it) }
+
+public fun <E, A> EagerEffect<E, A>.toIor(): Ior<E, A> =
+  fold({ Ior.Left(it) }) { Ior.Right(it) }
 
 public suspend fun <E, A> Effect<E, A>.orNull(): A? = fold({ _: E -> null }) { it }
 

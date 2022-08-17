@@ -44,7 +44,7 @@ public inline fun <R, A, B> fold(
   recover: (shifted: R) -> B,
   transform: (value: A) -> B,
 ): B {
-  val shift = DefaultShift<R>()
+  val shift = DefaultShift()
   return try {
     transform(program(shift))
   } catch (e: ShiftCancellationException) {
@@ -63,8 +63,6 @@ public class ShiftCancellationException(
 ) : CancellationException("Shifted Continuation")
 
 @PublishedApi
-internal class DefaultShift<R> : Shift<R> {
-  @Suppress("UNCHECKED_CAST")
-  override fun <B> shift(r: R): B =
-    throw ShiftCancellationException(r, this as DefaultShift<Any?>)
+internal class DefaultShift : Shift<Any?> {
+  override fun <B> shift(r: Any?): B = throw ShiftCancellationException(r, this)
 }

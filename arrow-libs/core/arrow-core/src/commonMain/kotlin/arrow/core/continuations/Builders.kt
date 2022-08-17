@@ -19,14 +19,6 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-public typealias EagerEffect<R, A> = Shift<R>.() -> A
-
-public typealias Effect<R, A> = suspend Shift<R>.() -> A
-
-public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Shift<R>.() -> A): EagerEffect<R, A> = block
-
-public inline fun <R, A> effect(@BuilderInference noinline block: suspend Shift<R>.() -> A): Effect<R, A> = block
-
 public inline fun <E, A> either(@BuilderInference block: Shift<E>.() -> A): Either<E, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 

@@ -6,6 +6,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -16,28 +17,33 @@ import kotlin.jvm.JvmName
 public annotation class EffectDSL
 
 public interface Shift<in R> {
-  public fun <B> shift(r: R): B
+  public fun <A> shift(r: R): A
   
-  public fun <B> EagerEffect<R, B>.bind(): B = invoke(this@Shift)
-  public operator fun <B> EagerEffect<R, B>.invoke(): B = invoke(this@Shift)
+  public fun <A> EagerEffect<R, A>.bind(): A = invoke(this@Shift)
+  public operator fun <A> EagerEffect<R, A>.invoke(): A = invoke(this@Shift)
   
-  public suspend fun <B> Effect<R, B>.bind(): B = invoke(this@Shift)
-  public suspend operator fun <B> Effect<R, B>.invoke(): B = invoke(this@Shift)
+  public suspend fun <A> Effect<R, A>.bind(): A = invoke(this@Shift)
+  public suspend operator fun <A> Effect<R, A>.invoke(): A = invoke(this@Shift)
   
-  public fun <B> Either<R, B>.bind(): B = when (this) {
+  public fun <A> Either<R, A>.bind(): A = when (this) {
     is Either.Left -> shift(value)
     is Either.Right -> value
   }
   
+  public fun <A> Validated<R, A>.bind(): A = when (this) {
+    is Validated.Invalid -> shift(value)
+    is Validated.Valid -> value
+  }
+  
   // TODO can be inlined with context receivers, and top-level
-  public fun <B> Option<B>.bind(transform: Shift<R>.(None) -> B): B =
+  public fun <A> Option<A>.bind(transform: Shift<R>.(None) -> A): A =
     when (this) {
       None -> transform(None)
       is Some -> value
     }
   
   // TODO can be inlined with context receivers, and top-level
-  public fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
+  public fun <A> Result<A>.bind(transform: (Throwable) -> R): A =
     fold(::identity) { throwable -> shift(transform(throwable)) }
   
   @EffectDSL
