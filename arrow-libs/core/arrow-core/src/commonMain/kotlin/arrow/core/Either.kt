@@ -1539,6 +1539,40 @@ public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
 public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
+public inline fun <reified E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
+  SE: Semigroup<E>,
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  ff: Either<E, F>,
+  g: Either<E, G>,
+  h: Either<E, H>,
+  i: Either<E, I>,
+  j: Either<E, J>,
+  f: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+): Either<E, Z> =
+  if (this is Either.Right && b is Either.Right && c is Either.Right && d is Either.Right && e is Either.Right && ff is Either.Right && g is Either.Right && h is Either.Right && i is Either.Right && j is Either.Right) {
+    Either.Right(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
+  } else SE.run {
+    val initialValue: Any? = if (this@zip is Either.Left) this@zip.value else EmptyValue
+    val accumulatedError = nonEmptyListOf(
+      b,
+      c,
+      d,
+      e,
+      ff,
+      g,
+      h,
+      i,
+      j
+    ).foldRight(initialValue) { next, acc ->
+      if (next is Either.Left) emptyCombine(acc, next.value) else acc
+    }
+
+    Either.Left(accumulatedError as E)
+  }
+
 public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
   flatMap { b ->
     fb.map { c -> f(b, c) }
