@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
@@ -427,11 +429,11 @@ class ResourceTest : ArrowFxSpec(
           r.update { i -> "$i$a" }
         }) { _, _ -> }
           .parZip(Resource({
-            r.set("$b")
+            r.value = "$b"
             require(modifyGate.complete(0))
           }) { _, _ -> }) { _a, _b -> _a to _b }
           .use {
-            r.get() shouldBe "$b$a"
+            r.value shouldBe "$b$a"
           }
       }
     }

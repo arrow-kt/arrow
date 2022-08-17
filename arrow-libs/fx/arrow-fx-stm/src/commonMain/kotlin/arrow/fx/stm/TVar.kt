@@ -1,8 +1,8 @@
 package arrow.fx.stm
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
-import arrow.core.continuations.updateAndGet
+import arrow.atomic.Atomic
+import arrow.atomic.update
+import arrow.atomic.updateAndGet
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlin.coroutines.resume
@@ -128,10 +128,10 @@ public class TVar<A> internal constructor(a: A) {
    * This is used to implement locking. Reading threads have to loop until the value is released by a
    *  transaction.
    */
-  private val ref = AtomicRef(a as Any?)
+  private val ref = Atomic(a as Any?)
 
   internal val value
-    get() = ref.get()
+    get() = ref.value
 
   /**
    * Each TVar has a unique id which is used to get a total ordering of variables to ensure that locks
@@ -147,7 +147,7 @@ public class TVar<A> internal constructor(a: A) {
    * Changes are pushed to waiting transactions via [notify]
    */
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
-  private val waiting = AtomicRef<List<STMTransaction<*>>>(emptyList())
+  private val waiting = Atomic<List<STMTransaction<*>>>(emptyList())
 
   override fun hashCode(): Int = id.hashCode()
 
@@ -167,7 +167,7 @@ public class TVar<A> internal constructor(a: A) {
    */
   internal fun readI(): A {
     while (true) {
-      ref.get().let {
+      ref.value.let {
         if (it !is STMFrame) return@readI it as A
       }
     }
@@ -251,4 +251,4 @@ public class TVar<A> internal constructor(a: A) {
   }
 }
 
-internal val globalC: AtomicRef<Long> = AtomicRef(0L)
+internal val globalC: Atomic<Long> = Atomic(0L)

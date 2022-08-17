@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.fx.coroutines.continuations.ResourceScope
@@ -182,12 +182,12 @@ public sealed class Resource<out A> {
         } catch (e: Throwable) {
           val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
           val ee = withContext(NonCancellable) {
-            effect.finalizers.get().cancelAll(ex, e) ?: e
+            effect.finalizers.value.cancelAll(ex, e) ?: e
           }
           throw ee
         }
         withContext(NonCancellable) {
-          effect.finalizers.get().cancelAll(ExitCase.Completed)?.let { throw it }
+          effect.finalizers.value.cancelAll(ExitCase.Completed)?.let { throw it }
         }
         b
       }
@@ -741,7 +741,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
   }
 
 private class ResourceScopeImpl : ResourceScope {
-  val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList())
+  val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
   override suspend fun <A> Resource<A>.bind(): A =
     when (this) {
       is Resource.Dsl -> dsl.invoke(this@ResourceScopeImpl)
@@ -754,7 +754,7 @@ private class ResourceScopeImpl : ResourceScope {
         // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
         // Otherwise we've saved the finalizer, and it will be called from somewhere else.
         if (ex != ExitCase.Completed) {
-          val e = finalizers.get().cancelAll(ex)
+          val e = finalizers.value.cancelAll(ex)
           val e2 = runCatching { release(a, ex) }.exceptionOrNull()
           Platform.composeErrors(e, e2)?.let { throw it }
         }

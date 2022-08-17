@@ -1,9 +1,10 @@
 package arrow.fx.coroutines.parMapN
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.Tuple6
 import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
@@ -59,14 +60,14 @@ class ParMap6Test : ArrowFxSpec(
             modifyGate5.complete(Unit)
           },
           {
-            r.set("$f")
+            r.value = "$f"
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e, _f ->
           Tuple6(_a, _b, _c, _d, _e, _f)
         }
 
-        r.get() shouldBe "$f$e$d$c$b$a"
+        r.value shouldBe "$f$e$d$c$b$a"
       }
     }
 
