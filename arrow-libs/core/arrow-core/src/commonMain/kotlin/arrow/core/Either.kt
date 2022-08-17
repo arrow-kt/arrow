@@ -3,6 +3,8 @@ package arrow.core
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.continuations.Shift
+import arrow.core.continuations.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -1228,6 +1230,12 @@ public sealed class Either<out A, out B> {
   public fun void(): Either<A, Unit> =
     map { Unit }
 }
+
+public inline fun <E2, E, A> Either<E, A>.catch(block: Shift<E2>.(E) -> A): Either<E2, A> =
+  when (this) {
+    is Right -> this
+    is Left -> either { block(value) }
+  }
 
 /**
  * Binds the given function across [Right].
