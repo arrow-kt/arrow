@@ -9,18 +9,15 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-@BuilderInference
-public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
+public infix fun <E, E2, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
   effect { catch(resolve) }
 
-@BuilderInference
-public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
+public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
   effect { attempt(recover) }
 
-@BuilderInference
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(
-  crossinline recover: suspend Shift<E>.(T) -> A,
+  @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
 ): Effect<E, A> =
   effect { attempt { t: Throwable -> if (t is T) recover(t) else throw t } }
 
@@ -33,12 +30,10 @@ public fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
     }
   }
 
-@BuilderInference
-public infix fun <E, E2, A> EagerEffect<E, A>.catch(resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+public infix fun <E, E2, A> EagerEffect<E, A>.catch(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
   eagerEffect { catch(resolve) }
 
-@BuilderInference
-public infix fun <E, A> EagerEffect<E, A>.attempt(recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
+public infix fun <E, A> EagerEffect<E, A>.attempt(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
   eagerEffect { attempt(recover) }
 
 @JvmName("attemptOrThrow")

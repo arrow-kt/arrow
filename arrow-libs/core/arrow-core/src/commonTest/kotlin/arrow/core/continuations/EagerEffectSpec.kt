@@ -5,7 +5,9 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -19,7 +21,7 @@ import kotlinx.coroutines.CompletableDeferred
 class EagerEffectSpec : StringSpec({
   "try/catch - can recover from shift" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
           shift(s)
         } catch (e: Throwable) {
@@ -28,13 +30,13 @@ class EagerEffectSpec : StringSpec({
       }.fold({ fail("Should never come here") }, ::identity) shouldBe i
     }
   }
-
+  
   "try/catch - finally works" {
     checkAll(Arb.string(), Arb.int()) { s, i ->
       val promise = CompletableDeferred<Int>()
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
-          shift(s)
+          shift<Int>(s)
         } finally {
           require(promise.complete(i))
         }
@@ -43,7 +45,7 @@ class EagerEffectSpec : StringSpec({
       promise.await() shouldBe i
     }
   }
-
+  
   "try/catch - First shift is ignored and second is returned" {
     checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
       eagerEffect<String, Int> {
@@ -57,7 +59,7 @@ class EagerEffectSpec : StringSpec({
       }.fold(::identity) { fail("Should never come here") } shouldBe s2
     }
   }
-
+  
   "attempt - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
@@ -70,7 +72,7 @@ class EagerEffectSpec : StringSpec({
       }.runCont() shouldBe i
     }
   }
-
+  
   "attempt - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
@@ -83,16 +85,29 @@ class EagerEffectSpec : StringSpec({
       }.runCont() shouldBe i
     }
   }
-
-  "immediate values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
-
-  "immediate short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
-
-  "Rethrows immediate exceptions" {
+  
+  "attempt - shift from catch" {
+    checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
+      eagerEffect {
+        eagerEffect<Long, Int> {
+          shift(l)
+        } catch { ll ->
+          ll shouldBe l
+          shift(error)
+        }
+      }.runCont() shouldBe error
+    }
+  }
+  
+  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
+  
+  "short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
+  
+  "Rethrows exceptions" {
     val e = RuntimeException("test")
     Either.catch { eagerEffect<Nothing, Nothing> { throw e }.runCont() } shouldBe Either.Left(e)
   }
-
+  
   "ensure null in eager either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
       either<String, Int> {
@@ -101,10 +116,10 @@ class EagerEffectSpec : StringSpec({
       } shouldBe if (predicate) success.right() else shift.left()
     }
   }
-
+  
   "ensureNotNull in eager either computation" {
     fun square(i: Int): Int = i * i
-
+    
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
       val res =
         either<String, Int> {
@@ -116,20 +131,83 @@ class EagerEffectSpec : StringSpec({
       res shouldBe expected
     }
   }
-
-  "low-level use-case: distinguish between concurrency error and shift exception" {
-    val effect = eagerEffect<String, Int> { shift("Shift") }
-    val e = RuntimeException("test")
-    Either.catch {
-      eagerEffect<String, Int> {
-        try {
-          effect()
-        } catch (eagerShiftError: ShiftCancellationException) {
-          throw e
-        } catch (otherError: Throwable) {
-          fail("Should never come here")
-        }
-      }.runCont()
-    } shouldBe Either.Left(e)
+  
+  "catch - happy path" {
+    checkAll(Arb.string()) { str ->
+      eagerEffect<Int, String> {
+        str
+      }.catch<Int, Nothing, String> { fail("It should never catch a success value") }
+        .runCont() shouldBe str
+    }
+  }
+  
+  "catch - error path and recover" {
+    checkAll(Arb.int(), Arb.string()) { int, fallback ->
+      eagerEffect<Int, String> {
+        shift<String>(int)
+        fail("It should never reach this point")
+      }.catch<Int, Nothing, String> { fallback }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "catch - error path and re-shift" {
+    checkAll(Arb.int(), Arb.string()) { int, fallback ->
+      eagerEffect<Int, Unit> {
+        shift<String>(int)
+        fail("It should never reach this point")
+      }.catch { shift(fallback) }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "catch - error path and throw" {
+    checkAll(Arb.int(), Arb.string()) { int, msg ->
+      shouldThrow<RuntimeException> {
+        eagerEffect<Int, String> {
+          shift<String>(int)
+          fail("It should never reach this point")
+        }.catch<Int, Nothing, String> { throw RuntimeException(msg) }
+          .runCont()
+      }.message.shouldNotBeNull() shouldBe msg
+    }
+  }
+  
+  "attempt - happy path" {
+    checkAll(Arb.string()) { str ->
+      eagerEffect<Int, String> {
+        str
+      }.attempt { fail("It should never catch a success value") }
+        .runCont() shouldBe str
+    }
+  }
+  
+  "attempt - error path and recover" {
+    checkAll(Arb.string(), Arb.string()) { msg, fallback ->
+      eagerEffect<Int, String> {
+        throw RuntimeException(msg)
+      }.attempt { fallback }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "attempt - error path and re-shift" {
+    checkAll(Arb.string(), Arb.int()) { msg, fallback ->
+      eagerEffect<Int, Unit> {
+        throw RuntimeException(msg)
+      }.attempt { shift(fallback) }
+        .runCont() shouldBe fallback
+    }
+  }
+  
+  "attempt - error path and throw" {
+    checkAll(Arb.string(), Arb.string()) { msg, msg2 ->
+      shouldThrow<RuntimeException> {
+        eagerEffect<Int, String> {
+          throw RuntimeException(msg)
+        }.attempt { throw RuntimeException(msg2) }
+          .runCont()
+      }.message.shouldNotBeNull() shouldBe msg2
+    }
   }
 })

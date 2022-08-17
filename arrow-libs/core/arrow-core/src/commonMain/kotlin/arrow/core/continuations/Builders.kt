@@ -22,13 +22,13 @@ import kotlin.jvm.JvmName
 public inline fun <E, A> either(@BuilderInference block: Shift<E>.() -> A): Either<E, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
-public inline fun <A> nullable(@BuilderInference block: NullableShift.() -> A): A? =
+public inline fun <A> nullable(block: NullableShift.() -> A): A? =
   fold({ block(NullableShift(this)) }, { null }, ::identity)
 
-public inline fun <A> result(@BuilderInference action: ResultShift.() -> A): Result<A> =
+public inline fun <A> result(action: ResultShift.() -> A): Result<A> =
   fold({ action(ResultShift(this)) }, Result.Companion::failure, Result.Companion::success)
 
-public inline fun <A> option(@BuilderInference action: OptionShift.() -> A): Option<A> =
+public inline fun <A> option(action: OptionShift.() -> A): Option<A> =
   fold({ action(OptionShift(this)) }, ::identity, ::Some)
 
 public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorShift<E>.() -> A): Ior<E, A> =

@@ -1,13 +1,10 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect04
 
-import arrow.core.Either
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
 import arrow.core.continuations.catch
 import arrow.core.continuations.attempt
-import arrow.core.continuations.toEither
-import io.kotest.matchers.shouldBe
 
 val failed: Effect<String, Int> =
   effect { shift("failed") }

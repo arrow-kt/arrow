@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.continuations.Shift
 import arrow.core.continuations.either
+import arrow.core.continuations.ensure
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -1485,22 +1486,13 @@ public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = 
  * This is like `flatMap` for the exception.
  */
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  when (this) {
-    is Left -> f(this.value)
-    is Right -> this
-  }
+  catch { f(it).bind() }
 
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  when (this) {
-    is Left -> f(value).right()
-    is Right -> this
-  }
+  catch { f(it) }
 
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  when (this) {
-    is Left -> fe(value).right()
-    is Right -> map(fa)
-  }
+  either { fa(bind()) }.catch { fe(it) }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
@@ -1548,31 +1540,17 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
 public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
-  flatMap { b ->
-    fb.map { c -> f(b, c) }
-  }
+  either { f(bind(), fb.bind()) }
 
 public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
-  flatMap { a ->
-    fb.map { b -> Pair(a, b) }
-  }
+  either { Pair(bind(), fb.bind()) }
 
 public inline fun <A, B, C, D, E> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   map: (B, C, D) -> E
 ): Either<A, E> =
-  zip(
-    c,
-    d,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  either { map(bind(), c.bind(), d.bind()) }
 
 public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1580,17 +1558,7 @@ public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   e: Either<A, E>,
   map: (B, C, D, E) -> F
 ): Either<A, F> =
-  zip(
-    c,
-    d,
-    e,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  either { map(bind(), c.bind(), d.bind(), e.bind()) }
 
 public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1599,17 +1567,7 @@ public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   f: Either<A, F>,
   map: (B, C, D, E, F) -> G
 ): Either<A, G> =
-  zip(
-    c,
-    d,
-    e,
-    f,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
 
 public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1619,16 +1577,7 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H
 ): Either<A, H> =
-  zip(c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ ->
-    map(
-      b,
-      c,
-      d,
-      e,
-      f,
-      g
-    )
-  }
+  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
 
 public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1639,17 +1588,7 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I
 ): Either<A, I> =
-  zip(c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ ->
-    map(
-      b,
-      c,
-      d,
-      e,
-      f,
-      g,
-      h
-    )
-  }
+  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1661,7 +1600,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   i: Either<A, I>,
   map: (B, C, D, E, F, G, H, I) -> J
 ): Either<A, J> =
-  zip(c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1674,7 +1613,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   j: Either<A, J>,
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Either<A, K> =
-  zip(c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   c: Either<A, C>,
@@ -1687,28 +1626,9 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   j: Either<A, J>,
   k: Either<A, K>,
   map: (B, C, D, E, F, G, H, I, J, K) -> L
-): Either<A, L> =
-  flatMap { bb ->
-    c.flatMap { cc ->
-      d.flatMap { dd ->
-        e.flatMap { ee ->
-          f.flatMap { ff ->
-            g.flatMap { gg ->
-              h.flatMap { hh ->
-                i.flatMap { ii ->
-                  j.flatMap { jj ->
-                    k.map { kk ->
-                      map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+): Either<A, L> = either {
+  map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind())
+}
 
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()
@@ -1720,16 +1640,14 @@ public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   }
 
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
-  when (this) {
-    is Right -> if (predicate(this.value)) this else error().left()
-    is Left -> this
+  either {
+    val b = bind()
+    ensure(predicate(b), error)
+    b
   }
 
 public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
-  when (this) {
-    is Left -> fa(this.value)
-    is Right -> fb(this.value)
-  }
+  either { fold({ fa(it).bind() }, { fb(it).bind() }) }
 
 public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   traverse(::identity)
