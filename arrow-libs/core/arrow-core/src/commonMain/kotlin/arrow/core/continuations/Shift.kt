@@ -63,6 +63,11 @@ public interface Shift<in R> {
   
   @EffectDSL
   public suspend fun <A> Effect<R, A>.attempt(
+    @BuilderInference recover: suspend Shift<R>.(Throwable) -> A,
+  ): A = fold({ recover(it) }, { shift(it) }, { it })
+  
+  @EffectDSL
+  public fun <A> EagerEffect<R, A>.attempt(
     @BuilderInference recover: Shift<R>.(Throwable) -> A,
   ): A = fold({ recover(it) }, { shift(it) }, { it })
 }
@@ -91,7 +96,7 @@ public inline fun <R, A> Shift<R>.attempt(
 public inline fun <reified T : Throwable, R, A> Shift<R>.attempt(
   @BuilderInference action: Shift<R>.() -> A,
   @BuilderInference recover: Shift<R>.(T) -> A,
-): A = attempt(action) { if (it is T) recover(it) else throw it }
+): A = attempt(action) { t: Throwable -> if (t is T) recover(t) else throw t }
 
 @EffectDSL
 public inline fun <R> Shift<R>.ensure(condition: Boolean, shift: () -> R): Unit =

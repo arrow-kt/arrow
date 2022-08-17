@@ -199,13 +199,10 @@ import kotlin.jvm.JvmMultifileClass
  * We define a `val failed` of type `Effect<String, Int>`, that represents a failed effect with value "failed".
  *
  * <!--- INCLUDE
- * import arrow.core.Either
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.catch
  * import arrow.core.continuations.attempt
- * import arrow.core.continuations.toEither
- * import io.kotest.matchers.shouldBe
  * -->
  * ```kotlin
  * val failed: Effect<String, Int> =

@@ -11,32 +11,38 @@ import kotlin.jvm.JvmName
 
 @BuilderInference
 public infix fun <E, E2, A> Effect<E, A>.catch(resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
-  effect { catch { e -> resolve(e) } }
+  effect { catch(resolve) }
 
 @BuilderInference
 public infix fun <E, A> Effect<E, A>.attempt(recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
-  effect { attempt({ invoke() }) { t -> recover(t) } }
+  effect { attempt(recover) }
 
 @BuilderInference
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(
   crossinline recover: suspend Shift<E>.(T) -> A,
 ): Effect<E, A> =
-  effect { attempt({ invoke() }) { t: T -> recover(t) } }
+  effect { attempt { t: Throwable -> if (t is T) recover(t) else throw t } }
 
-public  fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
-  effect{ kotlin.runCatching { invoke() }.onFailure { it.nonFatalOrThrow() } }
+public fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
+  effect {
+    try {
+      Result.success(invoke())
+    } catch (e: Throwable) {
+      Result.failure(e.nonFatalOrThrow())
+    }
+  }
 
 @BuilderInference
 public infix fun <E, E2, A> EagerEffect<E, A>.catch(resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
-  eagerEffect { catch { e -> resolve(e) } }
+  eagerEffect { catch(resolve) }
 
 @BuilderInference
 public infix fun <E, A> EagerEffect<E, A>.attempt(recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
-  eagerEffect { attempt({ invoke() }) { t -> recover(t) } }
+  eagerEffect { attempt(recover) }
 
 @JvmName("attemptOrThrow")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.attempt(
   @BuilderInference crossinline recover: Shift<E>.(T) -> A,
 ): EagerEffect<E, A> =
-  eagerEffect { attempt({ invoke() }) { t: T -> recover(t) } }
+  eagerEffect { attempt { t: Throwable -> if (t is T) recover(t) else throw t } }
