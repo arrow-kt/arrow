@@ -3,23 +3,14 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.any
-import arrow.core.test.generators.either
-import arrow.core.test.generators.intSmall
-import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
-import arrow.core.test.generators.suspendFunThatReturnsAnyRight
-import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
-import arrow.core.test.generators.suspendFunThatThrows
+import arrow.core.test.generators.*
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.string
-import io.kotest.property.arbitrary.nonPositiveInt
+import io.kotest.property.arbitrary.*
 
 class EitherTest : UnitSpec() {
 
@@ -571,6 +562,46 @@ class EitherTest : UnitSpec() {
         either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() shouldBe
           either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
+    }
+
+    "Cartesian builder should build products over homogeneous Either" {
+      Either.Right("11th").zip(
+        Semigroup.string(),
+        Either.Right("Doctor"),
+        Either.Right("Who"),
+      ) { a, b, c -> "$a $b $c" } shouldBe Either.Right("11th Doctor Who")
+    }
+
+    "Cartesian builder should build products over heterogeneous Either" {
+      Either.Right(13).zip(
+        Semigroup.string(),
+        Either.Right("Doctor"),
+        Either.Right(false),
+      ) { a, b, c -> "${a}th $b is $c" } shouldBe Either.Right("13th Doctor is false")
+    }
+
+    "Cartesian builder should build products over Either.Left" {
+      Either.Left("fail1").zip(
+        Semigroup.string(),
+        Either.Left("fail2"),
+        Either.Right("Who")
+      ) { _, _, _ -> "success!" } shouldBe Either.Left("fail1fail2")
+    }
+
+    "zip should return Right(f(a)) if both are Right" {
+      Right(10).zip(Semigroup.int(), Either.Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Either.Right(15)
+    }
+
+    "zip should return first Left found if is unique or combine both otherwise" {
+      Left(10).zip(Semigroup.int(), Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Left(10)
+      Right(10).zip<Int, Int, (Int) -> Int, Int>(
+        Semigroup.int(),
+        Either.Left(5)
+      ) { a, ff -> ff(a) } shouldBe Either.Left(5)
+      Left(10).zip<Int, Int, (Int) -> Int, Int>(
+        Semigroup.int(),
+        Either.Left(5)
+      ) { a, ff -> ff(a) } shouldBe Either.Left(15)
     }
   }
 }
