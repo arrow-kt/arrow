@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Validated
@@ -21,7 +23,7 @@ class ParTraverseValidatedTest : ArrowFxSpec(
       (0 until 100).parTraverseValidated(Semigroup.nonEmptyList()) {
         ref.update { it + 1 }.validNel()
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseValidated runs in parallel" {

@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.sequence
 import arrow.core.test.generators.result
@@ -19,7 +21,7 @@ class ParTraverseResultTest : ArrowFxSpec(
       (0 until 100).parTraverseResult {
         Result.success(ref.update { it + 1 })
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseResult runs in parallel" {

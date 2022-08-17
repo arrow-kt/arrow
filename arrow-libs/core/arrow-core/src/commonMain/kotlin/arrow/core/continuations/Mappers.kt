@@ -37,8 +37,10 @@ public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke()
 public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
 /** Run the [Effect] by returning [Result] of [A], [orElse] run the fallback lambda and returning its result of [Result] of [A]. */
-public suspend fun <E, A> Effect<E, A>.toResult(orElse: suspend (E) -> Result<A>): Result<A> = fold({ orElse(it) }, { Result.success(it) })
-public fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): Result<A> = fold({ orElse(it) }, { Result.success(it) })
+public suspend fun <E, A> Effect<E, A>.toResult(orElse: suspend (E) -> Result<A>): Result<A> =
+  fold({ orElse(it) }, { Result.success(it) })
+public fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): Result<A> =
+  fold({ orElse(it) }, { Result.success(it) })
 
 /** Run the [Effect] by returning [Result] of [A], or [Result.Failure] if shifted with [Throwable]. */
 public suspend fun <A> Effect<Throwable, A>.toResult(): Result<A> = result { invoke() }

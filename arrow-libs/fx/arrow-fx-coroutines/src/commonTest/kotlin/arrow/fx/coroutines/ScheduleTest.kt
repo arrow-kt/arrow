@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.Eval
 import io.kotest.assertions.fail
@@ -255,7 +257,7 @@ class ScheduleTest : ArrowFxSpec(
       }
 
       l should leftException(exception)
-      count.get() shouldBe 20_001
+      count.value shouldBe 20_001
     }
 
     "retry succeeds if no exception is thrown" {

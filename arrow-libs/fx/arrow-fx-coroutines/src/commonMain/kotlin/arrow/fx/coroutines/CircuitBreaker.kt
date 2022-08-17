@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.continuations.AtomicRef
+import arrow.atomic.Atomic
 import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
@@ -127,7 +127,7 @@ import kotlin.time.ExperimentalTime
  */
 public class CircuitBreaker
 private constructor(
-  private val state: AtomicRef<State>,
+  private val state: Atomic<State>,
   private val maxFailures: Int,
   private val resetTimeout: Double,
   private val exponentialBackoffFactor: Double,
@@ -140,7 +140,7 @@ private constructor(
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
-  public suspend fun state(): State = state.get()
+  public fun state(): State = state.value
 
   /**
    * Awaits for this `CircuitBreaker` to be [CircuitBreaker.State.Closed].
@@ -151,10 +151,10 @@ private constructor(
    * state again.
    */
   public suspend fun awaitClose(): Unit =
-    when (val curr = state.get()) {
+    when (val curr = state.value) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
-      is State.HalfOpen -> curr.awaitClose.await()
+      is HalfOpen -> curr.awaitClose.await()
     }
 
   /**
@@ -175,7 +175,7 @@ private constructor(
    * If an exception in [fa] occurs it will be rethrown
    */
   public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
-    when (val curr = state.get()) {
+    when (val curr = state.value) {
       is Closed -> {
         val attempt = try {
           Either.Right(fa.invoke())
@@ -191,7 +191,7 @@ private constructor(
           // task to execute, while transitioning into HalfOpen
           if (!state.compareAndSet(
               curr,
-              State.HalfOpen(curr.resetTimeoutNanos, curr.awaitClose)
+              HalfOpen(curr.resetTimeoutNanos, curr.awaitClose)
             )
           ) protectOrThrow(fa) // retry!
           else attemptReset(fa, curr.resetTimeoutNanos, curr.awaitClose, curr.startedAt)
@@ -205,7 +205,7 @@ private constructor(
           )
         }
       }
-      is State.HalfOpen -> {
+      is HalfOpen -> {
         // CircuitBreaker is in HalfOpen state, which means we still reject all
         // tasks, while waiting to see if our reset attempt succeeds or fails
         onRejected.invoke()
@@ -217,7 +217,7 @@ private constructor(
    * triggering the `Open` state if necessary.
    */
   private tailrec suspend fun <A> markOrResetFailures(result: Either<Throwable, A>): A =
-    when (val curr = state.get()) {
+    when (val curr = state.value) {
       is Closed -> {
         when (result) {
           is Either.Right -> {
@@ -280,13 +280,13 @@ private constructor(
           is ExitCase.Cancelled -> {
             // We need to return to Open state
             // otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-            state.set(Open(lastStartedAt, resetTimeout, awaitClose))
+            state.value = Open(lastStartedAt, resetTimeout, awaitClose)
             onOpen.invoke()
           }
           ExitCase.Completed -> {
             // While in HalfOpen only a reset attempt is allowed to update
             // the state, so setting this directly is safe
-            state.set(Closed(0))
+            state.value = Closed(0)
             awaitClose.complete(Unit)
             onClosed.invoke()
           }
@@ -297,7 +297,7 @@ private constructor(
               if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
               else value
             val ts = timeInMillis()
-            state.set(Open(ts, nextTimeout, awaitClose))
+            state.value = Open(ts, nextTimeout, awaitClose)
             onOpen.invoke()
           }
         }
@@ -561,7 +561,7 @@ private constructor(
       onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
       CircuitBreaker(
-        state = AtomicRef(Closed(0)),
+        state = Atomic(Closed(0)),
         maxFailures = requireNotNull(maxFailures.takeIf { it >= 0 }) { "maxFailures expected to be higher than 0" },
         resetTimeout = requireNotNull(resetTimeoutNanos.takeIf { it > 0 }) { "resetTimeoutNanos expected to be higher than 0" },
         exponentialBackoffFactor = requireNotNull(exponentialBackoffFactor.takeIf { it > 0 }) { "exponentialBackoffFactor expected to be higher than 0" },
