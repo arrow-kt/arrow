@@ -1,8 +1,6 @@
 package arrow.core
 
-import arrow.core.Ior.Both
-import arrow.core.Ior.Left
-import arrow.core.Ior.Right
+import arrow.core.Ior.*
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -454,7 +452,11 @@ public sealed class Ior<out A, out B> {
     fold(
       { a -> fa(a).map { Left(it) } },
       { b -> fb(b).map { Right(it) } },
-      { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
+      { a, b ->
+        fa(a).flatMap { aa ->
+          fb(b).map { c -> Both(aa,c) }
+        }
+      }
     )
 
   public inline fun <C, D> bitraverseOption(
