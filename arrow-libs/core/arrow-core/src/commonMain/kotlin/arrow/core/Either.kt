@@ -859,6 +859,15 @@ public sealed class Either<out A, out B> {
   public inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
 
+  public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+    crossinline combine: (first: Error, second: Error) -> Error,
+    transform: (A) -> Either<Error, B>,
+  ): Either<Error, List<B>> {
+
+    TODO()
+  }
+
+
   /**
    * The given function is applied if this is a [Left].
    *
