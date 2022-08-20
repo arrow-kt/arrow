@@ -37,6 +37,9 @@ jobs:
         with:
           arguments: --full-stacktrace mingwX64Test
 
+      - name: Create code coverage report
+        run: ./gradlew koverMergedReport
+
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
         with:
