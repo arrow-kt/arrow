@@ -2720,11 +2720,25 @@ public final class arrow/core/continuations/EffectScopeKt {
 	public static final fun ensureNotNull (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/FoldContinuation : kotlin/coroutines/Continuation {
+public final class arrow/core/continuations/FoldContinuation : arrow/core/continuations/Token, arrow/core/continuations/EffectScope, kotlin/coroutines/Continuation {
+	public field recover Lkotlin/jvm/functions/Function2;
 	public fun <init> (Larrow/core/continuations/Token;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)V
 	public fun <init> (Larrow/core/continuations/Token;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)V
+	public fun <init> (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)V
+	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun getContext ()Lkotlin/coroutines/CoroutineContext;
+	public final fun getRecover ()Lkotlin/jvm/functions/Function2;
 	public fun resumeWith (Ljava/lang/Object;)V
+	public final fun setRecover (Lkotlin/jvm/functions/Function2;)V
+	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/continuations/EagerEffectScope, arrow/typeclasses/Semigroup {
@@ -3004,7 +3018,7 @@ public final class arrow/core/continuations/Suspend : arrow/core/continuations/S
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class arrow/core/continuations/Token {
+public class arrow/core/continuations/Token {
 	public fun <init> ()V
 	public fun toString ()Ljava/lang/String;
 }
