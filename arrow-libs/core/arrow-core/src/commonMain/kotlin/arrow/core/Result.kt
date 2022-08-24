@@ -155,6 +155,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
 ): Result<J> =
   zip(b, c, d, e, f, g, h, i, UnitResult) { a, b, c, d, e, f, g, h, i, _ -> transform(a, b, c, d, e, f, g, h, i) }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -165,31 +166,35 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   h: Result<H>,
   i: Result<I>,
   j: Result<J>,
-  transform: (A, B, C, D, E, F, G, H, I, J) -> K
-): Result<K> = Nullable.zip(
-  getOrNull(),
-  b.getOrNull(),
-  c.getOrNull(),
-  d.getOrNull(),
-  e.getOrNull(),
-  f.getOrNull(),
-  g.getOrNull(),
-  h.getOrNull(),
-  i.getOrNull(),
-  j.getOrNull(),
-  transform
-)?.let { success(it) } ?: composeErrors(
-  exceptionOrNull(),
-  b.exceptionOrNull(),
-  c.exceptionOrNull(),
-  d.exceptionOrNull(),
-  e.exceptionOrNull(),
-  f.exceptionOrNull(),
-  g.exceptionOrNull(),
-  h.exceptionOrNull(),
-  i.exceptionOrNull(),
-  j.exceptionOrNull(),
-)!!.let(::failure)
+  transform: (A, B, C, D, E, F, G, H, I, J) -> K,
+): Result<K> =
+  if (isSuccess && b.isSuccess && c.isSuccess && d.isSuccess && e.isSuccess && f.isSuccess && g.isSuccess && h.isSuccess && i.isSuccess && j.isSuccess)
+    success(
+      transform(
+        getOrNull() as A,
+        b.getOrNull() as B,
+        c.getOrNull() as C,
+        d.getOrNull() as D,
+        e.getOrNull() as E,
+        f.getOrNull() as F,
+        g.getOrNull() as G,
+        h.getOrNull() as H,
+        i.getOrNull() as I,
+        j.getOrNull() as J
+      )
+    ) else
+    composeErrors(
+      exceptionOrNull(),
+      b.exceptionOrNull(),
+      c.exceptionOrNull(),
+      d.exceptionOrNull(),
+      e.exceptionOrNull(),
+      f.exceptionOrNull(),
+      g.exceptionOrNull(),
+      h.exceptionOrNull(),
+      i.exceptionOrNull(),
+      j.exceptionOrNull(),
+    )!!.let(::failure)
 
 @PublishedApi
 internal fun composeErrors(vararg other: Throwable?): Throwable? =
