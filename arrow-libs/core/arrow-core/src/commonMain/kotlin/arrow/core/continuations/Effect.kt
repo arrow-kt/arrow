@@ -17,7 +17,7 @@ import kotlin.jvm.JvmMultifileClass
       * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
       * [Handling errors](#handling-errors)
         * [recover](#recover)
-        * [attempt](#attempt)
+        * [catch](#catch)
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
@@ -187,7 +187,7 @@ import kotlin.jvm.JvmMultifileClass
  * There are two separate handlers to transform either of the error channels.
  *
  * - `recover` to handle, and transform any error of type `R`.
- * - `attempt` to handle, and transform and error of type `Throwable`.
+ * - `catch` to handle, and transform and error of type `Throwable`.
  *
  * ### recover
  *
@@ -202,7 +202,7 @@ import kotlin.jvm.JvmMultifileClass
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.recover
- * import arrow.core.continuations.attempt
+ * import arrow.core.continuations.catch
  * -->
  * ```kotlin
  * val failed: Effect<String, Int> =
@@ -248,9 +248,9 @@ import kotlin.jvm.JvmMultifileClass
  *   failed.recover { str -> throw RuntimeException(str) }
  * ```
  *
- * ### attempt
+ * ### catch
  *
- * `attempt` gives us the same powers as `recover`, but instead of resolving `R` we're recovering from any unexpected `Throwable`.
+ * `catch` gives us the same powers as `recover`, but instead of resolving `R` we're recovering from any unexpected `Throwable`.
  * Unexpected, because the expectation is that all `Throwable` get turned into `R` unless it's a fatal/unexpected.
  * This operator is useful when you need to work/wrap foreign code, especially Java SDKs or any code that is heavily based on exceptions.
  *
@@ -262,40 +262,40 @@ import kotlin.jvm.JvmMultifileClass
  * }
  * ```
  *
- * We can `attempt` to run the effect recovering from any exception,
+ * We can `catch` to run the effect recovering from any exception,
  * and recover it by providing a default value of `-1` or the length of the [Throwable.message].
  *
  * ```kotlin
  * val default3: Effect<String, Int> =
- *   foreign.attempt { -1 }
+ *   foreign.catch { -1 }
  *
  * val resolved3: Effect<String, Int> =
- *   foreign.attempt { it.message?.length ?: -1 }
+ *   foreign.catch { it.message?.length ?: -1 }
  * ```
  *
- * A big difference with `recover` is that `attempt` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
- * You can however compose `recover`, and `attempt` to resolve the error type **and** recover the exception.
+ * A big difference with `recover` is that `catch` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
+ * You can however compose `recover`, and `v` to resolve the error type **and** recover the exception.
  *
  * ```kotlin
  * val default4: Effect<Nothing, Int> =
  *   foreign
  *     .recover<String, Nothing, Int> { -1 }
- *     .attempt { -2 }
+ *     .catch { -2 }
  * ```
  *
- * `attempt` however offers an overload that can _refine the exception_.
+ * `catch` however offers an overload that can _refine the exception_.
  * Let's say you're wrapping some database interactions that might throw `java.sql.SqlException`, or `org.postgresql.util.PSQLException`,
- * then you might only be interested in those exceptions and not `Throwable`. `attempt` allows you to install multiple handlers for specific exceptions.
+ * then you might only be interested in those exceptions and not `Throwable`. `catch` allows you to install multiple handlers for specific exceptions.
  * If the desired exception is not matched, then it stays in the `suspend` exception channel and will be thrown or recovered at a later point.
  *
  * ```kotlin
  * val default5: Effect<String, Int> =
  *   foreign
- *     .attempt { ex: RuntimeException -> -1 }
- *     .attempt { ex: java.sql.SQLException -> -2 }
+ *     .catch { ex: RuntimeException -> -1 }
+ *     .catch { ex: java.sql.SQLException -> -2 }
  * ```
  *
- * Finally, since `attempt` also supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
+ * Finally, since `catch` also supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
  * This can be useful if refinement of exceptions is not sufficient, for example in the case of `org.postgresql.util.PSQLException` you might want to
  * check the `SQLState` to check for a `foreign key violation` and rethrow the exception if not matched.
  *
@@ -303,7 +303,7 @@ import kotlin.jvm.JvmMultifileClass
  * suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
  *
  * val rethrown: Effect<String, Int> =
- *   failed.attempt { ex: java.sql.SQLException ->
+ *   failed.catch { ex: java.sql.SQLException ->
  *     if(ex.isForeignKeyViolation()) shift("foreign key violation")
  *     else throw ex
  *   }

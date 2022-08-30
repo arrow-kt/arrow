@@ -335,7 +335,7 @@ class EffectSpec :
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
           str()
-        }.attempt { fail("It should never catch a success value") }
+        }.catch { fail("It should never catch a success value") }
           .runCont() shouldBe str()
       }
     }
@@ -344,7 +344,7 @@ class EffectSpec :
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
           throw RuntimeException(msg())
-        }.attempt { fallback() }
+        }.catch { fallback() }
           .runCont() shouldBe fallback()
       }
     }
@@ -353,7 +353,7 @@ class EffectSpec :
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
         effect<Int, Unit> {
           throw RuntimeException(msg())
-        }.attempt { shift(fallback()) }
+        }.catch { shift(fallback()) }
           .runCont() shouldBe fallback()
       }
     }
@@ -363,7 +363,7 @@ class EffectSpec :
         shouldThrow<RuntimeException> {
           effect<Int, String> {
             throw RuntimeException(msg())
-          }.attempt { throw RuntimeException(msg2()) }
+          }.catch { throw RuntimeException(msg2()) }
             .runCont()
         }.message.shouldNotBeNull() shouldBe msg2()
       }

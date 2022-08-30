@@ -2,15 +2,15 @@
 package arrow.core.examples.exampleEffectError03
 
 import arrow.core.continuations.effect
-import arrow.core.continuations.attempt
+import arrow.core.continuations.catch
 
 object User
 object Error
 
 val x = effect<Error, User> {
   throw IllegalArgumentException("builder missed args")
-}.attempt { shift(Error) }
+}.catch { shift(Error) }
 
 val y = effect<Nothing, User> {
   throw IllegalArgumentException("builder missed args")
-}.attempt<IllegalArgumentException, Error, User> { shift(Error) }
+}.catch<IllegalArgumentException, Error, User> { shift(Error) }

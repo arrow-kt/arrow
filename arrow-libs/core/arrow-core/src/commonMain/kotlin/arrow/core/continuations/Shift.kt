@@ -62,12 +62,12 @@ public interface Shift<in R> {
   ): A = fold({ action(this) }, { recover(it) }, { resolve(it) }, { it })
   
   @EffectDSL
-  public suspend fun <A> Effect<R, A>.attempt(
+  public suspend fun <A> Effect<R, A>.catch(
     @BuilderInference recover: suspend Shift<R>.(Throwable) -> A,
   ): A = fold({ recover(it) }, { shift(it) }, { it })
   
   @EffectDSL
-  public fun <A> EagerEffect<R, A>.attempt(
+  public fun <A> EagerEffect<R, A>.catch(
     @BuilderInference recover: Shift<R>.(Throwable) -> A,
   ): A = fold({ recover(it) }, { shift(it) }, { it })
 }
@@ -86,17 +86,17 @@ public inline fun <R, E, A> Shift<R>.recover(
 ): A = fold({ action(this) }, { recover(it) }, { resolve(it) }, { it })
 
 @EffectDSL
-public inline fun <R, A> Shift<R>.attempt(
+public inline fun <R, A> Shift<R>.catch(
   @BuilderInference action: Shift<R>.() -> A,
   @BuilderInference recover: Shift<R>.(Throwable) -> A,
 ): A = fold({ action(this) }, { recover(it) }, { shift(it) }, { it })
 
 @EffectDSL
-@JvmName("attemptOrThrow")
-public inline fun <reified T : Throwable, R, A> Shift<R>.attempt(
+@JvmName("catchOrThrow")
+public inline fun <reified T : Throwable, R, A> Shift<R>.catch(
   @BuilderInference action: Shift<R>.() -> A,
   @BuilderInference recover: Shift<R>.(T) -> A,
-): A = attempt(action) { t: Throwable -> if (t is T) recover(t) else throw t }
+): A = catch(action) { t: Throwable -> if (t is T) recover(t) else throw t }
 
 @EffectDSL
 public inline fun <R> Shift<R>.ensure(condition: Boolean, shift: () -> R): Unit =

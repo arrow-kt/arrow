@@ -177,7 +177,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
-      }.attempt { fail("It should never catch a success value") }
+      }.catch { fail("It should never catch a success value") }
         .runCont() shouldBe str
     }
   }
@@ -186,7 +186,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string(), Arb.string()) { msg, fallback ->
       eagerEffect<Int, String> {
         throw RuntimeException(msg)
-      }.attempt { fallback }
+      }.catch { fallback }
         .runCont() shouldBe fallback
     }
   }
@@ -195,7 +195,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
-      }.attempt { shift(fallback) }
+      }.catch { shift(fallback) }
         .runCont() shouldBe fallback
     }
   }
@@ -205,7 +205,7 @@ class EagerEffectSpec : StringSpec({
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
           throw RuntimeException(msg)
-        }.attempt { throw RuntimeException(msg2) }
+        }.catch { throw RuntimeException(msg2) }
           .runCont()
       }.message.shouldNotBeNull() shouldBe msg2
     }

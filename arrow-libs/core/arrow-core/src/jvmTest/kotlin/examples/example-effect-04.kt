@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEffect04
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
 import arrow.core.continuations.recover
-import arrow.core.continuations.attempt
+import arrow.core.continuations.catch
 
 val failed: Effect<String, Int> =
   effect { shift("failed") }
@@ -31,25 +31,25 @@ val foreign = effect<String, Int> {
 }
 
 val default3: Effect<String, Int> =
-  foreign.attempt { -1 }
+  foreign.catch { -1 }
 
 val resolved3: Effect<String, Int> =
-  foreign.attempt { it.message?.length ?: -1 }
+  foreign.catch { it.message?.length ?: -1 }
 
 val default4: Effect<Nothing, Int> =
   foreign
     .recover<String, Nothing, Int> { -1 }
-    .attempt { -2 }
+    .catch { -2 }
 
 val default5: Effect<String, Int> =
   foreign
-    .attempt { ex: RuntimeException -> -1 }
-    .attempt { ex: java.sql.SQLException -> -2 }
+    .catch { ex: RuntimeException -> -1 }
+    .catch { ex: java.sql.SQLException -> -2 }
 
 suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
 
 val rethrown: Effect<String, Int> =
-  failed.attempt { ex: java.sql.SQLException ->
+  failed.catch { ex: java.sql.SQLException ->
     if(ex.isForeignKeyViolation()) shift("foreign key violation")
     else throw ex
   }

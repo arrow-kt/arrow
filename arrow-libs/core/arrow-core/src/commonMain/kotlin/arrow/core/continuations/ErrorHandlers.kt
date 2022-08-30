@@ -34,43 +34,43 @@ public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: susp
   effect { recover(resolve) }
 
 /**
- * Attempt to run the effect, and [recover] from any unexpected exceptions.
+ * Catch any unexpected exceptions, and [resolve] them.
  * You can either return a value a new value of [A],
  * or short-circuit the effect by shifting with a value of [E],
  * or raise an exception into [suspend].
  *
  * ```kotlin
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.attempt
+ * import arrow.core.continuations.catch
  *
  * object User
  * object Error
  *
  * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
  *
- * val a = exception.attempt { error -> error.message?.length ?: -1 } // Success(5)
- * val b = exception.attempt { shift(Error) } // Shift(error)
- * val c = exception.attempt { throw  RuntimeException("other-failure") } // Exception(other-failure)
+ * val a = exception.catch { error -> error.message?.length ?: -1 } // Success(5)
+ * val b = exception.catch { shift(Error) } // Shift(error)
+ * val c = exception.catch { throw  RuntimeException("other-failure") } // Exception(other-failure)
  * ```
  * <!--- KNIT example-effect-error-02.kt -->
  */
-public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
-  effect { attempt(recover) }
+public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
+  effect { catch(resolve) }
 
 /**
- * A version of [attempt] that refines the [Throwable] to [T].
+ * A version of [catch] that refines the [Throwable] to [T].
  * This is useful for wrapping foreign code, such as database, network calls, etc.
  *
  * ```kotlin
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.attempt
+ * import arrow.core.continuations.catch
  *
  * object User
  * object Error
  *
  * val x = effect<Error, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.attempt { shift(Error) }
+ * }.catch { shift(Error) }
  * ```
  *
  * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
@@ -78,18 +78,18 @@ public infix fun <E, A> Effect<E, A>.attempt(@BuilderInference recover: suspend 
  * ```kotlin
  * val y = effect<Nothing, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.attempt<IllegalArgumentException, Error, User> { shift(Error) }
+ * }.catch<IllegalArgumentException, Error, User> { shift(Error) }
  * ```
  * <!--- KNIT example-effect-error-03.kt -->
  */
-@JvmName("attemptOrThrow")
-public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.attempt(
+@JvmName("catchOrThrow")
+public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.catch(
   @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
 ): Effect<E, A> =
-  effect { attempt { t: Throwable -> if (t is T) recover(t) else throw t } }
+  effect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
 
 /** Runs the [Effect] and captures any [nonFatalOrThrow] exception into [Result]. */
-public fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
+public fun <E, A> Effect<E, A>.catch(): Effect<E, Result<A>> =
   effect {
     try {
       Result.success(invoke())
@@ -101,11 +101,11 @@ public fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
 public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
   eagerEffect { recover(resolve) }
 
-public infix fun <E, A> EagerEffect<E, A>.attempt(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
-  eagerEffect { attempt(recover) }
+public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
+  eagerEffect { catch(recover) }
 
-@JvmName("attemptOrThrow")
-public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.attempt(
+@JvmName("catchOrThrow")
+public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
   @BuilderInference crossinline recover: Shift<E>.(T) -> A,
 ): EagerEffect<E, A> =
-  eagerEffect { attempt { t: Throwable -> if (t is T) recover(t) else throw t } }
+  eagerEffect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
