@@ -38,7 +38,14 @@ jobs:
           arguments: --full-stacktrace mingwX64Test
 
       - name: Create code coverage report
+        if: matrix.os == 'ubuntu-latest'
         run: ./gradlew koverMergedReport
+
+      - name: Upload coverage report (CodeCov)
+        uses: codecov/codecov-action@v3.1.0
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          files: build/reports/kover/merged/xml/report.xml
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
