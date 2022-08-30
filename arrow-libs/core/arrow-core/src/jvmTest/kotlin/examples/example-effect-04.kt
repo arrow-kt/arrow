@@ -3,28 +3,28 @@ package arrow.core.examples.exampleEffect04
 
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
-import arrow.core.continuations.catch
+import arrow.core.continuations.recover
 import arrow.core.continuations.attempt
 
 val failed: Effect<String, Int> =
   effect { shift("failed") }
 
 val default: Effect<Nothing, Int> =
-  failed.catch { -1 }
+  failed.recover { -1 }
 
 val resolved: Effect<Nothing, Int> =
-  failed.catch { it.length }
+  failed.recover { it.length }
 
 val default2: Effect<Double, Int> = default
 val resolved2: Effect<Unit, Int> = resolved
 
 val newError: Effect<List<Char>, Int> =
-  failed.catch { str ->
+  failed.recover { str ->
     shift(str.reversed().toList())
   }
 
 val newException: Effect<Nothing, Int> =
-  failed.catch { str -> throw RuntimeException(str) }
+  failed.recover { str -> throw RuntimeException(str) }
 
 val foreign = effect<String, Int> {
   throw RuntimeException("BOOM!")
@@ -38,7 +38,7 @@ val resolved3: Effect<String, Int> =
 
 val default4: Effect<Nothing, Int> =
   foreign
-    .catch<String, Nothing, Int> { -1 }
+    .recover<String, Nothing, Int> { -1 }
     .attempt { -2 }
 
 val default5: Effect<String, Int> =

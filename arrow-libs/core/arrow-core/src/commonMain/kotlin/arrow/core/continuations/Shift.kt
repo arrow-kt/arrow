@@ -47,15 +47,15 @@ public interface Shift<in R> {
     fold(::identity) { throwable -> shift(transform(throwable)) }
   
   @EffectDSL
-  public suspend infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<R>.(E) -> A): A =
-    catch({ invoke() }) { resolve(it) }
+  public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Shift<R>.(E) -> A): A =
+    recover({ invoke() }) { resolve(it) }
   
   @EffectDSL
-  public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference resolve: Shift<R>.(E) -> A): A =
-    catch({ invoke() }, resolve)
+  public infix fun <E, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Shift<R>.(E) -> A): A =
+    recover({ invoke() }, resolve)
   
   @EffectDSL
-  public suspend fun <E, A> Effect<E, A>.catch(
+  public suspend fun <E, A> Effect<E, A>.recover(
     @BuilderInference action: suspend Shift<E>.() -> A,
     @BuilderInference resolve: suspend Shift<R>.(E) -> A,
     @BuilderInference recover: suspend Shift<R>.(Throwable) -> A,
@@ -73,13 +73,13 @@ public interface Shift<in R> {
 }
 
 @EffectDSL
-public inline fun <R, E, A> Shift<R>.catch(
+public inline fun <R, E, A> Shift<R>.recover(
   @BuilderInference action: Shift<E>.() -> A,
   @BuilderInference resolve: Shift<R>.(E) -> A
 ): A = fold<E, A, A>({ action(this) }, { throw it }, { resolve(it) }, { it })
 
 @EffectDSL
-public inline fun <R, E, A> Shift<R>.catch(
+public inline fun <R, E, A> Shift<R>.recover(
   @BuilderInference action: Shift<E>.() -> A,
   @BuilderInference resolve: Shift<R>.(E) -> A,
   @BuilderInference recover: Shift<R>.(Throwable) -> A,

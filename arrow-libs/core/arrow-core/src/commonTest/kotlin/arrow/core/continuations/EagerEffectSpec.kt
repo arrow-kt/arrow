@@ -65,7 +65,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
           shift(l)
-        } catch { ll ->
+        } recover { ll ->
           ll shouldBe l
           i
         }
@@ -78,7 +78,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
           i
-        } catch { ll ->
+        } recover { ll ->
           ll shouldBe l
           i + 1
         }
@@ -91,7 +91,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect {
         eagerEffect<Long, Int> {
           shift(l)
-        } catch { ll ->
+        } recover { ll ->
           ll shouldBe l
           shift(error)
         }
@@ -136,7 +136,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
-      }.catch<Int, Nothing, String> { fail("It should never catch a success value") }
+      }.recover<Int, Nothing, String> { fail("It should never catch a success value") }
         .runCont() shouldBe str
     }
   }
@@ -146,7 +146,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<Int, String> {
         shift<String>(int)
         fail("It should never reach this point")
-      }.catch<Int, Nothing, String> { fallback }
+      }.recover<Int, Nothing, String> { fallback }
         .runCont() shouldBe fallback
     }
   }
@@ -156,7 +156,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<Int, Unit> {
         shift<String>(int)
         fail("It should never reach this point")
-      }.catch { shift(fallback) }
+      }.recover { shift(fallback) }
         .runCont() shouldBe fallback
     }
   }
@@ -167,7 +167,7 @@ class EagerEffectSpec : StringSpec({
         eagerEffect<Int, String> {
           shift<String>(int)
           fail("It should never reach this point")
-        }.catch<Int, Nothing, String> { throw RuntimeException(msg) }
+        }.recover<Int, Nothing, String> { throw RuntimeException(msg) }
           .runCont()
       }.message.shouldNotBeNull() shouldBe msg
     }

@@ -16,7 +16,7 @@ import kotlin.jvm.JvmMultifileClass
 
       * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
       * [Handling errors](#handling-errors)
-        * [catch](#catch)
+        * [recover](#recover)
         * [attempt](#attempt)
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
@@ -186,12 +186,12 @@ import kotlin.jvm.JvmMultifileClass
  * An Effect<R, A> has 2 error channels: `Throwable` and `R`
  * There are two separate handlers to transform either of the error channels.
  *
- * - `catch` to handle, and transform any error of type `R`.
+ * - `recover` to handle, and transform any error of type `R`.
  * - `attempt` to handle, and transform and error of type `Throwable`.
  *
- * ### catch
+ * ### recover
  *
- * `catch` handles the error of type `R`,
+ * `recover` handles the error of type `R`,
  * by providing a new value of type `A`, raising a different error of type `E`, or throwing an exception.
  *
  * Let's take a look at some examples:
@@ -201,7 +201,7 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
+ * import arrow.core.continuations.recover
  * import arrow.core.continuations.attempt
  * -->
  * ```kotlin
@@ -209,14 +209,14 @@ import kotlin.jvm.JvmMultifileClass
  *   effect { shift("failed") }
  * ```
  *
- * We can `catch` the failure, and resolve it by providing a default value of `-1` or the length of the `error: String`.
+ * We can `recover` the failure, and resolve it by providing a default value of `-1` or the length of the `error: String`.
  *
  * ```kotlin
  * val default: Effect<Nothing, Int> =
- *   failed.catch { -1 }
+ *   failed.recover { -1 }
  *
  * val resolved: Effect<Nothing, Int> =
- *   failed.catch { it.length }
+ *   failed.recover { it.length }
  * ```
  *
  * As you can see the resulting `error` is now of type `Nothing`, since we did not raise any new errors.
@@ -229,28 +229,28 @@ import kotlin.jvm.JvmMultifileClass
  * val resolved2: Effect<Unit, Int> = resolved
  * ```
  *
- * `catch` also allows us to _change_ the error type when we resolve the error of type `R`.
+ * `recover` also allows us to _change_ the error type when we resolve the error of type `R`.
  * Below we handle our error of `String` and turn it into `List<Char>` using `reversed().toList()`.
  * This is a powerful operation, since it allows us to transform our error types across boundaries or layers.
  *
  * ```kotlin
  * val newError: Effect<List<Char>, Int> =
- *   failed.catch { str ->
+ *   failed.recover { str ->
  *     shift(str.reversed().toList())
  *   }
  * ```
  *
- * Finally, since `catch` supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
+ * Finally, since `recover` supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
  * This is typically undesired, since you should prefer lifting `Throwable` into typed values of `R` to make them compile-time tracked.
  *
  * ```kotlin
  * val newException: Effect<Nothing, Int> =
- *   failed.catch { str -> throw RuntimeException(str) }
+ *   failed.recover { str -> throw RuntimeException(str) }
  * ```
  *
  * ### attempt
  *
- * `attempt` gives us the same powers as `catch`, but instead of resolving `R` we're recovering from any unexpected `Throwable`.
+ * `attempt` gives us the same powers as `recover`, but instead of resolving `R` we're recovering from any unexpected `Throwable`.
  * Unexpected, because the expectation is that all `Throwable` get turned into `R` unless it's a fatal/unexpected.
  * This operator is useful when you need to work/wrap foreign code, especially Java SDKs or any code that is heavily based on exceptions.
  *
@@ -273,13 +273,13 @@ import kotlin.jvm.JvmMultifileClass
  *   foreign.attempt { it.message?.length ?: -1 }
  * ```
  *
- * A big difference with `catch` is that `attempt` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
- * You can however compose `catch`, and `attempt` to resolve the error type **and** recover the exception.
+ * A big difference with `recover` is that `attempt` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
+ * You can however compose `recover`, and `attempt` to resolve the error type **and** recover the exception.
  *
  * ```kotlin
  * val default4: Effect<Nothing, Int> =
  *   foreign
- *     .catch<String, Nothing, Int> { -1 }
+ *     .recover<String, Nothing, Int> { -1 }
  *     .attempt { -2 }
  * ```
  *

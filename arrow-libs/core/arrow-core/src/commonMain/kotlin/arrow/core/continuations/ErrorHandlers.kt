@@ -17,21 +17,21 @@ import kotlin.jvm.JvmName
  *
  * ```kotlin
  * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
+ * import arrow.core.continuations.recover
  *
  * object User
  * object Error
  *
  * val error = effect<Error, User> { shift(Error) } // // Shift(error)
  *
- * val a = error.catch<Error, Error, User> { error -> User } // Success(User)
- * val b = error.catch<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
- * val c = error.catch<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * val a = error.recover<Error, Error, User> { error -> User } // Success(User)
+ * val b = error.recover<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
+ * val c = error.recover<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
  * <!--- KNIT example-effect-error-01.kt -->
  */
-public infix fun <E, E2, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
-  effect { catch(resolve) }
+public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
+  effect { recover(resolve) }
 
 /**
  * Attempt to run the effect, and [recover] from any unexpected exceptions.
@@ -98,8 +98,8 @@ public fun <E, A> Effect<E, A>.attempt(): Effect<E, Result<A>> =
     }
   }
 
-public infix fun <E, E2, A> EagerEffect<E, A>.catch(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
-  eagerEffect { catch(resolve) }
+public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+  eagerEffect { recover(resolve) }
 
 public infix fun <E, A> EagerEffect<E, A>.attempt(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
   eagerEffect { attempt(recover) }

@@ -76,7 +76,7 @@ class EffectSpec :
         effect<String, Int> {
           effect<Long, Int> {
             shift(l())
-          } catch { ll ->
+          } recover { ll ->
             ll shouldBe l()
             i()
           }
@@ -89,7 +89,7 @@ class EffectSpec :
         effect<String, Int> {
           effect<Long, Int> {
             i()
-          } catch { ll ->
+          } recover { ll ->
             ll shouldBe l()
             i() + 1
           }
@@ -222,7 +222,7 @@ class EffectSpec :
         }
         
         val newError: Effect<List<Char>, Int> =
-          failed.catch { str ->
+          failed.recover { str ->
             shift(str.reversed().toList())
           }
         
@@ -294,7 +294,7 @@ class EffectSpec :
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
           str()
-        }.catch<Int, Nothing, String> { fail("It should never catch a success value") }
+        }.recover<Int, Nothing, String> { fail("It should never catch a success value") }
           .runCont() shouldBe str()
       }
     }
@@ -304,7 +304,7 @@ class EffectSpec :
         effect<Int, String> {
           shift<String>(int())
           fail("It should never reach this point")
-        }.catch<Int, Nothing, String> { fallback() }
+        }.recover<Int, Nothing, String> { fallback() }
           .runCont() shouldBe fallback()
       }
     }
@@ -314,7 +314,7 @@ class EffectSpec :
         effect<Int, Unit> {
           shift<String>(int())
           fail("It should never reach this point")
-        }.catch { shift(fallback()) }
+        }.recover { shift(fallback()) }
           .runCont() shouldBe fallback()
       }
     }
@@ -325,7 +325,7 @@ class EffectSpec :
           effect<Int, String> {
             shift<String>(int())
             fail("It should never reach this point")
-          }.catch<Int, Nothing, String> { throw RuntimeException(msg()) }
+          }.recover<Int, Nothing, String> { throw RuntimeException(msg()) }
             .runCont()
         }.message.shouldNotBeNull() shouldBe msg()
       }
