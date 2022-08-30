@@ -1232,10 +1232,30 @@ public sealed class Either<out A, out B> {
     map { Unit }
 }
 
-public inline fun <E2, E, A> Either<E, A>.catch(block: Shift<E2>.(E) -> A): Either<E2, A> =
+/**
+ * Recover from [E] when encountering [Left].
+ * You can either return a new value of [A], or short-circuit by shifting with a value of [E2].
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.left
+ * import arrow.core.recover
+ *
+ * object User
+ * object Error
+ *
+ * val error: Either<Error, User> = Error.left()
+ *
+ * val a: Either<Error, User> = error.recover { error -> User } // Either.Right(User)
+ * val b: Either<String, User> = error.recover { error -> shift("other-failure") } // Either.Left(other-failure)
+ * val c: Either<Nothing, User> = error.recover { error -> User } // Either.Right(User)
+ * ```
+ * <!--- KNIT example-either.kt -->
+ */
+public inline fun <E2, E, A> Either<E, A>.recover(recover: Shift<E2>.(E) -> A): Either<E2, A> =
   when (this) {
     is Right -> this
-    is Left -> either { block(value) }
+    is Left -> either { recover(value) }
   }
 
 /**
@@ -1486,13 +1506,13 @@ public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = 
  * This is like `flatMap` for the exception.
  */
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  catch { f(it).bind() }
+  recover { f(it).bind() }
 
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  catch { f(it) }
+  recover { f(it) }
 
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  either { fa(bind()) }.catch { fe(it) }
+  either { fa(bind()) }.recover { fe(it) }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
