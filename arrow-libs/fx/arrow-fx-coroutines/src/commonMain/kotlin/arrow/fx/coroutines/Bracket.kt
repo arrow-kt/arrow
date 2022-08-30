@@ -1,9 +1,15 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines
 
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
+import kotlin.contracts.contract
 
 public sealed class ExitCase {
   public object Completed : ExitCase() {
@@ -28,11 +34,17 @@ public sealed class ExitCase {
  */
 public suspend inline fun <A> onCancel(
   fa: suspend () -> A,
-  crossinline onCancel: suspend () -> Unit
-): A = guaranteeCase(fa) { case ->
-  when (case) {
-    is ExitCase.Cancelled -> onCancel.invoke()
-    else -> Unit
+  crossinline onCancel: suspend () -> Unit,
+): A {
+  contract {
+    callsInPlace(fa, EXACTLY_ONCE)
+    callsInPlace(onCancel, AT_MOST_ONCE)
+  }
+  return guaranteeCase(fa) { case ->
+    when (case) {
+      is ExitCase.Cancelled -> onCancel.invoke()
+      else -> Unit
+    }
   }
 }
 
@@ -53,6 +65,10 @@ public suspend inline fun <A> guarantee(
   fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
 ): A {
+  contract {
+    callsInPlace(fa, EXACTLY_ONCE)
+    callsInPlace(finalizer, EXACTLY_ONCE)
+  }
   val res = try {
     fa.invoke()
   } catch (e: CancellationException) {
@@ -82,6 +98,10 @@ public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
 ): A {
+  contract {
+    callsInPlace(fa, EXACTLY_ONCE)
+    callsInPlace(finalizer, EXACTLY_ONCE)
+  }
   val res = try {
     fa()
   } catch (e: CancellationException) {
@@ -138,6 +158,12 @@ public suspend inline fun <A, B> bracket(
   use: suspend (A) -> B,
   crossinline release: suspend (A) -> Unit
 ): B {
+  contract {
+    callsInPlace(acquire, EXACTLY_ONCE)
+    callsInPlace(use, AT_MOST_ONCE)
+    callsInPlace(release, EXACTLY_ONCE)
+  }
+  
   val acquired = withContext(NonCancellable) {
     acquire()
   }
@@ -221,6 +247,12 @@ public suspend inline fun <A, B> bracketCase(
   use: suspend (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit
 ): B {
+  contract {
+    callsInPlace(acquire, EXACTLY_ONCE)
+    callsInPlace(use, AT_MOST_ONCE)
+    callsInPlace(release, EXACTLY_ONCE)
+  }
+  
   val acquired = withContext(NonCancellable) {
     acquire()
   }

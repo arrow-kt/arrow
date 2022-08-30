@@ -6,6 +6,7 @@ import kotlin.jvm.JvmName
 internal const val ArrowExceptionMessage =
   "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
 
+@Deprecated("Going to be removed from binary in Arrow 2.0")
 internal class ArrowInternalException(override val message: String = ArrowExceptionMessage) : RuntimeException(message)
 
 public object Platform {
