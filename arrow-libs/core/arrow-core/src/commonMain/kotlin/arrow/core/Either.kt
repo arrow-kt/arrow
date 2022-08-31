@@ -1250,7 +1250,7 @@ public sealed class Either<out A, out B> {
  * val b: Either<String, User> = error.recover { error -> shift("other-failure") } // Either.Left(other-failure)
  * val c: Either<Nothing, User> = error.recover { error -> User } // Either.Right(User)
  * ```
- * <!--- KNIT example-either.kt -->
+ * <!--- KNIT example-either-45.kt -->
  */
 public inline fun <E2, E, A> Either<E, A>.recover(recover: Shift<E2>.(E) -> A): Either<E2, A> =
   when (this) {
@@ -1286,7 +1286,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  *   Left(12).getOrElse { 17 }  // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-45.kt -->
+ * <!--- KNIT example-either-46.kt -->
  */
 public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
@@ -1304,7 +1304,7 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  *   Left(12).orNull()  // Result: null
  * }
  * ```
- * <!--- KNIT example-either-46.kt -->
+ * <!--- KNIT example-either-47.kt -->
  */
 @Deprecated("Duplicated API. Please use Either's member function orNull. This will be removed towards Arrow 2.0", ReplaceWith("orNull()"))
 public fun <B> Either<*, B>.orNull(): B? =
@@ -1325,7 +1325,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  *   Left(12).getOrHandle { it + 5 } // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-47.kt -->
+ * <!--- KNIT example-either-48.kt -->
  */
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1353,7 +1353,7 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  *   left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-48.kt -->
+ * <!--- KNIT example-either-49.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
@@ -1386,7 +1386,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-either-49.kt -->
+ * <!--- KNIT example-either-50.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap {
@@ -1408,7 +1408,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-50.kt -->
+ * <!--- KNIT example-either-51.kt -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
@@ -1433,7 +1433,7 @@ public inline fun <A> Either<A, A>.merge(): A =
  *   Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-51.kt -->
+ * <!--- KNIT example-either-52.kt -->
  */
 public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   flatMap { it.rightIfNotNull { default() } }
@@ -1485,7 +1485,7 @@ public fun <A> A.right(): Either<Nothing, A> = Right(this)
  *   null.rightIfNotNull { "left" }    // Left(a="left")
  * }
  * ```
- * <!--- KNIT example-either-52.kt -->
+ * <!--- KNIT example-either-53.kt -->
  */
 public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Left(default())
@@ -1551,7 +1551,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-either-53.kt -->
+ * <!--- KNIT example-either-54.kt -->
  */
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
