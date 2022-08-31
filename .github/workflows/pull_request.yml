@@ -44,6 +44,7 @@ jobs:
       - name: Add coverage to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.2
+        if: matrix.os == 'ubuntu-latest'
         with:
           paths: ${{ github.workspace }}/build/reports/kover/merged/xml/report.xml
           token: ${{ secrets.GITHUB_TOKEN }}
