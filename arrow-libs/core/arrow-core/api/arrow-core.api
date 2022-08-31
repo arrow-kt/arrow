@@ -244,7 +244,6 @@ public final class arrow/core/EitherKt {
 	public static final fun bisequenceNullable (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun bisequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun bisequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
-	public static final fun catch (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combine (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
 	public static final fun combineK (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
@@ -264,6 +263,7 @@ public final class arrow/core/EitherKt {
 	public static final fun leftWiden (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun merge (Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun orNull (Larrow/core/Either;)Ljava/lang/Object;
+	public static final fun recover (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun redeem (Larrow/core/Either;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun redeemWith (Larrow/core/Either;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun replicate (Larrow/core/Either;ILarrow/typeclasses/Monoid;)Larrow/core/Either;
