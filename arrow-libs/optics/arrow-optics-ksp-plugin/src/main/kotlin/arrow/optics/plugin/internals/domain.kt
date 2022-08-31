@@ -2,24 +2,33 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getVisibility
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSName
-import com.google.devtools.ksp.symbol.Visibility
+import com.google.devtools.ksp.symbol.*
 import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
   val sourceClassName = declaration.qualifiedNameOrSimpleName
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
-  val simpleName = declaration.simpleName.asString()
+  val simpleName = declaration.nameWithParentClass
   val packageName = pckg.asString()
   val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
     Visibility.INTERNAL -> "internal"
     else -> "public"
   }
+  val typeParameters: List<String> = declaration.typeParameters.map { it.simpleName.asString() }
+  val angledTypeParameters: String = when {
+    typeParameters.isEmpty() -> ""
+    else -> "<${typeParameters.joinToString(separator = ",")}>"
+  }
 
   operator fun Snippet.plus(snippet: Snippet): Snippet =
     copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
 }
+
+val KSClassDeclaration.nameWithParentClass: String
+  get() = when (val parent = parentDeclaration) {
+    is KSClassDeclaration -> parent.nameWithParentClass + "." + simpleName.asString()
+    else -> simpleName.asString()
+  }
 
 enum class OpticsTarget {
   ISO,
@@ -61,27 +70,46 @@ typealias NullableFocus = Focus.Nullable
 sealed class Focus {
 
   companion object {
-    operator fun invoke(fullName: String, paramName: String): Focus =
+    operator fun invoke(fullName: String, paramName: String, refinedType: KSType? = null): Focus =
       when {
-        fullName.endsWith("?") -> Nullable(fullName, paramName)
-        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(fullName, paramName)
-        else -> NonNull(fullName, paramName)
+        fullName.endsWith("?") -> Nullable(fullName, paramName, refinedType)
+        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(fullName, paramName, refinedType)
+        else -> NonNull(fullName, paramName, refinedType)
       }
   }
 
   abstract val className: String
   abstract val paramName: String
+  // only used for type-refining prisms
+  abstract val refinedType: KSType?
 
-  data class Nullable(override val className: String, override val paramName: String) : Focus() {
+  val refinedArguments: List<String>
+    get() = refinedType?.arguments?.filter {
+      it.type?.resolve()?.declaration is KSTypeParameter
+    }?.map { it.qualifiedString() }.orEmpty()
+
+  data class Nullable(
+    override val className: String,
+    override val paramName: String,
+    override val refinedType: KSType?
+  ) : Focus() {
     val nonNullClassName = className.dropLast(1)
   }
 
-  data class Option(override val className: String, override val paramName: String) : Focus() {
+  data class Option(
+    override val className: String,
+    override val paramName: String,
+    override val refinedType: KSType?
+  ) : Focus() {
     val nestedClassName =
       Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
   }
 
-  data class NonNull(override val className: String, override val paramName: String) : Focus()
+  data class NonNull(
+    override val className: String,
+    override val paramName: String,
+    override val refinedType: KSType?
+  ) : Focus()
 }
 
 const val Lens = "arrow.optics.Lens"

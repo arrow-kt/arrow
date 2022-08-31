@@ -1,3 +1,17 @@
+public abstract interface class arrow/optics/Copy {
+	public abstract fun inside (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun set (Larrow/optics/PSetter;Ljava/lang/Object;)V
+	public abstract fun transform (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/optics/Copy$DefaultImpls {
+	public static fun inside (Larrow/optics/Copy;Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/optics/CopyKt {
+	public static final fun copy (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
 public abstract interface class arrow/optics/Fold {
 	public static final field Companion Larrow/optics/Fold$Companion;
 	public abstract fun all (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
@@ -133,6 +147,9 @@ public final class arrow/optics/ListKt {
 	public static final fun snoc (Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;
 	public static final fun uncons (Ljava/util/List;)Lkotlin/Pair;
 	public static final fun unsnoc (Ljava/util/List;)Lkotlin/Pair;
+}
+
+public abstract interface annotation class arrow/optics/OpticsCopyMarker : java/lang/annotation/Annotation {
 }
 
 public final class arrow/optics/OptionalGetterKt {
