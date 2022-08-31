@@ -9,10 +9,6 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
 
-    permissions:
-      pull-requests: write
-      issues: write
-
     strategy:
       matrix:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
@@ -40,20 +36,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         with:
           arguments: --full-stacktrace mingwX64Test
-
-      - name: Create code coverage report
-        if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew koverMergedReport
-
-      - name: Add coverage report to PR
-        id: kover
-        if: matrix.os == 'ubuntu-latest'
-        uses: mi-kas/kover-report@v1
-        with:
-          path: ${{ github.workspace }}/build/reports/kover/merged/xml/report.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Kover Report
-          update-comment: true
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
