@@ -56,31 +56,25 @@ public inline fun <R, A, B> fold(
   val shift = DefaultShift()
   return try {
     transform(program(shift))
-  } catch (e: ShiftCancellationException) {
-    if (e.checkScope(shift)) recover(e.shifted()) else throw e
+  } catch (e: CancellationException) {
+    recover(e.shiftedOrRethrow(shift))
   } catch (e: Throwable) {
     error(e.nonFatalOrThrow())
   }
 }
 
-/**
- * **AVOID USING THIS TYPE, it's meant for low-level cancellation code** When in need in low-level code,
- * you can use this type to differentiate between a foreign [CancellationException] such as JobCancellationException, and the one from [Effect].
- */
-public class ShiftCancellationException(
-  private val _shifted: Any?,
-  private val shift: Shift<Any?>,
-) : CancellationException("Shifted Continuation") {
-  @Suppress("UNCHECKED_CAST")
-  @PublishedApi
-  internal fun <R> shifted(): R = _shifted as R
-  
-  @PublishedApi
-  internal fun checkScope(other: Shift<Any?>): Boolean = shift === other
-}
+/** Returns the shifted value, rethrows the CancellationException if not our scope */
+@PublishedApi
+internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultShift): R =
+  if (this is ShiftCancellationException && this.shift === shift) _shifted as R
+  else throw this
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Shift. */
 @PublishedApi
 internal class DefaultShift : Shift<Any?> {
   override fun <B> shift(r: Any?): B = throw ShiftCancellationException(r, this)
 }
+
+/** CancellationException is required to cancel coroutines when shifting from within them. */
+private class ShiftCancellationException(val _shifted: Any?, val shift: Shift<Any?>) :
+  CancellationException("Shifted Continuation")
