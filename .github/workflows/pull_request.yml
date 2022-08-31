@@ -41,13 +41,17 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: ./gradlew koverMergedReport
 
-      - name: Add coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.2
+      - name: Add coverage report to PR
+        id: kover
         if: matrix.os == 'ubuntu-latest'
+        uses: mi-kas/kover-report@v1
         with:
-          paths: ${{ github.workspace }}/build/reports/kover/merged/xml/report.xml
+          path: ${{ github.workspace }}/build/reports/kover/merged/xml/report.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+          title: Code Coverage
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
