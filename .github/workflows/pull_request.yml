@@ -46,7 +46,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: mi-kas/kover-report@v1
         with:
-          path: ${{ github.workspace }}/build/reports/kover/merged/xml/report.xml
+          path: build/reports/kover/merged/xml/report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
           title: Kover Report
           update-comment: true
 
