@@ -1,9 +1,7 @@
 package arrow.core
 
 /**
- * The monoid of endomorphisms under composition,
- * that is, functions which share input and output type.
- * For example, `Endo<Int>` represents functions `(Int) -> Int`.
+ * The monoid of endomorphisms under composition.
  */
 public data class Endo<A>(val f: (A) -> A) {
 
