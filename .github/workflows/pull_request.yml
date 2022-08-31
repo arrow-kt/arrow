@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
 
+    permissions:
+      pull-requests: write
+
     strategy:
       matrix:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
