@@ -82,7 +82,7 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Sh
  * ```
  * <!--- KNIT example-effect-error-03.kt -->
  */
-@JvmName("catchOrThrow")
+@JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.catch(
   @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
 ): Effect<E, A> =
@@ -104,7 +104,7 @@ public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve:
 public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
   eagerEffect { catch(recover) }
 
-@JvmName("catchOrThrow")
+@JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
   @BuilderInference crossinline recover: Shift<E>.(T) -> A,
 ): EagerEffect<E, A> =

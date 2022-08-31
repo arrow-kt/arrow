@@ -92,7 +92,7 @@ public inline fun <R, A> Shift<R>.catch(
 ): A = fold({ action(this) }, { recover(it) }, { shift(it) }, { it })
 
 @EffectDSL
-@JvmName("catchOrThrow")
+@JvmName("catchReified")
 public inline fun <reified T : Throwable, R, A> Shift<R>.catch(
   @BuilderInference action: Shift<R>.() -> A,
   @BuilderInference recover: Shift<R>.(T) -> A,
