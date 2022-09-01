@@ -11,7 +11,8 @@ class ParTraverseEitherJvmTest : ArrowFxSpec(
   spec = {
     "parTraverseEither finishes on single thread " { // 100 is same default length as Arb.list
       checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-        val res = single.use { ctx ->
+        val res = resourceScope {
+          val ctx = singleThreadContext("single")
           (0 until i).parTraverseEither(ctx) { Thread.currentThread().name.right() }
         }
         assertSoftly {
