@@ -38,7 +38,7 @@ public final class arrow/fx/coroutines/Predef_testKt {
 }
 
 public final class arrow/fx/coroutines/Predef_test_jvmKt {
-	public static final fun getSingle ()Larrow/fx/coroutines/Resource;
+	public static final fun getSingle ()Lkotlin/jvm/functions/Function2;
 	public static final fun getSingleThreadName ()Ljava/lang/String;
 	public static final fun getThreadName ()Lkotlin/jvm/functions/Function1;
 }
