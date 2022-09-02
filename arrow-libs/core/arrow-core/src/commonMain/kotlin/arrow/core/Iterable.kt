@@ -999,11 +999,13 @@ public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
-public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
-  val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return asep to bsep
-}
+public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
+  fold(listOf<A>() to listOf<B>()) { (lefts, rights), either ->
+    when (either) {
+      is Left -> lefts + either.value to rights
+      is Right -> lefts to rights + either.value
+    }
+  }
 
 /**
  * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
