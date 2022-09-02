@@ -63,18 +63,23 @@ public inline fun <R, A, B> fold(
   }
 }
 
-/** Returns the shifted value, rethrows the CancellationException if not our scope */
+/** Returns the shifted value, or rethrows the CancellationException if not our scope */
+@Suppress("UNCHECKED_CAST")
 @PublishedApi
 internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultShift): R =
-  if (this is ShiftCancellationException && this.shift === shift) _shifted as R
+  if (this is ShiftCancellationException && this.shift === shift) shifted as R
   else throw this
 
-/** Serves as both purposes of a scope-reference token, and a default implementation for Shift. */
+/** Serves as both purposes of a scope-reference token, and default implementation for Shift. */
 @PublishedApi
-internal class DefaultShift : Shift<Any?> {
-  override fun <B> shift(r: Any?): B = throw ShiftCancellationException(r, this)
+internal class DefaultShift(private val isTraced: Boolean = false) : Shift<Any?> {
+  override fun <B> shift(r: Any?): B = throw ShiftCancellationException(r, this, isTraced)
 }
 
 /** CancellationException is required to cancel coroutines when shifting from within them. */
-private class ShiftCancellationException(val _shifted: Any?, val shift: Shift<Any?>) :
-  CancellationException("Shifted Continuation")
+internal expect class ShiftCancellationException(shifted: Any?, shift: Shift<Any?>, isTraced: Boolean) :
+  CancellationException {
+  internal val shifted: Any?
+  internal val shift: Shift<Any?>
+  internal val isTraced: Boolean
+}
