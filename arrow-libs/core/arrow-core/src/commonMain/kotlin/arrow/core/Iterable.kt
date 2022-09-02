@@ -983,15 +983,13 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
 
+@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }"))
 public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
-  flatMap { either ->
-    either.fold({ emptyList() }, { b -> listOf(b) })
-  }
+  mapNotNull { it.orNull() }
 
+@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }", "arrow.core.orNull"))
 public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
-  flatMap { validated ->
-    validated.fold({ emptyList() }, { b -> listOf(b) })
-  }
+  mapNotNull { it.orNull() }
 
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
