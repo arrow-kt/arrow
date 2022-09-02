@@ -1,7 +1,8 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffectGuide13
+package arrow.core.examples.exampleEffect13
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

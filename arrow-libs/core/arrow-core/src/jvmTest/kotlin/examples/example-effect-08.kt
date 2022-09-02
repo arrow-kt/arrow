@@ -1,7 +1,8 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffectGuide08
+package arrow.core.examples.exampleEffect08
 
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
 import io.kotest.assertions.fail

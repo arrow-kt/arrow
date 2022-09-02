@@ -1,9 +1,11 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleEffectGuide10
+package arrow.core.examples.exampleEffect10
 
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
+import arrow.core.continuations.fold
 import arrow.core.continuations.ensureNotNull
+import arrow.core.continuations.ensure
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.fail
