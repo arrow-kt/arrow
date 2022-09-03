@@ -31,7 +31,13 @@ kotlin {
         implementation(libs.kotlin.stdlibJDK8)
       }
     }
-
+    
+    jvmTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+      }
+    }
+    
     jsMain {
       dependencies {
         implementation(libs.kotlin.stdlibJS)
