@@ -314,7 +314,10 @@ class SequenceKTest : UnitSpec() {
           if (it % 2 == 0) it.left()
           else it.right()
         }
-        sequence.separateEither() shouldBe ints.partition { it % 2 == 0 }
+
+        val (lefts, rights) = sequence.separateEither()
+
+        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
       }
     }
 
@@ -324,7 +327,10 @@ class SequenceKTest : UnitSpec() {
           if (it % 2 == 0) it.invalid()
           else it.valid()
         }
-        sequence.separateValidated() shouldBe ints.partition { it % 2 == 0 }
+
+        val (invalids, valids) = sequence.separateValidated()
+
+        invalids.toList() to valids.toList() shouldBe ints.partition { it % 2 == 0 }
       }
     }
   }
