@@ -307,5 +307,25 @@ class SequenceKTest : UnitSpec() {
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
     }
+
+    "separateEither" {
+      checkAll(Arb.sequence(Arb.int())) { ints ->
+        val sequence = ints.map {
+          if (it % 2 == 0) it.left()
+          else it.right()
+        }
+        sequence.separateEither() shouldBe ints.partition { it % 2 == 0 }
+      }
+    }
+
+    "separateValidated" {
+      checkAll(Arb.sequence(Arb.int())) { ints ->
+        val sequence = ints.map {
+          if (it % 2 == 0) it.invalid()
+          else it.valid()
+        }
+        sequence.separateValidated() shouldBe ints.partition { it % 2 == 0 }
+      }
+    }
   }
 }
