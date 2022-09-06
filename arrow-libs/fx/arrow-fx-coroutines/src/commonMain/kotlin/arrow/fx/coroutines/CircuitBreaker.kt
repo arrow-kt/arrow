@@ -11,6 +11,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 
 /**
  * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
@@ -130,15 +131,18 @@ public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
   private val maxFailures: Int,
-  private val resetTimeout: Duration,
+  private val resetTimeoutNanos: Double,
   private val exponentialBackoffFactor: Double,
-  private val maxResetTimeout: Duration,
+  private val maxResetTimeoutNanos: Double,
   private val onRejected: suspend () -> Unit,
   private val onClosed: suspend () -> Unit,
   private val onHalfOpen: suspend () -> Unit,
   private val onOpen: suspend () -> Unit
 ) {
-
+  
+  private val resetTimeout: Duration = resetTimeoutNanos.nanoseconds
+  private val maxResetTimeout: Duration = maxResetTimeoutNanos.nanoseconds
+  
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
   public suspend fun state(): State = state.get()
@@ -235,7 +239,7 @@ private constructor(
             if (curr.failures + 1 < maxFailures) {
               // It's fine, just increment the failures count
               val update = Closed(curr.failures + 1)
-              if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
+              if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result) // retry?
               else throw result.value
             } else {
               // N.B. this could be canceled, however we don't care
@@ -243,7 +247,7 @@ private constructor(
               // We've gone over the permitted failures threshold,
               // so we need to open the circuit breaker
               val update = Open(now, resetTimeout, CompletableDeferred())
-              if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry
+              if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result) // retry
               else {
                 onOpen.invoke()
                 throw result.value
@@ -322,9 +326,9 @@ private constructor(
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
-      resetTimeout = resetTimeout,
+      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeout = maxResetTimeout,
+      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = suspend { onRejected.invoke(); callback.invoke() },
       onClosed = onClosed,
       onHalfOpen = onHalfOpen,
@@ -348,9 +352,9 @@ private constructor(
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
-      resetTimeout = resetTimeout,
+      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeout = maxResetTimeout,
+      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = onRejected,
       onClosed = suspend { onClosed.invoke(); callback.invoke(); },
       onHalfOpen = onHalfOpen,
@@ -374,9 +378,9 @@ private constructor(
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
-      resetTimeout = resetTimeout,
+      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeout = maxResetTimeout,
+      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = onRejected,
       onClosed = onClosed,
       onHalfOpen = suspend { onHalfOpen.invoke(); callback.invoke() },
@@ -400,9 +404,9 @@ private constructor(
     CircuitBreaker(
       state = state,
       maxFailures = maxFailures,
-      resetTimeout = resetTimeout,
+      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeout = maxResetTimeout,
+      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = onRejected,
       onClosed = onClosed,
       onHalfOpen = onHalfOpen,
@@ -456,12 +460,42 @@ private constructor(
     public class Open internal constructor(
       public val startedAt: Long,
       public val resetTimeout: Duration,
-      internal val awaitClose: CompletableDeferred<Unit>
+      internal val awaitClose: CompletableDeferred<Unit>,
     ) : State() {
-
+      
+      @Deprecated(
+        "Prefer to use resetTimeout with kotlin.time.Duration",
+        ReplaceWith(
+          "resetTimeout.toDouble(DurationUnit.NANOSECONDS)",
+          "kotlin.time.DurationUnit"
+        )
+      )
+      public val resetTimeoutNanos: Double
+        get() = resetTimeout.toDouble(DurationUnit.NANOSECONDS)
+      
       public constructor(startedAt: Long, resetTimeout: Duration) : this(
         startedAt,
         resetTimeout,
+        CompletableDeferred()
+      )
+      
+      @Deprecated(
+        "This constructor will be removed in Arrow 2.0",
+        level = DeprecationLevel.WARNING
+      )
+      internal constructor(
+        startedAt: Long,
+        resetTimeoutNanos: Double,
+        awaitClose: CompletableDeferred<Unit>,
+      ) : this(startedAt, resetTimeoutNanos.nanoseconds, awaitClose)
+      
+      @Deprecated(
+        "This constructor will be removed in Arrow 2.0",
+        level = DeprecationLevel.WARNING
+      )
+      public constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
+        startedAt,
+        resetTimeoutNanos.nanoseconds,
         CompletableDeferred()
       )
 
@@ -504,8 +538,29 @@ private constructor(
       public val resetTimeout: Duration,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
-
+      
+      @Deprecated(
+        "Prefer to use resetTimeout with kotlin.time.Duration",
+        ReplaceWith(
+          "resetTimeout.toDouble(DurationUnit.NANOSECONDS)",
+          "kotlin.time.DurationUnit"
+        )
+      )
+      public val resetTimeoutNanos: Double
+        get() = resetTimeout.toDouble(DurationUnit.NANOSECONDS)
+      
       public constructor(resetTimeout: Duration) : this(resetTimeout, CompletableDeferred())
+      
+      @Deprecated(
+        "This constructor will be removed in Arrow 2.0",
+        level = DeprecationLevel.WARNING
+      )
+      internal constructor(
+        resetTimeoutNanos: Double,
+        awaitClose: CompletableDeferred<Unit>,
+      ) : this(resetTimeoutNanos.nanoseconds, awaitClose)
+
+      public constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos.nanoseconds, CompletableDeferred())
 
       override fun hashCode(): Int =
         resetTimeout.hashCode()
@@ -562,17 +617,17 @@ private constructor(
       maxFailures: Int,
       resetTimeoutNanos: Double,
       exponentialBackoffFactor: Double = 1.0,
-      maxResetTimeout: Double = Double.POSITIVE_INFINITY,
+      maxResetTimeoutNanos: Double = Double.POSITIVE_INFINITY,
       onRejected: suspend () -> Unit = { },
       onClosed: suspend () -> Unit = { },
       onHalfOpen: suspend () -> Unit = { },
-      onOpen: suspend () -> Unit = { }
+      onOpen: suspend () -> Unit = { },
     ): CircuitBreaker =
       of(
         maxFailures = maxFailures,
-        resetTimeout = resetTimeoutNanos.nanoseconds,
+        resetTimeoutNanos = resetTimeoutNanos,
         exponentialBackoffFactor = exponentialBackoffFactor,
-        maxResetTimeout = maxResetTimeout.nanoseconds,
+        maxResetTimeoutNanos = maxResetTimeoutNanos,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
@@ -608,6 +663,7 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
+    @ExperimentalTime
     public suspend fun of(
       maxFailures: Int,
       resetTimeout: Duration,
@@ -616,22 +672,24 @@ private constructor(
       onRejected: suspend () -> Unit = suspend { },
       onClosed: suspend () -> Unit = suspend { },
       onHalfOpen: suspend () -> Unit = suspend { },
-      onOpen: suspend () -> Unit = suspend { }
+      onOpen: suspend () -> Unit = suspend { },
     ): CircuitBreaker =
       CircuitBreaker(
         state = AtomicRef(Closed(0)),
         maxFailures = maxFailures
           .takeIf { it >= 0 }
           .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
-        resetTimeout = resetTimeout
+        resetTimeoutNanos = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
+          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } }
+          .toDouble(DurationUnit.NANOSECONDS),
         exponentialBackoffFactor = exponentialBackoffFactor
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeout = maxResetTimeout
+        maxResetTimeoutNanos = maxResetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } },
+          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } }
+          .toDouble(DurationUnit.NANOSECONDS),
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
