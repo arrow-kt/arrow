@@ -294,6 +294,15 @@ class CircuitBreakerTest : ArrowFxSpec(
               maxResetTimeout.toDouble(DurationUnit.NANOSECONDS)
             )
           }
+
+          shouldThrow<IllegalArgumentException> {
+            CircuitBreaker.of(
+              maxFailures,
+              resetTimeout,
+              exponentialBackoffFactor,
+              maxResetTimeout
+            )
+          }
         }
       }
     }

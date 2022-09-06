@@ -11,7 +11,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 
 /**
  * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
@@ -591,7 +590,7 @@ private constructor(
      *        the `resetTimeout` when in the `HalfOpen` state, in case
      *        the attempt to `Close` fails.
      *
-     * @param maxResetTimeout is the maximum timeout the circuit breaker
+     * @param maxResetTimeoutNanos is the maximum timeout the circuit breaker
      *        is allowed to use when applying the `exponentialBackoffFactor`.
      *
      * @param onRejected is a callback for signaling rejected tasks, so
@@ -623,11 +622,20 @@ private constructor(
       onHalfOpen: suspend () -> Unit = { },
       onOpen: suspend () -> Unit = { },
     ): CircuitBreaker =
-      of(
-        maxFailures = maxFailures,
-        resetTimeoutNanos = resetTimeoutNanos,
-        exponentialBackoffFactor = exponentialBackoffFactor,
-        maxResetTimeoutNanos = maxResetTimeoutNanos,
+      CircuitBreaker(
+        state = AtomicRef(Closed(0)),
+        maxFailures = maxFailures
+          .takeIf { it >= 0 }
+          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
+        resetTimeoutNanos = resetTimeoutNanos
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "resetTimeout expected to be greater than 0, but was $resetTimeoutNanos" } },
+        exponentialBackoffFactor = exponentialBackoffFactor
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
+        maxResetTimeoutNanos = maxResetTimeoutNanos
+          .takeIf { it > 0 }
+          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than 0, but was $maxResetTimeoutNanos" } },
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
@@ -663,7 +671,6 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
-    @ExperimentalTime
     public suspend fun of(
       maxFailures: Int,
       resetTimeout: Duration,
@@ -674,8 +681,7 @@ private constructor(
       onHalfOpen: suspend () -> Unit = suspend { },
       onOpen: suspend () -> Unit = suspend { },
     ): CircuitBreaker =
-      CircuitBreaker(
-        state = AtomicRef(Closed(0)),
+      of(
         maxFailures = maxFailures
           .takeIf { it >= 0 }
           .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
