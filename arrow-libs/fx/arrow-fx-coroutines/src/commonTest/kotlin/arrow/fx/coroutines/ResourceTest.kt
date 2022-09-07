@@ -21,6 +21,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlin.random.Random
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -217,15 +218,19 @@ class ResourceTest : ArrowFxSpec(
           val res = if (isLeft) Resource({
             latch.await() shouldBe (1..depth).sum()
             throw cancel
-          }) { _, _ -> }.parZip(resource.flatMap {
-            Resource({ require(latch.complete(it)) }) { _, _ -> }
-          }) { _, _ -> }
+          }) { _, _ -> }.parZip(
+            resource.flatMap {
+              Resource({ require(latch.complete(it)) }) { _, _ -> }
+            }
+          ) { _, _ -> }
           else resource.flatMap {
             Resource({ require(latch.complete(it)) }) { _, _ -> }
-          }.parZip(Resource({
-            latch.await() shouldBe (1..depth).sum()
-            throw cancel
-          }) { _, _ -> }) { _, _ -> }
+          }.parZip(
+            Resource({
+              latch.await() shouldBe (1..depth).sum()
+              throw cancel
+            }) { _, _ -> }
+          ) { _, _ -> }
 
           res.use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
@@ -265,9 +270,11 @@ class ResourceTest : ArrowFxSpec(
             started.await()
             throw cancel
           }) { _, _ -> }
-            .parZip(Resource({ require(started.complete(Unit)); i }, { ii, ex ->
-              require(released.complete(ii to ex))
-            })) { _, _ -> }
+            .parZip(
+              Resource({ require(started.complete(Unit)); i }, { ii, ex ->
+                require(released.complete(ii to ex))
+              })
+            ) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
 
@@ -310,7 +317,8 @@ class ResourceTest : ArrowFxSpec(
               Resource(
                 { require(started.complete(Unit)); i },
                 { ii, ex -> require(released.complete(ii to ex)) }
-              )) { _, _ -> }
+              )
+            ) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
 
@@ -426,10 +434,12 @@ class ResourceTest : ArrowFxSpec(
           modifyGate.await()
           r.update { i -> "$i$a" }
         }) { _, _ -> }
-          .parZip(Resource({
-            r.set("$b")
-            require(modifyGate.complete(0))
-          }) { _, _ -> }) { _a, _b -> _a to _b }
+          .parZip(
+            Resource({
+              r.set("$b")
+              require(modifyGate.complete(0))
+            }) { _, _ -> }
+          ) { _a, _b -> _a to _b }
           .use {
             r.get() shouldBe "$b$a"
           }
@@ -441,6 +451,44 @@ class ResourceTest : ArrowFxSpec(
         val r = Resource({ n }, { _, _ -> Unit })
 
         r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
+      }
+    }
+
+    suspend fun checkAllocated(mkResource: (() -> Int, (Int, ExitCase) -> Unit) -> Resource<Int>) {
+      val released = CompletableDeferred<Int>()
+      val releaseValue = Random.nextInt()
+      val seed = Random.nextInt()
+
+      val (allocate, release) = mkResource({ seed }) { _, _ -> released.complete(releaseValue) }.allocated()
+
+      allocate() shouldBe seed
+
+      release(1, ExitCase.Completed)
+
+      released.getCompleted() shouldBe releaseValue
+    }
+
+    "allocated - Allocate" {
+      checkAllocated { allocate, release ->
+        Resource(allocate, release)
+      }
+    }
+
+    "allocated - Defer" {
+      checkAllocated { allocate, release ->
+        Resource.defer { Resource(allocate, release) }
+      }
+    }
+
+    "allocated - Bind" {
+      checkAllocated { allocate, release ->
+        Resource.Bind(Resource(allocate, release)) { Resource.just(it) }
+      }
+    }
+
+    "allocated - Dsl" {
+      checkAllocated { allocate, close ->
+        arrow.fx.coroutines.continuations.resource { allocate() } releaseCase (close)
       }
     }
   }

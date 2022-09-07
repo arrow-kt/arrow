@@ -5,13 +5,13 @@ import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.fx.coroutines.continuations.ResourceScope
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
@@ -318,7 +318,7 @@ public sealed class Resource<out A> {
   public inline fun <B, C, D> zip(
     b: Resource<B>,
     c: Resource<C>,
-    crossinline map: (A, B, C) -> D,
+    crossinline map: (A, B, C) -> D
   ): Resource<D> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind())
@@ -328,7 +328,7 @@ public sealed class Resource<out A> {
     b: Resource<B>,
     c: Resource<C>,
     d: Resource<D>,
-    crossinline map: (A, B, C, D) -> E,
+    crossinline map: (A, B, C, D) -> E
   ): Resource<E> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind())
@@ -339,7 +339,7 @@ public sealed class Resource<out A> {
     c: Resource<C>,
     d: Resource<D>,
     e: Resource<E>,
-    crossinline map: (A, B, C, D, E) -> G,
+    crossinline map: (A, B, C, D, E) -> G
   ): Resource<G> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind())
@@ -351,7 +351,7 @@ public sealed class Resource<out A> {
     d: Resource<D>,
     e: Resource<E>,
     f: Resource<F>,
-    crossinline map: (A, B, C, D, E, F) -> G,
+    crossinline map: (A, B, C, D, E, F) -> G
   ): Resource<G> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind())
@@ -364,7 +364,7 @@ public sealed class Resource<out A> {
     e: Resource<E>,
     f: Resource<F>,
     g: Resource<G>,
-    crossinline map: (A, B, C, D, E, F, G) -> H,
+    crossinline map: (A, B, C, D, E, F, G) -> H
   ): Resource<H> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind())
@@ -378,7 +378,7 @@ public sealed class Resource<out A> {
     f: Resource<F>,
     g: Resource<G>,
     h: Resource<H>,
-    crossinline map: (A, B, C, D, E, F, G, H) -> I,
+    crossinline map: (A, B, C, D, E, F, G, H) -> I
   ): Resource<I> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind())
@@ -393,7 +393,7 @@ public sealed class Resource<out A> {
     g: Resource<G>,
     h: Resource<H>,
     i: Resource<I>,
-    crossinline map: (A, B, C, D, E, F, G, H, I) -> J,
+    crossinline map: (A, B, C, D, E, F, G, H, I) -> J
   ): Resource<J> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind())
@@ -409,7 +409,7 @@ public sealed class Resource<out A> {
     h: Resource<H>,
     i: Resource<I>,
     j: Resource<J>,
-    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K,
+    crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K
   ): Resource<K> =
     arrow.fx.coroutines.continuations.resource {
       map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind())
@@ -464,10 +464,46 @@ public sealed class Resource<out A> {
   public fun <B, C> parZip(
     ctx: CoroutineContext = Dispatchers.Default,
     fb: Resource<B>,
-    f: suspend (A, B) -> C,
+    f: suspend (A, B) -> C
   ): Resource<C> =
     arrow.fx.coroutines.continuations.resource {
       parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
+    }
+
+  /**
+   * Decomposes a [Resource]<A> into a Pair<suspend () -> A, suspend (A, ExitCase) -> Unit>, containing
+   * the allocation and release functions which make up the [Resource].
+   *
+   * This can be used to integrate Resources with code which cannot be run within the [use] function.
+   */
+  public suspend fun allocated(): Pair<suspend () -> A, suspend (@UnsafeVariance A, ExitCase) -> Unit> =
+    when (this) {
+      is Bind<*, A> ->
+        Dsl {
+          val any = source.bind()
+          val ff = f as (Any?) -> Resource<A>
+          ff(any).bind()
+        }.allocated()
+      is Allocate -> acquire to release
+      is Defer -> resource().allocated()
+      is Dsl -> {
+        val effect = ResourceScopeImpl()
+        val allocated = try {
+          val allocate: suspend () -> A = suspend { dsl(effect) }
+          val release: suspend (A, ExitCase) -> Unit = { _, e ->
+            effect.finalizers.get().cancelAll(e)
+            Unit
+          }
+          allocate to release
+        } catch (e: Throwable) {
+          val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
+          val ee = withContext(NonCancellable) {
+            effect.finalizers.get().cancelAll(ex, e) ?: e
+          }
+          throw ee
+        }
+        allocated
+      }
     }
 
   @Deprecated(
@@ -481,7 +517,7 @@ public sealed class Resource<out A> {
 
   public class Allocate<A>(
     public val acquire: suspend () -> A,
-    public val release: suspend (A, ExitCase) -> Unit,
+    public val release: suspend (A, ExitCase) -> Unit
   ) : Resource<A>()
 
   @Deprecated(
@@ -521,7 +557,7 @@ public sealed class Resource<out A> {
      */
     public operator fun <A> invoke(
       acquire: suspend () -> A,
-      release: suspend (A, ExitCase) -> Unit,
+      release: suspend (A, ExitCase) -> Unit
     ): Resource<A> = Allocate(acquire, release)
 
     /**
@@ -775,7 +811,7 @@ private class ResourceScopeImpl : ResourceScope {
 
 private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   exitCase: ExitCase,
-  first: Throwable? = null,
+  first: Throwable? = null
 ): Throwable? = fold(first) { acc, finalizer ->
   val other = kotlin.runCatching { finalizer(exitCase) }.exceptionOrNull()
   other?.let {
