@@ -459,6 +459,17 @@ public sealed class Ior<out A, out B> {
       }
     )
 
+  public inline fun <reified AA, C, D> bitraverseEitherAccumulated(
+    SA: Semigroup<AA>,
+    fa: (A) -> Either<AA, C>,
+    fb: (B) -> Either<AA, D>
+  ): Either<AA, Ior<C, D>> =
+    fold(
+      { a -> fa(a).map { Left(it) } },
+      { b -> fb(b).map { Right(it) } },
+      { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Both(aa, c) } }
+    )
+
   public inline fun <C, D> bitraverseOption(
     fa: (A) -> Option<C>,
     fb: (B) -> Option<D>
