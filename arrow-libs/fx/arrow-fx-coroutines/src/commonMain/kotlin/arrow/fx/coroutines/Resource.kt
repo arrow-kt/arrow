@@ -493,8 +493,7 @@ public sealed class Resource<out A> {
         val allocated = try {
           val allocate: suspend () -> A = suspend { dsl(effect) }
           val release: suspend (A, ExitCase) -> Unit = { _, e ->
-            effect.finalizers.get().cancelAll(e)
-            Unit
+            effect.finalizers.get().cancelAll(e)?.let { throw it }
           }
           allocate to release
         } catch (e: Throwable) {
