@@ -1,5 +1,5 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleResource11
+package arrow.fx.coroutines.examples.exampleResource12
 
 import arrow.fx.coroutines.*
 
@@ -18,13 +18,13 @@ suspend fun main(): Unit {
     "data.json",
     "user.json",
     "resource.json"
-  ).traverse { uri ->
+  ).map { uri ->
     resource {
      openFile(uri)
     } release { file ->
       closeFile(file)
     }
-  }.use { files ->
+  }.sequence().use { files ->
     files.map { fileToString(it) }
   }
   res.forEach(::println)

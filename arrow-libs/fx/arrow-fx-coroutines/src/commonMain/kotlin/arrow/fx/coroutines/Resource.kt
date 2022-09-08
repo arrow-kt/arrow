@@ -471,10 +471,36 @@ public sealed class Resource<out A> {
     }
 
   /**
-   * Decomposes a [Resource]<A> into a Pair<suspend () -> A, suspend (A, ExitCase) -> Unit>, containing
-   * the allocation and release functions which make up the [Resource].
+   * Deconstruct [Resource] into an `acquire` and `release` handlers.
+   * The `release` action **must** always be called with resource [A] returned from `acquire`,
+   * if the `release` step is never called, then the resource [A] will leak. The `acquire` and `release`
+   * steps are already made `NonCancellable` to guarantee correct invocation like `Resource` or `bracketCase`.
    *
-   * This can be used to integrate Resources with code which cannot be run within the [use] function.
+   * ```kotlin
+   * import arrow.fx.coroutines.*
+   *
+   * val resource = Resource({ println("Acquire") }) { _, exitCase ->
+   *  println("Release $exitCase")
+   * }
+   *
+   * suspend fun main(): Unit {
+   *   val (acquire, release) = resource.allocated()
+   *   val a = acquire()
+   *   try {
+   *     /** Do something with A */
+   *     release(a, ExitCase.Completed)
+   *   } catch(e: Throwable) {
+   *      val e2 = runCatching { release(a, ExitCase(e)) }.exceptionOrNull()
+   *      throw Platform.composeErrors(e, e2)
+   *   }
+   * }
+   * ```
+   * <!--- KNIT example-resource-08.kt -->
+   *
+   * This is a **delicate** API. It is easy to accidentally create resource or memory leaks `allocated` is used.
+   * A `Resource` allocated by `allocated` is not subject to the guarantees that [Resource] makes,
+   * instead the caller is responsible for correctly invoking the `release` handler at the appropriate time.
+   * This API is useful for building inter-op APIs between [Resource] and non-suspending code, such as Java libraries.
    */
   @DelicateCoroutinesApi
   public suspend fun allocated(): Pair<suspend () -> A, suspend (@UnsafeVariance A, ExitCase) -> Unit> =
@@ -552,7 +578,7 @@ public sealed class Resource<out A> {
      *   }
      * }
      * ```
-     * <!--- KNIT example-resource-08.kt -->
+     * <!--- KNIT example-resource-09.kt -->
      */
     public operator fun <A> invoke(
       acquire: suspend () -> A,
@@ -606,7 +632,7 @@ public sealed class Resource<out A> {
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-resource-09.kt -->
+ * <!--- KNIT example-resource-10.kt -->
  */
 @Deprecated(
   "Use the resource computation DSL instead",
@@ -696,7 +722,7 @@ public inline fun <A, B> Iterable<A>.traverseResource(crossinline f: (A) -> Reso
  *   res.forEach(::println)
  * }
  * ```
- * <!--- KNIT example-resource-10.kt -->
+ * <!--- KNIT example-resource-11.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -741,7 +767,7 @@ public inline fun <A, B> Iterable<A>.traverse(crossinline f: (A) -> Resource<B>)
  *   res.forEach(::println)
  * }
  * ```
- * <!--- KNIT example-resource-11.kt -->
+ * <!--- KNIT example-resource-12.kt -->
  */
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Iterable<Resource<A>>.sequence(): Resource<List<A>> =

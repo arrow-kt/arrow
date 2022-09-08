@@ -14,18 +14,13 @@ suspend fun closeFile(file: File): Unit = file.close()
 suspend fun fileToString(file: File): String = file.toString()
 
 suspend fun main(): Unit {
-  val res: List<String> = listOf(
-    "data.json",
-    "user.json",
-    "resource.json"
-  ).traverse { uri ->
-    resource {
-     openFile(uri)
-    } release { file ->
-      closeFile(file)
-    }
-  }.use { files ->
-    files.map { fileToString(it) }
+  val res = resource {
+    openFile("data.json")
+  } release { file ->
+    closeFile(file)
+  } use { file ->
+    fileToString(file)
   }
-  res.forEach(::println)
+
+  println(res)
 }

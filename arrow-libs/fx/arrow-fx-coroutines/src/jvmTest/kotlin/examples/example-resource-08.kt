@@ -3,12 +3,18 @@ package arrow.fx.coroutines.examples.exampleResource08
 
 import arrow.fx.coroutines.*
 
-suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
-suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
+val resource = Resource({ println("Acquire") }) { _, exitCase ->
+ println("Release $exitCase")
+}
 
 suspend fun main(): Unit {
-  val resource = Resource(::acquireResource, ::releaseResource)
-  resource.use {
-    println("Expensive resource under use! $it")
+  val (acquire, release) = resource.allocated()
+  val a = acquire()
+  try {
+    /** Do something with A */
+    release(a, ExitCase.Completed)
+  } catch(e: Throwable) {
+     val e2 = runCatching { release(a, ExitCase(e)) }.exceptionOrNull()
+     throw Platform.composeErrors(e, e2)
   }
 }
