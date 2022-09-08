@@ -459,11 +459,11 @@ class ResourceTest : ArrowFxSpec(
       val releaseValue = Random.nextInt()
       val seed = Random.nextInt()
 
-      val (allocate, release) = mkResource({ seed }) { _, _ -> released.complete(releaseValue) }.allocated()
+      val (allocate, release) = mkResource({ seed }) { i, _ -> released.complete(i) }.allocated()
 
       allocate() shouldBe seed
 
-      release(1, ExitCase.Completed)
+      release(releaseValue, ExitCase.Completed)
 
       released.getCompleted() shouldBe releaseValue
     }
