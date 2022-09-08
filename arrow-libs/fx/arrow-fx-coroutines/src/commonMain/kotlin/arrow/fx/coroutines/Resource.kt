@@ -6,6 +6,7 @@ import arrow.core.identity
 import arrow.core.prependTo
 import arrow.fx.coroutines.continuations.ResourceScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -476,6 +477,7 @@ public sealed class Resource<out A> {
    *
    * This can be used to integrate Resources with code which cannot be run within the [use] function.
    */
+  @DelicateCoroutinesApi
   public suspend fun allocated(): Pair<suspend () -> A, suspend (@UnsafeVariance A, ExitCase) -> Unit> =
     when (this) {
       is Bind<*, A> ->
