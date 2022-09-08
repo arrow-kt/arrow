@@ -2,6 +2,7 @@
 package arrow.fx.coroutines.examples.exampleResource08
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 
 val resource = Resource({ println("Acquire") }) { _, exitCase ->
  println("Release $exitCase")

@@ -478,6 +478,7 @@ public sealed class Resource<out A> {
    *
    * ```kotlin
    * import arrow.fx.coroutines.*
+   * import arrow.fx.coroutines.ExitCase.Companion.ExitCase
    *
    * val resource = Resource({ println("Acquire") }) { _, exitCase ->
    *  println("Release $exitCase")
