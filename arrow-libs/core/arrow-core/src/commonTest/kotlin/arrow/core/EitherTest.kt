@@ -588,6 +588,12 @@ class EitherTest : UnitSpec() {
       ) { _, _, _ -> "success!" } shouldBe Either.Left("fail1fail2")
     }
 
+    "Cartesian builder for nel doesn't need semigroup parameter" {
+      "fail1".leftNel()
+        .zip("fail2".leftNel()
+        ) { _,_ -> "success!"} shouldBe Left(nonEmptyListOf("fail1", "fail2"))
+    }
+
     "zip should return Right(f(a)) if both are Right" {
       Right(10).zip(Semigroup.int(), Either.Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Either.Right(15)
     }

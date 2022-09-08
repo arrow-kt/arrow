@@ -11,6 +11,9 @@ import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
+
+public typealias EitherNel<E, A> = Either<Nel<E>, A>
+
 /**
  *
  *
@@ -862,10 +865,20 @@ public sealed class Either<out A, out B> {
   public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
     crossinline combine: (first: Error, second: Error) -> Error,
     transform: (A) -> Either<Error, B>,
-  ): Either<Error, List<B>> {
+  ): Either<Error, List<B>> =
+    fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+      when (val res = transform(a)) {
+        is Right -> when (acc) {
+          is Right -> acc.also { acc.value.add(res.value) }
+          is Left -> acc
+        }
 
-    TODO()
-  }
+        is Left -> when (acc) {
+          is Right -> res
+          is Left -> Left(combine(acc.value, res.value))
+        }
+      }
+    }
 
 
   /**
@@ -1453,6 +1466,10 @@ public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
 public fun <A> A.right(): Either<Nothing, A> = Right(this)
 
+public fun <E> E.leftNel(): EitherNel<E, Nothing> = Either.Left(nonEmptyListOf(this))
+
+public fun <A> A.rightNel(): EitherNel<Nothing, A> = Either.Right(this)
+
 /**
  * Returns [Right] if the value of type B is not null, otherwise the specified A value wrapped into an
  * [Left].
@@ -1518,7 +1535,7 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
     }
     is Right -> when (b) {
       is Left -> b
-      is Right -> Either.Right(SGB.run { this@combine.value.combine(b.value) })
+      is Right -> Right(SGB.run { this@combine.value.combine(b.value) })
     }
   }
 
@@ -1664,43 +1681,43 @@ public inline fun <reified E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip
   j: Either<E, J>,
   f: (A, B, C, D, EE, F, G, H, I, J) -> Z,
 ): Either<E, Z> =
-  if (this is Either.Right && b is Either.Right && c is Either.Right && d is Either.Right && e is Either.Right && ff is Either.Right && g is Either.Right && h is Either.Right && i is Either.Right && j is Either.Right) {
-    Either.Right(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
+  if (this is Right && b is Right && c is Right && d is Right && e is Right && ff is Right && g is Right && h is Right && i is Right && j is Right) {
+    Right(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
   } else SE.run {
     var accumulatedError: Any? = EmptyValue
-    accumulatedError = if (this@zip is Either.Left) this@zip.value else accumulatedError
-    accumulatedError = if (b is Either.Left) emptyCombine(accumulatedError, b.value) else accumulatedError
-    accumulatedError = if (c is Either.Left) emptyCombine(accumulatedError, c.value) else accumulatedError
-    accumulatedError = if (d is Either.Left) emptyCombine(accumulatedError, d.value) else accumulatedError
-    accumulatedError = if (e is Either.Left) emptyCombine(accumulatedError, e.value) else accumulatedError
-    accumulatedError = if (ff is Either.Left) emptyCombine(accumulatedError, ff.value) else accumulatedError
-    accumulatedError = if (g is Either.Left) emptyCombine(accumulatedError, g.value) else accumulatedError
-    accumulatedError = if (h is Either.Left) emptyCombine(accumulatedError, h.value) else accumulatedError
-    accumulatedError = if (i is Either.Left) emptyCombine(accumulatedError, i.value) else accumulatedError
-    accumulatedError = if (j is Either.Left) emptyCombine(accumulatedError, j.value) else accumulatedError
+    accumulatedError = if (this@zip is Left) this@zip.value else accumulatedError
+    accumulatedError = if (b is Left) emptyCombine(accumulatedError, b.value) else accumulatedError
+    accumulatedError = if (c is Left) emptyCombine(accumulatedError, c.value) else accumulatedError
+    accumulatedError = if (d is Left) emptyCombine(accumulatedError, d.value) else accumulatedError
+    accumulatedError = if (e is Left) emptyCombine(accumulatedError, e.value) else accumulatedError
+    accumulatedError = if (ff is Left) emptyCombine(accumulatedError, ff.value) else accumulatedError
+    accumulatedError = if (g is Left) emptyCombine(accumulatedError, g.value) else accumulatedError
+    accumulatedError = if (h is Left) emptyCombine(accumulatedError, h.value) else accumulatedError
+    accumulatedError = if (i is Left) emptyCombine(accumulatedError, i.value) else accumulatedError
+    accumulatedError = if (j is Left) emptyCombine(accumulatedError, j.value) else accumulatedError
 
-    Either.Left(accumulatedError as E)
+    Left(accumulatedError as E)
   }
 
-public inline fun <E, A, B, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   f: (A, B) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, f)
 
-public inline fun <E, A, B, C, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   f: (A, B, C) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, f)
 
-public inline fun <E, A, B, C, D, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
   f: (A, B, C, D) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, f)
 
-public inline fun <E, A, B, C, D, EE, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
@@ -1708,7 +1725,7 @@ public inline fun <E, A, B, C, D, EE, Z> Either<NonEmptyList<E>, A>.zip(
   f: (A, B, C, D, EE) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, f)
 
-public inline fun <E, A, B, C, D, EE, FF, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, FF, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
@@ -1717,7 +1734,7 @@ public inline fun <E, A, B, C, D, EE, FF, Z> Either<NonEmptyList<E>, A>.zip(
   f: (A, B, C, D, EE, FF) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, f)
 
-public inline fun <E, A, B, C, D, EE, F, G, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
@@ -1727,7 +1744,7 @@ public inline fun <E, A, B, C, D, EE, F, G, Z> Either<NonEmptyList<E>, A>.zip(
   f: (A, B, C, D, EE, F, G) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, f)
 
-public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
@@ -1738,7 +1755,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<NonEmptyList<E>, A>.zip
   f: (A, B, C, D, EE, F, G, H) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, f)
 
-public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
@@ -1750,7 +1767,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<NonEmptyList<E>, A>.
   f: (A, B, C, D, EE, F, G, H, I) -> Z,
 ): Either<NonEmptyList<E>, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, f)
 
-public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<NonEmptyList<E>, A>.zip(
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> EitherNel<E, A>.zip(
   b: Either<NonEmptyList<E>, B>,
   c: Either<NonEmptyList<E>, C>,
   d: Either<NonEmptyList<E>, D>,
