@@ -2,15 +2,18 @@
 package arrow.core.examples.exampleEffectScope08
 
 import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
 import arrow.core.continuations.effect
+import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 
 suspend fun main() {
-  val condition = true
-  val failure = "failed"
-  val int = 4
   effect<String, Int> {
-    ensure(condition) { failure }
-    int
-  }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
+    val x = Either.Right(1).bind()
+    val y = Either.Right(2).bind()
+    val z =
+     attempt { None.bind { "Option was empty" } } catch { 0 }
+    x + y + z
+  }.fold({ fail("Shift can never be the result") }, { it shouldBe 3 })
 }

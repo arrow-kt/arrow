@@ -47,25 +47,6 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *
  * How then do we communicate an error? By making it explicit in the data type we return.
  *
- * ## Either vs Validated
- *
- * In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
- * upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
- *
- * By convention, the right side of an `Either` is used to hold successful values.
- *
- * ```kotlin
- * import arrow.core.Either
- *
- * val right: Either<String, Int> =
- * //sampleStart
- *  Either.Right(5)
- * //sampleEnd
- * fun main() {
- *  println(right)
- * }
- * ```
- * <!--- KNIT example-either-02.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -78,7 +59,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(left)
  * }
  * ```
- * <!--- KNIT example-either-03.kt -->
+ * <!--- KNIT example-either-02.kt -->
  *
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
  *
@@ -99,7 +80,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-04.kt -->
+ * <!--- KNIT example-either-03.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -113,7 +94,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-05.kt -->
+ * <!--- KNIT example-either-04.kt -->
  *
  * ## Using Either instead of exceptions
  *
@@ -141,7 +122,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  * fun stringify(d: Double): String = d.toString()
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-06.kt -->
+ * <!--- KNIT example-either-05.kt -->
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
  *
@@ -167,7 +148,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *   parse(s).flatMap { reciprocal(it) }.map { stringify(it) }
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-07.kt -->
+ * <!--- KNIT example-either-06.kt -->
  *
  * These calls to `parse` return a [Left] and [Right] value
  *
@@ -187,7 +168,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("number2 = $number2")
  * }
  * ```
- * <!--- KNIT example-either-08.kt -->
+ * <!--- KNIT example-either-07.kt -->
  *
  * Now, using combinators like `flatMap` and `map`, we can compose our functions together.
  *
@@ -219,7 +200,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("magicNotANumber = $magicNotANumber")
  * }
  * ```
- * <!--- KNIT example-either-09.kt -->
+ * <!--- KNIT example-either-08.kt -->
  *
  * In the following exercise, we pattern-match on every case in which the `Either` returned by `magic` can be in.
  * Note the `when` clause in the [Left] - the compiler will complain if we leave that out because it knows that,
@@ -260,7 +241,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-10.kt -->
+ * <!--- KNIT example-either-09.kt -->
  *
  * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
  * can go wrong in our program.
@@ -290,7 +271,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *   parse(s).flatMap{reciprocal(it)}.map{ stringify(it) }
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-11.kt -->
+ * <!--- KNIT example-either-10.kt -->
  *
  * For our little module, we enumerate any and all errors that can occur. Then, instead of using
  * exception classes as error values, we use one of the enumerated cases. Now, when we pattern match,
@@ -333,7 +314,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-12.kt -->
+ * <!--- KNIT example-either-11.kt -->
  *
  * ## Either.catch exceptions
  *
@@ -358,7 +339,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *   object SpecificError : Error()
  * }
  * ```
- * <!--- KNIT example-either-13.kt -->
+ * <!--- KNIT example-either-12.kt -->
  *
  * ## Resolve Either into one type of value
  * In some cases you can not use Either as a value. For instance, when you need to respond to an HTTP request. To resolve Either into one type of value, you can use the resolve function.
@@ -448,7 +429,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  * data class ErrorResponse(val errorMessage: String)
  * enum class Level { INFO, WARN, ERROR }
  * ```
- * <!--- KNIT example-either-14.kt -->
+ * <!--- KNIT example-either-13.kt -->
  *
  * There are far more use cases for the resolve function, the HTTP endpoint example is just one of them.
  *
@@ -470,7 +451,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("leftMapLeft = $leftMapLeft")
  * }
  * ```
- * <!--- KNIT example-either-15.kt -->
+ * <!--- KNIT example-either-14.kt -->
  *
  * `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
  *
@@ -486,7 +467,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("swapped = $swapped")
  * }
  * ```
- * <!--- KNIT example-either-16.kt -->
+ * <!--- KNIT example-either-15.kt -->
  *
  * For using Either's syntax on arbitrary data types.
  * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
@@ -502,7 +483,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(right7)
  * }
  * ```
- * <!--- KNIT example-either-17.kt -->
+ * <!--- KNIT example-either-16.kt -->
  *
  * ```kotlin
  * import arrow.core.left
@@ -515,7 +496,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(leftHello)
  * }
  * ```
- * <!--- KNIT example-either-18.kt -->
+ * <!--- KNIT example-either-17.kt -->
  *
  * ```kotlin
  * import arrow.core.right
@@ -529,7 +510,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("contains7 = $contains7")
  * }
  * ```
- * <!--- KNIT example-either-19.kt -->
+ * <!--- KNIT example-either-18.kt -->
  *
  * ```kotlin
  * import arrow.core.left
@@ -543,7 +524,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("getOr7 = $getOr7")
  * }
  * ```
- * <!--- KNIT example-either-20.kt -->
+ * <!--- KNIT example-either-19.kt -->
  *
  * ```kotlin
  * import arrow.core.left
@@ -557,7 +538,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-21.kt -->
+ * <!--- KNIT example-either-20.kt -->
  *
  * For creating Either instance based on a predicate, use `Either.conditionally()` method. It will evaluate an expression
  * passed as first parameter, in case the expression evaluates to `false` it will give an `Either.Left<L>` build from the second parameter.
@@ -574,7 +555,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-22.kt -->
+ * <!--- KNIT example-either-21.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -587,7 +568,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-23.kt -->
+ * <!--- KNIT example-either-22.kt -->
  *
  * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is [Left]
  *
@@ -603,7 +584,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("fold = $fold")
  * }
  * ```
- * <!--- KNIT example-either-24.kt -->
+ * <!--- KNIT example-either-23.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -617,7 +598,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("fold = $fold")
  * }
  * ```
- * <!--- KNIT example-either-25.kt -->
+ * <!--- KNIT example-either-24.kt -->
  *
  * The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
  * the value of [Left]. This can be useful when mapping to a single result type is required like `fold()`, but without
@@ -642,7 +623,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println("httpStatusCode = $httpStatusCode")
  * }
  * ```
- * <!--- KNIT example-either-26.kt -->
+ * <!--- KNIT example-either-25.kt -->
  *
  * The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value.
  * If the value is non-null, the value wrapped into a non-nullable ```Either.Right``` is returned (very useful to
@@ -663,7 +644,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *   println(value)
  * }
  * ```
- * <!--- KNIT example-either-27.kt -->
+ * <!--- KNIT example-either-26.kt -->
  *
  * ```kotlin
  * import arrow.core.Either.Right
@@ -677,7 +658,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-28.kt -->
+ * <!--- KNIT example-either-27.kt -->
  *
  * ```kotlin
  * import arrow.core.Either.Left
@@ -691,7 +672,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-29.kt -->
+ * <!--- KNIT example-either-28.kt -->
  *
  * Another useful operation when working with null is `rightIfNotNull`.
  * If the value is null, it will be transformed to the specified `Either.Left` and, if it's not null, the type will
@@ -710,7 +691,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-30.kt -->
+ * <!--- KNIT example-either-29.kt -->
  *
  * ```kotlin
  * import arrow.core.rightIfNotNull
@@ -723,7 +704,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-31.kt -->
+ * <!--- KNIT example-either-30.kt -->
  *
  * The inverse of `rightIfNotNull`, `rightIfNull`.
  * If the value is null it will be transformed to the specified `Either.right` and the type will be `Nothing?`.
@@ -742,7 +723,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-32.kt -->
+ * <!--- KNIT example-either-31.kt -->
  *
  * ```kotlin
  * import arrow.core.rightIfNull
@@ -755,7 +736,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *  println(value)
  * }
  * ```
- * <!--- KNIT example-either-33.kt -->
+ * <!--- KNIT example-either-32.kt -->
  *
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
@@ -800,7 +781,7 @@ public sealed class Either<out A, out B> {
    *   //sampleEnd
    * }
    * ```
-   * <!--- KNIT example-either-34.kt -->
+   * <!--- KNIT example-either-33.kt -->
    *
    * @param ifLeft the function to apply if this is a [Left]
    * @param ifRight the function to apply if this is a [Right]
@@ -840,7 +821,7 @@ public sealed class Either<out A, out B> {
    *   Either.Right("right").swap() // Result: Left("right")
    * }
    * ```
-   * <!--- KNIT example-either-35.kt -->
+   * <!--- KNIT example-either-34.kt -->
    */
   public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
@@ -857,7 +838,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).map { "flower" }  // Result: Left(12)
    * }
    * ```
-   * <!--- KNIT example-either-36.kt -->
+   * <!--- KNIT example-either-35.kt -->
    */
   public inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
@@ -893,7 +874,7 @@ public sealed class Either<out A, out B> {
    *  Either.Left(12).mapLeft { "flower" }  // Result: Left("flower")
    * }
    * ```
-   * <!--- KNIT example-either-37.kt -->
+   * <!--- KNIT example-either-36.kt -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
@@ -913,7 +894,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).tapLeft { println("flower") }  // Result: prints "flower" and returns: Left(12)
    * }
    * ```
-   * <!--- KNIT example-either-38.kt -->
+   * <!--- KNIT example-either-37.kt -->
    */
   public inline fun tapLeft(f: (A) -> Unit): Either<A, B> =
     when (this) {
@@ -939,7 +920,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).tap { println("flower") }  // Result: Left(12)
    * }
    * ```
-   * <!--- KNIT example-either-39.kt -->
+   * <!--- KNIT example-either-38.kt -->
    */
   public inline fun tap(f: (B) -> Unit): Either<A, B> =
     when (this) {
@@ -973,7 +954,7 @@ public sealed class Either<out A, out B> {
    *  left.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-40.kt -->
+   * <!--- KNIT example-either-39.kt -->
    */
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
@@ -1011,7 +992,7 @@ public sealed class Either<out A, out B> {
    *   println("left = $left")
    * }
    * ```
-   * <!--- KNIT example-either-41.kt -->
+   * <!--- KNIT example-either-40.kt -->
    */
   public fun orNull(): B? = fold({ null }, { it })
 
@@ -1041,18 +1022,6 @@ public sealed class Either<out A, out B> {
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     fold({ null }, { right -> fa(right)?.let(::Right) })
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    when (this) {
-      is Right -> fa(this.value).map(::Right)
-      is Left -> this.valid()
-    }
-
-  @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    traverse(fa)
-
   public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
@@ -1061,12 +1030,6 @@ public sealed class Either<out A, out B> {
 
   public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
     fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
-
-  public inline fun <AA, C, D> bitraverseValidated(
-    fe: (A) -> Validated<AA, C>,
-    fa: (B) -> Validated<AA, D>
-  ): Validated<AA, Either<C, D>> =
-    fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
 
   public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
@@ -1087,7 +1050,7 @@ public sealed class Either<out A, out B> {
    *   Either.Right("foo").isEmpty() // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-42.kt -->
+   * <!--- KNIT example-either-41.kt -->
    */
   public fun isEmpty(): Boolean = isLeft
 
@@ -1105,7 +1068,7 @@ public sealed class Either<out A, out B> {
    *   //sampleEnd
    * }
    * ```
-   * <!--- KNIT example-either-43.kt -->
+   * <!--- KNIT example-either-42.kt -->
    */
   public fun isNotEmpty(): Boolean = isRight
 
@@ -1144,12 +1107,6 @@ public sealed class Either<out A, out B> {
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-
-  public fun toValidatedNel(): ValidatedNel<A, B> =
-    fold({ Validated.invalidNel(it) }, ::Valid)
-
-  public fun toValidated(): Validated<A, B> =
-    fold({ it.invalid() }, { it.valid() })
 
   public companion object {
 
@@ -1237,7 +1194,7 @@ public sealed class Either<out A, out B> {
      *   println(result)
      *  }
      *  ```
-     * <!--- KNIT example-either-44.kt -->
+     * <!--- KNIT example-either-43.kt -->
      */
     @JvmStatic
     public fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
@@ -1280,7 +1237,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  *   Left(12).getOrElse { 17 }  // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-45.kt -->
+ * <!--- KNIT example-either-44.kt -->
  */
 public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
   fold({ default() }, ::identity)
@@ -1298,7 +1255,7 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  *   Left(12).orNull()  // Result: null
  * }
  * ```
- * <!--- KNIT example-either-46.kt -->
+ * <!--- KNIT example-either-45.kt -->
  */
 @Deprecated("Duplicated API. Please use Either's member function orNull. This will be removed towards Arrow 2.0", ReplaceWith("orNull()"))
 public fun <B> Either<*, B>.orNull(): B? =
@@ -1319,7 +1276,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  *   Left(12).getOrHandle { it + 5 } // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-47.kt -->
+ * <!--- KNIT example-either-46.kt -->
  */
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1347,7 +1304,7 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  *   left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-48.kt -->
+ * <!--- KNIT example-either-47.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
@@ -1380,7 +1337,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-either-49.kt -->
+ * <!--- KNIT example-either-48.kt -->
  */
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap {
@@ -1402,7 +1359,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-50.kt -->
+ * <!--- KNIT example-either-49.kt -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
@@ -1427,7 +1384,7 @@ public inline fun <A> Either<A, A>.merge(): A =
  *   Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-51.kt -->
+ * <!--- KNIT example-either-50.kt -->
  */
 public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   flatMap { it.rightIfNotNull { default() } }
@@ -1483,7 +1440,7 @@ public fun <A> A.rightNel(): EitherNel<Nothing, A> = Either.Right(this)
  *   null.rightIfNotNull { "left" }    // Left(a="left")
  * }
  * ```
- * <!--- KNIT example-either-52.kt -->
+ * <!--- KNIT example-either-51.kt -->
  */
 public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Left(default())
@@ -1558,7 +1515,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-either-53.kt -->
+ * <!--- KNIT example-either-52.kt -->
  */
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
@@ -1818,13 +1775,6 @@ public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
 public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
   traverseNullable(::identity)
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
-  sequence()
-
-public fun <A, B, C> Either<A, Validated<B, C>>.sequence(): Validated<B, Either<A, C>> =
-  traverse(::identity)
-
 public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
   bitraverse(::identity, ::identity)
 
@@ -1833,6 +1783,3 @@ public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either
 
 public fun <A, B> Either<A?, B?>.bisequenceNullable(): Either<A, B>? =
   bitraverseNullable(::identity, ::identity)
-
-public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
-  bitraverseValidated(::identity, ::identity)

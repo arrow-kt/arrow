@@ -4,6 +4,6 @@ package arrow.core.examples.exampleEither35
 import arrow.core.*
 
 fun main() {
-  Either.Left("left").swap()   // Result: Right("left")
-  Either.Right("right").swap() // Result: Left("right")
+  Either.Right(12).map { "flower" } // Result: Right("flower")
+  Either.Left(12).map { "flower" }  // Result: Left(12)
 }

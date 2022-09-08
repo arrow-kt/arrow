@@ -2,10 +2,15 @@
 package arrow.core.examples.exampleEither25
 
 import arrow.core.Either
-import arrow.core.left
+import arrow.core.getOrHandle
 
-val y : Either<Int, Int> = 7.left()
-val fold = y.fold({ 1 }, { it + 3 })
+val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
+val httpStatusCode = r.getOrHandle {
+  when(it) {
+    is NumberFormatException -> 400
+    else -> 500
+  }
+}
 fun main() {
- println("fold = $fold")
+ println("httpStatusCode = $httpStatusCode")
 }

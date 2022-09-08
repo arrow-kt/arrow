@@ -153,14 +153,6 @@ class IorTest : UnitSpec() {
       }
     }
 
-    "toValidated() should convert values into a valid Validated" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).toValidated() shouldBe Invalid(a)
-        Ior.Right(b).toValidated() shouldBe Valid(b)
-        Ior.Both(a, b).toValidated() shouldBe Valid(b)
-      }
-    }
-
     "fromNullables() should build a correct Ior" {
       checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
         Ior.fromNullables(a, null) shouldBe Ior.Left(a)

@@ -174,18 +174,6 @@ public final class arrow/fx/coroutines/ParTraverse {
 	public static final fun parSequenceScoped (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parSequenceScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parSequenceValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parSequenceValidated (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parSequenceValidated$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedN (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parSequenceValidatedN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedNScoped (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedNScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parSequenceValidatedNScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedScoped (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parSequenceValidatedScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parSequenceValidatedScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parTraverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parTraverse$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
@@ -204,12 +192,6 @@ public final class arrow/fx/coroutines/ParTraverse {
 	public static final fun parTraverseResultN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parTraverseResultN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parTraverseResultN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseValidated (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseValidated$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseValidatedN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseValidatedN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Semigroup;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/ParZipKt {

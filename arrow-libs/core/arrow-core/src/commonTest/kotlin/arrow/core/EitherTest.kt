@@ -485,20 +485,6 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "traverse for Validated should return validated of either" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-
-      right.traverse { it.valid() } shouldBe Valid(Right(1))
-      left.traverse { it.valid() } shouldBe Valid(Left("foo"))
-    }
-
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { it.valid() }.sequence() shouldBe either.traverse { it.valid() }
-      }
-    }
-
     "bitraverse should wrap either in a list" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
@@ -546,21 +532,6 @@ class EitherTest : UnitSpec() {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
           either.bitraverseOption({ Some(it) }, { Some(it) })
-      }
-    }
-
-    "bitraverseValidated should return validated of either" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-
-      right.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Valid(Right(1))
-      left.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Invalid("foo")
-    }
-
-    "bisequenceValidated should be consistent with bitraverseValidated" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() shouldBe
-          either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
     }
 

@@ -5,7 +5,6 @@ import arrow.core.Ior
 import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -89,7 +88,6 @@ import kotlin.coroutines.resumeWithException
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.ensureNotNull
@@ -139,7 +137,6 @@ import kotlin.coroutines.resumeWithException
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *
@@ -628,13 +625,6 @@ public interface Effect<out R, out A> {
   public suspend fun toIor(): Ior<R, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 
   /**
-   * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
-   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
-   */
-  public suspend fun toValidated(): Validated<R, A> =
-    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-
-  /**
    * [fold] the [Effect] into an [Option]. Where the shifted value [R] is mapped to [Option] by the
    * provided function [orElse], and result value [A] is mapped to [Some].
    */
@@ -772,7 +762,6 @@ internal class FoldContinuation<R, B>(
  * import arrow.core.Either
  * import arrow.core.None
  * import arrow.core.Option
- * import arrow.core.Validated
  * import arrow.core.continuations.effect
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
@@ -780,14 +769,14 @@ internal class FoldContinuation<R, B>(
  * suspend fun main() {
  *   effect<String, Int> {
  *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
+ *     val y = Either.Right(2).bind()
  *     val z = Option(3).bind { "Option was empty" }
  *     x + y + z
  *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
  *
  *   effect<String, Int> {
  *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
+ *     val y = Either.Right(2).bind()
  *     val z: Int = None.bind { "Option was empty" }
  *     x + y + z
  *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })

@@ -259,37 +259,6 @@ public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
 public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   sequence()
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
-public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> =
-  traverse(semigroup, f)
-
-public inline fun <K, E, A, B> Map<K, A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> =
-  foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
-    when (val res = f(v)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value[k] = res.value }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-      }
-    }
-  }
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
-public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  sequence(semigroup)
-
-public fun <K, E, A> Map<K, Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  traverse(semigroup, ::identity)
-
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> {

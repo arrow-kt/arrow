@@ -89,35 +89,6 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
-    "traverse for Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
-
-        res shouldBe expected
-      }
-    }
-
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
-          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
-      }
-    }
 
     "can align lists with different lengths" {
       checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->

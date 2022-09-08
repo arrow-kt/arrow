@@ -1,16 +1,13 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither26
 
-import arrow.core.Either
-import arrow.core.getOrHandle
+import arrow.core.Either.Right
+import arrow.core.leftIfNull
 
-val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
-val httpStatusCode = r.getOrHandle {
-  when(it) {
-    is NumberFormatException -> 400
-    else -> 500
-  }
-}
 fun main() {
- println("httpStatusCode = $httpStatusCode")
+  val value =
+  //sampleStart
+    Right(12).leftIfNull({ -1 })
+  //sampleEnd
+  println(value)
 }

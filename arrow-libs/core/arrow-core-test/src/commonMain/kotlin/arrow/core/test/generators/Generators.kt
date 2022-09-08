@@ -13,7 +13,6 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.Validated
 import arrow.core.left
 import arrow.core.right
 import arrow.core.test.concurrency.deprecateArrowTestModules
@@ -219,10 +218,6 @@ public fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E
 
 @Deprecated(deprecateArrowTestModules)
 public fun <E, A> Arb<E>.or(arbA: Arb<A>): Arb<Either<E, A>> = Arb.either(this, arbA)
-
-@Deprecated(deprecateArrowTestModules)
-public fun <E, A> Arb.Companion.validated(arbE: Arb<E>, arbA: Arb<A>): Arb<Validated<E, A>> =
-  Arb.either(arbE, arbA).map { Validated.fromEither(it) }
 
 @Deprecated(deprecateArrowTestModules)
 public fun Arb.Companion.unit(): Arb<Unit> =

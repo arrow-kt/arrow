@@ -1,18 +1,16 @@
 // This file was automatically generated from EagerEffectScope.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEagerEffectScope06
 
-import arrow.core.None
-import arrow.core.Option
+import arrow.core.Either
 import arrow.core.continuations.eagerEffect
-import arrow.core.getOrElse
-import arrow.core.identity
 import io.kotest.matchers.shouldBe
 
-private val default = "failed"
 fun main() {
-  val option: Option<Int> = None
+  val condition = true
+  val failure = "failed"
+  val int = 4
   eagerEffect<String, Int> {
-    val x: Int = option.bind { default }
-    x
-  }.fold({ default }, ::identity) shouldBe option.getOrElse { default }
+    ensure(condition) { failure }
+    int
+  }.toEither() shouldBe if(condition) Either.Right(int) else Either.Left(failure)
 }

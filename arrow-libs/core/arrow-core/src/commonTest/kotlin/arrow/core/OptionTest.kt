@@ -391,19 +391,6 @@ class OptionTest : UnitSpec() {
       }
     }
 
-    "traverseValidated should yield validated of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.valid() } shouldBe some.valid()
-      none.traverse { it.valid() } shouldBe none.valid()
-    }
-
-    "sequenceValidated should be consistent with traverseValidated" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.valid() }.sequence() shouldBe option.traverse { it.valid() }
-      }
-    }
-
     "catch should return Some(result) when f does not throw" {
       val recover: (Throwable) -> Option<Int> = { _ -> None}
       Option.catch(recover) { 1 } shouldBe Some(1)

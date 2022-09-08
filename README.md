@@ -11,7 +11,7 @@
 
 Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces
 and abstractions across Kotlin libraries. For this, it includes the most popular data types such
-as `Option`, `Either`, `Validated` etc and functional operators such as `traverse` and computation
+as `Option`, `Either` etc and functional operators such as `traverse` and computation
 blocks to empower users to write pure FP apps and libraries built atop higher order abstractions.
 
 Use the list below to learn more about Λrrow's main features.

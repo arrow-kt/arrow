@@ -1,12 +1,9 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither51
 
-import arrow.core.Either.*
-import arrow.core.leftIfNull
+import arrow.core.rightIfNotNull
 
 fun main() {
-  Right(12).leftIfNull({ -1 })   // Result: Right(12)
-  Right(null).leftIfNull({ -1 }) // Result: Left(-1)
-
-  Left(12).leftIfNull({ -1 })    // Result: Left(12)
+  "value".rightIfNotNull { "left" } // Right(b="value")
+  null.rightIfNotNull { "left" }    // Left(a="left")
 }

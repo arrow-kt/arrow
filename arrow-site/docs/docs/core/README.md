@@ -19,8 +19,7 @@ permalink: /core/
 # Arrow Core. Functional companion to Kotlin’s Standard Library
 
 Arrow Core includes types such as [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' |
-relative_url }}), [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }})
-and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' |
+relative_url }}) and many extensions to [`Iterable`]({{ '/apidocs/arrow-core/arrow.core/index.html#functions' |
 relative_url }}) that can be used when implementing [error handling patterns]({{ '/patterns/error_handling/' | relative_url }}).
 
 Core also includes the base continuation effects system, which includes patterns to remove callbacks
@@ -50,7 +49,6 @@ boilerplate and enable direct syntax including [monad comprehensions and computa
 <div class="quickstart-coroutines-item" markdown="1">
 #### Extensions and data types
   - [Either]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }})
-  - [Validated]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }})
   - [Option]({{ '/apidocs/arrow-core/arrow.core/-option/' | relative_url }})
   - [NonEmptyList]({{ '/apidocs/arrow-core/arrow.core/-non-empty-list/' | relative_url }})
   - [Ior]({{ '/apidocs/arrow-core/arrow.core/-ior/' | relative_url }})
@@ -236,7 +234,8 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
             <scope>import</scope>
         </dependency>
     </dependencies>
-</dependencyManagement><dependencies>
+</dependencyManagement>
+<dependencies>
 ...
 </dependencies>
 ```

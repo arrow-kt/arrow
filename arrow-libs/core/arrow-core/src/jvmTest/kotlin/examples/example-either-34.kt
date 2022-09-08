@@ -4,13 +4,6 @@ package arrow.core.examples.exampleEither34
 import arrow.core.*
 
 fun main() {
-  fun possiblyFailingOperation(): Either.Right<Int> =
-    Either.Right(1)
-  //sampleStart
-  val result: Either<Exception, Int> = possiblyFailingOperation()
-  result.fold(
-       { println("operation failed with $it") },
-       { println("operation succeeded with $it") }
-  )
-  //sampleEnd
+  Either.Left("left").swap()   // Result: Right("left")
+  Either.Right("right").swap() // Result: Left("right")
 }

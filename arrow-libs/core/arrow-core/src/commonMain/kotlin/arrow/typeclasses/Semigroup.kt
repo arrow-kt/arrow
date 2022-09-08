@@ -6,7 +6,6 @@ import arrow.core.Endo
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.combine
 import arrow.core.compose
 import kotlin.jvm.JvmName
@@ -84,10 +83,6 @@ public fun interface Semigroup<A> {
     public fun <A> option(SGA: Semigroup<A>): Semigroup<Option<A>> =
       OptionSemigroup(SGA)
 
-    @JvmStatic
-    public fun <E, A> validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
-      ValidatedSemigroup(SE, SA)
-
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     public fun <A> nonEmptyList(): Semigroup<NonEmptyList<A>> =
@@ -107,14 +102,6 @@ public fun interface Semigroup<A> {
     public object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
       override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =
         NonEmptyList(this.head, this.tail.plus(b))
-    }
-
-    private open class ValidatedSemigroup<A, B>(
-      private val SA: Semigroup<A>,
-      private val SB: Semigroup<B>
-    ) : Semigroup<Validated<A, B>> {
-      override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
-        combine(SA, SB, b)
     }
 
     private class OptionSemigroup<A>(

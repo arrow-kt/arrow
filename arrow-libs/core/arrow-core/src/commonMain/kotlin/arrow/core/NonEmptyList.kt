@@ -448,42 +448,6 @@ public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<
   traverse(::identity)
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
-)
-public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, NonEmptyList<B>> =
-  traverse(semigroup, f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> NonEmptyList<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, NonEmptyList<B>> =
-  fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
-      }
-    }
-  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  sequence(semigroup)
-
-public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverse(semigroup, ::identity)
-
-@Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",
   ReplaceWith("traverse(f)", "arrow.core.traverse")
 )

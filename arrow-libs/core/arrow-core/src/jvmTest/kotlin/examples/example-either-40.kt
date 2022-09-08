@@ -1,13 +1,12 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither40
 
-import arrow.core.Either
 import arrow.core.Either.Left
+import arrow.core.Either.Right
 
+val right = Right(12).orNull() // Result: 12
+val left = Left(12).orNull()   // Result: null
 fun main() {
- Either.Right(12).exists { it > 10 } // Result: true
- Either.Right(7).exists { it > 10 }  // Result: false
-
- val left: Either<Int, Int> = Left(12)
- left.exists { it > 10 }      // Result: false
+  println("right = $right")
+  println("left = $left")
 }

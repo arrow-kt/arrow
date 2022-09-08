@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.combine
 import arrow.core.compose
 import arrow.core.flatten
@@ -103,22 +102,8 @@ public interface Monoid<A> : Semigroup<A> {
       OptionMonoid(MA)
 
     @JvmStatic
-    public fun <E, A> validated(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
-      ValidatedMonoid(SE, MA)
-
-    @JvmStatic
     public fun <A, B> pair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
       PairMonoid(MA, MB)
-
-    private class ValidatedMonoid<A, B>(
-      private val SA: Semigroup<A>,
-      private val MB: Monoid<B>
-    ) : Monoid<Validated<A, B>> {
-      private val empty = Validated.Valid(MB.empty())
-      override fun empty(): Validated<A, B> = empty
-      override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
-        combine(SA, MB, b)
-    }
 
     private class OptionMonoid<A>(
       private val MA: Semigroup<A>

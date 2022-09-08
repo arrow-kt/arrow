@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -75,13 +74,6 @@ public interface EagerEffect<out R, out A> {
   public fun toEither(): Either<R, A> = fold({ Either.Left(it) }) { Either.Right(it) }
 
   /**
-   * [fold] the [EagerEffect] into an [Validated]. Where the shifted value [R] is mapped to
-   * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
-   */
-  public fun toValidated(): Validated<R, A> =
-    fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-
-  /**
    * [fold] the [EagerEffect] into an [A?]. Where the shifted value [R] is mapped to
    * [null], and result value [A].
    */
@@ -138,7 +130,6 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
  * import arrow.core.Either
  * import arrow.core.None
  * import arrow.core.Option
- * import arrow.core.Validated
  * import arrow.core.continuations.eagerEffect
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
@@ -146,16 +137,14 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
  * fun main() {
  *   eagerEffect<String, Int> {
  *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z = Option(3).bind { "Option was empty" }
- *     x + y + z
- *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 6 })
+ *     val y = Option(3).bind { "Option was empty" }
+ *     x + y
+ *   }.fold({ fail("Shift can never be the result") }, { it shouldBe 5 })
  *
  *   eagerEffect<String, Int> {
  *     val x = Either.Right(1).bind()
- *     val y = Validated.Valid(2).bind()
- *     val z: Int = None.bind { "Option was empty" }
- *     x + y + z
+ *     val y: Int = None.bind { "Option was empty" }
+ *     x + y
  *   }.fold({ it shouldBe "Option was empty" }, { fail("Int can never be the result") })
  * }
  * ```
