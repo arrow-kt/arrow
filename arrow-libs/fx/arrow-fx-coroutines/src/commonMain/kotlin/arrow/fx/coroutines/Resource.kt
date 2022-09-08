@@ -4,8 +4,8 @@ import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.prependTo
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import arrow.fx.coroutines.continuations.ResourceScope
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -181,9 +181,8 @@ public sealed class Resource<out A> {
           val a = dsl(effect)
           f(a)
         } catch (e: Throwable) {
-          val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
           val ee = withContext(NonCancellable) {
-            effect.finalizers.get().cancelAll(ex, e) ?: e
+            effect.finalizers.get().cancelAll(ExitCase(e), e) ?: e
           }
           throw ee
         }
@@ -497,9 +496,8 @@ public sealed class Resource<out A> {
           }
           allocate to release
         } catch (e: Throwable) {
-          val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
           val ee = withContext(NonCancellable) {
-            effect.finalizers.get().cancelAll(ex, e) ?: e
+            effect.finalizers.get().cancelAll(ExitCase(e), e) ?: e
           }
           throw ee
         }
