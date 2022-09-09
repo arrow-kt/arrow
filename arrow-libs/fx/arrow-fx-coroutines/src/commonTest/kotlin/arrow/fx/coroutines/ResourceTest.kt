@@ -460,7 +460,7 @@ class ResourceTest : ArrowFxSpec(
       listOf(
         ExitCase.Completed,
         ExitCase.Failure(Exception()),
-        ExitCase.Cancelled(CancellationException(null))
+        ExitCase.Cancelled(CancellationException(null, null))
       ).forAll { exit ->
         val released = CompletableDeferred<Int>()
         val seed = Random.nextInt()

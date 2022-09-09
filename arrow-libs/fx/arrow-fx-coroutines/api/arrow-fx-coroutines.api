@@ -94,6 +94,7 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coro
 }
 
 public abstract class arrow/fx/coroutines/ExitCase {
+	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }
 
 public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/ExitCase {
@@ -105,6 +106,10 @@ public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/
 	public final fun getException ()Ljava/util/concurrent/CancellationException;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/coroutines/ExitCase$Companion {
+	public final fun ExitCase (Ljava/lang/Throwable;)Larrow/fx/coroutines/ExitCase;
 }
 
 public final class arrow/fx/coroutines/ExitCase$Completed : arrow/fx/coroutines/ExitCase {
