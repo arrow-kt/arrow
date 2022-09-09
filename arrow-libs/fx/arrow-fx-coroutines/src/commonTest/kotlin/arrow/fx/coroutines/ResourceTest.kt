@@ -3,7 +3,9 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -455,17 +457,20 @@ class ResourceTest : ArrowFxSpec(
     }
 
     suspend fun checkAllocated(mkResource: (() -> Int, (Int, ExitCase) -> Unit) -> Resource<Int>) {
-      val released = CompletableDeferred<Int>()
-      val releaseValue = Random.nextInt()
-      val seed = Random.nextInt()
+      listOf(
+        ExitCase.Completed,
+        ExitCase.Failure(Exception()),
+        ExitCase.Cancelled(CancellationException(null))
+      ).forAll { exit ->
+        val released = CompletableDeferred<Int>()
+        val seed = Random.nextInt()
 
-      val (allocate, release) = mkResource({ seed }) { i, _ -> released.complete(i) }.allocated()
+        val (allocate, release) = mkResource({ seed }) { i, _ -> released.complete(i) }.allocated()
 
-      allocate() shouldBe seed
+        release(allocate(), exit)
 
-      release(releaseValue, ExitCase.Completed)
-
-      released.getCompleted() shouldBe releaseValue
+        released.getCompleted() shouldBe seed
+      }
     }
 
     "allocated - Allocate" {
