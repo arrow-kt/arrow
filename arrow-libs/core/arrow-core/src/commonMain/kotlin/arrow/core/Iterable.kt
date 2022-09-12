@@ -998,9 +998,16 @@ public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
-  val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return asep to bsep
+  val left = ArrayList<A>(collectionSizeOrDefault(10))
+  val right = ArrayList<B>(collectionSizeOrDefault(10))
+
+  for (either in this)
+    when (either) {
+      is Left -> left.add(either.value)
+      is Right -> right.add(either.value)
+    }
+
+  return Pair(left, right)
 }
 
 /**
@@ -1010,9 +1017,16 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
 public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
-  val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return asep to bsep
+  val invalids = ArrayList<A>(collectionSizeOrDefault(10))
+  val valids = ArrayList<B>(collectionSizeOrDefault(10))
+
+  for (validated in this)
+    when (validated) {
+      is Invalid -> invalids.add(validated.value)
+      is Valid -> valids.add(validated.value)
+    }
+
+  return Pair(invalids, valids)
 }
 
 public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
