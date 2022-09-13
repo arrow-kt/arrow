@@ -365,32 +365,6 @@ class OptionTest : UnitSpec() {
       none.toMap() shouldBe emptyMap()
     }
 
-    "traverse should yield list of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
-    }
-
-    "sequence should be consistent with traverse" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { listOf(it) }.sequence() shouldBe option.traverse { listOf(it) }
-      }
-    }
-
-    "traverseEither should yield either of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.right() } shouldBe some.right()
-      none.traverse { it.right() } shouldBe none.right()
-    }
-
-    "sequenceEither should be consistent with traverseEither" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.right() }.sequence() shouldBe option.traverse{ it.right() }
-      }
-    }
-
     "catch should return Some(result) when f does not throw" {
       val recover: (Throwable) -> Option<Int> = { _ -> None}
       Option.catch(recover) { 1 } shouldBe Some(1)

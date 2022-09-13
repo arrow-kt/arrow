@@ -21,34 +21,6 @@ class SequenceKTest : UnitSpec() {
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        if (a > 20_000) {
-          Either.Left(Unit)
-        } else {
-          acc.add(a)
-          Either.Right(a)
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe Either.Left(Unit)
-    }
-
-    "traverse for Option stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        (a <= 20_000).maybe {
-          acc.add(a)
-          a
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe None
-    }
-
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)

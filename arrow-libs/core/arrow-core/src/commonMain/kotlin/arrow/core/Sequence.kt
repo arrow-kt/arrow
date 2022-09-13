@@ -599,25 +599,6 @@ public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Seq
   return asep to bsep
 }
 
-public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
-
-@Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
-)
-public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
-  sequence().map { it.asSequence() }
-
-public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
-
-@Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
-)
-public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
-  sequence().map { it.asSequence() }
 
 @Deprecated("some is being deprecated in favor of map", ReplaceWith("map { generateSequence { this } }"))
 public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
@@ -646,52 +627,6 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverse res
-    }
-  }
-  return acc.toList().right()
-}
-
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
-)
-public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  traverse(f).map { it.asSequence() }
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverse res
-    }
-  }
-  return Some(acc)
-}
-
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
-)
-public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
-  traverse(f).map { it.asSequence() }
 
 /**
  * splits an union into its component parts.
