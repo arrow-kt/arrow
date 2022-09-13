@@ -287,6 +287,37 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
+public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+  crossinline combine: (first: Error, second: Error) -> Error,
+  transform: (A) -> Either<Error, B>,
+): Either<Error, List<B>> =
+  fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = transform(a)) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+  semigroup: Semigroup<Error>,
+  transform: (A) -> Either<Error, B>,
+): Either<Error, List<B>> = with(semigroup) {
+  mapAccumulating({ a, b ->
+    a.combine(b)
+  }, transform)
+}
+
+public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+  transform: (A) -> Either<NonEmptyList<Error>, B>,
+): Either<NonEmptyList<Error>, List<B>> = mapAccumulating(NonEmptyList<Error>::plus, transform)
+
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {

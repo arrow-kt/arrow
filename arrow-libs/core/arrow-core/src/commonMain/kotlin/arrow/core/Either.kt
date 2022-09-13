@@ -843,25 +843,6 @@ public sealed class Either<out A, out B> {
   public inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
 
-  public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
-    crossinline combine: (first: Error, second: Error) -> Error,
-    transform: (A) -> Either<Error, B>,
-  ): Either<Error, List<B>> =
-    fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
-      when (val res = transform(a)) {
-        is Right -> when (acc) {
-          is Right -> acc.also { acc.value.add(res.value) }
-          is Left -> acc
-        }
-
-        is Left -> when (acc) {
-          is Right -> res
-          is Left -> Left(combine(acc.value, res.value))
-        }
-      }
-    }
-
-
   /**
    * The given function is applied if this is a [Left].
    *
