@@ -986,32 +986,6 @@ public sealed class Either<out A, out B> {
       is Right -> List(n) { this.value }.right()
     }
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
-    fold({ emptyList() }, { fa(it).map(::Right) })
-
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Either<A, C>> =
-    fold({ None }, { right -> fa(right).map(::Right) })
-
-  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
-    traverse(fa)
-
-  public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
-    fold({ null }, { right -> fa(right)?.let(::Right) })
-
-  public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
-    fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
-
-  public inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
-    fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
-
-  public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
-    fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
-
   public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     when (this) {
       is Right -> if (predicate(this.value)) this.value else null
@@ -1738,29 +1712,3 @@ public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, 
     is Left -> fa(this.value)
     is Right -> fb(this.value)
   }
-
-public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
-  traverse(::identity)
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
-  sequence()
-
-public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
-  traverse(::identity)
-
-@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
-  sequence()
-
-public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
-  traverseNullable(::identity)
-
-public fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
-  bitraverse(::identity, ::identity)
-
-public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either<A, B>> =
-  bitraverseOption(::identity, ::identity)
-
-public fun <A, B> Either<A?, B?>.bisequenceNullable(): Either<A, B>? =
-  bitraverseNullable(::identity, ::identity)

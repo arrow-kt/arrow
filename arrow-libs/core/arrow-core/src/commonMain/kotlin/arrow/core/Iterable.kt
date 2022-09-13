@@ -283,10 +283,6 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  traverse(f)
-
 public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
   crossinline combine: (first: Error, second: Error) -> Error,
   transform: (A) -> Either<Error, B>,
@@ -317,99 +313,6 @@ public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
 public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
   transform: (A) -> Either<NonEmptyList<Error>, B>,
 ): Either<NonEmptyList<Error>, List<B>> = mapAccumulating(NonEmptyList<Error>::plus, transform)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Right -> destination.add(res.value)
-      is Left -> return res
-    }
-  }
-  return destination.right()
-}
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  traverse(::identity)
-
-public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    f(item).fold(destination::add) { throwable ->
-      return@traverse Result.failure(throwable)
-    }
-  }
-  return success(destination)
-}
-
-@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
-  traverse(f)
-
-@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  sequence()
-
-public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  traverse(::identity)
-
-@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Some -> destination.add(res.value)
-      is None -> return res
-    }
-  }
-  return destination.some()
-}
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  sequence()
-
-public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
-
-@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    val res = f(a)
-    if (res != null) {
-      acc.add(res)
-    } else {
-      return res
-    }
-  }
-  return acc.toList()
-}
-
-@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  sequence()
-
-public fun <A> Iterable<A?>.sequence(): List<A>? =
-  traverse(::identity)
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }

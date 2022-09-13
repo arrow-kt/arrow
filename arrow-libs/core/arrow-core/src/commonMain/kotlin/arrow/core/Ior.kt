@@ -419,58 +419,6 @@ public sealed class Ior<out A, out B> {
       { a, b -> fromNullables(fa(a), fb(b)) }
     )
 
-  public inline fun <AA, C> bitraverse(fa: (A) -> Iterable<AA>, fb: (B) -> Iterable<C>): List<Ior<AA, C>> =
-    fold(
-      { a -> fa(a).map { Left(it) } },
-      { b -> fb(b).map { Right(it) } },
-      { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
-    )
-
-  public inline fun <AA, C, D> bitraverseEither(
-    fa: (A) -> Either<AA, C>,
-    fb: (B) -> Either<AA, D>
-  ): Either<AA, Ior<C, D>> =
-    fold(
-      { a -> fa(a).map { Left(it) } },
-      { b -> fb(b).map { Right(it) } },
-      { a, b ->
-        fa(a).flatMap { aa ->
-          fb(b).map { c -> Both(aa,c) }
-        }
-      }
-    )
-
-  public inline fun <reified AA, C, D> bitraverseEitherAccumulated(
-    SA: Semigroup<AA>,
-    fa: (A) -> Either<AA, C>,
-    fb: (B) -> Either<AA, D>
-  ): Either<AA, Ior<C, D>> =
-    fold(
-      { a -> fa(a).map { Left(it) } },
-      { b -> fb(b).map { Right(it) } },
-      { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Both(aa, c) } }
-    )
-
-  public inline fun <C, D> bitraverseOption(
-    fa: (A) -> Option<C>,
-    fb: (B) -> Option<D>
-  ): Option<Ior<C, D>> =
-    fold(
-      { fa(it).map { Left(it) } },
-      { fb(it).map { Right(it) } },
-      { a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } }
-    )
-
-  public inline fun <C, D> bitraverseNullable(
-    fa: (A) -> C?,
-    fb: (B) -> D?
-  ): Ior<C, D>? =
-    fold(
-      { a -> fa(a)?.let { Left(it) } },
-      { b -> fb(b)?.let { Right(it) } },
-      { a, b -> Nullable.zip(fa(a), fb(b)) { aa, c -> Both(aa, c) } }
-    )
-
   public inline fun <C> crosswalk(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
       { emptyList() },
@@ -527,48 +475,6 @@ public sealed class Ior<out A, out B> {
 
   public fun isNotEmpty(): Boolean = !isLeft
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
-    fold(
-      { a -> listOf(Left(a)) },
-      { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) } }
-    )
-
-  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
-    traverse(fa)
-
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, C> traverse(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
-    fold(
-      { a -> Either.Right(Left(a)) },
-      { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) } }
-    )
-
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Ior<A, C>> =
-    fold(
-      { a -> Some(Left(a)) },
-      { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) } }
-    )
-
-  @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Ior<A, C>> =
-    traverse(fa)
-
-  public inline fun <C> traverseNullable(fa: (B) -> C?): Ior<A, C>? =
-    fold(
-      { a -> Left(a) },
-      { b -> fa(b)?.let { Right(it) } },
-      { a, b -> fa(b)?.let { Both(a, it) } }
-    )
-
   public fun void(): Ior<A, Unit> =
     map { Unit }
 }
@@ -600,17 +506,6 @@ public fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
-public fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
-  bitraverse(::identity, ::identity)
-
-public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<A, Ior<B, C>> =
-  bitraverseEither(::identity, ::identity)
-
-public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>> =
-  bitraverseOption(::identity, ::identity)
-
-public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
-  bitraverseNullable(::identity, ::identity)
 
 public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
   with(SA) {
@@ -660,31 +555,6 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): 
       { MB.run { List(n) { rightValue }.fold() } }
     )
   }
-
-public fun <A, B> Ior<A, Iterable<B>>.sequence(): List<Ior<A, B>> =
-  traverse(::identity)
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>> =
-  sequence()
-
-public fun <A, B, C> Ior<A, Either<B, C>>.sequence(): Either<B, Ior<A, C>> =
-  traverse(::identity)
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
-  sequence()
-
-public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
-  traverse(::identity)
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
-  sequence()
-
-public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
-  traverseNullable(::identity)
-
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
  *

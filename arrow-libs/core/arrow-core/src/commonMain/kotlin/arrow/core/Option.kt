@@ -813,23 +813,6 @@ public sealed class Option<out A> {
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
-    fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
-
-  @OptIn(ExperimentalTypeInference::class)
-  @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, B> traverse(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
-    when (this) {
-      is Some -> fa(value).map { Some(it) }
-      is None -> Right(this)
-    }
-
-  @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
-  public inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
-    traverse(fa)
-
   public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
@@ -978,16 +961,6 @@ public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<
   val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
   return asep to bsep
 }
-
-public fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
-  traverse(::identity)
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
-  sequence()
-
-public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
-  traverse(::identity)
 
 public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)

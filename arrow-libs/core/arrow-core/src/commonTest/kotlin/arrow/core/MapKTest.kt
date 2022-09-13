@@ -6,10 +6,9 @@ import arrow.core.test.generators.longSmall
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 
@@ -22,66 +21,6 @@ class MapKTest : UnitSpec() {
         Arb.map(Arb.longSmall(), Arb.intSmall(), maxSize = 10)
       )
     )
-
-    "traverseEither is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse { v ->
-        acc.add(v)
-        Either.Right(v)
-      }
-      res shouldBe acc.map { it to it }.toMap().right()
-      res shouldBe (0..20_000).map { it to it }.toMap().right()
-    }
-
-    "traverseEither short-circuit" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.values.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.values.first { it % 2 != 0 }
-        }
-      }
-    }
-
-    "traverseOption is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse { a ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc.map { it to it }.toMap())
-      res shouldBe Some((0..20_000).map { it to it }.toMap())
-    }
-
-    "traverseOption short-circuits" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          (it % 2 == 0).maybe {
-            acc.add(it)
-            it
-          }
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequenceOption yields some when all entries in the list are some" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys

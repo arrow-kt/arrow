@@ -85,48 +85,6 @@ class ResourceTest : ArrowFxSpec(
       }
     }
 
-    "traverseResource: identity" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, String>(Arb.string())
-      ) { list, f ->
-        list.traverse { Resource.just(f(it)) } resourceShouldBe Resource.just(list.map(f))
-      }
-    }
-
-    "traverse: map + sequence == traverse" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.string().map { { _: Int -> Resource.just(it) } }
-      ) { list, f ->
-        list.traverse(f) resourceShouldBe list.map(f).sequence()
-      }
-    }
-    "traverse: parallelComposition" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, String>(Arb.string()),
-        Arb.functionAToB<Int, String>(Arb.string())
-      ) { list, f, g ->
-
-        val ff = list.traverse { Resource.just(f(it)) }
-        val gg = list.traverse { Resource.just(g(it)) }
-
-        val result = ff.zip(gg).map { (a, b) ->
-          a.zip(b)
-        }
-
-        list.traverse { Resource.just(f(it) to g(it)) } resourceShouldBe result
-      }
-    }
-
-    "traverse: leftToRight" {
-      checkAll(Arb.list(Arb.int())) { list ->
-        list.traverse { Resource.just(it) }
-          .use(::identity) shouldBe list
-      }
-    }
-
     "Resource can close from either" {
       val exit = CompletableDeferred<ExitCase>()
       arrow.core.computations.either<String, Int> {
@@ -152,15 +110,6 @@ class ResourceTest : ArrowFxSpec(
 
     fun closeable(): Resource<CheckableAutoClose> =
       Resource({ CheckableAutoClose() }) { a, _ -> a.close() }
-
-    "parZip - success" {
-      val all = (1..depth).traverse { closeable() }.parZip(
-        (1..depth).traverse { closeable() }
-      ) { a, b -> a + b }.use { all ->
-        all.also { all.forEach { it.started shouldBe true } }
-      }
-      all.forEach { it.started shouldBe false }
-    }
 
     fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
       val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }

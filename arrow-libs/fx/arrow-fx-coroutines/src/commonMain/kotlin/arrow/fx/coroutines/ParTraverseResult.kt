@@ -3,12 +3,8 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.sequence
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.ContinuationInterceptor
@@ -103,6 +99,7 @@ public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSeque
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Result<List<A>> = parTraverseResult(ctx) { it() }
 
+//todo(#2728): @marc check if this is still valid after removing traverse
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Result<List<A>> = parTraverseResult(ctx) { it() }
@@ -130,7 +127,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
 public suspend fun <A, B> Iterable<A>.parTraverseResult(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Result<B>
-): Result<List<B>> =
-  coroutineScope {
-    map { async(ctx) { f.invoke(this, it) } }.awaitAll().sequence()
-  }
+): Result<List<B>> = TODO("(#2728): @marc check if this is still valid after removing traverse")
+//  coroutineScope {
+//    map { async(ctx) { f.invoke(this, it) } }.awaitAll().sequence()
+//  }

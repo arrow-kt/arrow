@@ -235,54 +235,6 @@ public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K
     f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
   }.toMap()
 
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
-  val acc = mutableMapOf<K, B>()
-  forEach { (k, v) ->
-    when (val res = f(v)) {
-      is Right -> acc[k] = res.value
-      is Left -> return@traverse res
-    }
-  }
-  return acc.right()
-}
-
-@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
-  traverse(f)
-
-public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
-  traverse(::identity)
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
-  sequence()
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> {
-  val acc = mutableMapOf<K, B>()
-  forEach { (k, v) ->
-    when (val res = f(v)) {
-      is Some -> acc[k] = res.value
-      is None -> return@traverse res
-    }
-  }
-  return acc.some()
-}
-
-@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
-  traverse(f)
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
-  sequence()
-
-public fun <K, V> Map<K, Option<V>>.sequence(): Option<Map<K, V>> =
-  traverse(::identity)
-
 public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
 
