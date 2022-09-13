@@ -4,12 +4,9 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.option
-import arrow.typeclasses.Semigroup
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
@@ -30,6 +27,31 @@ class IterableTest : UnitSpec() {
       }
       res shouldBe Either.Right(acc)
       res shouldBe Either.Right((0..20_000).toList())
+    }
+
+    "mapAccumulated stack-safe" {
+      // also verifies result order and execution order (l to r)
+      val acc = mutableListOf<Int>()
+      val res: EitherNel<Nothing, List<Int>> = (0..20_000).mapAccumulating {
+        acc.add(it)
+        Either.Right(it)
+      }
+
+      res shouldBe Either.Right(acc)
+      res shouldBe Either.Right((0..20_000).toList())
+    }
+
+    "mapAccumulated accumulates" {
+
+      checkAll(Arb.list(Arb.int())) { ints ->
+        val res: EitherNel<Int, List<Int>> =
+          ints.mapAccumulating { i -> if (i % 2 == 0) Either.Right(i) else Either.Left(nonEmptyListOf(i)) }
+
+        val expected: EitherNel<Int, List<Int>> = ints.filterNot { it % 2 == 0 }
+          .toNonEmptyListOrNull()?.left() ?: Either.Right(ints.filter { it % 2 == 0 })
+
+        res shouldBe expected
+      }
     }
 
     "traverse Either short-circuit" {
