@@ -431,7 +431,6 @@ class EitherTest : UnitSpec() {
 
     "Cartesian builder should build products over homogeneous Either" {
       Either.Right("11th").zip(
-        Semigroup.string(),
         Either.Right("Doctor"),
         Either.Right("Who"),
       ) { a, b, c -> "$a $b $c" } shouldBe Either.Right("11th Doctor Who")
@@ -439,7 +438,6 @@ class EitherTest : UnitSpec() {
 
     "Cartesian builder should build products over heterogeneous Either" {
       Either.Right(13).zip(
-        Semigroup.string(),
         Either.Right("Doctor"),
         Either.Right(false),
       ) { a, b, c -> "${a}th $b is $c" } shouldBe Either.Right("13th Doctor is false")
@@ -447,7 +445,6 @@ class EitherTest : UnitSpec() {
 
     "Cartesian builder should build products over Either.Left" {
       Either.Left("fail1").zip(
-        Semigroup.string(),
         Either.Left("fail2"),
         Either.Right("Who")
       ) { _, _, _ -> "success!" } shouldBe Either.Left("fail1fail2")
@@ -460,17 +457,14 @@ class EitherTest : UnitSpec() {
     }
 
     "zip should return Right(f(a)) if both are Right" {
-      Right(10).zip(Semigroup.int(), Either.Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Either.Right(15)
+      Right(10).zip(Either.Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Either.Right(15)
     }
 
     "zip should return first Left found if is unique or combine both otherwise" {
-      Left(10).zip(Semigroup.int(), Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Left(10)
-      Right(10).zip<Int, Int, (Int) -> Int, Int>(
-        Semigroup.int(),
-        Either.Left(5)
-      ) { a, ff -> ff(a) } shouldBe Either.Left(5)
+      Left(10).zip(Right { a: Int -> a + 5 }) { a, ff -> ff(a) } shouldBe Left(10)
+      Right(10).zip<Int, Int, (Int) -> Int, Int>(Either.Left(5)) { a, ff ->
+        ff(a) } shouldBe Either.Left(5)
       Left(10).zip<Int, Int, (Int) -> Int, Int>(
-        Semigroup.int(),
         Either.Left(5)
       ) { a, ff -> ff(a) } shouldBe Either.Left(15)
     }
