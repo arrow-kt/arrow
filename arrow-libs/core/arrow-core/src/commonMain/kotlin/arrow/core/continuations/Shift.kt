@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -29,12 +28,7 @@ public interface Shift<in R> {
     is Either.Left -> shift(value)
     is Either.Right -> value
   }
-  
-  public fun <A> Validated<R, A>.bind(): A = when (this) {
-    is Validated.Invalid -> shift(value)
-    is Validated.Valid -> value
-  }
-  
+
   // TODO can be inlined with context receivers, and top-level
   public fun <A> Option<A>.bind(transform: Shift<R>.(None) -> A): A =
     when (this) {

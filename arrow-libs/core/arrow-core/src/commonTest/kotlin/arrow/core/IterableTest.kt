@@ -299,15 +299,5 @@ class IterableTest : UnitSpec() {
         list.separateEither() shouldBe ints.partition { it % 2 == 0 }
       }
     }
-
-    "separateValidated" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val list = ints.map {
-          if (it % 2 == 0) it.invalid()
-          else it.valid()
-        }
-        list.separateValidated() shouldBe ints.partition { it % 2 == 0 }
-      }
-    }
   }
 }
