@@ -866,10 +866,9 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
 
+@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }"))
 public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
-  flatMap { either ->
-    either.fold({ emptyList() }, { b -> listOf(b) })
-  }
+  mapNotNull { it.orNull() }
 
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
@@ -878,9 +877,16 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
-  val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return asep to bsep
+  val left = ArrayList<A>(collectionSizeOrDefault(10))
+  val right = ArrayList<B>(collectionSizeOrDefault(10))
+
+  for (either in this)
+    when (either) {
+      is Left -> left.add(either.value)
+      is Right -> right.add(either.value)
+    }
+
+  return Pair(left, right)
 }
 
 public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =

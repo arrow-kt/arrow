@@ -1,35 +1,20 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource06
 
-import arrow.fx.coroutines.*
-
-class UserProcessor {
-  fun start(): Unit = println("Creating UserProcessor")
-  fun shutdown(): Unit = println("Shutting down UserProcessor")
-  fun process(ds: DataSource): List<String> =
-   ds.users().map { "Processed $it" }
-}
+import arrow.fx.coroutines.resourceScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DataSource {
-  fun connect(): Unit = println("Connecting dataSource")
-  fun users(): List<String> = listOf("User-1", "User-2", "User-3")
-  fun close(): Unit = println("Closed dataSource")
+  suspend fun connect(): Unit = withContext(Dispatchers.IO) { println("Connecting dataSource") }
+  suspend fun close(): Unit = withContext(Dispatchers.IO) { println("Closed dataSource") }
+  suspend fun users(): List<String> = listOf("User-1", "User-2", "User-3")
 }
 
-class Service(val db: DataSource, val userProcessor: UserProcessor) {
-  suspend fun processData(): List<String> = userProcessor.process(db)
-}
+suspend fun main(): Unit = resourceScope {
+  val dataSource = install({
+    DataSource().also { it.connect() }
+  }) { ds, _ -> ds.close() }
 
-val userProcessor = resource {
-  UserProcessor().also(UserProcessor::start)
-} release UserProcessor::shutdown
-
-val dataSource = resource {
-  DataSource().also { it.connect() }
-} release DataSource::close
-
-suspend fun main(): Unit {
-  userProcessor.zip(dataSource) { userProcessor, ds ->
-      Service(ds, userProcessor)
-    }.use { service -> service.processData() }
+  println("Using data source: ${dataSource.users()}")
 }

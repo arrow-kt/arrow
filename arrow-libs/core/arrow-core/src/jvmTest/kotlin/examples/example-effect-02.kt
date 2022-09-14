@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEffect02
 
 import arrow.core.Either
+import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.continuations.effect

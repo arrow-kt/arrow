@@ -1,14 +1,14 @@
 // This file was automatically generated from ResourceExtensions.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResourceextensions04
 
-import arrow.fx.coroutines.*
+import arrow.fx.coroutines.resourceScope
+import arrow.fx.coroutines.singleThreadContext
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 
-val singleCtx = Resource.singleThreadContext("single")
-
-suspend fun main(): Unit =
-  singleCtx.use { ctx ->
-    withContext(ctx) {
-      println("I am running on ${Thread.currentThread().name}")
-    }
+suspend fun main(): Unit = resourceScope {
+  val single: ExecutorCoroutineDispatcher = singleThreadContext("single")
+  withContext(single) {
+    println("I am running on ${Thread.currentThread().name}")
   }
+}
