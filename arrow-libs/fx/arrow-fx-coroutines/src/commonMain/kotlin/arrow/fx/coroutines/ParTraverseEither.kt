@@ -4,6 +4,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.continuations.effect
+import arrow.core.continuations.toEither
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

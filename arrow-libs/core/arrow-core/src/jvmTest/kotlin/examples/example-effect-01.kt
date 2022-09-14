@@ -1,17 +1,18 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffect01
 
+import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
-import io.kotest.matchers.shouldBe
+import arrow.core.continuations.ensureNotNull
+import arrow.core.continuations.ensure
 
-suspend fun main() {
-  val shift = effect<String, Int> {
-    shift("Hello, World!")
-  }.fold({ str: String -> str }, { int -> int.toString() })
-  shift shouldBe "Hello, World!"
+object EmptyPath
 
-  val res = effect<String, Int> {
-    1000
-  }.fold({ str: String -> str.length }, { int -> int })
-  res shouldBe 1000
+fun readFile(path: String): Effect<EmptyPath, Unit> = effect {
+  if (path.isEmpty()) shift(EmptyPath) else Unit
+}
+
+fun readFile2(path: String?): Effect<EmptyPath, Unit> = effect {
+  ensureNotNull(path) { EmptyPath }
+  ensure(path.isNotEmpty()) { EmptyPath }
 }

@@ -8,7 +8,8 @@ import io.kotest.property.arbitrary.int
 class ParTraverseJvmTest : ArrowFxSpec(spec = {
   "parTraverse runs on provided context " { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
+      val res = resourceScope {
+        val ctx = singleThreadContext("single")
         (0 until i).parTraverse(ctx) { Thread.currentThread().name }
       }
       assertSoftly {
@@ -16,10 +17,11 @@ class ParTraverseJvmTest : ArrowFxSpec(spec = {
       }
     }
   }
-
+  
   "parTraverseN runs on provided thread" {
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
+      val res = resourceScope {
+        val ctx = singleThreadContext("single")
         (0 until i).parTraverseN(ctx, 3) {
           Thread.currentThread().name
         }
