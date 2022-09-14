@@ -3,24 +3,12 @@ package arrow.fx.coroutines.examples.exampleResource09
 
 import arrow.fx.coroutines.*
 
-class File(url: String) {
-  suspend fun open(): File = this
-  suspend fun close(): Unit {}
-  override fun toString(): String = "This file contains some interesting content!"
-}
-
-suspend fun openFile(uri: String): File = File(uri).open()
-suspend fun closeFile(file: File): Unit = file.close()
-suspend fun fileToString(file: File): String = file.toString()
+suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
+suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
 
 suspend fun main(): Unit {
-  val res = resource {
-    openFile("data.json")
-  } release { file ->
-    closeFile(file)
-  } use { file ->
-    fileToString(file)
+  val resource = Resource(::acquireResource, ::releaseResource)
+  resource.use {
+    println("Expensive resource under use! $it")
   }
-
-  println(res)
 }
