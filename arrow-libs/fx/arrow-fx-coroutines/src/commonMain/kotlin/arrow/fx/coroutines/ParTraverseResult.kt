@@ -1,5 +1,5 @@
 @file:JvmMultifileClass
-@file:JvmName("ParTraverse")
+@file:JvmName("parMap")
 
 package arrow.fx.coroutines
 
@@ -21,10 +21,10 @@ import kotlin.jvm.JvmName
  */
 @JvmName("parSequenceResultNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResultN(n: Int): Result<List<A>> =
-  parTraverseResultN(Dispatchers.Default, n) { it() }
+  parMapResultN(Dispatchers.Default, n) { it() }
 
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(n: Int): Result<List<A>> =
-  parTraverseResultN(Dispatchers.Default, n) { it() }
+  parMapResultN(Dispatchers.Default, n) { it() }
 
 /**
  * Traverses this [Iterable] and runs `suspend CoroutineScope.() -> Result<A>` in [n] parallel operations on [CoroutineContext].
@@ -41,13 +41,13 @@ public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSeque
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Result<List<A>> =
-  parTraverseResultN(ctx, n) { it() }
+  parMapResultN(ctx, n) { it() }
 
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Result<List<A>> =
-  parTraverseResultN(ctx, n) { it() }
+  parMapResultN(ctx, n) { it() }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -55,11 +55,11 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B> Iterable<A>.parTraverseResultN(
+public suspend fun <A, B> Iterable<A>.parMapResultN(
   n: Int,
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
-  parTraverseResultN(Dispatchers.Default, n, f)
+  parMapResultN(Dispatchers.Default, n, f)
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [CoroutineContext].
@@ -71,13 +71,13 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B> Iterable<A>.parTraverseResultN(
+public suspend fun <A, B> Iterable<A>.parMapResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> {
   val semaphore = Semaphore(n)
-  return parTraverseResult(ctx) { a ->
+  return parMapResult(ctx) { a ->
     semaphore.withPermit { f(a) }
   }
 }
@@ -97,12 +97,12 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
 @JvmName("parSequenceResultScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResult(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Result<List<A>> = parTraverseResult(ctx) { it() }
+): Result<List<A>> = parMapResult(ctx) { it() }
 
 //todo(#2728): @marc check if this is still valid after removing traverse
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Result<List<A>> = parTraverseResult(ctx) { it() }
+): Result<List<A>> = parMapResult(ctx) { it() }
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
@@ -110,8 +110,8 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScope.(A) -> Result<B>): Result<List<B>> =
-  parTraverseResult(Dispatchers.Default, f)
+public suspend fun <A, B> Iterable<A>.parMapResult(f: suspend CoroutineScope.(A) -> Result<B>): Result<List<B>> =
+  parMapResult(Dispatchers.Default, f)
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -124,7 +124,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
  * Cancelling this operation cancels all running tasks.
  *
  */
-public suspend fun <A, B> Iterable<A>.parTraverseResult(
+public suspend fun <A, B> Iterable<A>.parMapResult(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> = TODO("(#2728): @marc check if this is still valid after removing traverse")

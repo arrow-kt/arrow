@@ -13,17 +13,17 @@ import kotlinx.coroutines.CompletableDeferred
 
 //todo(#2728): @marc check if this test is still valid after removing traverse
 /*
-class ParTraverseResultTest : ArrowFxSpec(
+class parMapResultTest : ArrowFxSpec(
   spec = {
-    "parTraverseResult can traverse effect full computations" {
+    "parMapResult can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parTraverseResult {
+      (0 until 100).parMapResult {
         Result.success(ref.update { it + 1 })
       }
       ref.get() shouldBe 100
     }
 
-    "parTraverseResult runs in parallel" {
+    "parMapResult runs in parallel" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
@@ -41,44 +41,44 @@ class ParTraverseResultTest : ArrowFxSpec(
           promiseB.complete(Unit)
           Result.success(promiseC.await())
         }
-      ).parTraverseResult { it() }
+      ).parMapResult { it() }
     }
 
-    "parTraverseResult results in the correct left" {
+    "parMapResult results in the correct left" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9)
       ) { n, killOn ->
-        (0 until n).parTraverseResult { i ->
+        (0 until n).parMapResult { i ->
           if (i == killOn) Result.failure(RuntimeException()) else Result.success(Unit)
         }.shouldBeFailureOfType<RuntimeException>()
       }
     }
 
-    "parTraverseResult identity is identity" {
+    "parMapResult identity is identity" {
       checkAll(Arb.list(Arb.result(Arb.int()))) { l ->
-        val res = l.parTraverseResult { it }
+        val res = l.parMapResult { it }
         res shouldBe l.sequence()
       }
     }
 
-    "parTraverseResult results in the correct error" {
+    "parMapResult results in the correct error" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9),
         Arb.string().orNull()
       ) { n, killOn, msg ->
         Either.catch {
-          (0 until n).parTraverseResult { i ->
+          (0 until n).parMapResult { i ->
             if (i == killOn) throw RuntimeException(msg) else Result.success(Unit)
           }.let(::println)
         }.shouldBeTypeOf<Either.Left<RuntimeException>>().value.message shouldBe msg
       }
     }
 
-    "parTraverseResult stack-safe" {
+    "parMapResult stack-safe" {
       val count = 20_000
-      val l = (0 until count).parTraverseResult { Result.success(it) }
+      val l = (0 until count).parMapResult { Result.success(it) }
       l shouldBe Result.success((0 until count).toList())
     }
   }

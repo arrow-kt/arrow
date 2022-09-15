@@ -21,7 +21,7 @@ import kotlin.jvm.JvmMultifileClass
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
-          * [parTraverse](#partraverse)
+          * [parMap](#parMap)
           * [raceN](#racen)
           * [bracketCase / Resource](#bracketcase--resource)
         * [KotlinX](#kotlinx)
@@ -359,13 +359,13 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-05.kt -->
  *
- * #### parTraverse
+ * #### parMap
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
- * import arrow.fx.coroutines.parTraverse
+ * import arrow.fx.coroutines.parMap
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  * import io.kotest.matchers.types.shouldBeTypeOf
@@ -383,7 +383,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val error = "Error"
  *   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
  *   effect<String, List<Unit>> {
- *     (0..4).parTraverse { index ->
+ *     (0..4).parMap { index ->
  *       if (index == 4) shift(error)
  *       else awaitExitCase(exits[index])
  *     }
@@ -394,7 +394,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-06.kt -->
  *
- * `parTraverse` will launch 5 tasks, for every element in `1..5`.
+ * `parMap` will launch 5 tasks, for every element in `1..5`.
  * The last task to get scheduled will `shift` with "error", and it will cancel the other launched tasks before returning.
  *
  * #### raceN

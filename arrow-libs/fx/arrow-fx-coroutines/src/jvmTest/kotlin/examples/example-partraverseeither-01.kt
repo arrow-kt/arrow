@@ -1,5 +1,5 @@
-// This file was automatically generated from ParTraverseEither.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.examplePartraverseeither01
+// This file was automatically generated from parMapEither.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.exampleparMapeither01
 
 import arrow.core.*
 import arrow.fx.coroutines.*

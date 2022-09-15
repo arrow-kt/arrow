@@ -120,7 +120,7 @@ class AtomicTest : ArrowFxSpec(
     "concurrent modifications" {
       val finalValue = 50_000
       val r = Atomic(0)
-      (0 until finalValue).parTraverse { r.update { it + 1 } }
+      (0 until finalValue).parMap { r.update { it + 1 } }
       r.get() shouldBe finalValue
     }
   }

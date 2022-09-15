@@ -1,5 +1,5 @@
-// This file was automatically generated from ParTraverse.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.examplePartraverse02
+// This file was automatically generated from parMap.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.exampleparMap02
 
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.Dispatchers

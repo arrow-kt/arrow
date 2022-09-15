@@ -1,5 +1,5 @@
-// This file was automatically generated from ParTraverseEither.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.examplePartraverseeither02
+// This file was automatically generated from parMapEither.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.exampleparMapeither02
 
 import arrow.core.*
 import arrow.fx.coroutines.*
@@ -15,10 +15,10 @@ suspend fun main(): Unit {
     else User(id, Thread.currentThread().name).right()
 
   val res = listOf(1, 2, 3)
-    .parTraverseEither(Dispatchers.IO) { getUserById(it) }
+    .parMapEither(Dispatchers.IO) { getUserById(it) }
 
   val res2 = listOf(1, 4, 2, 3)
-    .parTraverseEither(Dispatchers.IO) { getUserById(it) }
+    .parMapEither(Dispatchers.IO) { getUserById(it) }
  //sampleEnd
  println(res)
  println(res2)

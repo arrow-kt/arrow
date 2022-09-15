@@ -143,7 +143,7 @@ public final class arrow/fx/coroutines/FlowExtensions {
 	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/coroutines/Schedule;)Lkotlinx/coroutines/flow/Flow;
 }
 
-public final class arrow/fx/coroutines/ParTraverse {
+public final class arrow/fx/coroutines/parMap {
 	public static final fun parSequenceResult (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceResult$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parSequenceResultN (Ljava/lang/Iterable;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -154,12 +154,12 @@ public final class arrow/fx/coroutines/ParTraverse {
 	public static synthetic fun parSequenceResultNScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun parSequenceResultScoped (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun parSequenceResultScoped$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseResult (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseResult (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseResult$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun parTraverseResultN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun parTraverseResultN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun parTraverseResultN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parMapResult (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMapResult (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parMapResult$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parMapResultN (Ljava/lang/Iterable;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMapResultN (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parMapResultN$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/ParZipKt {

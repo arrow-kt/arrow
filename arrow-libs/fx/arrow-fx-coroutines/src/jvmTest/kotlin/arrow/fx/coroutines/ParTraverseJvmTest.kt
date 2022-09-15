@@ -5,12 +5,12 @@ import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 
-class ParTraverseJvmTest : ArrowFxSpec(spec = {
-  "parTraverse runs on provided context " { // 100 is same default length as Arb.list
+class parMapJvmTest : ArrowFxSpec(spec = {
+  "parMap runs on provided context " { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         val ctx = singleThreadContext("single")
-        (0 until i).parTraverse(ctx) { Thread.currentThread().name }
+        (0 until i).parMap(ctx) { Thread.currentThread().name }
       }
       assertSoftly {
         res.forEach { it shouldStartWith "single" }
@@ -18,11 +18,11 @@ class ParTraverseJvmTest : ArrowFxSpec(spec = {
     }
   }
   
-  "parTraverseN runs on provided thread" {
+  "parMapN runs on provided thread" {
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         val ctx = singleThreadContext("single")
-        (0 until i).parTraverseN(ctx, 3) {
+        (0 until i).parMapN(ctx, 3) {
           Thread.currentThread().name
         }
       }

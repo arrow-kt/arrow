@@ -1,5 +1,5 @@
 @file:JvmMultifileClass
-@file:JvmName("ParTraverse")
+@file:JvmName("parMap")
 package arrow.fx.coroutines
 
 import arrow.core.Either
@@ -23,11 +23,11 @@ import kotlin.jvm.JvmName
  * Cancelling this operation cancels all running tasks
  */
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n) { it() }
+  parMapEitherN(Dispatchers.Default, n) { it() }
 
 @JvmName("parSequenceEitherNScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n) { it() }
+  parMapEitherN(Dispatchers.Default, n) { it() }
 
 /**
  * Sequences all tasks in [n] parallel processes on [ctx] and return the result.
@@ -43,13 +43,13 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Either<A, List<B>> =
-  parTraverseEitherN(ctx, n) { it() }
+  parMapEitherN(ctx, n) { it() }
 
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Either<A, List<B>> =
-  parTraverseEitherN(ctx, n) { it() }
+  parMapEitherN(ctx, n) { it() }
 
 /**
  * Sequences all tasks in parallel on [Dispatchers.Default] and return the result.
@@ -59,11 +59,11 @@ public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither
  * Cancelling this operation cancels all running tasks.
  */
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
-  parTraverseEither(Dispatchers.Default) { it() }
+  parMapEither(Dispatchers.Default) { it() }
 
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
-  parTraverseEither(Dispatchers.Default) { it() }
+  parMapEither(Dispatchers.Default) { it() }
 
 /**
  * Sequences all tasks in parallel on [ctx] and return the result.
@@ -96,18 +96,18 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-partraverseeither-01.kt -->
+ * <!--- KNIT example-parMapeither-01.kt -->
  */
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Either<A, List<B>> =
-  parTraverseEither(ctx) { it() }
+  parMapEither(ctx) { it() }
 
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
 ): Either<A, List<B>> =
-  parTraverseEither(ctx) { it() }
+  parMapEither(ctx) { it() }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -116,11 +116,11 @@ public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
+public suspend fun <A, B, E> Iterable<A>.parMapEitherN(
   n: Int,
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n, f)
+  parMapEitherN(Dispatchers.Default, n, f)
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -133,13 +133,13 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
+public suspend fun <A, B, E> Iterable<A>.parMapEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> {
   val semaphore = Semaphore(n)
-  return parTraverseEither(ctx) { a ->
+  return parMapEither(ctx) { a ->
     semaphore.withPermit { f(a) }
   }
 }
@@ -151,10 +151,10 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
+public suspend fun <A, B, E> Iterable<A>.parMapEither(
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =
-  parTraverseEither(Dispatchers.Default, f)
+  parMapEither(Dispatchers.Default, f)
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -182,18 +182,18 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  *     else User(id, Thread.currentThread().name).right()
  *
  *   val res = listOf(1, 2, 3)
- *     .parTraverseEither(Dispatchers.IO) { getUserById(it) }
+ *     .parMapEither(Dispatchers.IO) { getUserById(it) }
  *
  *   val res2 = listOf(1, 4, 2, 3)
- *     .parTraverseEither(Dispatchers.IO) { getUserById(it) }
+ *     .parMapEither(Dispatchers.IO) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  *  println(res2)
  * }
  * ```
- * <!--- KNIT example-partraverseeither-02.kt -->
+ * <!--- KNIT example-parMapeither-02.kt -->
  */
-public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
+public suspend fun <A, B, E> Iterable<A>.parMapEither(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =

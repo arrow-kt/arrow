@@ -5,7 +5,7 @@ import arrow.fx.coroutines.*
 
 suspend fun main() {
   val count = Atomic(0)
-  (0 until 20_000).parTraverse {
+  (0 until 20_000).parMap {
     count.update(Int::inc)
   }
   println(count.get())

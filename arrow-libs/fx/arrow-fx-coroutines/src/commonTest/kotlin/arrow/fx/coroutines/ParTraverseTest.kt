@@ -14,18 +14,18 @@ import kotlin.time.milliseconds
 //todo(#2728): @marc check if this test is still valid after removing traverse
 /*
 @ExperimentalTime
-class ParTraverseTest : ArrowFxSpec(
+class parMapTest : ArrowFxSpec(
   spec = {
 
-    "parTraverse can traverse effect full computations" {
+    "parMap can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parTraverse {
+      (0 until 100).parMap {
         ref.update { it + 1 }
       }
       ref.get() shouldBe 100
     }
 
-    "parTraverse runs in parallel" {
+    "parMap runs in parallel" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
@@ -46,41 +46,41 @@ class ParTraverseTest : ArrowFxSpec(
       ).parSequence()
     }
 
-    "parTraverse results in the correct error" {
+    "parMap results in the correct error" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9),
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverse { i ->
+          (0 until n).parMap { i ->
             if (i == killOn) throw e else unit()
           }
         } should leftException(e)
       }
     }
 
-    "parTraverse identity is identity" {
+    "parMap identity is identity" {
       checkAll(Arb.list(Arb.int())) { l ->
-        l.parTraverse { it } shouldBe l
+        l.parMap { it } shouldBe l
       }
     }
 
-    "parTraverse stack-safe" {
+    "parMap stack-safe" {
       val count = 20_000
-      val l = (0 until count).parTraverse { it }
+      val l = (0 until count).parMap { it }
       l shouldBe (0 until count).toList()
     }
 
-    "parTraverseN can traverse effect full computations" {
+    "parMapN can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parTraverseN(5) {
+      (0 until 100).parMapN(5) {
         ref.update { it + 1 }
       }
       ref.get() shouldBe 100
     }
 
-    "parTraverseN(3) runs in (3) parallel" {
+    "parMapN(3) runs in (3) parallel" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
@@ -101,7 +101,7 @@ class ParTraverseTest : ArrowFxSpec(
       ).parSequenceN(3)
     }
 
-    "parTraverseN(1) times out running 3 tasks" {
+    "parMapN(1) times out running 3 tasks" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
@@ -124,29 +124,29 @@ class ParTraverseTest : ArrowFxSpec(
       } shouldBe null
     }
 
-    "parTraverseN identity is identity" {
+    "parMapN identity is identity" {
       checkAll(Arb.list(Arb.int())) { l ->
-        l.parTraverseN(5) { it } shouldBe l
+        l.parMapN(5) { it } shouldBe l
       }
     }
 
-    "parTraverseN results in the correct error" {
+    "parMapN results in the correct error" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9),
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverseN(3) { i ->
+          (0 until n).parMapN(3) { i ->
             if (i == killOn) throw e else unit()
           }
         } should leftException(e)
       }
     }
 
-    "parTraverseN stack-safe" {
+    "parMapN stack-safe" {
       val count = 20_000
-      val l = (0 until count).parTraverseN(20) { it }
+      val l = (0 until count).parMapN(20) { it }
       l shouldBe (0 until count).toList()
     }
 

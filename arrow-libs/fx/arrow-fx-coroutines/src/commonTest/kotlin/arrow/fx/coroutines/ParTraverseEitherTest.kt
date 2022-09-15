@@ -12,17 +12,17 @@ import kotlinx.coroutines.CompletableDeferred
 
 //todo(#2728): @marc check if this test is still valid after removing traverse
 /*
-class ParTraverseEitherTest : ArrowFxSpec(
+class parMapEitherTest : ArrowFxSpec(
   spec = {
-    "parTraverseEither can traverse effect full computations" {
+    "parMapEither can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parTraverseEither {
+      (0 until 100).parMapEither {
         ref.update { it + 1 }.right()
       }
       ref.get() shouldBe 100
     }
 
-    "parTraverseEither runs in parallel" {
+    "parMapEither runs in parallel" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
@@ -40,16 +40,16 @@ class ParTraverseEitherTest : ArrowFxSpec(
           promiseB.complete(Unit)
           promiseC.await().right()
         }
-      ).parTraverseEither { it() }
+      ).parMapEither { it() }
     }
 
-    "parTraverseEither results in the correct left" {
+    "parMapEither results in the correct left" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9),
         Arb.string()
       ) { n, killOn, e ->
-        (0 until n).parTraverseEither { i ->
+        (0 until n).parMapEither { i ->
           if (i == killOn) e.left() else Unit.right()
         } shouldBe e.left()
       }
@@ -57,10 +57,10 @@ class ParTraverseEitherTest : ArrowFxSpec(
 
     //todo(#2728): @marc check if this test is still valid after removing traverse
     */
-/*"parTraverseEither identity is identity" {
+/*"parMapEither identity is identity" {
       checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { l ->
         val containsError = l.any(Either<String, Int>::isLeft)
-        val res = l.parTraverseEither { it }
+        val res = l.parMapEither { it }
 
         if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
         else res shouldBe l.sequence()
@@ -68,23 +68,23 @@ class ParTraverseEitherTest : ArrowFxSpec(
     }*//*
 
 
-    "parTraverseEither results in the correct error" {
+    "parMapEither results in the correct error" {
       checkAll(
         Arb.int(min = 10, max = 20),
         Arb.int(min = 1, max = 9),
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parTraverseEither { i ->
+          (0 until n).parMapEither { i ->
             if (i == killOn) throw e else Unit.right()
           }
         } should leftException(e)
       }
     }
 
-    "parTraverseEither stack-safe" {
+    "parMapEither stack-safe" {
       val count = 20_000
-      val l = (0 until count).parTraverseEither { it.right() }
+      val l = (0 until count).parMapEither { it.right() }
       l shouldBe (0 until count).toList().right()
     }
   }
