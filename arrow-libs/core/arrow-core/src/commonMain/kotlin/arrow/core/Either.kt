@@ -787,17 +787,18 @@ public sealed class Either<out A, out B> {
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
   
-  @Deprecated(
-    RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Left<*>)")
-  )
-  public fun isLeft(): Boolean = isLeft
+  @OptIn(ExperimentalContracts::class)
+  public fun isLeft(): Boolean {
+    contract { returns(true) implies (this@Either is Left<A>) }
+    return this@Either is Left<A>
+  }
   
-  @Deprecated(
-    RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Right<*>)")
-  )
-  public fun isRight(): Boolean = isRight
+  
+  @OptIn(ExperimentalContracts::class)
+  public fun isRight(): Boolean {
+    contract { returns(true) implies (this@Either is Right<B>) }
+    return this@Either is Right<B>
+  }
   
   /**
    * Transform an [Either] into a value of [C].

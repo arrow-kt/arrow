@@ -12,6 +12,7 @@ import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -48,15 +49,18 @@ class EitherTest : UnitSpec() {
 
     "isLeft should return true if Left and false if Right" {
       checkAll(Arb.int()) { a: Int ->
-        Left(a).isLeft() && !Right(a).isLeft()
-        (Left(a) is Left<*>) && !(a.right() is Left<*>)
-      }
+        val x = Left(a)
+        if(x.isLeft()) x.value shouldBe a
+        else fail("Left(a).isLeft() cannot be false")
+        x.isRight() shouldBe false
     }
 
     "isRight should return false if Left and true if Right" {
       checkAll(Arb.int()) { a: Int ->
-        !Left(a).isRight() && Right(a).isRight()
-        (a.left() !is Right<*>) && (Right(a) is Right<*>)
+        val x = Right(a)
+        if(x.isRight()) x.value shouldBe a
+        else fail("Right(a).isRight() cannot be false")
+        x.isRight() shouldBe false
       }
     }
 
