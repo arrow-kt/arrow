@@ -49,12 +49,14 @@ class EitherTest : UnitSpec() {
     "isLeft should return true if Left and false if Right" {
       checkAll(Arb.int()) { a: Int ->
         Left(a).isLeft() && !Right(a).isLeft()
+        (Left(a) is Left<*>) && !(a.right() is Left<*>)
       }
     }
 
     "isRight should return false if Left and true if Right" {
       checkAll(Arb.int()) { a: Int ->
         !Left(a).isRight() && Right(a).isRight()
+        (a.left() !is Right<*>) && (Right(a) is Right<*>)
       }
     }
 
@@ -314,6 +316,8 @@ class EitherTest : UnitSpec() {
         val expected: Either<Int, List<Int>> = Right(emptyList())
 
         Right(a).replicate(n) shouldBe expected
+        
+        
         Left(a).replicate(n) shouldBe expected
       }
     }
