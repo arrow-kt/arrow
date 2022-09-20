@@ -1557,8 +1557,12 @@ public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B
 public fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   fold({ false }) { it == elem }
 
+@Deprecated(
+  RedundantAPI + "Prefer the Either DSL, or new recover API",
+  ReplaceWith("recover { y.bind() }")
+)
 public fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
-  handleErrorWith { y }
+  recover { y.bind() }
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
@@ -1601,12 +1605,24 @@ public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.
  */
+@Deprecated(
+  RedundantAPI + "Prefer the new recover API",
+  ReplaceWith("recover { a -> f(a).bind() }")
+)
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
   recover { a -> f(a).bind() }
 
+@Deprecated(
+  RedundantAPI + "Prefer the new recover API",
+  ReplaceWith("recover { a -> f(a) }")
+)
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
   recover { a -> f(a) }
 
+@Deprecated(
+  RedundantAPI + "Prefer the new recover API",
+  ReplaceWith("map(fa).recover { a -> fe(a) }")
+)
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
   map(fa).recover { a -> fe(a) }
 
