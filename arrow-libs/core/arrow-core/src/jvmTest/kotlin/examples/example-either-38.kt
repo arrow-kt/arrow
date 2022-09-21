@@ -1,9 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither38
 
-import arrow.core.*
+import arrow.core.Either
+import io.kotest.matchers.shouldBe
 
 fun main() {
-  Either.Right(12).tapLeft { println("flower") } // Result: Right(12)
-  Either.Left(12).tapLeft { println("flower") }  // Result: prints "flower" and returns: Left(12)
+  Either.Right(1).tapLeft(::println) shouldBe Either.Right(1)
+  Either.Left(2).tapLeft(::println) shouldBe Either.Left(2)
 }

@@ -793,7 +793,6 @@ public sealed class Either<out A, out B> {
     return this@Either is Left<A>
   }
   
-  
   @OptIn(ExperimentalContracts::class)
   public fun isRight(): Boolean {
     contract { returns(true) implies (this@Either is Right<B>) }
@@ -927,7 +926,7 @@ public sealed class Either<out A, out B> {
    */
   // TODO open-question: Deprecate for traced ???
   public inline fun tapLeft(f: (left: A) -> Unit): Either<A, B> =
-    also { if (it is Left) f(it.value) }
+    also { if (it.isLeft()) f(it.value) }
   
   /**
    * Inspect the right value [B] of this [Either], and ignore the result of [f] by returning the original [Either].
@@ -949,7 +948,7 @@ public sealed class Either<out A, out B> {
    */
   // TODO open-question: deprecate for `bind` ???
   public inline fun tap(f: (right: B) -> Unit): Either<A, B> =
-    also { if (it is Right) f(it.value) }
+    also { if (it.isRight()) f(it.value) }
   
   /**
    * Map over Left and Right of this Either
@@ -1941,13 +1940,51 @@ public const val NicheAPI: String =
 public const val RedundantAPI: String =
   "This API is considered redundant. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"
 
-public inline fun <E, EE, A> Either<E, A>.recover(recoverWith: EitherCatch<EE>.(E) -> A): Either<EE, A> =
+/**
+ * Recover from any [Either.Left] if encountered.
+ *
+ * The recover DSL allows you to recover from any [Either.Left] value by:
+ *  - Computing a fallback value [A], and resolve the left type [E] to [Nothing].
+ *  - Shifting a _new error_ of type [EE] into the [Either.Left] channel.
+ *
+ * When providing a fallback value [A],
+ * the [Either.Left] type is discarded because the error was handled correctly.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main() {
+ *   val error: Either<String, Int> = Either.Left("error")
+ *   val fallback: Either<Nothing, Int> = error.recover { it.length }
+ *   fallback shouldBe Either.Right(5)
+ * }
+ * ```
+ * <!--- KNIT example-either-53.kt -->
+ *
+ * When shifting a new error [EE] into the [Either.Left] channel,
+ * the [Either.Left] is _transformed_ from [E] to [EE] since we shifted a _new error_.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main() {
+ *   val error: Either<String, Int> = Either.Left("error")
+ *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
+ *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
+ * }
+ *```
+ * <!--- KNIT example-either-53.kt -->
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: RecoverEffect<EE>.(E) -> A): Either<EE, A> =
   when (this) {
     is Right -> this
     is Left -> {
-      val catch = DefaultEitherCatch<EE>()
+      val catch = DefaultRecoverEffect<EE>()
       try {
-        recoverWith(catch, value).right()
+        recover(catch, value).right()
       } catch (e: Eager) {
         if (e.token === catch) (e.shifted as EE).left()
         else throw e
@@ -1956,7 +1993,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(recoverWith: EitherCatch<EE>.(
   }
 
 // Temporary types to back-port API of 2.x.x
-public interface EitherCatch<R> {
+public interface RecoverEffect<R> {
   public fun <B> shift(r: R): B
   public suspend fun <B> Effect<R, B>.bind(): B = fold({ shift(it) }, ::identity)
   public fun <B> EagerEffect<R, B>.bind(): B = fold({ shift(it) }, ::identity)
@@ -1986,12 +2023,12 @@ public interface EitherCatch<R> {
 }
 
 @OptIn(ExperimentalContracts::class)
-public inline fun <R, B : Any> EitherCatch<R>.ensureNotNull(value: B?, shift: () -> R): B {
+public inline fun <R, B : Any> RecoverEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: shift(shift())
 }
 
 @PublishedApi
-internal class DefaultEitherCatch<R> : EitherCatch<R>, Token() {
+internal class DefaultRecoverEffect<R> : RecoverEffect<R>, Token() {
   override fun <B> shift(r: R): B = throw Eager(this, r) { it }
 }

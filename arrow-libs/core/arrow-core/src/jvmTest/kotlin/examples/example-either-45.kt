@@ -4,8 +4,9 @@ package arrow.core.examples.exampleEither45
 import arrow.core.Either.Right
 import arrow.core.Either.Left
 import arrow.core.getOrElse
+import io.kotest.matchers.shouldBe
 
 fun main() {
-  Right(12).getOrElse { 17 } // Result: 12
-  Left(12).getOrElse { 17 }  // Result: 17
+  Right(12).getOrHandle { it + 5 } shouldBe 12
+  Left(12).getOrHandle { it + 5 } shouldBe 17
 }

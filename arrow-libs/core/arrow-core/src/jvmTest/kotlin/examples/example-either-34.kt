@@ -1,16 +1,12 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither34
 
-import arrow.core.*
+import arrow.core.Either
 
 fun main() {
-  fun possiblyFailingOperation(): Either.Right<Int> =
-    Either.Right(1)
-  //sampleStart
-  val result: Either<Exception, Int> = possiblyFailingOperation()
-  result.fold(
-       { println("operation failed with $it") },
-       { println("operation succeeded with $it") }
-  )
-  //sampleEnd
+  fun Either<Exception, Int>.computeResult(): Int =
+    fold({ error: Exception -> -1 }) { res: Int -> res + 1 }
+
+  Either.Right(1).computeResult() shouldBe 2
+  Either.Left(RuntimeException("Boom!").computeResult() shouldBe -1
 }
