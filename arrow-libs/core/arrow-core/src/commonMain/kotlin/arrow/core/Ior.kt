@@ -23,7 +23,7 @@ public typealias IorNel<A, B> = Ior<Nel<A>, B>
  * [Ior]<`A`,`B`> is similar to [Either]<`A`,`B`>, except that it can represent the simultaneous presence of
  * an `A` and a `B`. It is right-biased so methods such as `map` and `flatMap` operate on the
  * `B` value. Some methods, like `flatMap`, handle the presence of two [Ior.Both] values using a
- * `[Semigroup]<`A`>, while other methods, like [toEither], ignore the `A` value in a [Ior.Both Both].
+ * [Semigroup]<`A`>, while other methods, like [toEither], ignore the `A` value in a [Ior.Both Both].
  *
  * [Ior]<`A`,`B`> is isomorphic to [Either]<[Either]<`A`,`B`>, [Pair]<`A`,`B`>>, but provides methods biased toward `B`
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
