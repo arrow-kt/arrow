@@ -1320,8 +1320,12 @@ public sealed class Either<out A, out B> {
       { it.bimap(fa, fb) }
   }
   
+  @Deprecated(
+    RedundantAPI + "Map with Unit",
+    ReplaceWith("map { }")
+  )
   public fun void(): Either<A, Unit> =
-    map { Unit }
+    map { }
 }
 
 /**
@@ -1439,10 +1443,10 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default()) }")
+  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: default().left() }")
 )
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
-  filterOrOther(predicate) { default() }
+  ensure(default, predicate)
 
 /**
  * Returns [Right] with the existing value of [Right] if this is a [Right] and the given
@@ -1847,11 +1851,12 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }
 
+@Deprecated(
+  RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
+  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: default().left() }")
+) // TODO open-question: should we expose `ensureNotNull` or `ensure` DSL API on Either or Companion?
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
-  when (this) {
-    is Right -> if (predicate(this.value)) this else error().left()
-    is Left -> this
-  }
+  flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, and recover",
