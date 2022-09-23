@@ -3,6 +3,8 @@ package arrow.core
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
+import io.kotest.assertions.withClue
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
@@ -298,7 +300,6 @@ class NonEmptyListTest : UnitSpec() {
       }
     }
 
-
     "minBy element" {
       checkAll(
         Arb.nonEmptyList(Arb.int())
@@ -306,6 +307,17 @@ class NonEmptyListTest : UnitSpec() {
         val result = a.minBy(::identity)
         val expected = a.minByOrNull(::identity)
         result shouldBe expected
+      }
+    }
+
+    "NonEmptyList equals List" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        withClue("$a should be equal to ${a.all}") {
+          // `shouldBe` doesn't use the `equals` methods on `Iterable`
+          (a == a.all).shouldBeTrue()
+        }
       }
     }
   }
