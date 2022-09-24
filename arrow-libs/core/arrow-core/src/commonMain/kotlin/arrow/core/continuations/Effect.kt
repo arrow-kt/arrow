@@ -664,11 +664,11 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-13.kt -->
  */
-public typealias Effect<R, A> = suspend Shift<R>.() -> A
+public typealias Effect<R, A> = suspend Raise<R>.() -> A
 
-public inline fun <R, A> effect(@BuilderInference noinline block: suspend Shift<R>.() -> A): Effect<R, A> = block
+public inline fun <R, A> effect(@BuilderInference noinline block: suspend Raise<R>.() -> A): Effect<R, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
-public typealias EagerEffect<R, A> = Shift<R>.() -> A
+public typealias EagerEffect<R, A> = Raise<R>.() -> A
 
-public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Shift<R>.() -> A): EagerEffect<R, A> = block
+public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Raise<R>.() -> A): EagerEffect<R, A> = block

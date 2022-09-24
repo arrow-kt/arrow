@@ -3,7 +3,7 @@ package arrow.core
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.continuations.Shift
+import arrow.core.continuations.Raise
 import arrow.core.continuations.either
 import arrow.core.continuations.ensure
 import arrow.typeclasses.Monoid
@@ -1252,7 +1252,7 @@ public sealed class Either<out A, out B> {
  * ```
  * <!--- KNIT example-either-45.kt -->
  */
-public inline fun <E2, E, A> Either<E, A>.recover(recover: Shift<E2>.(E) -> A): Either<E2, A> =
+public inline fun <E2, E, A> Either<E, A>.recover(recover: Raise<E2>.(E) -> A): Either<E2, A> =
   when (this) {
     is Right -> this
     is Left -> either { recover(value) }

@@ -14,8 +14,8 @@ suspend fun main() {
   val int = 45
   effect<String, Int> {
     coroutineScope<Int> {
-      launch { shift(errorA) }
-      launch { shift(errorB) }
+      launch { raise(errorA) }
+      launch { raise(errorB) }
       int
     }
   }.fold({ fail("Shift can never finish") }, { it shouldBe int })

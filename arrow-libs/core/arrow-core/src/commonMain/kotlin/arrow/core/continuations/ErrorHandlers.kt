@@ -30,7 +30,7 @@ import kotlin.jvm.JvmName
  * ```
  * <!--- KNIT example-effect-error-01.kt -->
  */
-public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
+public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<E2>.(shifted: E) -> A): Effect<E2, A> =
   effect { recover(resolve) }
 
 /**
@@ -54,7 +54,7 @@ public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: susp
  * ```
  * <!--- KNIT example-effect-error-02.kt -->
  */
-public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
+public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Raise<E>.(throwable: Throwable) -> A): Effect<E, A> =
   effect { catch(resolve) }
 
 /**
@@ -84,7 +84,7 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Sh
  */
 @JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.catch(
-  @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
+  @BuilderInference crossinline recover: suspend Raise<E>.(T) -> A,
 ): Effect<E, A> =
   effect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
 
@@ -98,14 +98,14 @@ public fun <E, A> Effect<E, A>.catch(): Effect<E, Result<A>> =
     }
   }
 
-public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
   eagerEffect { recover(resolve) }
 
-public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
+public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Raise<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
   eagerEffect { catch(recover) }
 
 @JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
-  @BuilderInference crossinline recover: Shift<E>.(T) -> A,
+  @BuilderInference crossinline recover: Raise<E>.(T) -> A,
 ): EagerEffect<E, A> =
   eagerEffect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }

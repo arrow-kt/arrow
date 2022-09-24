@@ -41,19 +41,19 @@ public inline fun <R, A, B> EagerEffect<R, A>.fold(
 
 @JvmName("_foldOrThrow")
 public inline fun <R, A, B> fold(
-  @BuilderInference program: Shift<R>.() -> A,
+  @BuilderInference program: Raise<R>.() -> A,
   recover: (shifted: R) -> B,
   transform: (value: A) -> B,
 ): B = fold(program, { throw it }, recover, transform)
 
 @JvmName("_fold")
 public inline fun <R, A, B> fold(
-  @BuilderInference program: Shift<R>.() -> A,
+  @BuilderInference program: Raise<R>.() -> A,
   error: (error: Throwable) -> B,
   recover: (shifted: R) -> B,
   transform: (value: A) -> B,
 ): B {
-  val shift = DefaultShift()
+  val shift = DefaultRaise()
   return try {
     transform(program(shift))
   } catch (e: CancellationException) {
@@ -65,16 +65,16 @@ public inline fun <R, A, B> fold(
 
 /** Returns the shifted value, rethrows the CancellationException if not our scope */
 @PublishedApi
-internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultShift): R =
-  if (this is ShiftCancellationException && this.shift === shift) _shifted as R
+internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultRaise): R =
+  if (this is ShiftCancellationException && this.raise === shift) _shifted as R
   else throw this
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Shift. */
 @PublishedApi
-internal class DefaultShift : Shift<Any?> {
-  override fun <B> shift(r: Any?): B = throw ShiftCancellationException(r, this)
+internal class DefaultRaise : Raise<Any?> {
+  override fun <B> raise(r: Any?): B = throw ShiftCancellationException(r, this)
 }
 
 /** CancellationException is required to cancel coroutines when shifting from within them. */
-private class ShiftCancellationException(val _shifted: Any?, val shift: Shift<Any?>) :
+private class ShiftCancellationException(val _shifted: Any?, val raise: Raise<Any?>) :
   CancellationException("Shifted Continuation")

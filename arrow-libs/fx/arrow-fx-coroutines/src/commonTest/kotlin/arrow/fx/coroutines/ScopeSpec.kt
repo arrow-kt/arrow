@@ -114,7 +114,7 @@ class ResourceTest : StringSpec({
         install({ 1 }) { _, ex ->
           require(exit.complete(ex))
         }
-        shift("error")
+        raise("error")
       }
     } shouldBe "error".left()
     exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
