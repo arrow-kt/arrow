@@ -36,9 +36,9 @@ fun readFile(path: String?): Effect<FileError, Content> = effect {
     val lines = File(path).readLines()
     Content(lines)
   } catch (e: FileNotFoundException) {
-    raise(FileNotFound(path))
+    shift(FileNotFound(path))
   } catch (e: SecurityException) {
-    raise(SecurityError(e.message))
+    shift(SecurityError(e.message))
   }
 }
 

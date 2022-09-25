@@ -13,8 +13,8 @@ suspend fun main() {
   val errorB = "ErrorB"
   coroutineScope {
     effect<String, Int> {
-      val fa = async<Int> { raise(errorA) }
-      val fb = async<Int> { raise(errorB) }
+      val fa = async<Int> { shift(errorA) }
+      val fb = async<Int> { shift(errorB) }
       fa.await() + fb.await()
     }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") })
   }
