@@ -52,7 +52,7 @@ import kotlin.jvm.JvmMultifileClass
  * object EmptyPath
  *
  * fun readFile(path: String): Effect<EmptyPath, Unit> = effect {
- *   if (path.isEmpty()) shift(EmptyPath) else Unit
+ *   if (path.isEmpty()) raise(EmptyPath) else Unit
  * }
  * ```
  *
@@ -116,9 +116,9 @@ import kotlin.jvm.JvmMultifileClass
  *     val lines = File(path).readLines()
  *     Content(lines)
  *   } catch (e: FileNotFoundException) {
- *     shift(FileNotFound(path))
+ *     raise(FileNotFound(path))
  *   } catch (e: SecurityException) {
- *     shift(SecurityError(e.message))
+ *     raise(SecurityError(e.message))
  *   }
  * }
  * ```
@@ -172,13 +172,13 @@ import kotlin.jvm.JvmMultifileClass
  * context(Shift<R>)
  * suspend fun <R, A> Either<R, A>.bind(): A =
  *   when (this) {
- *     is Either.Left -> shift(value)
+ *     is Either.Left -> raise(value)
  *     is Either.Right -> value
  *   }
  *
  * context(Shift<None>)
  * fun <A> Option<A>.bind(): A =
- *   fold({ shift(it) }, ::identity)
+ *   fold({ raise(it) }, ::identity)
  * ```
  *
  * ## Handling errors
@@ -206,7 +206,7 @@ import kotlin.jvm.JvmMultifileClass
  * -->
  * ```kotlin
  * val failed: Effect<String, Int> =
- *   effect { shift("failed") }
+ *   effect { raise("failed") }
  * ```
  *
  * We can `recover` the failure, and resolve it by providing a default value of `-1` or the length of the `error: String`.
@@ -236,7 +236,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```kotlin
  * val newError: Effect<List<Char>, Int> =
  *   failed.recover { str ->
- *     shift(str.reversed().toList())
+ *     raise(str.reversed().toList())
  *   }
  * ```
  *
@@ -304,7 +304,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * val rethrown: Effect<String, Int> =
  *   failed.catch { ex: java.sql.SQLException ->
- *     if(ex.isForeignKeyViolation()) shift("foreign key violation")
+ *     if(ex.isForeignKeyViolation()) raise("foreign key violation")
  *     else throw ex
  *   }
  * ```
@@ -387,7 +387,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
  *   effect<String, List<Unit>> {
  *     (0..4).parTraverse { index ->
- *       if (index == 4) shift(error)
+ *       if (index == 4) raise(error)
  *       else awaitExitCase(exits[index])
  *     }
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
@@ -458,7 +458,7 @@ import kotlin.jvm.JvmMultifileClass
  *   effect<String, Int> {
  *     bracketCase(
  *       acquire = { File("build.gradle.kts").bufferedReader() },
- *       use = { reader: BufferedReader -> shift(error) },
+ *       use = { reader: BufferedReader -> raise(error) },
  *       release = { reader, exitCase ->
  *         reader.close()
  *         exit.complete(exitCase)
@@ -547,9 +547,9 @@ import kotlin.jvm.JvmMultifileClass
  *     val lines = File(path).readLines()
  *     Content(lines)
  *   } catch (e: FileNotFoundException) {
- *     shift(FileNotFound(path))
+ *     raise(FileNotFound(path))
  *   } catch (e: SecurityException) {
- *     shift(SecurityError(e.message))
+ *     raise(SecurityError(e.message))
  *   }
  * }
  *
@@ -590,8 +590,8 @@ import kotlin.jvm.JvmMultifileClass
  *   val errorB = "ErrorB"
  *   coroutineScope {
  *     effect<String, Int> {
- *       val fa = async<Int> { shift(errorA) }
- *       val fb = async<Int> { shift(errorB) }
+ *       val fa = async<Int> { raise(errorA) }
+ *       val fb = async<Int> { raise(errorB) }
  *       fa.await() + fb.await()
  *     }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") })
  *   }
@@ -616,8 +616,8 @@ import kotlin.jvm.JvmMultifileClass
  *   val int = 45
  *   effect<String, Int> {
  *     coroutineScope<Int> {
- *       launch { shift(errorA) }
- *       launch { shift(errorB) }
+ *       launch { raise(errorA) }
+ *       launch { raise(errorB) }
  *       int
  *     }
  *   }.fold({ fail("Shift can never finish") }, { it shouldBe int })
@@ -645,7 +645,7 @@ import kotlin.jvm.JvmMultifileClass
  * -->
  * ```kotlin
  *   effect<String, suspend () -> Unit> {
- *     suspend { shift("error") }
+ *     suspend { raise("error") }
  *   }.fold({ }, { leakedShift -> leakedShift.invoke() })
  * ```
  *

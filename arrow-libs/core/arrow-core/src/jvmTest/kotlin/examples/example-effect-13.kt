@@ -10,7 +10,7 @@ import kotlinx.coroutines.coroutineScope
 suspend fun main() {
 
   effect<String, suspend () -> Unit> {
-    suspend { shift("error") }
+    suspend { raise("error") }
   }.fold({ }, { leakedShift -> leakedShift.invoke() })
 
   val leakedAsync = coroutineScope<suspend () -> Deferred<Unit>> {
