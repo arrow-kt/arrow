@@ -7,7 +7,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 
 /**
- * [Effect] represents a function of `suspend Shift<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.
+ * [Effect] represents a function of `suspend Raise<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.
  *
  * So [Effect] is defined by `suspend fun <B> fold(recover: suspend (Throwable) -> B, resolve: suspend (R) -> B, transform: suspend (A) -> B): B`,
  * to map all values of `R`, `Throwable` and `A` to a value of `B`.
@@ -39,8 +39,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * We'll start by defining a small function that accepts a [String], and does some simply validation to check that the path
  * is not empty. If the path is empty, we want to program to result in `EmptyPath`. So we're immediately going to see how
- * we can raise an error of any arbitrary type `R` by using the function `shift`. The name `shift` comes shifting (or
- * changing, especially unexpectedly), away from the computation and finishing the `Continuation` with `R`.
+ * we can raise an error of any arbitrary type `R` by using the function `raise`. The name `raise` comes raising an intterupt, or
+ * changing, especially unexpectedly, away from the computation and finishing the `Continuation` with `R`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
@@ -56,7 +56,7 @@ import kotlin.jvm.JvmMultifileClass
  * }
  * ```
  *
- * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the shift type `R`, and `Unit` for the success type `A`.
+ * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the raise type `R`, and `Unit` for the success type `A`.
  *
  * Patterns like validating a [Boolean] is very common, and the [Effect] DSL offers utility functions like [kotlin.require]
  * and [kotlin.requireNotNull]. They're named [ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
@@ -166,17 +166,17 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-03.kt -->
  *
- * Adding your own syntax to `Shift<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
+ * Adding your own syntax to `Raise<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
  *
  * ```
- * context(Shift<R>)
+ * context(Raise<R>)
  * suspend fun <R, A> Either<R, A>.bind(): A =
  *   when (this) {
  *     is Either.Left -> raise(value)
  *     is Either.Right -> value
  *   }
  *
- * context(Shift<None>)
+ * context(Raise<None>)
  * fun <A> Option<A>.bind(): A =
  *   fold({ raise(it) }, ::identity)
  * ```
@@ -317,10 +317,10 @@ import kotlin.jvm.JvmMultifileClass
  *
  * ## Structured Concurrency
  *
- * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
- * For this reason `shift` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
+ * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `raise` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
+ * For this reason `raise` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
  *
- * Let's overview below how `shift` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
+ * Let's overview below how `raise` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
  * In the examples below we're going to be using a utility to show how _sibling tasks_ get cancelled.
  * The utility function show below called `awaitExitCase` will `never` finish suspending, and completes a `Deferred` with the `ExitCase`.
  * `ExitCase` is a sealed class that can be a value of `Failure(Throwable)`, `Cancelled(CancellationException)`, or `Completed`.
@@ -345,7 +345,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  *
  * ### Arrow Fx Coroutines
- * All operators in Arrow Fx Coroutines run in place, so they have no way of leaking `shift`.
+ * All operators in Arrow Fx Coroutines run in place, so they have no way of leaking `raise`.
  * It's there always safe to compose `effect` with any Arrow Fx combinator. Let's see some small examples below.
  *
  * #### parZip
@@ -355,7 +355,7 @@ import kotlin.jvm.JvmMultifileClass
  *    val error = "Error"
  *    val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     parZip({ awaitExitCase<Int>(exit) }, { shift<Int>(error) }) { a, b -> a + b }
+ *     parZip({ awaitExitCase<Int>(exit) }, { raise<Int>(error) }) { a, b -> a + b }
  *   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
@@ -398,7 +398,7 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- KNIT example-effect-06.kt -->
  *
  * `parTraverse` will launch 5 tasks, for every element in `1..5`.
- * The last task to get scheduled will `shift` with "error", and it will cancel the other launched tasks before returning.
+ * The last task to get scheduled will `raise` with "error", and it will cancel the other launched tasks before returning.
  *
  * #### raceN
  * <!--- INCLUDE
@@ -425,7 +425,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val error = "Error"
  *   val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     raceN({ awaitExitCase<Int>(exit) }) { shift<Int>(error) }
+ *     raceN({ awaitExitCase<Int>(exit) }) { raise<Int>(error) }
  *       .merge() // Flatten Either<Int, Int> result from race into Int
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
  *   // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran
@@ -435,8 +435,8 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- KNIT example-effect-07.kt -->
  *
  * `raceN` races `n` suspend functions in parallel, and cancels all participating functions when a winner is found.
- * We can consider the function that `shift`s the winner of the race, except with a shifted value instead of a successful one.
- * So when a function in the race `shift`s, and thus short-circuiting the race, it will cancel all the participating functions.
+ * We can consider the function that `raise`s the winner of the race, except with a raised value instead of a successful one.
+ * So when a function in the race `raise`s, and thus short-circuiting the race, it will cancel all the participating functions.
  *
  * #### bracketCase / Resource
  * <!--- INCLUDE
@@ -497,7 +497,7 @@ import kotlin.jvm.JvmMultifileClass
  *   resourceScope {
  *     effect<String, Int> {
  *       val reader = bufferedReader("build.gradle.kts")
- *       shift<Int>(error)
+ *       raise<Int>(error)
  *       reader.lineSequence().count()
  *     }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   }
@@ -508,8 +508,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * ### KotlinX
  * #### withContext
- * It's always safe to call `shift` from `withContext` since it runs in place, so it has no way of leaking `shift`.
- * When `shift` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
+ * It's always safe to call `raise` from `withContext` since it runs in place, so it has no way of leaking `raise`.
+ * When `raise` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
@@ -574,7 +574,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * #### async
  *
- * When calling `shift` from `async` you should **always** call `await`, otherwise `shift` can leak out of its scope.
+ * When calling `raise` from `async` you should **always** call `await`, otherwise `raise` can leak out of its scope.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -620,7 +620,7 @@ import kotlin.jvm.JvmMultifileClass
  *       launch { raise(errorB) }
  *       int
  *     }
- *   }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+ *   }.fold({ fail("Raise can never finish") }, { it shouldBe int })
  * }
  * ```
  * <!--- KNIT example-effect-12.kt -->
@@ -628,8 +628,8 @@ import kotlin.jvm.JvmMultifileClass
  * #### Strange edge cases
  *
  * **NOTE**
- * Capturing `shift` into a lambda, and leaking it outside of `Effect` to be invoked outside will yield unexpected results.
- * Below we capture `shift` from inside the DSL, and then invoke it outside its context `Shift<String>`.
+ * Capturing `raise` into a lambda, and leaking it outside of `Effect` to be invoked outside will yield unexpected results.
+ * Below we capture `raise` from inside the DSL, and then invoke it outside its context `Raise<String>`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -646,7 +646,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```kotlin
  *   effect<String, suspend () -> Unit> {
  *     suspend { raise("error") }
- *   }.fold({ }, { leakedShift -> leakedShift.invoke() })
+ *   }.fold({ }, { leakedRaise -> leakedRaise.invoke() })
  * ```
  *
  * The same violation is possible in all DSLs in Kotlin, including Structured Concurrency.

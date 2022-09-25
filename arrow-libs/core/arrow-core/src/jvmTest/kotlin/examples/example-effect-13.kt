@@ -11,7 +11,7 @@ suspend fun main() {
 
   effect<String, suspend () -> Unit> {
     suspend { raise("error") }
-  }.fold({ }, { leakedShift -> leakedShift.invoke() })
+  }.fold({ }, { leakedRaise -> leakedRaise.invoke() })
 
   val leakedAsync = coroutineScope<suspend () -> Deferred<Unit>> {
     suspend {

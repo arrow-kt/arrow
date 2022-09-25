@@ -18,5 +18,5 @@ suspend fun main() {
       launch { raise(errorB) }
       int
     }
-  }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+  }.fold({ fail("Raise can never finish") }, { it shouldBe int })
 }
