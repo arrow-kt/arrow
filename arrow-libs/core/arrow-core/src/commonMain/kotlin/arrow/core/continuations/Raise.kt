@@ -42,7 +42,7 @@ public annotation class EffectDSL
  * ```kotlin
  * fun main() {
  *   val either: Either<String, Int> =
- *     either { failure() }
+ *     either { failure() } // returns Left("failed")
  *
  *   val effect: Effect<String, Int> =
  *     effect { failure() }
@@ -125,7 +125,7 @@ public interface Raise<in R> {
    *   either {
    *     recover({ failure.bind() }) { failure: Throwable ->
    *       delay(10)
-   *       shift("Something bad happened: ${failure.message}")
+   *       raise("Something bad happened: ${failure.message}")
    *     }
    *   }.also(::println)
    * ```
@@ -149,7 +149,7 @@ public interface Raise<in R> {
    *   either {
    *     recover({ empty.bind() }) { failure: None ->
    *       delay(10)
-   *       shift("Something bad happened: ${failure.message}")
+   *       raise("Something bad happened: ${failure.message}")
    *     }
    *   }.also(::println)
    * ```
