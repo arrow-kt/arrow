@@ -1247,7 +1247,7 @@ public sealed class Either<out A, out B> {
  * val error: Either<Error, User> = Error.left()
  *
  * val a: Either<Error, User> = error.recover { error -> User } // Either.Right(User)
- * val b: Either<String, User> = error.recover { error -> shift("other-failure") } // Either.Left(other-failure)
+ * val b: Either<String, User> = error.recover { error -> raise("other-failure") } // Either.Left(other-failure)
  * val c: Either<Nothing, User> = error.recover { error -> User } // Either.Right(User)
  * ```
  * <!--- KNIT example-either-45.kt -->
