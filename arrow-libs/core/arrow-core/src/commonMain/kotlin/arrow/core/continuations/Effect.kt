@@ -21,7 +21,7 @@ import kotlin.jvm.JvmMultifileClass
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
-          * [parMap](#parMap)
+          * [parMap](#parmap)
           * [raceN](#racen)
           * [bracketCase / Resource](#bracketcase--resource)
         * [KotlinX](#kotlinx)
