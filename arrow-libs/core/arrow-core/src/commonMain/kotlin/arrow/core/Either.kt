@@ -1879,14 +1879,14 @@ public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ it.left() }, { it.orNull()?.right() }).toOption()",
+    "orNull()?.orNull()?.right().toOption()",
     "arrow.core.toOption",
     "arrow.core.right",
     "arrow.core.left"
   )
 )
 public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
-  fold({ it.left() }, { it.orNull()?.right() }).toOption()
+  orNull()?.orNull()?.right().toOption()
 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",

@@ -61,7 +61,7 @@ class EitherTest : UnitSpec() {
         val x = Right(a)
         if (x.isRight()) x.value shouldBe a
         else fail("Right(a).isRight() cannot be false")
-        x.isRight() shouldBe false
+        x.isLeft() shouldBe false
       }
     }
     
