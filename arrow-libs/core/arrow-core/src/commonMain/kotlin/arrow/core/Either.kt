@@ -805,13 +805,14 @@ public sealed class Either<out A, out B> {
    *
    * ```kotlin
    * import arrow.core.Either
+   * import io.kotest.matchers.shouldBe
    *
    * fun main() {
    *   fun Either<Exception, Int>.computeResult(): Int =
    *     fold({ error: Exception -> -1 }) { res: Int -> res + 1 }
    *
    *   Either.Right(1).computeResult() shouldBe 2
-   *   Either.Left(RuntimeException("Boom!").computeResult() shouldBe -1
+   *   Either.Left(RuntimeException("Boom!")).computeResult() shouldBe -1
    * }
    * ```
    * <!--- KNIT example-either-34.kt -->
@@ -915,12 +916,8 @@ public sealed class Either<out A, out B> {
    * import io.kotest.matchers.shouldBe
    *
    * fun main() {
-   *   Either.Right(1).tapLeft(::println) shouldBe Either.Right(1)
    *   Either.Left(2).tapLeft(::println) shouldBe Either.Left(2)
    * }
-   * ```
-   * ```text
-   * 2
    * ```
    * <!--- KNIT example-either-38.kt -->
    */
@@ -938,11 +935,7 @@ public sealed class Either<out A, out B> {
    *
    * fun main() {
    *   Either.Right(1).tap(::println) shouldBe Either.Right(1)
-   *   Either.Left(2).tap(::println) shouldBe Either.Left(2)
    * }
-   * ```
-   * ```text
-   * 1
    * ```
    * <!--- KNIT example-either-39.kt -->
    */
@@ -1355,14 +1348,12 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * or compute a [default] value with the left value [A].
  *
  * ```kotlin
- * import arrow.core.Either.Right
  * import arrow.core.Either.Left
  * import arrow.core.getOrElse
  * import io.kotest.matchers.shouldBe
  *
  * fun main() {
- *   Right(12).getOrHandle { it + 5 } shouldBe 12
- *   Left(12).getOrHandle { it + 5 } shouldBe 17
+ *   Left(12).getOrElse { it + 5 } shouldBe 17
  * }
  * ```
  * <!--- KNIT example-either-45.kt -->
