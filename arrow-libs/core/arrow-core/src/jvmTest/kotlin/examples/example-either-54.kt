@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleEither54
 
 import arrow.core.Either
+import arrow.core.recover
 import io.kotest.matchers.shouldBe
 
 fun main() {
