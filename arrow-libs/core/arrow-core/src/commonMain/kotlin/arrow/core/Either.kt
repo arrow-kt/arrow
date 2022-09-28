@@ -1365,7 +1365,7 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  *   Left(12).getOrHandle { it + 5 } shouldBe 17
  * }
  * ```
- * <!--- KNIT example-either-47.kt -->
+ * <!--- KNIT example-either-45.kt -->
  */
 public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1965,7 +1965,7 @@ public const val RedundantAPI: String =
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
- * <!--- KNIT example-either-53.kt -->
+ * <!--- KNIT example-either-54.kt -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
  * the [Either.Left] is _transformed_ from [E] to [EE] since we shifted a _new error_.
@@ -1979,23 +1979,69 @@ public const val RedundantAPI: String =
  *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
- *```
- * <!--- KNIT example-either-53.kt -->
+ * ```
+ * <!--- KNIT example-either-55.kt -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: RecoverEffect<EE>.(E) -> A): Either<EE, A> =
   when (this) {
     is Right -> this
     is Left -> {
-      val catch = DefaultRecoverEffect<EE>()
+      val effect = DefaultRecoverEffect<EE>()
       try {
-        recover(catch, value).right()
+        recover(effect, value).right()
       } catch (e: Eager) {
-        if (e.token === catch) (e.shifted as EE).left()
+        if (e.token === effect) (e.shifted as EE).left()
         else throw e
       }
     }
   }
+
+/**
+ * Catch allows for transforming [Throwable] in the [Either.Left] side.
+ * This API is the same as [recover],
+ * but offers the same APIs for working over [Throwable] as [Effect] & [EagerEffect].
+ *
+ * This is useful when working with [Either.catch] since this API offers a `reified` variant.
+ * The reified version allows you to refine `Throwable` to `T : Throwable`,
+ * where any `Throwable` not matching the `t is T` predicate will be rethrown.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main() {
+ *   val boom = Either.catch { throw RuntimeException("Boom!") }
+ *
+ *   boom.catch { _: Throwable -> "resolved" } shouldBe Either.Right("resolved")
+ *
+ *   boom.catch { _: Throwable -> shift("failure") } shouldBe Either.Left("failure")
+ *
+ *   shouldThrow<RuntimeException> {
+ *     boom.catch { _: IllegalStateException -> "recover" }
+ *   }
+ * }
+ * ```
+ * <!--- KNIT example-either-56.kt -->
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(Throwable) -> A): Either<E, A> =
+  when (this) {
+    is Right -> this
+    is Left -> {
+      val effect = DefaultRecoverEffect<E>()
+      try {
+        catch(effect, value).right()
+      } catch (e: Eager) {
+        if (e.token === effect) (e.shifted as E).left()
+        else throw e
+      }
+    }
+  }
+
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(T) -> A): Either<E, A> =
+  catch { e -> if(e is T) catch(e) else throw e }
 
 // Temporary types to back-port API of 2.x.x
 public interface RecoverEffect<R> {

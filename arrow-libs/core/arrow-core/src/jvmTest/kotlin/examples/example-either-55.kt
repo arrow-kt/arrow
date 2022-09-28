@@ -1,0 +1,11 @@
+// This file was automatically generated from Either.kt by Knit tool. Do not edit.
+package arrow.core.examples.exampleEither55
+
+import arrow.core.Either
+import io.kotest.matchers.shouldBe
+
+fun main() {
+  val error: Either<String, Int> = Either.Left("error")
+  val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
+  listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
+}
