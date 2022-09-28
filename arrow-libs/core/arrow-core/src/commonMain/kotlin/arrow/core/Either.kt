@@ -2039,6 +2039,7 @@ public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: Rec
     }
   }
 
+@JvmName("catchReified")
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(T) -> A): Either<E, A> =
   catch { e -> if(e is T) catch(e) else throw e }
