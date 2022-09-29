@@ -77,7 +77,9 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Closed : arrow/fx/co
 
 public final class arrow/fx/coroutines/CircuitBreaker$State$HalfOpen : arrow/fx/coroutines/CircuitBreaker$State {
 	public fun <init> (D)V
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -85,8 +87,10 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$HalfOpen : arrow/fx/
 
 public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coroutines/CircuitBreaker$State {
 	public fun <init> (JD)V
+	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getExpiresAt ()J
+	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public final fun getStartedAt ()J
 	public fun hashCode ()I
