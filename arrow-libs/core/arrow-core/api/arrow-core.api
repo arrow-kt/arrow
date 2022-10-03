@@ -178,6 +178,8 @@ public abstract class arrow/core/Either {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Either;
+	public final fun getOrNone ()Larrow/core/Option;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public final fun isEmpty ()Z
 	public final fun isLeft ()Z
 	public final fun isNotEmpty ()Z
@@ -186,6 +188,8 @@ public abstract class arrow/core/Either {
 	public static final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun mapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun onLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun onRight (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun orNone ()Larrow/core/Option;
 	public final fun orNull ()Ljava/lang/Object;
 	public final fun replicate (I)Larrow/core/Either;
