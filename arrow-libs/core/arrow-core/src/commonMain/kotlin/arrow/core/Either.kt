@@ -17,7 +17,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- *
+ * <!--- TEST_NAME EitherKnitTest -->
  *
  * In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
  * For instance, querying a service may result in a connection issue, or some unexpected JSON response.
@@ -808,7 +808,7 @@ public sealed class Either<out A, out B> {
    * import io.kotest.matchers.shouldBe
    * import io.kotest.assertions.fail
    *
-   * fun main() {
+   * fun test() {
    *   Either.Right(1)
    *     .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
    *
@@ -817,6 +817,7 @@ public sealed class Either<out A, out B> {
    * }
    * ```
    * <!--- KNIT example-either-34.kt -->
+   * <!--- TEST lines.isEmpty() -->
    *
    * @param ifLeft transform the [Either.Left] type [A] to [C].
    * @param ifRight transform the [Either.Right] type [B] to [C].
@@ -863,13 +864,13 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Left("left").swap() shouldBe Either.Right("left")
    *   Either.Right("right").swap() shouldBe Either.Left("right")
    * }
    * ```
    * <!--- KNIT example-either-35.kt -->
-   * <!-- TEST .... -->
+   * <!-- TEST lines.isEmpty() -->
    */
   public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
@@ -881,12 +882,13 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Right(12).map { _: Int ->"flower" } shouldBe Either.Right("flower")
    *   Either.Left(12).map { _: Nothing -> "flower" } shouldBe Either.Left(12)
    * }
    * ```
    * <!--- KNIT example-either-36.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> map(f: (right: B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
@@ -898,14 +900,14 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *  Either.Right(12).mapLeft { _: Nothing -> "flower" } shouldBe Either.Right(12)
    *  Either.Left(12).mapLeft { _: Int -> "flower" }  shouldBe Either.Left("flower")
    * }
    * ```
    * <!--- KNIT example-either-37.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
-  // TODO open-question: Deprecate for recover ???
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     recover { a -> shift(f(a)) }
   
@@ -931,11 +933,12 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Right(1).onRight(::println) shouldBe Either.Right(1)
    * }
    * ```
    * <!--- KNIT example-either-38.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public inline fun onRight(action: (right: B) -> Unit): Either<A, B> =
     also { if (it.isRight()) action(it.value) }
@@ -948,11 +951,12 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Left(2).onLeft(::println) shouldBe Either.Left(2)
    * }
    * ```
    * <!--- KNIT example-either-39.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> =
     also { if (it.isLeft()) action(it.value) }
@@ -1026,12 +1030,13 @@ public sealed class Either<out A, out B> {
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Right(12).getOrNull() shouldBe 12
    *   Either.Left(12).getOrNull() shouldBe null
    * }
    * ```
    * <!--- KNIT example-either-41.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNull(): B? = getOrElse { null }
   
@@ -1048,12 +1053,13 @@ public sealed class Either<out A, out B> {
    * import arrow.core.None
    * import io.kotest.matchers.shouldBe
    *
-   * fun main() {
+   * fun test() {
    *   Either.Right(12).getOrNone() shouldBe Some(12)
-   *   Either.Left(12).getOrNull() shouldBe None
+   *   Either.Left(12).getOrNone() shouldBe None
    * }
    * ```
    * <!--- KNIT example-either-42.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
   
@@ -1383,15 +1389,16 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * or compute a [default] value with the left value [A].
  *
  * ```kotlin
- * import arrow.core.Either.Left
+ * import arrow.core.Either
  * import arrow.core.getOrElse
  * import io.kotest.matchers.shouldBe
  *
- * fun main() {
- *   Left(12).getOrElse { it + 5 } shouldBe 17
+ * fun test() {
+ *   Either.Left(12).getOrElse { it + 5 } shouldBe 17
  * }
  * ```
  * <!--- KNIT example-either-46.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B =
   fold(default, ::identity)
@@ -1520,12 +1527,13 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  * import arrow.core.Either.Right
  * import arrow.core.merge
  *
- * fun main() {
+ * fun test() {
  *   Right(12).merge() // Result: 12
  *   Left(12).merge() // Result: 12
  * }
  * ```
  * <!--- KNIT example-either-51.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
@@ -1986,13 +1994,14 @@ public const val RedundantAPI: String =
  * import arrow.core.recover
  * import io.kotest.matchers.shouldBe
  *
- * fun main() {
+ * fun test() {
  *   val error: Either<String, Int> = Either.Left("error")
  *   val fallback: Either<Nothing, Int> = error.recover { it.length }
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
  * <!--- KNIT example-either-55.kt -->
+ * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
  * the [Either.Left] is _transformed_ from [E] to [EE] since we shifted a _new error_.
@@ -2002,13 +2011,14 @@ public const val RedundantAPI: String =
  * import arrow.core.recover
  * import io.kotest.matchers.shouldBe
  *
- * fun main() {
+ * fun test() {
  *   val error: Either<String, Int> = Either.Left("error")
  *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
  * <!--- KNIT example-either-56.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: RecoverEffect<EE>.(E) -> A): Either<EE, A> =
@@ -2040,21 +2050,22 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rec
  * import io.kotest.assertions.throwables.shouldThrowUnit
  * import io.kotest.matchers.shouldBe
  *
- * fun main() {
- *   val boom: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
+ * fun test() {
+ *   val left: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
  *
- *   val caught: Either<Nothing, Int> = boom.catch { _: Throwable -> 1 }
- *   val failure: Either<String, Int> = boom.catch { _: Throwable -> shift("failure") }
+ *   val caught: Either<Nothing, Int> = left.catch { _: Throwable -> 1 }
+ *   val failure: Either<String, Int> = left.catch { _: Throwable -> shift("failure") }
  *
  *   shouldThrowUnit<RuntimeException> {
- *     val caught2: Either<Nothing, Int> = boom.catch { _: IllegalStateException -> 1 }
+ *     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }
  *   }
  *
- *   caught shouldBe Either.Right("resolved")
+ *   caught shouldBe Either.Right(1)
  *   failure shouldBe Either.Left("failure")
  * }
  * ```
  * <!--- KNIT example-either-57.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(Throwable) -> A): Either<E, A> =

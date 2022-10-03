@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEither37
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
 
-fun main() {
+fun test() {
  Either.Right(12).mapLeft { _: Nothing -> "flower" } shouldBe Either.Right(12)
  Either.Left(12).mapLeft { _: Int -> "flower" }  shouldBe Either.Left("flower")
 }

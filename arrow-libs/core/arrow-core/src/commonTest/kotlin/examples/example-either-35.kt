@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEither35
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
 
-fun main() {
+fun test() {
   Either.Left("left").swap() shouldBe Either.Right("left")
   Either.Right("right").swap() shouldBe Either.Left("right")
 }

@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.recover
 import io.kotest.matchers.shouldBe
 
-fun main() {
+fun test() {
   val error: Either<String, Int> = Either.Left("error")
   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))

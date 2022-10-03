@@ -5,7 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.merge
 
-fun main() {
+fun test() {
   Right(12).merge() // Result: 12
   Left(12).merge() // Result: 12
 }

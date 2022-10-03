@@ -5,7 +5,7 @@ import arrow.core.Either
 import io.kotest.matchers.shouldBe
 import io.kotest.assertions.fail
 
-fun main() {
+fun test() {
   Either.Right(1)
     .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
 
