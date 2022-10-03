@@ -2,13 +2,14 @@
 package ${test.package}
 
 import io.kotest.core.spec.style.StringSpec
-import kotlin.time.Duration.Companion.seconds
 
 class ${test.name} : StringSpec({
 <#list cases as case>
-    "${case.name}".config(timeout= 1.seconds) {
-      ${case.knit.package}.${case.knit.name}.test()
-    }
+  "${case.name}" {
+    ${case.knit.package}.${case.knit.name}.test()
+  }
 
 </#list>
-})
+}) {
+  override fun timeout(): Long = 1000
+}

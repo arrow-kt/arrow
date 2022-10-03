@@ -10,7 +10,6 @@ import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 
 /** Context of the [Effect] DSL. */
 public interface EffectScope<in R> {

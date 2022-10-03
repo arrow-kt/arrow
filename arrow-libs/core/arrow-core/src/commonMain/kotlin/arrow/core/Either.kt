@@ -3,6 +3,7 @@ package arrow.core
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.Effect
@@ -1303,7 +1304,7 @@ public sealed class Either<out A, out B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
-    // TODO open-question: NicheAPI ???
+    @Deprecated(NicheAPI + "Prefer using recover, catch and the either DSL to work with errors")
     @JvmStatic
     public inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
@@ -1312,12 +1313,14 @@ public sealed class Either<out A, out B> {
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
     ): B =
-      catch(f)
-        .fold(
-          { t: Throwable -> throwable(t) },
-          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
-        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
-        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
+      catch(f).flatMap {
+        it.fold({ e: E -> catch { error(e) } }, { a: A -> catch { success(a) } }).flatten()
+      }.recover { t: Throwable ->
+        throwable(t).bind()
+      }.getOrElse { t: Throwable ->
+          unrecoverableState(t)
+          throw t
+        }
     
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
