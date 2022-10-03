@@ -2,20 +2,11 @@
 package arrow.core.examples.exampleEither56
 
 import arrow.core.Either
-import arrow.core.catch
-import io.kotest.assertions.throwables.shouldThrowUnit
+import arrow.core.recover
 import io.kotest.matchers.shouldBe
 
 fun main() {
-  val boom: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
-
-  val caught: Either<Nothing, Int> = boom.catch { _: Throwable -> 1 }
-  val failure: Either<String, Int> = boom.catch { _: Throwable -> shift("failure") }
-
-  shouldThrowUnit<RuntimeException> {
-    val caught2: Either<Nothing, Int> = boom.catch { _: IllegalStateException -> 1 }
-  }
-
-  caught shouldBe Either.Right("resolved")
-  failure shouldBe Either.Left("failure")
+  val error: Either<String, Int> = Either.Left("error")
+  val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
+  listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
 }

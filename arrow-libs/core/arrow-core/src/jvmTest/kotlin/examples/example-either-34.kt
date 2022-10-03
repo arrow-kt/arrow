@@ -3,11 +3,12 @@ package arrow.core.examples.exampleEither34
 
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
+import io.kotest.assertions.fail
 
 fun main() {
-  fun Either<Exception, Int>.computeResult(): Int =
-    fold({ error: Exception -> -1 }) { res: Int -> res + 1 }
+  Either.Right(1)
+    .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
 
-  Either.Right(1).computeResult() shouldBe 2
-  Either.Left(RuntimeException("Boom!")).computeResult() shouldBe -1
+  Either.Left(RuntimeException("Boom!"))
+    .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
 }

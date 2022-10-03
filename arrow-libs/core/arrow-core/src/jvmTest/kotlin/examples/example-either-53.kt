@@ -1,13 +1,9 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither53
 
-import arrow.core.*
+import arrow.core.rightIfNotNull
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val string: Either<Int, String> = "Hello".right()
-  val chars: Either<Int, CharSequence> =
-    string.widen<Int, CharSequence, String>()
-  //sampleEnd
-  println(chars)
+fun main() {
+  "value".rightIfNotNull { "left" } // Right(b="value")
+  null.rightIfNotNull { "left" }    // Left(a="left")
 }
