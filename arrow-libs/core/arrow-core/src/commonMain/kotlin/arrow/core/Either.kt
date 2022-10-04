@@ -1282,8 +1282,7 @@ public fun <B> Either<*, B>.orNull(): B? =
   orNull()
 
 /**
- * Returns the value from this [Right] or allows clients to transform [Left] to [Right] while providing access to
- * the value of [Left].
+ * Returns the value from this [Right] or allows clients to transform the value from [Left] with the [default] lambda.
  *
  * Example:
  * ```kotlin
@@ -1292,7 +1291,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  * import arrow.core.getOrHandle
  *
  * fun main() {
- *   Right(12).getOrHandle { 17 } // Result: 12
+ *   Right("ok").getOrHandle { 17 } // Result: "ok"
  *   Left(12).getOrHandle { it + 5 } // Result: 17
  * }
  * ```
