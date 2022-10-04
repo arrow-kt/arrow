@@ -235,10 +235,9 @@ public class NonEmptyList<out A>(
     @Deprecated(
       "Use toNonEmptyListOrNull instead",
       ReplaceWith(
-        "Option.fromNullable<NonEmptyList<A>>(l.toNonEmptyListOrNull())",
+        "l.toNonEmptyListOrNull().toOption()",
         "import arrow.core.toNonEmptyListOrNull",
-        "import arrow.core.Option",
-        "import arrow.core.NonEmptyList"
+        "import arrow.core.toOption"
       )
     )
     @JvmStatic
