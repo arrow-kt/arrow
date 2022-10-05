@@ -82,4 +82,4 @@ internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
 internal open class ShiftCancellationException(val shifted: Any?, val raise: Raise<Any?>) :
   CancellationException("Shifted Continuation")
 
-internal expect class ShiftCancellationExceptionNoTrace(shifted: Any?, shift: Raise<Any?>) : ShiftCancellationException
+internal expect class ShiftCancellationExceptionNoTrace(shifted: Any?, raise: Raise<Any?>) : ShiftCancellationException
