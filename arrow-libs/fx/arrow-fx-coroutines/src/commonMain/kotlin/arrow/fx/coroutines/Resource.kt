@@ -469,7 +469,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  *   }
  * }
  * ```
- * <!--- KNIT example-resource-08.kt -->
+ * <!--- KNIT example-resource-09.kt -->
  *
  * This is a **delicate** API. It is easy to accidentally create resource or memory leaks `allocated` is used.
  * A `Resource` allocated by `allocated` is not subject to the guarantees that [Resource] makes,
