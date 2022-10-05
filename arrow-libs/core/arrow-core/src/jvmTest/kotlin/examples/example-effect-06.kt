@@ -23,7 +23,7 @@ suspend fun main() {
   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
   effect<String, List<Unit>> {
     (0..4).parTraverse { index ->
-      if (index == 4) shift(error)
+      if (index == 4) raise(error)
       else awaitExitCase(exits[index])
     }
   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })

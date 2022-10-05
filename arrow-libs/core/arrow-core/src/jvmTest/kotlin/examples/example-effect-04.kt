@@ -7,7 +7,7 @@ import arrow.core.continuations.recover
 import arrow.core.continuations.catch
 
 val failed: Effect<String, Int> =
-  effect { shift("failed") }
+  effect { raise("failed") }
 
 val default: Effect<Nothing, Int> =
   failed.recover { -1 }
@@ -20,7 +20,7 @@ val resolved2: Effect<Unit, Int> = resolved
 
 val newError: Effect<List<Char>, Int> =
   failed.recover { str ->
-    shift(str.reversed().toList())
+    raise(str.reversed().toList())
   }
 
 val newException: Effect<Nothing, Int> =
@@ -50,6 +50,6 @@ suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
 
 val rethrown: Effect<String, Int> =
   failed.catch { ex: java.sql.SQLException ->
-    if(ex.isForeignKeyViolation()) shift("foreign key violation")
+    if(ex.isForeignKeyViolation()) raise("foreign key violation")
     else throw ex
   }

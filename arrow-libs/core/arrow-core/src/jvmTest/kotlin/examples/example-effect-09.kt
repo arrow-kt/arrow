@@ -26,7 +26,7 @@ suspend fun main() {
   resourceScope {
     effect<String, Int> {
       val reader = bufferedReader("build.gradle.kts")
-      shift<Int>(error)
+      raise<Int>(error)
       reader.lineSequence().count()
     }.fold({ it shouldBe error }, { fail("Int can never be the result") })
   }
