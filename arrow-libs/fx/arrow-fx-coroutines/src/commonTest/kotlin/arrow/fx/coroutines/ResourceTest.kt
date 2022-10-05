@@ -3,27 +3,37 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
+import io.kotest.property.Exhaustive
 import io.kotest.property.arbitrary.bool
+import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInt
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.string
+import io.kotest.property.exhaustive.collection
+import io.kotest.property.exhaustive.of
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlin.random.Random
 
 class ResourceTest : StringSpec({
   
@@ -131,8 +141,8 @@ class ResourceTest : StringSpec({
   
   "parZip - success" {
     suspend fun ResourceScope.closeable(): CheckableAutoClose =
-      install({ CheckableAutoClose() } ) { a: CheckableAutoClose, _: ExitCase -> a.close() }
-  
+      install({ CheckableAutoClose() }) { a: CheckableAutoClose, _: ExitCase -> a.close() }
+    
     resourceScope {
       parZip({
         (1..depth).map { closeable() }
@@ -238,8 +248,9 @@ class ResourceTest : StringSpec({
         resourceScope {
           parZip({
             install({
- require(started.complete(Unit))
- i }, { ii: Int, ex: ExitCase ->
+              require(started.complete(Unit))
+              i
+            }, { ii: Int, ex: ExitCase ->
               require(released.complete(ii to ex))
             })
           }, {
@@ -269,8 +280,9 @@ class ResourceTest : StringSpec({
             throw cancel
           }, {
             install({
- require(started.complete(Unit))
- i }, { ii: Int, ex: ExitCase ->
+              require(started.complete(Unit))
+              i
+            }, { ii: Int, ex: ExitCase ->
               require(released.complete(ii to ex))
             })
           }) { _, _ -> }
@@ -292,8 +304,9 @@ class ResourceTest : StringSpec({
         resourceScope {
           parZip({
             install({
- require(started.complete(Unit))
- i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) }
+              require(started.complete(Unit))
+              i
+            }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) }
             )
           }, {
             started.await()
@@ -322,7 +335,8 @@ class ResourceTest : StringSpec({
           }, {
             install({
               require(started.complete(Unit))
-              i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) }
+              i
+            }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) }
             )
           }) { _, _ -> }
           fail("It should never reach here")
@@ -345,7 +359,7 @@ class ResourceTest : StringSpec({
           parZip({
             install({ i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) })
           }, {
-            install({  }, { _: Unit, _: ExitCase -> throw cancel })
+            install({ }, { _: Unit, _: ExitCase -> throw cancel })
           }) { _, _ -> }
         }
       }
@@ -364,7 +378,7 @@ class ResourceTest : StringSpec({
       shouldThrow<CancellationException> {
         resourceScope {
           parZip({
-            install({  }, { _: Unit, _: ExitCase -> throw cancel })
+            install({ }, { _: Unit, _: ExitCase -> throw cancel })
           }, {
             install({ i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) })
           }) { _, _ -> }
@@ -386,7 +400,7 @@ class ResourceTest : StringSpec({
           parZip({
             install({ i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) })
           }, {
-            install({  }, { _: Unit, _: ExitCase -> throw throwable })
+            install({ }, { _: Unit, _: ExitCase -> throw throwable })
           }) { _, _ -> }
         }
       } shouldBe throwable
@@ -404,7 +418,7 @@ class ResourceTest : StringSpec({
       shouldThrow<Throwable> {
         resourceScope {
           parZip({
-            install({  }, { _: Unit, _: ExitCase -> throw throwable })
+            install({ }, { _: Unit, _: ExitCase -> throw throwable })
           }, {
             install({ i }, { ii: Int, ex: ExitCase -> require(released.complete(ii to ex)) })
           }) { _, _ -> }
@@ -425,9 +439,9 @@ class ResourceTest : StringSpec({
       shouldThrow<Throwable> {
         resourceScope {
           parZip({
-            install({ a } ) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
+            install({ a }) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
           }, {
-            install({ b } ) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
+            install({ b }) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
           }) { _, _ -> }
           throw throwable
         }
@@ -451,9 +465,9 @@ class ResourceTest : StringSpec({
       shouldThrow<CancellationException> {
         resourceScope {
           parZip({
-            install({ a } ) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
+            install({ a }) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
           }, {
-            install({ b } ) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
+            install({ b }) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
           }) { _, _ -> }
           throw CancellationException("")
         }
@@ -502,6 +516,74 @@ class ResourceTest : StringSpec({
         r.asFlow().collect { throw CancellationException("") }
       }
       
+      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
+    }
+  }
+  
+  "allocated" {
+    checkAll(Arb.int()) { seed ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
+        .allocated()
+      
+      allocate shouldBe seed
+      release(ExitCase.Completed)
+      released.await() shouldBe ExitCase.Completed
+    }
+  }
+  
+  "allocated - suppressed exception" {
+    checkAll(
+      Arb.int(),
+      Arb.string().map(::RuntimeException),
+      Arb.string().map(::IllegalStateException)
+    ) { seed, original, suppressed ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource({ seed }) { _, exitCase ->
+          released.complete(exitCase)
+          throw suppressed
+        }.allocated()
+      
+      val exception = shouldThrow<RuntimeException> {
+        try {
+          allocate shouldBe seed
+          throw original
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+      
+      exception shouldBe original
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      released.await().shouldBeTypeOf<ExitCase.Failure>()
+    }
+  }
+  
+  "allocated - cancellation exception" {
+    checkAll(
+      Arb.int(),
+      Arb.string().map { CancellationException(it, null) },
+      Arb.string().map(::IllegalStateException)
+    ) { seed, cancellation, suppressed ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource({ seed }) { _, exitCase ->
+          released.complete(exitCase)
+          throw suppressed
+        }.allocated()
+      
+      val exception = shouldThrow<CancellationException> {
+        try {
+          allocate shouldBe seed
+          throw cancellation
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+      
+      exception shouldBe cancellation
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
       released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
