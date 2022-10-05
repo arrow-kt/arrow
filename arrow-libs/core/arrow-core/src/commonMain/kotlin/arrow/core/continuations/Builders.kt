@@ -19,31 +19,31 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-public inline fun <E, A> either(@BuilderInference block: Shift<E>.() -> A): Either<E, A> =
+public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
-public inline fun <A> nullable(block: NullableShift.() -> A): A? =
-  fold({ block(NullableShift(this)) }, { null }, ::identity)
+public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
+  fold({ block(NullableRaise(this)) }, { null }, ::identity)
 
-public inline fun <A> result(action: ResultShift.() -> A): Result<A> =
-  fold({ action(ResultShift(this)) }, Result.Companion::failure, Result.Companion::success)
+public inline fun <A> result(action: ResultRaise.() -> A): Result<A> =
+  fold({ action(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::success)
 
-public inline fun <A> option(action: OptionShift.() -> A): Option<A> =
-  fold({ action(OptionShift(this)) }, ::identity, ::Some)
+public inline fun <A> option(action: OptionRaise.() -> A): Option<A> =
+  fold({ action(OptionRaise(this)) }, ::identity, ::Some)
 
-public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorShift<E>.() -> A): Ior<E, A> =
-  fold({ IorShift(semigroup, this).invoke(action) }, { Ior.Left(it) }, ::identity)
+public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorRaise<E>.() -> A): Ior<E, A> =
+  fold({ IorRaise(semigroup, this).invoke(action) }, { Ior.Left(it) }, ::identity)
 
 @JvmInline
-public value class NullableShift(private val cont: Shift<Nothing?>) : Shift<Nothing?> {
+public value class NullableRaise(private val cont: Raise<Nothing?>) : Raise<Nothing?> {
   @EffectDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
-  override fun <B> shift(r: Nothing?): B = cont.shift(r)
-  public fun <B> Option<B>.bind(): B = bind { shift(null) }
+  override fun <B> raise(r: Nothing?): B = cont.raise(r)
+  public fun <B> Option<B>.bind(): B = bind { raise(null) }
   
   public fun <B> B?.bind(): B {
     contract { returns() implies (this@bind != null) }
-    return this ?: shift(null)
+    return this ?: raise(null)
   }
   
   public fun <B> ensureNotNull(value: B?): B {
@@ -53,15 +53,15 @@ public value class NullableShift(private val cont: Shift<Nothing?>) : Shift<Noth
 }
 
 @JvmInline
-public value class ResultShift(private val cont: Shift<Throwable>) : Shift<Throwable> {
-  override fun <B> shift(r: Throwable): B = cont.shift(r)
-  public fun <B> Result<B>.bind(): B = fold(::identity) { shift(it) }
+public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
+  override fun <B> raise(r: Throwable): B = cont.raise(r)
+  public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
 }
 
 @JvmInline
-public value class OptionShift(private val cont: Shift<None>) : Shift<None> {
-  override fun <B> shift(r: None): B = cont.shift(r)
-  public fun <B> Option<B>.bind(): B = bind { shift(None) }
+public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
+  override fun <B> raise(r: None): B = cont.raise(r)
+  public fun <B> Option<B>.bind(): B = bind { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
   
   public fun <B> ensureNotNull(value: B?): B {
@@ -70,17 +70,17 @@ public value class OptionShift(private val cont: Shift<None>) : Shift<None> {
   }
 }
 
-public class IorShift<E> @PublishedApi internal constructor(semigroup: Semigroup<E>, private val effect: Shift<E>) :
-  Shift<E>, Semigroup<E> by semigroup {
+public class IorRaise<E> @PublishedApi internal constructor(semigroup: Semigroup<E>, private val effect: Raise<E>) :
+  Raise<E>, Semigroup<E> by semigroup {
   
   // TODO this is a mess...
   @PublishedApi
   internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)
-  override fun <B> shift(r: E): B = effect.shift(combine(r))
+  override fun <B> raise(r: E): B = effect.raise(combine(r))
   
   public fun <B> Ior<E, B>.bind(): B =
     when (this) {
-      is Ior.Left -> shift(value)
+      is Ior.Left -> raise(value)
       is Ior.Right -> value
       is Ior.Both -> {
         combine(leftValue)
@@ -89,7 +89,7 @@ public class IorShift<E> @PublishedApi internal constructor(semigroup: Semigroup
     }
   
   @PublishedApi
-  internal inline operator fun <A> invoke(action: IorShift<E>.() -> A): Ior<E, A> {
+  internal inline operator fun <A> invoke(action: IorRaise<E>.() -> A): Ior<E, A> {
     val res = action(this)
     val leftState = leftState.get()
     return if (leftState === EmptyValue) Ior.Right(res)

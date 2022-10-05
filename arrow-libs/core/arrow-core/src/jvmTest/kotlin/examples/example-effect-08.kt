@@ -18,7 +18,7 @@ suspend fun main() {
   effect<String, Int> {
     bracketCase(
       acquire = { File("build.gradle.kts").bufferedReader() },
-      use = { reader: BufferedReader -> shift(error) },
+      use = { reader: BufferedReader -> raise(error) },
       release = { reader, exitCase ->
         reader.close()
         exit.complete(exitCase)

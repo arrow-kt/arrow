@@ -22,15 +22,15 @@ import kotlin.jvm.JvmName
  * object User
  * object Error
  *
- * val error = effect<Error, User> { shift(Error) } // // Shift(error)
+ * val error = effect<Error, User> { raise(Error) } // Raise(error)
  *
  * val a = error.recover<Error, Error, User> { error -> User } // Success(User)
- * val b = error.recover<Error, String, User> { error -> shift("other-failure") } // Shift(other-failure)
+ * val b = error.recover<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
  * val c = error.recover<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
  * <!--- KNIT example-effect-error-01.kt -->
  */
-public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Shift<E2>.(shifted: E) -> A): Effect<E2, A> =
+public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<E2>.(shifted: E) -> A): Effect<E2, A> =
   effect { recover(resolve) }
 
 /**
@@ -49,12 +49,12 @@ public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: susp
  * val exception = effect<Error, User> { throw RuntimeException("BOOM") }  // Exception(BOOM)
  *
  * val a = exception.catch { error -> error.message?.length ?: -1 } // Success(5)
- * val b = exception.catch { shift(Error) } // Shift(error)
+ * val b = exception.catch { raise(Error) } // Raise(error)
  * val c = exception.catch { throw  RuntimeException("other-failure") } // Exception(other-failure)
  * ```
  * <!--- KNIT example-effect-error-02.kt -->
  */
-public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Shift<E>.(throwable: Throwable) -> A): Effect<E, A> =
+public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Raise<E>.(throwable: Throwable) -> A): Effect<E, A> =
   effect { catch(resolve) }
 
 /**
@@ -70,7 +70,7 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Sh
  *
  * val x = effect<Error, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.catch { shift(Error) }
+ * }.catch { raise(Error) }
  * ```
  *
  * If you don't need an `error` value when wrapping your foreign code you can use `Nothing` to fill the type parameter.
@@ -78,13 +78,13 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Sh
  * ```kotlin
  * val y = effect<Nothing, User> {
  *   throw IllegalArgumentException("builder missed args")
- * }.catch<IllegalArgumentException, Error, User> { shift(Error) }
+ * }.catch<IllegalArgumentException, Error, User> { raise(Error) }
  * ```
  * <!--- KNIT example-effect-error-03.kt -->
  */
 @JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.catch(
-  @BuilderInference crossinline recover: suspend Shift<E>.(T) -> A,
+  @BuilderInference crossinline recover: suspend Raise<E>.(T) -> A,
 ): Effect<E, A> =
   effect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
 
@@ -98,14 +98,14 @@ public fun <E, A> Effect<E, A>.catch(): Effect<E, Result<A>> =
     }
   }
 
-public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Shift<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
   eagerEffect { recover(resolve) }
 
-public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Shift<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
+public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Raise<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
   eagerEffect { catch(recover) }
 
 @JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
-  @BuilderInference crossinline recover: Shift<E>.(T) -> A,
+  @BuilderInference crossinline recover: Raise<E>.(T) -> A,
 ): EagerEffect<E, A> =
   eagerEffect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }

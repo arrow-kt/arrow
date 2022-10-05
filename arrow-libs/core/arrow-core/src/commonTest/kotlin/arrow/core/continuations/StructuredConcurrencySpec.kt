@@ -46,7 +46,7 @@ class StructuredConcurrencySpec :
             }
             async<Int> {
                 started.await()
-                shift("hello")
+                raise("hello")
               }.await()
             never.await()
           }
@@ -66,8 +66,8 @@ class StructuredConcurrencySpec :
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              val fa = async<String> { shift(a) }
-              val fb = async<String> { shift(b) }
+              val fa = async<String> { raise(a) }
+              val fb = async<String> { raise(b) }
               fa.await() + fb.await()
             }
           }
@@ -101,7 +101,7 @@ class StructuredConcurrencySpec :
                       asyncTask(start, promise)
                     }
                     startLatches.awaitAll()
-                    shift(a)
+                    raise(a)
                   }
                 val fb = asyncTask(startLatches.first(), fbExit)
                 fa.await()
@@ -123,8 +123,8 @@ class StructuredConcurrencySpec :
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              val fa = async<Nothing> { shift(a) }
-              val fb = async<Nothing> { shift(b) }
+              val fa = async<Nothing> { raise(a) }
+              val fb = async<Nothing> { raise(b) }
               "I will be overwritten by shift - coroutineScope waits until all async are finished"
             }
           }
@@ -156,7 +156,7 @@ class StructuredConcurrencySpec :
                   async<Unit> {
                     startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
                     startLatches.awaitAll()
-                    shift(a)
+                    raise(a)
                   }
                 str
               }
@@ -174,8 +174,8 @@ class StructuredConcurrencySpec :
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              launch { shift(a) }
-              launch { shift(b) }
+              launch { raise(a) }
+              launch { raise(b) }
               "shift does not escape `launch`"
             }
           }
@@ -205,7 +205,7 @@ class StructuredConcurrencySpec :
                 val fa = launch {
                   startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
                   startLatches.awaitAll()
-                  shift(a)
+                  raise(a)
                 }
                 str
               }
@@ -227,8 +227,8 @@ class StructuredConcurrencySpec :
             coroutineScope {
               val shiftedAsync =
                 effect<Int, Deferred<String>> {
-                    val fa = async<Int> { shift(a) }
-                    async { shift(b) }
+                    val fa = async<Int> { raise(a) }
+                    async { raise(b) }
                   }
                   .fold({ fail("shift was never awaited, so it never took effect") }, ::identity)
               shiftedAsync.await()
