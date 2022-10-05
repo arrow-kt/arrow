@@ -19,7 +19,7 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 
 class EagerEffectSpec : StringSpec({
-  "try/catch - can recover from shift" {
+  "try/catch - can recover from raise" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
       eagerEffect {
         try {
@@ -46,7 +46,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "try/catch - First shift is ignored and second is returned" {
+  "try/catch - First raise is ignored and second is returned" {
     checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
       eagerEffect<String, Int> {
         val x: Int =
@@ -86,7 +86,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "attempt - shift from catch" {
+  "attempt - raise from catch" {
     checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
@@ -109,25 +109,25 @@ class EagerEffectSpec : StringSpec({
   }
   
   "ensure null in eager either computation" {
-    checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
+    checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, raise ->
       either<String, Int> {
-        ensure(predicate) { shift }
+        ensure(predicate) { raise }
         success
-      } shouldBe if (predicate) success.right() else shift.left()
+      } shouldBe if (predicate) success.right() else raise.left()
     }
   }
   
   "ensureNotNull in eager either computation" {
     fun square(i: Int): Int = i * i
     
-    checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
+    checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, raise: String ->
       val res =
         either<String, Int> {
           val ii = i
-          ensureNotNull(ii) { shift }
+          ensureNotNull(ii) { raise }
           square(ii) // Smart-cast by contract
         }
-      val expected = i?.let(::square)?.right() ?: shift.left()
+      val expected = i?.let(::square)?.right() ?: raise.left()
       res shouldBe expected
     }
   }
@@ -151,7 +151,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "catch - error path and re-shift" {
+  "catch - error path and re-raise" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
         raise<String>(int)
@@ -191,7 +191,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "attempt - error path and re-shift" {
+  "attempt - error path and re-raise" {
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
