@@ -4,18 +4,15 @@ package arrow.fx.coroutines.examples.exampleResource09
 import arrow.fx.coroutines.*
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 
-val resource = Resource({ println("Acquire") }) { _, exitCase ->
- println("Release $exitCase")
-}
+val resource =
+  resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
 
 suspend fun main(): Unit {
-  val (acquire, release) = resource.allocated()
-  val a = acquire()
+  val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
   try {
     /** Do something with A */
-    release(a, ExitCase.Completed)
+    release(ExitCase.Completed)
   } catch(e: Throwable) {
-     val e2 = runCatching { release(a, ExitCase(e)) }.exceptionOrNull()
-     throw Platform.composeErrors(e, e2)
+     release(ExitCase(e))
   }
 }

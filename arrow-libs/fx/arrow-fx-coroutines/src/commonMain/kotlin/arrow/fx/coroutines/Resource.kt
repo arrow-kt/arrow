@@ -444,28 +444,25 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
   }
 
 /**
- * Deconstruct [Resource] into an `acquire` and `release` handlers.
- * The `release` action **must** always be called with resource [A] returned from `acquire`,
- * if the `release` step is never called, then the resource [A] will leak. The `acquire` and `release`
- * steps are already made `NonCancellable` to guarantee correct invocation like `Resource` or `bracketCase`.
+ * Deconstruct [Resource] into an [A] and a `release` handler.
+ * The `release` action **must** always be called, if  never called, then the resource [A] will leak.
+ * The `release` step is already made `NonCancellable` to guarantee correct invocation like `Resource` or `bracketCase`,
+ * and it will automatically rethrow, and compose, the exceptions as needed.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
  * import arrow.fx.coroutines.ExitCase.Companion.ExitCase
  *
- * val resource = Resource({ println("Acquire") }) { _, exitCase ->
- *  println("Release $exitCase")
- * }
+ * val resource =
+ *   resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
  *
  * suspend fun main(): Unit {
- *   val (acquire, release) = resource.allocated()
- *   val a = acquire()
+ *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
  *   try {
  *     /** Do something with A */
- *     release(a, ExitCase.Completed)
+ *     release(ExitCase.Completed)
  *   } catch(e: Throwable) {
- *      val e2 = runCatching { release(a, ExitCase(e)) }.exceptionOrNull()
- *      throw Platform.composeErrors(e, e2)
+ *      release(ExitCase(e))
  *   }
  * }
  * ```
@@ -479,9 +476,15 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
 @DelicateCoroutinesApi
 public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Unit> {
   val effect = ResourceScopeImpl()
-  val allocated = invoke(effect)
+  val allocated: A = invoke(effect)
   val release: suspend (ExitCase) -> Unit = { e ->
-    effect.cancelAll(e)?.let { throw it }
+    val suppressed: Throwable? = effect.cancelAll(e)
+    val original: Throwable? = when(e) {
+      ExitCase.Completed -> null
+      is ExitCase.Cancelled -> e.exception
+      is ExitCase.Failure -> e.failure
+    }
+    Platform.composeErrors(original, suppressed)?.let { throw it }
   }
   return Pair(allocated, release)
 }

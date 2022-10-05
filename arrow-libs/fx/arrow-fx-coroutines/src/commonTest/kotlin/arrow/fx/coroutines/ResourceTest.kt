@@ -3,11 +3,13 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -518,30 +520,71 @@ class ResourceTest : StringSpec({
     }
   }
   
-  fun Exhaustive.Companion.exitCase(): Exhaustive<ExitCase> =
-    Exhaustive.of(
-      ExitCase.Completed,
-      ExitCase.Failure(Exception()),
-      ExitCase.Cancelled(CancellationException(null, null))
-    )
-  
   "allocated" {
-    checkAll(
-      Exhaustive.exitCase(),
-      Arb.int(),
-      Arb.string().map(::RuntimeException).orNull()
-    ) { exitCase, seed, exception ->
+    checkAll(Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
       val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
         .allocated()
       
-      try {
-        allocate shouldBe seed
-        exception?.let { throw it }
-      } finally {
-        release(exitCase)
+      allocate shouldBe seed
+      release(ExitCase.Completed)
+      released.await() shouldBe ExitCase.Completed
+    }
+  }
+  
+  "allocated - suppressed exception" {
+    checkAll(
+      Arb.int(),
+      Arb.string().map(::RuntimeException),
+      Arb.string().map(::IllegalStateException)
+    ) { seed, original, suppressed ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource({ seed }) { _, exitCase ->
+          released.complete(exitCase)
+          throw suppressed
+        }.allocated()
+      
+      val exception = shouldThrow<RuntimeException> {
+        try {
+          allocate shouldBe seed
+          throw original
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
       }
-      released.await() shouldBe exitCase
+      
+      exception shouldBe original
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      released.await().shouldBeTypeOf<ExitCase.Failure>()
+    }
+  }
+  
+  "allocated - cancellation exception" {
+    checkAll(
+      Arb.int(),
+      Arb.string().map { CancellationException(it, null) },
+      Arb.string().map(::IllegalStateException)
+    ) { seed, cancellation, suppressed ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource({ seed }) { _, exitCase ->
+          released.complete(exitCase)
+          throw suppressed
+        }.allocated()
+      
+      val exception = shouldThrow<CancellationException> {
+        try {
+          allocate shouldBe seed
+          throw cancellation
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+      
+      exception shouldBe cancellation
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
 })
