@@ -91,7 +91,7 @@ val companyAddress: Lens<Company, Address> = Lens(
         set = { company, address -> company.copy(address = address) }
 )
 
-val addressStrees: Lens<Address, Street> = Lens(
+val addressStreet: Lens<Address, Street> = Lens(
         get = { it.street },
         set = { address, street -> address.copy(street = street) }
 )
@@ -101,7 +101,7 @@ val streetName: Lens<Street, String> = Lens(
         set = { street, name -> street.copy(name = name) }
 )
 
-val employeeStreetName: Lens<Employee, String> = employeeCompany compose companyAddress compose addressStrees compose streetName
+val employeeStreetName: Lens<Employee, String> = employeeCompany compose companyAddress compose addressStreet compose streetName
 
 employeeStreetName.modify(employee, String::capitalize)
 ```
