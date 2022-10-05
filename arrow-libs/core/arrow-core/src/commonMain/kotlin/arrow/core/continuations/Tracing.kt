@@ -39,10 +39,10 @@ public data class Traced<R>(private val exception: CancellationException, privat
     exception.suppressedExceptions
 }
 
-public fun <R, A> Effect<R, A>.traced(recover: Shift<R>.(traces: Traced<R>) -> Unit): Effect<R, A> =
+public fun <R, A> Effect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): Effect<R, A> =
   effect { traced({ bind() }, recover) }
 
-public fun <R, A> EagerEffect<R, A>.traced(recover: Shift<R>.(traces: Traced<R>) -> Unit): EagerEffect<R, A> =
+public fun <R, A> EagerEffect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): EagerEffect<R, A> =
   eagerEffect { traced({ bind() }, recover) }
 
 /**
@@ -81,16 +81,16 @@ public fun <R, A> EagerEffect<R, A>.traced(recover: Shift<R>.(traces: Traced<R>)
  * but **this only occurs** when composing `traced`.
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
-public inline fun <R, A> Shift<R>.traced(
-  @BuilderInference program: Shift<R>.() -> A,
-  recover: Shift<R>.(traces: Traced<R>) -> Unit,
+public inline fun <R, A> Raise<R>.traced(
+  @BuilderInference program: Raise<R>.() -> A,
+  recover: Raise<R>.(traces: Traced<R>) -> Unit,
 ): A {
-  val nested = DefaultShift(true)
+  val nested = DefaultRaise(true)
   return try {
     program.invoke(nested)
   } catch (e: ShiftCancellationException) {
     val r: R = e.shiftedOrRethrow(nested)
     recover(Traced(e, r))
-    shift(r)
+    raise(r)
   }
 }

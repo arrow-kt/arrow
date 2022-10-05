@@ -9,17 +9,17 @@ sealed interface OtherError : MyError {
   object Actual : OtherError
 }
 
-context(Shift<SubError>)
+context(Raise<SubError>)
   suspend fun subprogram(): Unit =
   println("Hello SubProgram!")
 
-context(Shift<OtherError>)
+context(Raise<OtherError>)
   suspend fun otherprogram(): Unit =
   println("Hello OtherProgram!")
 
-context(Shift<OtherError>)
+context(Raise<OtherError>)
   suspend fun fail(): MyResponse =
-  shift(OtherError.Actual)
+  raise(OtherError.Actual)
 
 fun main() =
   runBlocking(Dispatchers.Default) {
@@ -38,11 +38,11 @@ object EmptyResponse : MyResponse
 data class ErrorResponse(val error: Throwable) : MyResponse
 data class BodyResponse(val body: String) : MyResponse
 
-context(Shift<SubError>)
+context(Raise<SubError>)
   suspend fun respondWithBody(): BodyResponse =
   BodyResponse("Hello Program!")
 
-context(Shift<OtherError>)
+context(Raise<OtherError>)
   suspend fun attemptOrError(): MyResponse =
   ErrorResponse(RuntimeException("Oh no!"))
 

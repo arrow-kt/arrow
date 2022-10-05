@@ -23,7 +23,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.int(), Arb.string()) { i, s ->
       eagerEffect {
         try {
-          shift(s)
+          raise(s)
         } catch (e: Throwable) {
           i
         }
@@ -36,7 +36,7 @@ class EagerEffectSpec : StringSpec({
       val promise = CompletableDeferred<Int>()
       eagerEffect {
         try {
-          shift<Int>(s)
+          raise<Int>(s)
         } finally {
           require(promise.complete(i))
         }
@@ -51,11 +51,11 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         val x: Int =
           try {
-            shift(s)
+            raise(s)
           } catch (e: Throwable) {
             i
           }
-        shift(s2)
+        raise(s2)
       }.fold(::identity) { fail("Should never come here") } shouldBe s2
     }
   }
@@ -64,7 +64,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
-          shift(l)
+          raise(l)
         } recover { ll ->
           ll shouldBe l
           i
@@ -90,10 +90,10 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
-          shift(l)
+          raise(l)
         } recover { ll ->
           ll shouldBe l
-          shift(error)
+          raise(error)
         }
       }.runCont() shouldBe error
     }
@@ -101,7 +101,7 @@ class EagerEffectSpec : StringSpec({
   
   "values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
   
-  "short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
+  "short-circuit" { eagerEffect<String, Nothing> { raise("hello") }.runCont() shouldBe "hello" }
   
   "Rethrows exceptions" {
     val e = RuntimeException("test")
@@ -144,7 +144,7 @@ class EagerEffectSpec : StringSpec({
   "catch - error path and recover" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
-        shift<String>(int)
+        raise<String>(int)
         fail("It should never reach this point")
       }.recover<Int, Nothing, String> { fallback }
         .runCont() shouldBe fallback
@@ -154,9 +154,9 @@ class EagerEffectSpec : StringSpec({
   "catch - error path and re-shift" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
-        shift<String>(int)
+        raise<String>(int)
         fail("It should never reach this point")
-      }.recover { shift(fallback) }
+      }.recover { raise(fallback) }
         .runCont() shouldBe fallback
     }
   }
@@ -165,7 +165,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
-          shift<String>(int)
+          raise<String>(int)
           fail("It should never reach this point")
         }.recover<Int, Nothing, String> { throw RuntimeException(msg) }
           .runCont()
@@ -195,7 +195,7 @@ class EagerEffectSpec : StringSpec({
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
-      }.catch { shift(fallback) }
+      }.catch { raise(fallback) }
         .runCont() shouldBe fallback
     }
   }

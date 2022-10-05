@@ -41,19 +41,19 @@ public inline fun <R, A, B> EagerEffect<R, A>.fold(
 
 @JvmName("_foldOrThrow")
 public inline fun <R, A, B> fold(
-  @BuilderInference program: Shift<R>.() -> A,
+  @BuilderInference program: Raise<R>.() -> A,
   recover: (shifted: R) -> B,
   transform: (value: A) -> B,
 ): B = fold(program, { throw it }, recover, transform)
 
 @JvmName("_fold")
 public inline fun <R, A, B> fold(
-  @BuilderInference program: Shift<R>.() -> A,
+  @BuilderInference program: Raise<R>.() -> A,
   error: (error: Throwable) -> B,
   recover: (shifted: R) -> B,
   transform: (value: A) -> B,
 ): B {
-  val shift = DefaultShift(false)
+  val shift = DefaultRaise(false)
   return try {
     transform(program(shift))
   } catch (e: CancellationException) {
@@ -66,18 +66,20 @@ public inline fun <R, A, B> fold(
 /** Returns the shifted value, or rethrows the CancellationException if not our scope */
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
-internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultShift): R =
-  if (this is ShiftCancellationException && this.shift === shift) shifted as R
+internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultRaise): R =
+  if (this is ShiftCancellationException && this.raise === shift) shifted as R
   else throw this
 
 /** Serves as both purposes of a scope-reference token, and default implementation for Shift. */
 @PublishedApi
-internal class DefaultShift(private val isTraced: Boolean) : Shift<Any?> {
-  override fun <B> shift(r: Any?): B =
+internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
+  override fun <B> raise(r: Any?): B =
     if (isTraced) throw ShiftCancellationException(r, this)
     else throw ShiftCancellationExceptionNoTrace(r, this)
 }
 
 /** CancellationException is required to cancel coroutines when shifting from within them. */
-internal open class ShiftCancellationException(val shifted: Any?, val shift: Shift<Any?>) : CancellationException("Shifted Continuation")
-internal expect class ShiftCancellationExceptionNoTrace(shifted: Any?, shift: Shift<Any?>): ShiftCancellationException
+internal open class ShiftCancellationException(val shifted: Any?, val raise: Raise<Any?>) :
+  CancellationException("Shifted Continuation")
+
+internal expect class ShiftCancellationExceptionNoTrace(shifted: Any?, shift: Raise<Any?>) : ShiftCancellationException
