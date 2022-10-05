@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 
 class EffectSpec :
   StringSpec({
-    "try/catch - can recover from shift" {
+    "try/catch - can recover from raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { i, s ->
         effect {
           try {
@@ -57,7 +57,7 @@ class EffectSpec :
       }
     }
     
-    "try/catch - First shift is ignored and second is returned" {
+    "try/catch - First raise is ignored and second is returned" {
       checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
         effect<String, Int> {
           val x: Int = try {
@@ -110,7 +110,7 @@ class EffectSpec :
       }
     }
     
-    "eagerEffect shift short-circuits effect computation" {
+    "eagerEffect raise short-circuits effect computation" {
       checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
           eagerEffect { raise(a) }
@@ -174,25 +174,25 @@ class EffectSpec :
         Arb.boolean().suspend(),
         Arb.int().suspend(),
         Arb.string().suspend()
-      ) { predicate, success, shift ->
+      ) { predicate, success, raise ->
         either {
-          ensure(predicate()) { shift() }
+          ensure(predicate()) { raise() }
           success()
-        } shouldBe if (predicate()) success().right() else shift().left()
+        } shouldBe if (predicate()) success().right() else raise().left()
       }
     }
     
     "ensureNotNull in either computation" {
       fun square(i: Int): Int = i * i
       
-      checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, shift->
+      checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, raise->
         val res =
           either<String, Int> {
             val ii = i()
-            ensureNotNull(ii) { shift() }
+            ensureNotNull(ii) { raise() }
             square(ii) // Smart-cast by contract
           }
-        val expected = i()?.let(::square)?.right() ?: shift().left()
+        val expected = i()?.let(::square)?.right() ?: raise().left()
         res shouldBe expected
       }
     }
@@ -262,7 +262,7 @@ class EffectSpec :
       }
     }
     
-    "Can shift from thrown exceptions" {
+    "Can raise from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<String, Int> {
           effect<Int, String> {
@@ -309,7 +309,7 @@ class EffectSpec :
       }
     }
     
-    "catch - error path and re-shift" {
+    "catch - error path and re-raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, Unit> {
           raise<String>(int())
@@ -349,7 +349,7 @@ class EffectSpec :
       }
     }
     
-    "attempt - error path and re-shift" {
+    "attempt - error path and re-raise" {
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
         effect<Int, Unit> {
           throw RuntimeException(msg())

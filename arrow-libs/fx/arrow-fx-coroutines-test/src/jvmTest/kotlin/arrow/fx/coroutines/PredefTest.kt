@@ -30,7 +30,7 @@ class PredefTest : ArrowFxSpec(
       }
     }
     
-    "shift" {
+    "raise" {
       checkAll(Arb.string(), Arb.string()) { a, b ->
         val t0 = Thread.currentThread().name
         
