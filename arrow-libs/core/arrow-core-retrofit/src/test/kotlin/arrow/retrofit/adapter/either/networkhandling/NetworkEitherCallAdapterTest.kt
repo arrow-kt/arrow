@@ -20,7 +20,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 
 @ExperimentalSerializationApi
@@ -96,7 +96,7 @@ private fun networkEitherCallAdapterTests(
 
     body.shouldBeInstanceOf<Left<*>>()
       .value.shouldBeInstanceOf<IOError>()
-      .cause.shouldBeInstanceOf<ConnectException>()
+      .cause.shouldBeInstanceOf<SocketException>()
   }
 
   "should return IOError when no response" {

@@ -5,6 +5,8 @@ import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.prependTo
 import kotlinx.coroutines.CancellationException
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -440,6 +442,49 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
       emit(bind())
     }
   }
+
+/**
+ * Deconstruct [Resource] into an `acquire` and `release` handlers.
+ * The `release` action **must** always be called with resource [A] returned from `acquire`,
+ * if the `release` step is never called, then the resource [A] will leak. The `acquire` and `release`
+ * steps are already made `NonCancellable` to guarantee correct invocation like `Resource` or `bracketCase`.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+ *
+ * val resource = Resource({ println("Acquire") }) { _, exitCase ->
+ *  println("Release $exitCase")
+ * }
+ *
+ * suspend fun main(): Unit {
+ *   val (acquire, release) = resource.allocated()
+ *   val a = acquire()
+ *   try {
+ *     /** Do something with A */
+ *     release(a, ExitCase.Completed)
+ *   } catch(e: Throwable) {
+ *      val e2 = runCatching { release(a, ExitCase(e)) }.exceptionOrNull()
+ *      throw Platform.composeErrors(e, e2)
+ *   }
+ * }
+ * ```
+ * <!--- KNIT example-resource-08.kt -->
+ *
+ * This is a **delicate** API. It is easy to accidentally create resource or memory leaks `allocated` is used.
+ * A `Resource` allocated by `allocated` is not subject to the guarantees that [Resource] makes,
+ * instead the caller is responsible for correctly invoking the `release` handler at the appropriate time.
+ * This API is useful for building inter-op APIs between [Resource] and non-suspending code, such as Java libraries.
+ */
+@DelicateCoroutinesApi
+public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Unit> {
+  val effect = ResourceScopeImpl()
+  val allocated = invoke(effect)
+  val release: suspend (ExitCase) -> Unit = { e ->
+    effect.cancelAll(e)?.let { throw it }
+  }
+  return Pair(allocated, release)
+}
 
 @JvmInline
 private value class ResourceScopeImpl(
