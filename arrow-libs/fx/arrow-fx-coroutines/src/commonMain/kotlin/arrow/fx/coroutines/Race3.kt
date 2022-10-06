@@ -77,17 +77,11 @@ public suspend inline fun <A, B, C> raceN(
 
 @PublishedApi
 internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>): Unit {
-  val e1 = try {
+  val e1 = runCatching {
     first.cancelAndJoin()
-    null
-  } catch (e: Throwable) {
-    e.nonFatalOrThrow()
-  }
-  val e2 = try {
+  }.exceptionOrNull()?.nonFatalOrThrow()
+  val e2 = runCatching {
     second.cancelAndJoin()
-    null
-  } catch (e: Throwable) {
-    e.nonFatalOrThrow()
-  }
-  Platform.composeErrors(e1, e2)?.let { throw it }
+  }.exceptionOrNull()?.nonFatalOrThrow()
+  (e1?.apply { e2?.let(::addSuppressed) } ?: e2)?.let { throw it }
 }
