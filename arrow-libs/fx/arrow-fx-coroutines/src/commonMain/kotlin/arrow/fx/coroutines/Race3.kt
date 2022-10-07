@@ -89,5 +89,5 @@ internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>): 
   } catch (e: Throwable) {
     e.nonFatalOrThrow()
   }
-  Platform.composeErrors(e1, e2)?.let { throw it }
+  (e1?.apply { e2?.let(::addSuppressed) } ?: e2)?.let { throw it }
 }
