@@ -23,7 +23,7 @@ suspend fun main() {
   val error = "Error"
   val exit = CompletableDeferred<ExitCase>()
   effect<String, Int> {
-    raceN({ awaitExitCase<Int>(exit) }) { raise<Int>(error) }
+    raceN({ awaitExitCase<Int>(exit) }) { raise(error) }
       .merge() // Flatten Either<Int, Int> result from race into Int
   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
   // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran

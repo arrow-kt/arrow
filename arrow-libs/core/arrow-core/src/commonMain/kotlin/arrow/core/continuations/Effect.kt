@@ -355,7 +355,7 @@ import kotlin.jvm.JvmMultifileClass
  *    val error = "Error"
  *    val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     parZip({ awaitExitCase<Int>(exit) }, { raise<Int>(error) }) { a, b -> a + b }
+ *     parZip({ awaitExitCase<Int>(exit) }, { raise(error) }) { a: Int, b: Int -> a + b }
  *   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
@@ -425,7 +425,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val error = "Error"
  *   val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     raceN({ awaitExitCase<Int>(exit) }) { raise<Int>(error) }
+ *     raceN({ awaitExitCase<Int>(exit) }) { raise(error) }
  *       .merge() // Flatten Either<Int, Int> result from race into Int
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
  *   // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran
@@ -497,7 +497,7 @@ import kotlin.jvm.JvmMultifileClass
  *   resourceScope {
  *     effect<String, Int> {
  *       val reader = bufferedReader("build.gradle.kts")
- *       raise<Int>(error)
+ *       raise(error)
  *       reader.lineSequence().count()
  *     }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   }

@@ -72,7 +72,7 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
 internal class DefaultRaise : Raise<Any?> {
-  override fun <B> raise(r: Any?): B = throw RaiseCancellationException(r, this)
+  override fun raise(r: Any?): Nothing = throw RaiseCancellationException(r, this)
 }
 
 /** CancellationException is required to cancel coroutines when shifting from within them. */

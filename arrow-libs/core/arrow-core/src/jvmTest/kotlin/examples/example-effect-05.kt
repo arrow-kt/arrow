@@ -19,7 +19,7 @@ suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
    val error = "Error"
    val exit = CompletableDeferred<ExitCase>()
   effect<String, Int> {
-    parZip({ awaitExitCase<Int>(exit) }, { raise<Int>(error) }) { a, b -> a + b }
+    parZip({ awaitExitCase<Int>(exit) }, { raise(error) }) { a: Int, b: Int -> a + b }
   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
   exit.await().shouldBeTypeOf<ExitCase>()
 }

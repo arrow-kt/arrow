@@ -61,7 +61,7 @@ public annotation class EffectDSL
 public interface Raise<in R> {
   
   /** Raise a _logical failure_ of type [R] */
-  public fun <A> raise(r: R): A
+  public fun raise(r: R): Nothing
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
