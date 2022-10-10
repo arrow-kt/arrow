@@ -141,6 +141,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and recover" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
@@ -151,6 +152,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and re-raise" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
@@ -161,6 +163,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and throw" {
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {

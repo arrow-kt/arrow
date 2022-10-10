@@ -299,6 +299,7 @@ class EffectSpec :
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and recover" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, String> {
@@ -309,6 +310,7 @@ class EffectSpec :
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and re-raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, Unit> {
@@ -319,6 +321,7 @@ class EffectSpec :
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and throw" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
         shouldThrow<RuntimeException> {
