@@ -24,7 +24,7 @@ public fun <E, A> EagerEffect<E, A>.toValidated(): Validated<E, A> = fold({ Vali
 public suspend fun <E, A> Effect<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 public fun <E, A> EagerEffect<E, A>.toIor(): Ior<E, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 
-/** Run the [Effect] by returning [A], or `null` if shifted with [E]. */
+/** Run the [Effect] by returning [A], or `null` if raised with [E]. */
 public suspend fun <E, A> Effect<E, A>.orNull(): A? = fold({ _: E -> null }) { it }
 public fun <E, A> EagerEffect<E, A>.orNull(): A? = fold({ _: E -> null }) { it }
 
@@ -32,7 +32,7 @@ public fun <E, A> EagerEffect<E, A>.orNull(): A? = fold({ _: E -> null }) { it }
 public suspend fun <E, A> Effect<E, A>.toOption(orElse: suspend (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
 public fun <E, A> EagerEffect<E, A>.toOption(orElse: (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
 
-/** Run the [Effect] by returning [Option] of [A], or [None] if shifted with [None]. */
+/** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
 public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
 public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
@@ -42,6 +42,6 @@ public suspend fun <E, A> Effect<E, A>.toResult(orElse: suspend (E) -> Result<A>
 public fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): Result<A> =
   fold({ orElse(it) }, { Result.success(it) })
 
-/** Run the [Effect] by returning [Result] of [A], or [Result.Failure] if shifted with [Throwable]. */
+/** Run the [Effect] by returning [Result] of [A], or [Result.Failure] if raised with [Throwable]. */
 public suspend fun <A> Effect<Throwable, A>.toResult(): Result<A> = result { invoke() }
 public fun <A> EagerEffect<Throwable, A>.toResult(): Result<A> = result { invoke() }

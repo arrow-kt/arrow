@@ -6,8 +6,8 @@ import arrow.atomic.Atomic
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
- * Intersection of Atomic<State> & Shift<R>.
- * Will be replaced by `context(Atomic<State>, Shift<R>)` later
+ * Intersection of Atomic<State> & Raise<R>.
+ * Will be replaced by `context(Atomic<State>, Raise<R>)` later
  */
 public interface StateRaise<State, R> : Atomic<State>, Raise<R>
 
@@ -19,7 +19,7 @@ public inline fun <State, R, A, B> fold(
   initial: State,
   @BuilderInference program: StateRaise<State, R>.() -> A,
   error: (state: State, error: Throwable) -> B,
-  recover: (state: State, shifted: R) -> B,
+  recover: (state: State, raised: R) -> B,
   transform: (state: State, value: A) -> B,
 ): B {
   val state = Atomic(initial)
@@ -35,5 +35,5 @@ public inline fun <State, R, A, B> fold(
 @PublishedApi
 internal class DefaultStateRaise<State, R>(
   state: Atomic<State>,
-  shift: Raise<R>,
-) : StateRaise<State, R>, Atomic<State> by state, Raise<R> by shift {}
+  raise: Raise<R>,
+) : StateRaise<State, R>, Atomic<State> by state, Raise<R> by raise {}
