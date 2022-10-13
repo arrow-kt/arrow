@@ -13,7 +13,7 @@ import kotlin.jvm.JvmName
 /**
  * `invoke` the [Effect] and [fold] the result:
  *  - _success_ [transform] result of [A] to a value of [B].
- *  - _shift_ [recover] from `shifted` value of [R] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [R] to a value of [B].
  *  - _exception_ [error] from [Throwable] by transforming value into [B].
  *
  * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
@@ -21,12 +21,12 @@ import kotlin.jvm.JvmName
  */
 public suspend fun <R, A, B> Effect<R, A>.fold(
   error: suspend (error: Throwable) -> B,
-  recover: suspend (shifted: R) -> B,
+  recover: suspend (raised: R) -> B,
   transform: suspend (value: A) -> B,
 ): B = fold({ invoke() }, { error(it) }, { recover(it) }, { transform(it) })
 
 public suspend fun <R, A, B> Effect<R, A>.fold(
-  recover: suspend (shifted: R) -> B,
+  recover: suspend (raised: R) -> B,
   transform: suspend (value: A) -> B,
 ): B = fold({ throw it }, recover, transform)
 
@@ -35,14 +35,14 @@ public fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) ->
 
 public inline fun <R, A, B> EagerEffect<R, A>.fold(
   error: (error: Throwable) -> B,
-  recover: (shifted: R) -> B,
+  recover: (raised: R) -> B,
   transform: (value: A) -> B,
 ): B = fold({ invoke(this) }, error, recover, transform)
 
 @JvmName("_foldOrThrow")
 public inline fun <R, A, B> fold(
   @BuilderInference program: Raise<R>.() -> A,
-  recover: (shifted: R) -> B,
+  recover: (raised: R) -> B,
   transform: (value: A) -> B,
 ): B = fold(program, { throw it }, recover, transform)
 
@@ -50,14 +50,14 @@ public inline fun <R, A, B> fold(
 public inline fun <R, A, B> fold(
   @BuilderInference program: Raise<R>.() -> A,
   error: (error: Throwable) -> B,
-  recover: (shifted: R) -> B,
+  recover: (raised: R) -> B,
   transform: (value: A) -> B,
 ): B {
-  val shift = DefaultRaise()
+  val raise = DefaultRaise()
   return try {
-    transform(program(shift))
+    transform(program(raise))
   } catch (e: CancellationException) {
-    recover(e.shiftedOrRethrow(shift))
+    recover(e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
     error(e.nonFatalOrThrow())
   }
@@ -65,16 +65,16 @@ public inline fun <R, A, B> fold(
 
 /** Returns the shifted value, rethrows the CancellationException if not our scope */
 @PublishedApi
-internal fun <R> CancellationException.shiftedOrRethrow(shift: DefaultRaise): R =
-  if (this is ShiftCancellationException && this.raise === shift) _shifted as R
+internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
+  if (this is RaiseCancellationException && this.raise === raise) _raised as R
   else throw this
 
-/** Serves as both purposes of a scope-reference token, and a default implementation for Shift. */
+/** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
 internal class DefaultRaise : Raise<Any?> {
-  override fun <B> raise(r: Any?): B = throw ShiftCancellationException(r, this)
+  override fun <B> raise(r: Any?): B = throw RaiseCancellationException(r, this)
 }
 
 /** CancellationException is required to cancel coroutines when shifting from within them. */
-private class ShiftCancellationException(val _shifted: Any?, val raise: Raise<Any?>) :
-  CancellationException("Shifted Continuation")
+private class RaiseCancellationException(val _raised: Any?, val raise: Raise<Any?>) :
+  CancellationException("Raised Continuation")

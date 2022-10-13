@@ -1234,7 +1234,7 @@ public sealed class Either<out A, out B> {
 
 /**
  * Recover from [E] when encountering [Left].
- * You can either return a new value of [A], or short-circuit by shifting with a value of [E2].
+ * You can either return a new value of [A], or short-circuit by raising with a value of [E2].
  *
  * ```kotlin
  * import arrow.core.Either
@@ -1311,8 +1311,7 @@ public fun <B> Either<*, B>.orNull(): B? =
   orNull()
 
 /**
- * Returns the value from this [Right] or allows clients to transform [Left] to [Right] while providing access to
- * the value of [Left].
+ * Returns the value from this [Right] or allows clients to transform the value from [Left] with the [default] lambda.
  *
  * Example:
  * ```kotlin

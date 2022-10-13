@@ -2635,10 +2635,10 @@ public final class arrow/core/continuations/Effect {
 	public static final fun option (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun orNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun orNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raisedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/continuations/DefaultRaise;)Ljava/lang/Object;
 	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
 	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun shiftedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/continuations/DefaultRaise;)Ljava/lang/Object;
 	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toIor (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;

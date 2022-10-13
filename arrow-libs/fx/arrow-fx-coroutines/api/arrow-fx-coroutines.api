@@ -55,7 +55,9 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Closed : arrow/fx/co
 
 public final class arrow/fx/coroutines/CircuitBreaker$State$HalfOpen : arrow/fx/coroutines/CircuitBreaker$State {
 	public fun <init> (D)V
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -63,8 +65,10 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$HalfOpen : arrow/fx/
 
 public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coroutines/CircuitBreaker$State {
 	public fun <init> (JD)V
+	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getExpiresAt ()J
+	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public final fun getStartedAt ()J
 	public fun hashCode ()I
@@ -72,6 +76,7 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coro
 }
 
 public abstract class arrow/fx/coroutines/ExitCase {
+	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }
 
 public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/ExitCase {
@@ -83,6 +88,10 @@ public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/
 	public final fun getException ()Ljava/util/concurrent/CancellationException;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/coroutines/ExitCase$Companion {
+	public final fun ExitCase (Ljava/lang/Throwable;)Larrow/fx/coroutines/ExitCase;
 }
 
 public final class arrow/fx/coroutines/ExitCase$Completed : arrow/fx/coroutines/ExitCase {
@@ -302,6 +311,7 @@ public final class arrow/fx/coroutines/ResourceExtensionsKt {
 }
 
 public final class arrow/fx/coroutines/ResourceKt {
+	public static final fun allocated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun asFlow (Lkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun resource (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
