@@ -203,18 +203,11 @@ public class NonEmptyList<out A>(
   public fun extract(): A =
     this.head
 
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    other?.let {
-      if (it::class != this::class) return false
-      (other as NonEmptyList<*>)
-      if (all != other.all) return false
-      return true
-    } ?: return false
-  }
+  override fun equals(other: Any?): Boolean =
+    super.equals(other)
 
   override fun hashCode(): Int =
-    all.hashCode()
+    super.hashCode()
 
   override fun toString(): String =
     "NonEmptyList(${all.joinToString()})"

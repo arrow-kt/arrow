@@ -4,6 +4,7 @@ import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.prependTo
+import arrow.core.zip
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import arrow.fx.coroutines.continuations.ResourceScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -818,7 +819,7 @@ private class ResourceScopeImpl : ResourceScope {
         if (ex != ExitCase.Completed) {
           val e = finalizers.get().cancelAll(ex)
           val e2 = runCatching { release(a, ex) }.exceptionOrNull()
-          Platform.composeErrors(e, e2)?.let { throw it }
+          (e?.apply { e2?.let(::addSuppressed) } ?: e2)?.let { throw it }
         }
       })
 
