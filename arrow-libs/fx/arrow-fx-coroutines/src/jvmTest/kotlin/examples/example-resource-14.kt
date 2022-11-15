@@ -1,5 +1,5 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleResource12
+package arrow.fx.coroutines.examples.exampleResource14
 
 import arrow.fx.coroutines.*
 
@@ -14,13 +14,18 @@ suspend fun closeFile(file: File): Unit = file.close()
 suspend fun fileToString(file: File): String = file.toString()
 
 suspend fun main(): Unit {
-  val res = resource {
-    openFile("data.json")
-  } release { file ->
-    closeFile(file)
-  } use { file ->
-    fileToString(file)
+  val res: List<String> = listOf(
+    "data.json",
+    "user.json",
+    "resource.json"
+  ).map { uri ->
+    resource {
+     openFile(uri)
+    } release { file ->
+      closeFile(file)
+    }
+  }.sequence().use { files ->
+    files.map { fileToString(it) }
   }
-
-  println(res)
+  res.forEach(::println)
 }
