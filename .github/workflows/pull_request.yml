@@ -25,9 +25,11 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Install Watch
+      # For watchOS x86 simulator. Remove with Kotlin 1.8.
+      - uses: maxim-lobanov/setup-xcode@v1
         if: matrix.os == 'macos-latest'
-        run: xcrun simctl create "Apple Watch Series 5 - 44mm" "Apple Watch Series 5 (44mm)"
+        with:
+          xcode-version: '13.4.1'
 
       - name: build
         uses: gradle/gradle-build-action@v2.2.0
