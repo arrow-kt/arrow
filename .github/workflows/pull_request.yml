@@ -25,6 +25,9 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Install Watch
+        run: xcrun simctl create "Apple Watch Series 5 - 44mm" "Apple Watch Series 5 (44mm)"
+
       - name: build
         uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os != 'windows-latest'
