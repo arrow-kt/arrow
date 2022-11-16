@@ -26,6 +26,7 @@ jobs:
           java-version: 11
 
       - name: Install Watch
+        if: matrix.os == 'macos-latest'
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "Apple Watch Series 5 (44mm)"
 
       - name: build
