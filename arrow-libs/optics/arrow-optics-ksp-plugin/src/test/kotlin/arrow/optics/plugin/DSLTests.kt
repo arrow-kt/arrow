@@ -27,5 +27,21 @@ class DSLTests {
       """.evals("r" to "Db(content={Two=two, Three=three, Four=four})")
   }
 
+  @Test
+  fun `DSL works with extensions in the file, issue #2803`() {
+    // it's important to keep the 'Source' name for the class,
+    // because files in the test are named 'Source.kt'
+    """
+      |$imports
+      |
+      |@optics
+      |data class Source(val id: Int) {
+      |  companion object
+      |}
+      |
+      |fun Source.toSomeObject() = 5
+      """.compilationSucceeds()
+  }
+
   // Db.content.at(At.map(), One).set(db, None)
 }
