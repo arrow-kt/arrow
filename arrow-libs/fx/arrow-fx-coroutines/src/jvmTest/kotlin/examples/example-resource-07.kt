@@ -2,35 +2,29 @@
 package arrow.fx.coroutines.examples.exampleResource07
 
 import arrow.fx.coroutines.*
-import kotlinx.coroutines.delay
 
-class UserProcessor {
-  suspend fun start(): Unit { delay(750); println("Creating UserProcessor") }
-  fun shutdown(): Unit = println("Shutting down UserProcessor")
-  fun process(ds: DataSource): List<String> =
-   ds.users().map { "Processed $it" }
-}
-
+object Connection
 class DataSource {
-  suspend fun connect(): Unit { delay(1000); println("Connecting dataSource") }
-  fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+  fun connect(): Unit = println("Connecting dataSource")
+  fun connection(): Connection = Connection
   fun close(): Unit = println("Closed dataSource")
 }
 
-class Service(val db: DataSource, val userProcessor: UserProcessor) {
-  suspend fun processData(): List<String> = userProcessor.process(db)
+class Database(private val database: DataSource) {
+  fun init(): Unit = println("Database initialising . . .")
+  fun shutdown(): Unit = println("Database shutting down . . .")
 }
 
-val userProcessor = resource {
-  UserProcessor().also { it.start() }
-} release UserProcessor::shutdown
-
-val dataSource = resource {
-  DataSource().also { it.connect() }
-} release DataSource::close
-
 suspend fun main(): Unit {
-  userProcessor.parZip(dataSource) { userProcessor, ds ->
-      Service(ds, userProcessor)
-    }.use { service -> service.processData() }
+  val dataSource = resource {
+    DataSource().also { it.connect() }
+  } release DataSource::close
+
+  fun database(ds: DataSource): Resource<Database> =
+    resource {
+      Database(ds).also(Database::init)
+    } release Database::shutdown
+
+  dataSource.flatMap(::database)
+    .use { println("Using database which uses dataSource") }
 }
