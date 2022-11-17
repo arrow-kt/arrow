@@ -4,13 +4,15 @@
 
 package arrow.core.continuations
 
+import arrow.atomic.updateAndGet
 import arrow.core.Either
-import arrow.core.EmptyValue
 import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.getOrElse
 import arrow.core.identity
+import arrow.core.orElse
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -32,7 +34,13 @@ public inline fun <A> option(action: OptionRaise.() -> A): Option<A> =
   fold({ action(OptionRaise(this)) }, ::identity, ::Some)
 
 public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorRaise<E>.() -> A): Ior<E, A> =
-  fold({ IorRaise(semigroup, this).invoke(action) }, { Ior.Left(it) }, ::identity)
+  fold<Option<E>, E, A, Ior<E, A>>(
+    None,
+    { action(IorRaise(semigroup, this)) },
+    { _, e -> throw e },
+    { state, e -> Ior.Left(state.getOrElse { e }) },
+    { state, a -> state.fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
+  )
 
 @JvmInline
 public value class NullableRaise(private val cont: Raise<Nothing?>) : Raise<Nothing?> {
@@ -70,12 +78,12 @@ public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   }
 }
 
-public class IorRaise<E> @PublishedApi internal constructor(semigroup: Semigroup<E>, private val effect: Raise<E>) :
-  Raise<E>, Semigroup<E> by semigroup {
-  
-  // TODO this is a mess...
+public class IorRaise<E> @PublishedApi internal constructor(
+  semigroup: Semigroup<E>,
   @PublishedApi
-  internal var leftState: AtomicRef<Any?> = AtomicRef(EmptyValue)
+  internal val effect: StateRaise<Option<E>, E>,
+) : Raise<E>, Semigroup<E> by semigroup {
+  
   override fun <B> raise(r: E): B = effect.raise(combine(r))
   
   public fun <B> Ior<E, B>.bind(): B =
@@ -87,18 +95,9 @@ public class IorRaise<E> @PublishedApi internal constructor(semigroup: Semigroup
         rightValue
       }
     }
-  
-  @PublishedApi
-  internal inline operator fun <A> invoke(action: IorRaise<E>.() -> A): Ior<E, A> {
-    val res = action(this)
-    val leftState = leftState.get()
-    return if (leftState === EmptyValue) Ior.Right(res)
-    else Ior.Both(EmptyValue.unbox(leftState), res)
-  }
-  
-  @Suppress("UNCHECKED_CAST")
+
   private fun combine(other: E): E =
-    leftState.updateAndGet { state ->
-      if (state === EmptyValue) other else EmptyValue.unbox<E>(state).combine(other)
-    } as E
+    effect.updateAndGet { state ->
+      state.map { e -> e.combine(other) }.orElse { Some(other) }
+    }.getOrElse { other }
 }

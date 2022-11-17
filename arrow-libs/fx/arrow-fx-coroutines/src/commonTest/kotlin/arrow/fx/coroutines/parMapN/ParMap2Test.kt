@@ -1,8 +1,9 @@
 package arrow.fx.coroutines.parMapN
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.guaranteeCase
@@ -40,14 +41,14 @@ class ParMap2Test : ArrowFxSpec(
             r.update { i -> "$i$a" }
           },
           {
-            r.set("$b")
+            r.value = "$b"
             modifyGate.complete(0)
           }
         ) { _a, _b ->
           Pair(_a, _b)
         }
 
-        r.get() shouldBe "$b$a"
+        r.value shouldBe "$b$a"
       }
     }
 

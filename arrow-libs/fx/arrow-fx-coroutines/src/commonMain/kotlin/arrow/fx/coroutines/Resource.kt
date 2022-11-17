@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.identity
 import arrow.core.prependTo
 import kotlinx.coroutines.CancellationException
@@ -491,7 +491,7 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
 
 @JvmInline
 private value class ResourceScopeImpl(
-  private val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList()),
+  private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
   
@@ -514,7 +514,7 @@ private value class ResourceScopeImpl(
   suspend fun cancelAll(
     exitCase: ExitCase,
     first: Throwable? = null,
-  ): Throwable? = finalizers.get().fold(first) { acc, finalizer ->
+  ): Throwable? = finalizers.value.fold(first) { acc, finalizer ->
     val other = kotlin.runCatching { finalizer(exitCase) }.exceptionOrNull()
     other?.let {
       acc?.apply { addSuppressed(other) } ?: other
