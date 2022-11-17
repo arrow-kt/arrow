@@ -26,6 +26,11 @@ fun String.compilationFails() {
   Assertions.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
 }
 
+fun String.compilationSucceeds() {
+  val compilationResult = compile(this)
+  Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+}
+
 fun String.evals(thing: Pair<String, Any?>) {
   val compilationResult = compile(this)
   Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
