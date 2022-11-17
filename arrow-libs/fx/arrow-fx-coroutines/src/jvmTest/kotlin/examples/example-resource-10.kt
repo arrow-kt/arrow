@@ -2,25 +2,17 @@
 package arrow.fx.coroutines.examples.exampleResource10
 
 import arrow.fx.coroutines.*
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 
-class File(url: String) {
-  suspend fun open(): File = this
-  suspend fun close(): Unit {}
-  override fun toString(): String = "This file contains some interesting content!"
-}
-
-suspend fun openFile(uri: String): File = File(uri).open()
-suspend fun closeFile(file: File): Unit = file.close()
-suspend fun fileToString(file: File): String = file.toString()
+val resource =
+  resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
 
 suspend fun main(): Unit {
-  val res = resource {
-    openFile("data.json")
-  } release { file ->
-    closeFile(file)
-  } use { file ->
-    fileToString(file)
+  val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocate()
+  try {
+    /** Do something with A */
+    release(ExitCase.Completed)
+  } catch(e: Throwable) {
+     release(ExitCase(e))
   }
-
-  println(res)
 }
