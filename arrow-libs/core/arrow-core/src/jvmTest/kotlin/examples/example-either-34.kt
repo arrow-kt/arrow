@@ -1,16 +1,14 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither34
 
-import arrow.core.*
+import arrow.core.Either
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.fail
 
-fun main() {
-  fun possiblyFailingOperation(): Either.Right<Int> =
-    Either.Right(1)
-  //sampleStart
-  val result: Either<Exception, Int> = possiblyFailingOperation()
-  result.fold(
-       { println("operation failed with $it") },
-       { println("operation succeeded with $it") }
-  )
-  //sampleEnd
+fun test() {
+  Either.Right(1)
+    .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
+
+  Either.Left(RuntimeException("Boom!"))
+    .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
 }

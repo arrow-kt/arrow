@@ -1,11 +1,15 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither46
 
-import arrow.core.Either.Right
-import arrow.core.Either.Left
-import arrow.core.getOrElse
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.recover
 
-fun main() {
-  Right(12).getOrElse { 17 } // Result: 12
-  Left(12).getOrElse { 17 }  // Result: 17
-}
+object User
+object Error
+
+val error: Either<Error, User> = Error.left()
+
+val a: Either<Error, User> = error.recover { error -> User } // Either.Right(User)
+val b: Either<String, User> = error.recover { error -> raise("other-failure") } // Either.Left(other-failure)
+val c: Either<Nothing, User> = error.recover { error -> User } // Either.Right(User)

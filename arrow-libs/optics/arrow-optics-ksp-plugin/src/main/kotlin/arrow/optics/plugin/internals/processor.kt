@@ -48,7 +48,7 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
   annotations
     .find { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
     ?.arguments
-    ?.flatMap { it.value as ArrayList<KSType> }
+    ?.flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
     ?.mapNotNull {
       when (it.qualifiedString() ) {
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO

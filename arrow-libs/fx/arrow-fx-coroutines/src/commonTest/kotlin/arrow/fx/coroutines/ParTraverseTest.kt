@@ -54,7 +54,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverse { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
@@ -138,7 +138,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverseN(3) { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
