@@ -1,18 +1,11 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource08
 
-import arrow.fx.coroutines.asFlow
-import arrow.fx.coroutines.closeable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import arrow.fx.coroutines.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.nio.file.Path
-import kotlin.io.path.useLines
+import kotlin.io.path.*
 
 fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
   closeable { path.toFile().outputStream() }

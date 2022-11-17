@@ -31,6 +31,9 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
+include("arrow-atomic")
+project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
+
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
     .forUseAtConfigurationTime().orNull?.toBoolean() == true

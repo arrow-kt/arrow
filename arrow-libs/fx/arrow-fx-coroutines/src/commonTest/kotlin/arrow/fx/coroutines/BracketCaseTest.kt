@@ -190,6 +190,9 @@ class BracketCaseTest : ArrowFxSpec(
         } should leftException(e)
       }
     }
+  
+    operator fun Throwable.plus(other: Throwable): Throwable =
+      apply { addSuppressed(other) }
 
     "bracketCase must compose immediate use & immediate release error" {
       checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
@@ -199,7 +202,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { throw e },
             release = { _, _ -> throw e2 }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -211,7 +214,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { e.suspend() },
             release = { _, _ -> throw e2 }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -223,7 +226,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { throw e },
             release = { _, _ -> e2.suspend() }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -235,7 +238,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { e.suspend() },
             release = { _, _ -> e2.suspend() }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 

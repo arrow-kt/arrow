@@ -1,0 +1,20 @@
+public abstract interface class arrow/atomic/Atomic {
+	public abstract fun compareAndSet (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public abstract fun getAndSet (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun getValue ()Ljava/lang/Object;
+	public abstract fun setAndGet (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun setValue (Ljava/lang/Object;)V
+}
+
+public final class arrow/atomic/AtomicActual {
+	public static final fun Atomic (Ljava/lang/Object;)Larrow/atomic/Atomic;
+}
+
+public final class arrow/atomic/AtomicKt {
+	public static final fun getAndUpdate (Larrow/atomic/Atomic;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun loop (Larrow/atomic/Atomic;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
+	public static final fun tryUpdate (Larrow/atomic/Atomic;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun update (Larrow/atomic/Atomic;Lkotlin/jvm/functions/Function1;)V
+	public static final fun updateAndGet (Larrow/atomic/Atomic;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+

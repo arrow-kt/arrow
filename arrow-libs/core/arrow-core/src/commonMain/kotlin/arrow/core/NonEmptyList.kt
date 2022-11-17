@@ -120,14 +120,12 @@ public typealias Nel<A> = NonEmptyList<A>
  * ```kotlin
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
- * import arrow.core.zip
- * import java.util.UUID
+ * import kotlin.random.Random
  *
- * //sampleStart
- * data class Person(val id: UUID, val name: String, val year: Int)
+ * data class Person(val id: Long, val name: String, val year: Int)
  *
  * // Note each NonEmptyList is of a different type
- * val nelId: NonEmptyList<UUID> = nonEmptyListOf(UUID.randomUUID(), UUID.randomUUID())
+ * val nelId: NonEmptyList<Long> = nonEmptyListOf(Random.nextLong(), Random.nextLong())
  * val nelName: NonEmptyList<String> = nonEmptyListOf("William Alvin Howard", "Haskell Curry")
  * val nelYear: NonEmptyList<Int> = nonEmptyListOf(1926, 1900)
  *
@@ -205,18 +203,11 @@ public class NonEmptyList<out A>(
   public fun extract(): A =
     this.head
 
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    other?.let {
-      if (it::class != this::class) return false
-      (other as NonEmptyList<*>)
-      if (all != other.all) return false
-      return true
-    } ?: return false
-  }
+  override fun equals(other: Any?): Boolean =
+    super.equals(other)
 
   override fun hashCode(): Int =
-    all.hashCode()
+    super.hashCode()
 
   override fun toString(): String =
     "NonEmptyList(${all.joinToString()})"
@@ -512,3 +503,6 @@ public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
 
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
   firstOrNull()?.let { NonEmptyList(it, drop(1)) }
+
+public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
+  toNonEmptyListOrNull().toOption()

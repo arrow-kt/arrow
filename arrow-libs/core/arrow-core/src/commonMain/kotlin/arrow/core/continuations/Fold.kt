@@ -63,7 +63,7 @@ public inline fun <R, A, B> fold(
   }
 }
 
-/** Returns the shifted value, rethrows the CancellationException if not our scope */
+/** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   if (this is RaiseCancellationException && this.raise === raise) _raised as R
@@ -75,6 +75,6 @@ internal class DefaultRaise : Raise<Any?> {
   override fun raise(r: Any?): Nothing = throw RaiseCancellationException(r, this)
 }
 
-/** CancellationException is required to cancel coroutines when shifting from within them. */
+/** CancellationException is required to cancel coroutines when raising from within them. */
 private class RaiseCancellationException(val _raised: Any?, val raise: Raise<Any?>) :
   CancellationException("Raised Continuation")

@@ -593,11 +593,13 @@ public fun <A> Sequence<A>.salign(
  * @receiver Iterable of Validated
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
-public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> {
-  val asep = flatMap { gab -> gab.fold({ sequenceOf(it) }, { emptySequence() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptySequence() }, { sequenceOf(it) }) }
-  return asep to bsep
-}
+public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> =
+  fold(sequenceOf<A>() to sequenceOf<B>()) { (lefts, rights), either ->
+    when (either) {
+      is Left -> lefts + either.value to rights
+      is Right -> lefts to rights + either.value
+    }
+  }
 
 /**
  * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
@@ -605,11 +607,13 @@ public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Seq
  * @receiver Iterable of Validated
  * @return a tuple containing Sequence with [Validated.Invalid] and another Sequence with its [Validated.Valid] values.
  */
-public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> {
-  val asep = flatMap { gab -> gab.fold({ sequenceOf(it) }, { emptySequence() }) }
-  val bsep = flatMap { gab -> gab.fold({ emptySequence() }, { sequenceOf(it) }) }
-  return asep to bsep
-}
+public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> =
+  fold(sequenceOf<A>() to sequenceOf<B>()) { (invalids, valids), validated ->
+    when (validated) {
+      is Valid -> invalids to valids + validated.value
+      is Invalid -> invalids + validated.value to valids
+    }
+  }
 
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)

@@ -1,13 +1,13 @@
 // This file was automatically generated from Atomic.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleAtomic01
+package arrow.atomic.examples.exampleAtomic01
 
-import arrow.fx.coroutines.*
-
+import arrow.atomic.Atomic
+import arrow.atomic.update
+import arrow.fx.coroutines.parTraverse
 suspend fun main() {
   val count = Atomic(0)
-
   (0 until 20_000).parTraverse {
     count.update(Int::inc)
   }
-  println(count.get())
+  println(count.value)
 }

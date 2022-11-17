@@ -10,9 +10,9 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 /**
- * Catch the shifted value [E] of the `Effect`.
+ * Catch the raised value [E] of the `Effect`.
  * You can either return a value a new value of [A],
- * or short-circuit the effect by shifting with a value of [E],
+ * or short-circuit the effect by raising with a value of [E],
  * or raise an exception into [suspend].
  *
  * ```kotlin
@@ -30,13 +30,13 @@ import kotlin.jvm.JvmName
  * ```
  * <!--- KNIT example-effect-error-01.kt -->
  */
-public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<E2>.(shifted: E) -> A): Effect<E2, A> =
+public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<E2>.(raised: E) -> A): Effect<E2, A> =
   effect { recover(resolve) }
 
 /**
  * Catch any unexpected exceptions, and [resolve] them.
  * You can either return a value a new value of [A],
- * or short-circuit the effect by shifting with a value of [E],
+ * or short-circuit the effect by raising with a value of [E],
  * or raise an exception into [suspend].
  *
  * ```kotlin
@@ -98,7 +98,7 @@ public fun <E, A> Effect<E, A>.catch(): Effect<E, Result<A>> =
     }
   }
 
-public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<E2>.(shifted: E) -> A): EagerEffect<E2, A> =
+public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<E2>.(raised: E) -> A): EagerEffect<E2, A> =
   eagerEffect { recover(resolve) }
 
 public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Raise<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =

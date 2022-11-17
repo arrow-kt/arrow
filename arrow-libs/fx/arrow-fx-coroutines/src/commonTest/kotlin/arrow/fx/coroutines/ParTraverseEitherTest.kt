@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -18,7 +20,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
       (0 until 100).parTraverseEither {
         ref.update { it + 1 }.right()
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseEither runs in parallel" {

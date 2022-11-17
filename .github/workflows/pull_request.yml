@@ -25,6 +25,12 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      # For watchOS x86 simulator. Remove with Kotlin 1.8.
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: '13.4.1'
+
       - name: build
         uses: gradle/gradle-build-action@v2.2.0
         if: matrix.os != 'windows-latest'

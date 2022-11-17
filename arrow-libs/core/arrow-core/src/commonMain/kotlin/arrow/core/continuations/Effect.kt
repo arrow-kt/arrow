@@ -313,7 +313,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * Note:
  *  Handling errors can also be done with `try/catch` but this is **not recommended**, it uses `CancellationException` which is used to cancel `Coroutine`s and is advised not to capture in Kotlin.
- *  The `CancellationException` from `Effect` is `ShiftCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
+ *  The `CancellationException` from `Effect` is `RaiseCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
  *
  * ## Structured Concurrency
  *

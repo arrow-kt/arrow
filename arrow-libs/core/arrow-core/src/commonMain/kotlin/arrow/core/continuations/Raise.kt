@@ -175,7 +175,7 @@ public interface Raise<in R> {
    *   }.also(::println)
    *
    *   either<Int, Nothing> {
-   *     effect { raise("failed") }.recover { str -> shift(-1) }
+   *     effect { raise("failed") }.recover { str -> raise(-1) }
    *   }.also(::println)
    * }
    * ```
@@ -245,12 +245,12 @@ public inline fun <reified T : Throwable, R, A> Raise<R>.catch(
 ): A = catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
 
 @EffectDSL
-public inline fun <R> Raise<R>.ensure(condition: Boolean, shift: () -> R): Unit =
-  if (condition) Unit else raise(shift())
+public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R): Unit =
+  if (condition) Unit else raise(raise())
 
 @OptIn(ExperimentalContracts::class)
 @EffectDSL
-public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, shift: () -> R): B {
+public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
   contract { returns() implies (value != null) }
-  return value ?: raise(shift())
+  return value ?: raise(raise())
 }

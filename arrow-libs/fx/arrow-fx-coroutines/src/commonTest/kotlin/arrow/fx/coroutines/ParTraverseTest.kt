@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -20,7 +22,7 @@ class ParTraverseTest : ArrowFxSpec(
       (0 until 100).parTraverse {
         ref.update { it + 1 }
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverse runs in parallel" {
@@ -52,7 +54,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverse { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
@@ -75,7 +77,7 @@ class ParTraverseTest : ArrowFxSpec(
       (0 until 100).parTraverseN(5) {
         ref.update { it + 1 }
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseN(3) runs in (3) parallel" {
@@ -136,7 +138,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverseN(3) { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
@@ -154,7 +156,7 @@ class ParTraverseTest : ArrowFxSpec(
         .map { suspend { ref.update { it + 1 } } }
         .parSequenceN(5)
 
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
   }
 )
