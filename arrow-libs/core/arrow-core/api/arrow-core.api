@@ -783,6 +783,7 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun sequenceEither (Larrow/core/NonEmptyList;)Larrow/core/Either;
 	public static final fun sequenceOption (Larrow/core/NonEmptyList;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun toNonEmptyListOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun toNonEmptyListOrNull (Ljava/lang/Iterable;)Larrow/core/NonEmptyList;
 	public static final fun traverse (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;

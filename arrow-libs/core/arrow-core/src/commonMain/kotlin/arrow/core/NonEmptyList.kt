@@ -503,3 +503,6 @@ public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
 
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
   firstOrNull()?.let { NonEmptyList(it, drop(1)) }
+
+public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
+  toNonEmptyListOrNull().toOption()
