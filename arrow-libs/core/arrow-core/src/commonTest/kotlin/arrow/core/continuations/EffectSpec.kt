@@ -47,7 +47,7 @@ class EffectSpec :
         val promise = CompletableDeferred<Int>()
         effect {
           try {
-            raise<Int>(s().suspend())
+            raise(s().suspend())
           } finally {
             require(promise.complete(i()))
           }
@@ -132,7 +132,7 @@ class EffectSpec :
     "short-circuit" {
       checkAll(Arb.string().suspend()) { msg ->
         effect {
-          raise<Int>(msg())
+          raise(msg())
         }.runCont() shouldBe msg()
       }
     }
@@ -299,31 +299,34 @@ class EffectSpec :
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and recover" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, String> {
-          raise<String>(int())
+          raise(int())
           fail("It should never reach this point")
         }.recover<Int, Nothing, String> { fallback() }
           .runCont() shouldBe fallback()
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and re-raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, Unit> {
-          raise<String>(int())
+          raise(int())
           fail("It should never reach this point")
         }.recover { raise(fallback()) }
           .runCont() shouldBe fallback()
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and throw" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
         shouldThrow<RuntimeException> {
           effect<Int, String> {
-            raise<String>(int())
+            raise(int())
             fail("It should never reach this point")
           }.recover<Int, Nothing, String> { throw RuntimeException(msg()) }
             .runCont()

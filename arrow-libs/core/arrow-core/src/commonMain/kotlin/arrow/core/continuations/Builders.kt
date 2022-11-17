@@ -46,7 +46,7 @@ public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: 
 public value class NullableRaise(private val cont: Raise<Nothing?>) : Raise<Nothing?> {
   @EffectDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
-  override fun <B> raise(r: Nothing?): B = cont.raise(r)
+  override fun raise(r: Nothing?): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = bind { raise(null) }
   
   public fun <B> B?.bind(): B {
@@ -62,13 +62,13 @@ public value class NullableRaise(private val cont: Raise<Nothing?>) : Raise<Noth
 
 @JvmInline
 public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
-  override fun <B> raise(r: Throwable): B = cont.raise(r)
+  override fun raise(r: Throwable): Nothing = cont.raise(r)
   public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
 }
 
 @JvmInline
 public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
-  override fun <B> raise(r: None): B = cont.raise(r)
+  override fun raise(r: None): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = bind { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
   
@@ -83,8 +83,8 @@ public class IorRaise<E> @PublishedApi internal constructor(
   @PublishedApi
   internal val effect: StateRaise<Option<E>, E>,
 ) : Raise<E>, Semigroup<E> by semigroup {
-  
-  override fun <B> raise(r: E): B = effect.raise(combine(r))
+
+  override fun raise(r: E): Nothing = effect.raise(combine(r))
   
   public fun <B> Ior<E, B>.bind(): B =
     when (this) {
