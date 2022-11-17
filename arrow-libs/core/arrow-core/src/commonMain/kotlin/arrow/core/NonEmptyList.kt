@@ -120,14 +120,12 @@ public typealias Nel<A> = NonEmptyList<A>
  * ```kotlin
  * import arrow.core.NonEmptyList
  * import arrow.core.nonEmptyListOf
- * import arrow.core.zip
- * import java.util.UUID
+ * import kotlin.random.Random
  *
- * //sampleStart
- * data class Person(val id: UUID, val name: String, val year: Int)
+ * data class Person(val id: Long, val name: String, val year: Int)
  *
  * // Note each NonEmptyList is of a different type
- * val nelId: NonEmptyList<UUID> = nonEmptyListOf(UUID.randomUUID(), UUID.randomUUID())
+ * val nelId: NonEmptyList<Long> = nonEmptyListOf(Random.nextLong(), Random.nextLong())
  * val nelName: NonEmptyList<String> = nonEmptyListOf("William Alvin Howard", "Haskell Curry")
  * val nelYear: NonEmptyList<Int> = nonEmptyListOf(1926, 1900)
  *
