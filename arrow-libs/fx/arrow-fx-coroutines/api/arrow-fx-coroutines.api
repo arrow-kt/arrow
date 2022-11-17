@@ -312,6 +312,7 @@ public final class arrow/fx/coroutines/Race3Kt {
 
 public abstract class arrow/fx/coroutines/Resource {
 	public static final field Companion Larrow/fx/coroutines/Resource$Companion;
+	public final fun allocate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun allocated (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun ap (Larrow/fx/coroutines/Resource;)Larrow/fx/coroutines/Resource;
 	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
@@ -381,7 +382,10 @@ public final class arrow/fx/coroutines/ResourceKt {
 	public static final fun release-zgiIeyo (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 	public static final fun releaseCase (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun releaseCase-zgiIeyo (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
-	public static final fun resource (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public static final synthetic fun resource (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
+	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+	public static final fun resourceScope (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/fx/coroutines/Resource;
 	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun traverseResource (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
@@ -517,11 +521,31 @@ public final class arrow/fx/coroutines/Use {
 	public final synthetic fun unbox-impl ()Lkotlin/jvm/functions/Function1;
 }
 
+public final class arrow/fx/coroutines/continuations/AcquireStep {
+	public static final field INSTANCE Larrow/fx/coroutines/continuations/AcquireStep;
+}
+
+public abstract interface annotation class arrow/fx/coroutines/continuations/ResourceDSL : java/lang/annotation/Annotation {
+}
+
 public final class arrow/fx/coroutines/continuations/ResourceKt {
 	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
 }
 
 public abstract interface class arrow/fx/coroutines/continuations/ResourceScope {
 	public abstract fun bind (Larrow/fx/coroutines/Resource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun install (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun onRelease (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun release (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun releaseCase (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/continuations/ResourceScope$DefaultImpls {
+	public static fun onRelease (Larrow/fx/coroutines/continuations/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun release (Larrow/fx/coroutines/continuations/ResourceScope;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun releaseCase (Larrow/fx/coroutines/continuations/ResourceScope;Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class arrow/fx/coroutines/continuations/ScopeDSL : java/lang/annotation/Annotation {
 }
 
