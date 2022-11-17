@@ -5,6 +5,7 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
@@ -16,6 +17,18 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
+
+    "iterable.toNonEmptyListOrNull should round trip" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
+      }
+    }
+
+    "iterable.toNonEmptyListOrNone should round trip" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNone() shouldBe nonEmptyList.some()
+      }
+    }
 
     "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
