@@ -34,6 +34,7 @@ kotlin {
     
     jvmTest {
       dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
         implementation(projects.arrowFxCoroutines)
       }
     }
