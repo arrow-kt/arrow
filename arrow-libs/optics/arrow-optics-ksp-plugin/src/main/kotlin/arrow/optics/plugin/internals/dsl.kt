@@ -33,7 +33,6 @@ private fun processLensSyntax(ele: ADT, foci: List<Focus>): String =
     |${ele.visibilityModifierName} inline val <S> $Setter<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Setter<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
     |${ele.visibilityModifierName} inline val <S> $Traversal<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Traversal<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
     |${ele.visibilityModifierName} inline val <S> $Fold<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Fold<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
-    |${ele.visibilityModifierName} inline val <S> $Every<S, ${ele.sourceClassName}>.${focus.lensParamName()}: $Every<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.lensParamName()}
     |""".trimMargin()
     }
   } else {
@@ -49,7 +48,6 @@ private fun processLensSyntax(ele: ADT, foci: List<Focus>): String =
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Setter<S, $sourceClassNameWithParams>.${focus.lensParamName()}(): $Setter<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.lensParamName()}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Traversal<S, $sourceClassNameWithParams>.${focus.lensParamName()}(): $Traversal<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.lensParamName()}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Fold<S, $sourceClassNameWithParams>.${focus.lensParamName()}(): $Fold<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.lensParamName()}()
-    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Every<S, $sourceClassNameWithParams>.${focus.lensParamName()}(): $Every<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.lensParamName()}()
     |""".trimMargin()
     }
   }
@@ -73,7 +71,6 @@ private fun processOptionalSyntax(ele: ADT, optic: DataClassDsl): String {
     |${ele.visibilityModifierName} inline val <S> $Setter<S, ${ele.sourceClassName}>.${focus.paramName}: $Setter<S, $targetClassName> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |${ele.visibilityModifierName} inline val <S> $Traversal<S, ${ele.sourceClassName}>.${focus.paramName}: $Traversal<S, $targetClassName> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |${ele.visibilityModifierName} inline val <S> $Fold<S, ${ele.sourceClassName}>.${focus.paramName}: $Fold<S, $targetClassName> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
-    |${ele.visibilityModifierName} inline val <S> $Every<S, ${ele.sourceClassName}>.${focus.paramName}: $Every<S, $targetClassName> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |""".trimMargin()
     } else {
       """
@@ -84,7 +81,6 @@ private fun processOptionalSyntax(ele: ADT, optic: DataClassDsl): String {
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Setter<S, $sourceClassNameWithParams>.${focus.paramName}(): $Setter<S, $targetClassName> = this + ${ele.sourceClassName}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Traversal<S, $sourceClassNameWithParams>.${focus.paramName}(): $Traversal<S, $targetClassName> = this + ${ele.sourceClassName}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Fold<S, $sourceClassNameWithParams>.${focus.paramName}(): $Fold<S, $targetClassName> = this + ${ele.sourceClassName}.${focus.paramName}()
-    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Every<S, $sourceClassNameWithParams>.${focus.paramName}(): $Every<S, $targetClassName> = this + ${ele.sourceClassName}.${focus.paramName}()
     |""".trimMargin()
     }
   }
@@ -101,7 +97,6 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl): String =
     |${ele.visibilityModifierName} inline val <S> $Setter<S, ${ele.sourceClassName}>.${focus.paramName}: $Setter<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |${ele.visibilityModifierName} inline val <S> $Traversal<S, ${ele.sourceClassName}>.${focus.paramName}: $Traversal<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |${ele.visibilityModifierName} inline val <S> $Fold<S, ${ele.sourceClassName}>.${focus.paramName}: $Fold<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
-    |${ele.visibilityModifierName} inline val <S> $Every<S, ${ele.sourceClassName}>.${focus.paramName}: $Every<S, ${focus.className}> inline get() = this + ${ele.sourceClassName}.${focus.paramName}
     |""".trimMargin()
     }
   } else {
@@ -119,7 +114,6 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl): String =
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Setter<S, $sourceClassNameWithParams>.${focus.paramName}(): $Setter<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Traversal<S, $sourceClassNameWithParams>.${focus.paramName}(): $Traversal<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Fold<S, $sourceClassNameWithParams>.${focus.paramName}(): $Fold<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.paramName}()
-    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Every<S, $sourceClassNameWithParams>.${focus.paramName}(): $Every<S, ${focus.className}> = this + ${ele.sourceClassName}.${focus.paramName}()
     |""".trimMargin()
     }
   }
