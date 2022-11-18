@@ -46,10 +46,10 @@ public val <S, A> KProperty1<S, A?>.optional: Optional<S, A>
 public val <S, A> ((S) -> Iterable<A>).iter: Fold<S, A>
   get() = ogetter compose Fold.iterable()
 
-public val <S, A> KProperty1<S, List<A>>.every: Every<S, A>
+public val <S, A> KProperty1<S, List<A>>.every: Traversal<S, A>
   get() = lens compose Every.list()
 
-public val <S, K, A> KProperty1<S, Map<K, A>>.values: Every<S, A>
+public val <S, K, A> KProperty1<S, Map<K, A>>.values: Traversal<S, A>
   get() = lens compose Every.map()
 
 private fun <S, A> clone(prop: KProperty1<S, A>, value: S, newField: A): S {
