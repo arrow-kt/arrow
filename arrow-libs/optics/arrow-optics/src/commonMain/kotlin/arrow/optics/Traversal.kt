@@ -10,6 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -29,33 +30,62 @@ public typealias Traversal<S, A> = PTraversal<S, S, A, A>
  * @param A the target of a [PTraversal]
  * @param B the modified target of a [PTraversal]
  */
-public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
+public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
+
+  /**
+   * Map each target to a type R and use a Monoid to fold the results
+   */
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
   override fun modify(source: S, map: (focus: A) -> B): T
 
   public fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
-    PTraversal { s, f ->
-      s.fold(
-        { a -> Either.Left(this@PTraversal.modify(a, f)) },
-        { u -> Either.Right(other.modify(u, f)) }
-      )
+    object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
+      override fun <R> foldMap(M: Monoid<R>, source: Either<S, U>, map: (A) -> R): R =
+        source.fold(
+          { a -> this@PTraversal.foldMap(M, a, map) },
+          { u -> other.foldMap(M, u, map) }
+        )
+
+      override fun modify(source: Either<S, U>, map: (focus: A) -> B): Either<T, V> =
+        source.fold(
+          { a -> Either.Left(this@PTraversal.modify(a, map)) },
+          { u -> Either.Right(other.modify(u, map)) }
+        )
     }
 
   /**
    * Compose a [PTraversal] with a [PTraversal]
    */
   public infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
-    PTraversal { s, f -> this@PTraversal.modify(s) { b -> other.modify(b, f) } }
+    object : PTraversal<S, T, C, D> {
+      override fun <R> foldMap(M: Monoid<R>, source: S, map: (C) -> R): R =
+        this@PTraversal.foldMap(M, source) { c -> other.foldMap(M, c, map) }
+
+      override fun modify(source: S, map: (focus: C) -> D): T =
+        this@PTraversal.modify(source) { b -> other.modify(b, map) }
+    }
 
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
 
   public companion object {
+
     public fun <S> id(): PTraversal<S, S, S, S> =
       PIso.id()
 
     public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
-      Traversal { s, f -> s.bimap(f, f) }
+      object : Traversal<Either<S, S>, S> {
+        override fun <R> foldMap(M: Monoid<R>, source: Either<S, S>, map: (focus: S) -> R): R =
+          source.fold(
+            { a -> map(a) },
+            { u -> map(u) }
+          )
+
+        override fun modify(source: Either<S, S>, map: (focus: S) -> S): Either<S, S> =
+          source.bimap(map, map)
+      }
+      // Traversal { s, f -> s.bimap(f, f) }
 
     /**
      * [PTraversal] that points to nothing
@@ -66,8 +96,17 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     /**
      * [PTraversal] constructor from multiple getters of the same source.
      */
-    public operator fun <S, T, A, B> invoke(get1: (S) -> A, get2: (S) -> A, set: (B, B, S) -> T): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), s) }
+    public operator fun <S, T, A, B> invoke(
+      get1: (S) -> A,
+      get2: (S) -> A,
+      set: (B, B, S) -> T
+    ): PTraversal<S, T, A, B> =
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -75,7 +114,12 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get3: (S) -> A,
       set: (B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), s) }
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -84,7 +128,12 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get4: (S) -> A,
       set: (B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), s) }
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -94,7 +143,12 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get5: (S) -> A,
       set: (B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), s) }
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -105,7 +159,12 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get6: (S) -> A,
       set: (B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), s) }
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -117,7 +176,12 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get7: (S) -> A,
       set: (B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f -> set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), s) }
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), s)
+      }
 
     public operator fun <S, T, A, B> invoke(
       get1: (S) -> A,
@@ -130,18 +194,11 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get8: (S) -> A,
       set: (B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f ->
-        set(
-          f(get1(s)),
-          f(get2(s)),
-          f(get3(s)),
-          f(get4(s)),
-          f(get5(s)),
-          f(get6(s)),
-          f(get7(s)),
-          f(get8(s)),
-          s
-        )
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), s)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -156,19 +213,11 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get9: (S) -> A,
       set: (B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f ->
-        set(
-          f(get1(s)),
-          f(get2(s)),
-          f(get3(s)),
-          f(get4(s)),
-          f(get5(s)),
-          f(get6(s)),
-          f(get7(s)),
-          f(get8(s)),
-          f(get9(s)),
-          s
-        )
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), s)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -184,20 +233,11 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       get10: (S) -> A,
       set: (B, B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
-      PTraversal { s, f ->
-        set(
-          f(get1(s)),
-          f(get2(s)),
-          f(get3(s)),
-          f(get4(s)),
-          f(get5(s)),
-          f(get6(s)),
-          f(get7(s)),
-          f(get8(s)),
-          f(get9(s)),
-          f(get10(s)),
-          s
-        )
+      object : PTraversal<S, T, A, B> {
+        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
+          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s))))
+        override fun modify(s: S, f: (focus: A) -> B): T =
+          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s)), s)
       }
 
     /**
@@ -514,13 +554,4 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     get() =
       this.compose(this@PTraversal)
 
-  /**
-   * DSL to compose [Traversal] with a [PEvery] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [PEvery] with a focus in [S]
-   * @return [PEvery] with a focus in [A]
-   */
-  public val <U, V> PEvery<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
 }

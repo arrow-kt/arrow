@@ -60,7 +60,7 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S, T, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface POptional<S, T, A, B> : POptionalGetter<S, T, A>, PTraversal<S, T, A, B> {
 
   /**
    * Get the modified source of a [POptional]
@@ -130,7 +130,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
   public override fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
       { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
-      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: c2 to set(s, b) }
+      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: (c2 to set(s, b)) }
     )
 
   /**

@@ -23,7 +23,7 @@ import kotlin.jvm.JvmStatic
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
  */
-public interface Fold<S, A> {
+public interface Fold<in S, out A> {
 
   /**
    * Map each target to a type R and use a Monoid to fold the results
@@ -91,14 +91,14 @@ public interface Fold<S, A> {
   /**
    * Fold using the given [Monoid] instance.
    */
-  public fun fold(M: Monoid<A>, source: S): A =
+  public fun fold(M: Monoid<@UnsafeVariance A>, source: S): A =
     foldMap(M, source, ::identity)
 
   /**
    * Alias for fold.
    */
   @Deprecated("use fold instead", ReplaceWith("fold(M, source)"))
-  public fun combineAll(M: Monoid<A>, source: S): A =
+  public fun combineAll(M: Monoid<@UnsafeVariance A>, source: S): A =
     fold(M, source)
 
   /**
@@ -136,7 +136,7 @@ public interface Fold<S, A> {
   /**
    * Join two [Fold] with the same target
    */
-  public infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> =
+  public infix fun <C> choice(other: Fold<C, @UnsafeVariance A>): Fold<Either<S, C>, A> =
     object : Fold<Either<S, C>, A> {
       override fun <R> foldMap(M: Monoid<R>, source: Either<S, C>, map: (focus: A) -> R): R =
         source.fold({ ac -> this@Fold.foldMap(M, ac, map) }, { c -> other.foldMap(M, c, map) })
@@ -165,13 +165,13 @@ public interface Fold<S, A> {
   /**
    * Compose a [Fold] with a [Fold]
    */
-  public infix fun <C> compose(other: Fold<in A, out C>): Fold<S, C> =
+  public infix fun <C> compose(other: Fold<A, C>): Fold<S, C> =
     object : Fold<S, C> {
       override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: C) -> R): R =
         this@Fold.foldMap(M, source) { c -> other.foldMap(M, c, map) }
     }
 
-  public operator fun <C> plus(other: Fold<in A, out C>): Fold<S, C> =
+  public operator fun <C> plus(other: Fold<A, C>): Fold<S, C> =
     this compose other
 
   public companion object {

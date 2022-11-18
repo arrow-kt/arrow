@@ -40,8 +40,7 @@ private val stringToList: Iso<String, List<Char>> =
  * @param A the focus of a [PIso]
  * @param B the modified target of a [PIso]
  */
-public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>, POptional<S, T, A, B>,
-  PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B> {
 
   /**
    * Get the focus of a [PIso]

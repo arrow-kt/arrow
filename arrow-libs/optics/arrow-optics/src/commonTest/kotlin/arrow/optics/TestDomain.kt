@@ -71,7 +71,7 @@ internal data class IncompleteUser(val token: Token?)
 
 internal fun Arb.Companion.incompleteUser(): Arb<IncompleteUser> = Arb.constant(IncompleteUser(null))
 
-internal fun Getter.Companion.token(): Getter<Token, String> =
+internal fun PGetter.Companion.token(): Getter<Token, String> =
   Getter { it.value }
 
 internal fun PLens.Companion.user(): Lens<User, Token> = Lens(

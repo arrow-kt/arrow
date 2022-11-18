@@ -15,7 +15,6 @@ import kotlin.jvm.JvmStatic
  */
 public typealias OptionalGetter<S, A> = POptionalGetter<S, S, A>
 
-@Suppress("FunctionName")
 public fun <S, A> OptionalGetter(getOption: (source: S) -> Option<A>): OptionalGetter<S, A> =
   POptionalGetter({ s -> getOption(s).toEither { s } })
 
@@ -26,7 +25,7 @@ public fun <S, A> OptionalGetter(getOption: (source: S) -> Option<A>): OptionalG
  * @param T the modified source of a [POptional]
  * @param A the focus of a [POptional]
  */
-public interface POptionalGetter<S, T, A>: Fold<S, A> {
+public interface POptionalGetter<in S, out T, out A>: Fold<S, A> {
   /**
    * Get the focus of an [OptionalGetter] or return the original value while allowing the type to change if it does not match
    */
@@ -44,7 +43,7 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
   /**
    * Join two [POptionalGetter] with the same focus
    */
-  public infix fun <S1, T1> choice(other: POptionalGetter<S1, T1, A>): POptionalGetter<Either<S, S1>, Either<T, T1>, A> =
+  public infix fun <S1, T1> choice(other: POptionalGetter<S1, T1, @UnsafeVariance A>): POptionalGetter<Either<S, S1>, Either<T, T1>, A> =
     POptionalGetter(
       { sources ->
         sources.fold(
@@ -77,7 +76,7 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
   /**
    * Compose a [POptionalGetter] with a [POptionalGetter]
    */
-  public infix fun <C> compose(other: POptionalGetter<in A, T, out C>): POptionalGetter<S, T, C> =
+  public infix fun <C> compose(other: POptionalGetter<A, @UnsafeVariance T, C>): POptionalGetter<S, T, C> =
     POptionalGetter(
       { source ->
         getOrModify(source).flatMap { a ->
@@ -86,7 +85,7 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
       }
     )
 
-  public operator fun <C, D> plus(other: POptionalGetter<in A, T, out C>): POptionalGetter<S, T, C> =
+  public operator fun <C, D> plus(other: POptionalGetter<A, @UnsafeVariance T, C>): POptionalGetter<S, T, C> =
     this compose other
 
   public companion object {
