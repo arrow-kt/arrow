@@ -87,7 +87,6 @@ apiValidation {
   ignoredProjects.addAll(ignoreApiValidation)
 }
 
-/*
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
   rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().apply {
     versions.webpackDevServer.version = "4.11.1"
@@ -97,4 +96,3 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
     versions.mocha.version = "10.1.0"
   }
 }
-*/

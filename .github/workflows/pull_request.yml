@@ -25,6 +25,11 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Set up NodeJS
+        uses: actions/setup-node"v3
+        with:
+          node-version: 18
+
       # For watchOS x86 simulator. Remove with Kotlin 1.8.
       - uses: maxim-lobanov/setup-xcode@v1
         if: matrix.os == 'macos-latest'
