@@ -52,3 +52,4 @@ kotlin {
 }
 
 tasks["jsBrowserTest"].enabled = false
+tasks["jsNodeTest"].enabled = false
