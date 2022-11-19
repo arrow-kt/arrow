@@ -50,3 +50,5 @@ kotlin {
     }
   }
 }
+
+tasks["jsBrowserTest"].enabled = false

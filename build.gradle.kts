@@ -96,3 +96,4 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
     versions.mocha.version = "10.1.0"
   }
 }
+
