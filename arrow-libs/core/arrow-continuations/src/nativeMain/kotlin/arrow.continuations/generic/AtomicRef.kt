@@ -3,8 +3,10 @@ package arrow.continuations.generic
 import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
+import kotlin.native.FreezingIsDeprecated
 
 @Deprecated(deprecateArrowContinuation)
+@OptIn(FreezingIsDeprecated::class)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private val atom = AtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value
