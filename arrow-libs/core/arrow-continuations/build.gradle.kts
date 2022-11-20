@@ -53,3 +53,4 @@ kotlin {
 
 tasks["jsBrowserTest"].enabled = false
 tasks["jsNodeTest"].enabled = false
+tasks["mingwX64Test"].enabled = false
