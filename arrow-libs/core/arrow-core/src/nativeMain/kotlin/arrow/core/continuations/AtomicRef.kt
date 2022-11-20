@@ -1,19 +1,18 @@
 package arrow.core.continuations
 
 import kotlin.native.concurrent.AtomicReference
-import kotlin.native.concurrent.freeze
-import kotlin.native.concurrent.isFrozen
 
+// according to https://kotlinlang.org/docs/native-migration-guide.html
+// we don't need freezing from 1.7.20 on
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
-  private val atom = AtomicReference(initialValue.freeze())
+  private val atom = AtomicReference(initialValue)
   public actual fun get(): V = atom.value
 
   public actual fun set(value: V) {
-    atom.value = value.freeze()
+    atom.value = value
   }
 
   public actual fun getAndSet(value: V): V {
-    if (atom.isFrozen) value.freeze()
     while (true) {
       val cur = atom.value
       if (cur === value) return cur
@@ -26,5 +25,5 @@ public actual class AtomicRef<V> actual constructor(initialValue: V) {
    * the actual object id, not 'equals'.
    */
   public actual fun compareAndSet(expected: V, new: V): Boolean =
-    atom.compareAndSet(expected, new.freeze())
+    atom.compareAndSet(expected, new)
 }
