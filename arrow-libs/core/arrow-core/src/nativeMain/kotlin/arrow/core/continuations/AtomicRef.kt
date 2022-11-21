@@ -1,13 +1,12 @@
 package arrow.core.continuations
 
-import kotlin.native.FreezingIsDeprecated
 import kotlin.native.concurrent.FreezableAtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
 // according to https://kotlinlang.org/docs/native-migration-guide.html
 // we don't need freezing from 1.7.20 on
-@OptIn(FreezingIsDeprecated::class)
+// @OptIn(FreezingIsDeprecated::class)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private val atom = FreezableAtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value
