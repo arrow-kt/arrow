@@ -31,6 +31,30 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
+      # Execute in several steps to prevent Gradle
+      # from running out of memory and be killed
+      # (only in ubuntu-latest)
+      - name: compile main files
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace compileJava compileKotlin
+      - name: compile test files
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace compileTestJava compileTestKotlin
+      - name: JVM tests
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace jvmTest
+      - name: JS tests
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os != 'ubuntu-latest'
+        with:
+          arguments: --full-stacktrace jsTest
+
       - name: build
         uses: gradle/gradle-build-action@v2
         if: matrix.os != 'windows-latest'
