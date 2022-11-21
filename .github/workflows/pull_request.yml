@@ -51,7 +51,7 @@ jobs:
           arguments: --full-stacktrace jvmTest
       - name: JS tests
         uses: gradle/gradle-build-action@v2
-        if: matrix.os != 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace jsTest
 
