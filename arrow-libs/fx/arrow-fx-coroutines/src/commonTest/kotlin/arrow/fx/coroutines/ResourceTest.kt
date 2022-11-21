@@ -1,6 +1,8 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.continuations.AtomicRef
+import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.left
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
@@ -31,20 +33,25 @@ class ResourceTest : ArrowFxSpec(
     "Can consume resource" {
       checkAll(Arb.int()) { n ->
         val r = Resource({ n }, { _, _ -> Unit })
-
         r.use { it + 1 } shouldBe n + 1
       }
     }
 
     "flatMap resource is released first" {
       checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
-        val l = mutableListOf<Int>()
-        fun r(n: Int) = Resource({ n.also(l::add) }, { it, _ -> l.add(-it) })
+        val l = AtomicRef<List<Int>>(mutableListOf())
+        fun r(n: Int) = Resource(
+          {
+            l.update { it + n }
+            n
+          },
+          { x, _ -> l.update { it + (-x) } }
+        )
 
         r(a).flatMap { r(it + b) }
           .use { it + 1 } shouldBe (a + b) + 1
 
-        l.shouldContainExactly(a, a + b, -a - b, -a)
+        l.get().shouldContainExactly(a, a + b, -a - b, -a)
       }
     }
 
@@ -147,9 +154,9 @@ class ResourceTest : ArrowFxSpec(
     val depth: Int = 100
 
     class CheckableAutoClose {
-      var started = true
+      var started: AtomicRef<Boolean> = AtomicRef(true)
       fun close() {
-        started = false
+        started.update { _ -> false }
       }
     }
 
@@ -160,9 +167,9 @@ class ResourceTest : ArrowFxSpec(
       val all = (1..depth).traverse { closeable() }.parZip(
         (1..depth).traverse { closeable() }
       ) { a, b -> a + b }.use { all ->
-        all.also { all.forEach { it.started shouldBe true } }
+        all.also { all.forEach { it.started.get() shouldBe true } }
       }
-      all.forEach { it.started shouldBe false }
+      all.forEach { it.started.get() shouldBe false }
     }
 
     fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {

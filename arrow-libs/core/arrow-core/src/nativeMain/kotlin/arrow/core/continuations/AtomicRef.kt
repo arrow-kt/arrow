@@ -1,5 +1,6 @@
 package arrow.core.continuations
 
+import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.FreezableAtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
@@ -8,7 +9,7 @@ import kotlin.native.concurrent.isFrozen
 // we don't need freezing from 1.7.20 on
 // @OptIn(FreezingIsDeprecated::class)
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
-  private val atom = FreezableAtomicReference(initialValue.freeze())
+  private val atom = AtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value
 
   public actual fun set(value: V) {
