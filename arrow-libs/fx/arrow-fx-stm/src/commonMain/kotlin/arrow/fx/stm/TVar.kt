@@ -167,8 +167,8 @@ public class TVar<A> internal constructor(a: A) {
    */
   internal fun readI(): A {
     while (true) {
-      ref.get().let {
-        if (it !is STMFrame) return@readI it as A
+      ref.get().let { a ->
+        if (a !is STMFrame) return@readI a as A
       }
     }
   }
