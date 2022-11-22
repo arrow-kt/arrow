@@ -155,6 +155,10 @@ public abstract class arrow/core/Either {
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun bitraverseValidated (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun conditionally (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun exists (Lkotlin/jvm/functions/Function1;)Z
 	public final fun findOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -162,6 +166,8 @@ public abstract class arrow/core/Either {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Either;
+	public final fun getOrNone ()Larrow/core/Option;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public final fun isEmpty ()Z
 	public final fun isLeft ()Z
 	public final fun isNotEmpty ()Z
@@ -170,6 +176,8 @@ public abstract class arrow/core/Either {
 	public static final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun mapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun onLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun onRight (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun orNone ()Larrow/core/Option;
 	public final fun orNull ()Ljava/lang/Object;
 	public final fun replicate (I)Larrow/core/Either;
@@ -178,6 +186,14 @@ public abstract class arrow/core/Either {
 	public final fun tap (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun tapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public fun toString ()Ljava/lang/String;
+	public final fun toValidated ()Larrow/core/Validated;
+	public final fun toValidatedNel ()Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun traverseNullable (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverseOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverseValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun tryCatchAndFlatten (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
@@ -228,6 +244,12 @@ public final class arrow/core/Either$Right$Companion {
 }
 
 public final class arrow/core/EitherKt {
+	public static final field NicheAPI Ljava/lang/String;
+	public static final field RedundantAPI Ljava/lang/String;
+	public static final fun bisequence (Larrow/core/Either;)Ljava/util/List;
+	public static final fun bisequenceNullable (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun bisequenceOption (Larrow/core/Either;)Larrow/core/Option;
+	public static final fun bisequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun combine (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
 	public static final fun combineK (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
@@ -238,13 +260,13 @@ public final class arrow/core/EitherKt {
 	public static final fun filterOrOther (Larrow/core/Either;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun flatMap (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun flatten (Larrow/core/Either;)Larrow/core/Either;
-	public static final fun getOrElse (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final synthetic fun getOrElse (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun getOrElse (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrHandle (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun handleError (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun handleErrorWith (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun left (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftIfNull (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
-	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftWiden (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun merge (Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun orNull (Larrow/core/Either;)Ljava/lang/Object;
@@ -255,8 +277,15 @@ public final class arrow/core/EitherKt {
 	public static final fun right (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun rightIfNotNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun rightIfNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
-	public static final fun rightNel (Ljava/lang/Object;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/Either;)Ljava/util/List;
+	public static final fun sequenceNullable (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
+	public static final fun sequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
@@ -400,6 +429,11 @@ public abstract class arrow/core/Ior {
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun bitraverseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun bitraverseValidated (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun bothNel (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
 	public final fun crosswalk (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun crosswalkMap (Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
@@ -426,6 +460,15 @@ public abstract class arrow/core/Ior {
 	public final fun swap ()Larrow/core/Ior;
 	public final fun toEither ()Larrow/core/Either;
 	public fun toString ()Ljava/lang/String;
+	public final fun toValidated ()Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun traverseEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverseNullable (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public final fun traverseOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverseValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public final fun unwrap ()Larrow/core/Either;
 	public final fun void ()Larrow/core/Ior;
 }
@@ -492,6 +535,11 @@ public final class arrow/core/Ior$Right$Companion {
 }
 
 public final class arrow/core/IorKt {
+	public static final fun bisequence (Larrow/core/Ior;)Ljava/util/List;
+	public static final fun bisequenceEither (Larrow/core/Ior;)Larrow/core/Either;
+	public static final fun bisequenceNullable (Larrow/core/Ior;)Larrow/core/Ior;
+	public static final fun bisequenceOption (Larrow/core/Ior;)Larrow/core/Option;
+	public static final fun bisequenceValidated (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun bothIor (Lkotlin/Pair;)Larrow/core/Ior;
 	public static final fun combine (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun compareTo (Larrow/core/Ior;Larrow/core/Ior;)I
@@ -503,6 +551,15 @@ public final class arrow/core/IorKt {
 	public static final fun replicate (Larrow/core/Ior;Larrow/typeclasses/Semigroup;I)Larrow/core/Ior;
 	public static final fun replicate (Larrow/core/Ior;Larrow/typeclasses/Semigroup;ILarrow/typeclasses/Monoid;)Larrow/core/Ior;
 	public static final fun rightIor (Ljava/lang/Object;)Larrow/core/Ior;
+	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Ior;
+	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/Ior;)Ljava/util/List;
+	public static final fun sequenceEither (Larrow/core/Ior;)Larrow/core/Either;
+	public static final fun sequenceNullable (Larrow/core/Ior;)Larrow/core/Ior;
+	public static final fun sequenceOption (Larrow/core/Ior;)Larrow/core/Option;
+	public static final fun sequenceValidated (Larrow/core/Ior;)Larrow/core/Validated;
 	public static final fun widen (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function10;)Larrow/core/Ior;
@@ -540,9 +597,6 @@ public final class arrow/core/IterableKt {
 	public static final fun lastOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun leftPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun leftPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static final fun mapAccumulating (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
-	public static final fun mapAccumulating (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
-	public static final fun mapAccumulating (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun prependTo (Ljava/lang/Object;Ljava/lang/Iterable;)Ljava/util/List;
@@ -554,13 +608,39 @@ public final class arrow/core/IterableKt {
 	public static final fun rightPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun salign (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;)Ljava/lang/Iterable;
 	public static final fun separateEither (Ljava/lang/Iterable;)Lkotlin/Pair;
+	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Either;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Validated;
+	public static final fun sequence (Ljava/lang/Iterable;)Ljava/lang/Object;
+	public static final fun sequence (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun sequence (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequenceEither (Ljava/lang/Iterable;)Larrow/core/Either;
+	public static final fun sequenceNullable (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun sequenceOption (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun sequenceResult (Ljava/lang/Iterable;)Ljava/lang/Object;
+	public static final fun sequenceValidated (Ljava/lang/Iterable;)Larrow/core/Validated;
+	public static final fun sequenceValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun singleOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun singleOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun split (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun tail (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun traverse (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun traverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverseNullable (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun traverseOption (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseResult (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun traverseValidated (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverseValidated (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unalign (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun unalign (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun uniteEither (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun uniteValidated (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun unweave (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun unzip (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun unzip (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
@@ -590,6 +670,18 @@ public final class arrow/core/MapKt {
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 	public static final fun salign (Ljava/util/Map;Larrow/typeclasses/Semigroup;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun sequence (Ljava/util/Map;)Larrow/core/Either;
+	public static final fun sequence (Ljava/util/Map;)Larrow/core/Option;
+	public static final fun sequence (Ljava/util/Map;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequenceEither (Ljava/util/Map;)Larrow/core/Either;
+	public static final fun sequenceOption (Ljava/util/Map;)Larrow/core/Option;
+	public static final fun sequenceValidated (Ljava/util/Map;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/util/Map;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseEither (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverseOption (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseValidated (Ljava/util/Map;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unalign (Ljava/util/Map;)Lkotlin/Pair;
 	public static final fun unalign (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun unzip (Ljava/util/Map;)Lkotlin/Pair;
@@ -671,7 +763,20 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun minBy (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun nel (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public static final fun nonEmptyListOf (Ljava/lang/Object;[Ljava/lang/Object;)Larrow/core/NonEmptyList;
+	public static final fun sequence (Larrow/core/NonEmptyList;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/NonEmptyList;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequenceEither (Larrow/core/NonEmptyList;)Larrow/core/Either;
+	public static final fun sequenceOption (Larrow/core/NonEmptyList;)Larrow/core/Option;
+	public static final fun sequenceValidated (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun toNonEmptyListOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun toNonEmptyListOrNull (Ljava/lang/Iterable;)Larrow/core/NonEmptyList;
+	public static final fun traverse (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseEither (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverseOption (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseValidated (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unzip (Larrow/core/NonEmptyList;)Lkotlin/Pair;
 	public static final fun unzip (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 }
@@ -743,6 +848,11 @@ public abstract class arrow/core/Option {
 	public final fun toEither (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun toList ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun traverseEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverseValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public static final fun tryCatchOrNone (Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
 	public final fun void ()Larrow/core/Option;
@@ -786,6 +896,12 @@ public final class arrow/core/OptionKt {
 	public static final fun rethrow (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun salign (Larrow/core/Option;Larrow/typeclasses/Semigroup;Larrow/core/Option;)Larrow/core/Option;
 	public static final fun separateEither (Larrow/core/Option;)Lkotlin/Pair;
+	public static final fun separateValidated (Larrow/core/Option;)Lkotlin/Pair;
+	public static final fun sequence (Larrow/core/Option;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Option;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/Option;)Ljava/util/List;
+	public static final fun sequenceEither (Larrow/core/Option;)Larrow/core/Either;
+	public static final fun sequenceValidated (Larrow/core/Option;)Larrow/core/Validated;
 	public static final fun some (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun toMap (Larrow/core/Option;)Ljava/util/Map;
 	public static final fun toOption (Ljava/lang/Object;)Larrow/core/Option;
@@ -793,6 +909,7 @@ public final class arrow/core/OptionKt {
 	public static final fun unalign (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun unite (Larrow/core/Option;Larrow/typeclasses/Monoid;)Larrow/core/Option;
 	public static final fun uniteEither (Larrow/core/Option;)Larrow/core/Option;
+	public static final fun uniteValidated (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun unzip (Larrow/core/Option;)Lkotlin/Pair;
 	public static final fun unzip (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun widen (Larrow/core/Option;)Larrow/core/Option;
@@ -1354,12 +1471,26 @@ public final class arrow/core/SequenceKt {
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun salign (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun separateEither (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
+	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Option;
+	public static final fun sequence (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequenceEither (Lkotlin/sequences/Sequence;)Larrow/core/Either;
+	public static final fun sequenceOption (Lkotlin/sequences/Sequence;)Larrow/core/Option;
+	public static final fun sequenceValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun some (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun split (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun tail (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseEither (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun traverseOption (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverseValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unalign (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun unalign (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun uniteEither (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun uniteValidated (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun unweave (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
 	public static final fun unzip (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun unzip (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
@@ -2181,14 +2312,164 @@ public final class arrow/core/UtilsKt {
 	public static final fun mapNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 }
 
+public abstract class arrow/core/Validated {
+	public static final field Companion Larrow/core/Validated$Companion;
+	public final fun all (Lkotlin/jvm/functions/Function1;)Z
+	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun bitraverseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun catchNel (Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun exist (Lkotlin/jvm/functions/Function1;)Z
+	public final fun findOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun fromEither (Larrow/core/Either;)Larrow/core/Validated;
+	public static final fun fromNullable (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun fromOption (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun invalidNel (Ljava/lang/Object;)Larrow/core/Validated;
+	public final fun isEmpty ()Z
+	public final fun isInvalid ()Z
+	public final fun isNotEmpty ()Z
+	public final fun isValid ()Z
+	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public static final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun mapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun swap ()Larrow/core/Validated;
+	public final fun tap (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun tapInvalid (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun toEither ()Larrow/core/Either;
+	public final fun toList ()Ljava/util/List;
+	public final fun toOption ()Larrow/core/Option;
+	public fun toString ()Ljava/lang/String;
+	public final fun toValidatedNel ()Larrow/core/Validated;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun traverseEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverseNullable (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public final fun traverseOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun validNel (Ljava/lang/Object;)Larrow/core/Validated;
+	public final fun void ()Larrow/core/Validated;
+	public final fun withEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+}
+
+public final class arrow/core/Validated$Companion {
+	public final fun catchNel (Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun fromEither (Larrow/core/Either;)Larrow/core/Validated;
+	public final fun fromNullable (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun fromOption (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun invalidNel (Ljava/lang/Object;)Larrow/core/Validated;
+	public final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public final fun validNel (Ljava/lang/Object;)Larrow/core/Validated;
+}
+
+public final class arrow/core/Validated$Invalid : arrow/core/Validated {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/core/Validated$Invalid;
+	public static synthetic fun copy$default (Larrow/core/Validated$Invalid;Ljava/lang/Object;ILjava/lang/Object;)Larrow/core/Validated$Invalid;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/core/Validated$Valid : arrow/core/Validated {
+	public static final field Companion Larrow/core/Validated$Valid$Companion;
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/core/Validated$Valid;
+	public static synthetic fun copy$default (Larrow/core/Validated$Valid;Ljava/lang/Object;ILjava/lang/Object;)Larrow/core/Validated$Valid;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/core/Validated$Valid$Companion {
+	public final fun getUnit ()Larrow/core/Validated;
+}
+
+public final class arrow/core/ValidatedKt {
+	public static final fun andThen (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun attempt (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun bisequence (Larrow/core/Validated;)Ljava/util/List;
+	public static final fun bisequenceEither (Larrow/core/Validated;)Larrow/core/Either;
+	public static final fun bisequenceNullable (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun bisequenceOption (Larrow/core/Validated;)Larrow/core/Option;
+	public static final fun combine (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun combineAll (Larrow/core/Validated;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
+	public static final fun combineK (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun compareTo (Larrow/core/Validated;Larrow/core/Validated;)I
+	public static final fun findValid (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun fold (Larrow/core/Validated;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
+	public static final fun getOrElse (Larrow/core/Validated;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun handleError (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun handleErrorWith (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun invalid (Ljava/lang/Object;)Larrow/core/Validated;
+	public static final fun invalidNel (Ljava/lang/Object;)Larrow/core/Validated;
+	public static final fun leftWiden (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun merge (Larrow/core/Validated;)Ljava/lang/Object;
+	public static final fun orElse (Larrow/core/Validated;Lkotlin/jvm/functions/Function0;)Larrow/core/Validated;
+	public static final fun orNone (Larrow/core/Validated;)Larrow/core/Option;
+	public static final fun orNull (Larrow/core/Validated;)Ljava/lang/Object;
+	public static final fun redeem (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun replicate (Larrow/core/Validated;Larrow/typeclasses/Semigroup;I)Larrow/core/Validated;
+	public static final fun replicate (Larrow/core/Validated;Larrow/typeclasses/Semigroup;ILarrow/typeclasses/Monoid;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/Validated;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Validated;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/Validated;)Ljava/util/List;
+	public static final fun sequenceEither (Larrow/core/Validated;)Larrow/core/Either;
+	public static final fun sequenceNullable (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun sequenceOption (Larrow/core/Validated;)Larrow/core/Option;
+	public static final fun toIor (Larrow/core/Validated;)Larrow/core/Ior;
+	public static final fun valid (Ljava/lang/Object;)Larrow/core/Validated;
+	public static final fun validNel (Ljava/lang/Object;)Larrow/core/Validated;
+	public static final fun valueOr (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun widen (Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function10;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function9;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function8;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function7;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function6;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function5;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function4;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function3;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function10;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function9;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function8;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function7;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function6;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function5;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function4;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function3;)Larrow/core/Validated;
+	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
+}
+
 public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect {
 	public abstract fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/EitherEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/computations/EitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/EitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/EitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -2240,6 +2521,7 @@ public abstract interface class arrow/core/computations/RestrictedEitherEffect :
 
 public final class arrow/core/computations/RestrictedEitherEffect$DefaultImpls {
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/computations/RestrictedEitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun ensure (Larrow/core/computations/RestrictedEitherEffect;ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -2271,12 +2553,8 @@ public final class arrow/core/computations/RestrictedOptionEffect$DefaultImpls {
 public final class arrow/core/computations/ResultEffect {
 	public static final field INSTANCE Larrow/core/computations/ResultEffect;
 	public final fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class arrow/core/computations/ResultEffect$result {
-	public static final field INSTANCE Larrow/core/computations/ResultEffect$result;
-	public final fun invoke-IoAF18A (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public final class arrow/core/computations/either {
@@ -2303,17 +2581,16 @@ public final class arrow/core/computations/option {
 	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/AtomicRefKt {
-	public static final fun getAndUpdate (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun loop (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
-	public static final fun update (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)V
-	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+public final class arrow/core/computations/result {
+	public static final field INSTANCE Larrow/core/computations/result;
+	public final fun invoke-IoAF18A (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/DefaultShift : arrow/core/continuations/Shift {
+public final class arrow/core/continuations/DefaultRaise : arrow/core/continuations/Raise {
 	public fun <init> ()V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2321,10 +2598,33 @@ public final class arrow/core/continuations/DefaultShift : arrow/core/continuati
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class arrow/core/continuations/DefaultStateRaise : arrow/atomic/Atomic, arrow/core/continuations/Raise, arrow/core/continuations/StateRaise {
+	public fun <init> (Larrow/atomic/Atomic;Larrow/core/continuations/Raise;)V
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
+	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun compareAndSet (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun getAndSet (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun setAndGet (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun setValue (Ljava/lang/Object;)V
 }
 
 public final class arrow/core/continuations/Effect {
@@ -2343,10 +2643,10 @@ public final class arrow/core/continuations/Effect {
 	public static final fun option (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun orNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun orNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raisedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/continuations/DefaultRaise;)Ljava/lang/Object;
 	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
 	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun shiftedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/continuations/DefaultShift;)Ljava/lang/Object;
 	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toIor (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
@@ -2359,6 +2659,8 @@ public final class arrow/core/continuations/Effect {
 	public static final fun toResult (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun toValidated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/core/continuations/EffectDSL : java/lang/annotation/Annotation {
@@ -2369,161 +2671,124 @@ public final class arrow/core/continuations/EffectKt {
 	public static final fun effect (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 }
 
-public final class arrow/core/continuations/IorShift : arrow/core/continuations/Shift, arrow/typeclasses/Semigroup {
-	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/Shift;)V
+public final class arrow/core/continuations/IorRaise : arrow/core/continuations/Raise, arrow/typeclasses/Semigroup {
+	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/StateRaise;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun getLeftState ()Ljava/util/concurrent/atomic/AtomicReference;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public final fun getEffect ()Larrow/core/continuations/StateRaise;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun maybeCombine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun setLeftState (Ljava/util/concurrent/atomic/AtomicReference;)V
-	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/NullableShift : arrow/core/continuations/Shift {
+public final class arrow/core/continuations/NullableRaise : arrow/core/continuations/Raise {
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/NullableShift;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Either;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Option;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Validated;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/NullableRaise;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/Shift;
-	public static final fun ensure-impl (Larrow/core/continuations/Shift;Z)V
-	public static final fun ensureNotNull-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/Raise;
+	public static final fun ensure-impl (Larrow/core/continuations/Raise;Z)V
+	public static final fun ensureNotNull-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
+	public static fun equals-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/Raise;Larrow/core/continuations/Raise;)Z
 	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
+	public static fun hashCode-impl (Larrow/core/continuations/Raise;)I
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun raise (Ljava/lang/Void;)Ljava/lang/Void;
+	public static fun raise-impl (Larrow/core/continuations/Raise;Ljava/lang/Void;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
-	public fun shift (Ljava/lang/Void;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/Shift;Ljava/lang/Void;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/Shift;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/Shift;
+	public static fun toString-impl (Larrow/core/continuations/Raise;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/Raise;
 }
 
-public final class arrow/core/continuations/OptionShift : arrow/core/continuations/Shift {
+public final class arrow/core/continuations/OptionRaise : arrow/core/continuations/Raise {
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/OptionShift;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Either;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Option;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Validated;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/OptionRaise;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/Shift;
-	public static final fun ensure-impl (Larrow/core/continuations/Shift;Z)V
-	public static final fun ensureNotNull-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/Raise;
+	public static final fun ensure-impl (Larrow/core/continuations/Raise;Z)V
+	public static final fun ensureNotNull-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
+	public static fun equals-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/Raise;Larrow/core/continuations/Raise;)Z
 	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
+	public static fun hashCode-impl (Larrow/core/continuations/Raise;)I
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Larrow/core/None;)Ljava/lang/Void;
+	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public static fun raise-impl (Larrow/core/continuations/Raise;Larrow/core/None;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun shift (Larrow/core/None;)Ljava/lang/Object;
-	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/Shift;Larrow/core/None;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/Shift;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/Shift;
+	public static fun toString-impl (Larrow/core/continuations/Raise;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/Raise;
 }
 
-public final class arrow/core/continuations/ResultShift : arrow/core/continuations/Shift {
-	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/ResultShift;
-	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/continuations/Shift;)Larrow/core/continuations/Shift;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/continuations/Shift;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/continuations/Shift;Larrow/core/continuations/Shift;)Z
-	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/continuations/Shift;)I
-	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
-	public fun shift (Ljava/lang/Throwable;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/continuations/Shift;Ljava/lang/Throwable;)Ljava/lang/Object;
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/continuations/Shift;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/continuations/Shift;
-}
-
-public abstract interface class arrow/core/continuations/Shift {
+public abstract interface class arrow/core/continuations/Raise {
 	public abstract fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public abstract fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2531,33 +2796,100 @@ public abstract interface class arrow/core/continuations/Shift {
 	public abstract fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public abstract fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/Shift$DefaultImpls {
-	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/Shift;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun catch (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun recover (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public final class arrow/core/continuations/Raise$DefaultImpls {
+	public static fun bind (Larrow/core/continuations/Raise;Larrow/core/Either;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/Raise;Larrow/core/Validated;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun catch (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun catch (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/ShiftKt {
-	public static final fun catch (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun ensure (Larrow/core/continuations/Shift;ZLkotlin/jvm/functions/Function0;)V
-	public static final fun ensureNotNull (Larrow/core/continuations/Shift;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
-	public static final fun recover (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun recover (Larrow/core/continuations/Shift;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+public final class arrow/core/continuations/RaiseKt {
+	public static final fun catch (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun ensure (Larrow/core/continuations/Raise;ZLkotlin/jvm/functions/Function0;)V
+	public static final fun ensureNotNull (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+}
+
+public final class arrow/core/continuations/ResultRaise : arrow/core/continuations/Raise {
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
+	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Either;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Larrow/core/Validated;)Ljava/lang/Object;
+	public static final fun bind-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/ResultRaise;
+	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun catch-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun constructor-impl (Larrow/core/continuations/Raise;)Larrow/core/continuations/Raise;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Larrow/core/continuations/Raise;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/continuations/Raise;Larrow/core/continuations/Raise;)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Larrow/core/continuations/Raise;)I
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
+	public static fun raise-impl (Larrow/core/continuations/Raise;Ljava/lang/Throwable;)Ljava/lang/Void;
+	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Larrow/core/continuations/Raise;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/continuations/Raise;
+}
+
+public abstract interface class arrow/core/continuations/StateRaise : arrow/atomic/Atomic, arrow/core/continuations/Raise {
+}
+
+public final class arrow/core/continuations/StateRaise$DefaultImpls {
+	public static fun bind (Larrow/core/continuations/StateRaise;Larrow/core/Either;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/StateRaise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/StateRaise;Larrow/core/Validated;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/StateRaise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun catch (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun catch (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/continuations/StateRaiseKt {
+	public static final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Semigroup {
@@ -2570,7 +2902,7 @@ public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Sem
 	public abstract fun combineAll (Ljava/util/Collection;)Ljava/lang/Object;
 	public abstract fun combineAll (Ljava/util/List;)Ljava/lang/Object;
 	public static fun constant (Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
-	public static fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
+	public static fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public abstract fun empty ()Ljava/lang/Object;
 	public static fun endo ()Larrow/typeclasses/Monoid;
 	public abstract fun fold (Ljava/util/Collection;)Ljava/lang/Object;
@@ -2581,6 +2913,7 @@ public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Sem
 	public static fun pair (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public static fun sequence ()Larrow/typeclasses/Monoid;
 	public static fun string ()Larrow/typeclasses/Monoid;
+	public static fun validated (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 }
 
 public final class arrow/typeclasses/Monoid$Companion {
@@ -2590,7 +2923,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 	public final fun Long ()Larrow/typeclasses/Monoid;
 	public final fun Short ()Larrow/typeclasses/Monoid;
 	public final fun constant (Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
-	public final fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
+	public final fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun endo ()Larrow/typeclasses/Monoid;
 	public final fun list ()Larrow/typeclasses/Monoid;
 	public final fun map (Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Monoid;
@@ -2598,6 +2931,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 	public final fun pair (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun sequence ()Larrow/typeclasses/Monoid;
 	public final fun string ()Larrow/typeclasses/Monoid;
+	public final fun validated (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 }
 
 public final class arrow/typeclasses/Monoid$DefaultImpls {
@@ -2630,6 +2964,7 @@ public abstract interface class arrow/typeclasses/Semigroup {
 	public abstract fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun sequence ()Larrow/typeclasses/Semigroup;
 	public static fun string ()Larrow/typeclasses/Semigroup;
+	public static fun validated (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
 }
 
 public final class arrow/typeclasses/Semigroup$Companion {
@@ -2649,6 +2984,7 @@ public final class arrow/typeclasses/Semigroup$Companion {
 	public final fun pair (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
 	public final fun sequence ()Larrow/typeclasses/Semigroup;
 	public final fun string ()Larrow/typeclasses/Semigroup;
+	public final fun validated (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
 }
 
 public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup : arrow/typeclasses/Semigroup {

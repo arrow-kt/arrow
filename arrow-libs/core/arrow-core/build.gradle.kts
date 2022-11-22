@@ -25,6 +25,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowContinuations)
+        api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
         api(libs.kotlin.stdlibCommon)
       }

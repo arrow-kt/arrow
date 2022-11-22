@@ -255,5 +255,18 @@ class SequenceKTest : UnitSpec() {
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
     }
+
+    "separateEither" {
+      checkAll(Arb.sequence(Arb.int())) { ints ->
+        val sequence = ints.map {
+          if (it % 2 == 0) it.left()
+          else it.right()
+        }
+
+        val (lefts, rights) = sequence.separateEither()
+
+        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
+      }
+    }
   }
 }

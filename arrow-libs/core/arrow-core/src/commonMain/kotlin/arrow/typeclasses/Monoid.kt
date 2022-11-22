@@ -75,8 +75,8 @@ public interface Monoid<A> : Semigroup<A> {
     public fun string(): Monoid<String> = StringMonoid
 
     @JvmStatic
-    public fun <A, B> either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
-      EitherMonoid(MA, MB)
+    public fun <A, B> either(SGA: Semigroup<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
+      EitherMonoid(SGA, MB)
 
     @JvmStatic
     public fun <A> endo(): Monoid<Endo<A>> =
@@ -176,22 +176,22 @@ public interface Monoid<A> : Semigroup<A> {
     }
 
     private class EitherMonoid<L, R>(
-      private val MOL: Monoid<L>,
+      private val SGOL: Semigroup<L>,
       private val MOR: Monoid<R>
     ) : Monoid<Either<L, R>> {
       override fun empty(): Either<L, R> = Either.Right(MOR.empty())
 
       override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> =
-        combine(MOL, MOR, b)
+        combine(SGOL, MOR, b)
 
       override fun Collection<Either<L, R>>.fold(): Either<L, R> =
-        fold(either(MOL, MOR))
+        fold(either(SGOL, MOR))
 
       override fun fold(elems: List<Either<L, R>>): Either<L, R> =
-        elems.fold(either(MOL, MOR))
+        elems.fold(either(SGOL, MOR))
 
       override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
-        b?.let { combine(MOL, MOR, it) } ?: this
+        b?.let { combine(SGOL, MOR, it) } ?: this
     }
 
     private class PairMonoid<A, B>(

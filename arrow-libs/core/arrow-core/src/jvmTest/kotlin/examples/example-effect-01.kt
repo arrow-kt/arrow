@@ -9,7 +9,7 @@ import arrow.core.continuations.ensure
 object EmptyPath
 
 fun readFile(path: String): Effect<EmptyPath, Unit> = effect {
-  if (path.isEmpty()) shift(EmptyPath) else Unit
+  if (path.isEmpty()) raise(EmptyPath) else Unit
 }
 
 fun readFile2(path: String?): Effect<EmptyPath, Unit> = effect {

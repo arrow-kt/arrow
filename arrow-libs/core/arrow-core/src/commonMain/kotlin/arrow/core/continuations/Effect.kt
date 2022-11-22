@@ -7,7 +7,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 
 /**
- * [Effect] represents a function of `suspend Shift<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.
+ * [Effect] represents a function of `suspend Raise<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.
  *
  * So [Effect] is defined by `suspend fun <B> fold(recover: suspend (Throwable) -> B, resolve: suspend (R) -> B, transform: suspend (A) -> B): B`,
  * to map all values of `R`, `Throwable` and `A` to a value of `B`.
@@ -39,8 +39,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * We'll start by defining a small function that accepts a [String], and does some simply validation to check that the path
  * is not empty. If the path is empty, we want to program to result in `EmptyPath`. So we're immediately going to see how
- * we can raise an error of any arbitrary type `R` by using the function `shift`. The name `shift` comes shifting (or
- * changing, especially unexpectedly), away from the computation and finishing the `Continuation` with `R`.
+ * we can raise an error of any arbitrary type `R` by using the function `raise`. The name `raise` comes raising an intterupt, or
+ * changing, especially unexpectedly, away from the computation and finishing the `Continuation` with `R`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
@@ -52,11 +52,11 @@ import kotlin.jvm.JvmMultifileClass
  * object EmptyPath
  *
  * fun readFile(path: String): Effect<EmptyPath, Unit> = effect {
- *   if (path.isEmpty()) shift(EmptyPath) else Unit
+ *   if (path.isEmpty()) raise(EmptyPath) else Unit
  * }
  * ```
  *
- * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the shift type `R`, and `Unit` for the success type `A`.
+ * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the raise type `R`, and `Unit` for the success type `A`.
  *
  * Patterns like validating a [Boolean] is very common, and the [Effect] DSL offers utility functions like [kotlin.require]
  * and [kotlin.requireNotNull]. They're named [ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
@@ -114,9 +114,9 @@ import kotlin.jvm.JvmMultifileClass
  *     val lines = File(path).readLines()
  *     Content(lines)
  *   } catch (e: FileNotFoundException) {
- *     shift(FileNotFound(path))
+ *     raise(FileNotFound(path))
  *   } catch (e: SecurityException) {
- *     shift(SecurityError(e.message))
+ *     raise(SecurityError(e.message))
  *   }
  * }
  * ```
@@ -163,19 +163,19 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-03.kt -->
  *
- * Adding your own syntax to `Shift<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
+ * Adding your own syntax to `Raise<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
  *
  * ```
- * context(Shift<R>)
+ * context(Raise<R>)
  * suspend fun <R, A> Either<R, A>.bind(): A =
  *   when (this) {
- *     is Either.Left -> shift(value)
+ *     is Either.Left -> raise(value)
  *     is Either.Right -> value
  *   }
  *
- * context(Shift<None>)
+ * context(Raise<None>)
  * fun <A> Option<A>.bind(): A =
- *   fold({ shift(it) }, ::identity)
+ *   fold({ raise(it) }, ::identity)
  * ```
  *
  * ## Handling errors
@@ -203,7 +203,7 @@ import kotlin.jvm.JvmMultifileClass
  * -->
  * ```kotlin
  * val failed: Effect<String, Int> =
- *   effect { shift("failed") }
+ *   effect { raise("failed") }
  * ```
  *
  * We can `recover` the failure, and resolve it by providing a default value of `-1` or the length of the `error: String`.
@@ -233,7 +233,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```kotlin
  * val newError: Effect<List<Char>, Int> =
  *   failed.recover { str ->
- *     shift(str.reversed().toList())
+ *     raise(str.reversed().toList())
  *   }
  * ```
  *
@@ -301,7 +301,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * val rethrown: Effect<String, Int> =
  *   failed.catch { ex: java.sql.SQLException ->
- *     if(ex.isForeignKeyViolation()) shift("foreign key violation")
+ *     if(ex.isForeignKeyViolation()) raise("foreign key violation")
  *     else throw ex
  *   }
  * ```
@@ -310,14 +310,14 @@ import kotlin.jvm.JvmMultifileClass
  *
  * Note:
  *  Handling errors can also be done with `try/catch` but this is **not recommended**, it uses `CancellationException` which is used to cancel `Coroutine`s and is advised not to capture in Kotlin.
- *  The `CancellationException` from `Effect` is `ShiftCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
+ *  The `CancellationException` from `Effect` is `RaiseCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
  *
  * ## Structured Concurrency
  *
- * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `shift` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
- * For this reason `shift` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
+ * `Effect<R, A>` relies on `kotlin.cancellation.CancellationException` to `raise` error values of type `R` inside the `Continuation` since it effectively cancels/short-circuits it.
+ * For this reason `raise` adheres to the same rules as [`Structured Concurrency`](https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency)
  *
- * Let's overview below how `shift` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
+ * Let's overview below how `raise` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
  * In the examples below we're going to be using a utility to show how _sibling tasks_ get cancelled.
  * The utility function show below called `awaitExitCase` will `never` finish suspending, and completes a `Deferred` with the `ExitCase`.
  * `ExitCase` is a sealed class that can be a value of `Failure(Throwable)`, `Cancelled(CancellationException)`, or `Completed`.
@@ -342,7 +342,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  *
  * ### Arrow Fx Coroutines
- * All operators in Arrow Fx Coroutines run in place, so they have no way of leaking `shift`.
+ * All operators in Arrow Fx Coroutines run in place, so they have no way of leaking `raise`.
  * It's there always safe to compose `effect` with any Arrow Fx combinator. Let's see some small examples below.
  *
  * #### parZip
@@ -352,7 +352,7 @@ import kotlin.jvm.JvmMultifileClass
  *    val error = "Error"
  *    val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     parZip({ awaitExitCase<Int>(exit) }, { shift<Int>(error) }) { a, b -> a + b }
+ *     parZip({ awaitExitCase<Int>(exit) }, { raise(error) }) { a: Int, b: Int -> a + b }
  *   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
@@ -384,7 +384,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
  *   effect<String, List<Unit>> {
  *     (0..4).parMap { index ->
- *       if (index == 4) shift(error)
+ *       if (index == 4) raise(error)
  *       else awaitExitCase(exits[index])
  *     }
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
@@ -395,7 +395,7 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- KNIT example-effect-06.kt -->
  *
  * `parMap` will launch 5 tasks, for every element in `1..5`.
- * The last task to get scheduled will `shift` with "error", and it will cancel the other launched tasks before returning.
+ * The last task to get scheduled will `raise` with "error", and it will cancel the other launched tasks before returning.
  *
  * #### raceN
  * <!--- INCLUDE
@@ -422,7 +422,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val error = "Error"
  *   val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     raceN({ awaitExitCase<Int>(exit) }) { shift<Int>(error) }
+ *     raceN({ awaitExitCase<Int>(exit) }) { raise(error) }
  *       .merge() // Flatten Either<Int, Int> result from race into Int
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
  *   // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran
@@ -432,8 +432,8 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- KNIT example-effect-07.kt -->
  *
  * `raceN` races `n` suspend functions in parallel, and cancels all participating functions when a winner is found.
- * We can consider the function that `shift`s the winner of the race, except with a shifted value instead of a successful one.
- * So when a function in the race `shift`s, and thus short-circuiting the race, it will cancel all the participating functions.
+ * We can consider the function that `raise`s the winner of the race, except with a raised value instead of a successful one.
+ * So when a function in the race `raise`s, and thus short-circuiting the race, it will cancel all the participating functions.
  *
  * #### bracketCase / Resource
  * <!--- INCLUDE
@@ -455,7 +455,7 @@ import kotlin.jvm.JvmMultifileClass
  *   effect<String, Int> {
  *     bracketCase(
  *       acquire = { File("build.gradle.kts").bufferedReader() },
- *       use = { reader: BufferedReader -> shift(error) },
+ *       use = { reader: BufferedReader -> raise(error) },
  *       release = { reader, exitCase ->
  *         reader.close()
  *         exit.complete(exitCase)
@@ -494,7 +494,7 @@ import kotlin.jvm.JvmMultifileClass
  *   resourceScope {
  *     effect<String, Int> {
  *       val reader = bufferedReader("build.gradle.kts")
- *       shift<Int>(error)
+ *       raise(error)
  *       reader.lineSequence().count()
  *     }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   }
@@ -505,8 +505,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * ### KotlinX
  * #### withContext
- * It's always safe to call `shift` from `withContext` since it runs in place, so it has no way of leaking `shift`.
- * When `shift` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
+ * It's always safe to call `raise` from `withContext` since it runs in place, so it has no way of leaking `raise`.
+ * When `raise` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.Effect
@@ -544,9 +544,9 @@ import kotlin.jvm.JvmMultifileClass
  *     val lines = File(path).readLines()
  *     Content(lines)
  *   } catch (e: FileNotFoundException) {
- *     shift(FileNotFound(path))
+ *     raise(FileNotFound(path))
  *   } catch (e: SecurityException) {
- *     shift(SecurityError(e.message))
+ *     raise(SecurityError(e.message))
  *   }
  * }
  *
@@ -571,7 +571,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * #### async
  *
- * When calling `shift` from `async` you should **always** call `await`, otherwise `shift` can leak out of its scope.
+ * When calling `raise` from `async` you should **always** call `await`, otherwise `raise` can leak out of its scope.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -587,8 +587,8 @@ import kotlin.jvm.JvmMultifileClass
  *   val errorB = "ErrorB"
  *   coroutineScope {
  *     effect<String, Int> {
- *       val fa = async<Int> { shift(errorA) }
- *       val fb = async<Int> { shift(errorB) }
+ *       val fa = async<Int> { raise(errorA) }
+ *       val fb = async<Int> { raise(errorB) }
  *       fa.await() + fb.await()
  *     }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") })
  *   }
@@ -613,11 +613,11 @@ import kotlin.jvm.JvmMultifileClass
  *   val int = 45
  *   effect<String, Int> {
  *     coroutineScope<Int> {
- *       launch { shift(errorA) }
- *       launch { shift(errorB) }
+ *       launch { raise(errorA) }
+ *       launch { raise(errorB) }
  *       int
  *     }
- *   }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+ *   }.fold({ fail("Raise can never finish") }, { it shouldBe int })
  * }
  * ```
  * <!--- KNIT example-effect-12.kt -->
@@ -625,8 +625,8 @@ import kotlin.jvm.JvmMultifileClass
  * #### Strange edge cases
  *
  * **NOTE**
- * Capturing `shift` into a lambda, and leaking it outside of `Effect` to be invoked outside will yield unexpected results.
- * Below we capture `shift` from inside the DSL, and then invoke it outside its context `Shift<String>`.
+ * Capturing `raise` into a lambda, and leaking it outside of `Effect` to be invoked outside will yield unexpected results.
+ * Below we capture `raise` from inside the DSL, and then invoke it outside its context `Raise<String>`.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -642,8 +642,8 @@ import kotlin.jvm.JvmMultifileClass
  * -->
  * ```kotlin
  *   effect<String, suspend () -> Unit> {
- *     suspend { shift("error") }
- *   }.fold({ }, { leakedShift -> leakedShift.invoke() })
+ *     suspend { raise("error") }
+ *   }.fold({ }, { leakedRaise -> leakedRaise.invoke() })
  * ```
  *
  * The same violation is possible in all DSLs in Kotlin, including Structured Concurrency.
@@ -661,11 +661,11 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-13.kt -->
  */
-public typealias Effect<R, A> = suspend Shift<R>.() -> A
+public typealias Effect<R, A> = suspend Raise<R>.() -> A
 
-public inline fun <R, A> effect(@BuilderInference noinline block: suspend Shift<R>.() -> A): Effect<R, A> = block
+public inline fun <R, A> effect(@BuilderInference noinline block: suspend Raise<R>.() -> A): Effect<R, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
-public typealias EagerEffect<R, A> = Shift<R>.() -> A
+public typealias EagerEffect<R, A> = Raise<R>.() -> A
 
-public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Shift<R>.() -> A): EagerEffect<R, A> = block
+public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Raise<R>.() -> A): EagerEffect<R, A> = block

@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.test.generators.result
 import io.kotest.matchers.result.shouldBeFailureOfType
@@ -20,7 +22,7 @@ class parMapResultTest : ArrowFxSpec(
       (0 until 100).parMapResult {
         Result.success(ref.update { it + 1 })
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parMapResult runs in parallel" {
