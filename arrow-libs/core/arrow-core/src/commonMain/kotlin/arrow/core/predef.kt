@@ -13,8 +13,11 @@ public inline fun <A> identity(a: A): A = a
 @PublishedApi
 internal object EmptyValue {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  public inline fun <A> unbox(value: Any?): A =
+  inline fun <A> unbox(value: Any?): A =
     if (value === this) null as A else value as A
+  
+  inline fun <T> combine(first: Any?, second: T, combine: (T, T) -> T): T =
+    if (first === EmptyValue) second else combine(first as T, second)
 }
 
 /**
@@ -22,4 +25,5 @@ internal object EmptyValue {
  */
 @PublishedApi
 internal fun <T> Semigroup<T>.emptyCombine(first: Any?, second: T): T =
-  if (first == EmptyValue) second else (first as T).combine(second)
+  if (first === EmptyValue) second else (first as T).combine(second)
+

@@ -3,18 +3,16 @@ package arrow.core
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.EmptyValue.combine as emptyCombine
 import arrow.core.continuations.Raise
 import arrow.core.continuations.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
-
-public typealias EitherNel<E, A> = Either<Nel<E>, A>
 
 /**
  * <!--- TEST_NAME EitherKnitTest -->
@@ -745,7 +743,7 @@ public typealias EitherNel<E, A> = Either<Nel<E>, A>
  *
  */
 public sealed class Either<out A, out B> {
-
+  
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
    * Used only for performance instead of fold.
@@ -756,7 +754,7 @@ public sealed class Either<out A, out B> {
   )
   @JsName("_isRight")
   internal abstract val isRight: Boolean
-
+  
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
    * Used only for performance instead of fold.
@@ -977,7 +975,7 @@ public sealed class Either<out A, out B> {
   )
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
-
+  
   /**
    * Returns `true` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -1114,6 +1112,7 @@ public sealed class Either<out A, out B> {
       ReplaceWith("(this is Either.Left<*>)")
     )
     override val isLeft = true
+    
     @Deprecated(
       RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
       ReplaceWith("(this is Either.Right<*>)")
@@ -1138,6 +1137,7 @@ public sealed class Either<out A, out B> {
       ReplaceWith("(this is Either.Left<*>)")
     )
     override val isLeft = false
+    
     @Deprecated(
       RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
       ReplaceWith("(this is Either.Right<*>)")
@@ -1157,7 +1157,7 @@ public sealed class Either<out A, out B> {
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-
+  
   public companion object {
     
     @Deprecated(
@@ -1239,9 +1239,9 @@ public sealed class Either<out A, out B> {
       }.recover<Throwable, Throwable, B> { t: Throwable ->
         throwable(t).bind()
       }.getOrElse { t: Throwable ->
-          unrecoverableState(t)
-          throw t
-        }
+        unrecoverableState(t)
+        throw t
+      }
     
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
@@ -1658,7 +1658,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
   fold(Monoid.either(MA, MB))
 
 /**
- * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>
+ * Given [B] is a subtype of [C], re-type this value from Either<A, B> to Either<A, C>
  *
  * ```kotlin
  * import arrow.core.*
@@ -1683,219 +1683,245 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
 @PublishedApi
 internal val unit: Either<Nothing, Unit> = Right(Unit)
 
-public inline fun <reified E, A, B, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
-  f: (A, B) -> Z,
-): Either<E, Z> = zip(
-  SE, b, unit, unit, unit, unit, unit, unit, unit, unit
-) { a, b, _, _, _, _, _, _, _, _ ->
-  f(a, b)
+  transform: (A, B) -> Z,
+): Either<E, Z> = zip(combine, b, unit, unit, unit, unit, unit, unit, unit, unit) { a, bb, _, _, _, _, _, _, _, _ ->
+  transform(a, bb)
 }
 
-public inline fun <reified E, A, B, C, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
-  f: (A, B, C) -> Z,
-): Either<E, Z> = zip(
-  SE, b, c, unit, unit, unit, unit, unit, unit, unit
-) { a, b, c, _, _, _, _, _, _, _ ->
-  f(a, b, c)
+  transform: (A, B, C) -> Z,
+): Either<E, Z> = zip(combine, b, c, unit, unit, unit, unit, unit, unit, unit) { a, bb, cc, _, _, _, _, _, _, _ ->
+  transform(a, bb, cc)
 }
 
-public inline fun <reified E, A, B, C, D, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
-  f: (A, B, C, D) -> Z,
-): Either<E, Z> = zip(
-  SE, b, c, d, unit, unit, unit, unit, unit, unit
-) { a, b, c, d, _, _, _, _, _, _ ->
-  f(a, b, c, d)
+  transform: (A, B, C, D) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, unit, unit, unit, unit, unit, unit) { a, bb, cc, dd, _, _, _, _, _, _ ->
+  transform(a, bb, cc, dd)
 }
 
-public inline fun <reified E, A, B, C, D, EE, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, EE, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  f: (A, B, C, D, EE) -> Z,
-): Either<E, Z> = zip(
-  SE, b, c, d, e, unit, unit, unit, unit, unit
-) { a, b, c, d, e, _, _, _, _, _ ->
-  f(a, b, c, d, e)
+  transform: (A, B, C, D, EE) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, e, unit, unit, unit, unit, unit) { a, bb, cc, dd, ee, _, _, _, _, _ ->
+  transform(a, bb, cc, dd, ee)
 }
 
-public inline fun <reified E, A, B, C, D, EE, FF, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, EE, FF, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  ff: Either<E, FF>,
-  f: (A, B, C, D, EE, FF) -> Z,
-): Either<E, Z> = zip(
-  SE, b, c, d, e, ff, unit, unit, unit, unit
-) { a, b, c, d, e, ff, _, _, _, _ ->
-  f(a, b, c, d, e, ff)
+  f: Either<E, FF>,
+  transform: (A, B, C, D, EE, FF) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, e, f, unit, unit, unit, unit) { a, bb, cc, dd, ee, ff, _, _, _, _ ->
+  transform(a, bb, cc, dd, ee, ff)
 }
 
-public inline fun <reified E, A, B, C, D, EE, F, G, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, EE, F, G, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  ff: Either<E, F>,
+  f: Either<E, F>,
   g: Either<E, G>,
-  f: (A, B, C, D, EE, F, G) -> Z,
-): Either<E, Z> = zip(SE, b, c, d, e, ff, g, unit, unit, unit) { a, b, c, d, e, ff, g, _, _, _ ->
-  f(a, b, c, d, e, ff, g)
+  transform: (A, B, C, D, EE, F, G) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, e, f, g, unit, unit, unit) { a, bb, cc, dd, ee, ff, gg, _, _, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg)
 }
 
-public inline fun <reified E, A, B, C, D, EE, F, G, H, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  ff: Either<E, F>,
+  f: Either<E, F>,
   g: Either<E, G>,
   h: Either<E, H>,
-  f: (A, B, C, D, EE, F, G, H) -> Z,
-): Either<E, Z> = zip(SE, b, c, d, e, ff, g, h, unit, unit) { a, b, c, d, e, ff, g, h, _, _ ->
-  f(a, b, c, d, e, ff, g, h)
+  transform: (A, B, C, D, EE, F, G, H) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, e, f, g, h, unit, unit) { a, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg, hh)
 }
 
-public inline fun <reified E, A, B, C, D, EE, F, G, H, I, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  ff: Either<E, F>,
+  f: Either<E, F>,
   g: Either<E, G>,
   h: Either<E, H>,
   i: Either<E, I>,
-  f: (A, B, C, D, EE, F, G, H, I) -> Z,
-): Either<E, Z> = zip(SE, b, c, d, e, ff, g, h, i, unit) { a, b, c, d, e, ff, g, h, i, _ ->
-  f(a, b, c, d, e, ff, g, h, i)
+  transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+): Either<E, Z> = zip(combine, b, c, d, e, f, g, h, i, unit) { a, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg, hh, ii)
 }
 
-public inline fun <reified E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
-  SE: Semigroup<E>,
+@Suppress("DuplicatedCode")
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
+  combine: (E, E) -> E,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
   e: Either<E, EE>,
-  ff: Either<E, F>,
+  f: Either<E, F>,
   g: Either<E, G>,
   h: Either<E, H>,
   i: Either<E, I>,
   j: Either<E, J>,
-  f: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+  transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
 ): Either<E, Z> =
-  if (this is Right && b is Right && c is Right && d is Right && e is Right && ff is Right && g is Right && h is Right && i is Right && j is Right) {
-    Right(f(this.value, b.value, c.value, d.value, e.value, ff.value, g.value, h.value, i.value, j.value))
-  } else SE.run {
+  if (this is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
+    Right(transform(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+  } else {
     var accumulatedError: Any? = EmptyValue
     accumulatedError = if (this@zip is Left) this@zip.value else accumulatedError
-    accumulatedError = if (b is Left) emptyCombine(accumulatedError, b.value) else accumulatedError
-    accumulatedError = if (c is Left) emptyCombine(accumulatedError, c.value) else accumulatedError
-    accumulatedError = if (d is Left) emptyCombine(accumulatedError, d.value) else accumulatedError
-    accumulatedError = if (e is Left) emptyCombine(accumulatedError, e.value) else accumulatedError
-    accumulatedError = if (ff is Left) emptyCombine(accumulatedError, ff.value) else accumulatedError
-    accumulatedError = if (g is Left) emptyCombine(accumulatedError, g.value) else accumulatedError
-    accumulatedError = if (h is Left) emptyCombine(accumulatedError, h.value) else accumulatedError
-    accumulatedError = if (i is Left) emptyCombine(accumulatedError, i.value) else accumulatedError
-    accumulatedError = if (j is Left) emptyCombine(accumulatedError, j.value) else accumulatedError
-
+    accumulatedError = if (b is Left) emptyCombine(accumulatedError, b.value, combine) else accumulatedError
+    accumulatedError = if (c is Left) emptyCombine(accumulatedError, c.value, combine) else accumulatedError
+    accumulatedError = if (d is Left) emptyCombine(accumulatedError, d.value, combine) else accumulatedError
+    accumulatedError = if (e is Left) emptyCombine(accumulatedError, e.value, combine) else accumulatedError
+    accumulatedError = if (f is Left) emptyCombine(accumulatedError, f.value, combine) else accumulatedError
+    accumulatedError = if (g is Left) emptyCombine(accumulatedError, g.value, combine) else accumulatedError
+    accumulatedError = if (h is Left) emptyCombine(accumulatedError, h.value, combine) else accumulatedError
+    accumulatedError = if (i is Left) emptyCombine(accumulatedError, i.value, combine) else accumulatedError
+    accumulatedError = if (j is Left) emptyCombine(accumulatedError, j.value, combine) else accumulatedError
+    
+    @Suppress("UNCHECKED_CAST")
     Left(accumulatedError as E)
   }
 
-public inline fun <E, A, B, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  f: (A, B) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, f)
+public inline fun <E, A, B, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  transform: (A, B) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, unit, unit, unit, unit, unit, unit, unit, unit) { a, bb, _, _, _, _, _, _, _, _ ->
+  transform(a, bb)
+}
 
-public inline fun <E, A, B, C, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  f: (A, B, C) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, f)
+public inline fun <E, A, B, C, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  transform: (A, B, C) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, unit, unit, unit, unit, unit, unit, unit) { a, bb, cc, _, _, _, _, _, _, _ ->
+  transform(a, bb, cc)
+}
 
-public inline fun <E, A, B, C, D, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  f: (A, B, C, D) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, f)
+public inline fun <E, A, B, C, D, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  transform: (A, B, C, D) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, bb, cc, dd, _, _, _, _, _, _ ->
+  transform(a, bb, cc, dd)
+}
 
-public inline fun <E, A, B, C, D, EE, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  f: (A, B, C, D, EE) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, f)
+public inline fun <E, A, B, C, D, EE, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  transform: (A, B, C, D, EE) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, unit, unit, unit, unit, unit) { a, bb, cc, dd, ee, _, _, _, _, _ ->
+  transform(a, bb, cc, dd, ee)
+}
 
-public inline fun <E, A, B, C, D, EE, FF, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  ff: EitherNel<E, FF>,
-  f: (A, B, C, D, EE, FF) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, f)
+public inline fun <E, A, B, C, D, EE, FF, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  f: Either<E, FF>,
+  transform: (A, B, C, D, EE, FF) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, unit, unit, unit, unit) { a, bb, cc, dd, ee, ff, _, _, _, _ ->
+  transform(a, bb, cc, dd, ee, ff)
+}
 
-public inline fun <E, A, B, C, D, EE, F, G, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  ff: EitherNel<E, F>,
-  g: EitherNel<E, G>,
-  f: (A, B, C, D, EE, F, G) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, f)
+public inline fun <E, A, B, C, D, EE, F, G, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  f: Either<E, F>,
+  g: Either<E, G>,
+  transform: (A, B, C, D, EE, F, G) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, unit, unit, unit) { a, bb, cc, dd, ee, ff, gg, _, _, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg)
+}
 
-public inline fun <E, A, B, C, D, EE, F, G, H, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  ff: EitherNel<E, F>,
-  g: EitherNel<E, G>,
-  h: EitherNel<E, H>,
-  f: (A, B, C, D, EE, F, G, H) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, f)
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  f: Either<E, F>,
+  g: Either<E, G>,
+  h: Either<E, H>,
+  transform: (A, B, C, D, EE, F, G, H) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, h, unit, unit) { a, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg, hh)
+}
 
-public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  ff: EitherNel<E, F>,
-  g: EitherNel<E, G>,
-  h: EitherNel<E, H>,
-  i: EitherNel<E, I>,
-  f: (A, B, C, D, EE, F, G, H, I) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, f)
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  f: Either<E, F>,
+  g: Either<E, G>,
+  h: Either<E, H>,
+  i: Either<E, I>,
+  transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, h, i, unit) { a, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+  transform(a, bb, cc, dd, ee, ff, gg, hh, ii)
+}
 
-public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> EitherNel<E, A>.zip(
-  b: EitherNel<E, B>,
-  c: EitherNel<E, C>,
-  d: EitherNel<E, D>,
-  e: EitherNel<E, EE>,
-  ff: EitherNel<E, F>,
-  g: EitherNel<E, G>,
-  h: EitherNel<E, H>,
-  i: EitherNel<E, I>,
-  j: EitherNel<E, J>,
-  f: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-): EitherNel<E, Z> = zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, j, f)
+@Suppress("DuplicatedCode")
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
+  b: Either<E, B>,
+  c: Either<E, C>,
+  d: Either<E, D>,
+  e: Either<E, EE>,
+  f: Either<E, F>,
+  g: Either<E, G>,
+  h: Either<E, H>,
+  i: Either<E, I>,
+  j: Either<E, J>,
+  transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+): Either<NonEmptyList<E>, Z> =
+  if (this is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
+    Right(transform(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+  } else {
+    val list = buildList(9) {
+      if (this@zip is Left) add(this@zip.value)
+      if (b is Left) add(b.value)
+      if (c is Left) add(c.value)
+      if (d is Left) add(d.value)
+      if (e is Left) add(e.value)
+      if (f is Left) add(f.value)
+      if (g is Left) add(g.value)
+      if (h is Left) add(h.value)
+      if (i is Left) add(i.value)
+      if (j is Left) add(j.value)
+    }
+    Left(NonEmptyList(list[0], list.drop(1)))
+  }
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",

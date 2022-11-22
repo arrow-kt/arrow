@@ -14,7 +14,7 @@ class IterableTest : UnitSpec() {
     "mapAccumulated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res: EitherNel<Nothing, List<Int>> = (0..20_000).mapAccumulating {
+      val res: Either<NonEmptyList<Nothing>, List<Int>> = (0..20_000).mapAccumulating {
         acc.add(it)
         Either.Right(it)
       }
@@ -26,10 +26,10 @@ class IterableTest : UnitSpec() {
     "mapAccumulated accumulates" {
 
       checkAll(Arb.list(Arb.int())) { ints ->
-        val res: EitherNel<Int, List<Int>> =
+        val res: Either<NonEmptyList<Int>, List<Int>> =
           ints.mapAccumulating { i -> if (i % 2 == 0) Either.Right(i) else Either.Left(nonEmptyListOf(i)) }
 
-        val expected: EitherNel<Int, List<Int>> = ints.filterNot { it % 2 == 0 }
+        val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
           .toNonEmptyListOrNull()?.left() ?: Either.Right(ints.filter { it % 2 == 0 })
 
         res shouldBe expected
