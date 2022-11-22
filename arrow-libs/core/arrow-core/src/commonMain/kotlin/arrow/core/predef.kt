@@ -16,8 +16,8 @@ internal object EmptyValue {
   inline fun <A> unbox(value: Any?): A =
     if (value === this) null as A else value as A
   
-  inline fun <T> combine(first: Any?, second: T, combine: (T, T) -> T): T =
-    if (first === EmptyValue) second else combine(first as T, second)
+  inline fun <T> combine(first: Any?, second: T, s: Semigroup<T>): T =
+    if (first === EmptyValue) second else s.combine(first as T, second)
 }
 
 /**

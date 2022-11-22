@@ -1684,7 +1684,7 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
 internal val unit: Either<Nothing, Unit> = Right(Unit)
 
 public inline fun <E, A, B, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   transform: (A, B) -> Z,
 ): Either<E, Z> = zip(combine, b, unit, unit, unit, unit, unit, unit, unit, unit) { a, bb, _, _, _, _, _, _, _, _ ->
@@ -1692,7 +1692,7 @@ public inline fun <E, A, B, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   transform: (A, B, C) -> Z,
@@ -1701,7 +1701,7 @@ public inline fun <E, A, B, C, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1711,7 +1711,7 @@ public inline fun <E, A, B, C, D, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, EE, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1722,7 +1722,7 @@ public inline fun <E, A, B, C, D, EE, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, EE, FF, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1734,7 +1734,7 @@ public inline fun <E, A, B, C, D, EE, FF, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, EE, F, G, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1747,7 +1747,7 @@ public inline fun <E, A, B, C, D, EE, F, G, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1761,7 +1761,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<E, A>.zip(
 }
 
 public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,
@@ -1777,7 +1777,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<E, A>.zip(
 
 @Suppress("DuplicatedCode")
 public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
-  combine: (E, E) -> E,
+  combine: Semigroup<E>,
   b: Either<E, B>,
   c: Either<E, C>,
   d: Either<E, D>,

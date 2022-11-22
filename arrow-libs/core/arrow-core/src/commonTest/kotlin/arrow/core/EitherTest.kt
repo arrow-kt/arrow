@@ -485,7 +485,7 @@ class EitherTest : UnitSpec() {
       ) { a, b -> a + b } shouldBe Left(10)
       
       Right(10).zip<Int, Int, Int, Int>(
-        Semigroup.int(),
+        { a, b -> a + b },
         Left(5)
       ) { a, b -> a + b } shouldBe Left(5)
       
