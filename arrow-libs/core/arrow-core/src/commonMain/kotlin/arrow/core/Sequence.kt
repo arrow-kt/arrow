@@ -4,7 +4,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.experimental.ExperimentalTypeInference
 
 public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
@@ -574,7 +573,7 @@ public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, 
   this.rightPadZip(other) { a, b -> a to b }
 
 /**
- * aligns two structures and combine them with the given [Semigroup.combine]
+ * aligns two structures and combine them with the given [Semigroup.append]
  */
 public fun <A> Sequence<A>.salign(
   SG: Semigroup<A>,

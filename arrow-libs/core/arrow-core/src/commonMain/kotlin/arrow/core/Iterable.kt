@@ -6,8 +6,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.Result.Companion.success
-import kotlin.experimental.ExperimentalTypeInference
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -548,7 +546,7 @@ private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
 }
 
 /**
- * aligns two structures and combine them with the given [Semigroup.combine]
+ * aligns two structures and combine them with the given [Semigroup.append]
  */
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,

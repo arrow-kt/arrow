@@ -23,10 +23,8 @@ class IorTest : UnitSpec() {
       SemigroupLaws.laws(Semigroup.ior(Semigroup.string(), Semigroup.int()), ARB)
     )
 
-    val nullableLongSemigroup = object : Semigroup<Long?> {
-      override fun Long?.combine(b: Long?): Long? =
-        Nullable.zip(this, b) { a, bb -> a + bb }
-    }
+    val nullableLongSemigroup =
+      Semigroup<Long?> { a, b -> Nullable.zip(a, b) { aa, bb -> aa + bb } }
 
     "zip identity" {
       checkAll(Arb.ior(Arb.long().orNull(), Arb.int().orNull())) { ior ->

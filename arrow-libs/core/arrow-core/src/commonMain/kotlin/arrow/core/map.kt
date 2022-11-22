@@ -1,10 +1,7 @@
 package arrow.core
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 
 /**

@@ -272,20 +272,20 @@ public final class arrow/core/EitherKt {
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function7;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function6;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function5;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
-	public static final fun zip (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function7;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function6;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function5;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
+	public static final fun zip (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 }
 
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
-	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Larrow/typeclasses/Semigroup;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -2403,6 +2403,7 @@ public final class arrow/core/continuations/EffectKt {
 
 public final class arrow/core/continuations/IorRaise : arrow/core/continuations/Raise, arrow/typeclasses/Semigroup {
 	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/StateRaise;)V
+	public fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
@@ -2653,6 +2654,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 }
 
 public final class arrow/typeclasses/Monoid$DefaultImpls {
+	public static fun combine (Larrow/typeclasses/Monoid;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/List;)Ljava/lang/Object;
 	public static fun fold (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
@@ -2668,6 +2670,7 @@ public abstract interface class arrow/typeclasses/Semigroup {
 	public static fun Integer ()Larrow/typeclasses/Semigroup;
 	public static fun Long ()Larrow/typeclasses/Semigroup;
 	public static fun Short ()Larrow/typeclasses/Semigroup;
+	public abstract fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun constant (Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
 	public static fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
@@ -2705,6 +2708,8 @@ public final class arrow/typeclasses/Semigroup$Companion {
 
 public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup : arrow/typeclasses/Semigroup {
 	public static final field INSTANCE Larrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup;
+	public fun append (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public synthetic fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun combine (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public synthetic fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun maybeCombine (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
@@ -2714,6 +2719,7 @@ public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup :
 }
 
 public final class arrow/typeclasses/Semigroup$DefaultImpls {
+	public static fun combine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun maybeCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun plus (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }

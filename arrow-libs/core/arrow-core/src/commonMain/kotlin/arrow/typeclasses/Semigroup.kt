@@ -13,18 +13,18 @@ import kotlin.jvm.JvmStatic
 
 public fun interface Semigroup<A> {
   
-  public fun combine(a: A, b: A): A
+  public fun append(a: A, b: A): A
   
   /**
    * Combine two [A] values.
    */
-  public fun A.combine(b: A): A = combine(this, b)
+  public fun A.combine(b: A): A = append(this, b)
 
   public operator fun A.plus(b: A): A =
-    this.combine(b)
+    append(this, b)
 
   public fun A.maybeCombine(b: A?): A =
-    b?.let { combine(it) } ?: this
+    b?.let { append(this, it) } ?: this
 
   public companion object {
     @JvmStatic
@@ -94,11 +94,11 @@ public fun interface Semigroup<A> {
       private val SA: Semigroup<A>,
       private val SB: Semigroup<B>
     ) : Semigroup<Pair<A, B>> {
-      override fun combine(a: Pair<A, B>, b: Pair<A, B>): Pair<A, B> = a.combine(SA, SB, b)
+      override fun append(a: Pair<A, B>, b: Pair<A, B>): Pair<A, B> = a.combine(SA, SB, b)
     }
 
     public object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
-      override fun combine(a: NonEmptyList<Any?>, b: NonEmptyList<Any?>): NonEmptyList<Any?> =
+      override fun append(a: NonEmptyList<Any?>, b: NonEmptyList<Any?>): NonEmptyList<Any?> =
         NonEmptyList(a.head, a.tail.plus(b))
     }
 
@@ -106,7 +106,7 @@ public fun interface Semigroup<A> {
       private val SGA: Semigroup<A>
     ) : Semigroup<Option<A>> {
 
-      override fun combine(a: Option<A>, b: Option<A>): Option<A> =
+      override fun append(a: Option<A>, b: Option<A>): Option<A> =
         a.combine(SGA, b)
 
       override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
@@ -114,7 +114,7 @@ public fun interface Semigroup<A> {
     }
 
     private class MapSemigroup<K, A>(private val SG: Semigroup<A>) : Semigroup<Map<K, A>> {
-      override fun combine(a: Map<K, A>, b: Map<K, A>): Map<K, A> =
+      override fun append(a: Map<K, A>, b: Map<K, A>): Map<K, A> =
         a.combine(SG, b)
     }
 
@@ -123,7 +123,7 @@ public fun interface Semigroup<A> {
       private val SGR: Semigroup<R>
     ) : Semigroup<Either<L, R>> {
 
-      override fun combine(a: Either<L, R>, b: Either<L, R>): Either<L, R> =
+      override fun append(a: Either<L, R>, b: Either<L, R>): Either<L, R> =
         a.combine(SGL, SGR, b)
 
       override fun Either<L, R>.maybeCombine(b: Either<L, R>?): Either<L, R> =
@@ -135,7 +135,7 @@ public fun interface Semigroup<A> {
       private val SGB: Semigroup<B>
     ) : Semigroup<Ior<A, B>> {
 
-      override fun combine(a: Ior<A, B>, b: Ior<A, B>): Ior<A, B> =
+      override fun append(a: Ior<A, B>, b: Ior<A, B>): Ior<A, B> =
         a.combine(SGA, SGB, b)
 
       override fun Ior<A, B>.maybeCombine(b: Ior<A, B>?): Ior<A, B> =

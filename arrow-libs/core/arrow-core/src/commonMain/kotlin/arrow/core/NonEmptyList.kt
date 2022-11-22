@@ -1,9 +1,6 @@
 package arrow.core
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
