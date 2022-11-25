@@ -20,6 +20,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+import kotlin.reflect.KProperty
 
 public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
@@ -58,24 +59,110 @@ public value class NullableRaise(private val cont: Raise<Nothing?>) : Raise<Noth
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
+
+  /**
+   * Used to provide property delegation inside a [nullable] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns an `Option<A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> Option<A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
+
+  /**
+   * Used to provide property delegation inside a [nullable] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns an `A?`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> A?.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
 }
 
 @JvmInline
 public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
   override fun raise(r: Throwable): Nothing = cont.raise(r)
   public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
+
+  /**
+   * Used to provide property delegation inside a [result] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns a `Result<A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> Result<A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
 }
 
 @JvmInline
 public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   override fun raise(r: None): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = bind { raise(None) }
+  public fun <B> Result<B>.bind(): B = fold(::identity) { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
   
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
   }
+
+  /**
+   * Used to provide property delegation inside an [option] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns an `Option<A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> Option<A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
+
+  /**
+   * Used to provide property delegation inside an [option] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns a `Result<A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> Result<A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
 }
 
 public class IorRaise<E> @PublishedApi internal constructor(

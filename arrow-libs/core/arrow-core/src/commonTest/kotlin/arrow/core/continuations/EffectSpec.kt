@@ -7,6 +7,7 @@ import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -369,6 +370,46 @@ class EffectSpec :
           }.catch { throw RuntimeException(msg2()) }
             .runCont()
         }.message.shouldNotBeNull() shouldBe msg2()
+      }
+    }
+
+    "bind using delegation, ok mode" {
+      checkAll(Arb.int(), Arb.int()) {x, y ->
+        nullable {
+          val n by x.right()
+          val m by y.right()
+          n + m
+        }.shouldNotBeNull() shouldBe (x + y)
+      }
+    }
+
+    "bind using delegation, failure mode" {
+      checkAll(Arb.int(), Arb.int()) {x, y ->
+        either<String, Int> {
+          val n by x.right()
+          val m: Int by "hello".left()
+          n + m
+        }.shouldBe(Either.Left("hello"))
+      }
+    }
+
+    "bind using delegation, failure mode, 2" {
+      checkAll(Arb.int(), Arb.int()) {x, y ->
+        nullable {
+          val n by x.right()
+          val m: Int by "hello".left().getOrNone()
+          n + m
+        }.shouldBeNull()
+      }
+    }
+
+    "bind using delegation, failure mode, not used" {
+      checkAll(Arb.int(), Arb.int()) {x, y ->
+        either<String, Int> {
+          val n by x.right()
+          val m: Int by "hello".left()
+          n
+        }.shouldBe(Either.Left("hello"))
       }
     }
   })

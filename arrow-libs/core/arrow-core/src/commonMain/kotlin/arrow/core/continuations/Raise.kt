@@ -12,6 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
+import kotlin.reflect.KProperty
 
 @DslMarker
 public annotation class EffectDSL
@@ -62,7 +63,7 @@ public interface Raise<in R> {
   
   /** Raise a _logical failure_ of type [R] */
   public fun raise(r: R): Nothing
-  
+
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
    * Any _logical failure_ raised are raised in `this` [Raise] context,
@@ -72,6 +73,23 @@ public interface Raise<in R> {
    */
   public operator fun <A> EagerEffect<R, A>.invoke(): A = invoke(this@Raise)
   public fun <A> EagerEffect<R, A>.bind(): A = invoke(this@Raise)
+
+  /**
+   * Used to provide property delegation inside a [Raise] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns an `EagerEffect<R, A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <A> EagerEffect<R, A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
   
   /**
    * Invoke an [Effect] inside `this` [Raise] context.
@@ -82,7 +100,7 @@ public interface Raise<in R> {
    */
   public suspend operator fun <A> Effect<R, A>.invoke(): A = invoke(this@Raise)
   public suspend fun <A> Effect<R, A>.bind(): A = invoke(this@Raise)
-  
+
   /**
    * Extract the [Either.Right] value of an [Either].
    * Any encountered [Either.Left] will be raised as a _logical failure_ in `this` [Raise] context.
@@ -101,13 +119,36 @@ public interface Raise<in R> {
    * Either.Right(Recovered from failed)
    * ```
    */
-  public fun <A> Either<R, A>.bind(): A = when (this) {
+  public fun <S : R, A> Either<S, A>.bind(): A = when (this) {
     is Either.Left -> raise(value)
     is Either.Right -> value
   }
+
+  /**
+   * Used to provide property delegation inside a [Raise] block.
+   *
+   * That means that you can write
+   *
+   * ```
+   * val x by otherComputation()
+   * ```
+   *
+   * where `otherComputation` returns an `Either<R, A>`, but treat
+   * the `x` as having type `A` throughout the rest of the block.
+   */
+  public operator fun <S : R, A> Either<S, A>.provideDelegate(
+    thisRef: Any?,
+    property: KProperty<*>
+  ): A = this@provideDelegate.bind()
+
+  /**
+   * Used to provide [delegated property](https://kotlinlang.org/docs/delegated-properties.html#property-delegate-requirements) syntax.
+   * Its explicit usage is highly discouraged.
+   */
+  public operator fun <A> A.getValue(thisRef: Any?, property: KProperty<*>): A = this
   
   /* Will be removed in subsequent PRs for Arrow 2.x.x */
-  public fun <A> Validated<R, A>.bind(): A = when (this) {
+  public fun <S : R, A> Validated<S, A>.bind(): A = when (this) {
     is Validated.Invalid -> raise(value)
     is Validated.Valid -> value
   }
