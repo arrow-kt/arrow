@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
+import arrow.core.continuations.result
 import arrow.core.mapAccumulating
 import arrow.core.test.generators.result
 import io.kotest.matchers.result.shouldBeFailureOfType
@@ -59,7 +60,7 @@ class ParTraverseResultTest : ArrowFxSpec(
     "parTraverseResult identity is identity" {
       checkAll(Arb.list(Arb.result(Arb.int()))) { l ->
         val res = l.parTraverseResult { it }
-        res shouldBe l.mapAccumulating { it.bind { t -> t } }
+        res shouldBe result { l.map { it.bind() } }
       }
     }
 
