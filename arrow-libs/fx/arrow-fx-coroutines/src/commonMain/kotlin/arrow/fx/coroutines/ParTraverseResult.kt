@@ -43,13 +43,13 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(n: I
 @JvmName("parSequenceResultNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  n: Int,
+  n: Int
 ): Result<List<A>> =
   parTraverseResultN(ctx, n) { it() }
 
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  n: Int,
+  n: Int
 ): Result<List<A>> =
   parTraverseResultN(ctx, n) { it() }
 
@@ -61,7 +61,7 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
  */
 public suspend fun <A, B> Iterable<A>.parTraverseResultN(
   n: Int,
-  f: suspend CoroutineScope.(A) -> Result<B>,
+  f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
   parTraverseResultN(Dispatchers.Default, n, f)
 
@@ -78,7 +78,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
 public suspend fun <A, B> Iterable<A>.parTraverseResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
-  f: suspend CoroutineScope.(A) -> Result<B>,
+  f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> {
   val semaphore = Semaphore(n)
   return parTraverseResult(ctx) { a ->
@@ -100,11 +100,11 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  */
 @JvmName("parSequenceResultScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResult(
-  ctx: CoroutineContext = EmptyCoroutineContext,
+  ctx: CoroutineContext = EmptyCoroutineContext
 ): Result<List<A>> = parTraverseResult(ctx) { it() }
 
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
-  ctx: CoroutineContext = EmptyCoroutineContext,
+  ctx: CoroutineContext = EmptyCoroutineContext
 ): Result<List<A>> = parTraverseResult(ctx) { it() }
 
 /**
@@ -129,7 +129,7 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
  */
 public suspend fun <A, B> Iterable<A>.parTraverseResult(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  f: suspend CoroutineScope.(A) -> Result<B>,
+  f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
   result {
     coroutineScope {

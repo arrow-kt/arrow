@@ -23,12 +23,12 @@ class ParTraverseResultTest : ArrowFxSpec(
       }
       ref.value shouldBe 100
     }
-    
+
     "parTraverseResult runs in parallel" {
       val promiseA = CompletableDeferred<Unit>()
       val promiseB = CompletableDeferred<Unit>()
       val promiseC = CompletableDeferred<Unit>()
-      
+
       listOf(
         suspend {
           promiseA.await()
@@ -44,7 +44,7 @@ class ParTraverseResultTest : ArrowFxSpec(
         }
       ).parTraverseResult { it() }
     }
-    
+
     "parTraverseResult results in the correct left" {
       checkAll(
         Arb.int(min = 10, max = 20),
@@ -55,14 +55,14 @@ class ParTraverseResultTest : ArrowFxSpec(
         }.shouldBeFailureOfType<RuntimeException>()
       }
     }
-    
+
     "parTraverseResult identity is identity" {
       checkAll(Arb.list(Arb.result(Arb.int()))) { l ->
         val res = l.parTraverseResult { it }
         res shouldBe l.mapAccumulating { it.bind { t -> t } }
       }
     }
-    
+
     "parTraverseResult results in the correct error" {
       checkAll(
         Arb.int(min = 10, max = 20),
@@ -76,7 +76,7 @@ class ParTraverseResultTest : ArrowFxSpec(
         }.shouldBeTypeOf<Either.Left<RuntimeException>>().value.message shouldBe msg
       }
     }
-    
+
     "parTraverseResult stack-safe" {
       val count = 20_000
       val l = (0 until count).parTraverseResult { Result.success(it) }

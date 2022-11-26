@@ -3,7 +3,6 @@ package arrow.fx.stm
 import arrow.fx.coroutines.ArrowFxSpec
 import kotlin.time.microseconds
 import kotlin.time.milliseconds
-import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely

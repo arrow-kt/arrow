@@ -285,14 +285,14 @@ public object AcquireStep
 
 @ResourceDSL
 public interface ResourceScope {
-
+  
   /**
    * Compose another [Resource] program into this [ResourceScope].
    * All [release] functions [install]ed into the [Resource] lambda will be installed in this [ResourceScope] while respecting the FIFO order.
    */
   @ResourceDSL
   public suspend fun <A> Resource<A>.bind(): A
-
+  
   /**
    * Install [A] into the [ResourceScope].
    * It's [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
@@ -303,22 +303,21 @@ public interface ResourceScope {
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
   ): A
-
+  
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A {
     val a = bind()
     return install({ a }) { a, _ -> release(a) }
   }
-
+  
   /** Composes a [releaseCase] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A {
     val a = bind()
     return install({ a }, release)
   }
-
-
+  
   public suspend infix fun onRelease(release: suspend (ExitCase) -> Unit): Unit =
     install({ }) { _, exitCase -> release(exitCase) }
 }
@@ -487,7 +486,7 @@ private value class ResourceScopeImpl(
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
-
+  
   override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
     bracketCase({
       val a = acquire(AcquireStep)
@@ -503,7 +502,7 @@ private value class ResourceScopeImpl(
         Platform.composeErrors(e, e2)?.let { throw it }
       }
     })
-
+  
   suspend fun cancelAll(
     exitCase: ExitCase,
     first: Throwable? = null,
