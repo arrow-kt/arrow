@@ -471,10 +471,9 @@ class EitherTest : UnitSpec() {
     }
     
     "Zip Left with Nel doesn't need semigroup parameter" {
-      Left(nonEmptyListOf("fail1"))
-        .zip(
-          Left(nonEmptyListOf("fail2"))
-        ) { _, _ -> "success!" } shouldBe Left(nonEmptyListOf("fail1", "fail2"))
+      Left("fail1").zip(Left("fail2")) { _, _ ->
+        "success!"
+      } shouldBe Left(nonEmptyListOf("fail1", "fail2"))
     }
     
     
