@@ -4,8 +4,12 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.continuations.Raise
+import arrow.core.continuations.either
+import arrow.core.continuations.recover
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -281,36 +285,45 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
+@OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
-  crossinline combine: (first: Error, second: Error) -> Error,
-  transform: (A) -> Either<Error, B>,
+  semigroup: Semigroup<Error>,
+  @BuilderInference transform: Raise<Error>.(A) -> B,
 ): Either<Error, List<B>> =
   fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
-    when (val res = transform(a)) {
+    when (val res = either { transform(a) }) {
       is Right -> when (acc) {
         is Right -> acc.also { acc.value.add(res.value) }
         is Left -> acc
       }
-
+      
       is Left -> when (acc) {
         is Right -> res
-        is Left -> Left(combine(acc.value, res.value))
+        is Left -> Left(semigroup.append(acc.value, res.value))
       }
     }
   }
 
+@OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
-  semigroup: Semigroup<Error>,
-  transform: (A) -> Either<Error, B>,
-): Either<Error, List<B>> = with(semigroup) {
-  mapAccumulating({ a, b ->
-    a.combine(b)
-  }, transform)
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<NonEmptyList<Error>, List<B>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+      
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
 }
-
-public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
-  transform: (A) -> Either<NonEmptyList<Error>, B>,
-): Either<NonEmptyList<Error>, List<B>> = mapAccumulating(NonEmptyList<Error>::plus, transform)
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
@@ -550,7 +563,7 @@ private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
  */
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
-  other: Iterable<A>
+  other: Iterable<A>,
 ): Iterable<A> = SG.run {
   align(other) {
     it.fold(::identity, ::identity) { a, b ->
@@ -664,6 +677,7 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     } else {
       None
     }
+    
     else -> {
       iterator().nextOrNone()
     }
@@ -697,6 +711,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       1 -> firstOrNone()
       else -> None
     }
+    
     else -> {
       iterator().run { nextOrNone().filter { !hasNext() } }
     }
@@ -728,6 +743,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
     } else {
       None
     }
+    
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -762,6 +778,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
       in indices -> Some(elementAt(index))
       else -> None
     }
+    
     else -> iterator().skip(index).nextOrNone()
   }
 
@@ -771,6 +788,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
       next()
       skip(count - 1)
     }
+    
     else -> this
   }
 
@@ -877,13 +895,13 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
   val left = ArrayList<A>(collectionSizeOrDefault(10))
   val right = ArrayList<B>(collectionSizeOrDefault(10))
-
+  
   for (either in this)
     when (either) {
       is Left -> left.add(either.value)
       is Right -> right.add(either.value)
     }
-
+  
   return Pair(left, right)
 }
 

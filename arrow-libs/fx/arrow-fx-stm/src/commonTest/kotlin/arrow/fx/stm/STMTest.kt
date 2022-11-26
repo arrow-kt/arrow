@@ -4,6 +4,7 @@ import arrow.fx.coroutines.ArrowFxSpec
 import kotlin.time.microseconds
 import kotlin.time.milliseconds
 import arrow.fx.coroutines.parMap
+import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
 import io.kotest.assertions.throwables.shouldThrow
@@ -251,7 +252,7 @@ class STMTest : ArrowFxSpec(
         parZip(
           {
             // producers
-            (0..4).parMap {
+            (0..4).parTraverse {
               for (i in (it * 20 + 1)..(it * 20 + 20)) {
                 atomically { tq.write(i) }
               }

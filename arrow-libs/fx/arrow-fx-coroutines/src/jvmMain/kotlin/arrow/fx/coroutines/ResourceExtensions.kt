@@ -34,7 +34,7 @@ public suspend fun ResourceScope.executor(
  * ```kotlin
  * import arrow.fx.coroutines.executor
  * import arrow.fx.coroutines.use
- * import arrow.fx.coroutines.parMap
+ * import arrow.fx.coroutines.parTraverse
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
  * import kotlin.math.max
@@ -50,7 +50,7 @@ public suspend fun ResourceScope.executor(
  *   }
  *
  *   pool.use { ctx ->
- *     listOf(1, 2, 3, 4, 5).parMap(ctx) { i ->
+ *     listOf(1, 2, 3, 4, 5).parTraverse(ctx) { i ->
  *       println("#$i running on ${Thread.currentThread().name}")
  *     }
  *   }

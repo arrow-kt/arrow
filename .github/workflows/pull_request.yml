@@ -44,6 +44,7 @@ jobs:
           arguments: --full-stacktrace mingwX64Test
 
       - name: Upload reports
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'

@@ -1,5 +1,5 @@
 @file:JvmMultifileClass
-@file:JvmName("parMap")
+@file:JvmName("ParTraverse")
 
 package arrow.fx.coroutines
 
@@ -16,9 +16,21 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
+  parSequenceN(Dispatchers.Default, n)
+
+/**
+ * Sequences all tasks in [n] parallel processes on [Dispatchers.Default] and return the result.
+ *
+ * Cancelling this operation cancels all running tasks
+ */
+@JvmName("parSequenceNScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(n: Int): List<A> =
+  parSequenceN(Dispatchers.Default, n)
+
 public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
   val s = Semaphore(n)
-  return parMap(ctx) {
+  return parTraverse(ctx) {
     s.withPermit { it.invoke() }
   }
 }
@@ -35,14 +47,44 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineCont
 @JvmName("parSequenceNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
   val s = Semaphore(n)
-  return parMap(ctx) {
+  return parTraverse(ctx) {
     s.withPermit { it.invoke(this) }
   }
 }
 
+public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
+  parSequence(Dispatchers.Default)
+
+/**
+ * Sequences all tasks in parallel on [Dispatchers.Default] and return the result
+ *
+ * Cancelling this operation cancels all running tasks.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
+ * typealias Task = suspend () -> Unit
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   fun getTask(id: Int): Task =
+ *     suspend { println("Working on task $id on ${Thread.currentThread().name}") }
+ *
+ *   val res = listOf(1, 2, 3)
+ *     .map(::getTask)
+ *     .parSequence()
+ *   //sampleEnd
+ *   println(res)
+ * }
+ * ```
+ * <!--- KNIT example-partraverse-01.kt -->
+ */
+@JvmName("parSequenceScoped")
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
+  parSequence(Dispatchers.Default)
 
 public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
-  parMap(ctx) { it.invoke() }
+  parTraverse(ctx) { it.invoke() }
 
 /**
  * Sequences all tasks in parallel and return the result
@@ -71,16 +113,19 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  *   println(res)
  * }
  * ```
- * <!--- KNIT example-parMap-01.kt -->
+ * <!--- KNIT example-partraverse-02.kt -->
  */
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
-  parMap(ctx) { it.invoke(this) }
+  parTraverse(ctx) { it.invoke(this) }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  */
+
+public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend CoroutineScope.(A) -> B): List<B> =
+  parTraverseN(Dispatchers.Default, n, f)
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [ctx].
@@ -91,16 +136,41 @@ public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx:
  *
  * Cancelling this operation cancels all running tasks.
  */
-public suspend fun <A, B> Iterable<A>.parMapN(
+public suspend fun <A, B> Iterable<A>.parTraverseN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> B
 ): List<B> {
   val s = Semaphore(n)
-  return parMap(ctx) { a ->
+  return parTraverse(ctx) { a ->
     s.withPermit { f(a) }
   }
 }
+
+/**
+ * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
+ * Cancelling this operation cancels all running tasks.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
+ * data class User(val id: Int, val createdOn: String)
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   suspend fun getUserById(id: Int): User =
+ *     User(id, Thread.currentThread().name)
+ *
+ *   val res = listOf(1, 2, 3)
+ *     .parTraverse { getUserById(it) }
+ *  //sampleEnd
+ *  println(res)
+ * }
+ * ```
+ * <!--- KNIT example-partraverse-03.kt -->
+ */
+public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) -> B): List<B> =
+  parTraverse(Dispatchers.Default, f)
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -123,14 +193,14 @@ public suspend fun <A, B> Iterable<A>.parMapN(
  *     User(id, Thread.currentThread().name)
  *
  *   val res = listOf(1, 2, 3)
- *     .parMap(Dispatchers.IO) { getUserById(it) }
+ *     .parTraverse(Dispatchers.IO) { getUserById(it) }
  *  //sampleEnd
  *  println(res)
  * }
  * ```
- * <!--- KNIT example-parMap-02.kt -->
+ * <!--- KNIT example-partraverse-04.kt -->
  */
-public suspend fun <A, B> Iterable<A>.parMap(
+public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> B
 ): List<B> = coroutineScope {

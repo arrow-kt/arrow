@@ -8,11 +8,11 @@ public expect fun <A> Atomic(initialValue: A): Atomic<A>
  * ```kotlin
  * import arrow.atomic.Atomic
  * import arrow.atomic.update
- * import arrow.fx.coroutines.parMap
+ * import arrow.fx.coroutines.parTraverse
  *
  * suspend fun main() {
  *   val count = Atomic(0)
- *   (0 until 20_000).parMap {
+ *   (0 until 20_000).parTraverse {
  *     count.update(Int::inc)
  *   }
  *   println(count.value)

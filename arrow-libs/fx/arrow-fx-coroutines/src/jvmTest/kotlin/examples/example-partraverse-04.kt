@@ -1,5 +1,5 @@
-// This file was automatically generated from ParMap.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleParMap02
+// This file was automatically generated from ParTraverse.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.examplePartraverse04
 
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +12,7 @@ suspend fun main(): Unit {
     User(id, Thread.currentThread().name)
 
   val res = listOf(1, 2, 3)
-    .parMap(Dispatchers.IO) { getUserById(it) }
+    .parTraverse(Dispatchers.IO) { getUserById(it) }
  //sampleEnd
  println(res)
 }

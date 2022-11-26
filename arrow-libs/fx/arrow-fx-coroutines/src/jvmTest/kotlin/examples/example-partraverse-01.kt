@@ -1,8 +1,7 @@
-// This file was automatically generated from ParMap.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleParMap01
+// This file was automatically generated from ParTraverse.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.examplePartraverse01
 
 import arrow.fx.coroutines.*
-import kotlinx.coroutines.Dispatchers
 
 typealias Task = suspend () -> Unit
 
@@ -13,7 +12,7 @@ suspend fun main(): Unit {
 
   val res = listOf(1, 2, 3)
     .map(::getTask)
-    .parSequence(Dispatchers.IO)
+    .parSequence()
   //sampleEnd
   println(res)
 }

@@ -19,7 +19,7 @@ class ParTraverseTest : ArrowFxSpec(
 
     "parTraverse can traverse effect full computations" {
       val ref = Atomic(0)
-      (0 until 100).parMap {
+      (0 until 100).parTraverse {
         ref.update { it + 1 }
       }
       ref.value shouldBe 100
@@ -53,7 +53,7 @@ class ParTraverseTest : ArrowFxSpec(
         Arb.throwable()
       ) { n, killOn, e ->
         Either.catch {
-          (0 until n).parMap { i ->
+          (0 until n).parTraverse { i ->
             if (i == killOn) throw e else Unit
           }
         } should leftException(e)
@@ -62,108 +62,101 @@ class ParTraverseTest : ArrowFxSpec(
 
     "parTraverse identity is identity" {
       checkAll(Arb.list(Arb.int())) { l ->
-        l.parMap { it } shouldBe l
+        l.parTraverse { it } shouldBe l
       }
     }
 
     "parTraverse stack-safe" {
       val count = 20_000
-      val l = (0 until count).parMap { it }
+      val l = (0 until count).parTraverse { it }
       l shouldBe (0 until count).toList()
     }
 
-    // TODO: Fix
-    // "parTraverseN can traverse effect full computations" {
-    //   val ref = Atomic(0)
-    //   (0 until 100).parMapN(5) {
-    //     ref.update { it + 1 }
-    //   }
-    //   ref.value shouldBe 100
-    // }
+    "parTraverseN can traverse effect full computations" {
+      val ref = Atomic(0)
+      (0 until 100).parTraverseN(5) {
+        ref.update { it + 1 }
+      }
+      ref.value shouldBe 100
+    }
 
-    // TODO: Fix
-    // "parTraverseN(3) runs in (3) parallel" {
-    //   val promiseA = CompletableDeferred<Unit>()
-    //   val promiseB = CompletableDeferred<Unit>()
-    //   val promiseC = CompletableDeferred<Unit>()
-    //
-    //   listOf(
-    //     suspend {
-    //       promiseA.await()
-    //       promiseC.complete(Unit)
-    //     },
-    //     suspend {
-    //       promiseB.await()
-    //       promiseA.complete(Unit)
-    //     },
-    //     suspend {
-    //       promiseB.complete(Unit)
-    //       promiseC.await()
-    //     }
-    //   ).parSequenceN(3)
-    // }
+    "parTraverseN(3) runs in (3) parallel" {
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
-    // TODO: Fix
-    // "parTraverseN(1) times out running 3 tasks" {
-    //   val promiseA = CompletableDeferred<Unit>()
-    //   val promiseB = CompletableDeferred<Unit>()
-    //   val promiseC = CompletableDeferred<Unit>()
-    //
-    //   withTimeoutOrNull(10.milliseconds) {
-    //     listOf(
-    //       suspend {
-    //         promiseA.await()
-    //         promiseC.complete(Unit)
-    //       },
-    //       suspend {
-    //         promiseB.await()
-    //         promiseA.complete(Unit)
-    //       },
-    //       suspend {
-    //         promiseB.complete(Unit)
-    //         promiseC.await()
-    //       }
-    //     ).parSequenceN(1)
-    //   } shouldBe null
-    // }
+      listOf(
+        suspend {
+          promiseA.await()
+          promiseC.complete(Unit)
+        },
+        suspend {
+          promiseB.await()
+          promiseA.complete(Unit)
+        },
+        suspend {
+          promiseB.complete(Unit)
+          promiseC.await()
+        }
+      ).parSequenceN(3)
+    }
 
-    // TODO: Fix
-    // "parTraverseN identity is identity" {
-    //   checkAll(Arb.list(Arb.int())) { l ->
-    //     l.parTraverseN(5) { it } shouldBe l
-    //   }
-    // }
+    "parTraverseN(1) times out running 3 tasks" {
+      val promiseA = CompletableDeferred<Unit>()
+      val promiseB = CompletableDeferred<Unit>()
+      val promiseC = CompletableDeferred<Unit>()
 
-    // TODO: Fix
-    // "parTraverseN results in the correct error" {
-    //   checkAll(
-    //     Arb.int(min = 10, max = 20),
-    //     Arb.int(min = 1, max = 9),
-    //     Arb.throwable()
-    //   ) { n, killOn, e ->
-    //     Either.catch {
-    //       (0 until n).parTraverseN(3) { i ->
-    //         if (i == killOn) throw e else Unit
-    //       }
-    //     } should leftException(e)
-    //   }
-    // }
+      withTimeoutOrNull(10.milliseconds) {
+        listOf(
+          suspend {
+            promiseA.await()
+            promiseC.complete(Unit)
+          },
+          suspend {
+            promiseB.await()
+            promiseA.complete(Unit)
+          },
+          suspend {
+            promiseB.complete(Unit)
+            promiseC.await()
+          }
+        ).parSequenceN(1)
+      } shouldBe null
+    }
 
-    // TODO: Fix
-    // "parTraverseN stack-safe" {
-    //   val count = 20_000
-    //   val l = (0 until count).parTraverseN(20) { it }
-    //   l shouldBe (0 until count).toList()
-    // }
+    "parTraverseN identity is identity" {
+      checkAll(Arb.list(Arb.int())) { l ->
+        l.parTraverseN(5) { it } shouldBe l
+      }
+    }
 
-    // TODO: Fix
-    // "parSequenceN can traverse effect full computations" {
-    //   val ref = Atomic(0)
-    //   (0 until 100)
-    //     .map { suspend { ref.update { it + 1 } } }
-    //     .parSequenceN(5)
-    //
-    //   ref.value shouldBe 100
-    // }
+    "parTraverseN results in the correct error" {
+      checkAll(
+        Arb.int(min = 10, max = 20),
+        Arb.int(min = 1, max = 9),
+        Arb.throwable()
+      ) { n, killOn, e ->
+        Either.catch {
+          (0 until n).parTraverseN(3) { i ->
+            if (i == killOn) throw e else Unit
+          }
+        } should leftException(e)
+      }
+    }
+
+    "parTraverseN stack-safe" {
+      val count = 20_000
+      val l = (0 until count).parTraverseN(20) { it }
+      l shouldBe (0 until count).toList()
+    }
+
+    "parSequenceN can traverse effect full computations" {
+      val ref = Atomic(0)
+      (0 until 100)
+        .map { suspend { ref.update { it + 1 } } }
+        .parSequenceN(5)
+
+      ref.value shouldBe 100
+    }
   }
 )

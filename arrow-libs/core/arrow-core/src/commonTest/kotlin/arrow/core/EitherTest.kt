@@ -494,6 +494,13 @@ class EitherTest : UnitSpec() {
         Left(5)
       ) { a, b -> a + b } shouldBe Left(15)
     }
+    
+    "mapAccumulating with String::plus" {
+      listOf(1, 2, 3).mapAccumulating(String::plus) { i ->
+        raise("fail")
+        1.0
+      } shouldBe Either.Left("failfailfail")
+    }
   }
 }
 

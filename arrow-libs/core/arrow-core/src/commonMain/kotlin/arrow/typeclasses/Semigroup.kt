@@ -13,12 +13,14 @@ import kotlin.jvm.JvmStatic
 
 public fun interface Semigroup<A> {
   
+  // TODO: think of better name
   public fun append(a: A, b: A): A
   
   /**
    * Combine two [A] values.
    */
-  public fun A.combine(b: A): A = append(this, b)
+  public fun A.combine(b: A): A =
+    append(this, b)
 
   public operator fun A.plus(b: A): A =
     append(this, b)
