@@ -3,8 +3,8 @@ package arrow.fx.coroutines
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.left
-import arrow.core.mapAccumulating
 import arrow.core.right
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -62,7 +62,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val res = l.parTraverseEither { it }
 
         if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
-        else res shouldBe l.mapAccumulating { it.bind() }
+        else res shouldBe either { l.map { it.bind() } }
       }
     }
 
