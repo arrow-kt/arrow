@@ -6,6 +6,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -61,7 +62,7 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val containsError = l.any(Either<String, Int>::isLeft)
         val res = l.parTraverseEither { it }
 
-        if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
+        if (containsError) l.shouldContain(res)
         else res shouldBe either { l.map { it.bind() } }
       }
     }
