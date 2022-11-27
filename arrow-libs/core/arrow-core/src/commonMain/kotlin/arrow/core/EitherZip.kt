@@ -249,112 +249,120 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<E, A>.zip(
     Either.Left(NonEmptyList(list[0], list.drop(1)))
   }
 
+public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
+
+public fun <E, A> Either<E, A>.toEitherNel(): EitherNel<E, A> =
+  mapLeft { nonEmptyListOf(it) }
+
+public fun <E> E.toEitherNel(): EitherNel<E, Nothing> =
+  nonEmptyListOf(this).left()
+
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
+public inline fun <E, A, B, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
   transform: (A, B) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, unit, unit, unit, unit, unit, unit, unit, unit) { a, bb, _, _, _, _, _, _, _, _ ->
+): EitherNel<E, Z> = zip(b, unit, unit, unit, unit, unit, unit, unit, unit) { a, bb, _, _, _, _, _, _, _, _ ->
   transform(a, bb)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
+public inline fun <E, A, B, C, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
   transform: (A, B, C) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, unit, unit, unit, unit, unit, unit, unit) { a, bb, cc, _, _, _, _, _, _, _ ->
+): EitherNel<E, Z> = zip(b, c, unit, unit, unit, unit, unit, unit, unit) { a, bb, cc, _, _, _, _, _, _, _ ->
   transform(a, bb, cc)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
+public inline fun <E, A, B, C, D, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
   transform: (A, B, C, D) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, bb, cc, dd, _, _, _, _, _, _ ->
+): EitherNel<E, Z> = zip(b, c, d, unit, unit, unit, unit, unit, unit) { a, bb, cc, dd, _, _, _, _, _, _ ->
   transform(a, bb, cc, dd)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
+public inline fun <E, A, B, C, D, EE, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
   transform: (A, B, C, D, EE) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, unit, unit, unit, unit, unit) { a, bb, cc, dd, ee, _, _, _, _, _ ->
+): EitherNel<E, Z> = zip(b, c, d, e, unit, unit, unit, unit, unit) { a, bb, cc, dd, ee, _, _, _, _, _ ->
   transform(a, bb, cc, dd, ee)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, FF, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
-  f: Either<NonEmptyList<E>, FF>,
+public inline fun <E, A, B, C, D, EE, FF, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
+  f: EitherNel<E, FF>,
   transform: (A, B, C, D, EE, FF) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, unit, unit, unit, unit) { a, bb, cc, dd, ee, ff, _, _, _, _ ->
+): EitherNel<E, Z> = zip(b, c, d, e, f, unit, unit, unit, unit) { a, bb, cc, dd, ee, ff, _, _, _, _ ->
   transform(a, bb, cc, dd, ee, ff)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, F, G, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
-  f: Either<NonEmptyList<E>, F>,
-  g: Either<NonEmptyList<E>, G>,
+public inline fun <E, A, B, C, D, EE, F, G, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
+  f: EitherNel<E, F>,
+  g: EitherNel<E, G>,
   transform: (A, B, C, D, EE, F, G) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, unit, unit, unit) { a, bb, cc, dd, ee, ff, gg, _, _, _ ->
+): EitherNel<E, Z> = zip(b, c, d, e, f, g, unit, unit, unit) { a, bb, cc, dd, ee, ff, gg, _, _, _ ->
   transform(a, bb, cc, dd, ee, ff, gg)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, F, G, H, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
-  f: Either<NonEmptyList<E>, F>,
-  g: Either<NonEmptyList<E>, G>,
-  h: Either<NonEmptyList<E>, H>,
+public inline fun <E, A, B, C, D, EE, F, G, H, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
+  f: EitherNel<E, F>,
+  g: EitherNel<E, G>,
+  h: EitherNel<E, H>,
   transform: (A, B, C, D, EE, F, G, H) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, h, unit, unit) { a, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+): EitherNel<E, Z> = zip(b, c, d, e, f, g, h, unit, unit) { a, bb, cc, dd, ee, ff, gg, hh, _, _ ->
   transform(a, bb, cc, dd, ee, ff, gg, hh)
 }
 
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
-  f: Either<NonEmptyList<E>, F>,
-  g: Either<NonEmptyList<E>, G>,
-  h: Either<NonEmptyList<E>, H>,
-  i: Either<NonEmptyList<E>, I>,
+public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
+  f: EitherNel<E, F>,
+  g: EitherNel<E, G>,
+  h: EitherNel<E, H>,
+  i: EitherNel<E, I>,
   transform: (A, B, C, D, EE, F, G, H, I) -> Z,
-): Either<NonEmptyList<E>, Z> = zip(b, c, d, e, f, g, h, i, unit) { a, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+): EitherNel<E, Z> = zip(b, c, d, e, f, g, h, i, unit) { a, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
   transform(a, bb, cc, dd, ee, ff, gg, hh, ii)
 }
 
 @Suppress("DuplicatedCode")
 @JvmName("zipNonEmptyList")
-public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Either<NonEmptyList<E>, A>.zip(
-  b: Either<NonEmptyList<E>, B>,
-  c: Either<NonEmptyList<E>, C>,
-  d: Either<NonEmptyList<E>, D>,
-  e: Either<NonEmptyList<E>, EE>,
-  f: Either<NonEmptyList<E>, F>,
-  g: Either<NonEmptyList<E>, G>,
-  h: Either<NonEmptyList<E>, H>,
-  i: Either<NonEmptyList<E>, I>,
-  j: Either<NonEmptyList<E>, J>,
+public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> EitherNel<E, A>.zip(
+  b: EitherNel<E, B>,
+  c: EitherNel<E, C>,
+  d: EitherNel<E, D>,
+  e: EitherNel<E, EE>,
+  f: EitherNel<E, F>,
+  g: EitherNel<E, G>,
+  h: EitherNel<E, H>,
+  i: EitherNel<E, I>,
+  j: EitherNel<E, J>,
   transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-): Either<NonEmptyList<E>, Z> =
+): EitherNel<E, Z> =
   if (this is Either.Right && b is Either.Right && c is Either.Right && d is Either.Right && e is Either.Right && f is Either.Right && g is Either.Right && h is Either.Right && i is Either.Right && j is Either.Right) {
     Either.Right(transform(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
   } else {
