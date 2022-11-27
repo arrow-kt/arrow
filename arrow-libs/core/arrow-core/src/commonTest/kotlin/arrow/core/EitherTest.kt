@@ -445,61 +445,6 @@ class EitherTest : UnitSpec() {
         }
       }
     }
-    
-    "zip should combine all Right Either" {
-      Right("11th").zip(
-        Semigroup.string(),
-        Right("Doctor"),
-        Right("Who"),
-      ) { a, b, c -> "$a $b $c" } shouldBe Right("11th Doctor Who")
-    }
-    
-    "zip should combine all Right Either - different types" {
-      Right(13).zip(
-        Semigroup.string(),
-        Right("Doctor"),
-        Right(false),
-      ) { a, b, c -> "${a}th $b is $c" } shouldBe Right("13th Doctor is false")
-    }
-    
-    "zio should combine all Either.Left with Semigroup" {
-      Left("fail1").zip(
-        Semigroup.string(),
-        Left("fail2"),
-        Right("Who")
-      ) { _, _, _ -> "success!" } shouldBe Left("fail1fail2")
-    }
-    
-    "Zip Left with Nel doesn't need semigroup parameter" {
-      Left("fail1").zip(Left("fail2")) { _, _ ->
-        "success!"
-      } shouldBe Left(nonEmptyListOf("fail1", "fail2"))
-    }
-    
-    
-    "zip should return first Left found if is unique or combine both otherwise" {
-      Left(10).zip<Int, Int, Int, Int>(
-        Semigroup.int(),
-        Right(5)
-      ) { a, b -> a + b } shouldBe Left(10)
-      
-      Right(10).zip<Int, Int, Int, Int>(
-        { a, b -> a + b },
-        Left(5)
-      ) { a, b -> a + b } shouldBe Left(5)
-      
-      Left(10).zip<Int, Int, Int, Int>(
-        Semigroup.int(),
-        Left(5)
-      ) { a, b -> a + b } shouldBe Left(15)
-    }
-    
-    "mapAccumulating with String::plus" {
-      listOf(1, 2, 3).mapAccumulating(String::plus) { i ->
-        raise("fail")
-        1.0
-      } shouldBe Either.Left("failfailfail")
-    }
   }
 }
 

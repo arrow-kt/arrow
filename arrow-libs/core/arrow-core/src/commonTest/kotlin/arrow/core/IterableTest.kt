@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.option
+import arrow.typeclasses.Semigroup
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -11,29 +12,32 @@ import kotlin.math.min
 
 class IterableTest : UnitSpec() {
   init {
-    "mapAccumulated stack-safe" {
-      // also verifies result order and execution order (l to r)
+    "mapAccumulating stack-safe, and runs in original order" {
       val acc = mutableListOf<Int>()
-      val res: Either<NonEmptyList<Nothing>, List<Int>> = (0..20_000).mapAccumulating {
+      val res = (0..20_000).mapAccumulating(Semigroup.string()) {
         acc.add(it)
         it
       }
-
-      res shouldBe Either.Right(acc)
-      res shouldBe Either.Right((0..20_000).toList())
+      res shouldBe acc.right()
+      res shouldBe (0..20_000).toList().right()
     }
-
-    "mapAccumulated accumulates" {
-
+  
+    "mapAccumulating accumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val res: Either<NonEmptyList<Int>, List<Int>> =
           ints.mapAccumulating { i -> if (i % 2 == 0) i else raise(i) }
-
+      
         val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
-          .toNonEmptyListOrNull()?.left() ?: Either.Right(ints.filter { it % 2 == 0 })
-
+          .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()
+      
         res shouldBe expected
       }
+    }
+  
+    "mapAccumulating with String::plus" {
+      listOf(1, 2, 3).mapAccumulating(String::plus) { i ->
+        raise("fail")
+      } shouldBe Either.Left("failfailfail")
     }
 
     "zip3" {
