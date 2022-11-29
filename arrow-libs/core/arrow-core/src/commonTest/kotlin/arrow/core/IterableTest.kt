@@ -14,7 +14,7 @@ class IterableTest : UnitSpec() {
   init {
     "mapAccumulating stack-safe, and runs in original order" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).mapAccumulating(Semigroup.string()) {
+      val res = (0..20_000).mapOrAccumulate(Semigroup.string()) {
         acc.add(it)
         it
       }
@@ -25,7 +25,7 @@ class IterableTest : UnitSpec() {
     "mapAccumulating accumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val res: Either<NonEmptyList<Int>, List<Int>> =
-          ints.mapAccumulating { i -> if (i % 2 == 0) i else raise(i) }
+          ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
       
         val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
           .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()
@@ -35,7 +35,7 @@ class IterableTest : UnitSpec() {
     }
   
     "mapAccumulating with String::plus" {
-      listOf(1, 2, 3).mapAccumulating(String::plus) { i ->
+      listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
         raise("fail")
       } shouldBe Either.Left("failfailfail")
     }

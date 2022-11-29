@@ -6,7 +6,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.continuations.Raise
 import arrow.core.continuations.either
-import arrow.core.continuations.recover
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -285,8 +284,14 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
+ * The [semigroup] is used to accumulate all the _logical errors_.
+ */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   semigroup: Semigroup<Error>,
   @BuilderInference transform: Raise<Error>.(A) -> B,
 ): Either<Error, List<B>> =
@@ -304,8 +309,13 @@ public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
     }
   }
 
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ into a [NonEmptyList] that were _raised_ while applying the [transform] function.
+ */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <Error, A, B> Iterable<A>.mapAccumulating(
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   @BuilderInference transform: Raise<Error>.(A) -> B,
 ): Either<NonEmptyList<Error>, List<B>> {
   val buffer = mutableListOf<Error>()

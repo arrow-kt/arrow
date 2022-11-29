@@ -4,7 +4,6 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.continuations.result
-import arrow.core.mapAccumulating
 import arrow.core.test.generators.result
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.result.shouldBeFailureOfType
