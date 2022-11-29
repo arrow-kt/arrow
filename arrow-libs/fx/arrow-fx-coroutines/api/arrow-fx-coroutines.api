@@ -370,10 +370,26 @@ public final class arrow/fx/coroutines/Resource$Dsl : arrow/fx/coroutines/Resour
 }
 
 public final class arrow/fx/coroutines/ResourceExtensionsKt {
+	public static final fun autoCloseable (Larrow/fx/coroutines/continuations/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun autoCloseable (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static synthetic fun autoCloseable$default (Larrow/fx/coroutines/continuations/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun autoCloseable$default (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/coroutines/Resource;
+	public static final fun closeable (Larrow/fx/coroutines/continuations/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun closeable (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static synthetic fun closeable$default (Larrow/fx/coroutines/continuations/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun closeable$default (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/coroutines/Resource;
+	public static final fun executor-KLykuaI (JLkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
+	public static synthetic fun executor-KLykuaI$default (JLkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/coroutines/Resource;
+	public static final fun executor-WPwdCS8 (Larrow/fx/coroutines/continuations/ResourceScope;JLkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun executor-WPwdCS8$default (Larrow/fx/coroutines/continuations/ResourceScope;JLkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun fixedThreadPoolContext (ILjava/lang/String;)Larrow/fx/coroutines/Resource;
+	public static final fun fixedThreadPoolContext (Larrow/fx/coroutines/continuations/ResourceScope;ILjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun fromAutoCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun fromCloseable (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun fromExecutor (Larrow/fx/coroutines/Resource$Companion;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
 	public static final fun singleThreadContext (Larrow/fx/coroutines/Resource$Companion;Ljava/lang/String;)Larrow/fx/coroutines/Resource;
+	public static final fun singleThreadContext (Larrow/fx/coroutines/continuations/ResourceScope;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun singleThreadContext (Ljava/lang/String;)Larrow/fx/coroutines/Resource;
 }
 
 public final class arrow/fx/coroutines/ResourceKt {
