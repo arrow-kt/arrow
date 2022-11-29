@@ -24,7 +24,7 @@ import kotlin.time.Duration
  *
  * ```kotlin
  * import arrow.fx.coroutines.executor
- * import arrow.fx.coroutines.use
+ * import arrow.fx.coroutines.resourceScope
  * import arrow.fx.coroutines.parTraverse
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
@@ -41,7 +41,7 @@ import kotlin.time.Duration
  *       }
  *     }
  *
- *     listOf(1, 2, 3, 4, 5).parTraverse(ctx) { i ->
+ *     listOf(1, 2, 3, 4, 5).parTraverse(pool) { i ->
  *       println("#$i running on ${Thread.currentThread().name}")
  *     }
  *   }
