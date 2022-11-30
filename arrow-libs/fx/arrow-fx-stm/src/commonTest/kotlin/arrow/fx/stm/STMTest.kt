@@ -25,7 +25,7 @@ class STMTest : ArrowFxSpec(
     "no-effects" {
       atomically { 10 } shouldBeExactly 10
     }
-    "reading from vars".config(enabled = false) {
+    "reading from vars" {
       checkAll(Arb.int()) { i: Int ->
         val tv = TVar.new(i)
         atomically {

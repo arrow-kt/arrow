@@ -184,26 +184,6 @@ public class TVar<A> internal constructor(a: A) {
   }
 
   /**
-   * Lock a [TVar] by replacing the value with [frame].
-   *
-   * This forces all further reads to wait until [frame] is done with the value.
-   *
-   * This works by continuously calling [readI] and then trying to compare and set the frame.
-   * If the value has been modified after reading it tries again, if the value inside is locked
-   *  it will loop inside [readI] until it is unlocked.
-   *
-   * > This is unused atm because locks are only taken conditionally, but is kept because it helps testing and
-   *  may be useful in the future.
-   */
-  internal fun lock(frame: STMFrame): A {
-    var res: A
-    do {
-      res = this.readI()
-    } while (ref.compareAndSet(res as Any?, frame).not())
-    return res
-  }
-
-  /**
    * Lock a [TVar] by replacing the value with [frame] only if the current value is [expected]
    */
   internal fun lock_cond(frame: STMFrame, expected: A): Boolean =
