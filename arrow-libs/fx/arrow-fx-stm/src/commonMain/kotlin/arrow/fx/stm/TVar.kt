@@ -2,10 +2,10 @@ package arrow.fx.stm
 
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
-import arrow.core.continuations.updateAndGet
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlin.coroutines.resume
+import kotlin.random.Random
 
 /**
  * A [TVar] is a mutable reference that can only be (safely) accessed inside a [STM] transaction.
@@ -135,12 +135,12 @@ public class TVar<A> internal constructor(a: A) {
 
   /**
    * Each TVar has a unique id which is used to get a total ordering of variables to ensure that locks
-   *  are always acquired in the same order on each thread
+   * are always acquired in the same order on each thread.
    *
-   * > The current implementation no longer waits on locks which means lock order is irrelevant. This is still used as
-   *  a good hash value though.
+   * > The current implementation no longer waits on locks which means lock order is irrelevant.
+   * > This is still used as a good hash value though.
    */
-  internal val id: Long = globalC.updateAndGet(Long::inc)
+  internal val id: Long = Random.nextLong()
 
   /**
    * A list of running transactions waiting for a change on this variable.
@@ -230,5 +230,3 @@ public class TVar<A> internal constructor(a: A) {
     public suspend fun <A> new(a: A): TVar<A> = TVar(a)
   }
 }
-
-internal val globalC: AtomicRef<Long> = AtomicRef(0L)
