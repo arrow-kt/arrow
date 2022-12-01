@@ -148,6 +148,11 @@ public final class arrow/fx/coroutines/FlowExtensions {
 	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/coroutines/Schedule;)Lkotlinx/coroutines/flow/Flow;
 }
 
+public final class arrow/fx/coroutines/OS {
+	public static final field INSTANCE Larrow/fx/coroutines/OS;
+	public final fun isApple ()Z
+}
+
 public final class arrow/fx/coroutines/ParTraverse {
 	public static final fun parSequence (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun parSequence (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
