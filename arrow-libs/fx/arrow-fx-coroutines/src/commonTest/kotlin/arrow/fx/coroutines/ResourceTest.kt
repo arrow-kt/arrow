@@ -5,7 +5,6 @@ import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.left
-import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
@@ -184,15 +183,18 @@ class ResourceTest : ArrowFxSpec(
       return Pair(promises.map { it.second }, res)
     }
 
-    "parZip - deep finalizers are called when final one blows" {
+    "parZip - deep finalizers are called when final one blows".config(enabled = !OS.isApple) {
       io.kotest.property.checkAll(3, Arb.int(10..100)) {
+        println("$it")
         val (promises, resource) = generate()
+        println("here")
         assertThrowable {
           resource.flatMap {
             Resource({ throw RuntimeException() }) { _, _ -> }
           }.parZip(Resource({ }) { _, _ -> }) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<RuntimeException>()
+        println("there")
 
         (1..depth).zip(promises) { i, promise ->
           promise.await() shouldBe i
@@ -200,7 +202,7 @@ class ResourceTest : ArrowFxSpec(
       }
     }
 
-    "parZip - deep finalizers are called when final one cancels" {
+    "parZip - deep finalizers are called when final one cancels".config(enabled = !OS.isApple) {
       io.kotest.property.checkAll(3, Arb.int(10..100)) {
         val cancel = CancellationException(null, null)
         val (promises, resource) = generate()
@@ -218,7 +220,7 @@ class ResourceTest : ArrowFxSpec(
     }
 
     // Test multiple release triggers on acquire fail.
-    "parZip - Deep finalizers get called on left or right cancellation" {
+    "parZip - Deep finalizers get called on left or right cancellation".config(enabled = !OS.isApple) {
       checkAll(Arb.bool()) { isLeft ->
         val cancel = CancellationException(null, null)
         val (promises, resource) = generate()
