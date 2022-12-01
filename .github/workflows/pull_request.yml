@@ -27,6 +27,7 @@ jobs:
           java-version: 11
 
       - name: Install watchOS simulator
+        if: matrix.os == 'macos-latest'
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
 
       # Execute in several steps to prevent Gradle
