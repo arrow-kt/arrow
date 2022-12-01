@@ -6,7 +6,7 @@ import kotlinx.coroutines.CompletableDeferred
 
 /**
  * [CountDownLatch] allows for awaiting a given number of countdown signals.
- * Models the behavior of java.util.concurrent.CountDownLatch in Kotlin with suspend.
+ * Models the behavior of java.util.concurrent.CountDownLatch in Kotlin with `suspend`.
  *
  * Must be initialised with an [initial] value of 1 or higher,
  * if constructed with 0 or negative value then it throws [IllegalArgumentException].
@@ -17,7 +17,7 @@ public class CountDownLatch @Throws(IllegalArgumentException::class) constructor
   
   init {
     require(initial > 0) {
-      "CountDownLatch must be constructed with positive non-zero initial count $initial but was $initial > 0"
+      "CountDownLatch must be constructed with positive non-zero initial count, but was $initial"
     }
   }
   
@@ -33,7 +33,10 @@ public class CountDownLatch @Throws(IllegalArgumentException::class) constructor
     count.loop { current ->
       when {
         current == 0L -> return
-        current == 1L && count.compareAndSet(1L, 0L) -> return signal.complete(Unit).let {}
+        current == 1L && count.compareAndSet(1L, 0L) -> {
+          signal.complete(Unit)
+          return
+        }
         count.compareAndSet(current, current - 1) -> return
       }
     }
