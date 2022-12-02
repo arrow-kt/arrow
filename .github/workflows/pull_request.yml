@@ -3,17 +3,12 @@ name: "pull_request"
 on: pull_request
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
-
-    strategy:
-      matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+  ios_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -27,25 +22,9 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
 
-      # Execute tests depending on the platform
-      # Ubuntu
-      - name: Build (Ubuntu)
-        uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'ubuntu-latest'
+      - uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace build
-      # Windows
-      - name: MinGW tests (Windows)
-        uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'windows-latest'
-        with:
-          arguments: mingwX64Test
-      # Apple
-      - name: Apple tests
-        uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'macos-latest'
-        with:
-          arguments: iosSimulatorArm64Test iosX64Test macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v3
@@ -53,8 +32,80 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+  macos_tvos:
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: mingwX64Test
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --full-stacktrace build
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
 
   update_api:
     runs-on: ubuntu-latest
@@ -75,9 +126,6 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: apiDump
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
 
       - name: "Commit new API files"
         uses: stefanzweifel/git-auto-commit-action@v4

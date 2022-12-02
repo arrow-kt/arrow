@@ -25,9 +25,6 @@ on:
           - 'major'
           - 'auto'
 
-env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-
 jobs:
   build:
     runs-on: ubuntu-latest
