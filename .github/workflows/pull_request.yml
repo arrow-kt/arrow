@@ -33,7 +33,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: build
+          arguments: --full-stacktrace build
       # Windows
       - name: MinGW tests (Windows)
         uses: gradle/gradle-build-action@v2
