@@ -173,17 +173,15 @@ class ResourceTest : ArrowFxSpec(
 
     fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
       val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
-      val res = promises.fold(Resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
-        acc.flatMap { ii: Int ->
-          Resource({ ii + i }) { _, _ ->
-            require(promise.complete(i))
-          }
+      val res = promises.fold(resource({ 0 }) { _, _ -> }) { acc, (i, p) ->
+        resource {
+          acc.bind() + install({ i }) { ii, _ -> p.complete(ii) }
         }
       }
       return Pair(promises.map { it.second }, res)
     }
 
-    "parZip - deep finalizers are called when final one blows".config(enabled = !OS.isApple) {
+    "parZip - deep finalizers are called when final one blows" {
       io.kotest.property.checkAll(3, Arb.int(10..100)) {
         val (promises, resource) = generate()
         assertThrowable {
@@ -199,7 +197,7 @@ class ResourceTest : ArrowFxSpec(
       }
     }
 
-    "parZip - deep finalizers are called when final one cancels".config(enabled = !OS.isApple) {
+    "parZip - deep finalizers are called when final one cancels" {
       io.kotest.property.checkAll(3, Arb.int(10..100)) {
         val cancel = CancellationException(null, null)
         val (promises, resource) = generate()
@@ -217,7 +215,7 @@ class ResourceTest : ArrowFxSpec(
     }
 
     // Test multiple release triggers on acquire fail.
-    "parZip - Deep finalizers get called on left or right cancellation".config(enabled = !OS.isApple) {
+    "parZip - Deep finalizers get called on left or right cancellation" {
       checkAll(Arb.bool()) { isLeft ->
         val cancel = CancellationException(null, null)
         val (promises, resource) = generate()
