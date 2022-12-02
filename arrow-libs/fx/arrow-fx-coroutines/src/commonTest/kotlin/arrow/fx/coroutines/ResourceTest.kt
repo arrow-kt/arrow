@@ -185,16 +185,13 @@ class ResourceTest : ArrowFxSpec(
 
     "parZip - deep finalizers are called when final one blows".config(enabled = !OS.isApple) {
       io.kotest.property.checkAll(3, Arb.int(10..100)) {
-        println("$it")
         val (promises, resource) = generate()
-        println("here")
         assertThrowable {
           resource.flatMap {
             Resource({ throw RuntimeException() }) { _, _ -> }
           }.parZip(Resource({ }) { _, _ -> }) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<RuntimeException>()
-        println("there")
 
         (1..depth).zip(promises) { i, promise ->
           promise.await() shouldBe i

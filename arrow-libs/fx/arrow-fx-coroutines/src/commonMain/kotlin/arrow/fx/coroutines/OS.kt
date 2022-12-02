@@ -1,6 +1,6 @@
 package arrow.fx.coroutines
 
-public expect object OS {
+internal expect object OS {
   /**
    * Used to detect if we are running on an Apple OS.
    */
