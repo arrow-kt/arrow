@@ -28,24 +28,24 @@ jobs:
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
 
       # Execute tests depending on the platform
-      # Ubuntu: JVM, JS, Linux
-      - name: Build and test (Ubuntu)
+      # Ubuntu
+      - name: Build (Ubuntu)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: --full-stacktrace build
+          arguments: build
       # Windows
       - name: MinGW tests (Windows)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'windows-latest'
         with:
-          arguments: --full-stacktrace mingwX64Test
-      # Apple: iOS, macOS
-      - name: macOS & iOS tests
+          arguments: mingwX64Test
+      # Apple
+      - name: Apple tests
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'macos-latest'
         with:
-          arguments: --full-stacktrace iosX64Test macosX64Test
+          arguments: iosSimulatorArm64Test iosX64Test macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v3
