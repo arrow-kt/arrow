@@ -43,21 +43,11 @@ jobs:
 
       # Execute tests depending on the platform
       # Ubuntu: JVM, JS, Linux
-      - name: JVM tests (Ubuntu)
+      - name: Build and test (Ubuntu)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: --full-stacktrace jvmTest
-      - name: JS tests (Ubuntu)
-        uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          arguments: --full-stacktrace jsTest
-      - name: Linux Native tests (Ubuntu)
-        uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'ubuntu-latest'
-        with:
-          arguments: --full-stacktrace linuxX64Test
+          arguments: --full-stacktrace build
       # Windows
       - name: MinGW tests (Windows)
         uses: gradle/gradle-build-action@v2

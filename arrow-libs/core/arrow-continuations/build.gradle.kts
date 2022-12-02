@@ -50,12 +50,3 @@ kotlin {
     }
   }
 }
-
-tasks["jsBrowserTest"].enabled = false
-tasks["jsNodeTest"].enabled = false
-tasks["mingwX64Test"].enabled = false
-tasks["linuxX64Test"].enabled = false
-tasks["iosX64Test"].enabled = false
-tasks["tvosX64Test"].enabled = false
-tasks["watchosX64Test"].enabled = false
-tasks["macosX64Test"].enabled = false
