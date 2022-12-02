@@ -8,7 +8,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 120
+    timeout-minutes: 90
 
     strategy:
       matrix:
@@ -30,41 +30,51 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
 
-      # Execute in several steps to prevent Gradle
-      # from running out of memory and be killed
-      # (only in ubuntu-latest)
-      - name: compile main files
+      - name: Compile main files
         uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace compileJava compileKotlin
-      - name: compile test files
+
+      - name: Compile test files
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace compileTestJava compileTestKotlin
-      - name: JVM tests
+
+      # Execute tests depending on the platform
+      # Ubuntu: JVM, JS, Linux
+      - name: JVM tests (Ubuntu)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace jvmTest
-      - name: JS tests
+      - name: JS tests (Ubuntu)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'ubuntu-latest'
         with:
           arguments: --full-stacktrace jsTest
-
-      - name: build
+      - name: Linux Native tests (Ubuntu)
         uses: gradle/gradle-build-action@v2
-        if: matrix.os != 'windows-latest'
+        if: matrix.os == 'ubuntu-latest'
         with:
-          arguments: --full-stacktrace build
-
-      - name: mingwX64Test
+          arguments: --full-stacktrace linuxX64Test
+      # Windows
+      - name: MinGW tests (Windows)
         uses: gradle/gradle-build-action@v2
         if: matrix.os == 'windows-latest'
         with:
           arguments: --full-stacktrace mingwX64Test
+      # Apple: iOS, macOS
+      - name: iOS tests (Mac)
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os == 'macos-latest'
+        with:
+          arguments: --full-stacktrace iosX64Test
+      - name: macOS tests (Mac)
+        uses: gradle/gradle-build-action@v2
+        if: matrix.os == 'macos-latest'
+        with:
+          arguments: --full-stacktrace macosX64Test
 
       - name: Upload reports
         uses: actions/upload-artifact@v3
