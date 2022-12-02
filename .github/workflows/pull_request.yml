@@ -18,15 +18,17 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Install watchOS simulator
-        if: matrix.os == 'macos-latest'
-        run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
+      # For watchOS x86 simulator. Remove with Kotlin 1.8.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '13.4.1'
 
       - uses: gradle/gradle-build-action@v2
         with:
           arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
@@ -52,6 +54,7 @@ jobs:
           arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
@@ -77,12 +80,13 @@ jobs:
           arguments: mingwX64Test
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-  build:
+  ubuntu:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -102,6 +106,7 @@ jobs:
           arguments: --full-stacktrace build
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
