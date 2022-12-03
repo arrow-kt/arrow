@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +27,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace build "-Psemver.stage=alpha"
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+          arguments: build "-Psemver.stage=alpha"
 
   generate-alpha-tag:
     runs-on: ubuntu-latest
@@ -51,10 +51,7 @@ jobs:
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace createSemverTag "-Psemver.stage=alpha"
+          arguments: createSemverTag "-Psemver.stage=alpha"
 
       - name: Push
         run: git push --follow-tags
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop

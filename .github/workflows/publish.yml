@@ -7,6 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
@@ -29,7 +30,7 @@ env:
 
 jobs:
   publish:
-    timeout-minutes: 150
+    timeout-minutes: 90
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -52,6 +53,7 @@ jobs:
         run: echo "::set-output name=arrow::$(head -n 1 build/semver/version.txt)"
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
@@ -157,6 +159,3 @@ jobs:
         with:
           name: logs
           path: arrow-libs/logs.
-
-      - name: Stop Gradle daemons
-        run: ./gradlew -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --stop

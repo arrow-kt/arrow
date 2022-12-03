@@ -25,6 +25,9 @@ on:
           - 'major'
           - 'auto'
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,10 +47,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+          arguments: build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
   generate-tag:
     runs-on: ubuntu-latest
@@ -71,10 +71,7 @@ jobs:
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+          arguments: createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
       - name: Push
         run: git push --follow-tags
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
