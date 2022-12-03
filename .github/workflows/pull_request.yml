@@ -2,6 +2,9 @@ name: "pull_request"
 
 on: pull_request
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dkotlin.incremental=false
+
 jobs:
   ios_watchos:
     runs-on: macos-latest
