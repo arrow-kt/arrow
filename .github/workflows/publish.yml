@@ -7,7 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
