@@ -104,7 +104,15 @@ jobs:
 
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: build --no-parallel --scan
+          arguments: compileKotlin
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileTestKotlin
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check
 
       - name: Upload reports
         if: failure()
