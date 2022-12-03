@@ -99,3 +99,8 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
   }
 }
 
+afterEvaluate {
+  tasks.withType<Test>().configureEach {
+    maxParallelForks = 1
+  }
+}
