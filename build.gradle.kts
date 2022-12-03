@@ -98,9 +98,3 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
     versions.mocha.version = "10.1.0"
   }
 }
-
-afterEvaluate {
-  tasks.withType<Test>().configureEach {
-    maxParallelForks = 1
-  }
-}

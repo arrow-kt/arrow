@@ -104,7 +104,7 @@ jobs:
 
       - uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: build --scan
 
       - name: Upload reports
         if: failure()
