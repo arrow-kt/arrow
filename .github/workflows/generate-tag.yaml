@@ -26,7 +26,7 @@ on:
           - 'auto'
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -44,13 +44,20 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle build
+      - name: compileKotlin
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace build "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+          arguments: compileKotlin
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+      - name: compileTestKotlin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileTestKotlin
+
+      - name: check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
   generate-tag:
     runs-on: ubuntu-latest
@@ -74,10 +81,7 @@ jobs:
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+          arguments: createSemverTag "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
       - name: Push
         run: git push --follow-tags
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
