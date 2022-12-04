@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.loop
 import arrow.core.continuations.update
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 
 /**
@@ -41,8 +42,9 @@ public class CyclicBarrier @Throws(IllegalArgumentException::class) constructor(
       } else if (state.compareAndSet(original, State(awaitingNow, epoch, unblock))) {
         return try {
           unblock.await()
-        } finally {
+        } catch (cancelled: CancellationException) {
           state.update { s -> if (s.epoch == epoch) s.copy(awaiting = s.awaiting + 1) else s }
+          throw cancelled
         }
       }
     }
