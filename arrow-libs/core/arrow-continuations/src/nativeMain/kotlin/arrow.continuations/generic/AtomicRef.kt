@@ -5,8 +5,6 @@ import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
 @Deprecated(deprecateArrowContinuation)
-// according to https://kotlinlang.org/docs/native-migration-guide.html
-// we don't need freezing from 1.7.20 on
 public actual class AtomicRef<V> actual constructor(initialValue: V) {
   private val atom = AtomicReference(initialValue.freeze())
   public actual fun get(): V = atom.value
