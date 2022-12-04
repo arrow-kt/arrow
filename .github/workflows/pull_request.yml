@@ -24,7 +24,8 @@ jobs:
       - name: Install watchOS simulator
         run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
 
-      - uses: gradle/gradle-build-action@v2
+      - name: ios and watchos tests
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel
 
@@ -50,7 +51,8 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - uses: gradle/gradle-build-action@v2
+      - name: macos and tvos tests
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel
 
@@ -76,7 +78,8 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - uses: gradle/gradle-build-action@v2
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: mingwX64Test
 
@@ -102,15 +105,18 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - uses: gradle/gradle-build-action@v2
+      - name: compileKotlin
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: compileKotlin
 
-      - uses: gradle/gradle-build-action@v2
+      - name: compileTestKotlin
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: compileTestKotlin
 
-      - uses: gradle/gradle-build-action@v2
+      - name: check
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: check
 
@@ -136,7 +142,7 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: apiDump
         uses: gradle/gradle-build-action@v2
         with:
           arguments: apiDump
