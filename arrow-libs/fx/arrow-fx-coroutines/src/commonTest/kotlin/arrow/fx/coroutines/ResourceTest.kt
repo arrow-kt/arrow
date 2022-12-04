@@ -1,13 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.left
-import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+import arrow.core.continuations.either
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
@@ -15,25 +13,20 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
-import io.kotest.property.Exhaustive
 import io.kotest.property.arbitrary.bool
-import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInt
-import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.string
-import io.kotest.property.exhaustive.collection
-import io.kotest.property.exhaustive.of
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlin.random.Random
 
 class ResourceTest : StringSpec({
   
@@ -94,7 +87,7 @@ class ResourceTest : StringSpec({
         resourceScope {
           n()
           require(start.complete(Unit))
-          never<Int>()
+          awaitCancellation()
         }
       }
       
@@ -550,7 +543,7 @@ class ResourceTest : StringSpec({
           allocate shouldBe seed
           throw original
         } catch (e: Throwable) {
-          release(ExitCase(e))
+          release(ExitCase.fromError(e))
         }
       }
       
@@ -578,7 +571,7 @@ class ResourceTest : StringSpec({
           allocate shouldBe seed
           throw cancellation
         } catch (e: Throwable) {
-          release(ExitCase(e))
+          release(ExitCase.fromError(e))
         }
       }
       
