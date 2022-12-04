@@ -21,7 +21,7 @@ class CountDownLatchSpec : StringSpec({
   "should raise an exception when constructed with a negative or zero capacity" {
     checkAll(Arb.long(Long.MIN_VALUE, 0)) { i ->
       shouldThrow<IllegalArgumentException> { CountDownLatch(i) }.message shouldBe
-        "CountDownLatch must be constructed with positive non-zero initial count $i but was $i > 0"
+        "CountDownLatch must be constructed with positive non-zero initial count, but was $i"
     }
   }
   
