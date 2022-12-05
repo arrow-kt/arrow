@@ -21,7 +21,7 @@ import kotlin.jvm.JvmMultifileClass
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
-          * [parTraverse](#partraverse)
+          * [parMap](#parmap)
           * [raceN](#racen)
           * [bracketCase / Resource](#bracketcase--resource)
         * [KotlinX](#kotlinx)
@@ -78,12 +78,10 @@ import kotlin.jvm.JvmMultifileClass
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.fold
  * import arrow.core.continuations.toEither
- * import arrow.core.continuations.toValidated
  * import arrow.core.continuations.toIor
  * import arrow.core.continuations.toOption
  * import arrow.core.continuations.ensureNotNull
@@ -134,7 +132,6 @@ import kotlin.jvm.JvmMultifileClass
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *
@@ -362,7 +359,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-05.kt -->
  *
- * #### parTraverse
+ * #### parMap
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.fold
@@ -397,7 +394,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-06.kt -->
  *
- * `parTraverse` will launch 5 tasks, for every element in `1..5`.
+ * `parMap` will launch 5 tasks, for every element in `1..5`.
  * The last task to get scheduled will `raise` with "error", and it will cancel the other launched tasks before returning.
  *
  * #### raceN

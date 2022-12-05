@@ -1,11 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither19
 
-import arrow.core.right
-import arrow.core.contains
+import arrow.core.left
+import arrow.core.getOrElse
 
-val x = 7.right()
-val contains7 = x.contains(7)
+val x = "hello".left()
+val getOr7 = x.getOrElse { 7 }
 fun main() {
- println("contains7 = $contains7")
+ println("getOr7 = $getOr7")
 }

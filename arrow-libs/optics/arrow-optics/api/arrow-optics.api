@@ -191,8 +191,6 @@ public final class arrow/optics/PGetter$DefaultImpls {
 public abstract interface class arrow/optics/PIso : arrow/optics/PLens, arrow/optics/PPrism {
 	public static final field Companion Larrow/optics/PIso$Companion;
 	public abstract fun compose (Larrow/optics/PIso;)Larrow/optics/PIso;
-	public static fun eitherToPValidated ()Larrow/optics/PIso;
-	public static fun eitherToValidated ()Larrow/optics/PIso;
 	public abstract fun first ()Larrow/optics/PIso;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
@@ -217,13 +215,9 @@ public abstract interface class arrow/optics/PIso : arrow/optics/PLens, arrow/op
 	public abstract fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun split (Larrow/optics/PIso;)Larrow/optics/PIso;
 	public static fun stringToList ()Larrow/optics/PIso;
-	public static fun validatedToEither ()Larrow/optics/PIso;
-	public static fun validatedToPEither ()Larrow/optics/PIso;
 }
 
 public final class arrow/optics/PIso$Companion {
-	public final fun eitherToPValidated ()Larrow/optics/PIso;
-	public final fun eitherToValidated ()Larrow/optics/PIso;
 	public final fun id ()Larrow/optics/PIso;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/optics/PIso;
 	public final fun listToOptionNel ()Larrow/optics/PIso;
@@ -236,8 +230,6 @@ public final class arrow/optics/PIso$Companion {
 	public final fun optionToPEither ()Larrow/optics/PIso;
 	public final fun optionToPNullable ()Larrow/optics/PIso;
 	public final fun stringToList ()Larrow/optics/PIso;
-	public final fun validatedToEither ()Larrow/optics/PIso;
-	public final fun validatedToPEither ()Larrow/optics/PIso;
 }
 
 public final class arrow/optics/PIso$DefaultImpls {

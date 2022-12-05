@@ -33,8 +33,6 @@ public final class arrow/fx/coroutines/Predef_testKt {
 	public static final fun throwable (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
 	public static final fun toEither (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun unit (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
-	public static final fun validated (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
-	public static final fun validatedNel (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
 }
 
 public final class arrow/fx/coroutines/Predef_test_jvmKt {

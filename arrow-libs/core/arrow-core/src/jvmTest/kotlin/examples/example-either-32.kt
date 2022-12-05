@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEither32
 import arrow.core.rightIfNull
 
 val value =
- "value".rightIfNull { "left" }
+ null.rightIfNull { "left" }
 fun main() {
  println(value)
 }

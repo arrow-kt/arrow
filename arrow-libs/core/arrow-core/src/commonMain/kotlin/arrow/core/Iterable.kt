@@ -4,9 +4,10 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.continuations.Raise
+import arrow.core.continuations.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.Result.Companion.success
 import kotlin.experimental.ExperimentalTypeInference
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
@@ -283,153 +284,56 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  traverse(f)
-
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
+ * The [semigroup] is used to accumulate all the _logical errors_.
+ */
 @OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Right -> destination.add(res.value)
-      is Left -> return res
-    }
-  }
-  return destination.right()
-}
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  traverse(::identity)
-
-public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    f(item).fold(destination::add) { throwable ->
-      return@traverse Result.failure(throwable)
-    }
-  }
-  return success(destination)
-}
-
-@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
-  traverse(f)
-
-@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  sequence()
-
-public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  traverse(::identity)
-
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  traverse(semigroup, f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  semigroup.run {
-    fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-      when (val res = f(a)) {
-        is Validated.Valid -> when (acc) {
-          is Valid -> acc.also { it.value.add(res.value) }
-          is Invalid -> acc
-        }
-        is Validated.Invalid -> when (acc) {
-          is Valid -> res
-          is Invalid -> Invalid(acc.value.combine(res.value))
-        }
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  semigroup: Semigroup<Error>,
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<Error, List<B>> =
+  fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+      
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(semigroup.append(acc.value, res.value))
       }
     }
   }
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(f)
-
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ into a [NonEmptyList] that were _raised_ while applying the [transform] function.
+ */
 @OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(Semigroup.nonEmptyList(), f)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
-public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  sequence(semigroup)
-
-public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  sequence()
-
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  traverse(Semigroup.nonEmptyList(), ::identity)
-
-@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Some -> destination.add(res.value)
-      is None -> return res
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<NonEmptyList<Error>, List<B>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+      
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
     }
   }
-  return destination.some()
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
 }
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  sequence()
-
-public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
-
-@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
-public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    val res = f(a)
-    if (res != null) {
-      acc.add(res)
-    } else {
-      return res
-    }
-  }
-  return acc.toList()
-}
-
-@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  sequence()
-
-public fun <A> Iterable<A?>.sequence(): List<A>? =
-  traverse(::identity)
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
@@ -665,11 +569,11 @@ private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
 }
 
 /**
- * aligns two structures and combine them with the given [Semigroup.combine]
+ * aligns two structures and combine them with the given [Semigroup.append]
  */
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
-  other: Iterable<A>
+  other: Iterable<A>,
 ): Iterable<A> = SG.run {
   align(other) {
     it.fold(::identity, ::identity) { a, b ->
@@ -783,6 +687,7 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     } else {
       None
     }
+    
     else -> {
       iterator().nextOrNone()
     }
@@ -816,6 +721,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       1 -> firstOrNone()
       else -> None
     }
+    
     else -> {
       iterator().run { nextOrNone().filter { !hasNext() } }
     }
@@ -847,6 +753,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
     } else {
       None
     }
+    
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -881,6 +788,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
       in indices -> Some(elementAt(index))
       else -> None
     }
+    
     else -> iterator().skip(index).nextOrNone()
   }
 
@@ -890,6 +798,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
       next()
       skip(count - 1)
     }
+    
     else -> this
   }
 
@@ -987,46 +896,23 @@ public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterabl
 public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
   mapNotNull { it.orNull() }
 
-@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }", "arrow.core.orNull"))
-public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
-  mapNotNull { it.orNull() }
-
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
- * @receiver Iterable of Validated
+ * @receiver Iterable of Either
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
   val left = ArrayList<A>(collectionSizeOrDefault(10))
   val right = ArrayList<B>(collectionSizeOrDefault(10))
-
+  
   for (either in this)
     when (either) {
       is Left -> left.add(either.value)
       is Right -> right.add(either.value)
     }
-
+  
   return Pair(left, right)
-}
-
-/**
- * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
- *
- * @receiver Iterable of Validated
- * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
- */
-public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
-  val invalids = ArrayList<A>(collectionSizeOrDefault(10))
-  val valids = ArrayList<B>(collectionSizeOrDefault(10))
-
-  for (validated in this)
-    when (validated) {
-      is Invalid -> invalids.add(validated.value)
-      is Valid -> valids.add(validated.value)
-    }
-
-  return Pair(invalids, valids)
 }
 
 public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =

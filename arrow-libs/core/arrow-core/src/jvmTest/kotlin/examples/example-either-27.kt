@@ -4,10 +4,8 @@ package arrow.core.examples.exampleEither27
 import arrow.core.Either.Right
 import arrow.core.leftIfNull
 
+val value =
+ Right(null).leftIfNull({ -1 })
 fun main() {
-  val value =
-  //sampleStart
-    Right(12).leftIfNull({ -1 })
-  //sampleEnd
-  println(value)
+ println(value)
 }

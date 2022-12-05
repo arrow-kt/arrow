@@ -20,7 +20,6 @@ public class SemigroupUsageTest {
         Semigroup<Endo<Integer>> endo = Semigroup.endo();
         Semigroup<Map<String, Integer>> map = Semigroup.map(Semigroup.Integer());
         Semigroup<Option<Integer>> option = Semigroup.option(Semigroup.Integer());
-        Semigroup<Validated<Boolean, Integer>> validated = Semigroup.validated(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<NonEmptyList<Integer>> nonEmptyList = Semigroup.nonEmptyList();
         Semigroup<Pair<Boolean, Integer>> pair = Semigroup.pair(Semigroup.Boolean(), Semigroup.Integer());
         Semigroup<Const<Integer, Object>> constant = Semigroup.constant(Semigroup.Integer());

@@ -5,5 +5,5 @@ import arrow.core.Either
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Right(1).onRight(::println) shouldBe Either.Right(1)
+  Either.Left(2).onLeft(::println) shouldBe Either.Left(2)
 }

@@ -1,9 +1,6 @@
 package arrow.core
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -408,98 +405,6 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
         NonEmptyList(nel.head.second, it.second)
     }
   }
-
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
-public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  f(head).map { newHead ->
-    val acc = mutableListOf<B>()
-    tail.forEach { a ->
-      when (val res = f(a)) {
-        is Right -> acc.add(res.value)
-        is Left -> return@traverse res
-      }
-    }
-    NonEmptyList(newHead, acc)
-  }
-
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
-  sequence()
-
-public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
-  traverse(::identity)
-
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
-)
-public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, NonEmptyList<B>> =
-  traverse(semigroup, f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> NonEmptyList<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, NonEmptyList<B>> =
-  fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
-      }
-    }
-  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
-
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  sequence(semigroup)
-
-public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverse(semigroup, ::identity)
-
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
-public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  traverse(f)
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  f(head).map { newHead ->
-    val acc = mutableListOf<B>()
-    tail.forEach { a ->
-      when (val res = f(a)) {
-        is Some -> acc.add(res.value)
-        is None -> return@traverse res
-      }
-    }
-    NonEmptyList(newHead, acc)
-  }
-
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
-public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
-  sequence()
-
-public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
-  traverse(::identity)
 
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
   firstOrNull()?.let { NonEmptyList(it, drop(1)) }

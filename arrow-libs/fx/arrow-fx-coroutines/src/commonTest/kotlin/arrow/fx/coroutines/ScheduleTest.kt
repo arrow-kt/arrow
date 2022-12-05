@@ -1,7 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.Eval
 import io.kotest.assertions.fail
@@ -248,16 +246,16 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "retry is stack-safe" {
-      val count = Atomic(0)
+      var count = 0
       val l = Either.catch {
         Schedule.recurs<Throwable>(20_000).retry {
-          count.updateAndGet { it + 1 }
+          count++
           throw exception
         }
       }
 
       l should leftException(exception)
-      count.value shouldBe 20_001
+      count shouldBe 20_001
     }
 
     "retry succeeds if no exception is thrown" {
@@ -329,16 +327,16 @@ private tailrec suspend fun <I, A> go(
   }
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Unit {
-  val count = Atomic(0)
+  var count = 0
   schedule.repeat {
-    count.updateAndGet { it + 1 }
+    ++count
   } shouldBe expected
 }
 
 private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: Flow<B>): Unit {
-  val count = Atomic(0)
+  var count = 0
   schedule.repeatAsFlow {
-    count.updateAndGet { it + 1 }
+    ++count
   }.zip(expected, ::Pair)
     .collect { (a, b) -> a shouldBe b }
 }

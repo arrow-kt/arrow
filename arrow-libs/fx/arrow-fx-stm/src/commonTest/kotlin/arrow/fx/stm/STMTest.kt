@@ -28,7 +28,9 @@ class STMTest : ArrowFxSpec(
     "reading from vars" {
       checkAll(Arb.int()) { i: Int ->
         val tv = TVar.new(i)
-        atomically { tv.read() } shouldBeExactly i
+        atomically {
+          tv.read()
+        } shouldBeExactly i
         tv.unsafeRead() shouldBeExactly i
       }
     }
