@@ -99,7 +99,6 @@ public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/
 
 public final class arrow/fx/coroutines/ExitCase$Companion {
 	public final fun ExitCase (Ljava/lang/Throwable;)Larrow/fx/coroutines/ExitCase;
-	public final fun fromError (Ljava/lang/Throwable;)Larrow/fx/coroutines/ExitCase;
 }
 
 public final class arrow/fx/coroutines/ExitCase$Completed : arrow/fx/coroutines/ExitCase {
