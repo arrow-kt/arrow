@@ -75,6 +75,13 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coro
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/fx/coroutines/CountDownLatch {
+	public fun <init> (J)V
+	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun count ()J
+	public final fun countDown ()V
+}
+
 public abstract class arrow/fx/coroutines/ExitCase {
 	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }

@@ -24,6 +24,7 @@ kotlin {
         api(projects.arrowCore)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.coroutines.test)
       }
     }
 
@@ -36,7 +37,6 @@ kotlin {
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
-          implementation(libs.coroutines.test)
         }
       }
     }
