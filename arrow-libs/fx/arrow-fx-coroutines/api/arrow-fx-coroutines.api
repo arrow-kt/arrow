@@ -104,6 +104,12 @@ public final class arrow/fx/coroutines/CountDownLatch {
 	public final fun countDown ()V
 }
 
+public final class arrow/fx/coroutines/CyclicBarrier {
+	public fun <init> (I)V
+	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getCapacity ()I
+}
+
 public abstract class arrow/fx/coroutines/ExitCase {
 	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }
