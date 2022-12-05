@@ -431,6 +431,41 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
 
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(semigroup: Semigroup<Error>): Either<Error, List<A>> =
+  with(semigroup) {
+    fold<Either<Error, A>, Either<Error, ArrayList<A>>>(Right(ArrayList(10))) { acc, res ->
+      when (res) {
+        is Right -> when (acc) {
+          is Right -> acc.also { acc.value.add(res.value) }
+          is Left -> acc
+        }
+
+        is Left -> when (acc) {
+          is Right -> res
+          is Left -> Left(acc.value.combine(res.value))
+        }
+      }
+    }
+  }
+
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(10))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
 
