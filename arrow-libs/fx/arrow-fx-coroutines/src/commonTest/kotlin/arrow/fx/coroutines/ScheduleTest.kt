@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.Eval
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -18,22 +18,21 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
 
 @ExperimentalTime
-class ScheduleTest : ArrowFxSpec(
-  spec = {
+class ScheduleTest : StringSpec({
     class MyException : Exception()
 
     val exception = MyException()
 
     "Schedule.identity()" {
       val dec = Schedule.identity<Int>().calculateSchedule1(1)
-      val expected = Schedule.Decision<Any?, Int>(true, 0.0, Unit, Eval.now(1))
+      val expected = Schedule.Decision<Any?, Int>(true, 0.0, Unit, { 1 })
 
       dec eqv expected
     }
 
     "Schedule.unfold()" {
       val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-      val expected = Schedule.Decision<Any?, Int>(true, 0.0, 1, Eval.now(1))
+      val expected = Schedule.Decision<Any?, Int>(true, 0.0, 1, { 1 })
 
       dec eqv expected
     }
@@ -64,7 +63,7 @@ class ScheduleTest : ArrowFxSpec(
       res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
       res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
 
-      res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
+      res.last() eqv Schedule.Decision(false, 0.0, n + 1, { n + 1 })
     }
 
     "Schedule.once() repeats 1 additional time" {
@@ -184,7 +183,7 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeat" {
       val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val dec = Schedule.Decision(true, 10.0, 0, { "state" })
       val n = 100
       val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
@@ -203,7 +202,7 @@ class ScheduleTest : ArrowFxSpec(
 
     "repeatAsFlow" {
       val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val dec = Schedule.Decision(true, 10.0, 0, { "state" })
       val n = 100
       val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
@@ -246,16 +245,16 @@ class ScheduleTest : ArrowFxSpec(
     }
 
     "retry is stack-safe" {
-      val count = Atomic(0)
+      var count = 0
       val l = Either.catch {
         Schedule.recurs<Throwable>(20_000).retry {
-          count.updateAndGet { it + 1 }
+          count++
           throw exception
         }
       }
 
       l should leftException(exception)
-      count.get() shouldBe 20_001
+      count shouldBe 20_001
     }
 
     "retry succeeds if no exception is thrown" {
@@ -327,16 +326,16 @@ private tailrec suspend fun <I, A> go(
   }
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Unit {
-  val count = Atomic(0)
+  var count = 0
   schedule.repeat {
-    count.updateAndGet { it + 1 }
+    ++count
   } shouldBe expected
 }
 
 private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: Flow<B>): Unit {
-  val count = Atomic(0)
+  var count = 0
   schedule.repeatAsFlow {
-    count.updateAndGet { it + 1 }
+    ++count
   }.zip(expected, ::Pair)
     .collect { (a, b) -> a shouldBe b }
 }
@@ -346,8 +345,8 @@ private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<An
   require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
   require(delayInNanos.nanoseconds == other.delayInNanos.nanoseconds) { "Decision#delay.nanoseconds: ${this.delayInNanos.nanoseconds} shouldBe ${other.delayInNanos.nanoseconds}" }
   if (cont) {
-    val lh = finish.value()
-    val rh = other.finish.value()
+    val lh = finish()
+    val rh = other.finish()
     require(lh == rh) { "Decision#cont: $lh shouldBe $rh" }
   }
 }

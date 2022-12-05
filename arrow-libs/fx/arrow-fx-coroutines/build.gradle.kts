@@ -24,12 +24,14 @@ kotlin {
         api(projects.arrowCore)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.coroutines.test)
       }
     }
 
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
+          implementation(projects.arrowCore)
           implementation(libs.kotest.frameworkApi)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
@@ -39,12 +41,15 @@ kotlin {
           implementation(libs.kotest.arrowProperty.get().toString()) {
             exclude(group = "io.arrow-kt", module = "arrow-core")
           }
+          implementation(libs.kotest.arrowFxAssertions.get().toString()) {
+            exclude(group = "io.arrow-kt", module = "arrow-core")
+            exclude(group = "io.arrow-kt", module = "arrow-fx-coroutines")
+          }
         }
       }
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
-          implementation(libs.coroutines.test)
         }
       }
     }

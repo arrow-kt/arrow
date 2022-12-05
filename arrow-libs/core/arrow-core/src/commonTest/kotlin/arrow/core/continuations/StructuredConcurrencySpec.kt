@@ -27,10 +27,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
-@OptIn(ExperimentalTime::class)
 class StructuredConcurrencySpec :
   StringSpec({
-    "async - suspendCancellableCoroutine.invokeOnCancellation is called with Shifted Continuation" {
+    "async - suspendCancellableCoroutine.invokeOnCancellation is called with Raised Continuation" {
       val started = CompletableDeferred<Unit>()
       val cancelled = CompletableDeferred<Throwable?>()
 
@@ -46,14 +45,14 @@ class StructuredConcurrencySpec :
             }
             async<Int> {
                 started.await()
-                shift("hello")
+                raise("hello")
               }.await()
             never.await()
           }
         }.runCont() shouldBe "hello"
 
       withTimeout(2.seconds) {
-        cancelled.await().shouldNotBeNull().message shouldBe "Shifted Continuation"
+        cancelled.await().shouldNotBeNull().message shouldBe "Raised Continuation"
       }
     }
 
@@ -62,12 +61,12 @@ class StructuredConcurrencySpec :
       effect<Nothing, Unit> { currentContext() shouldBe parentCtx }.runCont()
     }
 
-    "Concurrent shift - async await" {
+    "Concurrent raise - async await" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              val fa = async<String> { shift(a) }
-              val fb = async<String> { shift(b) }
+              val fa = async<String> { raise(a) }
+              val fb = async<String> { raise(b) }
               fa.await() + fb.await()
             }
           }
@@ -75,7 +74,7 @@ class StructuredConcurrencySpec :
       }
     }
 
-    "Concurrent shift - async await exit results" {
+    "Concurrent raise - async await exit results" {
       checkAll(Arb.int()) { a ->
         val scopeExit = CompletableDeferred<ExitCase>()
         val fbExit = CompletableDeferred<ExitCase>()
@@ -101,7 +100,7 @@ class StructuredConcurrencySpec :
                       asyncTask(start, promise)
                     }
                     startLatches.awaitAll()
-                    shift(a)
+                    raise(a)
                   }
                 val fb = asyncTask(startLatches.first(), fbExit)
                 fa.await()
@@ -119,21 +118,21 @@ class StructuredConcurrencySpec :
       }
     }
 
-    "Concurrent shift - async" {
+    "Concurrent raise - async" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              val fa = async<Nothing> { shift(a) }
-              val fb = async<Nothing> { shift(b) }
-              "I will be overwritten by shift - coroutineScope waits until all async are finished"
+              val fa = async<Nothing> { raise(a) }
+              val fb = async<Nothing> { raise(b) }
+              "I will be overwritten by raise - coroutineScope waits until all async are finished"
             }
           }
           .fold({ fail("Async is never awaited, and thus ignored.") }, ::identity) shouldBe
-          "I will be overwritten by shift - coroutineScope waits until all async are finished"
+          "I will be overwritten by raise - coroutineScope waits until all async are finished"
       }
     }
 
-    "Concurrent shift - async exit results" {
+    "Concurrent raise - async exit results" {
       checkAll(Arb.int(), Arb.string()) { a, str ->
         val exitScope = CompletableDeferred<ExitCase>()
         val startLatches = (0..10).map { CompletableDeferred<Unit>() }
@@ -156,7 +155,7 @@ class StructuredConcurrencySpec :
                   async<Unit> {
                     startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
                     startLatches.awaitAll()
-                    shift(a)
+                    raise(a)
                   }
                 str
               }
@@ -170,20 +169,20 @@ class StructuredConcurrencySpec :
       }
     }
 
-    "Concurrent shift - launch" {
+    "Concurrent raise - launch" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         effect<Int, String> {
             coroutineScope {
-              launch { shift(a) }
-              launch { shift(b) }
-              "shift does not escape `launch`"
+              launch { raise(a) }
+              launch { raise(b) }
+              "raise does not escape `launch`"
             }
           }
-          .runCont() shouldBe "shift does not escape `launch`"
+          .runCont() shouldBe "raise does not escape `launch`"
       }
     }
 
-    "Concurrent shift - launch exit results" {
+    "Concurrent raise - launch exit results" {
       checkAll(Arb.int(), Arb.string()) { a, str ->
         val scopeExit = CompletableDeferred<ExitCase>()
         val startLatches = (0..10).map { CompletableDeferred<Unit>() }
@@ -205,7 +204,7 @@ class StructuredConcurrencySpec :
                 val fa = launch {
                   startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
                   startLatches.awaitAll()
-                  shift(a)
+                  raise(a)
                 }
                 str
               }
@@ -219,23 +218,23 @@ class StructuredConcurrencySpec :
       }
     }
 
-    // `shift` escapes `cont` block, and gets rethrown inside `coroutineScope`.
+    // `raise` escapes `cont` block, and gets rethrown inside `coroutineScope`.
     // Effectively awaiting/executing DSL code, outside of the DSL...
-    "async funky scenario #1 - Extract `shift` from `cont` through `async`" {
+    "async funky scenario #1 - Extract `raise` from `cont` through `async`" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         runCatching {
             coroutineScope {
-              val shiftedAsync =
+              val raiseedAsync =
                 effect<Int, Deferred<String>> {
-                    val fa = async<Int> { shift(a) }
-                    async { shift(b) }
+                    val fa = async<Int> { raise(a) }
+                    async { raise(b) }
                   }
-                  .fold({ fail("shift was never awaited, so it never took effect") }, ::identity)
-              shiftedAsync.await()
+                  .fold({ fail("raise was never awaited, so it never took effect") }, ::identity)
+              raiseedAsync.await()
             }
           }
           .exceptionOrNull()
-          ?.message shouldBe "Shifted Continuation"
+          ?.message shouldBe "Raised Continuation"
       }
     }
   })

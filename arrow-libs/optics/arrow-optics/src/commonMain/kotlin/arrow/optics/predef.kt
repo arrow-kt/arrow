@@ -11,7 +11,7 @@ internal object EMPTY_VALUE {
 
 private object BooleanOr : Monoid<Boolean> {
   override fun empty(): Boolean = false
-  override fun Boolean.combine(b: Boolean): Boolean = this || b
+  override fun append(a: Boolean, b: Boolean): Boolean = a || b
 }
 
 internal fun Monoid.Companion.booleanOr(): Monoid<Boolean> =

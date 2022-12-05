@@ -320,45 +320,6 @@ class OptionTest : StringSpec() {
       none.toMap() shouldBe emptyMap()
     }
 
-    "traverse should yield list of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
-    }
-
-    "sequence should be consistent with traverse" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { listOf(it) }.sequence() shouldBe option.traverse { listOf(it) }
-      }
-    }
-
-    "traverseEither should yield either of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.right() } shouldBe some.right()
-      none.traverse { it.right() } shouldBe none.right()
-    }
-
-    "sequenceEither should be consistent with traverseEither" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.right() }.sequence() shouldBe option.traverse{ it.right() }
-      }
-    }
-
-    "traverseValidated should yield validated of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.valid() } shouldBe some.valid()
-      none.traverse { it.valid() } shouldBe none.valid()
-    }
-
-    "sequenceValidated should be consistent with traverseValidated" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.valid() }.sequence() shouldBe option.traverse { it.valid() }
-      }
-    }
-
     "catch should return Some(result) when f does not throw" {
       val recover: (Throwable) -> Option<Int> = { _ -> None}
       Option.catch(recover) { 1 } shouldBe Some(1)

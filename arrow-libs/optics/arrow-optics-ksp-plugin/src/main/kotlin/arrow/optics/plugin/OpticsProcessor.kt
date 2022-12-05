@@ -8,7 +8,6 @@ import arrow.optics.plugin.internals.noCompanion
 import arrow.optics.plugin.internals.otherClassTypeErrorMessage
 import arrow.optics.plugin.internals.qualifiedNameOrSimpleName
 import arrow.optics.plugin.internals.snippets
-import arrow.optics.plugin.internals.typeParametersErrorMessage
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -52,7 +51,7 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
           .createNewFile(
             Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
             it.`package`,
-            it.name
+            it.name + "__Optics"
           )
           .writer()
       writer.write(it.asFileText())

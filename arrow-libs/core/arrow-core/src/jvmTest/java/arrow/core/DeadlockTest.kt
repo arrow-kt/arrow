@@ -10,20 +10,6 @@ class DeadlockTest : StringSpec() {
 
   init {
 
-    "classloader should not deadlock Validated initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Validated.Invalid(Unit)
-            } else {
-              Validated.Valid(null)
-            }
-          }
-        }.joinAll()
-      }
-    }
-
     "classloader should not deadlock Either initialization" {
       runBlocking {
         (0..10).map { i ->

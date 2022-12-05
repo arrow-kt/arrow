@@ -2,14 +2,15 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import kotlinx.coroutines.withContext
 
-class RaceNJvmTest : ArrowFxSpec(
-  spec = {
+class RaceNJvmTest : StringSpec({
     "race2 returns to original context" {
       val racerName = "race2"
       checkAll(Arb.int(1..2)) { choose ->

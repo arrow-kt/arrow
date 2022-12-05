@@ -13,7 +13,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.10.2"
+  id("com.gradle.enterprise") version "3.11.4"
 }
 
 dependencyResolutionManagement {
@@ -30,6 +30,9 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
+
+include("arrow-atomic")
+project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")

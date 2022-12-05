@@ -23,58 +23,6 @@ class SequenceKTest : StringSpec() {
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        if (a > 20_000) {
-          Either.Left(Unit)
-        } else {
-          acc.add(a)
-          Either.Right(a)
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe Either.Left(Unit)
-    }
-
-    "traverse for Option stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        (a <= 20_000).maybe {
-          acc.add(a)
-          a
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe None
-    }
-
-    "traverse for Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }.map { it.toList() }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.sequence(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequence(Semigroup.nonEmptyList())
-
-        val expected: ValidatedNel<Int, Sequence<Int>> =
-          ints.filterNot { it % 2 == 0 }.toList()
-            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
-
-        res.map { it.toList() } shouldBe expected.map { it.toList() }
-      }
-    }
-
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
@@ -279,6 +227,19 @@ class SequenceKTest : StringSpec() {
     "filterOption should filter None" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
+      }
+    }
+
+    "separateEither" {
+      checkAll(Arb.sequence(Arb.int())) { ints ->
+        val sequence = ints.map {
+          if (it % 2 == 0) it.left()
+          else it.right()
+        }
+
+        val (lefts, rights) = sequence.separateEither()
+
+        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
       }
     }
   }

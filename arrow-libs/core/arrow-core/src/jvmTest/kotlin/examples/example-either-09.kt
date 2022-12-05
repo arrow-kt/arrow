@@ -17,11 +17,15 @@ fun stringify(d: Double): String = d.toString()
 fun magic(s: String): Either<Exception, String> =
   parse(s).flatMap{ reciprocal(it) }.map{ stringify(it) }
 
-val magic0 = magic("0")
-val magic1 = magic("1")
-val magicNotANumber = magic("Not a number")
+val x = magic("2")
+val value = when(x) {
+  is Either.Left -> when (x.value) {
+    is NumberFormatException -> "Not a number!"
+    is IllegalArgumentException -> "Can't take reciprocal of 0!"
+    else -> "Unknown error"
+  }
+  is Either.Right -> "Got reciprocal: ${x.value}"
+}
 fun main() {
- println("magic0 = $magic0")
- println("magic1 = $magic1")
- println("magicNotANumber = $magicNotANumber")
+ println("value = $value")
 }

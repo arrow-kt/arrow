@@ -3,6 +3,8 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.merge
+import io.kotest.assertions.arrow.core.rethrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -10,13 +12,14 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
+import io.kotest.property.arrow.core.either
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 
-class RaceNTest : ArrowFxSpec(
-  spec = {
+class RaceNTest : StringSpec({
     "race2 can join first" {
       checkAll(Arb.int()) { i ->
         raceN({ i }, { never<Unit>() }) shouldBe Either.Left(i)

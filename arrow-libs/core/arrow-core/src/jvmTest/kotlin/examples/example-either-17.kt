@@ -1,10 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither17
 
-import arrow.core.right
+import arrow.core.left
 
-val right7 =
-  7.right()
+ val leftHello =
+ "hello".left()
 fun main() {
- println(right7)
+ println(leftHello)
 }

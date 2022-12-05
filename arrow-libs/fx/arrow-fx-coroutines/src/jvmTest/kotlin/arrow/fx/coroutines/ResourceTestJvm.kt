@@ -1,13 +1,15 @@
 package arrow.fx.coroutines
 
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.property.checkAll
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 
-class ResourceTestJvm : ArrowFxSpec(spec = {
+class ResourceTestJvm : StringSpec({
   
   class AutoCloseableTest() : AutoCloseable {
     val didClose = AtomicBoolean(false)
@@ -20,7 +22,6 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   }
   
   "AutoCloseable closes" {
-    checkAll {
       val t = AutoCloseableTest()
       
       resourceScope {
@@ -28,7 +29,6 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       }
       
       t.didClose.get() shouldBe true
-    }
   }
   
   "AutoCloseable closes on error" {
@@ -47,7 +47,6 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   }
   
   "Closeable closes" {
-    checkAll() {
       val t = CloseableTest()
       
       resourceScope {
@@ -55,7 +54,6 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       }
       
       t.didClose.get() shouldBe true
-    }
   }
   
   "Closeable closes on error" {

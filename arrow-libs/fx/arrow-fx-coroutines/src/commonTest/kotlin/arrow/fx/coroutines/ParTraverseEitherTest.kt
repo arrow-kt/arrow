@@ -1,24 +1,30 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import arrow.core.sequence
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arrow.core.either
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 
-class ParTraverseEitherTest : ArrowFxSpec(
-  spec = {
+class ParTraverseEitherTest : StringSpec({
     "parTraverseEither can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverseEither {
         ref.update { it + 1 }.right()
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseEither runs in parallel" {
@@ -59,8 +65,8 @@ class ParTraverseEitherTest : ArrowFxSpec(
         val containsError = l.any(Either<String, Int>::isLeft)
         val res = l.parTraverseEither { it }
 
-        if (containsError) l.contains<Either<String, Any>>(res) shouldBe true
-        else res shouldBe l.sequence()
+        if (containsError) l.shouldContain(res)
+        else res shouldBe either { l.map { it.bind() } }
       }
     }
 

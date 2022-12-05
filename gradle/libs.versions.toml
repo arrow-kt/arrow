@@ -1,22 +1,22 @@
 [versions]
-animalSniffer = "1.5.4"
-arrowGradleConfig = "0.10.1"
+animalSniffer = "1.6.0"
+arrowGradleConfig = "0.11.0-alpha.1"
 assertj = "3.23.1"
-coroutines = "1.6.3"
-classgraph = "4.8.147"
-dokka = "1.6.21"
+coroutines = "1.6.4"
+classgraph = "4.8.151"
+dokka = "1.7.20"
 jUnit = "4.13.2"
 jUnitJupiter = "5.8.2"
 jUnitVintage = "5.8.2"
-kotest = "5.4.1"
-kotestGradle = "5.4.1"
-kotestArrow = "1.2.5"
-kotlin = "1.6.21"
-kotlinBinaryCompatibilityValidator = "0.11.0"
-kotlinCompileTesting = "1.4.8"
+kotest = "5.5.4"
+kotestGradle = "5.5.4"
+kotestArrow = "1.3.0"
+kotlin = "1.7.22"
+kotlinBinaryCompatibilityValidator = "0.12.1"
+kotlinCompileTesting = "1.4.9"
 knit = "0.4.0"
-kspVersion = "1.6.21-1.0.6"
-kotlinxSerialization = "1.3.3"
+kspVersion = "1.7.22-1.0.8"
+kotlinxSerialization = "1.4.1"
 mockWebServer = "4.10.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "0.8.0"
@@ -37,6 +37,7 @@ kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref =
 kotest-arrowAssertions = { module = "io.kotest.extensions:kotest-assertions-arrow", version.ref = "kotestArrow" }
 kotest-arrowProperty = { module = "io.kotest.extensions:kotest-property-arrow", version.ref = "kotestArrow" }
 kotest-arrowOpticsProperty = { module = "io.kotest.extensions:kotest-property-arrow-optics", version.ref = "kotestArrow" }
+kotest-arrowFxAssertions = { module = "io.kotest.extensions:kotest-assertions-arrow-fx-coroutines", version.ref = "kotestArrow" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlibJDK8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }

@@ -61,8 +61,6 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### Error handling
 
-- [`Validated`]({{ '/apidocs/arrow-core/arrow.core/-validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
-
 - [`Either`]({{ '/apidocs/arrow-core/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
 #### Effects

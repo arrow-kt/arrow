@@ -1,12 +1,13 @@
 // This file was automatically generated from Ior.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleIor13
 
-import arrow.core.Ior
+import arrow.core.*
 
-fun main() {
-  Ior.Both(5, 12).exists { it > 10 } // Result: true
-  Ior.Right(12).exists { it > 10 }   // Result: true
-  Ior.Right(7).exists { it > 10 }    // Result: false
-  val left: Ior<Int, Int> = Ior.Left(12)
-  left.exists { it > 10 }      // Result: false
+fun main(args: Array<String>) {
+  //sampleStart
+  val string: Ior<Int, String> = Ior.Right("Hello")
+  val chars: Ior<Int, CharSequence> =
+    string.widen<Int, CharSequence, String>()
+  //sampleEnd
+  println(chars)
 }

@@ -30,11 +30,11 @@ import kotlinx.coroutines.withContext
 
 class EffectSpec :
   StringSpec({
-    "try/catch - can recover from shift" {
+    "try/catch - can recover from raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { i, s ->
         effect {
           try {
-            shift(s())
+            raise(s())
           } catch (e: Throwable) {
             i()
           }
@@ -47,7 +47,7 @@ class EffectSpec :
         val promise = CompletableDeferred<Int>()
         effect {
           try {
-            shift<Int>(s().suspend())
+            raise(s().suspend())
           } finally {
             require(promise.complete(i()))
           }
@@ -57,15 +57,15 @@ class EffectSpec :
       }
     }
     
-    "try/catch - First shift is ignored and second is returned" {
+    "try/catch - First raise is ignored and second is returned" {
       checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
         effect<String, Int> {
           val x: Int = try {
-            shift(s())
+            raise(s())
           } catch (e: Throwable) {
             i()
           }
-          shift(s2())
+          raise(s2())
         }
           .fold(::identity) { fail("Should never come here") } shouldBe s2()
       }
@@ -75,7 +75,7 @@ class EffectSpec :
       checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
         effect<String, Int> {
           effect<Long, Int> {
-            shift(l())
+            raise(l())
           } recover { ll ->
             ll shouldBe l()
             i()
@@ -110,10 +110,10 @@ class EffectSpec :
       }
     }
     
-    "eagerEffect shift short-circuits effect computation" {
+    "eagerEffect raise short-circuits effect computation" {
       checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
-          eagerEffect { shift(a) }
+          eagerEffect { raise(a) }
         
         effect {
           val bb = b()
@@ -132,7 +132,7 @@ class EffectSpec :
     "short-circuit" {
       checkAll(Arb.string().suspend()) { msg ->
         effect {
-          shift<Int>(msg())
+          raise(msg())
         }.runCont() shouldBe msg()
       }
     }
@@ -150,7 +150,7 @@ class EffectSpec :
     "Can short-circuit from nested blocks" {
       checkAll(Arb.string().suspend()) { msg ->
         effect<String, Int> {
-          effect<Nothing, Long> { shift(msg()) }.runCont()
+          effect<Nothing, Long> { raise(msg()) }.runCont()
           fail("Should never reach this point")
         }
           .runCont() shouldBe msg()
@@ -162,7 +162,7 @@ class EffectSpec :
         effect<String, Int> {
           effect<Nothing, Long> {
             1L.suspend()
-            shift(msg())
+            raise(msg())
           }.runCont()
           fail("Should never reach this point")
         }.runCont() shouldBe msg()
@@ -174,25 +174,25 @@ class EffectSpec :
         Arb.boolean().suspend(),
         Arb.int().suspend(),
         Arb.string().suspend()
-      ) { predicate, success, shift ->
+      ) { predicate, success, raise ->
         either {
-          ensure(predicate()) { shift() }
+          ensure(predicate()) { raise() }
           success()
-        } shouldBe if (predicate()) success().right() else shift().left()
+        } shouldBe if (predicate()) success().right() else raise().left()
       }
     }
     
     "ensureNotNull in either computation" {
       fun square(i: Int): Int = i * i
       
-      checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, shift->
+      checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, raise->
         val res =
           either<String, Int> {
             val ii = i()
-            ensureNotNull(ii) { shift() }
+            ensureNotNull(ii) { raise() }
             square(ii) // Smart-cast by contract
           }
-        val expected = i()?.let(::square)?.right() ?: shift().left()
+        val expected = i()?.let(::square)?.right() ?: raise().left()
         res shouldBe expected
       }
     }
@@ -201,7 +201,7 @@ class EffectSpec :
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
-          shift(Failure(msg))
+          raise(Failure(msg))
         }
         
         effect {
@@ -218,12 +218,12 @@ class EffectSpec :
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
-          shift(error)
+          raise(error)
         }
         
         val newError: Effect<List<Char>, Int> =
           failed.recover { str ->
-            shift(str.reversed().toList())
+            raise(str.reversed().toList())
           }
         
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
@@ -234,14 +234,14 @@ class EffectSpec :
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
-          shift(error)
+          raise(error)
         }
         
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
               effect<List<Char>, Int> {
-                shift(r.reversed().toList())
+                raise(r.reversed().toList())
               }.bind()
             }, ::identity)
           }
@@ -262,13 +262,13 @@ class EffectSpec :
       }
     }
     
-    "Can shift from thrown exceptions" {
+    "Can raise from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<String, Int> {
           effect<Int, String> {
             throw RuntimeException(msg())
           }.fold(
-            { shift(fallback()) },
+            { raise(fallback()) },
             ::identity,
             { it.length }
           )
@@ -299,31 +299,34 @@ class EffectSpec :
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and recover" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, String> {
-          shift<String>(int())
+          raise(int())
           fail("It should never reach this point")
         }.recover<Int, Nothing, String> { fallback() }
           .runCont() shouldBe fallback()
       }
     }
     
-    "catch - error path and re-shift" {
+    @Suppress("UNREACHABLE_CODE")
+    "catch - error path and re-raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
         effect<Int, Unit> {
-          shift<String>(int())
+          raise(int())
           fail("It should never reach this point")
-        }.recover { shift(fallback()) }
+        }.recover { raise(fallback()) }
           .runCont() shouldBe fallback()
       }
     }
     
+    @Suppress("UNREACHABLE_CODE")
     "catch - error path and throw" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
         shouldThrow<RuntimeException> {
           effect<Int, String> {
-            shift<String>(int())
+            raise(int())
             fail("It should never reach this point")
           }.recover<Int, Nothing, String> { throw RuntimeException(msg()) }
             .runCont()
@@ -349,11 +352,11 @@ class EffectSpec :
       }
     }
     
-    "attempt - error path and re-shift" {
+    "attempt - error path and re-raise" {
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
         effect<Int, Unit> {
           throw RuntimeException(msg())
-        }.catch { shift(fallback()) }
+        }.catch { raise(fallback()) }
           .runCont() shouldBe fallback()
       }
     }

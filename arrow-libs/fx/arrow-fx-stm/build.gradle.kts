@@ -30,7 +30,11 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          // implementation(libs.kotest.arrowFxAssertions)
+          implementation(projects.arrowFxCoroutines)
+          implementation(libs.kotest.arrowFxAssertions)
+          implementation(libs.kotest.frameworkApi)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
         }
       }
       jvmTest {

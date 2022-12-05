@@ -2,6 +2,9 @@ package arrow.core
 
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.assertions.withClue
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
@@ -17,110 +20,48 @@ class NonEmptyListTest : StringSpec() {
   init {
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
-
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
-        acc.add(a)
-        Either.Right(a)
-      }
-      res shouldBe Either.Right(acc.toNonEmptyListOrNull())
-      res shouldBe Either.Right((0..20_000).toNonEmptyListOrNull())
-    }
-
-    "traverse for Either short-circuit" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.first { it % 2 != 0 }
-        }
+    
+    "iterable.toNonEmptyListOrNull should round trip" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
       }
     }
 
-    "sequence for Either should be consistent with traverseEither" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequence() shouldBe
-          ints.traverse { Either.conditionally(it % 2 == 0, { it }, { it }) }
+    "iterable.toNonEmptyListOrNone should round trip" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNone() shouldBe nonEmptyList.some()
       }
     }
-
-    "traverse for Option is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc.toNonEmptyListOrNull())
-      res shouldBe Some((0..20_000).toNonEmptyListOrNull())
-    }
-
-    "traverse for Option short-circuits" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          (it % 2 == 0).maybe {
-            acc.add(it)
-            it
-          }
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence for Option yields some when all entries in the list are some" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence for Option should be consistent with traverseOption" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { (it % 2 == 0).maybe { it } }.sequence() shouldBe
-          ints.traverse { (it % 2 == 0).maybe { it } }
-      }
-    }
-
-    "traverse for Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
-
-        res shouldBe expected
-      }
-    }
-
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
-          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
-      }
-    }
+    
+    // "traverse for Validated stack-safe" {
+    //   // also verifies result order and execution order (l to r)
+    //   val acc = mutableListOf<Int>()
+    //   val res = (0..20_000).traverse(Semigroup.string()) {
+    //     acc.add(it)
+    //     Validated.Valid(it)
+    //   }
+    //   res shouldBe Validated.Valid(acc)
+    //   res shouldBe Validated.Valid((0..20_000).toList())
+    // }
+    //
+    // "traverse for Validated acummulates" {
+    //   checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
+    //     val res: ValidatedNel<Int, NonEmptyList<Int>> =
+    //       ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+    //
+    //     val expected: ValidatedNel<Int, NonEmptyList<Int>> =
+    //       ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
+    //
+    //     res shouldBe expected
+    //   }
+    // }
+    //
+    // "sequence for Validated should be consistent with traverseValidated" {
+    //   checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
+    //     ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
+    //       ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
+    //   }
+    // }
 
     "can align lists with different lengths" {
       checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
@@ -281,7 +222,6 @@ class NonEmptyListTest : StringSpec() {
       }
     }
 
-
     "minBy element" {
       checkAll(
         Arb.nonEmptyList(Arb.int())
@@ -289,6 +229,17 @@ class NonEmptyListTest : StringSpec() {
         val result = a.minBy(::identity)
         val expected = a.minByOrNull(::identity)
         result shouldBe expected
+      }
+    }
+
+    "NonEmptyList equals List" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        withClue("$a should be equal to ${a.all}") {
+          // `shouldBe` doesn't use the `equals` methods on `Iterable`
+          (a == a.all).shouldBeTrue()
+        }
       }
     }
   }

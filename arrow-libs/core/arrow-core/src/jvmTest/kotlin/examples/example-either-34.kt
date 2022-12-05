@@ -1,16 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither34
 
-import arrow.core.*
+import arrow.core.Either
+import io.kotest.matchers.shouldBe
 
-fun main() {
-  fun possiblyFailingOperation(): Either.Right<Int> =
-    Either.Right(1)
-  //sampleStart
-  val result: Either<Exception, Int> = possiblyFailingOperation()
-  result.fold(
-       { println("operation failed with $it") },
-       { println("operation succeeded with $it") }
-  )
-  //sampleEnd
+fun test() {
+  Either.Left("left").swap() shouldBe Either.Right("left")
+  Either.Right("right").swap() shouldBe Either.Left("right")
 }

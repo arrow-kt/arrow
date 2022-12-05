@@ -1,26 +1,39 @@
 package arrow.fx.coroutines
 
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
+import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.checkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.reduce
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 @ExperimentalTime
-class FlowTest : ArrowFxSpec(
-  spec = {
+class FlowTest : StringSpec({
 
     "Retry - flow fails" {
       val bang = RuntimeException("Bang!")
@@ -72,7 +85,6 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMap - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
@@ -88,7 +100,6 @@ class FlowTest : ArrowFxSpec(
         job.cancelAndJoin()
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMap - exception in parMap cancels all running tasks" {
@@ -169,7 +180,6 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMapUnordered - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
@@ -186,7 +196,6 @@ class FlowTest : ArrowFxSpec(
 
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapUnordered - exception in parMap cancels all running tasks" {
@@ -243,6 +252,113 @@ class FlowTest : ArrowFxSpec(
         val (ii2, ex2) = exitB.await()
         ii2 shouldBe i2
         ex2.shouldBeTypeOf<ExitCase.Cancelled>()
+      }
+    }
+  
+    "Retry - schedule with delay" {
+      runTest {
+        checkAll(Arb.int(), Arb.int(100, 1000)) { a, delayMs ->
+          val start = currentTime
+          val timestamps = mutableListOf<Long>()
+          shouldThrow<RuntimeException> {
+            flow {
+              emit(a)
+              timestamps.add(currentTime)
+              throw RuntimeException("Bang!")
+            }
+              .retry(Schedule.recurs<Throwable>(2) and Schedule.spaced(delayMs.milliseconds))
+              .collect()
+          }
+          timestamps.size shouldBe 3
+        
+          // total run should be between start time + delay * 3 AND start + tolerance %
+          val min = start + (delayMs * 2)
+          val max = min + delayMs / 10
+        
+          timestamps.last() shouldBeGreaterThanOrEqual min
+          timestamps.last() shouldBeLessThan max
+        }
+      }
+    }
+  
+    "fixedDelay" {
+      runTest {
+        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+          val emissionDuration = waitPeriod / 10L
+          var state: Long? = null
+        
+          val rate = flow { emit(delay(waitPeriod)) }.repeat()
+            .map {
+              val now = state ?: currentTime
+              val nextNow = currentTime
+              val lapsed = nextNow - now
+              state = nextNow
+              delay(emissionDuration)
+              lapsed
+            }
+            .take(n)
+            .toList()
+        
+          rate.first() shouldBe 0 // First element is immediately
+          rate.drop(1).forEach { act ->
+            act shouldBe (waitPeriod + emissionDuration) // Remaining elements all take delay + emission duration
+          }
+        }
+      }
+    }
+  
+    "fixedRate" {
+      runTest {
+        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+          val emissionDuration = waitPeriod / 10
+          var state: Long? = null
+        
+          val rate = fixedRate(waitPeriod) { currentTime }
+            .map {
+              val now = state ?: currentTime
+              val nextNow = currentTime
+              val lapsed = nextNow - now
+              state = nextNow
+              delay(emissionDuration)
+              lapsed
+            }
+            .take(n)
+            .toList()
+        
+          rate.first() shouldBe 0 // First element is immediately
+          rate.drop(1).forEach { act ->
+            // Remaining elements all take total of waitPeriod, emissionDuration is correctly taken into account.
+            act shouldBe waitPeriod
+          }
+        }
+      }
+    }
+  
+    "fixedRate(dampen = true)" {
+      runTest {
+        val buffer = mutableListOf<Unit>()
+        withTimeoutOrNull(4500) {
+          fixedRate(1000, true) { currentTime }
+            .mapIndexed { index, _ ->
+              if (index == 0) delay(3000) else Unit
+              advanceTimeBy(1)
+            }.collect(buffer::add)
+        }
+        buffer.size shouldBe 2
+      }
+    }
+  
+    "fixedRate(dampen = false)" {
+      runTest {
+        val buffer = mutableListOf<Unit>()
+        withTimeoutOrNull(4500) {
+          fixedRate(1000, false) { currentTime }
+            .mapIndexed { index, _ ->
+              if (index == 0) delay(3000) else Unit
+              advanceTimeBy(1)
+            }.collect(buffer::add)
+        }
+        buffer.size shouldBe 4
       }
     }
   }

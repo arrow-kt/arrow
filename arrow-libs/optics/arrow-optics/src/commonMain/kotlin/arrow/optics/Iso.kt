@@ -6,9 +6,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Either.Right
 import arrow.core.Some
-import arrow.core.Validated
-import arrow.core.Validated.Invalid
-import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.typeclasses.Monoid
@@ -169,23 +166,6 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
       listToPOptionNel()
 
     /**
-     * [PIso] that defines the equality between [Either] and [Validated]
-     */
-    @JvmStatic
-    public fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
-      PIso(
-        get = { it.fold(::Invalid, ::Valid) },
-        reverseGet = Validated<A2, B2>::toEither
-      )
-
-    /**
-     * [Iso] that defines the equality between [Either] and [Validated]
-     */
-    @JvmStatic
-    public fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
-      eitherToPValidated()
-
-    /**
      * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
      */
     @JvmStatic
@@ -248,22 +228,5 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
     @JvmStatic
     public fun stringToList(): Iso<String, List<Char>> =
       stringToList
-
-    /**
-     * [PIso] that defines equality between [Validated] and [Either]
-     */
-    @JvmStatic
-    public fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
-      PIso(
-        get = Validated<A1, B1>::toEither,
-        reverseGet = Validated.Companion::fromEither
-      )
-
-    /**
-     * [Iso] that defines equality between [Validated] and [Either]
-     */
-    @JvmStatic
-    public fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
-      validatedToPEither()
   }
 }

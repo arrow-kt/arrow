@@ -1,43 +1,42 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.Tuple6
 import io.kotest.assertions.assertSoftly
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 
-class ParMap6JvmTest : ArrowFxSpec(spec = {
+class ParMap6JvmTest : StringSpec({
   val mapCtxName = "parMap6"
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
   "parMapN 6 returns to original context" {
-    checkAll {
       parallelCtx(6, mapCtxName) { _single, _mapCtx ->
         withContext(_single) {
           threadName() shouldStartWith "single"
   
-          val (s1, s2, s3, s4, s5, s6) = parZip(
+          val result = parZip(
             _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName
           ) { a, b, c, d, e, f ->
-            Tuple6(a, b, c, d, e, f)
+            listOf(a, b, c, d, e, f)
           }
   
-          s1 shouldStartWith mapCtxName
-          s2 shouldStartWith mapCtxName
-          s3 shouldStartWith mapCtxName
-          s4 shouldStartWith mapCtxName
-          s5 shouldStartWith mapCtxName
-          s6 shouldStartWith mapCtxName
+          result[0] shouldStartWith mapCtxName
+          result[1] shouldStartWith mapCtxName
+          result[2] shouldStartWith mapCtxName
+          result[3] shouldStartWith mapCtxName
+          result[4] shouldStartWith mapCtxName
+          result[5] shouldStartWith mapCtxName
           threadName() shouldStartWith "single"
         }
       }
-    }
   }
 
   "parMapN 6 returns to original context on failure" {

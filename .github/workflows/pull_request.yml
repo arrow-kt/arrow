@@ -3,52 +3,12 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.0.2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.4.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: build
-        uses: gradle/gradle-build-action@v2.2.0
-        if: matrix.os != 'windows-latest'
-        with:
-          arguments: --full-stacktrace build
-
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2.2.0
-        if: matrix.os == 'windows-latest'
-        with:
-          arguments: --full-stacktrace mingwX64Test
-
-      - name: Upload reports
-        uses: actions/upload-artifact@v3.1.0
-        with:
-          name: 'reports-${{ matrix.os }}'
-          path: '**/build/reports/**'
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  update_api:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
+  ios_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 90
 
     steps:
       - uses: actions/checkout@v3
@@ -56,21 +16,139 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3.4.0
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
-        uses: gradle/gradle-build-action@v2.2.0
+      - name: Install watchOS simulator
+        run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
+
+      - name: ios and watchos tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-ios_watchos'
+          path: '**/build/reports/**'
+
+  macos_tvos:
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: macos and tvos tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-macos_tvos'
+          path: '**/build/reports/**'
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: mingwX64Test
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-windows'
+          path: '**/build/reports/**'
+
+  ubuntu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: compileKotlin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileKotlin
+
+      - name: compileTestKotlin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileTestKotlin
+
+      - name: check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-ubuntu'
+          path: '**/build/reports/**'
+
+  update_api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: apiDump
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: apiDump
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4.14.1
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api

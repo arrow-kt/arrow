@@ -67,8 +67,8 @@ public interface Fold<S, A> {
     val fold = ::fold as (Monoid<Any?>, S) -> Any?
     val res = fold(object : Monoid<Any?> {
       override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
     }, source)
     return EMPTY_VALUE.unbox(res)
   }
@@ -81,8 +81,8 @@ public interface Fold<S, A> {
     val fold = ::fold as (Monoid<Any?>, S) -> Any?
     val res = fold(object : Monoid<Any?> {
       override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (b !== EMPTY_VALUE) b else this
+      override fun append(a: Any?, b: Any?): Any? =
+        if (b !== EMPTY_VALUE) b else a
     }, source)
     return EMPTY_VALUE.unbox(res)
   }
@@ -112,8 +112,8 @@ public interface Fold<S, A> {
   public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? {
     val res = foldMap(object : Monoid<Any?> {
       override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
     }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
     return EMPTY_VALUE.unbox(res)
   }
@@ -126,8 +126,8 @@ public interface Fold<S, A> {
   public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean {
     val res = foldMap(object : Monoid<Any?> {
       override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
     }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
     return res !== EMPTY_VALUE
   }

@@ -7,7 +7,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
   SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
   SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
@@ -30,7 +30,7 @@ env:
 
 jobs:
   publish:
-    timeout-minutes: 150
+    timeout-minutes: 90
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -38,43 +38,44 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3.4.0
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
-        uses: gradle/gradle-build-action@v2.2.0
+      - name: assemble
+        uses: gradle/gradle-build-action@v2
         with:
-          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --full-stacktrace
+          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
 
       - name: Get Arrow version
         id: version
         run: echo "::set-output name=arrow::$(head -n 1 build/semver/version.txt)"
 
       - name: Upload reports
-        uses: actions/upload-artifact@v3.1.0
+        if: failure()
+        uses: actions/upload-artifact@v3
         with:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
       - name: Publish alpha/beta/rc version
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2
         if: |
           contains(steps.version.outputs.arrow, 'alpha') ||
           contains(steps.version.outputs.arrow, 'beta') ||
           contains(steps.version.outputs.arrow, 'rc')
         with:
-          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeAndReleaseSonatypeStagingRepository
+          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish final version
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2
         if: |
           !contains(steps.version.outputs.arrow, 'alpha') &&
           !contains(steps.version.outputs.arrow, 'beta') &&
           !contains(steps.version.outputs.arrow, 'rc')
         with:
-          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeSonatypeStagingRepository
+          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype closeSonatypeStagingRepository
 
       - name: Prepare environment
         working-directory: arrow-site
@@ -85,9 +86,9 @@ jobs:
           bundle install --gemfile Gemfile
 
       - name: Create API doc
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace -Pkotlin.mpp.enableCompatibilityMetadataVariant=true dokkaGfm
+          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true dokkaGfm
 
       - name: Build release directory (/docs)
         working-directory: arrow-site
@@ -158,6 +159,3 @@ jobs:
         with:
           name: logs
           path: arrow-libs/logs.
-
-      - name: Stop Gradle daemons
-        run: ./gradlew -Pkotlin.mpp.enableCompatibilityMetadataVariant=true --stop

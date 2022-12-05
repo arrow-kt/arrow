@@ -1,14 +1,14 @@
 package arrow.fx.coroutines.parMapN
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
-import arrow.core.Tuple5
-import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -16,14 +16,14 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 
-class ParMap5Test : ArrowFxSpec(
-  spec = {
+class ParMap5Test : StringSpec({
     "parMapN 5 runs in parallel" {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e ->
         val r = Atomic("")
@@ -53,19 +53,16 @@ class ParMap5Test : ArrowFxSpec(
             modifyGate4.complete(Unit)
           },
           {
-            r.set("$e")
+            r.value = "$e"
             modifyGate1.complete(Unit)
           }
-        ) { _a, _b, _c, _d, _e ->
-          Tuple5(_a, _b, _c, _d, _e)
-        }
+        ) { _a, _b, _c, _d, _e -> }
 
-        r.get() shouldBe "$e$d$c$b$a"
+        r.value shouldBe "$e$d$c$b$a"
       }
     }
 
     "Cancelling parMapN 5 cancels all participants" {
-      checkAll {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -81,13 +78,7 @@ class ParMap5Test : ArrowFxSpec(
 
         val f = async {
           parZip(loserA, loserB, loserC, loserD, loserE) { _a, _b, _c, _d, _e ->
-            Tuple5(
-              _a,
-              _b,
-              _c,
-              _d,
-              _e
-            )
+
           }
         }
 
@@ -99,7 +90,6 @@ class ParMap5Test : ArrowFxSpec(
         pc.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pd.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapN 5 cancels losers if a failure occurs in one of the tasks" {

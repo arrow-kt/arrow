@@ -1,7 +1,8 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.StringSpec
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.assertions.asClue
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -11,9 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.DurationUnit.NANOSECONDS
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -79,7 +82,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -106,7 +109,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -121,7 +124,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -143,7 +146,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -186,7 +189,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -201,7 +204,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -226,7 +229,7 @@ class CircuitBreakerTest : StringSpec({
 
       when (val s = cb.state()) {
         is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeoutNanos shouldBe resetTimeout.toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
@@ -243,7 +246,7 @@ class CircuitBreakerTest : StringSpec({
       // resetTimeout should've applied
       when (val s = cb.state()) {
         is CircuitBreaker.State.Open -> {
-          s.resetTimeoutNanos shouldBe (resetTimeout * exponentialBackoffFactor).toDouble(NANOSECONDS)
+          s.resetTimeout shouldBe resetTimeout * exponentialBackoffFactor
         }
         else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
       }
@@ -267,7 +270,50 @@ class CircuitBreakerTest : StringSpec({
         stackSafeIteration(), 0
       ) shouldBe stackSafeIteration()
     }
+
+    listOf(
+      ConstructorValues(maxFailures = -1),
+      ConstructorValues(resetTimeout = Duration.ZERO),
+      ConstructorValues(resetTimeout = (-1).seconds),
+      ConstructorValues(exponentialBackoffFactor = 0.0),
+      ConstructorValues(exponentialBackoffFactor = -1.0),
+      ConstructorValues(maxResetTimeout = Duration.ZERO),
+      ConstructorValues(maxResetTimeout = (-1).seconds),
+    ).forEach { value ->
+      "should require valid constructor values" {
+        value.asClue { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
+          shouldThrow<IllegalArgumentException> {
+            CircuitBreaker.of(maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout)
+          }
+
+          shouldThrow<IllegalArgumentException> {
+            CircuitBreaker.of(
+              maxFailures,
+              resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+              exponentialBackoffFactor,
+              maxResetTimeout.toDouble(DurationUnit.NANOSECONDS)
+            )
+          }
+
+          shouldThrow<IllegalArgumentException> {
+            CircuitBreaker.of(
+              maxFailures,
+              resetTimeout,
+              exponentialBackoffFactor,
+              maxResetTimeout
+            )
+          }
+        }
+      }
+    }
   }
+)
+
+private data class ConstructorValues(
+  val maxFailures: Int = 1,
+  val resetTimeout: Duration = 1.seconds,
+  val exponentialBackoffFactor: Double = 1.0,
+  val maxResetTimeout: Duration = Duration.INFINITE,
 )
 
 /**

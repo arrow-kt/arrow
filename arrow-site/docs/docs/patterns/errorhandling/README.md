@@ -222,17 +222,12 @@ suspend fun prepareEither(): Either<CookingException, Salad> =
 
 ### Alternative validation strategies : Failing fast vs accumulating errors
 
-In this different validation example, we demonstrate how we can use `Validated` to perform validation with error accumulation or short-circuit strategies.
+In this different validation example, we demonstrate how we can use `mapAccumulating` to perform error accumulation strategies vs short-circuit ones.
 
 ```kotlin
 import arrow.core.Nel
-import arrow.core.ValidatedNel
 import arrow.core.computations.either
 import arrow.core.handleErrorWith
-import arrow.core.invalidNel
-import arrow.core.traverseEither
-import arrow.core.traverseValidated
-import arrow.core.validNel
 import arrow.typeclasses.Semigroup
 import arrow.core.zip
 ```
@@ -262,36 +257,31 @@ sealed class Strategy {
 /** Abstracts away invoke strategy **/
 object Rules {
 
-  private fun FormField.contains(needle: String): ValidatedNel<ValidationError, FormField> =
-    if (value.contains(needle, false)) validNel()
-    else ValidationError.DoesNotContain(needle).invalidNel()
+  private fun FormField.contains(needle: String): EitherNel<ValidationError, FormField> =
+    if (value.contains(needle, false)) rightNel()
+    else ValidationError.DoesNotContain(needle).leftNel()
 
-  private fun FormField.maxLength(maxLength: Int): ValidatedNel<ValidationError, FormField> =
-    if (value.length <= maxLength) validNel()
-    else ValidationError.MaxLength(maxLength).invalidNel()
+  private fun FormField.maxLength(maxLength: Int): EitherNel<ValidationError, FormField> =
+    if (value.length <= maxLength) rightNel()
+    else ValidationError.MaxLength(maxLength).leftNel()
 
-  private fun FormField.validateErrorAccumulate(): ValidatedNel<ValidationError, Email> =
-  contains("@").zip(
-      Semigroup.nonEmptyList(), // accumulates errors in a non empty list, can be omited for NonEmptyList
+  private fun FormField.validateErrorAccumulate(): EitherNel<ValidationError, Email> =
+    contains("@").zip(
       maxLength(250)
-    ) { _, _ -> Email(value) }.handleErrorWith { ValidationError.NotAnEmail(it).invalidNel() }
+    ) { _, _ -> Email(value) }.handleErrorWith { ValidationError.NotAnEmail(it).leftNel() }
 
   /** either blocks support binding over Validated values with no additional cost or need to convert first to Either **/
-  private fun FormField.validateFailFast(): Either<Nel<ValidationError>, Email> =
-    either.eager {
+  private fun FormField.validateFailFast(): EitherNel<ValidationError, Email> =
+    either {
       contains("@").bind() // fails fast on first error found
       maxLength(250).bind()
       Email(value)
     }
 
-  operator fun invoke(strategy: Strategy, fields: List<FormField>): Either<Nel<ValidationError>, List<Email>> =
+  operator fun invoke(strategy: Strategy, fields: List<FormField>): EitherNel<ValidationError, List<Email>> =
     when (strategy) {
-      Strategy.FailFast ->
-        fields.traverseEither { it.validateFailFast() }
-      Strategy.ErrorAccumulation ->
-        fields.traverseValidated(Semigroup.nonEmptyList()) {
-          it.validateErrorAccumulate()
-        }.toEither()
+      Strategy.FailFast -> either { fields.map { it.validateFailFast().bind() } }
+      Strategy.ErrorAccumulation -> fields.mapAccumulating { it.validateErrorAccumulate() }
     }
 }
 ```

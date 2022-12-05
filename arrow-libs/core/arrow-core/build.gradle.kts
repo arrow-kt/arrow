@@ -24,6 +24,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
+        api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
         api(libs.kotlin.stdlibCommon)
       }

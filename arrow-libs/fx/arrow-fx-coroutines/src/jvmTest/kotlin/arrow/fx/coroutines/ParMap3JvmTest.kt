@@ -1,19 +1,20 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.withContext
 
-class ParMap3JvmTest : ArrowFxSpec(spec = {
+class ParMap3JvmTest : StringSpec({
   "parMapN 3 returns to original context" {
     val mapCtxName = "parMap3"
 
-    checkAll {
       parallelCtx(3, mapCtxName) { _single, _mapCtx ->
         withContext(_single) {
           Thread.currentThread().name shouldStartWith "single"
@@ -30,7 +31,6 @@ class ParMap3JvmTest : ArrowFxSpec(spec = {
           Thread.currentThread().name shouldStartWith "single"
         }
       }
-    }
   }
 
   "parMapN 3 returns to original context on failure" {

@@ -3,7 +3,6 @@ package arrow.typeclasses;
 import arrow.core.Either;
 import arrow.core.Endo;
 import arrow.core.Option;
-import arrow.core.Validated;
 import kotlin.Pair;
 import kotlin.sequences.Sequence;
 
@@ -17,7 +16,6 @@ public class MonoidUsageTest {
         Monoid<Short> aShort = Monoid.Short();
         Monoid<Boolean> bool = Monoid.Boolean();
         Monoid<Integer> integer = Monoid.Integer();
-
         Monoid<String> string = Monoid.string();
         Monoid<List<Integer>> list = Monoid.list();
         Monoid<Sequence<Integer>> sequence = Monoid.sequence();
@@ -25,7 +23,6 @@ public class MonoidUsageTest {
         Monoid<Endo<Integer>> endo = Monoid.endo();
         Monoid<Map<String, Integer>> map = Monoid.map(Semigroup.Integer());
         Monoid<Option<Integer>> option = Monoid.option(Semigroup.Integer());
-        Monoid<Validated<Integer, Boolean>> validated = Monoid.validated(Semigroup.Integer(), Monoid.Boolean());
         Monoid<Pair<Boolean, Integer>> pair = Monoid.pair(Monoid.Boolean(), Monoid.Integer());
     }
 }
