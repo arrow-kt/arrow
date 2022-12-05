@@ -4,8 +4,12 @@ package arrow.core.examples.test
 import io.kotest.core.spec.style.StringSpec
 
 class EitherKnitTest : StringSpec({
-  "ExampleEither34" {
-    arrow.core.examples.exampleEither34.test()
+  "ExampleEither33" {
+    arrow.core.examples.exampleEither33.test()
+  }
+
+  "ExampleEither35" {
+    arrow.core.examples.exampleEither35.test()
   }
 
   "ExampleEither36" {
@@ -20,24 +24,20 @@ class EitherKnitTest : StringSpec({
     arrow.core.examples.exampleEither38.test()
   }
 
-  "ExampleEither39" {
-    arrow.core.examples.exampleEither39.test()
+  "ExampleEither40" {
+    arrow.core.examples.exampleEither40.test()
   }
 
   "ExampleEither41" {
     arrow.core.examples.exampleEither41.test()
   }
 
-  "ExampleEither42" {
-    arrow.core.examples.exampleEither42.test()
+  "ExampleEither47" {
+    arrow.core.examples.exampleEither47.test()
   }
 
-  "ExampleEither48" {
-    arrow.core.examples.exampleEither48.test()
-  }
-
-  "ExampleEither53" {
-    arrow.core.examples.exampleEither53.test()
+  "ExampleEither52" {
+    arrow.core.examples.exampleEither52.test()
   }
 
 }) {

@@ -2,9 +2,10 @@
 package arrow.core.examples.exampleEither23
 
 import arrow.core.Either
+import arrow.core.right
 
-val value =
- Either.conditionally(false, { "Error" }, { 42 })
+val x : Either<Int, Int> = 7.right()
+val fold = x.fold({ 1 }, { it + 3 })
 fun main() {
- println(value)
+ println("fold = $fold")
 }

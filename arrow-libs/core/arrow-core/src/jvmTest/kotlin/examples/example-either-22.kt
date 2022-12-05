@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEither22
 import arrow.core.Either
 
 val value =
- Either.conditionally(true, { "Error" }, { 42 })
+ Either.conditionally(false, { "Error" }, { 42 })
 fun main() {
  println(value)
 }

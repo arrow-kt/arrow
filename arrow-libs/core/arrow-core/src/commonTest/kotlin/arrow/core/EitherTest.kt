@@ -12,6 +12,7 @@ import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
 import arrow.core.test.generators.suspendFunThatThrows
 import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -321,8 +322,6 @@ class EitherTest : UnitSpec() {
         val expected: Either<Int, List<Int>> = Right(emptyList())
         
         Right(a).replicate(n) shouldBe expected
-        
-        
         Left(a).replicate(n) shouldBe expected
       }
     }
@@ -334,18 +333,6 @@ class EitherTest : UnitSpec() {
       ) { n: Int, a: Int ->
         Right(a).replicate(n) shouldBe Right(List(n) { a })
         Left(a).replicate(n) shouldBe Left(a)
-      }
-    }
-    
-    "traverse should return list of Right when Right and empty list when Left" {
-      checkAll(
-        Arb.int(),
-        Arb.int(),
-        Arb.int()
-      ) { a: Int, b: Int, c: Int ->
-        Right(a).traverse { emptyList<Int>() } shouldBe emptyList<Int>()
-        Right(a).traverse { listOf(b, c) } shouldBe listOf(Right(b), Right(c))
-        Left(a).traverse { listOf(b, c) } shouldBe emptyList<Int>()
       }
     }
     
@@ -456,129 +443,6 @@ class EitherTest : UnitSpec() {
             unrecoverableState = { handleWithPureFunction(it) }
           )
         }
-      }
-    }
-    
-    "traverse should return list if either is right" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
-      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
-    }
-    
-    "sequence should be consistent with traverse" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { listOf(it) }.sequence() shouldBe either.traverse { listOf(it) }
-      }
-    }
-    
-    "traverseNullable should return non-nullable if either is right" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.traverseNullable { it } shouldBe Right(1)
-      right.traverseNullable { null } shouldBe null
-      left.traverseNullable { it } shouldBe null
-    }
-    
-    "sequence for Nullable should be consistent with traverseNullable" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { it }.sequence() shouldBe either.traverseNullable { it }
-        either.map { null }.sequence() shouldBe null
-      }
-    }
-    
-    "traverse for Option should return option if either is right" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.traverse { Some(it) } shouldBe Some(Right(1))
-      left.traverse { Some(it) } shouldBe None
-    }
-    
-    "sequence for Option should be consistent with traverseOption" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { Some(it) }.sequence() shouldBe either.traverse { Some(it) }
-      }
-    }
-    
-    "traverse for Validated should return validated of either" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.traverse { it.valid() } shouldBe Valid(Right(1))
-      left.traverse { it.valid() } shouldBe Valid(Left("foo"))
-    }
-    
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.map { it.valid() }.sequence() shouldBe either.traverse { it.valid() }
-      }
-    }
-    
-    "bitraverse should wrap either in a list" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.bitraverse({ listOf(it, "bar", "baz") }, { listOf(it, 2, 3) }) shouldBe listOf(Right(1), Right(2), Right(3))
-      left.bitraverse({ listOf(it, "bar", "baz") }, { listOf(it, 2, 3) }) shouldBe
-        listOf(Left("foo"), Left("bar"), Left("baz"))
-    }
-    
-    "bisequence should be consistent with bitraverse" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe either.bitraverse(
-          { listOf(it) },
-          { listOf(it) })
-      }
-    }
-    
-    "bitraverseNullable should wrap either in a nullable" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.bitraverseNullable({ it }, { it.toString() }) shouldBe Right("1")
-      left.bitraverseNullable({ it }, { it.toString() }) shouldBe Left("foo")
-      
-      right.bitraverseNullable({ it }, { null }) shouldBe null
-      left.bitraverseNullable({ null }, { it.toString() }) shouldBe null
-    }
-    
-    "bisequenceNullable should be consistent with bitraverseNullable" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.bimap({ it }, { it }).bisequenceNullable() shouldBe
-          either.bitraverseNullable({ it }, { it })
-      }
-    }
-    
-    "bitraverseOption should wrap either in an option" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.bitraverseOption({ Some(it) }, { Some(it.toString()) }) shouldBe Some(Right("1"))
-      left.bitraverseOption({ Some(it) }, { Some(it.toString()) }) shouldBe Some(Left("foo"))
-    }
-    
-    "bisequenceOption should be consistent with bitraverseOption" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.bimap({ Some(it) }, { Some(it) }).bisequenceOption() shouldBe
-          either.bitraverseOption({ Some(it) }, { Some(it) })
-      }
-    }
-    
-    "bitraverseValidated should return validated of either" {
-      val right: Either<String, Int> = Right(1)
-      val left: Either<String, Int> = Left("foo")
-      
-      right.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Valid(Right(1))
-      left.bitraverseValidated({ it.invalid() }, { it.valid() }) shouldBe Invalid("foo")
-    }
-    
-    "bisequenceValidated should be consistent with bitraverseValidated" {
-      checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
-        either.bimap({ it.invalid() }, { it.valid() }).bisequenceValidated() shouldBe
-          either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
     }
   }

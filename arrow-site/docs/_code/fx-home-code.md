@@ -2,7 +2,7 @@
 library: fx
 ---
 <!--- INCLUDE
-import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 
 data class Street(val name: String) 
@@ -33,7 +33,7 @@ suspend fun process(): List<Employee> {
   val pepe   = parZip({  "Pepe"  }, { company("Arrow") }) { 
     name, company -> Employee(name, company) 
   }
-  // hires in parallel using 'parTraverse'
-  return listOf(audrey, pepe).parTraverse { hire(it) } 
+  // hires in parallel using 'parMap'
+  return listOf(audrey, pepe).parMap { hire(it) } 
 }
 ```

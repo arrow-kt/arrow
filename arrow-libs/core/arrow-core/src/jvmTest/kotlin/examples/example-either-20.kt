@@ -2,10 +2,10 @@
 package arrow.core.examples.exampleEither20
 
 import arrow.core.left
-import arrow.core.getOrElse
+import arrow.core.getOrHandle
 
 val x = "hello".left()
-val getOr7 = x.getOrElse { 7 }
+val value = x.getOrHandle { "$it world!" }
 fun main() {
- println("getOr7 = $getOr7")
+ println("value = $value")
 }

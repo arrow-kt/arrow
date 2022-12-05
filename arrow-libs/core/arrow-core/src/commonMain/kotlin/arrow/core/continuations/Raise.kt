@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -104,12 +103,6 @@ public interface Raise<in R> {
   public fun <A> Either<R, A>.bind(): A = when (this) {
     is Either.Left -> raise(value)
     is Either.Right -> value
-  }
-  
-  /* Will be removed in subsequent PRs for Arrow 2.x.x */
-  public fun <A> Validated<R, A>.bind(): A = when (this) {
-    is Validated.Invalid -> raise(value)
-    is Validated.Valid -> value
   }
   
   /**

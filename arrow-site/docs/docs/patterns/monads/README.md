@@ -467,7 +467,7 @@ Those are called data-types or just types. Let's see the difference!
 
 As you have seen, neither A? nor Option implement Monad directly. Their actual `bind` and `just` capabilities are described by implementing the `Effect` interface.
 
-This is intentional, as you can potentially have several Monad implementations for a single type or even mix non-monadic effects inside `Effect` interfaces in order to provide more expressive DSLs. This is notorious in the actual Arrow implementations where effects such as `Either` can perform different forms of monad bind over multiple types like `Either` and `Validated` using the same idioms.
+This is intentional, as you can potentially have several Monad implementations for a single type or even mix non-monadic effects inside `Effect` interfaces in order to provide more expressive DSLs. This is notorious in the actual Arrow implementations where effects such as `Either` can perform different forms of monad bind over multiple types using the same idioms.
 
 Arrow specifies that Monad capabilities must be implemented by a separate object or class in terms of the `Effect` interface, referred to as the "instance of Monad for type F" or "computation expression for F".
 
