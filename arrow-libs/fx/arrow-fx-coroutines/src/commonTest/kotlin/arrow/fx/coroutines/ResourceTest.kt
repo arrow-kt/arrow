@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.continuations.either
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -543,7 +544,7 @@ class ResourceTest : StringSpec({
           allocate shouldBe seed
           throw original
         } catch (e: Throwable) {
-          release(ExitCase.fromError(e))
+          release(ExitCase(e))
         }
       }
       
@@ -571,7 +572,7 @@ class ResourceTest : StringSpec({
           allocate shouldBe seed
           throw cancellation
         } catch (e: Throwable) {
-          release(ExitCase.fromError(e))
+          release(ExitCase(e))
         }
       }
       

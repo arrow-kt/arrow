@@ -17,9 +17,6 @@ public sealed class ExitCase {
   public companion object {
     public fun ExitCase(error: Throwable): ExitCase =
       if (error is CancellationException) Cancelled(error) else Failure(error)
-
-    public fun fromError(error: Throwable): ExitCase =
-      if (error is CancellationException) Cancelled(error) else Failure(error)
   }
 }
 
