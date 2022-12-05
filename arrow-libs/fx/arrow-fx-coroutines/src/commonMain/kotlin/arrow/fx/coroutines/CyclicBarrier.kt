@@ -17,7 +17,7 @@ import kotlinx.coroutines.CompletableDeferred
  *
  * Models the behavior of java.util.concurrent.CyclicBarrier in Kotlin with `suspend`.
  */
-public class CyclicBarrier @Throws(IllegalArgumentException::class) constructor(public val capacity: Int) {
+public class CyclicBarrier(public val capacity: Int) {
   init {
     require(capacity > 0) {
       "Cyclic barrier must be constructed with positive non-zero capacity $capacity but was $capacity > 0"
