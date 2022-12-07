@@ -1,8 +1,8 @@
 package arrow.fx.stm
 
 import arrow.fx.coroutines.ArrowFxSpec
-import kotlin.time.microseconds
-import kotlin.time.milliseconds
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.milliseconds
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely

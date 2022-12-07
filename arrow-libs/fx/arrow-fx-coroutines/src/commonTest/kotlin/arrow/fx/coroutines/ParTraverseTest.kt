@@ -9,7 +9,7 @@ import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
+import kotlin.time.Duration.Companion.milliseconds
 
 @ExperimentalTime
 class ParTraverseTest : ArrowFxSpec(
