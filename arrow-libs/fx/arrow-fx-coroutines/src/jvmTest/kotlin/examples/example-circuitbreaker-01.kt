@@ -2,9 +2,8 @@
 package arrow.fx.coroutines.examples.exampleCircuitbreaker01
 
 import arrow.core.Either
-import arrow.core.flatten
 import arrow.fx.coroutines.CircuitBreaker
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
 
