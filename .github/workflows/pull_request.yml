@@ -83,20 +83,6 @@ jobs:
         with:
           arguments: mingwX64Test
 
-      - name: Create code coverage report
-        if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew koverMergedReport
-
-      - name: Add coverage report to PR
-        id: kover
-        if: matrix.os == 'ubuntu-latest'
-        uses: mi-kas/kover-report@v1
-        with:
-          path: build/reports/kover/merged/xml/report.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Kover Report
-          update-comment: true
-
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3
@@ -133,6 +119,20 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: check
+
+      - name: Create code coverage report
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: koverMergedReport
+
+      - name: Add coverage report to PR
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: build/reports/kover/merged/xml/report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Kover Report
+          update-comment: true
 
       - name: Upload reports
         if: failure()
