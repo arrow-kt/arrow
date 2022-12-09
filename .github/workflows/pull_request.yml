@@ -121,11 +121,13 @@ jobs:
           arguments: check
 
       - name: Create code coverage report
+        if: "! github.event.pull_request.head.repo.fork "
         uses: gradle/gradle-build-action@v2
         with:
           arguments: koverMergedReport
 
       - name: Add coverage report to PR
+        if: "! github.event.pull_request.head.repo.fork "
         id: kover
         uses: mi-kas/kover-report@v1
         with:
