@@ -7,23 +7,35 @@ import arrow.core.identity
 /**
  * DSL Receiver Syntax for [result].
  */
-@Deprecated("$deprecatedInFavorOfEagerEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
+@Deprecated(
+  "ResultEffect is replaced with arrow.core.raise.ResultRaise",
+  ReplaceWith("ResultRaise", "arrow.core.raise.ResultRaise")
+)
 public object ResultEffect {
 
-  @Deprecated("$deprecatedInFavorOfEagerEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
+  @Deprecated(
+    "This object introduces dangerous behavior.",
+    level = DeprecationLevel.ERROR
+  )
   public fun <A> Result<A>.bind(): A =
     getOrThrow()
-
-  @Deprecated("$deprecatedInFavorOfEagerEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
+  
+  @Deprecated(
+    "This object introduces dangerous behavior.",
+    level = DeprecationLevel.ERROR
+  )
   public fun <A> Either<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
-
-  @Deprecated("$deprecatedInFavorOfEagerEffectScope\nThis object introduces dangerous behavior and will be removed in the next version: https://github.com/arrow-kt/arrow/issues/2547")
+  
+  @Deprecated(
+    "This object introduces dangerous behavior.",
+    level = DeprecationLevel.ERROR
+  )
   public fun <A> Validated<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
 }
 
-@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("result", "arrow.core.continuations.result"))
+@Deprecated(resultDSLDeprecation, ReplaceWith("result", "arrow.core.raise.result"))
 @Suppress("ClassName")
 public object result {
 
@@ -54,7 +66,14 @@ public object result {
    * ```
    * <!--- KNIT example-result-computations-01.kt -->
    */
-  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("result.eager(block)", "arrow.core.continuations.result"))
+  @Deprecated(
+    resultDSLDeprecation,
+    ReplaceWith("result(block)", "arrow.core.raise.result")
+  )
   public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
     kotlin.runCatching { block(ResultEffect) }
 }
+
+private const val resultDSLDeprecation =
+  "The result DSL has been moved to arrow.core.raise.result.\n" +
+    "Replace import arrow.core.computations.* with arrow.core.raise.*"

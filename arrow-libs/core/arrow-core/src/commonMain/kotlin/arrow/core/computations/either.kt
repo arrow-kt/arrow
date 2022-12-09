@@ -11,26 +11,29 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
-@Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("EffectScope<E>", "arrow.core.continuations.EffectScope"))
+@Deprecated(
+  "EitherEffect is replaced with arrow.core.raise.Raise<E>",
+  ReplaceWith("Raise<E>", "arrow.core.raise.Raise")
+)
 public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
-
+  
   public suspend fun <B> Either<E, B>.bind(): B =
     when (this) {
       is Either.Right -> value
       is Left -> control().shift(this@bind)
     }
-
+  
   public suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
       is Validated.Invalid -> control().shift(Left(value))
     }
-
+  
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> E): B =
     fold(::identity) { throwable ->
       control().shift(transform(throwable).left())
     }
-
+  
   /**
    * Ensure check if the [value] is `true`,
    * and if it is it allows the `either { }` binding to continue.
@@ -85,34 +88,41 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
  * ```
  * <!--- KNIT example-either-computations-02.kt -->
  */
-@Deprecated(deprecateInFavorOfEffectScope)
+@Deprecated(
+  "Replaced by Raise, replace arrow.core.computations.ensureNotNull to arrow.core.raise.ensureNotNull",
+  ReplaceWith(
+    "ensureNotNull(value, orLeft)",
+    "import arrow.core.raise.ensureNotNull"
+  )
+)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <E, B : Any> EitherEffect<E, *>.ensureNotNull(value: B?, orLeft: () -> E): B {
   contract {
     returns() implies (value != null)
   }
-
+  
   return value ?: orLeft().left().bind()
 }
 
-@Deprecated(deprecatedInFavorOfEagerEffectScope, ReplaceWith("EagerEffectScope<E>", "arrow.core.continuations.EagerEffectScope"))
+@Deprecated(
+  "RestrictedEitherEffect is replaced with arrow.core.raise.Raise<E>",
+  ReplaceWith("Raise<E>", "arrow.core.raise.Raise")
+)
 @RestrictsSuspension
 public fun interface RestrictedEitherEffect<E, A> : EitherEffect<E, A>
 
-@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("either", "arrow.core.continuations.either"))
+@Deprecated(eitherDSLDeprecation, ReplaceWith("either", "arrow.core.raise.either"))
 @Suppress("ClassName")
 public object either {
-  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("either.eager(c)", "arrow.core.continuations.either"))
+  @Deprecated(eitherDSLDeprecation, ReplaceWith("either(c)", "arrow.core.raise.either"))
   public inline fun <E, A> eager(crossinline c: suspend RestrictedEitherEffect<E, *>.() -> A): Either<E, A> =
     Effect.restricted(eff = { RestrictedEitherEffect { it } }, f = c, just = { it.right() })
-
-  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("either(c)", "arrow.core.continuations.either"))
+  
+  @Deprecated(eitherDSLDeprecation, ReplaceWith("either(c)", "arrow.core.raise.either"))
   public suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
     Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }
 
-internal const val deprecatedInFavorOfEagerEffectScope: String = "Deprecated in favor of Eager Effect DSL: EagerEffectScope"
-internal const val deprecateInFavorOfEffectScope: String = "Deprecated in favor of Effect DSL: EffectScope"
-internal const val deprecateInFavorOfEffect: String = "Deprecated in favor of the Effect Runtime"
-internal const val deprecateInFavorOfEagerEffect: String = "Deprecated in favor of the EagerEffect Runtime"
-internal const val deprecateInFavorOfEffectOrEagerEffect: String = "Deprecated in favor of the Effect or EagerEffect Runtime"
+private const val eitherDSLDeprecation =
+  "The either DSL has been moved to arrow.core.raise.either.\n" +
+    "Replace import arrow.core.computations.* with arrow.core.raise.*"

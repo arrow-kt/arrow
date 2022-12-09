@@ -18,6 +18,10 @@ import kotlin.coroutines.RestrictsSuspension
  * An [effect] computation interoperates with an [EagerEffect] via `bind`.
  * @see Effect
  */
+@Deprecated(
+  "Use the arrow.core.raise.Effect type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick."
+)
 public interface EagerEffect<out R, out A> {
 
   /**
@@ -161,6 +165,11 @@ internal class Eager(val token: Token, val shifted: Any?, val recover: (Any?) ->
  * ```
  * <!--- KNIT example-eager-effect-02.kt -->
  */
+@Deprecated(
+  "Use the arrow.core.raise.effect DSL instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith("eagerEffect(f)", "arrow.core.raise.eagerEffect")
+)
 public fun <R, A> eagerEffect(f: suspend EagerEffectScope<R>.() -> A): EagerEffect<R, A> = DefaultEagerEffect(f)
 
 private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R>.() -> A) : EagerEffect<R, A> {
