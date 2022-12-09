@@ -1,9 +1,12 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.continuations.AtomicRef
+import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.left
 import io.kotest.assertions.fail
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -21,6 +24,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlin.random.Random
 
 class ResourceTest : ArrowFxSpec(
   spec = {
@@ -28,20 +32,25 @@ class ResourceTest : ArrowFxSpec(
     "Can consume resource" {
       checkAll(Arb.int()) { n ->
         val r = Resource({ n }, { _, _ -> Unit })
-
         r.use { it + 1 } shouldBe n + 1
       }
     }
 
     "flatMap resource is released first" {
       checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
-        val l = mutableListOf<Int>()
-        fun r(n: Int) = Resource({ n.also(l::add) }, { it, _ -> l.add(-it) })
+        val l = AtomicRef<List<Int>>(mutableListOf())
+        fun r(n: Int) = Resource(
+          {
+            l.update { it + n }
+            n
+          },
+          { x, _ -> l.update { it + (-x) } }
+        )
 
         r(a).flatMap { r(it + b) }
           .use { it + 1 } shouldBe (a + b) + 1
 
-        l.shouldContainExactly(a, a + b, -a - b, -a)
+        l.get().shouldContainExactly(a, a + b, -a - b, -a)
       }
     }
 
@@ -144,9 +153,9 @@ class ResourceTest : ArrowFxSpec(
     val depth: Int = 100
 
     class CheckableAutoClose {
-      var started = true
+      var started: AtomicRef<Boolean> = AtomicRef(true)
       fun close() {
-        started = false
+        started.update { _ -> false }
       }
     }
 
@@ -157,18 +166,16 @@ class ResourceTest : ArrowFxSpec(
       val all = (1..depth).traverse { closeable() }.parZip(
         (1..depth).traverse { closeable() }
       ) { a, b -> a + b }.use { all ->
-        all.also { all.forEach { it.started shouldBe true } }
+        all.also { all.forEach { it.started.get() shouldBe true } }
       }
-      all.forEach { it.started shouldBe false }
+      all.forEach { it.started.get() shouldBe false }
     }
 
     fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
       val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
-      val res = promises.fold(Resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
-        acc.flatMap { ii: Int ->
-          Resource({ ii + i }) { _, _ ->
-            require(promise.complete(i))
-          }
+      val res = promises.fold(resource({ 0 }) { _, _ -> }) { acc, (i, p) ->
+        resource {
+          acc.bind() + install({ i }) { ii, _ -> p.complete(ii) }
         }
       }
       return Pair(promises.map { it.second }, res)
@@ -217,15 +224,19 @@ class ResourceTest : ArrowFxSpec(
           val res = if (isLeft) Resource({
             latch.await() shouldBe (1..depth).sum()
             throw cancel
-          }) { _, _ -> }.parZip(resource.flatMap {
-            Resource({ require(latch.complete(it)) }) { _, _ -> }
-          }) { _, _ -> }
+          }) { _, _ -> }.parZip(
+            resource.flatMap {
+              Resource({ require(latch.complete(it)) }) { _, _ -> }
+            }
+          ) { _, _ -> }
           else resource.flatMap {
             Resource({ require(latch.complete(it)) }) { _, _ -> }
-          }.parZip(Resource({
-            latch.await() shouldBe (1..depth).sum()
-            throw cancel
-          }) { _, _ -> }) { _, _ -> }
+          }.parZip(
+            Resource({
+              latch.await() shouldBe (1..depth).sum()
+              throw cancel
+            }) { _, _ -> }
+          ) { _, _ -> }
 
           res.use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
@@ -265,9 +276,11 @@ class ResourceTest : ArrowFxSpec(
             started.await()
             throw cancel
           }) { _, _ -> }
-            .parZip(Resource({ require(started.complete(Unit)); i }, { ii, ex ->
-              require(released.complete(ii to ex))
-            })) { _, _ -> }
+            .parZip(
+              Resource({ require(started.complete(Unit)); i }, { ii, ex ->
+                require(released.complete(ii to ex))
+              })
+            ) { _, _ -> }
             .use { fail("It should never reach here") }
         }.shouldBeTypeOf<CancellationException>()
 
@@ -310,7 +323,8 @@ class ResourceTest : ArrowFxSpec(
               Resource(
                 { require(started.complete(Unit)); i },
                 { ii, ex -> require(released.complete(ii to ex)) }
-              )) { _, _ -> }
+              )
+            ) { _, _ -> }
             .use { fail("It should never reach here") }
         } shouldBe throwable
 
@@ -426,10 +440,12 @@ class ResourceTest : ArrowFxSpec(
           modifyGate.await()
           r.update { i -> "$i$a" }
         }) { _, _ -> }
-          .parZip(Resource({
-            r.set("$b")
-            require(modifyGate.complete(0))
-          }) { _, _ -> }) { _a, _b -> _a to _b }
+          .parZip(
+            Resource({
+              r.set("$b")
+              require(modifyGate.complete(0))
+            }) { _, _ -> }
+          ) { _a, _b -> _a to _b }
           .use {
             r.get() shouldBe "$b$a"
           }
@@ -441,6 +457,47 @@ class ResourceTest : ArrowFxSpec(
         val r = Resource({ n }, { _, _ -> Unit })
 
         r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
+      }
+    }
+
+    suspend fun checkAllocated(mkResource: (() -> Int, (Int, ExitCase) -> Unit) -> Resource<Int>) {
+      listOf(
+        ExitCase.Completed,
+        ExitCase.Failure(Exception()),
+        ExitCase.Cancelled(CancellationException(null, null))
+      ).forAll { exit ->
+        val released = CompletableDeferred<Int>()
+        val seed = Random.nextInt()
+
+        val (allocate, release) = mkResource({ seed }) { i, _ -> released.complete(i) }.allocated()
+
+        release(allocate(), exit)
+
+        released.getCompleted() shouldBe seed
+      }
+    }
+
+    "allocated - Allocate" {
+      checkAllocated { allocate, release ->
+        Resource(allocate, release)
+      }
+    }
+
+    "allocated - Defer" {
+      checkAllocated { allocate, release ->
+        Resource.defer { Resource(allocate, release) }
+      }
+    }
+
+    "allocated - Bind" {
+      checkAllocated { allocate, release ->
+        Resource.Bind(Resource(allocate, release)) { Resource.just(it) }
+      }
+    }
+
+    "allocated - Dsl" {
+      checkAllocated { allocate, close ->
+        arrow.fx.coroutines.continuations.resource { allocate() } releaseCase (close)
       }
     }
   }

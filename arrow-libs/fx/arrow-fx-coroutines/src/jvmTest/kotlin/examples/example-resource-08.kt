@@ -3,12 +3,33 @@ package arrow.fx.coroutines.examples.exampleResource08
 
 import arrow.fx.coroutines.*
 
-suspend fun acquireResource(): Int = 42.also { println("Getting expensive resource") }
-suspend fun releaseResource(r: Int, exitCase: ExitCase): Unit = println("Releasing expensive resource: $r, exit: $exitCase")
+class UserProcessor {
+  fun start(): Unit = println("Creating UserProcessor")
+  fun shutdown(): Unit = println("Shutting down UserProcessor")
+  fun process(ds: DataSource): List<String> =
+   ds.users().map { "Processed $it" }
+}
+
+class DataSource {
+  fun connect(): Unit = println("Connecting dataSource")
+  fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+  fun close(): Unit = println("Closed dataSource")
+}
+
+class Service(val db: DataSource, val userProcessor: UserProcessor) {
+  suspend fun processData(): List<String> = userProcessor.process(db)
+}
+
+val userProcessor = resource {
+  UserProcessor().also(UserProcessor::start)
+} release UserProcessor::shutdown
+
+val dataSource = resource {
+  DataSource().also { it.connect() }
+} release DataSource::close
 
 suspend fun main(): Unit {
-  val resource = Resource(::acquireResource, ::releaseResource)
-  resource.use {
-    println("Expensive resource under use! $it")
-  }
+  userProcessor.zip(dataSource) { userProcessor, ds ->
+      Service(ds, userProcessor)
+    }.use { service -> service.processData() }
 }

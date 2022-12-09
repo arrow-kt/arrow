@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
   repositories {
     mavenCentral()
@@ -104,4 +106,14 @@ apiValidation {
   }
 
   ignoredProjects.addAll(ignoreApiValidation)
+}
+
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().apply {
+    versions.webpackDevServer.version = "4.11.1"
+    versions.webpack.version = "5.75.0"
+    versions.webpackCli.version = "4.10.0"
+    versions.karma.version = "6.4.1"
+    versions.mocha.version = "10.1.0"
+  }
 }
