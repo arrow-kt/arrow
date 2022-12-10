@@ -11,7 +11,7 @@ import kotlinx.coroutines.CompletableDeferred
  * Must be initialised with an [initial] value of 1 or higher,
  * if constructed with 0 or negative value then it throws [IllegalArgumentException].
  */
-public class CountDownLatch @Throws(IllegalArgumentException::class) constructor(private val initial: Long) {
+public class CountDownLatch(private val initial: Long) {
   private val signal = CompletableDeferred<Unit>()
   private val count = Atomic(initial)
   

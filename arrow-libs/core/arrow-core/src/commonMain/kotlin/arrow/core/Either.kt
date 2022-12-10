@@ -473,7 +473,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-either-15.kt -->
  *
  * For using Either's syntax on arbitrary data types.
- * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
+ * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` methods:
  *
  * ```kotlin
  * import arrow.core.right
@@ -743,7 +743,6 @@ import kotlin.jvm.JvmStatic
  *
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
- *
  */
 public sealed class Either<out A, out B> {
   
@@ -891,7 +890,7 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
-    recover { a -> raise(f(a)) }
+    fold({ Left(f(it)) }, { Right(it) })
   
   @Deprecated(
     "tapLeft is being renamed to onLeft to be more consistent with the Kotlin Standard Library naming",
@@ -1115,7 +1114,7 @@ public sealed class Either<out A, out B> {
       ReplaceWith("(this is Either.Left<*>)")
     )
     override val isLeft = true
-    
+
     @Deprecated(
       RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
       ReplaceWith("(this is Either.Right<*>)")
@@ -1140,7 +1139,7 @@ public sealed class Either<out A, out B> {
       ReplaceWith("(this is Either.Left<*>)")
     )
     override val isLeft = false
-    
+
     @Deprecated(
       RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
       ReplaceWith("(this is Either.Right<*>)")
@@ -1160,7 +1159,7 @@ public sealed class Either<out A, out B> {
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-  
+
   public companion object {
     
     @Deprecated(
@@ -1228,7 +1227,6 @@ public sealed class Either<out A, out B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
-    @Deprecated(NicheAPI + "Prefer using recover, catch and the either DSL to work with errors")
     @JvmStatic
     public inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
@@ -1237,15 +1235,13 @@ public sealed class Either<out A, out B> {
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
     ): B =
-      catch(f).flatMap {
-        it.fold({ e: E -> catch { error(e) } }, { a: A -> catch { success(a) } }).flatten()
-      }.recover<Throwable, Throwable, B> { t: Throwable ->
-        throwable(t).bind()
-      }.getOrElse { t: Throwable ->
-        unrecoverableState(t)
-        throw t
-      }
-    
+      catch(f)
+        .fold(
+          { t: Throwable -> throwable(t) },
+          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
+        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
+
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
      *  that can be applied over all [Either] values in the shape of Either<A, B>
@@ -1413,7 +1409,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  */
 @Deprecated(
   RedundantAPI + "Use other getOrElse signature",
-  ReplaceWith("getOrHandle(default)")
+  ReplaceWith("getOrElse(default)")
 )
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1569,7 +1565,10 @@ public fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   ReplaceWith("recover { y.bind() }")
 )
 public fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
-  recover { y.bind() }
+  when (this) {
+    is Left -> y
+    else -> this
+  }
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
@@ -1617,21 +1616,30 @@ public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
   ReplaceWith("recover { a -> f(a).bind() }")
 )
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  recover { a -> f(a).bind() }
+  when (this) {
+    is Left -> f(this.value)
+    is Right -> this
+  }
 
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
   ReplaceWith("recover { a -> f(a) }")
 )
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  recover { a -> f(a) }
+  when (this) {
+    is Left -> f(value).right()
+    is Right -> this
+  }
 
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
   ReplaceWith("map(fa).recover { a -> fe(a) }")
 )
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  map(fa).recover { a -> fe(a) }
+  when (this) {
+    is Left -> fe(value).right()
+    is Right -> map(fa)
+  }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
@@ -1697,12 +1705,59 @@ public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }
 
-@Deprecated(
-  NicheAPI + "Prefer using the Either DSL, and recover",
-  ReplaceWith("fold(fa, fb)")
-)
 public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
   fold(fa, fb)
+
+@Deprecated(
+  "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
+  ReplaceWith(
+    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "arrow.core.right",
+  )
+)
+public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
+  fold({ emptyList() }, { iterable -> iterable.map { it.right() } })
+
+@Deprecated(
+  "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
+  ReplaceWith(
+    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "arrow.core.right",
+  )
+)
+public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
+  sequence()
+
+@Deprecated(
+  "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
+  ReplaceWith(
+    "orNull()?.orNull()?.right().toOption()",
+    "arrow.core.toOption",
+    "arrow.core.right",
+    "arrow.core.left"
+  )
+)
+public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
+  orNull()?.orNull()?.right().toOption()
+
+@Deprecated(
+  "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
+  ReplaceWith(
+    "fold({ it.left() }, { it.orNull()?.right() }).toOption()",
+    "arrow.core.toOption",
+    "arrow.core.right",
+    "arrow.core.left"
+  )
+)
+public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
+  sequence()
+
+@Deprecated(
+  "Prefer Kotlin nullable syntax",
+  ReplaceWith("orNull()?.right()", "arrow.core.right")
+)
+public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
+  orNull()?.right()
 
 public const val NicheAPI: String =
   "This API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"

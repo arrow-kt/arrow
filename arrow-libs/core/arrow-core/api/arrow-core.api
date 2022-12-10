@@ -261,6 +261,11 @@ public final class arrow/core/EitherKt {
 	public static final fun right (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun rightIfNotNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun rightIfNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/Either;)Ljava/util/List;
+	public static final fun sequenceNullable (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun toEitherNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
