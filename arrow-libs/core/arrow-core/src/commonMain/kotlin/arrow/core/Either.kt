@@ -492,7 +492,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-either-16.kt -->
  *
  * For using Either's syntax on arbitrary data types.
- * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
+ * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` methods:
  *
  * ```kotlin
  * import arrow.core.right
@@ -762,7 +762,6 @@ import kotlin.jvm.JvmStatic
  *
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
- *
  */
 public sealed class Either<out A, out B> {
   
@@ -910,7 +909,7 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
-    recover { a -> shift(f(a)) }
+    fold({ Left(f(it)) }, { Right(it) })
   
   @Deprecated(
     "tapLeft is being renamed to onLeft to be more consistent with the Kotlin Standard Library naming",
@@ -1304,7 +1303,6 @@ public sealed class Either<out A, out B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
-    @Deprecated(NicheAPI + "Prefer using recover, catch and the either DSL to work with errors")
     @JvmStatic
     public inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
@@ -1313,15 +1311,13 @@ public sealed class Either<out A, out B> {
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
     ): B =
-      catch(f).flatMap {
-        it.fold({ e: E -> catch { error(e) } }, { a: A -> catch { success(a) } }).flatten()
-      }.recover { t: Throwable ->
-        throwable(t).bind()
-      }.getOrElse { t: Throwable ->
-          unrecoverableState(t)
-          throw t
-        }
-    
+      catch(f)
+        .fold(
+          { t: Throwable -> throwable(t) },
+          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
+        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
+
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
      *  that can be applied over all [Either] values in the shape of Either<A, B>
@@ -1446,7 +1442,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  */
 @Deprecated(
   RedundantAPI + "Use other getOrElse signature",
-  ReplaceWith("getOrHandle(default)")
+  ReplaceWith("getOrElse(default)")
 )
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1597,12 +1593,11 @@ public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B
 public fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   fold({ false }) { it == elem }
 
-@Deprecated(
-  RedundantAPI + "Prefer the Either DSL, or new recover API",
-  ReplaceWith("recover { y.bind() }")
-)
 public fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
-  recover { y.bind() }
+  when (this) {
+    is Left -> y
+    else -> this
+  }
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
@@ -1641,30 +1636,24 @@ public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> =
 public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
   this?.let { default().left() } ?: null.right()
 
-/**
- * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
- * This is like `flatMap` for the exception.
- */
-@Deprecated(
-  RedundantAPI + "Prefer the new recover API",
-  ReplaceWith("recover { a -> f(a).bind() }")
-)
+
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  recover { a -> f(a).bind() }
+  when (this) {
+    is Left -> f(this.value)
+    is Right -> this
+  }
 
-@Deprecated(
-  RedundantAPI + "Prefer the new recover API",
-  ReplaceWith("recover { a -> f(a) }")
-)
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  recover { a -> f(a) }
+  when (this) {
+    is Left -> f(value).right()
+    is Right -> this
+  }
 
-@Deprecated(
-  RedundantAPI + "Prefer the new recover API",
-  ReplaceWith("map(fa).recover { a -> fe(a) }")
-)
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  map(fa).recover { a -> fe(a) }
+  when (this) {
+    is Left -> fe(value).right()
+    is Right -> map(fa)
+  }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
@@ -1894,10 +1883,6 @@ public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }
 
-@Deprecated(
-  NicheAPI + "Prefer using the Either DSL, and recover",
-  ReplaceWith("fold(fa, fb)")
-)
 public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
   fold(fa, fb)
 
@@ -1980,152 +1965,3 @@ public const val NicheAPI: String =
 
 public const val RedundantAPI: String =
   "This API is considered redundant. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"
-
-/**
- * Recover from any [Either.Left] if encountered.
- *
- * The recover DSL allows you to recover from any [Either.Left] value by:
- *  - Computing a fallback value [A], and resolve the left type [E] to [Nothing].
- *  - Shifting a _new error_ of type [EE] into the [Either.Left] channel.
- *
- * When providing a fallback value [A],
- * the [Either.Left] type is discarded because the error was handled correctly.
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.recover
- * import io.kotest.matchers.shouldBe
- *
- * fun test() {
- *   val error: Either<String, Int> = Either.Left("error")
- *   val fallback: Either<Nothing, Int> = error.recover { it.length }
- *   fallback shouldBe Either.Right(5)
- * }
- * ```
- * <!--- KNIT example-either-55.kt -->
- * <!--- TEST lines.isEmpty() -->
- *
- * When shifting a new error [EE] into the [Either.Left] channel,
- * the [Either.Left] is _transformed_ from [E] to [EE] since we shifted a _new error_.
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.recover
- * import io.kotest.matchers.shouldBe
- *
- * fun test() {
- *   val error: Either<String, Int> = Either.Left("error")
- *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
- *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
- * }
- * ```
- * <!--- KNIT example-either-56.kt -->
- * <!--- TEST lines.isEmpty() -->
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: RecoverEffect<EE>.(E) -> A): Either<EE, A> =
-  when (this) {
-    is Right -> this
-    is Left -> {
-      val effect = DefaultRecoverEffect<EE>()
-      try {
-        recover(effect, value).right()
-      } catch (e: Eager) {
-        if (e.token === effect) (e.shifted as EE).left()
-        else throw e
-      }
-    }
-  }
-
-/**
- * Catch allows for transforming [Throwable] in the [Either.Left] side.
- * This API is the same as [recover],
- * but offers the same APIs for working over [Throwable] as [Effect] & [EagerEffect].
- *
- * This is useful when working with [Either.catch] since this API offers a `reified` variant.
- * The reified version allows you to refine `Throwable` to `T : Throwable`,
- * where any `Throwable` not matching the `t is T` predicate will be rethrown.
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.catch
- * import io.kotest.assertions.throwables.shouldThrowUnit
- * import io.kotest.matchers.shouldBe
- *
- * fun test() {
- *   val left: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
- *
- *   val caught: Either<Nothing, Int> = left.catch { _: Throwable -> 1 }
- *   val failure: Either<String, Int> = left.catch { _: Throwable -> shift("failure") }
- *
- *   shouldThrowUnit<RuntimeException> {
- *     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }
- *   }
- *
- *   caught shouldBe Either.Right(1)
- *   failure shouldBe Either.Left("failure")
- * }
- * ```
- * <!--- KNIT example-either-57.kt -->
- * <!--- TEST lines.isEmpty() -->
- */
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(Throwable) -> A): Either<E, A> =
-  when (this) {
-    is Right -> this
-    is Left -> {
-      val effect = DefaultRecoverEffect<E>()
-      try {
-        catch(effect, value).right()
-      } catch (e: Eager) {
-        if (e.token === effect) (e.shifted as E).left()
-        else throw e
-      }
-    }
-  }
-
-@JvmName("catchReified")
-@OptIn(ExperimentalTypeInference::class)
-public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: RecoverEffect<E>.(T) -> A): Either<E, A> =
-  catch { e -> if (e is T) catch(e) else throw e }
-
-// Temporary types to back-port API of 2.x.x
-public interface RecoverEffect<R> {
-  public fun <B> shift(r: R): B
-  public suspend fun <B> Effect<R, B>.bind(): B = fold({ shift(it) }, ::identity)
-  public fun <B> EagerEffect<R, B>.bind(): B = fold({ shift(it) }, ::identity)
-  public fun <B> Either<R, B>.bind(): B =
-    when (this) {
-      is Left -> shift(value)
-      is Right -> value
-    }
-  
-  public fun <B> Validated<R, B>.bind(): B =
-    when (this) {
-      is Validated.Valid -> value
-      is Validated.Invalid -> shift(value)
-    }
-  
-  public fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
-    fold(::identity) { throwable -> shift(transform(throwable)) }
-  
-  public fun <B> Option<B>.bind(shift: () -> R): B =
-    when (this) {
-      None -> shift(shift())
-      is Some -> value
-    }
-  
-  public fun ensure(condition: Boolean, shift: () -> R): Unit =
-    if (condition) Unit else shift(shift())
-}
-
-@OptIn(ExperimentalContracts::class)
-public inline fun <R, B : Any> RecoverEffect<R>.ensureNotNull(value: B?, shift: () -> R): B {
-  contract { returns() implies (value != null) }
-  return value ?: shift(shift())
-}
-
-@PublishedApi
-internal class DefaultRecoverEffect<R> : RecoverEffect<R>, Token() {
-  override fun <B> shift(r: R): B = throw Eager(this, r) { it }
-}
