@@ -48,10 +48,6 @@ jobs:
         with:
           arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
 
-      - name: Get Arrow version
-        id: version
-        run: echo "::set-output name=arrow::$(head -n 1 build/semver/version.txt)"
-
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3
