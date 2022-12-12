@@ -41,7 +41,7 @@ jobs:
       - name: assemble
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
+          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true -Psemver.stage=snapshot -Psemver.scope=major
 
       - name: Upload reports
         if: failure()
@@ -50,7 +50,7 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Publish alpha/beta/rc version
+      - name: Publish next major SNAPSHOT version
         uses: gradle/gradle-build-action@v2
         with:
           arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype -Psemver.stage=snapshot -Psemver.scope=major
