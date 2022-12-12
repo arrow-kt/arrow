@@ -3092,6 +3092,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 	public final fun Long ()Larrow/typeclasses/Monoid;
 	public final fun Short ()Larrow/typeclasses/Monoid;
 	public final fun constant (Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
+	public final synthetic fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun endo ()Larrow/typeclasses/Monoid;
 	public final fun list ()Larrow/typeclasses/Monoid;
