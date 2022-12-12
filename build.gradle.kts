@@ -27,7 +27,7 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
-  // alias(libs.plugins.arrowGradleConfig.versioning)
+   alias(libs.plugins.arrowGradleConfig.versioning)
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
