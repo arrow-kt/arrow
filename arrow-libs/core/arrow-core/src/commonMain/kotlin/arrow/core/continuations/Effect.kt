@@ -679,7 +679,9 @@ public interface Effect<out R, out A> {
  * code, you can use this type to differentiate between a foreign [CancellationException] and the
  * one from [Effect].
  */
-public sealed class ShiftCancellationException : CancellationException("Shifted Continuation")
+public sealed class ShiftCancellationException : CancellationExceptionNoTrace()
+
+public expect open class CancellationExceptionNoTrace() : CancellationException
 
 /**
  * Holds `R` and `suspend (R) -> B`, the exception that wins the race, will get to execute
