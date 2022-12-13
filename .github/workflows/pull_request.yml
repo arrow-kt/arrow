@@ -120,6 +120,22 @@ jobs:
         with:
           arguments: check
 
+      - name: Create code coverage report
+        if: "! github.event.pull_request.head.repo.fork "
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: koverMergedReport
+
+      - name: Add coverage report to PR
+        if: "! github.event.pull_request.head.repo.fork "
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: build/reports/kover/merged/xml/report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Kover Report
+          update-comment: true
+
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3

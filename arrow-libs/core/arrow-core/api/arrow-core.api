@@ -261,6 +261,11 @@ public final class arrow/core/EitherKt {
 	public static final fun right (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun rightIfNotNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun rightIfNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequence (Larrow/core/Either;)Larrow/core/Option;
+	public static final fun sequence (Larrow/core/Either;)Ljava/util/List;
+	public static final fun sequenceNullable (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun toEitherNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
@@ -2652,6 +2657,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 	public final fun Long ()Larrow/typeclasses/Monoid;
 	public final fun Short ()Larrow/typeclasses/Monoid;
 	public final fun constant (Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
+	public final synthetic fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun endo ()Larrow/typeclasses/Monoid;
 	public final fun list ()Larrow/typeclasses/Monoid;

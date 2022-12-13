@@ -23,10 +23,11 @@ plugins {
   alias(libs.plugins.dokka)
   alias(libs.plugins.animalSniffer) apply false
   alias(libs.plugins.kotest.multiplatform) apply false
+  alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
-  // alias(libs.plugins.arrowGradleConfig.versioning)
+   alias(libs.plugins.arrowGradleConfig.versioning)
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
@@ -41,6 +42,24 @@ configure<kotlinx.knit.KnitPluginExtension> {
 
     exclude("**/build/**")
     exclude("**/.gradle/**")
+  }
+}
+
+koverMerged {
+  enable()
+  filters {
+    projects {
+      excludes.addAll(
+        listOf(
+          ":arrow-annotations",
+          ":arrow-core-test",
+          ":arrow-fx-coroutines-test",
+          ":arrow-optics-test",
+          ":arrow-site",
+          ":arrow-stack"
+        )
+      )
+    }
   }
 }
 
