@@ -1,0 +1,56 @@
+name: "Publish all libs, Arrow-stack and Docs"
+
+on:
+  push:
+    branch:
+      - 'arrow-2'
+      - 'arrow-2.0.0-SNAPSHOT'
+
+env:
+  BASEDIR: ${{github.workspace}}/arrow-libs
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+  SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+  SONATYPE_PWD: ${{ secrets.SONATYPE_PWD }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_signingKey }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingPassword }}
+  OSS_USER: '${{ secrets.OSS_USER }}'
+  OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
+  OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+  SIGNING_KEY_NAME: '${{ secrets.SIGNING_KEY_NAME }}'
+  SIGNING_KEY_ID: '${{ secrets.SIGNING_KEY_ID }}'
+  SIGNING_KEY_PASSPHRASE: '${{ secrets.SIGNING_KEY_PASSPHRASE }}'
+  SIGNING_KEY: '${{ secrets.SIGNING_KEY }}'
+  GRADLE_PUBLISH_KEY: '${{ secrets.GRADLE_PUBLISH_KEY }}'
+  GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
+
+jobs:
+  publish:
+    timeout-minutes: 90
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: assemble
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assemble -Pkotlin.mpp.enableCompatibilityMetadataVariant=true -Psemver.stage=snapshot -Psemver.scope=major
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
+
+      - name: Publish next major SNAPSHOT version
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true publishToSonatype -Psemver.stage=snapshot -Psemver.scope=major
