@@ -3,6 +3,7 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -246,4 +247,24 @@ public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R): Unit 
 public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: raise(raise())
+}
+
+/**
+ * Accumulate the errors obtained by executing the [block]
+ * over every element of [list].
+ */
+@EffectDSL
+public fun <R, A, B> Raise<NonEmptyList<R>>.accumulate(
+  list: Iterable<A>,
+  block: Raise<R>.(A) -> B
+): List<B> {
+  val errors = mutableListOf<R>()
+  val results = mutableListOf<B>()
+  list.forEach {
+    fold<R, B, Unit>({ block(it) }, { errors.add(it) }, { results.add(it) })
+  }
+  if (errors.isNotEmpty())
+    raise(NonEmptyList.fromListUnsafe(errors))
+  else
+    return results
 }
