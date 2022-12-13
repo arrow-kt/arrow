@@ -2557,6 +2557,7 @@ public final class arrow/core/continuations/Raise$DefaultImpls {
 }
 
 public final class arrow/core/continuations/RaiseKt {
+	public static final fun accumulate (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun catch (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun ensure (Larrow/core/continuations/Raise;ZLkotlin/jvm/functions/Function0;)V
 	public static final fun ensureNotNull (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
