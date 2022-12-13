@@ -32,7 +32,7 @@ public object Every {
   /**
    * [Traversal] for [Either] that has focus in each [Either.Right].
    *
-   * @receiver [Traversal.Companion] to make it statically available.
+   * @receiver [PTraversal.Companion] to make it statically available.
    * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
    */
   @JvmStatic

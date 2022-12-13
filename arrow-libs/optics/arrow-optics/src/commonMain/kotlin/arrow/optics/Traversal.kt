@@ -10,6 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.identity
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -30,15 +31,33 @@ public typealias Traversal<S, A> = PTraversal<S, S, A, A>
  * @param A the target of a [PTraversal]
  * @param B the modified target of a [PTraversal]
  */
-public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
+public interface PTraversal<S, T, A, B> {
 
   /**
    * Map each target to a type R and use a Monoid to fold the results
    */
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
+  public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
-  override fun modify(source: S, map: (focus: A) -> B): T
+  /**
+   * Modify polymorphically the focus of a [PTraversal] with a function [map].
+   */
+  public fun modify(source: S, map: (focus: A) -> B): T
 
+  /**
+   * Set polymorphically the focus of a [PTraversal] with a value [focus].
+   */
+  public fun set(source: S, focus: B): T =
+    modify(source) { focus }
+
+  /**
+   * Lift a function [map]: `(A) -> B to the context of `S`: `(S) -> T`
+   */
+  public fun lift(map: (focus: A) -> B): (source: S) -> T =
+    { s -> modify(s) { map(it) } }
+
+  /**
+   * Join two [PTraversal] with the same target
+   */
   public fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
     object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
       override fun <R> foldMap(M: Monoid<R>, source: Either<S, U>, map: (A) -> R): R =
@@ -69,10 +88,112 @@ public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
 
+  /**
+   * Calculate the number of targets
+   */
+  public fun size(source: S): Int =
+    foldMap(Monoid.int(), source) { 1 }
+
+  /**
+   * Check if all targets satisfy the predicate
+   */
+  public fun all(source: S, predicate: (focus: A) -> Boolean): Boolean =
+    foldMap(Monoid.boolean(), source, predicate)
+
+  /**
+   * Returns `true` if at least one focus matches the given [predicate].
+   */
+  public fun any(source: S, predicate: (focus: A) -> Boolean): Boolean =
+    foldMap(Monoid.booleanOr(), source, predicate)
+
+  /**
+   * Check if there is no target
+   */
+  public fun isEmpty(source: S): Boolean =
+    foldMap(Monoid.boolean(), source) { false }
+
+  /**
+   * Check if there is at least one target
+   */
+  public fun isNotEmpty(source: S): Boolean =
+    !isEmpty(source)
+
+  /**
+   * Get the first target or null
+   */
+  @Suppress("UNCHECKED_CAST")
+  public fun firstOrNull(source: S): A? {
+    val fold = ::fold as (Monoid<Any?>, S) -> Any?
+    val res = fold(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
+    }, source)
+    return EMPTY_VALUE.unbox(res)
+  }
+
+  /**
+   * Get the last target or null
+   */
+  @Suppress("UNCHECKED_CAST")
+  public fun lastOrNull(source: S): A? {
+    val fold = ::fold as (Monoid<Any?>, S) -> Any?
+    val res = fold(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun append(a: Any?, b: Any?): Any? =
+        if (b !== EMPTY_VALUE) b else a
+    }, source)
+    return EMPTY_VALUE.unbox(res)
+  }
+
+  /**
+   * Fold using the given [Monoid] instance.
+   */
+  public fun fold(M: Monoid<@UnsafeVariance A>, source: S): A =
+    foldMap(M, source, ::identity)
+
+  /**
+   * Alias for fold.
+   */
+  @Deprecated("use fold instead", ReplaceWith("fold(M, source)"))
+  public fun combineAll(M: Monoid<@UnsafeVariance A>, source: S): A =
+    fold(M, source)
+
+  /**
+   * Get all targets of the [Traversal]
+   */
+  public fun getAll(source: S): List<A> =
+    foldMap(Monoid.list(), source, ::listOf)
+
+  /**
+   * Find the first element matching the predicate, if one exists.
+   */
+  public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? {
+    val res = foldMap(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
+    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
+    return EMPTY_VALUE.unbox(res)
+  }
+
+  /**
+   * Check whether at least one element satisfies the predicate.
+   *
+   * If there are no elements, the result is false.
+   */
+  public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean {
+    val res = foldMap(object : Monoid<Any?> {
+      override fun empty(): Any = EMPTY_VALUE
+      override fun append(a: Any?, b: Any?): Any? =
+        if (a === EMPTY_VALUE) b else a
+    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
+    return res !== EMPTY_VALUE
+  }
+
   public companion object {
 
-    public fun <S> id(): PTraversal<S, S, S, S> =
-      PIso.id()
+    public fun <S> id(): Traversal<S, S> = PLens.id()
 
     public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
       object : Traversal<Either<S, S>, S> {
@@ -250,7 +371,7 @@ public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
     /**
      * [Traversal] for [Either] that has focus in each [Either.Right].
      *
-     * @receiver [Traversal.Companion] to make it statically available.
+     * @receiver [PTraversal.Companion] to make it statically available.
      * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
      */
     @JvmStatic
@@ -505,16 +626,6 @@ public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
       this@every.compose(this@PTraversal)
 
   /**
-   * DSL to compose [Traversal] with a [Iso] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Iso] with a focus in [S]
-   * @return [Traversal] with a focus in [A]
-   */
-  public val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this@every.compose(this@PTraversal)
-
-  /**
    * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
    *
    * @receiver [Prism] with a focus in [S]
@@ -531,16 +642,6 @@ public interface PTraversal<S, T, A, B> : PSetter<S, T, A, B>, Fold<S, A> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
-
-  /**
-   * DSL to compose [Traversal] with a [Setter] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Setter] with a focus in [S]
-   * @return [Setter] with a focus in [A]
-   */
-  public val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B>
     get() =
       this.compose(this@PTraversal)
 

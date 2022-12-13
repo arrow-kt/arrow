@@ -5,7 +5,6 @@ import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Monoid
 import io.kotest.matchers.shouldBe
@@ -22,13 +21,6 @@ class PrismTest : UnitSpec() {
       "Prism sum - ",
       PrismLaws.laws(
         prism = Prism.sumType(),
-        aGen = Arb.sumType(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
-      ),
-
-      SetterLaws.laws(
-        setter = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),

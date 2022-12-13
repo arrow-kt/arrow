@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.right
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -80,7 +81,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
   /**
    * Create a sum of the [PPrism] and a type [C]
    */
-  override fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
+  public fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
     PPrism(
       {
         it.fold(
@@ -98,7 +99,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
   /**
    * Create a sum of a type [C] and the [PPrism]
    */
-  override fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
+  public fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
     PPrism(
       {
         it.fold(
@@ -122,7 +123,10 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): Prism<S, S> = PPrism(
+      getOrModify = { it.right() },
+      reverseGet = ::identity
+    )
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
@@ -179,7 +183,6 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-@Suppress("FunctionName")
 public fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }

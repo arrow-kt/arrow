@@ -4,7 +4,7 @@ import arrow.core.NonEmptyList
 import arrow.core.Predicate
 import arrow.core.toNonEmptyListOrNull
 import arrow.optics.Every
-import arrow.optics.Iso
+import arrow.optics.PLens
 import arrow.optics.Traversal
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
@@ -24,12 +24,6 @@ public fun interface FilterIndex<S, I, A> {
   public fun filter(p: Predicate<I>): Traversal<S, A>
 
   public companion object {
-
-    /**
-     * Lift an instance of [FilterIndex] using an [Iso]
-     */
-    public fun <S, A, I, B> fromIso(FI: FilterIndex<A, I, B>, iso: Iso<S, A>): FilterIndex<S, I, B> =
-      FilterIndex { p -> iso compose FI.filter(p) }
 
     /**
      * [FilterIndex] instance definition for [List].
@@ -106,7 +100,7 @@ public fun interface FilterIndex<S, I, A> {
     @JvmStatic
     public fun string(): FilterIndex<String, Int, Char> =
       FilterIndex { p ->
-        Iso.stringToList() compose list<Char>().filter(p)
+        PLens.stringToList() compose list<Char>().filter(p)
       }
   }
 }

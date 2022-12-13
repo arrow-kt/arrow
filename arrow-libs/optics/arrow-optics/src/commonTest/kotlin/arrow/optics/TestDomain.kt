@@ -37,23 +37,10 @@ internal fun PLens.Companion.token(): Lens<Token, String> = PLens(
   { token: Token, value: String -> token.copy(value = value) }
 )
 
-internal fun PIso.Companion.token(): Iso<Token, String> = Iso(
-  { token: Token -> token.value },
-  ::Token
-)
-
-internal fun PSetter.Companion.token(): Setter<Token, String> = Setter { token, s ->
-  token.copy(value = s(token.value))
-}
-
-internal fun PIso.Companion.user(): Iso<User, Token> = Iso(
+internal fun PLens.Companion.user(): Lens<User, Token> = PLens(
   { user: User -> user.token },
-  ::User
+  { user: User, token: Token -> user.copy(token = token) }
 )
-
-internal fun PSetter.Companion.user(): Setter<User, Token> = Setter { user, s ->
-  user.copy(token = s(user.token))
-}
 
 internal data class Token(val value: String) {
   companion object
@@ -70,14 +57,6 @@ internal fun Arb.Companion.user(): Arb<User> =
 internal data class IncompleteUser(val token: Token?)
 
 internal fun Arb.Companion.incompleteUser(): Arb<IncompleteUser> = Arb.constant(IncompleteUser(null))
-
-internal fun PGetter.Companion.token(): Getter<Token, String> =
-  Getter { it.value }
-
-internal fun PLens.Companion.user(): Lens<User, Token> = Lens(
-  { user: User -> user.token },
-  { user: User, token: Token -> user.copy(token = token) }
-)
 
 internal fun POptional.Companion.incompleteUserToken(): Optional<IncompleteUser, Token> = Optional(
   getOrModify = { user -> user.token?.right() ?: user.left() },
