@@ -254,7 +254,7 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
  * over every element of [list].
  */
 @EffectDSL
-public fun <R, A, B> Raise<NonEmptyList<R>>.accumulate(
+public inline fun <R, A, B> Raise<NonEmptyList<R>>.accumulate(
   list: Iterable<A>,
   block: Raise<R>.(A) -> B
 ): List<B> {
