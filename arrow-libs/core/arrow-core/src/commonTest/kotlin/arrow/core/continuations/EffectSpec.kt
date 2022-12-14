@@ -272,14 +272,14 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
-    
+
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
-        
+
         effect<Failure, Int> {
           failure().bind()
           1
@@ -289,30 +289,30 @@ class EffectSpec :
         ) shouldBe Failure(msg)
       }
     }
-  
+
     "#2779 - handleErrorWith does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           failed.handleErrorWith { str ->
             effect { shift(str.reversed().toList()) }
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
@@ -321,11 +321,11 @@ class EffectSpec :
               }.bind()
             }, ::identity)
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "Can handle thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
@@ -337,7 +337,7 @@ class EffectSpec :
         ) shouldBe fallback()
       }
     }
-    
+
     "Can shift from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<String, Int> {
@@ -351,7 +351,7 @@ class EffectSpec :
         }.runCont() shouldBe fallback()
       }
     }
-  
+
     "Can throw from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         shouldThrow<IllegalStateException> {
@@ -363,6 +363,14 @@ class EffectSpec :
             { it.length }
           )
         }.message shouldBe fallback()
+      }
+    }
+
+    "shift leaked results in ShiftLeakException" {
+      shouldThrow<ShiftLeakedException> {
+        effect {
+          suspend { shift<Unit>("failure") }
+        }.fold(::println) { f -> f() }
       }
     }
   })

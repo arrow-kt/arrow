@@ -26,19 +26,19 @@ import kotlin.coroutines.resumeWithException
  *
  * <!--- TOC -->
 
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Strange edge cases](#strange-edge-cases)
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Strange edge cases](#strange-edge-cases)
 
  * <!--- END -->
  *
@@ -716,7 +716,7 @@ internal class FoldContinuation<R, B>(
   private val error: suspend (Throwable) -> B,
   private val parent: Continuation<B>,
 ) : Continuation<B>, Token(), EffectScope<R> {
-  
+
   constructor(ignored: Token, context: CoroutineContext, parent: Continuation<B>) : this(context, { throw it }, parent)
   constructor(
     ignored: Token,
@@ -724,9 +724,12 @@ internal class FoldContinuation<R, B>(
     error: suspend (Throwable) -> B,
     parent: Continuation<B>,
   ) : this(context, error, parent)
-  
+
   lateinit var recover: suspend (R) -> Any?
-  
+
+  // Add AtomicBoolean to arrow-atomic
+  val isActive: AtomicRef<Boolean> = AtomicRef(true)
+
   // Shift away from this Continuation by intercepting it, and completing it with
   // ShiftCancellationException
   // This is needed because this function will never yield a result,
@@ -739,8 +742,9 @@ internal class FoldContinuation<R, B>(
   // CancellationException and thus effectively recovering from the cancellation/shift.
   // This means try/catch is also capable of recovering from monadic errors.
     // See: EffectSpec - try/catch tests
-    throw Suspend(this, r, recover as suspend (Any?) -> Any?)
-  
+    if (isActive.get()) throw Suspend(this, r, recover as suspend (Any?) -> Any?)
+    else throw ShiftLeakedException()
+
   // In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl
   private fun (suspend () -> B).startCoroutineUnintercepted() {
     try {
@@ -753,15 +757,20 @@ internal class FoldContinuation<R, B>(
       parent.resumeWithException(e)
     }
   }
-  
+
   override fun resumeWith(result: Result<B>) {
     result.fold(parent::resume) { throwable ->
       when {
-        throwable is Suspend && this === throwable.token ->
+        throwable is Suspend && this === throwable.token -> {
+          isActive.set(false)
           suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted()
-        
+        }
+
         throwable is Suspend -> parent.resumeWith(result)
-        else -> suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
+        else -> {
+          isActive.set(false)
+          suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
+        }
       }
     }
   }
@@ -800,12 +809,12 @@ internal class FoldContinuation<R, B>(
 public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
 private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {
-  
+
   override suspend fun <B> fold(
     recover: suspend (shifted: R) -> B,
     transform: suspend (value: A) -> B,
   ): B = fold({ throw it }, recover, transform)
-  
+
   // We create a `Token` for fold Continuation, so we can properly differentiate between nested folds
   override suspend fun <B> fold(
     error: suspend (error: Throwable) -> B,
@@ -816,14 +825,19 @@ private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effec
       val shift = FoldContinuation<R, B>(cont.context, error, cont)
       shift.recover = recover
       try {
-        val fold: suspend EffectScope<R>.() -> B = { transform(f(this)) }
+        val fold: suspend EffectScope<R>.() -> B = {
+          val res = f(this).also { shift.isActive.set(false) }
+          transform(res)
+        }
         fold.startCoroutineUninterceptedOrReturn(shift, shift)
       } catch (e: Suspend) {
         if (shift === e.token) {
+          shift.isActive.set(false)
           val f: suspend () -> B = { e.recover(e.shifted) as B }
           f.startCoroutineUninterceptedOrReturn(cont)
         } else throw e
       } catch (e: Throwable) {
+        shift.isActive.set(false)
         val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
         f.startCoroutineUninterceptedOrReturn(cont)
       }
@@ -831,3 +845,12 @@ private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effec
 }
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
+
+public class ShiftLeakedException : RuntimeException(
+  """
+      "shift or bind occurred outside of its DSL scope, and the DSL scoped operator was leaked, this is kind of usage is incorrect.
+       Make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar.
+       
+       See: ... for additional information.
+    """.trimIndent()
+)

@@ -166,6 +166,7 @@ public fun <R, A> eagerEffect(f: suspend EagerEffectScope<R>.() -> A): EagerEffe
 private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R>.() -> A) : EagerEffect<R, A> {
   override fun <B> fold(recover: (R) -> B, transform: (A) -> B): B {
     val token = Token()
+    val isActive = AtomicRef(true)
     val eagerEffectScope =
       object : EagerEffectScope<R> {
         // Shift away from this Continuation by intercepting it, and completing it with
@@ -180,12 +181,15 @@ private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R
         // CancellationException and thus effectively recovering from the cancellation/shift.
         // This means try/catch is also capable of recovering from monadic errors.
           // See: EagerEffectSpec - try/catch tests
-          throw Eager(token, r, recover as (Any?) -> Any?)
+          if (isActive.get()) throw Eager(token, r, recover as (Any?) -> Any?)
+          else throw ShiftLeakedException()
       }
 
     return try {
-      suspend { transform(f(eagerEffectScope)) }
-        .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
+      suspend {
+        val res = f(eagerEffectScope).also { isActive.set(false) }
+        transform(res)
+      }.startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
           result.getOrElse { throwable ->
             if (throwable is Eager && token == throwable.token) {
               throwable.recover(throwable.shifted) as B
@@ -193,8 +197,10 @@ private class DefaultEagerEffect<R, A>(private val f: suspend EagerEffectScope<R
           }
         }) as B
     } catch (e: Eager) {
-      if (token == e.token) e.recover(e.shifted) as B
-      else throw e
+      if (token == e.token) {
+        isActive.set(false)
+        e.recover(e.shifted) as B
+      } else throw e
     }
   }
 }
