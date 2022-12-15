@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -85,13 +87,13 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) },
-          { c -> Either.Right(Either.Right(c)) })
+          { a -> getOrModify(a).bimap(::Left, ::Left) },
+          { c -> Right(Right(c)) })
       },
       {
         when (it) {
-          is Either.Left -> Either.Left(reverseGet(it.value))
-          is Either.Right -> Either.Right(it.value)
+          is Left -> Left(reverseGet(it.value))
+          is Right -> Right(it.value)
         }
       }
     )
@@ -103,8 +105,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { c -> Either.Right(Either.Left(c)) },
-          { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) })
+          { c -> Right(Left(c)) },
+          { s -> getOrModify(s).bimap(::Right, ::Right) })
       },
       { it.map(this::reverseGet) }
     )
@@ -146,7 +148,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * A [PPrism] that checks for equality with a given value [a]
      */
     public fun <A> only(a: A, eq: (constant: A, other: A) -> Boolean = { aa, b -> aa == b }): Prism<A, Unit> = Prism(
-      getOrModify = { a2 -> (if (eq(a, a2)) Either.Left(a) else Either.Right(Unit)) },
+      getOrModify = { a2 -> (if (eq(a, a2)) Left(a) else Right(Unit)) },
       reverseGet = { a }
     )
 
@@ -156,7 +158,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     @JvmStatic
     public fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
       PPrism(
-        getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
+        getOrModify = { option -> option.fold({ Left(None) }, ::Right) },
         reverseGet = ::Some
       )
 
@@ -173,7 +175,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     @JvmStatic
     public fun <A> none(): Prism<Option<A>, Unit> =
       Prism(
-        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
+        getOrModify = { option -> option.fold({ Right(Unit) }, { Left(option) }) },
         reverseGet = { _ -> None }
       )
   }

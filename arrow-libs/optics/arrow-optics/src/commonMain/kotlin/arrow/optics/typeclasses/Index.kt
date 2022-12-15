@@ -4,11 +4,9 @@ import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
-import arrow.optics.Lens
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.POptional
-import arrow.optics.Prism
 import arrow.optics.Traversal
 import kotlin.jvm.JvmStatic
 
@@ -30,24 +28,6 @@ public fun interface Index<S, I, A> {
   public fun index(i: I): Optional<S, A>
 
   /**
-   * DSL to compose [Index] with a [Lens] for a structure [S] to focus in on [A] at given index [I].
-   *
-   * @receiver [Lens] with a focus in [S]
-   * @param i index [I] to focus into [S] and find focus [A]
-   * @return [Optional] with a focus in [A] at given index [I].
-   */
-  public fun <T> Lens<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
-
-  /**
-   *  DSL to compose [Index] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
-   *
-   * @receiver [Prism] with a focus in [S]
-   * @param i index [I] to focus into [S] and find focus [A]
-   * @return [Optional] with a focus in [A] at given index [I].
-   */
-  public fun <T> Prism<T, S>.index(i: I): Optional<T, A> = this.compose(this@Index.index(i))
-
-  /**
    *  DSL to compose [Index] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
    *
    * @receiver [Optional] with a focus in [S]
@@ -64,24 +44,6 @@ public fun interface Index<S, I, A> {
    * @return [Traversal] with a focus in [A] at given index [I].
    */
   public fun <T> Traversal<T, S>.index(i: I): Traversal<T, A> = this.compose(this@Index.index(i))
-
-  /**
-   * DSL to compose [Index] with a [Lens] for a structure [S] to focus in on [A] at given index [I].
-   *
-   * @receiver [Lens] with a focus in [S]
-   * @param i index [I] to focus into [S] and find focus [A]
-   * @return [Optional] with a focus in [A] at given index [I].
-   */
-  public operator fun <T> Lens<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
-
-  /**
-   *  DSL to compose [Index] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
-   *
-   * @receiver [Prism] with a focus in [S]
-   * @param i index [I] to focus into [S] and find focus [A]
-   * @return [Optional] with a focus in [A] at given index [I].
-   */
-  public operator fun <T> Prism<T, S>.get(i: I): Optional<T, A> = this.compose(this@Index.index(i))
 
   /**
    *  DSL to compose [Index] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
@@ -159,7 +121,7 @@ public fun interface Index<S, I, A> {
     @JvmStatic
     public fun string(): Index<String, Int, Char> =
       Index { i ->
-        PLens.stringToList() compose Index.list<Char>().index(i)
+        PLens.stringToList() compose list<Char>().index(i)
       }
   }
 }

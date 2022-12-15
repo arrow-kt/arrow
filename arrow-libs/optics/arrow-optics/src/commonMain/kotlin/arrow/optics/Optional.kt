@@ -205,10 +205,19 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
       set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
     )
 
+    /**
+     * [Optional] to safely operate in a nullable value.
+     */
     @JvmStatic
     public fun <A> nullable(): Optional<A?, A> = Optional(
       getOption = { it.toOption() },
       set = { source, new -> source?.let { new } }
     )
+
+    /**
+     * [Optional] to safely operate in a nullable value.
+     */
+    @JvmStatic
+    public fun <A> notNull(): Optional<A?, A> = nullable()
   }
 }

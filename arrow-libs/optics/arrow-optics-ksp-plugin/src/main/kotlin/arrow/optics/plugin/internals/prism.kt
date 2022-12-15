@@ -1,7 +1,5 @@
 package arrow.optics.plugin.internals
 
-import com.google.devtools.ksp.symbol.KSTypeParameter
-
 internal fun generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,

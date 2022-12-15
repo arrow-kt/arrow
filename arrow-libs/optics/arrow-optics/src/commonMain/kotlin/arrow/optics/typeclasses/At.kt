@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.optics.Lens
 import arrow.optics.Optional
 import arrow.optics.PLens
-import arrow.optics.Prism
 import arrow.optics.Traversal
 import kotlin.jvm.JvmStatic
 
@@ -35,15 +34,6 @@ public fun interface At<S, I, A> {
    */
   public fun <T> Lens<T, S>.at(i: I): Lens<T, A> =
     this@at.compose(this@At.at(i))
-
-  /**
-   *  DSL to compose [At] with a [Prism] for a structure [S] to focus in on [A] at given index [I].
-   *
-   * @receiver [Prism] with a focus in [S]
-   * @param i index [I] to zoom into [S] and find focus [A]
-   * @return [Optional] with a focus in [A] at given index [I].
-   */
-  public fun <T> Prism<T, S>.at(i: I): Optional<T, A> = this.compose(this@At.at(i))
 
   /**
    *  DSL to compose [At] with an [Optional] for a structure [S] to focus in on [A] at given index [I].
