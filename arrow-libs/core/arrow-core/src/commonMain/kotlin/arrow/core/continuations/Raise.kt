@@ -241,16 +241,6 @@ public interface Raise<in R> {
   ): A = fold({ catch(it) }, { raise(it) }, { it })
 }
 
-/**
- * Execute an [action], and map every error of type [E]
- * into one of type [R].
- */
-@EffectDSL
-public inline fun <R, E, A> Raise<R>.mapLeft(
-  @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference error: (E) -> R
-): A = recover(action) { raise(error(it)) }
-
 @EffectDSL
 public inline fun <R, E, A> Raise<R>.recover(
   @BuilderInference action: Raise<E>.() -> A,
