@@ -3,10 +3,12 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.EmptyValue
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.emptyCombine
 import arrow.core.identity
 import arrow.core.nel
 import arrow.typeclasses.Semigroup
@@ -73,23 +75,20 @@ public interface Raise<in R> {
     semigroup: Semigroup<@UnsafeVariance R>,
     block: Raise<R>.(A) -> B
   ): List<B> {
-    var error: R? = null
+    var error: Any? = EmptyValue
     val results = mutableListOf<B>()
     forEach {
       fold<R, B, Unit>({
         block(it)
       }, { newError ->
-        error = when (val oldError = error) {
-          null -> newError
-          else -> semigroup.append(oldError, newError)
-        }
+        error = semigroup.emptyCombine(error, newError)
       }, {
         results.add(it)
       })
     }
     when (val e = error) {
-      null -> return results
-      else -> raise(e)
+      is EmptyValue -> return results
+      else -> raise(EmptyValue.unbox(e))
     }
   }
   
@@ -294,9 +293,9 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
  * over every element of [list].
  */
 @EffectDSL
-public fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
+public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
-  block: Raise<R>.(A) -> B
+  crossinline block: Raise<R>.(A) -> B
 ): List<B> = list.mapOrAccumulate(Semigroup.nonEmptyList()) {
-  mapLeft({ block(it) }, { it.nel() })
+  recover({ block(it) }, { raise(it.nel()) })
 }
