@@ -394,7 +394,6 @@ public final class arrow/optics/dsl/EveryKt {
 }
 
 public final class arrow/optics/dsl/IndexKt {
-	public static final fun index (Larrow/optics/PLens;Larrow/optics/typeclasses/Index;Ljava/lang/Object;)Larrow/optics/POptional;
 	public static final fun index (Larrow/optics/POptional;Larrow/optics/typeclasses/Index;Ljava/lang/Object;)Larrow/optics/POptional;
 	public static final fun index (Larrow/optics/PTraversal;Larrow/optics/typeclasses/Index;Ljava/lang/Object;)Larrow/optics/PTraversal;
 }
