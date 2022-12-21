@@ -377,7 +377,7 @@ class EffectSpec :
     "accumulate, returns every error" {
       checkAll(Arb.list(Arb.int(), range = 2 .. 100)) { errors ->
         either<NonEmptyList<Int>, List<String>> {
-          accumulate(errors) { raise(it) }
+          mapOrAccumulate(errors) { raise(it) }
         } shouldBe NonEmptyList.fromListUnsafe(errors).left()
       }
     }
@@ -385,7 +385,7 @@ class EffectSpec :
     "accumulate, returns no error" {
       checkAll(Arb.list(Arb.string())) { elements ->
         either<NonEmptyList<Int>, List<String>> {
-          accumulate(elements) { it }
+          mapOrAccumulate(elements) { it }
         } shouldBe elements.right()
       }
     }
