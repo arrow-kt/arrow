@@ -17,7 +17,6 @@ import kotlin.jvm.JvmStatic
  */
 public typealias Optional<S, A> = POptional<S, S, A, A>
 
-@Suppress("FunctionName")
 public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
   POptional({ s -> getOption(s).toEither { s } }, set)
 
@@ -60,7 +59,7 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S, T, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
 
   /**
    * Get the modified source of a [POptional]
@@ -70,7 +69,13 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
   /**
    * Get the focus of a [POptional] or return the original value while allowing the type to change if it does not match
    */
-  override fun getOrModify(source: S): Either<T, A>
+  public fun getOrModify(source: S): Either<T, A>
+
+  /**
+   * Get the focus of an [Optional] or `null` if the is not there
+   */
+  public fun getOrNull(source: S): A? =
+    getOrModify(source).getOrNull()
 
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrModify(source).map(map).fold({ M.empty() }, ::identity)
@@ -118,7 +123,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
   /**
    * Create a product of the [POptional] and a type [C]
    */
-  public override fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
+  public fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     POptional(
       { (source, c) -> getOrModify(source).bimap({ Pair(it, c) }, { Pair(it, c) }) },
       { (source, c2), (update, c) -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
@@ -127,10 +132,10 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
   /**
    * Create a product of a type [C] and the [POptional]
    */
-  public override fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
+  public fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
       { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
-      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: c2 to set(s, b) }
+      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: (c2 to set(s, b)) }
     )
 
   /**
@@ -151,7 +156,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): Optional<S, S> = PLens.id()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
@@ -200,10 +205,19 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
       set = { list, newTail -> if (list.isNotEmpty()) list[0] prependTo newTail else emptyList() }
     )
 
+    /**
+     * [Optional] to safely operate in a nullable value.
+     */
     @JvmStatic
     public fun <A> nullable(): Optional<A?, A> = Optional(
       getOption = { it.toOption() },
       set = { source, new -> source?.let { new } }
     )
+
+    /**
+     * [Optional] to safely operate in a nullable value.
+     */
+    @JvmStatic
+    public fun <A> notNull(): Optional<A?, A> = nullable()
   }
 }

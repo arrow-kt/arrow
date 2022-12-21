@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Nullable
 import arrow.core.left
 import arrow.core.right
-import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.Prism
@@ -55,12 +54,6 @@ public fun interface Snoc<S, A> {
     snoc().getOrNull(this)
 
   public companion object {
-
-    /**
-     * Lift an instance of [Snoc] using an [Iso].
-     */
-    public fun <S, A, B> fromIso(SS: Snoc<A, B>, iso: Iso<S, A>): Snoc<S, B> =
-      Snoc { iso compose SS.snoc() compose iso.reverse().first() }
 
     /**
      * Construct a [Snoc] instance from a [Prism].
