@@ -2346,7 +2346,6 @@ public final class arrow/core/continuations/DefaultRaise : arrow/core/continuati
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2368,7 +2367,6 @@ public final class arrow/core/continuations/DefaultStateRaise : arrow/atomic/Ato
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2435,7 +2433,6 @@ public final class arrow/core/continuations/IorRaise : arrow/core/continuations/
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun maybeCombine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -2475,9 +2472,7 @@ public final class arrow/core/continuations/NullableRaise : arrow/core/continuat
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Void;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/continuations/Raise;Ljava/lang/Void;)Ljava/lang/Void;
@@ -2522,9 +2517,7 @@ public final class arrow/core/continuations/OptionRaise : arrow/core/continuatio
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun raise (Larrow/core/None;)Ljava/lang/Void;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/continuations/Raise;Larrow/core/None;)Ljava/lang/Void;
@@ -2550,7 +2543,6 @@ public abstract interface class arrow/core/continuations/Raise {
 	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public abstract fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public abstract fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2568,7 +2560,6 @@ public final class arrow/core/continuations/Raise$DefaultImpls {
 	public static fun invoke (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun mapOrAccumulate (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun mapOrAccumulate (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2578,6 +2569,7 @@ public final class arrow/core/continuations/RaiseKt {
 	public static final fun catch (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun ensure (Larrow/core/continuations/Raise;ZLkotlin/jvm/functions/Function0;)V
 	public static final fun ensureNotNull (Larrow/core/continuations/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun mapLeft (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun mapOrAccumulate (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
@@ -2611,9 +2603,7 @@ public final class arrow/core/continuations/ResultRaise : arrow/core/continuatio
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke-impl (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun mapOrAccumulate-impl (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/continuations/Raise;Ljava/lang/Throwable;)Ljava/lang/Void;
@@ -2642,7 +2632,6 @@ public final class arrow/core/continuations/StateRaise$DefaultImpls {
 	public static fun invoke (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun mapOrAccumulate (Larrow/core/continuations/StateRaise;Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun mapOrAccumulate (Larrow/core/continuations/StateRaise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/continuations/StateRaise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

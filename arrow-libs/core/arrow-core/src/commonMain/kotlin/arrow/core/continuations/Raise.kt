@@ -68,21 +68,17 @@ public interface Raise<in R> {
   /**
    * Accumulate the errors obtained by executing the [block]
    * over every element of [this] using the given [semigroup].
-   * The error type [E] of the [block] may be different from
-   * the error type [R] of the surrounding computation.
    */
-  public fun <E, A, B> Iterable<A>.mapOrAccumulate(
-    embed: (E) -> R,
+  public fun <A, B> Iterable<A>.mapOrAccumulate(
     semigroup: Semigroup<@UnsafeVariance R>,
-    block: Raise<E>.(A) -> B
+    block: Raise<R>.(A) -> B
   ): List<B> {
     var error: R? = null
     val results = mutableListOf<B>()
     forEach {
-      fold<E, B, Unit>({
+      fold<R, B, Unit>({
         block(it)
-      }, { e ->
-        val newError = embed(e)
+      }, { newError ->
         error = when (val oldError = error) {
           null -> newError
           else -> semigroup.append(oldError, newError)
@@ -96,15 +92,6 @@ public interface Raise<in R> {
       else -> raise(e)
     }
   }
-
-  /**
-   * Accumulate the errors obtained by executing the [block]
-   * over every element of [this] using the given [semigroup].
-   */
-  public fun <A, B> Iterable<A>.mapOrAccumulate(
-    semigroup: Semigroup<@UnsafeVariance R>,
-    block: Raise<R>.(A) -> B
-  ): List<B> = mapOrAccumulate({ it }, semigroup, block)
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
@@ -255,6 +242,16 @@ public interface Raise<in R> {
   ): A = fold({ catch(it) }, { raise(it) }, { it })
 }
 
+/**
+ * Execute an [action], and map every error of type [E]
+ * into one of type [R].
+ */
+@EffectDSL
+public inline fun <R, E, A> Raise<R>.mapLeft(
+  @BuilderInference action: Raise<E>.() -> A,
+  @BuilderInference error: (E) -> R
+): A = recover(action) { raise(error(it)) }
+
 @EffectDSL
 public inline fun <R, E, A> Raise<R>.recover(
   @BuilderInference action: Raise<E>.() -> A,
@@ -300,4 +297,6 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
 public fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
   block: Raise<R>.(A) -> B
-): List<B> = list.mapOrAccumulate({ it.nel() }, Semigroup.nonEmptyList(), block)
+): List<B> = list.mapOrAccumulate(Semigroup.nonEmptyList()) {
+  mapLeft({ block(it) }, { it.nel() })
+}
