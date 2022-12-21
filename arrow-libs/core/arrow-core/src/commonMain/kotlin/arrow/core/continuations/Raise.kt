@@ -8,6 +8,8 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.identity
+import arrow.core.nel
+import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
@@ -62,6 +64,47 @@ public interface Raise<in R> {
   
   /** Raise a _logical failure_ of type [R] */
   public fun raise(r: R): Nothing
+
+  /**
+   * Accumulate the errors obtained by executing the [block]
+   * over every element of [this] using the given [semigroup].
+   * The error type [E] of the [block] may be different from
+   * the error type [R] of the surrounding computation.
+   */
+  public fun <E, A, B> Iterable<A>.mapOrAccumulate(
+    embed: (E) -> R,
+    semigroup: Semigroup<@UnsafeVariance R>,
+    block: Raise<E>.(A) -> B
+  ): List<B> {
+    var error: R? = null
+    val results = mutableListOf<B>()
+    forEach {
+      fold<E, B, Unit>({
+        block(it)
+      }, { e ->
+        val newError = embed(e)
+        error = when (val oldError = error) {
+          null -> newError
+          else -> semigroup.append(oldError, newError)
+        }
+      }, {
+        results.add(it)
+      })
+    }
+    when (val e = error) {
+      null -> return results
+      else -> raise(e)
+    }
+  }
+
+  /**
+   * Accumulate the errors obtained by executing the [block]
+   * over every element of [this] using the given [semigroup].
+   */
+  public fun <A, B> Iterable<A>.mapOrAccumulate(
+    semigroup: Semigroup<@UnsafeVariance R>,
+    block: Raise<R>.(A) -> B
+  ): List<B> = mapOrAccumulate({ it }, semigroup, block)
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
@@ -254,17 +297,7 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
  * over every element of [list].
  */
 @EffectDSL
-public inline fun <R, A, B> Raise<NonEmptyList<R>>.accumulate(
+public fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
   block: Raise<R>.(A) -> B
-): List<B> {
-  val errors = mutableListOf<R>()
-  val results = mutableListOf<B>()
-  list.forEach {
-    fold<R, B, Unit>({ block(it) }, { errors.add(it) }, { results.add(it) })
-  }
-  if (errors.isNotEmpty())
-    raise(NonEmptyList.fromListUnsafe(errors))
-  else
-    return results
-}
+): List<B> = list.mapOrAccumulate({ it.nel() }, Semigroup.nonEmptyList(), block)
