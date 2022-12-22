@@ -40,18 +40,6 @@ class EitherKnitTest : StringSpec({
     arrow.core.examples.exampleEither51.test()
   }
 
-  "ExampleEither55" {
-    arrow.core.examples.exampleEither55.test()
-  }
-
-  "ExampleEither56" {
-    arrow.core.examples.exampleEither56.test()
-  }
-
-  "ExampleEither57" {
-    arrow.core.examples.exampleEither57.test()
-  }
-
 }) {
   override fun timeout(): Long = 1000
 }
