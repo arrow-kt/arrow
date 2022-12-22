@@ -4,6 +4,7 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 
 class ParTraverseJvmTest : ArrowFxSpec(spec = {
   "parTraverse runs on provided context " { // 100 is same default length as Arb.list

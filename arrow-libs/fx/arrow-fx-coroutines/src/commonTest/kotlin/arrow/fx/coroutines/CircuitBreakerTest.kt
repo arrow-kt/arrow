@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.test.stackSafeIteration
 import io.kotest.assertions.asClue
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow

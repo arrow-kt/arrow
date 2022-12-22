@@ -17,6 +17,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
 
+internal data class SideEffect(var counter: Int = 0) {
+  public fun increment() {
+    counter++
+  }
+}
+
 @ExperimentalTime
 class ScheduleTest : ArrowFxSpec(
   spec = {

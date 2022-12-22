@@ -10,6 +10,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.checkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
@@ -84,7 +85,6 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMap - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
@@ -100,7 +100,6 @@ class FlowTest : ArrowFxSpec(
         job.cancelAndJoin()
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMap - exception in parMap cancels all running tasks" {
@@ -181,7 +180,6 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMapUnordered - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
@@ -198,7 +196,6 @@ class FlowTest : ArrowFxSpec(
 
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapUnordered - exception in parMap cancels all running tasks" {

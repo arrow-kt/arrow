@@ -8,6 +8,7 @@ import io.kotest.assertions.fail
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 
 class ParTraverseValidatedJvmTest : ArrowFxSpec(spec = {
   "parTraverseValidated finishes on single thread " { // 100 is same default length as Arb.list

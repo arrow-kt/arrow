@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class ResourceTestJvm : ArrowFxSpec(spec = {
 
@@ -20,14 +21,12 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   }
 
   "AutoCloseable closes" {
-    checkAll {
       val t = AutoCloseableTest()
 
       Resource.fromAutoCloseable { t }
         .use {}
 
       t.didClose.get() shouldBe true
-    }
   }
 
   "AutoCloseable closes on error" {
@@ -44,14 +43,12 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   }
 
   "Closeable closes" {
-    checkAll() {
       val t = CloseableTest()
 
       Resource.fromCloseable { t }
         .use {}
 
       t.didClose.get() shouldBe true
-    }
   }
 
   "Closeable closes on error" {

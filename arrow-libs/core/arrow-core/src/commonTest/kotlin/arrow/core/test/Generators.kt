@@ -1,19 +1,11 @@
 package arrow.core.test
 
-import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Tuple10
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
 import arrow.core.Validated
 import arrow.core.left
 import arrow.core.right
@@ -21,20 +13,14 @@ import arrow.core.toOption
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.filter
-import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.numericDoubles
-import io.kotest.property.arbitrary.numericFloats
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.Dispatchers
 import kotlin.Result.Companion.failure
@@ -79,8 +65,6 @@ public fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E
   val arbRight = arbA.map { Either.Right(it) }
   return Arb.choice(arbLeft, arbRight)
 }
-
-public fun <E, A> Arb<E>.or(arbA: Arb<A>): Arb<Either<E, A>> = Arb.either(this, arbA)
 
 public fun <E, A> Arb.Companion.validated(arbE: Arb<E>, arbA: Arb<A>): Arb<Validated<E, A>> =
   Arb.either(arbE, arbA).map { Validated.fromEither(it) }

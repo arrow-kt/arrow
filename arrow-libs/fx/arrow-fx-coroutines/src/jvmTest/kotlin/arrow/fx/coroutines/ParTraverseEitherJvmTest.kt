@@ -6,6 +6,7 @@ import io.kotest.assertions.fail
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 
 class ParTraverseEitherJvmTest : ArrowFxSpec(
   spec = {

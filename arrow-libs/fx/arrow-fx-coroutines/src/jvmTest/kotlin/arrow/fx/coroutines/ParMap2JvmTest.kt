@@ -7,6 +7,7 @@ import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
@@ -16,7 +17,6 @@ class ParMap2JvmTest : ArrowFxSpec(
       val mapCtxName = "parMap2"
       val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
 
-      checkAll {
         single.zip(mapCtx).use { (_single, _mapCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
@@ -31,7 +31,6 @@ class ParMap2JvmTest : ArrowFxSpec(
             threadName() shouldStartWith singleThreadName
           }
         }
-      }
     }
 
     "parMapN 2 returns to original context on failure" {

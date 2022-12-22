@@ -16,6 +16,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
@@ -71,7 +72,6 @@ class ParMap6Test : ArrowFxSpec(
     }
 
     "Cancelling parMapN 6 cancels all participants" {
-      checkAll {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -102,7 +102,6 @@ class ParMap6Test : ArrowFxSpec(
         pd.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapN 6 cancels losers if a failure occurs in one of the tasks" {
