@@ -1,4 +1,4 @@
-package arrow.core.test
+package arrow.optics.test.laws
 
 import io.kotest.assertions.fail
 import io.kotest.core.names.TestName

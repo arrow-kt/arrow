@@ -2,19 +2,14 @@ package arrow.optics.test.laws
 
 import arrow.core.compose
 import arrow.core.identity
-import arrow.core.test.concurrency.deprecateArrowTestModules
 import arrow.optics.Lens
-import arrow.core.test.laws.Law
-import arrow.core.test.laws.equalUnderTheLaw
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
-@Deprecated(deprecateArrowTestModules)
 public object LensLaws {
 
-  @Deprecated(deprecateArrowTestModules)
   public fun <A, B> laws(
     lensGen: Arb<Lens<A, B>>,
     aGen: Arb<A>,
@@ -32,10 +27,7 @@ public object LensLaws {
       Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, eqa) }
     )
 
-  /**
-   * Warning: Use only when a `Gen.constant()` applies
-   */
-  @Deprecated(deprecateArrowTestModules)
+
   public fun <A, B> laws(
     lens: Lens<A, B>,
     aGen: Arb<A>,
@@ -45,7 +37,6 @@ public object LensLaws {
     eqb: (B, B) -> Boolean = { a, b -> a == b }
   ): List<Law> = laws(Arb.constant(lens), aGen, bGen, funcGen, eqa, eqb)
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensGetSet(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen) { lens, a ->
       lens.run {
@@ -53,7 +44,6 @@ public object LensLaws {
       }
     }
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensSetGet(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, bGen: Arb<B>, eq: (B, B) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
@@ -61,7 +51,6 @@ public object LensLaws {
       }
     }
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensSetIdempotent(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
@@ -69,7 +58,6 @@ public object LensLaws {
       }
     }
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensModifyIdentity(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen) { lens, a ->
       lens.run {
@@ -77,7 +65,6 @@ public object LensLaws {
       }
     }
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensComposeModify(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen, funcGen, funcGen) { lens, a, f, g ->
       lens.run {
@@ -85,7 +72,6 @@ public object LensLaws {
       }
     }
 
-  @Deprecated(deprecateArrowTestModules)
   public suspend fun <A, B> lensConsistentSetModify(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen, bGen) { lens, a, b ->
       lens.run {

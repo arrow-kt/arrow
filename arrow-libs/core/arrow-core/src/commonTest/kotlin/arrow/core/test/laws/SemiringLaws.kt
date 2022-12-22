@@ -1,5 +1,7 @@
 package arrow.core.test.laws
 
+import arrow.core.test.Law
+import arrow.core.test.equalUnderTheLaw
 import arrow.typeclasses.Semiring
 import io.kotest.property.Arb
 import io.kotest.property.checkAll

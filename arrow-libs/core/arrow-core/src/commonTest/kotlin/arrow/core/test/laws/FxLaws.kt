@@ -2,6 +2,8 @@ package arrow.core.test.laws
 
 import arrow.continuations.Effect
 import arrow.core.Either
+import arrow.core.test.Law
+import arrow.core.test.equalUnderTheLaw
 import arrow.core.test.suspend
 import arrow.core.test.throwable
 import io.kotest.assertions.fail

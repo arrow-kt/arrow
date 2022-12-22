@@ -86,7 +86,6 @@ tasks {
     listOf(
       project(":arrow-core-test"),
       project(":arrow-fx-coroutines-test"),
-      project(":arrow-optics-test"),
       project(":arrow-optics-ksp-plugin"),
     )
   } else {
@@ -100,7 +99,7 @@ tasks {
 
 apiValidation {
   val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
-    listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site")
+    listOf("arrow-optics-ksp-plugin", "arrow-site")
   } else {
     listOf("arrow-optics-ksp-plugin")
   }

@@ -66,11 +66,6 @@ project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-opti
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
 
-if (!enableCompatibilityMetadataVariant) {
-  include("arrow-optics-test")
-  project(":arrow-optics-test").projectDir = file("arrow-libs/optics/arrow-optics-test")
-}
-
 // STACK
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")

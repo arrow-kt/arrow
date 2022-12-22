@@ -4,23 +4,24 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
 import arrow.core.toOption
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class OptionalTest : UnitSpec() {
-
-  init {
+class OptionalTest : StringSpec({
 
     testLaws(
       "Optional identity - ",
@@ -163,7 +164,7 @@ class OptionalTest : UnitSpec() {
     }
 
     "Set a value over a non empty list target then the first item of the result should be the value" {
-      checkAll(Arb.list(Arb.int(), 1..maxDepth), Arb.int()) { list, value ->
+      checkAll(Arb.list(Arb.int(), 1..200), Arb.int()) { list, value ->
         Optional.listHead<Int>().set(list, value)[0] shouldBe value
       }
     }
@@ -175,5 +176,5 @@ class OptionalTest : UnitSpec() {
         joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
       }
     }
-  }
-}
+
+})
