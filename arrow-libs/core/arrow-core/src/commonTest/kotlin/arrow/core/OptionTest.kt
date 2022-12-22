@@ -2,10 +2,11 @@ package arrow.core
 
 import arrow.core.continuations.ensureNotNull
 import arrow.core.continuations.option
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.option
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.option
+import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
@@ -13,13 +14,12 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class OptionTest : UnitSpec() {
+class OptionTest : StringSpec({
 
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = None
-
-  init {
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
@@ -424,8 +424,7 @@ class OptionTest : UnitSpec() {
       val exception = Exception("Boom!")
       Option.catch { throw exception } shouldBe None
     }
-  }
-}
+})
 
 // Utils
 

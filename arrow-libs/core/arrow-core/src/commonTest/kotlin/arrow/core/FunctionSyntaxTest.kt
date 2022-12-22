@@ -1,19 +1,17 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class FunctionSyntaxTest : UnitSpec() {
+class FunctionSyntaxTest : StringSpec({
 
   val f = { prefix: String, numericPostfix: Int, values: List<String> ->
     values.map { "$prefix$it$numericPostfix" }
   }
 
-  private val sum = { i1: Int, i2: Int -> i1 + i2 }
-  private val add5 = { i: Int -> i + 5 }
-  private val multiplyBy2 = { i: Int -> i * 2 }
-
-  init {
+  val sum = { i1: Int, i2: Int -> i1 + i2 }
+  val add5 = { i: Int -> i + 5 }
+  val multiplyBy2 = { i: Int -> i * 2 }
 
     "it should compose function correctly (andThen)" {
       val potato = "potato"
@@ -160,5 +158,5 @@ class FunctionSyntaxTest : UnitSpec() {
       binded()
       i shouldBe 5
     }
-  }
-}
+
+})

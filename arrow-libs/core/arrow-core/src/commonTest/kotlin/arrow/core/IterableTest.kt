@@ -1,26 +1,26 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
+import arrow.core.test.either
+import arrow.core.test.functionAToB
+import arrow.core.test.option
 import arrow.typeclasses.Semigroup
-import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class IterableTest : UnitSpec() {
-  init {
+class IterableTest : StringSpec({
+
     "traverse Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -499,5 +499,5 @@ class IterableTest : UnitSpec() {
         list.separateValidated() shouldBe ints.partition { it % 2 == 0 }
       }
     }
-  }
-}
+
+})

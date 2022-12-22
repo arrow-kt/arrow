@@ -1,23 +1,25 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.option
-import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.option
+import arrow.core.test.sequence
+import arrow.core.test.testLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class SequenceKTest : UnitSpec() {
-
-  init {
+class SequenceKTest : StringSpec({
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
@@ -333,5 +335,4 @@ class SequenceKTest : UnitSpec() {
         invalids.toList() to valids.toList() shouldBe ints.partition { it % 2 == 0 }
       }
     }
-  }
-}
+})

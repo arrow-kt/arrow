@@ -2,16 +2,17 @@
 
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.intSmall
+import arrow.core.test.intSmall
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class NullableTest : UnitSpec(spec = {
+class NullableTest : StringSpec({
   "map1 short circuits if any arg is null" {
     Nullable.zip(null) { Unit }.shouldBeNull()
   }

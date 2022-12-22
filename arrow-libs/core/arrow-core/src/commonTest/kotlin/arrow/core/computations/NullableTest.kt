@@ -1,16 +1,15 @@
 package arrow.core.computations
 
 import arrow.core.Some
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class NullableTest : UnitSpec() {
-
-  init {
+class NullableTest : StringSpec({
     "simple case" {
       nullable {
         "s".length.bind()
@@ -95,5 +94,4 @@ class NullableTest : UnitSpec() {
         } shouldBe i?.let(::square)
       }
     }
-  }
-}
+})
