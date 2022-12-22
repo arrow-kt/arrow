@@ -1,6 +1,7 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
@@ -14,6 +15,7 @@ import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
@@ -369,6 +371,22 @@ class EffectSpec :
           }.catch { throw RuntimeException(msg2()) }
             .runCont()
         }.message.shouldNotBeNull() shouldBe msg2()
+      }
+    }
+
+    "accumulate, returns every error" {
+      checkAll(Arb.list(Arb.int(), range = 2 .. 100)) { errors ->
+        either<NonEmptyList<Int>, List<String>> {
+          mapOrAccumulate(errors) { raise(it) }
+        } shouldBe NonEmptyList.fromListUnsafe(errors).left()
+      }
+    }
+
+    "accumulate, returns no error" {
+      checkAll(Arb.list(Arb.string())) { elements ->
+        either<NonEmptyList<Int>, List<String>> {
+          mapOrAccumulate(elements) { it }
+        } shouldBe elements.right()
       }
     }
   })

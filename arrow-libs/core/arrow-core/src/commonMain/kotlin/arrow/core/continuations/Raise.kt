@@ -3,10 +3,15 @@
 package arrow.core.continuations
 
 import arrow.core.Either
+import arrow.core.EmptyValue
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.emptyCombine
 import arrow.core.identity
+import arrow.core.nel
+import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
@@ -61,6 +66,31 @@ public interface Raise<in R> {
   
   /** Raise a _logical failure_ of type [R] */
   public fun raise(r: R): Nothing
+
+  /**
+   * Accumulate the errors obtained by executing the [block]
+   * over every element of [this] using the given [semigroup].
+   */
+  public fun <A, B> Iterable<A>.mapOrAccumulate(
+    semigroup: Semigroup<@UnsafeVariance R>,
+    block: Raise<R>.(A) -> B
+  ): List<B> {
+    var error: Any? = EmptyValue
+    val results = mutableListOf<B>()
+    forEach {
+      fold<R, B, Unit>({
+        block(it)
+      }, { newError ->
+        error = semigroup.emptyCombine(error, newError)
+      }, {
+        results.add(it)
+      })
+    }
+    when (val e = error) {
+      is EmptyValue -> return results
+      else -> raise(EmptyValue.unbox(e))
+    }
+  }
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
@@ -246,4 +276,16 @@ public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R): Unit 
 public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
   contract { returns() implies (value != null) }
   return value ?: raise(raise())
+}
+
+/**
+ * Accumulate the errors obtained by executing the [block]
+ * over every element of [list].
+ */
+@EffectDSL
+public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
+  list: Iterable<A>,
+  crossinline block: Raise<R>.(A) -> B
+): List<B> = list.mapOrAccumulate(Semigroup.nonEmptyList()) {
+  recover({ block(it) }, { raise(it.nel()) })
 }
