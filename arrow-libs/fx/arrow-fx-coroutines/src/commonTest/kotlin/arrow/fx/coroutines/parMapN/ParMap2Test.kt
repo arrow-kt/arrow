@@ -17,6 +17,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred

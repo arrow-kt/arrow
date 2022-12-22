@@ -82,15 +82,8 @@ tasks {
     dependsOn(generateDoc)
   }
 
-  val undocumentedProjects = if (!enableCompatibilityMetadataVariant) {
-    listOf(
-      project(":arrow-core-test"),
-      project(":arrow-fx-coroutines-test"),
-      project(":arrow-optics-ksp-plugin"),
-    )
-  } else {
+  val undocumentedProjects =
     listOf(project(":arrow-optics-ksp-plugin"))
-  }
 
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }

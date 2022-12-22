@@ -29,7 +29,9 @@ kotlin {
     if(!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-core-test"))
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
         }
       }
       jvmTest {
