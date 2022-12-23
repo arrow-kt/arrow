@@ -57,6 +57,14 @@ kotlin {
       }
     }
   }
+
+  js(IR) {
+    browser {
+      testTask {
+        useMocha()
+      }
+    }
+  }
 }
 
 //fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {

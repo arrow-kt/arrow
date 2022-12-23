@@ -58,6 +58,14 @@ kotlin {
       }
     }
   }
+
+  js(IR) {
+    browser {
+      testTask {
+        useMocha()
+      }
+    }
+  }
 }
 
 // enables context receivers for Jvm Tests
