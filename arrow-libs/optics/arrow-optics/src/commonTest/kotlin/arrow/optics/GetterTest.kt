@@ -39,7 +39,7 @@ class GetterTest : StringSpec({
 
     "asFold should behave as valid Fold: combineAll" {
       checkAll(Arb.token()) { token ->
-        Getter.token().combineAll(Monoid.string(), token) shouldBe token.value
+        Getter.token().fold(Monoid.string(), token) shouldBe token.value
       }
     }
 
@@ -69,7 +69,7 @@ class GetterTest : StringSpec({
 
     "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
       checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
-        Getter.token().findOrNull(Token(value)) { predicate }?.let { true } ?: false shouldBe predicate
+        (Getter.token().findOrNull(Token(value)) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 
@@ -82,7 +82,7 @@ class GetterTest : StringSpec({
     "Zipping two lenses should yield a tuple of the targets" {
       checkAll(Arb.string()) { value: String ->
         Getter<String, Int> { it.length }.zip { it.uppercase() }
-          .get(value) shouldBe (value.length to value.toUpperCase())
+          .get(value) shouldBe (value.length to value.uppercase())
       }
     }
 

@@ -86,7 +86,7 @@ class LensTest : StringSpec({
 
     "asFold should behave as valid Fold: combineAll" {
       checkAll(Arb.token()) { token ->
-        Lens.token().combineAll(Monoid.string(), token) shouldBe token.value
+        Lens.token().fold(Monoid.string(), token) shouldBe token.value
       }
     }
 
@@ -134,7 +134,7 @@ class LensTest : StringSpec({
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.boolean()) { predicate: Boolean ->
-        Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false shouldBe predicate
+        (Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 

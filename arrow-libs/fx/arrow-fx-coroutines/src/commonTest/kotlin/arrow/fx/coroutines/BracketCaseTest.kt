@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -9,12 +10,12 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class BracketCaseTest : ArrowFxSpec(
-  spec = {
+class BracketCaseTest : StringSpec({
     "Immediate acquire bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         var once = true
@@ -253,7 +254,7 @@ class BracketCaseTest : ArrowFxSpec(
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -277,7 +278,7 @@ class BracketCaseTest : ArrowFxSpec(
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -306,7 +307,7 @@ class BracketCaseTest : ArrowFxSpec(
 
         // Signal that fiber can be cancelled running
         start.complete(Unit)
-        never<Unit>()
+        awaitCancellation()
       }
 
       // Wait until the fiber is started before cancelling
@@ -328,7 +329,7 @@ class BracketCaseTest : ArrowFxSpec(
               // This should be uncancellable, and suspends until capacity 1 is received
               mVar.send(y)
             },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, exitCase -> require(p.complete(exitCase)) }
           )
         }
@@ -351,7 +352,7 @@ class BracketCaseTest : ArrowFxSpec(
         val fiber = async {
           bracketCase(
             acquire = { latch.complete(Unit) },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, _ -> mVar.send(y) }
           )
         }

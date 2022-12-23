@@ -1,27 +1,27 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
-import kotlin.time.microseconds
-import kotlin.time.milliseconds
 import arrow.fx.coroutines.parTraverse
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.ints.shouldBeInRange
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class STMTest : ArrowFxSpec(
-  spec = {
+class STMTest : StringSpec({
     "no-effects" {
       atomically { 10 } shouldBeExactly 10
     }
@@ -152,7 +152,6 @@ class STMTest : ArrowFxSpec(
       }
     }
     "suspended transactions are resumed for variables accessed in orElse" {
-      checkAll {
         val tv = TVar.new(0)
         val f = async {
           delay(10.microseconds)
@@ -167,10 +166,8 @@ class STMTest : ArrowFxSpec(
           } orElse { retry() }
         } shouldBeExactly 1
         f.join()
-      }
     }
     "on a single variable concurrent transactions should be linear" {
-      checkAll {
         val tv = TVar.new(0)
         val res = TQueue.new<Int>()
 
@@ -184,7 +181,6 @@ class STMTest : ArrowFxSpec(
         }.joinAll()
 
         atomically { res.flush() } shouldBe (0..100).toList()
-      }
     }
     "atomically rethrows exceptions" {
       shouldThrow<IllegalArgumentException> { atomically { throw IllegalArgumentException("Test") } }
@@ -210,7 +206,6 @@ class STMTest : ArrowFxSpec(
       tv.unsafeRead() shouldBeExactly 10
     }
     "concurrent example 1" {
-      checkAll {
         val acc1 = TVar.new(100)
         val acc2 = TVar.new(200)
         parZip(
@@ -233,7 +228,6 @@ class STMTest : ArrowFxSpec(
         )
         acc1.unsafeRead() shouldBeExactly 50
         acc2.unsafeRead() shouldBeExactly 250
-      }
     }
 
     // TypeError: Cannot read property 'toString' of undefined
@@ -248,7 +242,6 @@ class STMTest : ArrowFxSpec(
     // at WindowMessageQueue.MessageQueue.process(/var/folders/x5/6r18d9w52c7czy6zh5m1spvw0000gn/T/_karma_webpack_624630/commons.js:177985)
     // at <global>.<unknown>(/var/folders/x5/6r18d9w52c7czy6zh5m1spvw0000gn/T/_karma_webpack_624630/commons.js:177940)
     "concurrent example 2".config(enabled = false) {
-      checkAll {
         val tq = TQueue.new<Int>()
         parZip(
           {
@@ -273,7 +266,6 @@ class STMTest : ArrowFxSpec(
         ) { _, _ -> Unit }
         // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
         atomically { tq.flush() } shouldBe emptyList()
-      }
     }
   }
 )

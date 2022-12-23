@@ -28,12 +28,12 @@ class MapKTest : StringSpec({
 
     "traverseEither is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse { v ->
+      val res = (0..20_000).associateWith { it }.traverse { v ->
         acc.add(v)
         Either.Right(v)
       }
-      res shouldBe acc.map { it to it }.toMap().right()
-      res shouldBe (0..20_000).map { it to it }.toMap().right()
+      res shouldBe acc.associateWith { it }.right()
+      res shouldBe (0..20_000).associateWith { it }.right()
     }
 
     "traverseEither short-circuit" {
@@ -56,12 +56,12 @@ class MapKTest : StringSpec({
     "traverseOption is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse { a ->
+      val res = (0..20_000).associateWith { it }.traverse { a ->
         acc.add(a)
         Some(a)
       }
-      res shouldBe Some(acc.map { it to it }.toMap())
-      res shouldBe Some((0..20_000).map { it to it }.toMap())
+      res shouldBe Some(acc.associateWith { it })
+      res shouldBe Some((0..20_000).associateWith { it })
     }
 
     "traverseOption short-circuits" {
@@ -87,12 +87,12 @@ class MapKTest : StringSpec({
 
     "traverseValidated is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).map { it to it }.toMap().traverse(Semigroup.string()) { v ->
+      val res = (0..20_000).associateWith { it }.traverse(Semigroup.string()) { v ->
         acc.add(v)
         Validated.Valid(v)
       }
-      res shouldBe acc.map { it to it }.toMap().valid()
-      res shouldBe (0..20_000).map { it to it }.toMap().valid()
+      res shouldBe acc.associateWith { it }.valid()
+      res shouldBe (0..20_000).associateWith { it }.valid()
     }
 
     "traverseValidated acummulates" {
@@ -103,7 +103,7 @@ class MapKTest : StringSpec({
         val expected: ValidatedNel<Int, Map<Int, Int>> =
           Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
             .fold(
-              { ints.entries.filter { (_, v) -> v % 2 == 0 }.map { (k, v) -> k to v }.toMap().validNel() },
+              { ints.entries.filter { (_, v) -> v % 2 == 0 }.associate { (k, v) -> k to v }.validNel() },
               { it.invalid() })
 
         res shouldBe expected

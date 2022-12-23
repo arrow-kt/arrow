@@ -31,7 +31,7 @@ class FoldTest : StringSpec({
 
       "Folding a list should yield same result as combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) shouldBe ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 

@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
@@ -9,10 +10,12 @@ import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.checkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -31,14 +34,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class FlowTest : ArrowFxSpec(
-  spec = {
+class FlowTest : StringSpec({
 
     "Retry - flow fails" {
       val bang = RuntimeException("Bang!")
 
-      checkAll(Arb.int(), Arb.positiveInts(10)) { a, n ->
+      checkAll(Arb.int(), Arb.positiveInt(10)) { a, n ->
         var counter = 0
         val e = assertThrowable {
           flow {
@@ -89,7 +92,7 @@ class FlowTest : ArrowFxSpec(
         val exit = CompletableDeferred<ExitCase>()
 
         val job = launch {
-          flowOf(1).parMap { index ->
+          flowOf(1).parMap { _ ->
             guaranteeCase({
               latch.complete(Unit)
               awaitCancellation()
@@ -283,7 +286,7 @@ class FlowTest : ArrowFxSpec(
   
     "fixedDelay" {
       runTest {
-        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
           val emissionDuration = waitPeriod / 10L
           var state: Long? = null
         
@@ -309,7 +312,7 @@ class FlowTest : ArrowFxSpec(
   
     "fixedRate" {
       runTest {
-        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
           val emissionDuration = waitPeriod / 10
           var state: Long? = null
         

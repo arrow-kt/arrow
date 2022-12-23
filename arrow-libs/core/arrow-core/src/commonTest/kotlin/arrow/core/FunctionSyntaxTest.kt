@@ -5,10 +5,6 @@ import io.kotest.matchers.shouldBe
 
 class FunctionSyntaxTest : StringSpec({
 
-  val f = { prefix: String, numericPostfix: Int, values: List<String> ->
-    values.map { "$prefix$it$numericPostfix" }
-  }
-
   val sum = { i1: Int, i2: Int -> i1 + i2 }
   val add5 = { i: Int -> i + 5 }
   val multiplyBy2 = { i: Int -> i * 2 }
@@ -41,8 +37,8 @@ class FunctionSyntaxTest : StringSpec({
       val sum2ints = { x: Int, y: Int -> x + y }
       val curried = sum2ints.curried()
       curried(2)(4) shouldBe 6
-      val add5 = curried(5)
-      add5(7) shouldBe 12
+      val addFive = curried(5)
+      addFive(7) shouldBe 12
     }
 
     "testUncurrying" {
@@ -58,8 +54,8 @@ class FunctionSyntaxTest : StringSpec({
       val sum2ints: suspend (Int, Int) -> Int = { x: Int, y: Int -> x + y }
       val curried: (Int) -> suspend (Int) -> Int = sum2ints.curried()
       curried(2)(4) shouldBe 6
-      val add5: suspend (Int) -> Int = curried(5)
-      add5(7) shouldBe 12
+      val addFive: suspend (Int) -> Int = curried(5)
+      addFive(7) shouldBe 12
     }
 
     "testUncurryingEffect" {

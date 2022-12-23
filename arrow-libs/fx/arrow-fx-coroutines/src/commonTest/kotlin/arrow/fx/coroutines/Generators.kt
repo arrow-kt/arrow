@@ -30,35 +30,35 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 
-public fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
+fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
   Arb.choose(
     10 to Arb.list(arbA).map { it.asFlow() },
     10 to Arb.list(arbA).map { channelFlow { it.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
     1 to Arb.constant(emptyFlow()),
   )
 
-public fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
+fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
 
-public fun Arb.Companion.throwable(): Arb<Throwable> =
+fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
 
-public fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
+fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
   val arbLeft = arbE.map { Either.Left(it) }
   val arbRight = arbA.map { Either.Right(it) }
   return Arb.choice(arbLeft, arbRight)
 }
 
-public fun <A> Arb.Companion.result(arbA: Arb<A>): Arb<Result<A>> =
+fun <A> Arb.Companion.result(arbA: Arb<A>): Arb<Result<A>> =
   Arb.choice(arbA.map(Result.Companion::success), throwable().map(Result.Companion::failure))
 
-public fun <L, R> Arb.Companion.validatedNel(left: Arb<L>, right: Arb<R>): Arb<ValidatedNel<L, R>> {
+fun <L, R> Arb.Companion.validatedNel(left: Arb<L>, right: Arb<R>): Arb<ValidatedNel<L, R>> {
   val failure: Arb<ValidatedNel<L, R>> = left.map { l -> l.invalidNel() }
   val success: Arb<ValidatedNel<L, R>> = right.map { r -> r.validNel() }
   return Arb.choice(failure, success)
 }
 
-public suspend fun Throwable.suspend(): Nothing =
+suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { throw this }.startCoroutine(
       Continuation(Dispatchers.Default) {
@@ -69,7 +69,7 @@ public suspend fun Throwable.suspend(): Nothing =
     COROUTINE_SUSPENDED
   }
 
-public suspend fun <A> A.suspend(): A =
+suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
     suspend { this }.startCoroutine(
       Continuation(Dispatchers.Default) {
@@ -80,7 +80,7 @@ public suspend fun <A> A.suspend(): A =
     COROUTINE_SUSPENDED
   }
 
-public fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
+fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
   object : Matcher<Either<Throwable, *>> {
     override fun test(value: Either<Throwable, *>): MatcherResult =
       when (value) {
@@ -109,7 +109,7 @@ public fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
       }
   }
 
-public fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
+fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
   object : Matcher<Either<Throwable, A>> {
     override fun test(value: Either<Throwable, A>): MatcherResult =
       when (value) {
@@ -135,19 +135,19 @@ public fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
       }
   }
 
-public suspend fun <A> awaitExitCase(send: Channel<Unit>, exit: CompletableDeferred<ExitCase>): A =
+suspend fun <A> awaitExitCase(send: Channel<Unit>, exit: CompletableDeferred<ExitCase>): A =
   guaranteeCase({
     send.receive()
     awaitCancellation()
   }) { ex -> exit.complete(ex) }
 
-public suspend fun <A> awaitExitCase(start: CompletableDeferred<Unit>, exit: CompletableDeferred<ExitCase>): A =
+suspend fun <A> awaitExitCase(start: CompletableDeferred<Unit>, exit: CompletableDeferred<ExitCase>): A =
   guaranteeCase({
     start.complete(Unit)
     awaitCancellation()
   }) { ex -> exit.complete(ex) }
 
-public inline fun <A> assertThrowable(executable: () -> A): Throwable {
+inline fun <A> assertThrowable(executable: () -> A): Throwable {
   val a = try {
     executable.invoke()
   } catch (e: Throwable) {

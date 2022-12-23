@@ -7,9 +7,9 @@ import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
 
-public object PrismLaws {
+object PrismLaws {
 
-  public fun <A, B> laws(
+  fun <A, B> laws(
     prism: Prism<A, B>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -24,29 +24,29 @@ public object PrismLaws {
     Law("Prism law: consistent set modify") { prism.consistentSetModify(aGen, bGen, eqa) }
   )
 
-  public suspend fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
+  private suspend fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, aGen) { a ->
       getOrModify(a).fold(::identity, ::reverseGet)
         .equalUnderTheLaw(a, eq)
     }
 
-  public suspend fun <A, B> Prism<A, B>.roundTripOtherWay(bGen: Arb<B>, eq: (B?, B?) -> Boolean): PropertyContext =
+  private suspend fun <A, B> Prism<A, B>.roundTripOtherWay(bGen: Arb<B>, eq: (B?, B?) -> Boolean): PropertyContext =
     checkAll(100, bGen) { b ->
       getOrNull(reverseGet(b))
         .equalUnderTheLaw(b, eq)
     }
 
-  public suspend fun <A, B> Prism<A, B>.modifyIdentity(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
+  private suspend fun <A, B> Prism<A, B>.modifyIdentity(aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, aGen) { a ->
       modify(a, ::identity).equalUnderTheLaw(a, eq)
     }
 
-  public suspend fun <A, B> Prism<A, B>.composeModify(aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
+  private suspend fun <A, B> Prism<A, B>.composeModify(aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, aGen, funcGen, funcGen) { a, f, g ->
       modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
     }
 
-  public suspend fun <A, B> Prism<A, B>.consistentSetModify(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
+  private suspend fun <A, B> Prism<A, B>.consistentSetModify(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, aGen, bGen) { a, b ->
       set(a, b).equalUnderTheLaw(modify(a) { b }, eq)
     }

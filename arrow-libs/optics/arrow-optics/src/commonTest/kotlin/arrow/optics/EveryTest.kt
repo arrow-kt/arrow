@@ -39,7 +39,7 @@ class EveryTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) shouldBe ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
@@ -78,7 +78,7 @@ class EveryTest : StringSpec({
 
       "Combining all the values of a traversal" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) shouldBe ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 

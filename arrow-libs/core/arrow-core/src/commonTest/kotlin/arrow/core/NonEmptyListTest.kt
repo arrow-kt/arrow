@@ -62,8 +62,8 @@ class NonEmptyListTest : StringSpec({
 
     "sequence for Either should be consistent with traverseEither" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequence() shouldBe
-          ints.traverse { Either.conditionally(it % 2 == 0, { it }, { it }) }
+        ints.map { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }.sequence() shouldBe
+          ints.traverse { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }
       }
     }
 

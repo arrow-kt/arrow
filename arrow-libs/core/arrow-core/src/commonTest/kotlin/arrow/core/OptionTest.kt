@@ -54,9 +54,8 @@ class OptionTest : StringSpec({
       fun square(i: Int): Int = i * i
       checkAll(Arb.int().orNull()) { i: Int? ->
         option {
-          val ii = i
-          ensureNotNull(ii)
-          square(ii) // Smart-cast by contract
+          ensureNotNull(i)
+          square(i) // Smart-cast by contract
         } shouldBe i.toOption().map(::square)
       }
     }

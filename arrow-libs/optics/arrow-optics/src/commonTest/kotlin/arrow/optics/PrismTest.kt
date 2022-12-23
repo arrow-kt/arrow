@@ -127,7 +127,7 @@ class PrismTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.sumType()) { sum: SumType ->
-          combineAll(Monoid.string(), sum) shouldBe
+          fold(Monoid.string(), sum) shouldBe
             (Prism.sumType().getOrNull(sum) ?: Monoid.string().empty())
         }
       }
@@ -186,7 +186,7 @@ class PrismTest : StringSpec({
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.sumType(), Arb.boolean()) { sum, predicate ->
-        Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false shouldBe (predicate && sum is SumType.A)
+        (Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false) shouldBe (predicate && sum is SumType.A)
       }
     }
 

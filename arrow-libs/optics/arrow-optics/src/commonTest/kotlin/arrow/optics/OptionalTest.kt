@@ -88,7 +88,7 @@ class OptionalTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          combineAll(Monoid.int(), ints) shouldBe
+          fold(Monoid.int(), ints) shouldBe
             ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
@@ -146,8 +146,8 @@ class OptionalTest : StringSpec({
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
       checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
-          ?: false shouldBe (predicate && list.isNotEmpty())
+        (Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
+          ?: false) shouldBe (predicate && list.isNotEmpty())
       }
     }
 

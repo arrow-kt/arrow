@@ -98,7 +98,7 @@ class IsoTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.token()) { token ->
-          combineAll(Monoid.string(), token) shouldBe token.value
+          fold(Monoid.string(), token) shouldBe token.value
         }
       }
 
@@ -180,7 +180,7 @@ class IsoTest : StringSpec({
 
     "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
       checkAll(Arb.boolean()) { predicate: Boolean ->
-        Iso.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false shouldBe predicate
+        (Iso.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 

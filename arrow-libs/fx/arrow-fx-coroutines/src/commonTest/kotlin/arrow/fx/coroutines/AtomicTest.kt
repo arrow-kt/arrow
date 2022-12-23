@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -8,8 +9,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
-class AtomicTest : ArrowFxSpec(
-  spec = {
+class AtomicTest : StringSpec({
 
     "set get - successful" {
       checkAll(Arb.int(), Arb.int()) { x, y ->

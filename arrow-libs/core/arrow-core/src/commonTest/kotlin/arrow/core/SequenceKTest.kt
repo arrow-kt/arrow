@@ -15,7 +15,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 

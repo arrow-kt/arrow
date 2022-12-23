@@ -8,9 +8,9 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
-public object OptionalLaws {
+object OptionalLaws {
 
-  public fun <A, B> laws(
+  fun <A, B> laws(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -29,7 +29,7 @@ public object OptionalLaws {
   /**
    * Warning: Use only when a `Gen.constant()` applies
    */
-  public fun <A, B> laws(
+  fun <A, B> laws(
     optional: Optional<A, B>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -38,7 +38,7 @@ public object OptionalLaws {
     eqb: (B?, B?) -> Boolean = { a, b -> a == b }
   ): List<Law> = laws(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
 
-  public suspend fun <A, B> getOptionSet(
+  private suspend fun <A, B> getOptionSet(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
@@ -50,7 +50,7 @@ public object OptionalLaws {
       }
     }
 
-  public suspend fun <A, B> setGetOption(
+  private suspend fun <A, B> setGetOption(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -63,7 +63,7 @@ public object OptionalLaws {
       }
     }
 
-  public suspend fun <A, B> setIdempotent(
+  private suspend fun <A, B> setIdempotent(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,
@@ -76,7 +76,7 @@ public object OptionalLaws {
       }
     }
 
-  public suspend fun <A, B> modifyIdentity(
+  private suspend fun <A, B> modifyIdentity(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     eq: (A, A) -> Boolean
@@ -88,7 +88,7 @@ public object OptionalLaws {
       }
     }
 
-  public suspend fun <A, B> composeModify(
+  private suspend fun <A, B> composeModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     funcGen: Arb<(B) -> B>,
@@ -101,7 +101,7 @@ public object OptionalLaws {
       }
     }
 
-  public suspend fun <A, B> consistentSetModify(
+  private suspend fun <A, B> consistentSetModify(
     optionalGen: Arb<Optional<A, B>>,
     aGen: Arb<A>,
     bGen: Arb<B>,

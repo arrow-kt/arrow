@@ -241,7 +241,7 @@ class ValidatedTest : StringSpec({
     }
 
     "withEither should return Valid(result) if f return Right" {
-      Valid(10).withEither { it.map { it + 5 } } shouldBe Valid(15)
+      Valid(10).withEither { it.map { n -> n + 5 } } shouldBe Valid(15)
       Invalid(10).withEither { Right(5) } shouldBe Valid(5)
     }
 

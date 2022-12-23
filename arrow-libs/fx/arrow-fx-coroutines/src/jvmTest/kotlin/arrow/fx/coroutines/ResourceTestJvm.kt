@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
@@ -8,14 +9,14 @@ import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 
-class ResourceTestJvm : ArrowFxSpec(spec = {
+class ResourceTestJvm : StringSpec({
 
-  class AutoCloseableTest() : AutoCloseable {
+  class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
 
-  class CloseableTest() : Closeable {
+  class CloseableTest : Closeable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
@@ -23,8 +24,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   "AutoCloseable closes" {
       val t = AutoCloseableTest()
 
-      Resource.fromAutoCloseable { t }
-        .use {}
+      autoCloseable { t }.use {}
 
       t.didClose.get() shouldBe true
   }
@@ -34,8 +34,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       val t = AutoCloseableTest()
 
       shouldThrow<Exception> {
-        Resource.fromAutoCloseable { t }
-          .use { throw throwable }
+        autoCloseable { t }.use<Nothing> { throw throwable }
       } shouldBe throwable
 
       t.didClose.get() shouldBe true
@@ -45,8 +44,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
   "Closeable closes" {
       val t = CloseableTest()
 
-      Resource.fromCloseable { t }
-        .use {}
+      closeable { t }.use {}
 
       t.didClose.get() shouldBe true
   }
@@ -56,8 +54,7 @@ class ResourceTestJvm : ArrowFxSpec(spec = {
       val t = CloseableTest()
 
       shouldThrow<Exception> {
-        Resource.fromCloseable { t }
-          .use { throw throwable }
+        closeable { t }.use<Nothing> { throw throwable }
       } shouldBe throwable
 
       t.didClose.get() shouldBe true

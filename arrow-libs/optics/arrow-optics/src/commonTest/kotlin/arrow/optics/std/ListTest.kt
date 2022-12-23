@@ -26,13 +26,13 @@ class ListTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.int()),
       ),
       TraversalLaws.laws(
-        traversal = Optional.listHead<Int>(),
+        traversal = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ),
       SetterLaws.laws(
-        setter = Optional.listHead<Int>(),
+        setter = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),

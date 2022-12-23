@@ -2,17 +2,18 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.assertSoftly
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParMap2JvmTest : ArrowFxSpec(
-  spec = {
+class ParMap2JvmTest : StringSpec({
     "parMapN 2 returns to original context" {
       val mapCtxName = "parMap2"
       val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
@@ -44,8 +45,8 @@ class ParMap2JvmTest : ArrowFxSpec(
 
             Either.catch {
               when (choose) {
-                1 -> parZip(_mapCtx, { e.suspend() }, { never<Nothing>() }) { _, _ -> Unit }
-                else -> parZip(_mapCtx, { never<Nothing>() }, { e.suspend() }) { _, _ -> Unit }
+                1 -> parZip(_mapCtx, { e.suspend() }, { awaitCancellation() }) { _, _ -> Unit }
+                else -> parZip(_mapCtx, { awaitCancellation() }, { e.suspend() }) { _, _ -> Unit }
               }
             } should leftException(e)
 

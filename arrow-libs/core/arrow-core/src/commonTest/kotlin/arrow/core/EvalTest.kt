@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
 internal data class SideEffect(var counter: Int = 0) {
-  public fun increment() {
+  fun increment() {
     counter++
   }
 }
