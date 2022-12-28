@@ -32,6 +32,7 @@ kotlin {
       commonTest {
         dependencies {
           implementation(project(":arrow-fx-coroutines-test"))
+          implementation(libs.coroutines.test)
         }
       }
       jvmTest {
