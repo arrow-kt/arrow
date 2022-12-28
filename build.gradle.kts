@@ -52,9 +52,6 @@ koverMerged {
       excludes.addAll(
         listOf(
           ":arrow-annotations",
-          ":arrow-core-test",
-          ":arrow-fx-coroutines-test",
-          ":arrow-optics-test",
           ":arrow-site",
           ":arrow-stack"
         )
@@ -106,6 +103,6 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
     versions.webpack.version = "5.75.0"
     versions.webpackCli.version = "4.10.0"
     versions.karma.version = "6.4.1"
-    versions.mocha.version = "10.1.0"
+    versions.mocha.version = "10.2.0"
   }
 }
