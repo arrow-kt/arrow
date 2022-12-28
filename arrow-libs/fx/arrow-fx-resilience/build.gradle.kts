@@ -6,7 +6,6 @@ plugins {
 
 apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
-apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")

@@ -684,19 +684,22 @@ private constructor(
       onHalfOpen: suspend () -> Unit = suspend { },
       onOpen: suspend () -> Unit = suspend { },
     ): CircuitBreaker =
-      of(
+      CircuitBreaker(
+        state = Atomic(Closed(0)),
         maxFailures = maxFailures
           .takeIf { it >= 0 }
           .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
-        resetTimeout = resetTimeout
+        resetTimeoutNanos = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
+          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } }
+          .toDouble(DurationUnit.NANOSECONDS),
         exponentialBackoffFactor = exponentialBackoffFactor
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeout = maxResetTimeout
+        maxResetTimeoutNanos = maxResetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } },
+          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } }
+          .toDouble(DurationUnit.NANOSECONDS),
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
