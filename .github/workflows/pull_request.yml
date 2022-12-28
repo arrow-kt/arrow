@@ -140,7 +140,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-ubuntu'
+          name: 'reports-jvm'
           path: '**/build/reports/**'
 
   js:
@@ -161,13 +161,13 @@ jobs:
       - name: jsTest
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jsTest
+          arguments: jsTest --info
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-ubuntu'
+          name: 'reports-js'
           path: '**/build/reports/**'
 
   linux:
@@ -194,7 +194,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-ubuntu'
+          name: 'reports-linux'
           path: '**/build/reports/**'
 
   update_api:
