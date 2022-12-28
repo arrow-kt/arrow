@@ -2,7 +2,8 @@
 package arrow.fx.resilience.examples.exampleFlow01
 
 import kotlinx.coroutines.flow.*
-import arrow.fx.coroutines.*
+import arrow.fx.resilience.*
+
 suspend fun main(): Unit {
   var counter = 0
   val flow = flow {
