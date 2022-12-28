@@ -1,10 +1,10 @@
 // This file was automatically generated from CircuitBreaker.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleCircuitbreaker02
+package arrow.fx.resilience.examples.exampleCircuitbreaker02
 
 import arrow.core.Either
-import arrow.fx.coroutines.CircuitBreaker
-import arrow.fx.coroutines.Schedule
-import arrow.fx.coroutines.retry
+import arrow.fx.resilience.CircuitBreaker
+import arrow.fx.resilience.Schedule
+import arrow.fx.resilience.retry
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay

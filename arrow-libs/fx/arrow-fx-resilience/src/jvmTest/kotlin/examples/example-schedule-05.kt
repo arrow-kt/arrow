@@ -1,7 +1,7 @@
 // This file was automatically generated from Schedule.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleSchedule05
+package arrow.fx.resilience.examples.exampleSchedule05
 
-import arrow.fx.coroutines.*
+import arrow.fx.resilience.*
 
 suspend fun main(): Unit {
   var counter = 0

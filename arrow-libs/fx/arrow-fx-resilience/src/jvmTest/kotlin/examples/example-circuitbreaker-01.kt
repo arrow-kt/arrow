@@ -1,9 +1,9 @@
 // This file was automatically generated from CircuitBreaker.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleCircuitbreaker01
+package arrow.fx.resilience.examples.exampleCircuitbreaker01
 
 import arrow.core.Either
 import arrow.core.flatten
-import arrow.fx.coroutines.CircuitBreaker
+import arrow.fx.resilience.CircuitBreaker
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay

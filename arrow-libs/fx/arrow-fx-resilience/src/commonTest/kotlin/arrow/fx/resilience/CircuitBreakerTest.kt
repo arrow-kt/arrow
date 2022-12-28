@@ -1,7 +1,8 @@
-package arrow.fx.coroutines
+package arrow.fx.resilience
 
 import arrow.core.Either
 import arrow.core.test.stackSafeIteration
+import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.assertions.asClue
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -289,9 +290,9 @@ class CircuitBreakerTest : ArrowFxSpec(
           shouldThrow<IllegalArgumentException> {
             CircuitBreaker.of(
               maxFailures,
-              resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+              resetTimeout,
               exponentialBackoffFactor,
-              maxResetTimeout.toDouble(DurationUnit.NANOSECONDS)
+              maxResetTimeout
             )
           }
 

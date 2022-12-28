@@ -30,54 +30,6 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 /**
- * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
- * This operator is *transparent* to exceptions that occur in downstream flow and does not retry on exceptions that are thrown
- * to cancel the flow.
- *
- * @see [Schedule] for how to build a schedule.
- *
- * ```kotlin
- * import kotlinx.coroutines.flow.*
- * import arrow.fx.coroutines.*
- * suspend fun main(): Unit {
- *   var counter = 0
- *   val flow = flow {
- *    emit(counter)
- *    if (++counter <= 5) throw RuntimeException("Bang!")
- *   }
- *   //sampleStart
- *  val sum = flow.retry(Schedule.recurs(5))
- *    .reduce(Int::plus)
- *   //sampleEnd
- *   println(sum)
- * }
- * ```
- * <!--- KNIT example-flow-01.kt -->
- *
- * @param schedule - the [Schedule] used for retrying the collection of the flow
- */
-public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
-  (schedule as Schedule.ScheduleImpl<Any?, Throwable, B>)
-  var dec: Schedule.Decision<Any?, B>
-  var state: Any? = schedule.initialState()
-
-  val retryWhen = retryWhen { cause, _ ->
-    dec = schedule.update(cause, state)
-    state = dec.state
-
-    if (dec.cont) {
-      delay((dec.delayInNanos / 1_000_000).toLong())
-      true
-    } else {
-      false
-    }
-  }
-  retryWhen.collect {
-    emit(it)
-  }
-}
-
-/**
  * Like [map], but will evaluate [transform] in parallel, emitting the results
  * downstream in **the same order as the input stream**. The number of concurrent effects
  * is limited by [concurrency].
@@ -106,7 +58,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-02.kt -->
+ * <!--- KNIT example-flow-01.kt -->
  * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
  * concurrently runs, "prefetching", the next element. i.e.
  *
@@ -123,7 +75,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * //sampleEnd
  * }
  * ```
- * <!--- KNIT example-flow-03.kt -->
+ * <!--- KNIT example-flow-02.kt -->
  *
  * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
  */
@@ -179,7 +131,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-04.kt -->
+ * <!--- KNIT example-flow-03.kt -->
  */
 @FlowPreview
 public inline fun <A, B> Flow<A>.parMapUnordered(

@@ -1,10 +1,10 @@
 // This file was automatically generated from Schedule.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleSchedule02
+package arrow.fx.resilience.examples.exampleSchedule02
 
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import arrow.fx.coroutines.*
+import arrow.fx.resilience.*
 
 @ExperimentalTime
 fun <A> complexPolicy(): Schedule<A, List<A>> =

@@ -59,6 +59,9 @@ if (!enableCompatibilityMetadataVariant) {
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 
+include("arrow-fx-resilience")
+project(":arrow-fx-resilience").projectDir = file("arrow-libs/fx/arrow-fx-resilience")
+
 // OPTICS
 include("arrow-optics")
 project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
