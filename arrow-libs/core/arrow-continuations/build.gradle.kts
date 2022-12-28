@@ -52,12 +52,4 @@ kotlin {
       }
     }
   }
-
-  js(IR) {
-    browser {
-      testTask {
-        useMocha()
-      }
-    }
-  }
 }
