@@ -1,14 +1,14 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import kotlin.random.Random
 
-class TQueueTest : ArrowFxSpec(
-  spec = {
+class TQueueTest : StringSpec({
     "writing to a queue adds an element" {
       val tq = TQueue.new<Int>()
       atomically { tq.write(10) }

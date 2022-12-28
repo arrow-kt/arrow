@@ -1,18 +1,17 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.validated
 import arrow.optics.Iso
+import arrow.optics.test.either
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.IsoLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.validated
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 
-class ValidatedTest : UnitSpec() {
-
-  init {
+class ValidatedTest : StringSpec({
 
     testLaws(
       "Iso validated to either - ",
@@ -23,5 +22,5 @@ class ValidatedTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.either(Arb.string(), Arb.int())),
       )
     )
-  }
-}
+
+})

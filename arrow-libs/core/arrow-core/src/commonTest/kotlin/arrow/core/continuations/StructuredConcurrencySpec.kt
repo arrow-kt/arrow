@@ -3,7 +3,6 @@ package arrow.core.continuations
 import arrow.core.identity
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
-import arrow.fx.coroutines.never
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeIn
@@ -15,26 +14,25 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
-@OptIn(ExperimentalTime::class)
 class StructuredConcurrencySpec :
   StringSpec({
     "async - suspendCancellableCoroutine.invokeOnCancellation is called with Shifted Continuation" {
       val started = CompletableDeferred<Unit>()
       val cancelled = CompletableDeferred<Throwable?>()
 
-      effect<String, Nothing> {
+      effect {
           coroutineScope {
             val never = async {
               suspendCancellableCoroutine<Nothing> { cont ->
@@ -66,7 +64,7 @@ class StructuredConcurrencySpec :
 
     "Concurrent shift - async await" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
-        effect<Int, String> {
+        effect {
             coroutineScope {
               val fa = async<String> { shift(a) }
               val fb = async<String> { shift(b) }
@@ -90,7 +88,7 @@ class StructuredConcurrencySpec :
         ): Deferred<Unit> = async {
           guaranteeCase({
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           }) { case -> require(exit.complete(case)) }
         }
 
@@ -123,10 +121,10 @@ class StructuredConcurrencySpec :
 
     "Concurrent shift - async" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
-        effect<Int, String> {
+        effect {
             coroutineScope {
-              val fa = async<Nothing> { shift(a) }
-              val fb = async<Nothing> { shift(b) }
+              val fa = async { shift<Nothing>(a) }
+              val fb = async { shift<Nothing>(b) }
               "I will be overwritten by shift - coroutineScope waits until all async are finished"
             }
           }
@@ -147,11 +145,11 @@ class StructuredConcurrencySpec :
         ): Deferred<Unit> = async {
           guaranteeCase({
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           }) { case -> require(exit.complete(case)) }
         }
 
-        effect<Int, String> {
+        effect {
             guaranteeCase({
               coroutineScope {
                 val fa =
@@ -174,7 +172,7 @@ class StructuredConcurrencySpec :
 
     "Concurrent shift - launch" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
-        effect<Int, String> {
+        effect {
             coroutineScope {
               launch { shift(a) }
               launch { shift(b) }
@@ -197,11 +195,11 @@ class StructuredConcurrencySpec :
         ): Job = launch {
           guaranteeCase({
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           }) { case -> require(exit.complete(case)) }
         }
 
-        effect<Int, String> {
+        effect {
             guaranteeCase({
               coroutineScope {
                 val fa = launch {
