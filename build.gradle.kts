@@ -53,7 +53,8 @@ koverMerged {
         listOf(
           ":arrow-annotations",
           ":arrow-site",
-          ":arrow-stack"
+          ":arrow-stack",
+          ":arrow-optics-ksp-plugin"
         )
       )
     }
