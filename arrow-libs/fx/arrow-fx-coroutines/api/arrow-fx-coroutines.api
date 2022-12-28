@@ -16,65 +16,6 @@ public final class arrow/fx/coroutines/BuildersKt {
 	public static final fun unit (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/fx/coroutines/CircuitBreaker {
-	public static final field Companion Larrow/fx/coroutines/CircuitBreaker$Companion;
-	public synthetic fun <init> (Larrow/atomic/Atomic;IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun awaitClose (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun doOnClosed (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/CircuitBreaker;
-	public final fun doOnHalfOpen (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/CircuitBreaker;
-	public final fun doOnOpen (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/CircuitBreaker;
-	public final fun doOnRejectedTask (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/CircuitBreaker;
-	public final fun protectEither (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun protectOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun state ()Larrow/fx/coroutines/CircuitBreaker$State;
-}
-
-public final class arrow/fx/coroutines/CircuitBreaker$Companion {
-	public final fun of (IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun of$default (Larrow/fx/coroutines/CircuitBreaker$Companion;IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun of-3c68mSE (IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun of-3c68mSE$default (Larrow/fx/coroutines/CircuitBreaker$Companion;IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class arrow/fx/coroutines/CircuitBreaker$ExecutionRejected : java/lang/Throwable {
-	public fun <init> (Ljava/lang/String;Larrow/fx/coroutines/CircuitBreaker$State;)V
-	public final fun getReason ()Ljava/lang/String;
-	public final fun getState ()Larrow/fx/coroutines/CircuitBreaker$State;
-}
-
-public abstract class arrow/fx/coroutines/CircuitBreaker$State {
-}
-
-public final class arrow/fx/coroutines/CircuitBreaker$State$Closed : arrow/fx/coroutines/CircuitBreaker$State {
-	public fun <init> (I)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getFailures ()I
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/coroutines/CircuitBreaker$State$HalfOpen : arrow/fx/coroutines/CircuitBreaker$State {
-	public fun <init> (D)V
-	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getResetTimeout-UwyO8pc ()J
-	public final fun getResetTimeoutNanos ()D
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coroutines/CircuitBreaker$State {
-	public fun <init> (JD)V
-	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getExpiresAt ()J
-	public final fun getResetTimeout-UwyO8pc ()J
-	public final fun getResetTimeoutNanos ()D
-	public final fun getStartedAt ()J
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
 public final class arrow/fx/coroutines/CountDownLatch {
 	public fun <init> (J)V
 	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -136,7 +77,6 @@ public final class arrow/fx/coroutines/FlowExtensions {
 	public static final fun parMapUnordered (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun parMapUnordered$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun repeat (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/coroutines/Schedule;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public final class arrow/fx/coroutines/ParTraverse {
@@ -326,123 +266,6 @@ public final class arrow/fx/coroutines/ResourceScope$DefaultImpls {
 	public static fun onRelease (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun release (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun releaseCase (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public abstract class arrow/fx/coroutines/Schedule {
-	public static final field Companion Larrow/fx/coroutines/Schedule$Companion;
-	public final fun and (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public abstract fun andThen (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public abstract fun check (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public abstract fun choose (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun collect ()Larrow/fx/coroutines/Schedule;
-	public final fun combine (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public abstract fun combineNanos (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun compose (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun const (Ljava/lang/Object;)Larrow/fx/coroutines/Schedule;
-	public abstract fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun delay (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun delayedNanos (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun dimap (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
-	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public abstract fun foldLazy (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public abstract fun forever ()Larrow/fx/coroutines/Schedule;
-	public final fun jittered (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
-	public final fun jittered (Lkotlin/random/Random;)Larrow/fx/coroutines/Schedule;
-	public static synthetic fun jittered$default (Larrow/fx/coroutines/Schedule;Lkotlin/random/Random;ILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
-	public final fun jitteredDuration (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
-	public abstract fun logInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public abstract fun logOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public abstract fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
-	public final fun modify (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public abstract fun modifyNanos (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public abstract fun not ()Larrow/fx/coroutines/Schedule;
-	public final fun or (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public abstract fun pipe (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun repeat (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun repeatAsFlow (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun repeatOrElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun repeatOrElseAsFlow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun repeatOrElseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun repeatOrElseEitherAsFlow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun untilInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun untilOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun void ()Larrow/fx/coroutines/Schedule;
-	public final fun whileInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun whileOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun zip (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public abstract fun zip (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun zipLeft (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun zipRight (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-}
-
-public final class arrow/fx/coroutines/Schedule$Companion {
-	public final fun collect ()Larrow/fx/coroutines/Schedule;
-	public final fun decision ()Larrow/fx/coroutines/Schedule;
-	public final fun delayInNanos ()Larrow/fx/coroutines/Schedule;
-	public final fun delayedDuration (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun delayedNanos (Larrow/fx/coroutines/Schedule;)Larrow/fx/coroutines/Schedule;
-	public final fun doUntil (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun doWhile (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun duration ()Larrow/fx/coroutines/Schedule;
-	public final fun exponential (DD)Larrow/fx/coroutines/Schedule;
-	public static synthetic fun exponential$default (Larrow/fx/coroutines/Schedule$Companion;DDILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
-	public final fun exponential-VtjQ1oo (JD)Larrow/fx/coroutines/Schedule;
-	public static synthetic fun exponential-VtjQ1oo$default (Larrow/fx/coroutines/Schedule$Companion;JDILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
-	public final fun fibonacci (D)Larrow/fx/coroutines/Schedule;
-	public final fun fibonacci-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
-	public final fun forever ()Larrow/fx/coroutines/Schedule;
-	public final fun identity ()Larrow/fx/coroutines/Schedule;
-	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
-	public final fun linear (D)Larrow/fx/coroutines/Schedule;
-	public final fun linear-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
-	public final fun logInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun logOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun never ()Larrow/fx/coroutines/Schedule;
-	public final fun once ()Larrow/fx/coroutines/Schedule;
-	public final fun recurs (I)Larrow/fx/coroutines/Schedule;
-	public final fun spaced (D)Larrow/fx/coroutines/Schedule;
-	public final fun spaced-LRDsOJo (J)Larrow/fx/coroutines/Schedule;
-	public final fun unfold (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
-	public final fun unfoldLazy (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
-	public final fun unit ()Larrow/fx/coroutines/Schedule;
-}
-
-public final class arrow/fx/coroutines/Schedule$Decision {
-	public static final field Companion Larrow/fx/coroutines/Schedule$Decision$Companion;
-	public fun <init> (ZDLjava/lang/Object;Larrow/core/Eval;)V
-	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun combine (Larrow/fx/coroutines/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun combineNanos (Larrow/fx/coroutines/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun component1 ()Z
-	public final fun component2 ()D
-	public final fun component3 ()Ljava/lang/Object;
-	public final fun component4 ()Larrow/core/Eval;
-	public final fun copy (ZDLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public static synthetic fun copy$default (Larrow/fx/coroutines/Schedule$Decision;ZDLjava/lang/Object;Larrow/core/Eval;ILjava/lang/Object;)Larrow/fx/coroutines/Schedule$Decision;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getCont ()Z
-	public final fun getDelayInNanos ()D
-	public final fun getDuration-UwyO8pc ()J
-	public final fun getFinish ()Larrow/core/Eval;
-	public final fun getState ()Ljava/lang/Object;
-	public fun hashCode ()I
-	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun mapLeft (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun not ()Larrow/fx/coroutines/Schedule$Decision;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/coroutines/Schedule$Decision$Companion {
-	public final fun cont (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun cont-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun done (DLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-	public final fun done-KLykuaI (JLjava/lang/Object;Larrow/core/Eval;)Larrow/fx/coroutines/Schedule$Decision;
-}
-
-public final class arrow/fx/coroutines/ScheduleKt {
-	public static final fun retry (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun retryOrElse (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun retryOrElseEither (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/fx/coroutines/ScopeDSL : java/lang/annotation/Annotation {
