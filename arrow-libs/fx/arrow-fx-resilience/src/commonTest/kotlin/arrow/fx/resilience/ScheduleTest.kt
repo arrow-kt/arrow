@@ -2,13 +2,11 @@ package arrow.fx.resilience
 
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.SideEffect
-import arrow.fx.coroutines.leftException
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
@@ -263,7 +261,7 @@ class ScheduleTest : StringSpec({
         }
       }
 
-      l should leftException(exception)
+      l.shouldBeTypeOf<Either.Left<MyException>>()
       count shouldBe 20_001
     }
 
