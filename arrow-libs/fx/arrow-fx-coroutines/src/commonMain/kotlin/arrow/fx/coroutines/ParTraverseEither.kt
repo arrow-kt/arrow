@@ -3,8 +3,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.continuations.effect
-import arrow.core.continuations.toEither
+import arrow.core.continuations.either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -198,8 +197,8 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =
-  effect<E, List<B>> {
+  either {
     coroutineScope {
       map { async(ctx) { f.invoke(this, it).bind() } }.awaitAll()
     }
-  }.toEither()
+  }

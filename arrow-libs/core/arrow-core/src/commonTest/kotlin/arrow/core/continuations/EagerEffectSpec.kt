@@ -99,7 +99,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
+  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().getOrNull() shouldBe 1 }
   
   "short-circuit" { eagerEffect<String, Nothing> { raise("hello") }.runCont() shouldBe "hello" }
   
@@ -124,8 +124,8 @@ class EagerEffectSpec : StringSpec({
       val res =
         either<String, Int> {
           val ii = i
-          ensureNotNull(ii) { raise }
-          square(ii) // Smart-cast by contract
+          ensureNotNull(i) { raise }
+          square(i) // Smart-cast by contract
         }
       val expected = i?.let(::square)?.right() ?: raise.left()
       res shouldBe expected
@@ -213,4 +213,5 @@ class EagerEffectSpec : StringSpec({
       }.message.shouldNotBeNull() shouldBe msg2
     }
   }
+
 })

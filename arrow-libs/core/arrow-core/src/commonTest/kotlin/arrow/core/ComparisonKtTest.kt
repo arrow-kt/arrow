@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
@@ -55,7 +56,8 @@ class ComparisonKtTest : StringSpec({
     }
 
     "Arberic - sortAll" {
-      checkAll(Arb.person(), Arb.array(Arb.person(), 0..50)) { a, aas ->
+      checkAll(Arb.person(), Arb.list(Arb.person(), 0..50)) { a, lst ->
+        val aas = lst.toTypedArray()
         val res = sort(a, *aas)
         val expected = listOf(a, *aas).sorted()
 

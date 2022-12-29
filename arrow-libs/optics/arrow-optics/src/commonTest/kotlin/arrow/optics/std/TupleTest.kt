@@ -2,6 +2,16 @@ package arrow.optics.std
 
 import arrow.optics.Lens
 import arrow.optics.Traversal
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.LensLaws
+import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.tuple4
+import arrow.optics.test.tuple5
+import arrow.optics.test.tuple6
+import arrow.optics.test.tuple7
+import arrow.optics.test.tuple8
+import arrow.optics.test.tuple9
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -9,14 +19,8 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.triple
-import io.kotest.property.arrow.core.*
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.LensLaws
-import io.kotest.property.arrow.optics.TraversalLaws
 
-class TupleTest : StringSpec() {
-
-  init {
+class TupleTest : StringSpec({
 
     testLaws(
       "Lens pair first - ",
@@ -174,5 +178,5 @@ class TupleTest : StringSpec() {
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
-  }
-}
+
+})

@@ -1,5 +1,11 @@
 package arrow.optics
 
+import arrow.optics.test.either
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.PrismLaws
+import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -8,29 +14,14 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.either
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.OptionalLaws
-import io.kotest.property.arrow.optics.PrismLaws
-import io.kotest.property.arrow.optics.SetterLaws
-import io.kotest.property.arrow.optics.TraversalLaws
 import io.kotest.property.checkAll
 
-class PrismTest : StringSpec() {
+class PrismTest : StringSpec({
 
-  init {
     testLaws(
       "Prism sum - ",
       PrismLaws.laws(
         prism = Prism.sumType(),
-        aGen = Arb.sumType(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
-      ),
-
-      SetterLaws.laws(
-        setter = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
@@ -128,7 +119,7 @@ class PrismTest : StringSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.sumType()) { sum: SumType ->
-          combineAll(Monoid.string(), sum) shouldBe
+          fold(Monoid.string(), sum) shouldBe
             (Prism.sumType().getOrNull(sum) ?: Monoid.string().empty())
         }
       }
@@ -187,7 +178,7 @@ class PrismTest : StringSpec() {
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.sumType(), Arb.boolean()) { sum, predicate ->
-        Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false shouldBe (predicate && sum is SumType.A)
+        (Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false) shouldBe (predicate && sum is SumType.A)
       }
     }
 
@@ -202,5 +193,5 @@ class PrismTest : StringSpec() {
         Prism.sumType().all(sum) { predicate } shouldBe (predicate || sum is SumType.B)
       }
     }
-  }
-}
+
+})

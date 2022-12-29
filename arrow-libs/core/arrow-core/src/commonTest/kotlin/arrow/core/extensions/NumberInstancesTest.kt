@@ -1,5 +1,8 @@
 package arrow.core.extensions
 
+import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.laws.SemiringLaws
+import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semiring
 import io.kotest.core.spec.style.StringSpec
@@ -9,12 +12,9 @@ import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.short
-import io.kotest.property.arrow.core.MonoidLaws
-import io.kotest.property.arrow.core.SemiringLaws
-import io.kotest.property.arrow.laws.testLaws
 import io.kotest.property.checkAll
 
-class NumberInstancesTest : StringSpec() {
+class NumberInstancesTest : StringSpec({
 
   fun <F> testAllLaws(
     SG: Semiring<F>,
@@ -26,7 +26,6 @@ class NumberInstancesTest : StringSpec() {
     testLaws(MonoidLaws.laws(M, GEN, eq))
   }
 
-  init {
     testAllLaws(Semiring.byte(), Monoid.byte(), Arb.byte())
     testAllLaws(Semiring.short(), Monoid.short(), Arb.short())
     testAllLaws(Semiring.int(), Monoid.int(), Arb.int())
@@ -69,5 +68,4 @@ class NumberInstancesTest : StringSpec() {
         expected shouldBe seen
       }
     }
-  }
-}
+})

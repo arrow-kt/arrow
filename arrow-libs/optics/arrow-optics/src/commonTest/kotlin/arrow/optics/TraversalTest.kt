@@ -1,18 +1,19 @@
 package arrow.optics
 
+import arrow.optics.test.functionAToB
+import arrow.optics.test.option
+import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.nonEmptyList
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.*
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.core.nonEmptyList
-import io.kotest.property.arrow.core.option
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.SetterLaws
-import io.kotest.property.arrow.optics.TraversalLaws
+import io.kotest.property.arbitrary.char
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
 
-class TraversalTest : StringSpec() {
-
-  init {
+class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal list - ",
@@ -22,13 +23,6 @@ class TraversalTest : StringSpec() {
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ),
-
-      SetterLaws.laws(
-        setter = Traversal.list(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
-      )
     )
 
     testLaws(
@@ -81,5 +75,5 @@ class TraversalTest : StringSpec() {
         funcGen = Arb.functionAToB(Arb.char()),
       )
     )
-  }
-}
+
+})

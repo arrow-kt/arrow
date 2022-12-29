@@ -6,11 +6,14 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flowOn
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ExperimentalTime
 class FlowJvmTest : StringSpec({
   "parMap - single thread - identity" {

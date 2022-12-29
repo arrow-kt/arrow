@@ -90,7 +90,7 @@ jobs:
           name: 'reports-windows'
           path: '**/build/reports/**'
 
-  ubuntu:
+  jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -115,16 +115,86 @@ jobs:
         with:
           arguments: compileTestKotlin
 
-      - name: check
+      - name: jvmTest
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check
+          arguments: jvmTest
+
+      - name: Create code coverage report
+        if: "! github.event.pull_request.head.repo.fork "
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: koverMergedReport
+
+      - name: Add coverage report to PR
+        if: "! github.event.pull_request.head.repo.fork "
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: build/reports/kover/merged/xml/report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Kover Report
+          update-comment: true
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-ubuntu'
+          name: 'reports-jvm'
+          path: '**/build/reports/**'
+
+  js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jsTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jsTest --info
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-js'
+          path: '**/build/reports/**'
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: linuxX64Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: linuxX64Test
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-linux'
           path: '**/build/reports/**'
 
   update_api:

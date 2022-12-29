@@ -1,6 +1,6 @@
 package arrow.core
 
-import arrow.core.Either
+import arrow.core.test.either
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -16,10 +16,9 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.either
 import io.kotest.property.checkAll
 
-public data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
+data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
   val first: A,
   val second: B,
   val third: C,
@@ -35,7 +34,7 @@ public data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H
   override fun toString(): String =
     "($first, $second, $third, $fourth, $fifth, $sixth, $seventh, $eighth, $ninth, $tenth)"
 
-  public companion object
+  companion object
 }
 
 class EitherZipTest : StringSpec({

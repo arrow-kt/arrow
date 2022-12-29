@@ -5,20 +5,23 @@ import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.toOption
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.*
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.OptionalLaws
+import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
-class OptionalTest : StringSpec() {
-
-  init {
+class OptionalTest : StringSpec({
 
     testLaws(
       "Optional identity - ",
@@ -85,7 +88,7 @@ class OptionalTest : StringSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          combineAll(Monoid.int(), ints) shouldBe
+          fold(Monoid.int(), ints) shouldBe
             ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
         }
       }
@@ -143,8 +146,8 @@ class OptionalTest : StringSpec() {
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
       checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
-          ?: false shouldBe (predicate && list.isNotEmpty())
+        (Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
+          ?: false) shouldBe (predicate && list.isNotEmpty())
       }
     }
 
@@ -161,7 +164,7 @@ class OptionalTest : StringSpec() {
     }
 
     "Set a value over a non empty list target then the first item of the result should be the value" {
-      checkAll(Arb.list(Arb.int(), 1..1000), Arb.int()) { list, value ->
+      checkAll(Arb.list(Arb.int(), 1..200), Arb.int()) { list, value ->
         Optional.listHead<Int>().set(list, value)[0] shouldBe value
       }
     }
@@ -173,5 +176,5 @@ class OptionalTest : StringSpec() {
         joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
       }
     }
-  }
-}
+
+})

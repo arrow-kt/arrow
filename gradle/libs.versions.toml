@@ -10,7 +10,7 @@ jUnitJupiter = "5.8.2"
 jUnitVintage = "5.8.2"
 kotest = "5.5.4"
 kotestGradle = "5.5.4"
-kotestArrow = "1.3.0"
+kover = "0.6.1"
 kotlin = "1.7.22"
 kotlinBinaryCompatibilityValidator = "0.12.1"
 kotlinCompileTesting = "1.4.9"
@@ -34,10 +34,6 @@ kotest-frameworkApi = { module = "io.kotest:kotest-framework-api", version.ref =
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-arrowAssertions = { module = "io.kotest.extensions:kotest-assertions-arrow", version.ref = "kotestArrow" }
-kotest-arrowProperty = { module = "io.kotest.extensions:kotest-property-arrow", version.ref = "kotestArrow" }
-kotest-arrowOpticsProperty = { module = "io.kotest.extensions:kotest-property-arrow-optics", version.ref = "kotestArrow" }
-kotest-arrowFxAssertions = { module = "io.kotest.extensions:kotest-assertions-arrow-fx-coroutines", version.ref = "kotestArrow" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlibJDK8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
@@ -69,5 +65,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
+kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }

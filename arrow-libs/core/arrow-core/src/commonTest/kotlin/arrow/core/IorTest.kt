@@ -1,5 +1,8 @@
 package arrow.core
 
+import arrow.core.test.ior
+import arrow.core.test.laws.SemigroupLaws
+import arrow.core.test.testLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
@@ -10,13 +13,9 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.SemigroupLaws
-import io.kotest.property.arrow.laws.testLaws
 import io.kotest.property.checkAll
 
-class IorTest : StringSpec() {
-
-  init {
+class IorTest : StringSpec({
 
     val ARB = Arb.ior(Arb.string(), Arb.int())
 
@@ -193,5 +192,4 @@ class IorTest : StringSpec() {
       }
     }
 
-  }
-}
+})

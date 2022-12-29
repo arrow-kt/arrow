@@ -1,18 +1,16 @@
 package arrow.optics.std
 
 import arrow.optics.Lens
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.LensLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.nonEmptyList
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.core.nonEmptyList
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.LensLaws
 
-class NonEmptyListTest : StringSpec() {
-
-  init {
+class NonEmptyListTest : StringSpec({
 
     testLaws(
       "Lens Nel head - ",
@@ -33,5 +31,5 @@ class NonEmptyListTest : StringSpec() {
         funcGen = Arb.functionAToB(Arb.list(Arb.string())),
       )
     )
-  }
-}
+
+})

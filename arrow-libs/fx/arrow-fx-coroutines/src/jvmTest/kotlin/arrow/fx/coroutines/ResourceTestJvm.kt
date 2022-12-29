@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.checkAll
 import java.util.concurrent.atomic.AtomicBoolean
@@ -10,24 +10,23 @@ import java.io.Closeable
 import io.kotest.property.Arb
 
 class ResourceTestJvm : StringSpec({
-  
-  class AutoCloseableTest() : AutoCloseable {
+
+  class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
-  
-  class CloseableTest() : Closeable {
+
+  class CloseableTest : Closeable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
   
   "AutoCloseable closes" {
       val t = AutoCloseableTest()
-      
       resourceScope {
         autoCloseable { t }
       }
-      
+
       t.didClose.get() shouldBe true
   }
   
@@ -48,11 +47,11 @@ class ResourceTestJvm : StringSpec({
   
   "Closeable closes" {
       val t = CloseableTest()
-      
+
       resourceScope {
         closeable { t }
       }
-      
+
       t.didClose.get() shouldBe true
   }
   

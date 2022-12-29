@@ -1,12 +1,15 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.right
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -32,7 +35,7 @@ public typealias Prism<S, A> = PPrism<S, S, A, A>
  * @param A the focus of a [PPrism]
  * @param B the modified focus of a [PPrism]
  */
-public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, POptionalGetter<S, T, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
 
   override fun getOrModify(source: S): Either<T, A>
 
@@ -80,17 +83,17 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
   /**
    * Create a sum of the [PPrism] and a type [C]
    */
-  override fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
+  public fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
     PPrism(
       {
         it.fold(
-          { a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) },
-          { c -> Either.Right(Either.Right(c)) })
+          { a -> getOrModify(a).bimap(::Left, ::Left) },
+          { c -> Right(Right(c)) })
       },
       {
         when (it) {
-          is Either.Left -> Either.Left(reverseGet(it.value))
-          is Either.Right -> Either.Right(it.value)
+          is Left -> Left(reverseGet(it.value))
+          is Right -> Right(it.value)
         }
       }
     )
@@ -98,12 +101,12 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
   /**
    * Create a sum of a type [C] and the [PPrism]
    */
-  override fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
+  public fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
     PPrism(
       {
         it.fold(
-          { c -> Either.Right(Either.Left(c)) },
-          { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) })
+          { c -> Right(Left(c)) },
+          { s -> getOrModify(s).bimap(::Right, ::Right) })
       },
       { it.map(this::reverseGet) }
     )
@@ -122,7 +125,10 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): Prism<S, S> = PPrism(
+      getOrModify = { it.right() },
+      reverseGet = ::identity
+    )
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
@@ -142,7 +148,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
      * A [PPrism] that checks for equality with a given value [a]
      */
     public fun <A> only(a: A, eq: (constant: A, other: A) -> Boolean = { aa, b -> aa == b }): Prism<A, Unit> = Prism(
-      getOrModify = { a2 -> (if (eq(a, a2)) Either.Left(a) else Either.Right(Unit)) },
+      getOrModify = { a2 -> (if (eq(a, a2)) Left(a) else Right(Unit)) },
       reverseGet = { a }
     )
 
@@ -152,7 +158,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     @JvmStatic
     public fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
       PPrism(
-        getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
+        getOrModify = { option -> option.fold({ Left(None) }, ::Right) },
         reverseGet = ::Some
       )
 
@@ -169,7 +175,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     @JvmStatic
     public fun <A> none(): Prism<Option<A>, Unit> =
       Prism(
-        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
+        getOrModify = { option -> option.fold({ Right(Unit) }, { Left(option) }) },
         reverseGet = { _ -> None }
       )
   }
@@ -179,7 +185,6 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-@Suppress("FunctionName")
 public fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }

@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 
 class GuaranteeCaseTest : StringSpec({
 
@@ -49,7 +50,7 @@ class GuaranteeCaseTest : StringSpec({
         guaranteeCase(
           fa = {
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           finalizer = { ex -> require(p.complete(ex)) }
         )

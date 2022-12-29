@@ -8,6 +8,7 @@ import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 
 class RaceNJvmTest : StringSpec({
@@ -20,8 +21,8 @@ class RaceNJvmTest : StringSpec({
             Thread.currentThread().name shouldStartWith "single"
             
             val racedOn = when (choose) {
-              1 -> raceN<String, Nothing>(pool, { Thread.currentThread().name }, { never() }).swap().orNull()
-              else -> raceN<Nothing, String>(pool, { never() }, { Thread.currentThread().name }).orNull()
+              1 -> raceN<String, Nothing>(pool, { Thread.currentThread().name }, { awaitCancellation() }).swap().getOrNull()
+              else -> raceN<Nothing, String>(pool, { awaitCancellation() }, { Thread.currentThread().name }).getOrNull()
             }
             
             racedOn shouldStartWith racerName
@@ -42,8 +43,8 @@ class RaceNJvmTest : StringSpec({
             
             Either.catch {
               when (choose) {
-                1 -> raceN<Nothing, Nothing>(pool, { e.suspend() }, { never() }).swap().orNull()
-                else -> raceN<Nothing, Nothing>(pool, { never() }, { e.suspend() }).orNull()
+                1 -> raceN(pool, { e.suspend() }, { awaitCancellation() }).swap().getOrNull()
+                else -> raceN(pool, { awaitCancellation() }, { e.suspend() }).getOrNull()
               }
             } should leftException(e)
             
@@ -57,7 +58,7 @@ class RaceNJvmTest : StringSpec({
       resourceScope {
         val ctx = singleThreadContext("single")
         raceN(ctx, { Thread.currentThread().name }, { Thread.currentThread().name })
-      }.swap().orNull() shouldStartWith "single"
+      }.swap().getOrNull() shouldStartWith "single"
     }
     
     "race3 returns to original context" {
@@ -70,15 +71,15 @@ class RaceNJvmTest : StringSpec({
             
             val racedOn = when (choose) {
               1 ->
-                raceN(raceCtx, { Thread.currentThread().name }, { never<Nothing>() }, { never<Nothing>() })
+                raceN(raceCtx, { Thread.currentThread().name }, { awaitCancellation() }, { awaitCancellation() })
                   .fold(::identity, { null }, { null })
               
               2 ->
-                raceN(raceCtx, { never<Nothing>() }, { Thread.currentThread().name }, { never<Nothing>() })
+                raceN(raceCtx, { awaitCancellation() }, { Thread.currentThread().name }, { awaitCancellation() })
                   .fold({ null }, ::identity, { null })
               
               else ->
-                raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { Thread.currentThread().name })
+                raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { Thread.currentThread().name })
                   .fold({ null }, { null }, ::identity)
             }
             
@@ -100,15 +101,15 @@ class RaceNJvmTest : StringSpec({
             Either.catch {
               when (choose) {
                 1 ->
-                  raceN(raceCtx, { e.suspend() }, { never<Nothing>() }, { never<Nothing>() })
+                  raceN(raceCtx, { e.suspend() }, { awaitCancellation() }, { awaitCancellation() })
                     .fold(::identity, { null }, { null })
                 
                 2 ->
-                  raceN(raceCtx, { never<Nothing>() }, { e.suspend() }, { never<Nothing>() })
+                  raceN(raceCtx, { awaitCancellation() }, { e.suspend() }, { awaitCancellation() })
                     .fold({ null }, ::identity, { null })
                 
                 else ->
-                  raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { e.suspend() })
+                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { e.suspend() })
                     .fold({ null }, { null }, ::identity)
               }
             } should leftException(e)

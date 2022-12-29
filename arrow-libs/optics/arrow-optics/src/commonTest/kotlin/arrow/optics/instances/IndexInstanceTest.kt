@@ -1,17 +1,21 @@
 package arrow.optics.instances
 
+import arrow.optics.test.functionAToB
+import arrow.optics.test.nonEmptyList
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.sequence
 import arrow.optics.typeclasses.Index
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.*
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.core.nonEmptyList
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.OptionalLaws
+import io.kotest.property.arbitrary.char
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
 
-class IndexInstanceTest : StringSpec() {
+class IndexInstanceTest : StringSpec({
 
-  init {
     testLaws(
       "Index list - ",
       OptionalLaws.laws(
@@ -62,5 +66,5 @@ class IndexInstanceTest : StringSpec() {
         funcGen = Arb.functionAToB(Arb.char()),
       )
     )
-  }
-}
+
+})

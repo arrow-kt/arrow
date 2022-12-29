@@ -1,23 +1,16 @@
 package arrow.optics.std
 
-import arrow.optics.Iso
 import arrow.optics.Optional
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.core.nonEmptyList
-import io.kotest.property.arrow.core.option
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.IsoLaws
-import io.kotest.property.arrow.optics.OptionalLaws
-import io.kotest.property.arrow.optics.SetterLaws
-import io.kotest.property.arrow.optics.TraversalLaws
 
-class ListTest : StringSpec() {
-
-  init {
+class ListTest : StringSpec({
 
     testLaws(
       "Optional list head - ",
@@ -28,17 +21,11 @@ class ListTest : StringSpec() {
         funcGen = Arb.functionAToB(Arb.int()),
       ),
       TraversalLaws.laws(
-        traversal = Optional.listHead<Int>(),
+        traversal = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ),
-      SetterLaws.laws(
-        setter = Optional.listHead<Int>(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
-      )
     )
 
     testLaws(
@@ -51,14 +38,4 @@ class ListTest : StringSpec() {
       )
     )
 
-    testLaws(
-      "Iso list to Option Nel - ",
-      IsoLaws.laws(
-        iso = Iso.listToOptionNel(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.option(Arb.nonEmptyList(Arb.int())),
-        funcGen = Arb.functionAToB(Arb.option(Arb.nonEmptyList(Arb.int()))),
-      )
-    )
-  }
-}
+})

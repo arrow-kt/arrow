@@ -7,7 +7,6 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.never
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
 import io.kotest.core.spec.style.StringSpec
@@ -19,7 +18,6 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +25,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 
-@OptIn(ExperimentalTime::class)
 class ParMap2Test : StringSpec({
-
     "parMapN 2 runs in parallel" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         val r = Atomic("")
@@ -59,9 +55,9 @@ class ParMap2Test : StringSpec({
         val pb = CompletableDeferred<Pair<Int, ExitCase>>()
 
         val loserA: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+          { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pa.complete(Pair(a, ex)) } }
         val loserB: suspend CoroutineScope.() -> Int =
-          { guaranteeCase({ s.receive(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+          { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pb.complete(Pair(b, ex)) } }
 
         val f = async { parZip(loserA, loserB) { _a, _b -> Pair(_a, _b) } }
 

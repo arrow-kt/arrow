@@ -10,6 +10,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlin.time.ExperimentalTime
 
@@ -253,7 +254,7 @@ class BracketCaseTest : StringSpec({
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -277,7 +278,7 @@ class BracketCaseTest : StringSpec({
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -306,7 +307,7 @@ class BracketCaseTest : StringSpec({
 
         // Signal that fiber can be cancelled running
         start.complete(Unit)
-        never<Unit>()
+        awaitCancellation()
       }
 
       // Wait until the fiber is started before cancelling
@@ -328,7 +329,7 @@ class BracketCaseTest : StringSpec({
               // This should be uncancellable, and suspends until capacity 1 is received
               mVar.send(y)
             },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, exitCase -> require(p.complete(exitCase)) }
           )
         }
@@ -351,7 +352,7 @@ class BracketCaseTest : StringSpec({
         val fiber = async {
           bracketCase(
             acquire = { latch.complete(Unit) },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, _ -> mVar.send(y) }
           )
         }

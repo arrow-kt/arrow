@@ -26,6 +26,22 @@ kotlin {
       }
     }
 
+    if (!enableCompatibilityMetadataVariant) {
+      commonTest {
+        dependencies {
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
+        }
+      }
+
+      jvmTest {
+        dependencies {
+          runtimeOnly(libs.kotest.runnerJUnit5)
+        }
+      }
+    }
+
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlibJDK8)

@@ -77,6 +77,10 @@ public interface Monoid<A> : Semigroup<A> {
     public fun <A, B> either(SGA: Semigroup<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
       EitherMonoid(SGA, MB)
 
+    @Deprecated("For binary compat", level = DeprecationLevel.HIDDEN)
+    public fun <A, B> either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
+      EitherMonoid(MA, MB)
+
     @JvmStatic
     public fun <A> endo(): Monoid<Endo<A>> =
       object : Monoid<Endo<A>> {

@@ -19,10 +19,7 @@ package arrow.core
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class CollectionsSyntaxTests : StringSpec() {
-
-  init {
-
+class CollectionsSyntaxTests : StringSpec({
     "tail" {
       listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
     }
@@ -36,5 +33,4 @@ class CollectionsSyntaxTests : StringSpec() {
       head shouldBe 1
       tail shouldBe listOf(2, 3)
     }
-  }
-}
+})

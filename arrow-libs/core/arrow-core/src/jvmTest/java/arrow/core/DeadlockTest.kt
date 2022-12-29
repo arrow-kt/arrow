@@ -6,9 +6,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class DeadlockTest : StringSpec() {
-
-  init {
+class DeadlockTest : StringSpec({
 
     "classloader should not deadlock Either initialization" {
       runBlocking {
@@ -51,5 +49,5 @@ class DeadlockTest : StringSpec() {
         }.joinAll()
       }
     }
-  }
-}
+
+})

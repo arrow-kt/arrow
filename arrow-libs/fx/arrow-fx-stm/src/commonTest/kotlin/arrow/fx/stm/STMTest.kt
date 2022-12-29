@@ -152,7 +152,6 @@ class STMTest : StringSpec({
       }
     }
     "suspended transactions are resumed for variables accessed in orElse" {
-      checkAll<Int> {
         val tv = TVar.new(0)
         val f = async {
           delay(10.microseconds)
@@ -167,10 +166,8 @@ class STMTest : StringSpec({
           } orElse { retry() }
         } shouldBeExactly 1
         f.join()
-      }
     }
     "on a single variable concurrent transactions should be linear" {
-      checkAll<Int> {
         val tv = TVar.new(0)
         val res = TQueue.new<Int>()
 
@@ -184,7 +181,6 @@ class STMTest : StringSpec({
         }.joinAll()
 
         atomically { res.flush() } shouldBe (0..100).toList()
-      }
     }
     "atomically rethrows exceptions" {
       shouldThrow<IllegalArgumentException> { atomically { throw IllegalArgumentException("Test") } }
@@ -210,7 +206,6 @@ class STMTest : StringSpec({
       tv.unsafeRead() shouldBeExactly 10
     }
     "concurrent example 1" {
-      checkAll<Int> {
         val acc1 = TVar.new(100)
         val acc2 = TVar.new(200)
         parZip(
@@ -233,7 +228,6 @@ class STMTest : StringSpec({
         )
         acc1.unsafeRead() shouldBeExactly 50
         acc2.unsafeRead() shouldBeExactly 250
-      }
     }
 
     // TypeError: Cannot read property 'toString' of undefined
@@ -248,7 +242,6 @@ class STMTest : StringSpec({
     // at WindowMessageQueue.MessageQueue.process(/var/folders/x5/6r18d9w52c7czy6zh5m1spvw0000gn/T/_karma_webpack_624630/commons.js:177985)
     // at <global>.<unknown>(/var/folders/x5/6r18d9w52c7czy6zh5m1spvw0000gn/T/_karma_webpack_624630/commons.js:177940)
     "concurrent example 2".config(enabled = false) {
-      checkAll<Int> {
         val tq = TQueue.new<Int>()
         parZip(
           {
@@ -273,7 +266,6 @@ class STMTest : StringSpec({
         ) { _, _ -> Unit }
         // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
         atomically { tq.flush() } shouldBe emptyList()
-      }
     }
-  }
-)
+
+})

@@ -2,6 +2,11 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.optics.test.functionAToB
+import arrow.optics.test.laws.LensLaws
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -9,14 +14,10 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.laws.testLaws
-import io.kotest.property.arrow.optics.*
 import io.kotest.property.checkAll
 
-class LensTest : StringSpec() {
+class LensTest : StringSpec({
 
-  init {
     testLaws(
       "TokenLens - ",
       LensLaws.laws(
@@ -39,13 +40,6 @@ class LensTest : StringSpec() {
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       ),
-
-      SetterLaws.laws(
-        setter = Lens.token(),
-        aGen = Arb.token(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
-      )
     )
 
     testLaws(
@@ -84,7 +78,7 @@ class LensTest : StringSpec() {
 
     "asFold should behave as valid Fold: combineAll" {
       checkAll(Arb.token()) { token ->
-        Lens.token().combineAll(Monoid.string(), token) shouldBe token.value
+        Lens.token().fold(Monoid.string(), token) shouldBe token.value
       }
     }
 
@@ -106,24 +100,6 @@ class LensTest : StringSpec() {
       }
     }
 
-    "asGetter should behave as valid Getter: get" {
-      checkAll(Arb.token()) { token ->
-        Lens.token().get(token) shouldBe Getter.token().get(token)
-      }
-    }
-
-    "asGetter should behave as valid Getter: find" {
-      checkAll(Arb.token(), Arb.functionAToB<String, Boolean>(Arb.boolean())) { token, p ->
-        Lens.token().findOrNull(token, p) shouldBe Getter.token().findOrNull(token, p)
-      }
-    }
-
-    "asGetter should behave as valid Getter: exist" {
-      checkAll(Arb.token(), Arb.functionAToB<String, Boolean>(Arb.boolean())) { token, p ->
-        Lens.token().any(token, p) shouldBe Getter.token().any(token, p)
-      }
-    }
-
     "Lifting a function should yield the same result as not yielding" {
       checkAll(Arb.token(), Arb.string()) { token, value ->
         Lens.token().set(token, value) shouldBe Lens.token().lift { value }(token)
@@ -132,7 +108,7 @@ class LensTest : StringSpec() {
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.boolean()) { predicate: Boolean ->
-        Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false shouldBe predicate
+        (Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 
@@ -173,5 +149,5 @@ class LensTest : StringSpec() {
         second.get(int to token) shouldBe (int to token.value)
       }
     }
-  }
-}
+
+})

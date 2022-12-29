@@ -6,7 +6,7 @@ import arrow.core.Either
 import arrow.core.continuations.result
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.result.shouldBeFailureOfType
+import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
@@ -19,7 +19,7 @@ import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseResultTest : StringSpec({
     "parTraverseResult can traverse effect full computations" {
-      val ref = Atomic(0)
+      val ref: Atomic<Int> = Atomic(0)
       (0 until 100).parTraverseResult {
         Result.success(ref.update { it + 1 })
       }
@@ -54,7 +54,7 @@ class ParTraverseResultTest : StringSpec({
       ) { n, killOn ->
         (0 until n).parTraverseResult { i ->
           if (i == killOn) Result.failure(RuntimeException()) else Result.success(Unit)
-        }.shouldBeFailureOfType<RuntimeException>()
+        }.shouldBeFailure<RuntimeException>()
       }
     }
 

@@ -29,19 +29,9 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(libs.kotest.frameworkApi)
+          implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-          implementation(libs.kotest.arrowAssertions.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
-          implementation(libs.kotest.arrowProperty.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
-          implementation(libs.kotest.arrowOpticsProperty.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-            exclude(group = "io.arrow-kt", module = "arrow-optics")
-          }
         }
       }
       jvmTest {

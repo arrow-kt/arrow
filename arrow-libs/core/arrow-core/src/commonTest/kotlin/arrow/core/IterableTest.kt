@@ -1,24 +1,18 @@
 package arrow.core
 
 import arrow.typeclasses.Semigroup
+import arrow.core.test.option
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arrow.core.either
-import io.kotest.property.arrow.core.functionAToB
-import io.kotest.property.arrow.core.option
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class IterableTest : StringSpec() {
-  init {
+class IterableTest : StringSpec({
     "mapAccumulating stack-safe, and runs in original order" {
       val acc = mutableListOf<Int>()
       val res = (0..20_000).mapOrAccumulate(Semigroup.string()) {
@@ -282,5 +276,5 @@ class IterableTest : StringSpec() {
         list.separateEither() shouldBe ints.partition { it % 2 == 0 }
       }
     }
-  }
-}
+
+})

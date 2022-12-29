@@ -1,7 +1,7 @@
 package arrow.fx.stm
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 

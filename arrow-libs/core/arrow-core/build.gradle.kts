@@ -32,15 +32,10 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(libs.kotest.frameworkApi)
+          implementation(projects.arrowFxCoroutines)
+          implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-          implementation(libs.kotest.arrowAssertions.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
-          implementation(libs.kotest.arrowProperty.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
         }
       }
       jvmTest {

@@ -1,12 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.asClue
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -16,7 +15,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -289,9 +287,9 @@ class CircuitBreakerTest : StringSpec({
           shouldThrow<IllegalArgumentException> {
             CircuitBreaker.of(
               maxFailures,
-              resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+              resetTimeout,
               exponentialBackoffFactor,
-              maxResetTimeout.toDouble(DurationUnit.NANOSECONDS)
+              maxResetTimeout
             )
           }
 

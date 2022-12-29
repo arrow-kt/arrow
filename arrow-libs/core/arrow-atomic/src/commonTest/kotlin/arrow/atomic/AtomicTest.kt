@@ -11,6 +11,14 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
 class AtomicTest : StringSpec({
 
+    "set get - successful" {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        val r = Atomic(x)
+        r.update { y }
+        r.value shouldBe y
+      }
+    }
+
     "getAndSet - successful" {
       checkAll(Arb.int(), Arb.int()) { x, y ->
         val ref = Atomic(x)
@@ -35,6 +43,24 @@ class AtomicTest : StringSpec({
             .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { })
           it + 1
         } shouldBe false
+      }
+    }
+
+    "consistent set update" {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        val set = suspend {
+          val r = Atomic(x)
+          r.update { y }
+          r.value
+        }
+
+        val update = suspend {
+          val r = Atomic(x)
+          r.update { y }
+          r.value
+        }
+
+        set() shouldBe update()
       }
     }
 

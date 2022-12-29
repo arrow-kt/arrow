@@ -2,8 +2,16 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.test.any
+import arrow.core.test.either
+import arrow.core.test.intSmall
+import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.suspendFunThatReturnsAnyLeft
+import arrow.core.test.suspendFunThatReturnsAnyRight
+import arrow.core.test.suspendFunThatReturnsEitherAnyOrAnyOrThrows
+import arrow.core.test.suspendFunThatThrows
+import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -14,16 +22,12 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
-import io.kotest.property.arrow.core.MonoidLaws
-import io.kotest.property.arrow.core.either
-import io.kotest.property.arrow.laws.testLaws
 import io.kotest.property.checkAll
 
-class EitherTest : StringSpec() {
-
-  private val ARB = Arb.either(Arb.string(), Arb.int())
+class EitherTest : StringSpec({
   
-  init {
+  val ARB = Arb.either(Arb.string(), Arb.int())
+
     testLaws(
       MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
     )
@@ -425,8 +429,7 @@ class EitherTest : StringSpec() {
         }
       }
     }
-  }
-}
+})
 
 @Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")
 suspend fun handleWithPureFunction(a: Any, b: Any): Either<Throwable, Any> =

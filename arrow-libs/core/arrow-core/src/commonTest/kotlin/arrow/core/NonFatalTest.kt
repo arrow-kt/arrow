@@ -3,8 +3,7 @@ package arrow.core
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class NonFatalTest : StringSpec() {
-  init {
+class NonFatalTest : StringSpec({
     val nonFatals: List<Throwable> =
       listOf(
         RuntimeException(),
@@ -23,5 +22,4 @@ class NonFatalTest : StringSpec() {
         it.nonFatalOrThrow() shouldBe it
       }
     }
-  }
-}
+})

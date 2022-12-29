@@ -24,11 +24,12 @@ dependencies {
   compileOnly(libs.squareup.retrofit)
 
   if (!enableCompatibilityMetadataVariant) {
-    testCompileOnly(libs.kotlin.reflect)
-    testRuntimeOnly(libs.kotest.runnerJUnit5)
+    testImplementation(projects.arrowCore)
     testImplementation(libs.kotest.frameworkEngine)
     testImplementation(libs.kotest.assertionsCore)
-    testImplementation(projects.arrowCore)
+    testImplementation(libs.kotest.property)
+    testCompileOnly(libs.kotlin.reflect)
+    testRuntimeOnly(libs.kotest.runnerJUnit5)
     testImplementation(libs.squareup.okhttpMockWebServer)
     testImplementation(libs.squareup.retrofitConverterGson)
     testImplementation(libs.squareup.retrofitConverterMoshi)

@@ -14,7 +14,6 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arrow.core.either
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 

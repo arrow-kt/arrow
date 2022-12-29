@@ -17,7 +17,7 @@ class ParTraverseEitherJvmTest : StringSpec({
           (0 until i).parTraverseEither(ctx) { Thread.currentThread().name.right() }
         }
         assertSoftly {
-          res.orNull()?.forEach {
+          res.getOrNull()?.forEach {
             it shouldStartWith "single"
           } ?: fail("Expected Right but found $res")
         }

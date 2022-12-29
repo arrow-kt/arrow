@@ -10,6 +10,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 
 class ParMap5JvmTest : StringSpec({
@@ -35,6 +36,7 @@ class ParMap5JvmTest : StringSpec({
             threadName() shouldStartWith "single"
           }
         }
+
     }
 
     "parMapN 5 returns to original context on failure" {
@@ -48,45 +50,45 @@ class ParMap5JvmTest : StringSpec({
                 1 -> parZip(
                   _mapCtx,
                   { e.suspend() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() }
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() }
                 ) { _, _, _, _, _ -> Unit }
       
                 2 -> parZip(
                   _mapCtx,
-                  { never<Nothing>() },
+                  { awaitCancellation() },
                   { e.suspend() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() }
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() }
                 ) { _, _, _, _, _ -> Unit }
       
                 3 -> parZip(
                   _mapCtx,
-                  { never<Nothing>() },
-                  { never<Nothing>() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
                   { e.suspend() },
-                  { never<Nothing>() },
-                  { never<Nothing>() }
+                  { awaitCancellation() },
+                  { awaitCancellation() }
                 ) { _, _, _, _, _ -> Unit }
       
                 4 -> parZip(
                   _mapCtx,
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
                   { e.suspend() },
-                  { never<Nothing>() }
+                  { awaitCancellation() }
                 ) { _, _, _, _, _ -> Unit }
       
                 else -> parZip(
                   _mapCtx,
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
-                  { never<Nothing>() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
+                  { awaitCancellation() },
                   { e.suspend() }
                 ) { _, _, _, _, _ -> Unit }
               }

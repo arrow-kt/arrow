@@ -30,3 +30,5 @@
 //    dependsOn test // tests are required to run before generating the report
 //    mustRunAfter test
 //}
+
+apply plugin: 'kover'

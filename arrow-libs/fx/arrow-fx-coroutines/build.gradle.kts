@@ -32,19 +32,9 @@ kotlin {
       commonTest {
         dependencies {
           implementation(projects.arrowCore)
-          implementation(libs.kotest.frameworkApi)
+          implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-          implementation(libs.kotest.arrowAssertions.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
-          implementation(libs.kotest.arrowProperty.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-          }
-          implementation(libs.kotest.arrowFxAssertions.get().toString()) {
-            exclude(group = "io.arrow-kt", module = "arrow-core")
-            exclude(group = "io.arrow-kt", module = "arrow-fx-coroutines")
-          }
         }
       }
       jvmTest {

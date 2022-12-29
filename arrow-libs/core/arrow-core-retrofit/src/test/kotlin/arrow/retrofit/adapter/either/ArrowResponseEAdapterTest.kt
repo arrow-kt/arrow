@@ -13,12 +13,10 @@ import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ArrowResponseEAdapterTest : StringSpec() {
+class ArrowResponseEAdapterTest : StringSpec({
 
-  private lateinit var server: MockWebServer
-  private lateinit var service: SuspendApiTestClient
-
-  init {
+  lateinit var server: MockWebServer
+  lateinit var service: SuspendApiTestClient
 
     beforeAny {
       server = MockWebServer()
@@ -100,5 +98,5 @@ class ArrowResponseEAdapterTest : StringSpec() {
 
       responseE.isFailure shouldBe true
     }
-  }
-}
+
+})

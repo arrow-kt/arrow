@@ -2,6 +2,7 @@
 
 package arrow.core
 
+import arrow.core.test.intSmall
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
@@ -27,8 +28,8 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05)
     ) { a: String?, b: String? ->
-      if (a == null || b == null) Nullable.zip(a, b, { _, _ -> Unit }) shouldBe null
-      else Nullable.zip(a, b, { a, b -> a + b }) shouldBe a + b
+      if (a == null || b == null) Nullable.zip(a, b) { _, _ -> Unit } shouldBe null
+      else Nullable.zip(a, b) { a, b -> a + b } shouldBe a + b
     }
   }
 
@@ -38,8 +39,8 @@ class NullableTest : StringSpec({
       Arb.string().orNull(0.05),
       Arb.string().orNull(0.05)
     ) { a: String?, b: String?, c: String? ->
-      if (a == null || b == null || c == null) Nullable.zip(a, b, c, { a, b, c -> a + b + c }) shouldBe null
-      else Nullable.zip(a, b, c, { a, b, c -> a + b + c }) shouldBe a + b + c
+      if (a == null || b == null || c == null) Nullable.zip(a, b, c) { a, b, c -> a + b + c } shouldBe null
+      else Nullable.zip(a, b, c) { a, b, c -> a + b + c } shouldBe a + b + c
     }
   }
 
@@ -54,9 +55,9 @@ class NullableTest : StringSpec({
         a,
         b,
         c,
-        d,
-        { a, b, c, d -> a + b + c + d }) shouldBe null
-      else Nullable.zip(a, b, c, d, { a, b, c, d -> a + b + c + d }) shouldBe a + b + c + d
+        d
+      ) { a, b, c, d -> a + b + c + d } shouldBe null
+      else Nullable.zip(a, b, c, d) { a, b, c, d -> a + b + c + d } shouldBe a + b + c + d
     }
   }
 
@@ -73,9 +74,9 @@ class NullableTest : StringSpec({
         b,
         c,
         d,
-        e,
-        { _, _, _, _, _ -> Unit }) shouldBe null
-      else Nullable.zip(a, b, c, d, e, { a, b, c, d, e -> a + b + c + d + e }) shouldBe a + b + c + d + e
+        e
+      ) { _, _, _, _, _ -> Unit } shouldBe null
+      else Nullable.zip(a, b, c, d, e) { a, b, c, d, e -> a + b + c + d + e } shouldBe a + b + c + d + e
     }
   }
 
@@ -94,9 +95,9 @@ class NullableTest : StringSpec({
         c,
         d,
         e,
-        f,
-        { _, _, _, _, _, _ -> Unit }) shouldBe null
-      else Nullable.zip(a, b, c, d, e, f, { a, b, c, d, e, f -> a + b + c + d + e + f }) shouldBe a + b + c + d + e + f
+        f
+      ) { _, _, _, _, _, _ -> Unit } shouldBe null
+      else Nullable.zip(a, b, c, d, e, f) { a, b, c, d, e, f -> a + b + c + d + e + f } shouldBe a + b + c + d + e + f
     }
   }
 
@@ -117,8 +118,8 @@ class NullableTest : StringSpec({
         d,
         e,
         f,
-        g,
-        { _, _, _, _, _, _, _ -> Unit }) shouldBe null
+        g
+      ) { _, _, _, _, _, _, _ -> Unit } shouldBe null
       else Nullable.zip(
         a,
         b,
@@ -126,8 +127,8 @@ class NullableTest : StringSpec({
         d,
         e,
         f,
-        g,
-        { a, b, c, d, e, f, g -> a + b + c + d + e + f + g }) shouldBe a + b + c + d + e + f + g
+        g
+      ) { a, b, c, d, e, f, g -> a + b + c + d + e + f + g } shouldBe a + b + c + d + e + f + g
     }
   }
 
@@ -150,8 +151,8 @@ class NullableTest : StringSpec({
         e,
         f,
         g,
-        h,
-        { _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
+        h
+      ) { _, _, _, _, _, _, _, _ -> Unit } shouldBe null
       else Nullable.zip(
         a,
         b,
@@ -160,8 +161,8 @@ class NullableTest : StringSpec({
         e,
         f,
         g,
-        h,
-        { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h }) shouldBe a + b + c + d + e + f + g + h
+        h
+      ) { a, b, c, d, e, f, g, h -> a + b + c + d + e + f + g + h } shouldBe a + b + c + d + e + f + g + h
     }
   }
 
@@ -178,7 +179,7 @@ class NullableTest : StringSpec({
       Arb.int().orNull(0.05)
     ) { a: Int?, b: Int?, c: Int?, d: Int?, e: Int?, f: Int?, g: Int?, h: Int?, i: Int? ->
       if (a == null || b == null || c == null || d == null || e == null || f == null || g == null || h == null || i == null) {
-        Nullable.zip(a, b, c, d, e, f, g, h, i, { _, _, _, _, _, _, _, _, _ -> Unit }) shouldBe null
+        Nullable.zip(a, b, c, d, e, f, g, h, i) { _, _, _, _, _, _, _, _, _ -> Unit } shouldBe null
       } else {
         Nullable.zip(
           a,
@@ -189,8 +190,8 @@ class NullableTest : StringSpec({
           f,
           g,
           h,
-          i,
-          { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i }) shouldBe a + b + c + d + e + f + g + h + i
+          i
+        ) { a, b, c, d, e, f, g, h, i -> a + b + c + d + e + f + g + h + i } shouldBe a + b + c + d + e + f + g + h + i
       }
     }
   }
