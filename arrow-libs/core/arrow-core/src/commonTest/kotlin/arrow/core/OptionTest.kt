@@ -2,10 +2,11 @@ package arrow.core
 
 import arrow.core.continuations.ensureNotNull
 import arrow.core.continuations.option
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.option
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.option
+import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
@@ -13,13 +14,12 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class OptionTest : UnitSpec() {
+class OptionTest : StringSpec({
 
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = None
-
-  init {
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
@@ -54,9 +54,8 @@ class OptionTest : UnitSpec() {
       fun square(i: Int): Int = i * i
       checkAll(Arb.int().orNull()) { i: Int? ->
         option {
-          val ii = i
-          ensureNotNull(ii)
-          square(ii) // Smart-cast by contract
+          ensureNotNull(i)
+          square(i) // Smart-cast by contract
         } shouldBe i.toOption().map(::square)
       }
     }
@@ -365,45 +364,6 @@ class OptionTest : UnitSpec() {
       none.toMap() shouldBe emptyMap()
     }
 
-    "traverse should yield list of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
-    }
-
-    "sequence should be consistent with traverse" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { listOf(it) }.sequence() shouldBe option.traverse { listOf(it) }
-      }
-    }
-
-    "traverseEither should yield either of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.right() } shouldBe some.right()
-      none.traverse { it.right() } shouldBe none.right()
-    }
-
-    "sequenceEither should be consistent with traverseEither" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.right() }.sequence() shouldBe option.traverse{ it.right() }
-      }
-    }
-
-    "traverseValidated should yield validated of option" {
-      val some: Option<String> = Some("value")
-      val none: Option<String> = None
-      some.traverse { it.valid() } shouldBe some.valid()
-      none.traverse { it.valid() } shouldBe none.valid()
-    }
-
-    "sequenceValidated should be consistent with traverseValidated" {
-      checkAll(Arb.option(Arb.int())) { option ->
-        option.map { it.valid() }.sequence() shouldBe option.traverse { it.valid() }
-      }
-    }
-
     "catch should return Some(result) when f does not throw" {
       val recover: (Throwable) -> Option<Int> = { _ -> None}
       Option.catch(recover) { 1 } shouldBe Some(1)
@@ -424,8 +384,7 @@ class OptionTest : UnitSpec() {
       val exception = Exception("Boom!")
       Option.catch { throw exception } shouldBe None
     }
-  }
-}
+})
 
 // Utils
 

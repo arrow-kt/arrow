@@ -1,6 +1,5 @@
 package arrow.optics.plugin
 
-import arrow.optics.plugin.internals.typeParametersErrorMessage
 import org.junit.jupiter.api.Test
 
 class LensTests {

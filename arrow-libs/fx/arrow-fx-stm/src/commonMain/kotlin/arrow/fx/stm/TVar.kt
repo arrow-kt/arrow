@@ -1,11 +1,11 @@
 package arrow.fx.stm
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
-import arrow.core.continuations.updateAndGet
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlin.coroutines.resume
+import kotlin.random.Random
 
 /**
  * A [TVar] is a mutable reference that can only be (safely) accessed inside a [STM] transaction.
@@ -128,26 +128,26 @@ public class TVar<A> internal constructor(a: A) {
    * This is used to implement locking. Reading threads have to loop until the value is released by a
    *  transaction.
    */
-  private val ref = AtomicRef(a as Any?)
+  private val ref = Atomic(a as Any?)
 
   internal val value
-    get() = ref.get()
+    get() = ref.value
 
   /**
    * Each TVar has a unique id which is used to get a total ordering of variables to ensure that locks
-   *  are always acquired in the same order on each thread
+   * are always acquired in the same order on each thread.
    *
-   * > The current implementation no longer waits on locks which means lock order is irrelevant. This is still used as
-   *  a good hash value though.
+   * > The current implementation no longer waits on locks which means lock order is irrelevant.
+   * > This is still used as a good hash value though.
    */
-  internal val id: Long = globalC.updateAndGet(Long::inc)
+  internal val id: Long = Random.nextLong()
 
   /**
    * A list of running transactions waiting for a change on this variable.
    * Changes are pushed to waiting transactions via [notify]
    */
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
-  private val waiting = AtomicRef<List<STMTransaction<*>>>(emptyList())
+  private val waiting = Atomic<List<STMTransaction<*>>>(emptyList())
 
   override fun hashCode(): Int = id.hashCode()
 
@@ -167,8 +167,8 @@ public class TVar<A> internal constructor(a: A) {
    */
   internal fun readI(): A {
     while (true) {
-      ref.get().let {
-        if (it !is STMFrame) return@readI it as A
+      ref.value.let { a ->
+        if (a !is STMFrame) return@readI a as A
       }
     }
   }
@@ -181,26 +181,6 @@ public class TVar<A> internal constructor(a: A) {
    */
   internal fun release(frame: STMFrame, a: A): Unit {
     ref.compareAndSet(frame, a as Any?)
-  }
-
-  /**
-   * Lock a [TVar] by replacing the value with [frame].
-   *
-   * This forces all further reads to wait until [frame] is done with the value.
-   *
-   * This works by continuously calling [readI] and then trying to compare and set the frame.
-   * If the value has been modified after reading it tries again, if the value inside is locked
-   *  it will loop inside [readI] until it is unlocked.
-   *
-   * > This is unused atm because locks are only taken conditionally, but is kept because it helps testing and
-   *  may be useful in the future.
-   */
-  internal fun lock(frame: STMFrame): A {
-    var res: A
-    do {
-      res = this.readI()
-    } while (ref.compareAndSet(res as Any?, frame).not())
-    return res
   }
 
   /**
@@ -250,5 +230,3 @@ public class TVar<A> internal constructor(a: A) {
     public suspend fun <A> new(a: A): TVar<A> = TVar(a)
   }
 }
-
-internal val globalC: AtomicRef<Long> = AtomicRef(0L)

@@ -1,11 +1,11 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.identity
 import arrow.core.prependTo
-import kotlinx.coroutines.CancellationException
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +20,8 @@ public annotation class ScopeDSL
 public annotation class ResourceDSL
 
 /**
- * [Resource] represents a suspending computation of `A`, with the capabilities of safely acquiring resources.
- * The capability of _installing_ resources is called [ResourceScope], and [Resource] is thus defined as `suspend ResourceScope.() -> A`.
+ * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other need to be acquired and later released in reverse order.
+ * The capability of _installing_ resources is called [ResourceScope], and [Resource] defines the value associating the `acquisition` step, and the `finalizer`.
  * [Resource] allocates and releases resources in a safe way that co-operates with Structured Concurrency, and KotlinX Coroutines.
  *
  * It is especially useful when multiple resources that depend on each other need to be acquired, and later released in reverse order.
@@ -227,7 +227,6 @@ public annotation class ResourceDSL
  * import arrow.fx.coroutines.ResourceScope
  * import arrow.fx.coroutines.resourceScope
  * import arrow.fx.coroutines.parZip
- * import arrow.fx.coroutines.resource
  * import kotlinx.coroutines.Dispatchers
  * import kotlinx.coroutines.withContext
  *
@@ -402,21 +401,14 @@ public fun <A> resource(
 }
 
 /**
- * Runs [use] and emits [A] of the resource
+ * Runs [Resource.use] and emits [A] of the resource
  *
  * ```kotlin
- * import arrow.fx.coroutines.asFlow
- * import arrow.fx.coroutines.closeable
- * import kotlinx.coroutines.Dispatchers
- * import kotlinx.coroutines.flow.flow
- * import kotlinx.coroutines.flow.Flow
- * import kotlinx.coroutines.flow.asFlow
- * import kotlinx.coroutines.flow.emitAll
- * import kotlinx.coroutines.flow.flatMapConcat
- * import kotlinx.coroutines.flow.flowOn
- * import kotlinx.coroutines.flow.map
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.*
+ * import kotlinx.coroutines.flow.*
  * import java.nio.file.Path
- * import kotlin.io.path.useLines
+ * import kotlin.io.path.*
  *
  * fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
  *   closeable { path.toFile().outputStream() }
@@ -491,7 +483,7 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
 
 @JvmInline
 private value class ResourceScopeImpl(
-  private val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList()),
+  private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
   
@@ -514,7 +506,7 @@ private value class ResourceScopeImpl(
   suspend fun cancelAll(
     exitCase: ExitCase,
     first: Throwable? = null,
-  ): Throwable? = finalizers.get().fold(first) { acc, finalizer ->
+  ): Throwable? = finalizers.value.fold(first) { acc, finalizer ->
     val other = kotlin.runCatching { finalizer(exitCase) }.exceptionOrNull()
     other?.let {
       acc?.apply { addSuppressed(other) } ?: other

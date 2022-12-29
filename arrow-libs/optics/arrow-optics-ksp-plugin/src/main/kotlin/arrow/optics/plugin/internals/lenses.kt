@@ -1,24 +1,11 @@
 package arrow.optics.plugin.internals
 
-import java.util.Locale
-
 internal fun generateLenses(ele: ADT, target: LensTarget) =
   Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
     content = processElement(ele, target.foci)
   )
-
-private fun String.toUpperCamelCase(): String =
-  split(" ")
-    .joinToString(
-      "",
-      transform = {
-        it.replaceFirstChar {
-          if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-        }
-      }
-    )
 
 private fun processElement(adt: ADT, foci: List<Focus>): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
@@ -48,9 +35,4 @@ private fun processElement(adt: ADT, foci: List<Focus>): String {
   }
 }
 
-fun Focus.lensParamName(): String =
-  when (this) {
-    is NullableFocus -> "nullable${paramName.toUpperCamelCase()}"
-    is OptionFocus -> "option${paramName.toUpperCamelCase()}"
-    is NonNullFocus -> paramName
-  }
+fun Focus.lensParamName(): String = paramName

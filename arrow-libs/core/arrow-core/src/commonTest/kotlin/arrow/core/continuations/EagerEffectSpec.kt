@@ -36,7 +36,7 @@ class EagerEffectSpec : StringSpec({
       val promise = CompletableDeferred<Int>()
       eagerEffect {
         try {
-          raise<Int>(s)
+          raise(s)
         } finally {
           require(promise.complete(i))
         }
@@ -99,7 +99,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
-  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
+  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().getOrNull() shouldBe 1 }
   
   "short-circuit" { eagerEffect<String, Nothing> { raise("hello") }.runCont() shouldBe "hello" }
   
@@ -124,8 +124,8 @@ class EagerEffectSpec : StringSpec({
       val res =
         either<String, Int> {
           val ii = i
-          ensureNotNull(ii) { raise }
-          square(ii) // Smart-cast by contract
+          ensureNotNull(i) { raise }
+          square(i) // Smart-cast by contract
         }
       val expected = i?.let(::square)?.right() ?: raise.left()
       res shouldBe expected
@@ -141,31 +141,34 @@ class EagerEffectSpec : StringSpec({
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and recover" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
-        raise<String>(int)
+        raise(int)
         fail("It should never reach this point")
       }.recover<Int, Nothing, String> { fallback }
         .runCont() shouldBe fallback
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and re-raise" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
-        raise<String>(int)
+        raise(int)
         fail("It should never reach this point")
       }.recover { raise(fallback) }
         .runCont() shouldBe fallback
     }
   }
   
+  @Suppress("UNREACHABLE_CODE")
   "catch - error path and throw" {
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
-          raise<String>(int)
+          raise(int)
           fail("It should never reach this point")
         }.recover<Int, Nothing, String> { throw RuntimeException(msg) }
           .runCont()
@@ -210,4 +213,5 @@ class EagerEffectSpec : StringSpec({
       }.message.shouldNotBeNull() shouldBe msg2
     }
   }
+
 })

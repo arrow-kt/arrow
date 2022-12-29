@@ -63,7 +63,7 @@ public inline fun <R, A, B> fold(
   }
 }
 
-/** Returns the shifted value, or rethrows the CancellationException if not our scope */
+/** Returns the raised value, or rethrows the CancellationException if not our scope */
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
@@ -73,7 +73,7 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 /** Serves as both purposes of a scope-reference token, and default implementation for Raise. */
 @PublishedApi
 internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
-  override fun <B> raise(r: Any?): B =
+  override fun raise(r: Any?): Nothing =
     if (isTraced) throw RaiseCancellationException(r, this)
     else throw RaiseCancellationExceptionNoTrace(r, this)
 }

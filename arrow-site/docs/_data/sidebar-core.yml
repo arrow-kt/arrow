@@ -9,9 +9,6 @@ options:
       - title: Either
         url: /apidocs/arrow-core/arrow.core/-either/
 
-      - title: Validated
-        url: /apidocs/arrow-core/arrow.core/-validated/
-
       - title: Option
         url: /apidocs/arrow-core/arrow.core/-option/
 

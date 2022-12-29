@@ -3,7 +3,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

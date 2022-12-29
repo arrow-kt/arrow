@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
   build:
@@ -19,18 +19,25 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3.4.0
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle build
-        uses: gradle/gradle-build-action@v2.2.0
+      - name: compileKotlin
+        uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace build "-Psemver.stage=alpha"
+          arguments: compileKotlin
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+      - name: compileTestKotlin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileTestKotlin
+
+      - name: check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check "-Psemver.stage=alpha"
 
   generate-alpha-tag:
     runs-on: ubuntu-latest
@@ -46,18 +53,15 @@ jobs:
           token: ${{ secrets.TOKEN_GITHUB_ACTION }}
 
       - name: Set up Java
-        uses: actions/setup-java@v3.4.0
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 11
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2
         with:
-          arguments: --full-stacktrace createSemverTag "-Psemver.stage=alpha"
+          arguments: createSemverTag "-Psemver.stage=alpha"
 
       - name: Push
         run: git push --follow-tags
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop

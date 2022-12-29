@@ -13,7 +13,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.10.2"
+  id("com.gradle.enterprise") version "3.11.4"
 }
 
 dependencyResolutionManagement {
@@ -31,14 +31,13 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
+include("arrow-atomic")
+project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
+
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
     .forUseAtConfigurationTime().orNull?.toBoolean() == true
 
-if (!enableCompatibilityMetadataVariant) {
-  include("arrow-core-test")
-  project(":arrow-core-test").projectDir = file("arrow-libs/core/arrow-core-test")
-}
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
@@ -49,10 +48,6 @@ project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-re
 include("arrow-fx-coroutines")
 project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-coroutines")
 
-if (!enableCompatibilityMetadataVariant) {
-  include("arrow-fx-coroutines-test")
-  project(":arrow-fx-coroutines-test").projectDir = file("arrow-libs/fx/arrow-fx-coroutines-test")
-}
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 
@@ -65,11 +60,6 @@ project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-opti
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
-
-if (!enableCompatibilityMetadataVariant) {
-  include("arrow-optics-test")
-  project(":arrow-optics-test").projectDir = file("arrow-libs/optics/arrow-optics-test")
-}
 
 // STACK
 include("arrow-stack")

@@ -1,26 +1,29 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 @ExperimentalTime
-class ParTraverseTest : ArrowFxSpec(
-  spec = {
+class ParTraverseTest : StringSpec({
 
     "parTraverse can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverse {
         ref.update { it + 1 }
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverse runs in parallel" {
@@ -52,7 +55,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverse { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
@@ -75,7 +78,7 @@ class ParTraverseTest : ArrowFxSpec(
       (0 until 100).parTraverseN(5) {
         ref.update { it + 1 }
       }
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
 
     "parTraverseN(3) runs in (3) parallel" {
@@ -136,7 +139,7 @@ class ParTraverseTest : ArrowFxSpec(
       ) { n, killOn, e ->
         Either.catch {
           (0 until n).parTraverseN(3) { i ->
-            if (i == killOn) throw e else unit()
+            if (i == killOn) throw e else Unit
           }
         } should leftException(e)
       }
@@ -154,7 +157,7 @@ class ParTraverseTest : ArrowFxSpec(
         .map { suspend { ref.update { it + 1 } } }
         .parSequenceN(5)
 
-      ref.get() shouldBe 100
+      ref.value shouldBe 100
     }
   }
 )

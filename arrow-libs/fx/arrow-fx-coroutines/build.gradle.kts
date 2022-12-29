@@ -24,19 +24,21 @@ kotlin {
         api(projects.arrowCore)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.coroutines.test)
       }
     }
 
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-fx-coroutines-test"))
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
         }
       }
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
-          implementation(libs.coroutines.test)
         }
       }
     }

@@ -1,13 +1,14 @@
 package arrow.fx.coroutines.parMapN
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.core.Either
-import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -15,14 +16,14 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 
-class ParMap3Test : ArrowFxSpec(
-  spec = {
+class ParMap3Test : StringSpec({
     "parMapN 3 runs in parallel" {
       checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
         val r = Atomic("")
@@ -40,19 +41,18 @@ class ParMap3Test : ArrowFxSpec(
             modifyGate2.complete(Unit)
           },
           {
-            r.set("$c")
+            r.value ="$c"
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c ->
           Triple(_a, _b, _c)
         }
 
-        r.get() shouldBe "$c$b$a"
+        r.value shouldBe "$c$b$a"
       }
     }
 
     "Cancelling parMapN 3 cancels all participants" {
-      checkAll {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -75,7 +75,6 @@ class ParMap3Test : ArrowFxSpec(
         pa.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pb.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pc.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapN 3 cancels losers if a failure occurs in one of the tasks" {

@@ -1,77 +1,25 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.option
-import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.option
+import arrow.core.test.sequence
+import arrow.core.test.testLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlin.math.max
 import kotlin.math.min
 
-class SequenceKTest : UnitSpec() {
-
-  init {
+class SequenceKTest : StringSpec({
 
     testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
-
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        if (a > 20_000) {
-          Either.Left(Unit)
-        } else {
-          acc.add(a)
-          Either.Right(a)
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe Either.Left(Unit)
-    }
-
-    "traverse for Option stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        (a <= 20_000).maybe {
-          acc.add(a)
-          a
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe None
-    }
-
-    "traverse for Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }.map { it.toList() }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.sequence(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequence(Semigroup.nonEmptyList())
-
-        val expected: ValidatedNel<Int, Sequence<Int>> =
-          ints.filterNot { it % 2 == 0 }.toList()
-            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
-
-        res.map { it.toList() } shouldBe expected.map { it.toList() }
-      }
-    }
 
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
@@ -307,5 +255,18 @@ class SequenceKTest : UnitSpec() {
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
     }
-  }
-}
+
+    "separateEither" {
+      checkAll(Arb.sequence(Arb.int())) { ints ->
+        val sequence = ints.map {
+          if (it % 2 == 0) it.left()
+          else it.right()
+        }
+
+        val (lefts, rights) = sequence.separateEither()
+
+        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
+      }
+    }
+
+})

@@ -2,10 +2,10 @@
 package arrow.core.examples.exampleEither24
 
 import arrow.core.Either
-import arrow.core.right
+import arrow.core.left
 
-val x : Either<Int, Int> = 7.right()
-val fold = x.fold({ 1 }, { it + 3 })
+val y : Either<Int, Int> = 7.left()
+val fold = y.fold({ 1 }, { it + 3 })
 fun main() {
  println("fold = $fold")
 }

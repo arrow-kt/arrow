@@ -21,7 +21,7 @@ import kotlin.jvm.JvmMultifileClass
       * [Structured Concurrency](#structured-concurrency)
         * [Arrow Fx Coroutines](#arrow-fx-coroutines)
           * [parZip](#parzip)
-          * [parTraverse](#partraverse)
+          * [parMap](#parmap)
           * [raceN](#racen)
           * [bracketCase / Resource](#bracketcase--resource)
         * [KotlinX](#kotlinx)
@@ -78,12 +78,10 @@ import kotlin.jvm.JvmMultifileClass
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.fold
  * import arrow.core.continuations.toEither
- * import arrow.core.continuations.toValidated
  * import arrow.core.continuations.toIor
  * import arrow.core.continuations.toOption
  * import arrow.core.continuations.ensureNotNull
@@ -134,7 +132,6 @@ import kotlin.jvm.JvmMultifileClass
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *
@@ -313,7 +310,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  * Note:
  *  Handling errors can also be done with `try/catch` but this is **not recommended**, it uses `CancellationException` which is used to cancel `Coroutine`s and is advised not to capture in Kotlin.
- *  The `CancellationException` from `Effect` is `ShiftCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
+ *  The `CancellationException` from `Effect` is `RaiseCancellationException`, this a public type, thus can be distinguished from any other `CancellationException` if necessary.
  *
  * ## Structured Concurrency
  *
@@ -355,14 +352,14 @@ import kotlin.jvm.JvmMultifileClass
  *    val error = "Error"
  *    val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     parZip({ awaitExitCase<Int>(exit) }, { raise<Int>(error) }) { a, b -> a + b }
+ *     parZip({ awaitExitCase<Int>(exit) }, { raise(error) }) { a: Int, b: Int -> a + b }
  *   }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
  * ```
  * <!--- KNIT example-effect-05.kt -->
  *
- * #### parTraverse
+ * #### parMap
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.fold
@@ -397,7 +394,7 @@ import kotlin.jvm.JvmMultifileClass
  * ```
  * <!--- KNIT example-effect-06.kt -->
  *
- * `parTraverse` will launch 5 tasks, for every element in `1..5`.
+ * `parMap` will launch 5 tasks, for every element in `1..5`.
  * The last task to get scheduled will `raise` with "error", and it will cancel the other launched tasks before returning.
  *
  * #### raceN
@@ -425,7 +422,7 @@ import kotlin.jvm.JvmMultifileClass
  *   val error = "Error"
  *   val exit = CompletableDeferred<ExitCase>()
  *   effect<String, Int> {
- *     raceN({ awaitExitCase<Int>(exit) }) { raise<Int>(error) }
+ *     raceN({ awaitExitCase<Int>(exit) }) { raise(error) }
  *       .merge() // Flatten Either<Int, Int> result from race into Int
  *   }.fold({ msg -> msg shouldBe error }, { fail("Int can never be the result") })
  *   // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran
@@ -497,7 +494,7 @@ import kotlin.jvm.JvmMultifileClass
  *   resourceScope {
  *     effect<String, Int> {
  *       val reader = bufferedReader("build.gradle.kts")
- *       raise<Int>(error)
+ *       raise(error)
  *       reader.lineSequence().count()
  *     }.fold({ it shouldBe error }, { fail("Int can never be the result") })
  *   }

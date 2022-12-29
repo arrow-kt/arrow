@@ -1,229 +1,44 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
 import arrow.typeclasses.Semigroup
-import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
+import arrow.core.test.option
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.list
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class IterableTest : UnitSpec() {
-  init {
-    "traverse Either stack-safe" {
-      // also verifies result order and execution order (l to r)
+class IterableTest : StringSpec({
+    "mapAccumulating stack-safe, and runs in original order" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse { a ->
-        acc.add(a)
-        Either.Right(a)
-      }
-      res shouldBe Either.Right(acc)
-      res shouldBe Either.Right((0..20_000).toList())
-    }
-
-    "traverse Either short-circuit" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.first { it % 2 != 0 }
-        }
-      }
-    }
-
-    "sequenceEither should be consistent with traverse Either" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it.right() }.sequence() shouldBe ints.traverse { it.right() }
-      }
-    }
-
-    "traverse Result stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse { a ->
-        acc.add(a)
-        Result.success(a)
-      }
-      res shouldBe Result.success(acc)
-      res shouldBe Result.success((0..20_000).toList())
-    }
-
-    "traverse Result short-circuit" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Result.success(it)
-          } else Result.failure(RuntimeException())
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        evens.fold(
-          { it shouldBe ints },
-          { }
-        )
-      }
-    }
-
-    "sequence Result should be consistent with traverse Result" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { Result.success(it) }.sequence() shouldBe ints.traverse { Result.success(it) }
-      }
-    }
-
-    "traverse Option is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse { a: Int ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc)
-      res shouldBe Some((0..20_000).toList())
-    }
-
-    "traverse Option short-circuits" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          (it % 2 == 0).maybe {
-            acc.add(it)
-            it
-          }
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence Option yields some when all entries in the list are some" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence Option should be consistent with traverse Option" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { Some(it) }.sequence() shouldBe ints.traverse { Some(it) }
-      }
-    }
-
-    "traverse Nullable is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int?>()
-      val res = (0..20_000).traverse { a: Int ->
-        acc.add(a)
-        a
-      }
-      res.shouldNotBeNull() shouldBe acc
-      res.shouldNotBeNull() shouldBe (0..20_000).toList()
-    }
-
-    "traverse Nullable short-circuits" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            it
-          } else {
-            null
-          }
-        }
-
-        val expected = ints.takeWhile { it % 2 == 0 }
-        acc shouldBe expected
-
-        if (ints.any { it % 2 != 0 }) {
-          evens.shouldBeNull()
-        } else {
-          evens.shouldNotBeNull() shouldContainExactly expected
-        }
-      }
-    }
-
-    "sequence Nullable yields some when all entries in the list are not null" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { if (it % 2 == 0) it else null }.sequence()
-
-        if (ints.any { it % 2 != 0 }) {
-          evens.shouldBeNull()
-        } else {
-          evens.shouldNotBeNull() shouldContainExactly ints.takeWhile { it % 2 == 0 }
-        }
-      }
-    }
-
-    "sequence Nullable should be consistent with travers Nullable" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it as Int? }.sequence() shouldBe ints.traverse { it as Int? }
-      }
-    }
-
-    "traverse Validated stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
+      val res = (0..20_000).mapOrAccumulate(Semigroup.string()) {
         acc.add(it)
-        Validated.Valid(it)
+        it
       }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
+      res shouldBe acc.right()
+      res shouldBe (0..20_000).toList().right()
     }
-
-    "traverse Validated acumulates" {
+  
+    "mapAccumulating accumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> =
-          ints.map { i -> if (i % 2 == 0) Valid(i) else Invalid(nonEmptyListOf(i)) }
-            .sequence()
-
-        val expected: ValidatedNel<Int, List<Int>> = ints.filterNot { it % 2 == 0 }
-          .toNonEmptyListOrNull()?.invalid() ?: Valid(ints.filter { it % 2 == 0 })
-
+        val res: Either<NonEmptyList<Int>, List<Int>> =
+          ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
+      
+        val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
+          .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()
+      
         res shouldBe expected
       }
     }
-
-    "sequence Validated should be consistent with traverse Validated" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        ints.map { it.valid() }.sequence(Semigroup.string()) shouldBe
-          ints.traverse(Semigroup.string()) { it.valid() }
-      }
-    }
-
-    "sequence Either traverse Nullable interoperate - and proof map + sequence equality with traverse" {
-      checkAll(
-        Arb.list(Arb.int()),
-        Arb.functionAToB<Int, Either<String, Int>?>(Arb.either(Arb.string(), Arb.int()).orNull())
-      ) { ints, f ->
-
-        val res: Either<String, List<Int>>? =
-          ints.traverse(f)?.sequence()
-
-        val expected: Either<String, List<Int>>? =
-          ints.map(f).sequence()?.sequence()
-
-        res shouldBe expected
-      }
+  
+    "mapAccumulating with String::plus" {
+      listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
+        raise("fail")
+      } shouldBe Either.Left("failfailfail")
     }
 
     "zip3" {
@@ -490,14 +305,4 @@ class IterableTest : UnitSpec() {
       }
     }
 
-    "separateValidated" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val list = ints.map {
-          if (it % 2 == 0) it.invalid()
-          else it.valid()
-        }
-        list.separateValidated() shouldBe ints.partition { it % 2 == 0 }
-      }
-    }
-  }
-}
+})

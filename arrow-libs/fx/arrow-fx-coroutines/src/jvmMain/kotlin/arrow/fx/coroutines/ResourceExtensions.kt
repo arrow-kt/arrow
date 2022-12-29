@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -14,6 +15,38 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
+/**
+ * Creates a single threaded [CoroutineContext] as a [Resource].
+ * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
+ * tasks are executed, but no new tasks will be accepted.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.executor
+ * import arrow.fx.coroutines.resourceScope
+ * import arrow.fx.coroutines.parTraverse
+ * import java.util.concurrent.Executors
+ * import java.util.concurrent.atomic.AtomicInteger
+ * import kotlin.math.max
+ *
+ * suspend fun main(): Unit {
+ *   resourceScope {
+ *     val pool = executor {
+ *       val ctr = AtomicInteger(0)
+ *       val size = max(2, Runtime.getRuntime().availableProcessors())
+ *       Executors.newFixedThreadPool(size) { r ->
+ *         Thread(r, "computation-${ctr.getAndIncrement()}")
+ *           .apply { isDaemon = true }
+ *       }
+ *     }
+ *
+ *     listOf(1, 2, 3, 4, 5).parTraverse(pool) { i ->
+ *       println("#$i running on ${Thread.currentThread().name}")
+ *     }
+ *   }
+ * }
+ * ```
+ * <!--- KNIT example-resourceextensions-01.kt -->
+ */
 @ResourceDSL
 public suspend fun ResourceScope.executor(
   timeout: Duration = Duration.INFINITE,
@@ -26,38 +59,6 @@ public suspend fun ResourceScope.executor(
   }
 }.asCoroutineDispatcher()
 
-/**
- * Creates a single threaded [CoroutineContext] as a [Resource].
- * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
- * tasks are executed, but no new tasks will be accepted.
- *
- * ```kotlin
- * import arrow.fx.coroutines.executor
- * import arrow.fx.coroutines.use
- * import arrow.fx.coroutines.parTraverse
- * import java.util.concurrent.Executors
- * import java.util.concurrent.atomic.AtomicInteger
- * import kotlin.math.max
- *
- * suspend fun main(): Unit {
- *   val pool = executor {
- *     val ctr = AtomicInteger(0)
- *     val size = max(2, Runtime.getRuntime().availableProcessors())
- *     Executors.newFixedThreadPool(size) { r ->
- *       Thread(r, "computation-${ctr.getAndIncrement()}")
- *         .apply { isDaemon = true }
- *     }
- *   }
- *
- *   pool.use { ctx ->
- *     listOf(1, 2, 3, 4, 5).parTraverse(ctx) { i ->
- *       println("#$i running on ${Thread.currentThread().name}")
- *     }
- *   }
- * }
- * ```
- * <!--- KNIT example-resourceextensions-01.kt -->
- */
 public fun executor(
   timeout: Duration = Duration.INFINITE,
   closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -98,7 +99,7 @@ public fun <A : Closeable> closeable(
 }
 
 /**
- * Creates a [Resource] from an [AutoClos eable], which uses [AutoCloseable.close] for releasing.
+ * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *
  * ```kotlin
  * import arrow.fx.coroutines.resourceScope
@@ -150,6 +151,7 @@ public fun <A : AutoCloseable> autoCloseable(
  * ```
  * <!--- KNIT example-resourceextensions-04.kt -->
  */
+@OptIn(DelicateCoroutinesApi::class)
 @ResourceDSL
 public suspend fun ResourceScope.singleThreadContext(name: String): ExecutorCoroutineDispatcher =
   closeable { newSingleThreadContext(name) }
@@ -180,6 +182,7 @@ public fun singleThreadContext(name: String): Resource<ExecutorCoroutineDispatch
  * ```
  * <!--- KNIT example-resourceextensions-05.kt -->
  */
+@OptIn(DelicateCoroutinesApi::class)
 @ResourceDSL
 public suspend fun ResourceScope.fixedThreadPoolContext(nThreads: Int, name: String): ExecutorCoroutineDispatcher =
   closeable { newFixedThreadPoolContext(nThreads, name) }

@@ -1,13 +1,13 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
+import io.kotest.property.checkAll
 
-class TMapTest : ArrowFxSpec(
-  spec = {
+class TMapTest : StringSpec({
     "insert values" {
       checkAll(Arb.int(), Arb.int()) { k, v ->
         val map = TMap.new<Int, Int>()

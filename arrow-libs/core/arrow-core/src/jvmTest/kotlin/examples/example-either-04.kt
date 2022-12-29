@@ -4,8 +4,8 @@ package arrow.core.examples.exampleEither04
 import arrow.core.Either
 import arrow.core.flatMap
 
-val right: Either<String, Int> = Either.Right(5)
-val value = right.flatMap{ Either.Right(it + 1) }
+val left: Either<String, Int> = Either.Left("Something went wrong")
+val value = left.flatMap{ Either.Right(it + 1) }
 fun main() {
  println("value = $value")
 }

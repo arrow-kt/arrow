@@ -2,7 +2,7 @@
 package arrow.core.examples.exampleResultComputations01
 
 import arrow.core.*
-import arrow.core.computations.result
+import arrow.core.computations.ResultEffect.result
 
 fun main() {
   result { // We can safely use assertion based operation inside blocks

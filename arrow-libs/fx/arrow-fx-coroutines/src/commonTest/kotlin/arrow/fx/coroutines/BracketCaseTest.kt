@@ -1,19 +1,21 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class BracketCaseTest : ArrowFxSpec(
-  spec = {
+class BracketCaseTest : StringSpec({
     "Immediate acquire bracketCase finishes successfully" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         var once = true
@@ -190,6 +192,9 @@ class BracketCaseTest : ArrowFxSpec(
         } should leftException(e)
       }
     }
+  
+    operator fun Throwable.plus(other: Throwable): Throwable =
+      apply { addSuppressed(other) }
 
     "bracketCase must compose immediate use & immediate release error" {
       checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
@@ -199,7 +204,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { throw e },
             release = { _, _ -> throw e2 }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -211,7 +216,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { e.suspend() },
             release = { _, _ -> throw e2 }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -223,7 +228,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { throw e },
             release = { _, _ -> e2.suspend() }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -235,7 +240,7 @@ class BracketCaseTest : ArrowFxSpec(
             use = { e.suspend() },
             release = { _, _ -> e2.suspend() }
           )
-        } shouldBe Either.Left(Platform.composeErrors(e, e2))
+        } shouldBe Either.Left(e + e2)
       }
     }
 
@@ -249,7 +254,7 @@ class BracketCaseTest : ArrowFxSpec(
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -273,7 +278,7 @@ class BracketCaseTest : ArrowFxSpec(
           use = {
             // Signal that fiber is running
             start.complete(Unit)
-            never<Unit>()
+            awaitCancellation()
           },
           release = { _, exitCase ->
             require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -302,7 +307,7 @@ class BracketCaseTest : ArrowFxSpec(
 
         // Signal that fiber can be cancelled running
         start.complete(Unit)
-        never<Unit>()
+        awaitCancellation()
       }
 
       // Wait until the fiber is started before cancelling
@@ -324,7 +329,7 @@ class BracketCaseTest : ArrowFxSpec(
               // This should be uncancellable, and suspends until capacity 1 is received
               mVar.send(y)
             },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, exitCase -> require(p.complete(exitCase)) }
           )
         }
@@ -347,7 +352,7 @@ class BracketCaseTest : ArrowFxSpec(
         val fiber = async {
           bracketCase(
             acquire = { latch.complete(Unit) },
-            use = { never<Unit>() },
+            use = { awaitCancellation() },
             release = { _, _ -> mVar.send(y) }
           )
         }

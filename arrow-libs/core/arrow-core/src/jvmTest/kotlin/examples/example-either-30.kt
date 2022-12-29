@@ -4,7 +4,7 @@ package arrow.core.examples.exampleEither30
 import arrow.core.rightIfNotNull
 
 val value =
- "value".rightIfNotNull { "left" }
+ null.rightIfNotNull { "left" }
 fun main() {
  println(value)
 }
