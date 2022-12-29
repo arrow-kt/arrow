@@ -1,6 +1,6 @@
 package arrow.core
 
-import arrow.core.test.generators.either
+import arrow.core.test.either
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

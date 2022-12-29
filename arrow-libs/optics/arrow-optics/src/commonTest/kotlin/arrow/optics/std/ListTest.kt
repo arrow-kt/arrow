@@ -1,16 +1,16 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
 import arrow.optics.Optional
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 
-class ListTest : UnitSpec() {
-
-  init {
+class ListTest : StringSpec({
 
     testLaws(
       "Optional list head - ",
@@ -21,7 +21,7 @@ class ListTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.int()),
       ),
       TraversalLaws.laws(
-        traversal = Optional.listHead<Int>(),
+        traversal = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
@@ -37,5 +37,5 @@ class ListTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.list(Arb.int())),
       )
     )
-  }
-}
+
+})

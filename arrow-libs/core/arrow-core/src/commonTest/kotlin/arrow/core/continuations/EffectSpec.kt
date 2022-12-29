@@ -43,7 +43,7 @@ class EffectSpec :
         }.fold({ fail("Should never come here") }, ::identity) shouldBe i()
       }
     }
-    
+
     "try/catch - finally works" {
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { s, i ->
         val promise = CompletableDeferred<Int>()
@@ -58,7 +58,7 @@ class EffectSpec :
         promise.await() shouldBe i()
       }
     }
-    
+
     "try/catch - First raise is ignored and second is returned" {
       checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
         effect<String, Int> {
@@ -72,7 +72,7 @@ class EffectSpec :
           .fold(::identity) { fail("Should never come here") } shouldBe s2()
       }
     }
-    
+
     "attempt - catch" {
       checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
         effect<String, Int> {
@@ -85,7 +85,7 @@ class EffectSpec :
         }.runCont() shouldBe i()
       }
     }
-    
+
     "attempt - no catch" {
       checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
         effect<String, Int> {
@@ -98,12 +98,12 @@ class EffectSpec :
         }.runCont() shouldBe i()
       }
     }
-    
+
     "eagerEffect can be consumed within an Effect computation" {
       checkAll(Arb.int(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
           eagerEffect { a }
-        
+
         effect {
           val bb = b()
           val aa = eager()
@@ -111,12 +111,12 @@ class EffectSpec :
         }.runCont() shouldBe (a + b())
       }
     }
-    
+
     "eagerEffect raise short-circuits effect computation" {
       checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
         val eager: EagerEffect<String, Int> =
           eagerEffect { raise(a) }
-        
+
         effect {
           val bb = b()
           val aa = eager()
@@ -124,13 +124,13 @@ class EffectSpec :
         }.runCont() shouldBe a
       }
     }
-    
+
     "success" {
       checkAll(Arb.int().suspend()) { i ->
         effect<Nothing, Int> { i() }.value() shouldBe i()
       }
     }
-    
+
     "short-circuit" {
       checkAll(Arb.string().suspend()) { msg ->
         effect {
@@ -138,7 +138,7 @@ class EffectSpec :
         }.runCont() shouldBe msg()
       }
     }
-    
+
     "Rethrows exceptions" {
       checkAll(Arb.string().suspend()) { msg ->
         shouldThrow<RuntimeException> {
@@ -148,7 +148,7 @@ class EffectSpec :
         }.message shouldBe msg()
       }
     }
-    
+
     "Can short-circuit from nested blocks" {
       checkAll(Arb.string().suspend()) { msg ->
         effect<String, Int> {
@@ -158,7 +158,7 @@ class EffectSpec :
           .runCont() shouldBe msg()
       }
     }
-    
+
     "Can short-circuit immediately after suspending from nested blocks" {
       checkAll(Arb.string().suspend()) { msg ->
         effect<String, Int> {
@@ -170,7 +170,7 @@ class EffectSpec :
         }.runCont() shouldBe msg()
       }
     }
-    
+
     "ensure null in either computation" {
       checkAll(
         Arb.boolean().suspend(),
@@ -183,13 +183,13 @@ class EffectSpec :
         } shouldBe if (predicate()) success().right() else raise().left()
       }
     }
-    
+
     "ensureNotNull in either computation" {
       fun square(i: Int): Int = i * i
-      
+
       checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, raise->
         val res =
-          either<String, Int> {
+          either {
             val ii = i()
             ensureNotNull(ii) { raise() }
             square(ii) // Smart-cast by contract
@@ -198,14 +198,14 @@ class EffectSpec :
         res shouldBe expected
       }
     }
-    
+
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           raise(Failure(msg))
         }
-        
+
         effect {
           failure().bind()
           1
@@ -215,30 +215,30 @@ class EffectSpec :
         ) shouldBe Failure(msg)
       }
     }
-    
+
     "#2779 - handleErrorWith does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           raise(error)
         }
-        
+
         val newError: Effect<List<Char>, Int> =
           failed.recover { str ->
             raise(str.reversed().toList())
           }
-        
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           raise(error)
         }
-        
+
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
@@ -247,11 +247,11 @@ class EffectSpec :
               }.bind()
             }, ::identity)
           }
-        
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "Can handle thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
@@ -263,10 +263,10 @@ class EffectSpec :
         ) shouldBe fallback()
       }
     }
-    
+
     "Can raise from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
-        effect<String, Int> {
+        effect {
           effect<Int, String> {
             throw RuntimeException(msg())
           }.fold(
@@ -277,7 +277,7 @@ class EffectSpec :
         }.runCont() shouldBe fallback()
       }
     }
-    
+
     "Can throw from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         shouldThrow<IllegalStateException> {
@@ -291,7 +291,7 @@ class EffectSpec :
         }.message shouldBe fallback()
       }
     }
-    
+
     "catch - happy path" {
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
@@ -300,7 +300,7 @@ class EffectSpec :
           .runCont() shouldBe str()
       }
     }
-    
+
     @Suppress("UNREACHABLE_CODE")
     "catch - error path and recover" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
@@ -311,7 +311,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-    
+
     @Suppress("UNREACHABLE_CODE")
     "catch - error path and re-raise" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
@@ -322,7 +322,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-    
+
     @Suppress("UNREACHABLE_CODE")
     "catch - error path and throw" {
       checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
@@ -335,7 +335,7 @@ class EffectSpec :
         }.message.shouldNotBeNull() shouldBe msg()
       }
     }
-    
+
     "attempt - happy path" {
       checkAll(Arb.string().suspend()) { str ->
         effect<Int, String> {
@@ -344,7 +344,7 @@ class EffectSpec :
           .runCont() shouldBe str()
       }
     }
-    
+
     "attempt - error path and recover" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
@@ -353,7 +353,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-    
+
     "attempt - error path and re-raise" {
       checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
         effect<Int, Unit> {
@@ -362,7 +362,7 @@ class EffectSpec :
           .runCont() shouldBe fallback()
       }
     }
-    
+
     "attempt - error path and throw" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, msg2 ->
         shouldThrow<RuntimeException> {
@@ -407,13 +407,13 @@ private fun <A> Arb<A>.suspend(): Arb<suspend () -> A> =
 internal suspend fun Throwable.suspend(): Nothing = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { throw this }
     .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
-  
+
   COROUTINE_SUSPENDED
 }
 
 internal suspend fun <A> A.suspend(): A = suspendCoroutineUninterceptedOrReturn { cont ->
   suspend { this }
     .startCoroutine(Continuation(Dispatchers.Default) { cont.intercepted().resumeWith(it) })
-  
+
   COROUTINE_SUSPENDED
 }

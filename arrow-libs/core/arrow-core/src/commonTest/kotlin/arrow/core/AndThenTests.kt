@@ -1,14 +1,15 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
+import arrow.core.test.functionAToB
 import arrow.core.test.stackSafeIteration
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.checkAll
 
-class AndThenTests : UnitSpec(spec = {
+class AndThenTests : StringSpec({
   val count = stackSafeIteration()
 
   "AndThen0 - compose a chain of functions with andThen should be same with AndThen" {

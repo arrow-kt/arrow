@@ -3,19 +3,20 @@ package arrow.fx.coroutines
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 @ExperimentalTime
-class ParTraverseTest : ArrowFxSpec(
-  spec = {
+class ParTraverseTest : StringSpec({
 
     "parTraverse can traverse effect full computations" {
       val ref = Atomic(0)

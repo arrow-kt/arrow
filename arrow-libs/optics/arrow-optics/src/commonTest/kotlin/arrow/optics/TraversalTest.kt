@@ -1,17 +1,20 @@
 package arrow.optics
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
+import arrow.optics.test.functionAToB
+import arrow.optics.test.option
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.nonEmptyList
+import arrow.optics.test.sequence
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 
-class TraversalTest : UnitSpec() {
-
-  init {
+class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal list - ",
@@ -73,5 +76,5 @@ class TraversalTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.char()),
       )
     )
-  }
-}
+
+})

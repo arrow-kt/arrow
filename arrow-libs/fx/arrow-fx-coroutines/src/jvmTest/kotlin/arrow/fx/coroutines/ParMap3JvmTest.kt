@@ -2,18 +2,20 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.assertSoftly
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 
-class ParMap3JvmTest : ArrowFxSpec(spec = {
+class ParMap3JvmTest : StringSpec({
   "parMapN 3 returns to original context" {
     val mapCtxName = "parMap3"
 
-    checkAll {
       parallelCtx(3, mapCtxName) { _single, _mapCtx ->
         withContext(_single) {
           Thread.currentThread().name shouldStartWith "single"
@@ -30,7 +32,6 @@ class ParMap3JvmTest : ArrowFxSpec(spec = {
           Thread.currentThread().name shouldStartWith "single"
         }
       }
-    }
   }
 
   "parMapN 3 returns to original context on failure" {
@@ -46,21 +47,21 @@ class ParMap3JvmTest : ArrowFxSpec(spec = {
               1 -> parZip(
                 _mapCtx,
                 { e.suspend() },
-                { never<Nothing>() },
-                { never<Nothing>() }
+                { awaitCancellation() },
+                { awaitCancellation() }
               ) { _, _, _ -> Unit }
       
               2 -> parZip(
                 _mapCtx,
-                { never<Nothing>() },
+                { awaitCancellation() },
                 { e.suspend() },
-                { never<Nothing>() }
+                { awaitCancellation() }
               ) { _, _, _ -> Unit }
       
               else -> parZip(
                 _mapCtx,
-                { never<Nothing>() },
-                { never<Nothing>() },
+                { awaitCancellation() },
+                { awaitCancellation() },
                 { e.suspend() }
               ) { _, _, _ -> Unit }
             }

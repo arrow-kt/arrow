@@ -1,22 +1,23 @@
 package arrow.optics
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
+import arrow.optics.test.either
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class PrismTest : UnitSpec() {
+class PrismTest : StringSpec({
 
-  init {
     testLaws(
       "Prism sum - ",
       PrismLaws.laws(
@@ -118,7 +119,7 @@ class PrismTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.sumType()) { sum: SumType ->
-          combineAll(Monoid.string(), sum) shouldBe
+          fold(Monoid.string(), sum) shouldBe
             (Prism.sumType().getOrNull(sum) ?: Monoid.string().empty())
         }
       }
@@ -177,7 +178,7 @@ class PrismTest : UnitSpec() {
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.sumType(), Arb.boolean()) { sum, predicate ->
-        Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false shouldBe (predicate && sum is SumType.A)
+        (Prism.sumType().findOrNull(sum) { predicate }?.let { true } ?: false) shouldBe (predicate && sum is SumType.A)
       }
     }
 
@@ -192,5 +193,5 @@ class PrismTest : UnitSpec() {
         Prism.sumType().all(sum) { predicate } shouldBe (predicate || sum is SumType.B)
       }
     }
-  }
-}
+
+})

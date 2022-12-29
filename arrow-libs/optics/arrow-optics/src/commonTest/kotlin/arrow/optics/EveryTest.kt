@@ -1,14 +1,15 @@
 package arrow.optics
 
-import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class EveryTest : UnitSpec() {
-  init {
+class EveryTest : StringSpec({
 
     with(Every.list<Int>()) {
 
@@ -38,7 +39,7 @@ class EveryTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) shouldBe ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
@@ -77,7 +78,7 @@ class EveryTest : UnitSpec() {
 
       "Combining all the values of a traversal" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          combineAll(Monoid.int(), ints) shouldBe ints.sum()
+          fold(Monoid.int(), ints) shouldBe ints.sum()
         }
       }
 
@@ -94,5 +95,5 @@ class EveryTest : UnitSpec() {
         }
       }
     }
-  }
-}
+
+})
