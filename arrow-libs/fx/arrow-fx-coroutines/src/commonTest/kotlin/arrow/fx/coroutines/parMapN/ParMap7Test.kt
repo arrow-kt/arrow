@@ -3,6 +3,7 @@ package arrow.fx.coroutines.parMapN
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
+import arrow.core.Tuple7
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
@@ -68,7 +69,9 @@ class ParMap7Test : StringSpec({
             r.value = "$g"
             modifyGate1.complete(Unit)
           }
-        ) { _a, _b, _c, _d, _e, _f, _g -> }
+        ) { _a, _b, _c, _d, _e, _f, _g ->
+          Tuple7(_a, _b, _c, _d, _e, _f, _g)
+        }
 
         r.value shouldBe "$g$f$e$d$c$b$a"
       }
@@ -94,6 +97,7 @@ class ParMap7Test : StringSpec({
 
         val fork = async {
           parZip(loserA, loserB, loserC, loserD, loserE, loserF, loserG) { a, b, c, d, e, f, g ->
+            Tuple7(a, b, c, d, e, f, g)
           }
         }
 

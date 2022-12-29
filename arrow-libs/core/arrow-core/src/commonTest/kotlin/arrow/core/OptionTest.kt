@@ -21,7 +21,7 @@ class OptionTest : StringSpec({
   val none: Option<String> = None
 
     testLaws(
-      MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int()))
+      MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
     )
 
     "ensure null in option computation" {

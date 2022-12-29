@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.Tuple4
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
@@ -26,7 +27,7 @@ class ParMap4JvmTest : StringSpec({
               { Thread.currentThread().name },
               { Thread.currentThread().name },
               { Thread.currentThread().name }
-            ) { a, b, c, d -> listOf(a, b, c, d) }
+            ) { a, b, c, d -> Tuple4(a, b, c, d) }
   
             s1 shouldStartWith mapCtxName
             s2 shouldStartWith mapCtxName

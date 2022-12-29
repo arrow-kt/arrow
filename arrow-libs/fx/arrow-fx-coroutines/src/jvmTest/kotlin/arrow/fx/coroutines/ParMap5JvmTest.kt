@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.Tuple5
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
@@ -26,7 +27,7 @@ class ParMap5JvmTest : StringSpec({
   
             val (s1, s2, s3, s4, s5) = parZip(
               _mapCtx, threadName, threadName, threadName, threadName, threadName
-            ) { a, b, c, d, e -> listOf(a, b, c, d, e) }
+            ) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
   
             s1 shouldStartWith mapCtxName
             s2 shouldStartWith mapCtxName

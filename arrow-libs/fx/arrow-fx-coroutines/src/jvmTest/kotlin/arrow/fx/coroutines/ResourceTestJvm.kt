@@ -3,11 +3,11 @@ package arrow.fx.coroutines
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.property.checkAll
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
+import io.kotest.property.checkAll
 
 class ResourceTestJvm : StringSpec({
 

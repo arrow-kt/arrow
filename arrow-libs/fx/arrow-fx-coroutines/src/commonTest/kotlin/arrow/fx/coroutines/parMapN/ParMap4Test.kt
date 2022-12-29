@@ -3,6 +3,7 @@ package arrow.fx.coroutines.parMapN
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
+import arrow.core.Tuple4
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
@@ -50,7 +51,9 @@ class ParMap4Test : StringSpec({
             r.value = "$d"
             modifyGate1.complete(Unit)
           }
-        ) { _a, _b, _c, _d -> }
+        ) { _a, _b, _c, _d ->
+          Tuple4(_a, _b, _c, _d)
+        }
 
         r.value shouldBe "$d$c$b$a"
       }
@@ -68,7 +71,7 @@ class ParMap4Test : StringSpec({
         val loserC: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pc) }
         val loserD: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pd) }
 
-        val f = async { parZip(loserA, loserB, loserC, loserD) { _a, _b, _c, _d ->  } }
+        val f = async { parZip(loserA, loserB, loserC, loserD) { _a, _b, _c, _d -> Tuple4(_a, _b, _c, _d) } }
 
         repeat(4) { s.send(Unit) } // Suspend until all racers started
         f.cancel()
