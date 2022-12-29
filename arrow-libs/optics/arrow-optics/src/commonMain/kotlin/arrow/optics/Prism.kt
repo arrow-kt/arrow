@@ -7,6 +7,8 @@ import arrow.core.Some
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.left
+import arrow.core.right
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -171,6 +173,26 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
       Prism(
         getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
         reverseGet = { _ -> None }
+      )
+
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Left]
+     */
+    @JvmStatic
+    public fun <L, R> left(): Prism<Either<L, R>, L> =
+      Prism(
+        getOrModify = { e -> e.fold({ it.right() }, { e.left() }) },
+        reverseGet = { it.left() }
+      )
+
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Right]
+     */
+    @JvmStatic
+    public fun <L, R> right(): Prism<Either<L, R>, R> =
+      Prism(
+        getOrModify = { e -> e.fold({ e.left() }, { it.right() }) },
+        reverseGet = { it.right() }
       )
   }
 }
