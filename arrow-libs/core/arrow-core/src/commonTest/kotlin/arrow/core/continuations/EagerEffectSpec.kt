@@ -19,7 +19,7 @@ import kotlinx.coroutines.CompletableDeferred
 class EagerEffectSpec : StringSpec({
   "try/catch - can recover from shift" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
           shift(s)
         } catch (e: Throwable) {
@@ -84,9 +84,9 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "immediate values" { eagerEffect<Nothing, Int> { 1 }.toEither().orNull() shouldBe 1 }
+  "immediate values" { eagerEffect<Nothing, Int> { 1 }.toEither().getOrNull() shouldBe 1 }
 
-  "immediate short-circuit" { eagerEffect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello" }
+  "immediate short-circuit" { eagerEffect { shift<Nothing>("hello") }.runCont() shouldBe "hello" }
 
   "Rethrows immediate exceptions" {
     val e = RuntimeException("test")
@@ -95,7 +95,7 @@ class EagerEffectSpec : StringSpec({
 
   "ensure null in eager either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
-      either.eager<String, Int> {
+      either.eager {
         ensure(predicate) { shift }
         success
       } shouldBe if (predicate) success.right() else shift.left()
@@ -107,10 +107,9 @@ class EagerEffectSpec : StringSpec({
 
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
       val res =
-        either.eager<String, Int> {
-          val ii = i
-          ensureNotNull(ii) { shift }
-          square(ii) // Smart-cast by contract
+        either.eager {
+          ensureNotNull(i) { shift }
+          square(i) // Smart-cast by contract
         }
       val expected = i?.let(::square)?.right() ?: shift.left()
       res shouldBe expected
@@ -121,7 +120,7 @@ class EagerEffectSpec : StringSpec({
     val effect = eagerEffect<String, Int> { shift("Shift") }
     val e = RuntimeException("test")
     Either.catch {
-      eagerEffect<String, Int> {
+      eagerEffect {
         try {
           effect.bind()
         } catch (shiftError: Suspend) {

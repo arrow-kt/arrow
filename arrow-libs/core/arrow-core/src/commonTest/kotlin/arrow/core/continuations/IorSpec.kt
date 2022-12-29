@@ -33,7 +33,7 @@ class IorSpec :
 
     "Concurrent - arrow.ior bind" {
       checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
-        ior(Semigroup.list<String>()) {
+        ior(Semigroup.list()) {
           strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
         }
           .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())

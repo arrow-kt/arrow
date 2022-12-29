@@ -25,7 +25,11 @@ public class CountDownLatch(private val initial: Long) {
   public fun count(): Long = count.get()
   
   /** Await [count] to reach zero */
-  public suspend fun await(): Unit = signal.await()
+  public suspend fun await(): Unit =
+    when (count.get()) {
+      0L -> { }
+      else -> signal.await()
+    }
   
   /** Decrement [count] by one */
   @Suppress("ReturnCount")

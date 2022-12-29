@@ -52,11 +52,9 @@ koverMerged {
       excludes.addAll(
         listOf(
           ":arrow-annotations",
-          ":arrow-core-test",
-          ":arrow-fx-coroutines-test",
-          ":arrow-optics-test",
           ":arrow-site",
-          ":arrow-stack"
+          ":arrow-stack",
+          ":arrow-optics-ksp-plugin"
         )
       )
     }
@@ -82,16 +80,8 @@ tasks {
     dependsOn(generateDoc)
   }
 
-  val undocumentedProjects = if (!enableCompatibilityMetadataVariant) {
-    listOf(
-      project(":arrow-core-test"),
-      project(":arrow-fx-coroutines-test"),
-      project(":arrow-optics-test"),
-      project(":arrow-optics-ksp-plugin"),
-    )
-  } else {
+  val undocumentedProjects =
     listOf(project(":arrow-optics-ksp-plugin"))
-  }
 
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
@@ -100,7 +90,7 @@ tasks {
 
 apiValidation {
   val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
-    listOf("arrow-optics-ksp-plugin", "arrow-optics-test", "arrow-site")
+    listOf("arrow-optics-ksp-plugin", "arrow-site")
   } else {
     listOf("arrow-optics-ksp-plugin")
   }
@@ -114,6 +104,6 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlu
     versions.webpack.version = "5.75.0"
     versions.webpackCli.version = "4.10.0"
     versions.karma.version = "6.4.1"
-    versions.mocha.version = "10.1.0"
+    versions.mocha.version = "10.2.0"
   }
 }

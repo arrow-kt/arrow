@@ -9,14 +9,15 @@ import arrow.core.computations.ensureNotNull
 import arrow.core.computations.eval
 import arrow.core.left
 import arrow.core.right
-import arrow.core.test.UnitSpec
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -31,7 +32,7 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 
-class SuspendingComputationTest : UnitSpec({
+class SuspendingComputationTest : StringSpec({
 
   "immediate values" {
     either<String, Int> {

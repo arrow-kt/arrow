@@ -1,10 +1,9 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class NonFatalTest : UnitSpec() {
-  init {
+class NonFatalTest : StringSpec({
     val nonFatals: List<Throwable> =
       listOf(
         RuntimeException(),
@@ -23,5 +22,4 @@ class NonFatalTest : UnitSpec() {
         it.nonFatalOrThrow() shouldBe it
       }
     }
-  }
-}
+})
