@@ -1,14 +1,18 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.positiveInt
+import io.kotest.property.checkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -25,9 +29,9 @@ import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class FlowTest : ArrowFxSpec(
-  spec = {
+class FlowTest : StringSpec({
 
     "parMap - concurrency = 1 - identity" {
       checkAll(Arb.flow(Arb.int())) { flow ->
@@ -50,12 +54,11 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMap - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
         val job = launch {
-          flowOf(1).parMap { index ->
+          flowOf(1).parMap { _ ->
             guaranteeCase({
               latch.complete(Unit)
               awaitCancellation()
@@ -66,7 +69,6 @@ class FlowTest : ArrowFxSpec(
         job.cancelAndJoin()
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMap - exception in parMap cancels all running tasks" {
@@ -147,7 +149,6 @@ class FlowTest : ArrowFxSpec(
     }
 
     "parMapUnordered - triggers cancel signal" {
-      checkAll {
         val latch = CompletableDeferred<Unit>()
         val exit = CompletableDeferred<ExitCase>()
 
@@ -164,7 +165,6 @@ class FlowTest : ArrowFxSpec(
 
         job.isCancelled shouldBe true
         exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
-      }
     }
 
     "parMapUnordered - exception in parMap cancels all running tasks" {
@@ -226,7 +226,7 @@ class FlowTest : ArrowFxSpec(
   
     "fixedDelay" {
       runTest {
-        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
           val emissionDuration = waitPeriod / 10L
           var state: Long? = null
         
@@ -252,7 +252,7 @@ class FlowTest : ArrowFxSpec(
   
     "fixedRate" {
       runTest {
-        checkAll(Arb.positiveInts().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+        checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
           val emissionDuration = waitPeriod / 10
           var state: Long? = null
         

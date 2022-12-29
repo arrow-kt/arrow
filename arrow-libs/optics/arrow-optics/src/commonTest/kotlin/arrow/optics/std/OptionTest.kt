@@ -1,19 +1,16 @@
 package arrow.optics.std
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
 import arrow.optics.Prism
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.PrismLaws
+import arrow.optics.test.laws.testLaws
+import arrow.optics.test.option
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.orNull
 
-class OptionTest : UnitSpec() {
-
-  init {
+class OptionTest : StringSpec({
 
     testLaws(
       "Prism some - ",
@@ -34,5 +31,5 @@ class OptionTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.constant(Unit)),
       )
     )
-  }
-}
+
+})

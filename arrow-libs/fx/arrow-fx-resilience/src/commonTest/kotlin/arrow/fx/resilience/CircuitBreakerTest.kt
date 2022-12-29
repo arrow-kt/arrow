@@ -1,11 +1,10 @@
 package arrow.fx.resilience
 
 import arrow.core.Either
-import arrow.core.test.stackSafeIteration
-import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.assertions.asClue
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class CircuitBreakerTest : ArrowFxSpec(
-  spec = {
+class CircuitBreakerTest : StringSpec({
     val dummy = RuntimeException("dummy")
     val maxFailures = 5
     val exponentialBackoffFactor = 2.0

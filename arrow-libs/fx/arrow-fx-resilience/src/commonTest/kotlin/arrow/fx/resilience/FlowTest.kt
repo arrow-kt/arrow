@@ -1,14 +1,15 @@
 package arrow.fx.resilience
 
-import arrow.fx.coroutines.ArrowFxSpec
-import arrow.fx.coroutines.assertThrowable
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.checkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.collect
@@ -20,8 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class FlowTest : ArrowFxSpec(
-  spec = {
+class FlowTest : StringSpec({
 
     "Retry - flow fails" {
       val bang = RuntimeException("Bang!")
@@ -79,3 +79,13 @@ class FlowTest : ArrowFxSpec(
     }
   }
 )
+
+inline fun <A> assertThrowable(executable: () -> A): Throwable {
+  val a = try {
+    executable.invoke()
+  } catch (e: Throwable) {
+    e
+  }
+
+  return if (a is Throwable) a else fail("Expected an exception but found: $a")
+}

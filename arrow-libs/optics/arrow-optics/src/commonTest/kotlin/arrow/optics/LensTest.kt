@@ -2,21 +2,22 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class LensTest : UnitSpec() {
+class LensTest : StringSpec({
 
-  init {
     testLaws(
       "TokenLens - ",
       LensLaws.laws(
@@ -77,7 +78,7 @@ class LensTest : UnitSpec() {
 
     "asFold should behave as valid Fold: combineAll" {
       checkAll(Arb.token()) { token ->
-        Lens.token().combineAll(Monoid.string(), token) shouldBe token.value
+        Lens.token().fold(Monoid.string(), token) shouldBe token.value
       }
     }
 
@@ -107,7 +108,7 @@ class LensTest : UnitSpec() {
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
       checkAll(Arb.boolean()) { predicate: Boolean ->
-        Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false shouldBe predicate
+        (Lens.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 
@@ -148,5 +149,5 @@ class LensTest : UnitSpec() {
         second.get(int to token) shouldBe (int to token.value)
       }
     }
-  }
-}
+
+})

@@ -1,20 +1,21 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.intSmall
-import arrow.core.test.generators.longSmall
+import arrow.core.test.intSmall
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.longSmall
+import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class MapKTest : UnitSpec() {
-
-  init {
+class MapKTest : StringSpec({
     testLaws(
       MonoidLaws.laws(
         Monoid.map(Semigroup.int()),
@@ -226,5 +227,5 @@ class MapKTest : UnitSpec() {
         result shouldBe expected
       }
     }
-  }
-}
+
+})
