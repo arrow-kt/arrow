@@ -179,7 +179,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
      * [Prism] to focus into an [arrow.core.Either.Left]
      */
     @JvmStatic
-    public fun <L, R> left(): Prism<Either<L, R>, L> =
+    public fun <L, R> pLeft(): Prism<Either<L, R>, L> =
       Prism(
         getOrModify = { e -> e.fold({ it.right() }, { e.left() }) },
         reverseGet = { it.left() }
@@ -189,7 +189,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
      * [Prism] to focus into an [arrow.core.Either.Right]
      */
     @JvmStatic
-    public fun <L, R> right(): Prism<Either<L, R>, R> =
+    public fun <L, R> pRight(): Prism<Either<L, R>, R> =
       Prism(
         getOrModify = { e -> e.fold({ e.left() }, { it.right() }) },
         reverseGet = { it.right() }

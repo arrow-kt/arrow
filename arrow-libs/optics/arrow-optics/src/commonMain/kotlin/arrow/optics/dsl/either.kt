@@ -12,7 +12,7 @@ import arrow.optics.Traversal
  * @receiver [Prism] with a focus in [Either]
  * @return [Prism] with a focus in [L]
  */
-public inline val <A, L, R> Prism<A, Either<L, R>>.left: Prism<A, L> inline get() = this.compose(Prism.left())
+public inline val <A, L, R> Prism<A, Either<L, R>>.left: Prism<A, L> inline get() = this.compose(Prism.pLeft())
 
 /**
  * DSL to compose a [Optional] with focus [Either] with a [Prism] with a focus of [Either.Left]<[L]>
@@ -20,7 +20,7 @@ public inline val <A, L, R> Prism<A, Either<L, R>>.left: Prism<A, L> inline get(
  * @receiver [Lens] or [Optional] with a focus in [Either]
  * @return [Optional] with a focus in [L]
  */
-public inline val <A, L, R> Optional<A, Either<L, R>>.left: Optional<A, L> inline get() = this.compose(Prism.left())
+public inline val <A, L, R> Optional<A, Either<L, R>>.left: Optional<A, L> inline get() = this.compose(Prism.pLeft())
 
 /**
  * DSL to compose a [Traversal] with focus [Either] with a [Prism] with a focus of [Either.Left]<[L]>
@@ -28,7 +28,7 @@ public inline val <A, L, R> Optional<A, Either<L, R>>.left: Optional<A, L> inlin
  * @receiver [Traversal] with a focus in [Either]
  * @return [Traversal] with a focus in [L]
  */
-public inline val <A, L, R> Traversal<A, Either<L, R>>.left: Traversal<A, L> inline get() = this.compose(Prism.left())
+public inline val <A, L, R> Traversal<A, Either<L, R>>.left: Traversal<A, L> inline get() = this.compose(Prism.pLeft())
 
 /**
  * DSL to compose a [Prism] with focus [Either] with a [Prism] with a focus of [Either.Right]<[R]>
@@ -36,7 +36,7 @@ public inline val <A, L, R> Traversal<A, Either<L, R>>.left: Traversal<A, L> inl
  * @receiver [Prism] with a focus in [Either]
  * @return [Prism] with a focus in [R]
  */
-public inline val <A, L, R> Prism<A, Either<L, R>>.right: Prism<A, R> inline get() = this.compose(Prism.right())
+public inline val <A, L, R> Prism<A, Either<L, R>>.right: Prism<A, R> inline get() = this.compose(Prism.pRight())
 
 /**
  * DSL to compose a [Optional] with focus [Either] with a [Prism] with a focus of [Either.Right]<[R]>
@@ -44,7 +44,7 @@ public inline val <A, L, R> Prism<A, Either<L, R>>.right: Prism<A, R> inline get
  * @receiver [Lens] or [Optional] with a focus in [Either]
  * @return [Optional] with a focus in [R]
  */
-public inline val <A, L, R> Optional<A, Either<L, R>>.right: Optional<A, R> inline get() = this.compose(Prism.right())
+public inline val <A, L, R> Optional<A, Either<L, R>>.right: Optional<A, R> inline get() = this.compose(Prism.pRight())
 
 /**
  * DSL to compose a [Traversal] with focus [Either] with a [Prism] with a focus of [Either.Right]<[R]>
@@ -52,4 +52,4 @@ public inline val <A, L, R> Optional<A, Either<L, R>>.right: Optional<A, R> inli
  * @receiver [Traversal] with a focus in [Either]
  * @return [Traversal] with a focus in [R]
  */
-public inline val <A, L, R> Traversal<A, Either<L, R>>.right: Traversal<A, R> inline get() = this.compose(Prism.right())
+public inline val <A, L, R> Traversal<A, Either<L, R>>.right: Traversal<A, R> inline get() = this.compose(Prism.pRight())
