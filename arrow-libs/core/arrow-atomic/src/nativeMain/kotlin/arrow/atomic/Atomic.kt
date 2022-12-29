@@ -1,3 +1,4 @@
+@file:OptIn(FreezingIsDeprecated::class)
 package arrow.atomic
 
 import kotlin.native.concurrent.AtomicReference
@@ -8,7 +9,7 @@ public actual fun <A> Atomic(initialValue: A): Atomic<A> =
   AtomicRef(AtomicReference(initialValue.freeze()))
 
 private class AtomicRef<V>(private val atom: AtomicReference<V>): Atomic<V> {
-  
+
   override fun getAndSet(value: V): V {
     if (atom.isFrozen) value.freeze()
     while (true) {
@@ -32,4 +33,3 @@ private class AtomicRef<V>(private val atom: AtomicReference<V>): Atomic<V> {
     return value
   }
 }
-

@@ -8,7 +8,7 @@ env:
 jobs:
   ios_watchos:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v3
@@ -38,7 +38,7 @@ jobs:
 
   macos_tvos:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v3
@@ -65,7 +65,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
 
   jvm:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v3
@@ -199,7 +199,7 @@ jobs:
 
   update_api:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v3

@@ -8,11 +8,10 @@ public expect fun <A> Atomic(initialValue: A): Atomic<A>
  * ```kotlin
  * import arrow.atomic.Atomic
  * import arrow.atomic.update
- * import arrow.fx.coroutines.parTraverse
  *
  * suspend fun main() {
  *   val count = Atomic(0)
- *   (0 until 20_000).parTraverse {
+ *   (0 until 20_000).forEach {
  *     count.update(Int::inc)
  *   }
  *   println(count.value)
@@ -21,6 +20,8 @@ public expect fun <A> Atomic(initialValue: A): Atomic<A>
  * <!--- KNIT example-atomic-01.kt -->
  *
  * [Atomic] also offers some other interesting operators such as [loop], [update], [tryUpdate], etc.
+ *
+ * **WARNING**: this class may not work as intended on [Int] and [Long] on Kotlin Native!
  */
 public interface Atomic<A> {
   public var value: A

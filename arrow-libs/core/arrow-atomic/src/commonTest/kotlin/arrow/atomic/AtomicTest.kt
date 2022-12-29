@@ -1,10 +1,9 @@
 package arrow.atomic
 
-import arrow.fx.coroutines.parTraverse
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
@@ -12,8 +11,10 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
 class AtomicTest : StringSpec({
 
+    // NOTE: we test with strings because testing with ints doesn't work!
+
     "set get - successful" {
-      checkAll(Arb.int(), Arb.int()) { x, y ->
+      checkAll(Arb.string(), Arb.string()) { x, y ->
         val r = Atomic(x)
         r.update { y }
         r.value shouldBe y
@@ -21,7 +22,7 @@ class AtomicTest : StringSpec({
     }
 
     "getAndSet - successful" {
-      checkAll(Arb.int(), Arb.int()) { x, y ->
+      checkAll(Arb.string(), Arb.string()) { x, y ->
         val ref = Atomic(x)
         ref.getAndSet(y) shouldBe x
         ref.value shouldBe y
@@ -29,7 +30,7 @@ class AtomicTest : StringSpec({
     }
 
     "tryUpdate - modification occurs successfully" {
-      checkAll(Arb.int()) { x ->
+      checkAll(Arb.string()) { x ->
         val ref = Atomic(x)
         ref.tryUpdate { it + 1 }
         ref.value shouldBe x + 1
@@ -37,18 +38,18 @@ class AtomicTest : StringSpec({
     }
 
     "tryUpdate - should fail to update if modification has occurred" {
-      checkAll(Arb.int()) { x ->
+      checkAll(Arb.string()) { x ->
         val ref = Atomic(x)
         ref.tryUpdate {
-          suspend { ref.update(Int::inc) }
+          suspend { ref.update { it + "a" } }
             .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { })
-          it + 1
+          it + "b"
         } shouldBe false
       }
     }
 
-    "consistent set update" {
-      checkAll(Arb.int(), Arb.int()) { x, y ->
+    "consistent set update on strings" {
+      checkAll(Arb.string(), Arb.string()) { x, y ->
         val set = suspend {
           val r = Atomic(x)
           r.update { y }
@@ -67,9 +68,9 @@ class AtomicTest : StringSpec({
 
     "concurrent modifications" {
       val finalValue = 50_000
-      val r = Atomic(0)
-      (0 until finalValue).parTraverse { r.update { it + 1 } }
-      r.value shouldBe finalValue
+      val r = Atomic("")
+      (0 until finalValue).forEach { r.update { it + "a" } }
+      r.value shouldBe "a".repeat(finalValue)
     }
   }
 )
