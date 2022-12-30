@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.core.left
+import arrow.core.nel
 import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -382,11 +383,32 @@ class EffectSpec :
       }
     }
 
+    "accumulate, returns one error" {
+      either<NonEmptyList<Int>, List<Int>> {
+        mapOrAccumulate((0 .. 100).toList()) {
+          ensure(it != 1) { it }
+          it
+        }
+      } shouldBe 1.nel().left()
+    }
+
     "accumulate, returns no error" {
       checkAll(Arb.list(Arb.string())) { elements ->
         either<NonEmptyList<Int>, List<String>> {
           mapOrAccumulate(elements) { it }
         } shouldBe elements.right()
+      }
+    }
+
+    "accumulate DSL" {
+      checkAll(Arb.int(), Arb.int()) { x, y ->
+        either<NonEmptyList<Int>, Int> {
+          accumulateErrors {
+            val a = accumulate<Int> { raise(x) }
+            val b = accumulate { y }
+            a.value + b.value
+          }
+        } shouldBe x.nel().left()
       }
     }
   })

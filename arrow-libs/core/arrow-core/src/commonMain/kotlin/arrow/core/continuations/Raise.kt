@@ -71,27 +71,15 @@ public interface Raise<in R> {
    * Accumulate the errors obtained by executing the [block]
    * over every element of [this] using the given [semigroup].
    */
+  @EffectDSL
   public fun <A, B> Iterable<A>.mapOrAccumulate(
     semigroup: Semigroup<@UnsafeVariance R>,
     block: Raise<R>.(A) -> B
-  ): List<B> {
-    var error: Any? = EmptyValue
-    val results = mutableListOf<B>()
-    forEach {
-      fold<R, B, Unit>({
-        block(it)
-      }, { newError ->
-        error = semigroup.emptyCombine(error, newError)
-      }, {
-        results.add(it)
-      })
+  ): List<B> =
+    accumulateErrors(semigroup) {
+      map { accumulate { block(it) } }.map { it.value }
     }
-    when (val e = error) {
-      is EmptyValue -> return results
-      else -> raise(EmptyValue.unbox(e))
-    }
-  }
-  
+
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
    * Any _logical failure_ raised are raised in `this` [Raise] context,
@@ -288,4 +276,16 @@ public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   crossinline block: Raise<R>.(A) -> B
 ): List<B> = list.mapOrAccumulate(Semigroup.nonEmptyList()) {
   recover({ block(it) }, { raise(it.nel()) })
+}
+
+@EffectDSL
+public inline fun <R, A, B, C> Raise<R>.zip(
+  semigroup: Semigroup<R>,
+  noinline action1: Raise<R>.() -> A,
+  noinline action2: Raise<R>.() -> B,
+  crossinline block: (A, B) -> C
+): C = accumulateErrors(semigroup) {
+  val x = accumulate(action1)
+  val y = accumulate(action2)
+  block(x.value, y.value)
 }
