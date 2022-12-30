@@ -2334,6 +2334,28 @@ public final class arrow/core/computations/option {
 	public final fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface class arrow/core/continuations/Accumulate {
+	public abstract fun accumulate (Lkotlin/jvm/functions/Function1;)Larrow/core/continuations/Accumulate$Value;
+}
+
+public abstract interface class arrow/core/continuations/Accumulate$Value {
+	public abstract fun getValue ()Ljava/lang/Object;
+	public abstract fun isFailure ()Z
+	public abstract fun isSuccess ()Z
+}
+
+public final class arrow/core/continuations/Accumulate$Value$DefaultImpls {
+	public static fun isFailure (Larrow/core/continuations/Accumulate$Value;)Z
+}
+
+public abstract interface annotation class arrow/core/continuations/AccumulateDSL : java/lang/annotation/Annotation {
+}
+
+public final class arrow/core/continuations/AccumulateKt {
+	public static final fun accumulateErrors (Larrow/core/continuations/Raise;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun accumulateErrors (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
 public final class arrow/core/continuations/DefaultRaise : arrow/core/continuations/Raise {
 	public fun <init> ()V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
@@ -2572,6 +2594,7 @@ public final class arrow/core/continuations/RaiseKt {
 	public static final fun mapOrAccumulate (Larrow/core/continuations/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun recover (Larrow/core/continuations/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun zip (Larrow/core/continuations/Raise;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
 public final class arrow/core/continuations/ResultRaise : arrow/core/continuations/Raise {
