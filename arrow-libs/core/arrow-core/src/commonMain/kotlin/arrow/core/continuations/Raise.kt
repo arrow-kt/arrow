@@ -68,6 +68,58 @@ public interface Raise<in R> {
   public fun raise(r: R): Nothing
 
   /**
+   * Accumulate the errors from running both [action1] and [action2]
+   * using the given [semigroup].
+   */
+  public fun <A, B, C> zipOrAccumulate(
+    semigroup: Semigroup<@UnsafeVariance R>,
+    action1: Raise<R>.() -> A,
+    action2: Raise<R>.() -> B,
+    block: Raise<R>.(A, B) -> C
+  ): C {
+    val result1 = recover(action1) { e1 ->
+      // try to execute the second
+      recover(action2) { e2 -> raise(semigroup.append(e1, e2)) }
+      // if the second succeeds, just raise the first one
+      raise(e1)
+    }
+    return block(result1, action2())
+  }
+
+  /**
+   * Accumulate the errors from running [action1], [action2], and [action3]
+   * using the given [semigroup].
+   */
+  public fun <A, B, C, D> zipOrAccumulate(
+    semigroup: Semigroup<@UnsafeVariance R>,
+    action1: Raise<R>.() -> A,
+    action2: Raise<R>.() -> B,
+    action3: Raise<R>.() -> C,
+    block: Raise<R>.(A, B, C) -> D
+  ): D = zipOrAccumulate(
+    semigroup,
+    { zipOrAccumulate(semigroup, action1, action2) { x, y -> x to y } },
+    action3
+  ) { xy, z -> block(xy.first, xy.second, z) }
+
+  /**
+   * Accumulate the errors from running [action1], [action2], [action3], and [action4]
+   * using the given [semigroup].
+   */
+  public fun <A, B, C, D, E> zipOrAccumulate(
+    semigroup: Semigroup<@UnsafeVariance R>,
+    action1: Raise<R>.() -> A,
+    action2: Raise<R>.() -> B,
+    action3: Raise<R>.() -> C,
+    action4: Raise<R>.() -> D,
+    block: Raise<R>.(A, B, C, D) -> E
+  ): E = zipOrAccumulate(
+    semigroup,
+    { zipOrAccumulate(semigroup, action1, action2, action3) { x, y, z -> Triple(x, y, z) } },
+    action4
+  ) { xyz, z -> block(xyz.first, xyz.second, xyz.third, z) }
+
+  /**
    * Accumulate the errors obtained by executing the [block]
    * over every element of [this] using the given [semigroup].
    */
@@ -75,6 +127,8 @@ public interface Raise<in R> {
     semigroup: Semigroup<@UnsafeVariance R>,
     block: Raise<R>.(A) -> B
   ): List<B> {
+    // this could be implemented using [zipOrAccumulate],
+    // but we can have a faster implementation using [MutableList]
     var error: Any? = EmptyValue
     val results = mutableListOf<B>()
     forEach {
@@ -278,6 +332,11 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
   return value ?: raise(raise())
 }
 
+@EffectDSL
+public inline fun <R, A> Raise<NonEmptyList<R>>.mapErrorNel(
+  crossinline block: Raise<R>.() -> A
+): A = recover(block) { raise(it.nel()) }
+
 /**
  * Accumulate the errors obtained by executing the [block]
  * over every element of [list].
@@ -286,6 +345,56 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
 public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
   crossinline block: Raise<R>.(A) -> B
-): List<B> = list.mapOrAccumulate(Semigroup.nonEmptyList()) {
-  recover({ block(it) }, { raise(it.nel()) })
-}
+): List<B> =
+  list.mapOrAccumulate(Semigroup.nonEmptyList()) { elt -> mapErrorNel { block(elt) } }
+
+/**
+ * Accumulate the errors from running both [action1] and [action2].
+ */
+@EffectDSL
+public inline fun <R, A, B, C> Raise<NonEmptyList<R>>.zipOrAccumulate(
+  crossinline action1: Raise<R>.() -> A,
+  crossinline action2: Raise<R>.() -> B,
+  crossinline block: Raise<R>.(A, B) -> C
+): C = zipOrAccumulate(
+  Semigroup.nonEmptyList(),
+  { mapErrorNel(action1) },
+  { mapErrorNel(action2) },
+  { x, y -> mapErrorNel { block(x, y) } }
+)
+
+/**
+ * Accumulate the errors from running [action1], [action2], and [action3].
+ */
+@EffectDSL
+public inline fun <R, A, B, C, D> Raise<NonEmptyList<R>>.zipOrAccumulate(
+  crossinline action1: Raise<R>.() -> A,
+  crossinline action2: Raise<R>.() -> B,
+  crossinline action3: Raise<R>.() -> C,
+  crossinline block: Raise<R>.(A, B, C) -> D
+): D = zipOrAccumulate(
+  Semigroup.nonEmptyList(),
+  { mapErrorNel(action1) },
+  { mapErrorNel(action2) },
+  { mapErrorNel(action3) },
+  { x, y, z -> mapErrorNel { block(x, y, z) } }
+)
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], and [action4].
+ */
+@EffectDSL
+public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
+  crossinline action1: Raise<R>.() -> A,
+  crossinline action2: Raise<R>.() -> B,
+  crossinline action3: Raise<R>.() -> C,
+  crossinline action4: Raise<R>.() -> D,
+  crossinline block: Raise<R>.(A, B, C, D) -> E
+): E = zipOrAccumulate(
+  Semigroup.nonEmptyList(),
+  { mapErrorNel(action1) },
+  { mapErrorNel(action2) },
+  { mapErrorNel(action3) },
+  { mapErrorNel(action4) },
+  { x, y, z, u -> mapErrorNel { block(x, y, z, u) } }
+)
