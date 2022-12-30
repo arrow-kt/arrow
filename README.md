@@ -37,7 +37,7 @@ If you want to try it, you need to add the following repository in your build fi
 maven("https://oss.sonatype.org/content/repositories/snapshots")
 ```
 
-and depend on the `2.0-SNAPSHOT` version of the desired library.
+and depend on the `2.0.0-SNAPSHOT` version of the desired library.
 
 ## Join Us
 
