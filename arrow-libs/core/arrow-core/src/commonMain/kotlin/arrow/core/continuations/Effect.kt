@@ -26,19 +26,19 @@ import kotlin.coroutines.resumeWithException
  *
  * <!--- TOC -->
 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Leaking `shift`](#leaking-shift)
 
  * <!--- END -->
  *
@@ -418,7 +418,7 @@ import kotlin.coroutines.resumeWithException
  *
  * ### KotlinX
  * #### withContext
- * It's always safe to call `shift` from `withContext` since it runs in place, so it has no way of leaking `shift`.
+ * It's always safe to call `shift` from `withContext` since it runs _in place_, so it has no way of leaking `shift`.
  * When `shift` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
  *
  * <!--- INCLUDE
@@ -483,6 +483,8 @@ import kotlin.coroutines.resumeWithException
  * #### async
  *
  * When calling `shift` from `async` you should **always** call `await`, otherwise `shift` can leak out of its scope.
+ * So it's safe to call `shift` from `async` as long as you **always** call `await` on the `Deferred` returned by `async`,
+ * but we advise using Arrow Fx `parZip`, `raceN`, `parTraverse`, etc instead.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -500,13 +502,28 @@ import kotlin.coroutines.resumeWithException
  *       val fa = async<Int> { shift(errorA) }
  *       val fb = async<Int> { shift(errorB) }
  *       fa.await() + fb.await()
- *     }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") })
+ *     }.fold(
+ *       { error ->
+ *         println(error)
+ *         error shouldBeIn listOf(errorA, errorB)
+ *       },
+ *       { fail("Int can never be the result") }
+ *     )
  *   }
  * }
  * ```
  * <!--- KNIT example-effect-guide-11.kt -->
+ * ```text
+ * ErrorA
+ * ```
+ *
+ * The example here will always print `ErrorA`, but never `ErrorB`. This is because `fa` is awaited first, and when it's `shifts` it will cancel `fb`.
+ * If instead we used `awaitAll`, then it would print `ErrorA` or `ErrorB` due to both `fa` and `fb` being awaited in parallel.
  *
  * #### launch
+ *
+ * It's **not allowed** to call `shift` from within `launch`, this is because `launch` creates a separate process.
+ * Any calls to `shift` inside of `launch` will be ignored by `effect`, and result in an exception being thrown.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -519,29 +536,30 @@ import kotlin.coroutines.resumeWithException
  * suspend fun main() {
  *   val errorA = "ErrorA"
  *   val errorB = "ErrorB"
- *   val int = 45
  *   effect<String, Int> {
  *     coroutineScope<Int> {
  *       launch { shift(errorA) }
  *       launch { shift(errorB) }
- *       int
+ *       45
  *     }
- *   }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+ *   }.fold({ fail("Shift can never finish") }, ::println)
  * }
  * ```
  * <!--- KNIT example-effect-guide-12.kt -->
+ * ```text
+ * 45
+ * ```
  *
- * #### Strange edge cases
+ * As you can see from the output, the `effect` block is still executed, but the `shift` calls inside `launch` are ignored.
  *
- * **NOTE**
- * Capturing `shift` into a lambda, and leaking it outside of `Effect` to be invoked outside will yield unexpected results.
- * Below we capture `shift` from inside the DSL, and then invoke it outside its context `EffectScope<String>`.
+ * #### Leaking `shift`
+ *
+ * **IMPORTANT:** Capturing `shift` and leaking it outside of `effect { }` and invoking it outside its scope will yield unexpected results.
+ *
+ * Below an example of the capturing of `shift` inside a `suspend lambda`, and then invoking it outside its `effect { }` scope.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
- * import kotlinx.coroutines.Deferred
- * import kotlinx.coroutines.async
- * import kotlinx.coroutines.coroutineScope
  *
  * suspend fun main() {
  * -->
@@ -553,21 +571,65 @@ import kotlin.coroutines.resumeWithException
  *     suspend { shift("error") }
  *   }.fold({ }, { leakedShift -> leakedShift.invoke() })
  * ```
- *
- * The same violation is possible in all DSLs in Kotlin, including Structured Concurrency.
- *
- * ```kotlin
- *   val leakedAsync = coroutineScope<suspend () -> Deferred<Unit>> {
- *     suspend {
- *       async {
- *         println("I am never going to run, until I get called invoked from outside")
- *       }
- *     }
- *   }
- *
- *   leakedAsync.invoke().await()
- * ```
  * <!--- KNIT example-effect-guide-13.kt -->
+ *
+ * When we invoke `leakedShift` outside of `effect { }` a special `ShiftLeakedException` is thrown to improve the debugging experience.
+ * The message clearly states that `shift` was leaked outside its scope, and the stacktrace will point to the exact location where `shift` was captured.
+ * In this case in line `9` of `example-effect-guide-13.kt`, which is stated in the second line of the stacktrace: `invokeSuspend(example-effect-guide-13.kt:9)`.
+ *
+ * ```text
+ * Exception in thread "main" arrow.core.continuations.ShiftLeakedException:
+ * shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
+ * This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
+ *
+ * See: ... for additional information.
+ * 	at arrow.core.continuations.FoldContinuation.shift(Effect.kt:770)
+ * 	at arrow.core.examples.exampleEffectGuide13.Example_effect_guide_13Kt$main$2$1.invokeSuspend(example-effect-guide-13.kt:9)
+ * 	at arrow.core.examples.exampleEffectGuide13.Example_effect_guide_13Kt$main$2$1.invoke(example-effect-guide-13.kt)
+ * ```
+ *
+ * An example with KotlinX Coroutines launch. Which can _concurrently_ leak `shift` outside of its scope.
+ * In this case by _delaying_ the invocation of `shift` by `3.seconds`,
+ * we can see that the `ShiftLeakedException` is again thrown when `shift` is invoked.
+ *
+ * <!--- INCLUDE
+ * import kotlinx.coroutines.launch
+ * import kotlinx.coroutines.delay
+ * import kotlinx.coroutines.coroutineScope
+ * import kotlinx.coroutines.runBlocking
+ * import arrow.core.continuations.effect
+ * import kotlin.time.Duration.Companion.seconds
+ *
+ * fun main(): Unit = runBlocking {
+ * -->
+ * <!--- SUFFIX
+ * }
+ * -->
+ * ```kotlin
+ *   coroutineScope {
+ *     effect<String, Int> {
+ *       launch {
+ *         delay(3.seconds)
+ *         shift("error")
+ *       }
+ *       1
+ *     }.fold(::println, ::println)
+ *   }
+ * ```
+ * ```text
+ * 1
+ * Exception in thread "main" arrow.core.continuations.ShiftLeakedException:
+ * shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
+ * This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
+ *
+ * See: ... for additional information.
+ * 	at arrow.core.continuations.FoldContinuation.shift(Effect.kt:780)
+ * 	at arrow.core.examples.exampleEffectGuide14.Example_effect_guide_14Kt$main$1$1$1$1.invokeSuspend(example-effect-guide-14.kt:17)
+ * 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33) <13 internal lines>
+ * 	at arrow.core.examples.exampleEffectGuide14.Example_effect_guide_14Kt.main(example-effect-guide-14.kt:11)
+ * 	at arrow.core.examples.exampleEffectGuide14.Example_effect_guide_14Kt.main(example-effect-guide-14.kt)
+ * ```
+ * <!--- KNIT example-effect-guide-14.kt -->
  */
 public interface Effect<out R, out A> {
   /**
@@ -846,11 +908,12 @@ private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effec
 
 public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
 
-public class ShiftLeakedException : RuntimeException(
+public class ShiftLeakedException : IllegalStateException(
   """
-      "shift or bind occurred outside of its DSL scope, and the DSL scoped operator was leaked, this is kind of usage is incorrect.
-       Make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar.
-       
-       See: ... for additional information.
-    """.trimIndent()
+  
+  shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
+  This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
+ 
+  See: ... for additional information.
+  """.trimIndent()
 )
