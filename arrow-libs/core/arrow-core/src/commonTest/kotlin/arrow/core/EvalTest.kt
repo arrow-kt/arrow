@@ -1,22 +1,29 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.stackSafeIteration
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class EvalTest : UnitSpec() {
+internal data class SideEffect(var counter: Int = 0) {
+  fun increment() {
+    counter++
+  }
+}
 
-  init {
+private fun recur(limit: Int, sideEffect: SideEffect): (Int) -> Eval<Int> {
+  return { num ->
+    if (num <= limit) {
+      sideEffect.increment()
+      Eval.defer {
+        recur(limit, sideEffect).invoke(num + 1)
+      }
+    } else {
+      Eval.now(-1)
+    }
+  }
+}
 
-    testLaws(
-      /*FxLaws.suspended<EvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::invoke) {
-        it.bind()
-      },
-      FxLaws.eager<RestrictedEvalEffect<*>, Eval<Int>, Int>(Arb.int().map(Eval.Companion::now), Arb.int().map(Eval.Companion::now), Eval<Int>::equals, eval::eager) {
-        it.bind()
-      }*/
-    )
+class EvalTest : StringSpec({
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
@@ -123,18 +130,5 @@ class EvalTest : UnitSpec() {
       flatMapped.value() shouldBe -1
       sideEffect.counter shouldBe limit + 1
     }
-  }
 
-  private fun recur(limit: Int, sideEffect: SideEffect): (Int) -> Eval<Int> {
-    return { num ->
-      if (num <= limit) {
-        sideEffect.increment()
-        Eval.defer {
-          recur(limit, sideEffect).invoke(num + 1)
-        }
-      } else {
-        Eval.now(-1)
-      }
-    }
-  }
-}
+})

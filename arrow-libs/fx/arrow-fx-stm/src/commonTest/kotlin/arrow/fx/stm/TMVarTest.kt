@@ -1,14 +1,14 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.checkAll
 
-class TMVarTest : ArrowFxSpec(
-  spec = {
+class TMVarTest : StringSpec({
     "empty creates an empty TMVar" {
       val t1 = TMVar.empty<Int>()
       atomically { t1.tryTake() } shouldBe null

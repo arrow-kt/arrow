@@ -1,24 +1,24 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.test.laws.testLaws
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
-class IsoTest : UnitSpec() {
-
-  init {
+class IsoTest : StringSpec({
 
     val aIso: Iso<SumType.A, String> = Iso(
       get = { a: SumType.A -> a.string },
@@ -98,7 +98,7 @@ class IsoTest : UnitSpec() {
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.token()) { token ->
-          combineAll(Monoid.string(), token) shouldBe token.value
+          fold(Monoid.string(), token) shouldBe token.value
         }
       }
 
@@ -180,7 +180,7 @@ class IsoTest : UnitSpec() {
 
     "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
       checkAll(Arb.boolean()) { predicate: Boolean ->
-        Iso.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false shouldBe predicate
+        (Iso.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 
@@ -209,5 +209,5 @@ class IsoTest : UnitSpec() {
         composedIso.get(user) shouldBe tokenValue
       }
     }
-  }
-}
+
+})

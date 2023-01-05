@@ -1,17 +1,18 @@
 package arrow.optics.instances
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.functionAToB
+import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.PrismLaws
+import arrow.optics.test.laws.testLaws
 import arrow.optics.typeclasses.Snoc
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 
-class SnocInstanceTest : UnitSpec() {
-  init {
+class SnocInstanceTest : StringSpec({
     testLaws(
       "Snoc list - ",
       PrismLaws.laws(
@@ -30,5 +31,4 @@ class SnocInstanceTest : UnitSpec() {
         funcGen = Arb.functionAToB(Arb.pair(Arb.string(), Arb.char())),
       )
     )
-  }
-}
+})

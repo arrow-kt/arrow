@@ -2,18 +2,19 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.sequence
-import arrow.core.test.generators.result
-import io.kotest.matchers.result.shouldBeFailureOfType
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 
-class ParTraverseResultTest : ArrowFxSpec(
-  spec = {
+class ParTraverseResultTest : StringSpec({
     "parTraverseResult can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverseResult {
@@ -50,7 +51,7 @@ class ParTraverseResultTest : ArrowFxSpec(
       ) { n, killOn ->
         (0 until n).parTraverseResult { i ->
           if (i == killOn) Result.failure(RuntimeException()) else Result.success(Unit)
-        }.shouldBeFailureOfType<RuntimeException>()
+        }.shouldBeFailure<RuntimeException>()
       }
     }
 

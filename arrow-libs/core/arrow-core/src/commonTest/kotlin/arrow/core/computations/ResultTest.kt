@@ -6,12 +6,12 @@ import arrow.core.composeErrors
 import arrow.core.flatMap
 import arrow.core.handleErrorWith
 import arrow.core.redeemWith
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.result
-import arrow.core.test.generators.suspend
-import arrow.core.test.generators.throwable
+import arrow.core.test.result
+import arrow.core.test.suspend
+import arrow.core.test.throwable
 import arrow.core.zip
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.result.shouldBeFailureOfType
 import io.kotest.matchers.shouldBe
@@ -31,8 +31,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-class ResultTest : UnitSpec() {
-  init {
+class ResultTest : StringSpec({
     "flatMap" {
       checkAll(Arb.result(Arb.int()), Arb.result(Arb.string())) { ints, strs ->
         val res = ints.flatMap { strs }
@@ -220,5 +219,4 @@ class ResultTest : UnitSpec() {
         currentContext() shouldBe parentCtx
       }
     }
-  }
-}
+})
