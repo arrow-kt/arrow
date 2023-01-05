@@ -10,13 +10,11 @@ import kotlin.time.Duration.Companion.seconds
 
 fun main(): Unit = runBlocking {
 
-  coroutineScope {
-    effect<String, Int> {
-      launch {
-        delay(3.seconds)
-        shift("error")
-      }
-      1
-    }.fold(::println, ::println)
-  }
+ effect<String, Int> {
+   launch {
+     delay(3.seconds)
+     shift("error")
+   }
+   1
+ }.fold(::println, ::println)
 }

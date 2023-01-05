@@ -522,8 +522,9 @@ import kotlin.coroutines.resumeWithException
  *
  * #### launch
  *
- * It's **not allowed** to call `shift` from within `launch`, this is because `launch` creates a separate process.
- * Any calls to `shift` inside of `launch` will be ignored by `effect`, and result in an exception being thrown.
+ * It's **not allowed** to call `shift` from within `launch`, this is because `launch` creates a separate unrelated child Job/Continuation.
+ * Any calls to `shift` inside of `launch` will be ignored by `effect`, and result in an exception being thrown inside `launch`.
+ * Because KotlinX Coroutines ignores `CancellationException`, and thus swallows the `shift` call.
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -606,15 +607,13 @@ import kotlin.coroutines.resumeWithException
  * }
  * -->
  * ```kotlin
- *   coroutineScope {
- *     effect<String, Int> {
- *       launch {
- *         delay(3.seconds)
- *         shift("error")
- *       }
- *       1
- *     }.fold(::println, ::println)
- *   }
+ *  effect<String, Int> {
+ *    launch {
+ *      delay(3.seconds)
+ *      shift("error")
+ *    }
+ *    1
+ *  }.fold(::println, ::println)
  * ```
  * ```text
  * 1
