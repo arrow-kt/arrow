@@ -583,7 +583,7 @@ import kotlin.coroutines.resumeWithException
  * shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
  * This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
  *
- * See: ... for additional information.
+ * See: Effect KDoc for additional information.
  * 	at arrow.core.continuations.FoldContinuation.shift(Effect.kt:770)
  * 	at arrow.core.examples.exampleEffectGuide13.Example_effect_guide_13Kt$main$2$1.invokeSuspend(example-effect-guide-13.kt:9)
  * 	at arrow.core.examples.exampleEffectGuide13.Example_effect_guide_13Kt$main$2$1.invoke(example-effect-guide-13.kt)
@@ -621,7 +621,7 @@ import kotlin.coroutines.resumeWithException
  * shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
  * This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
  *
- * See: ... for additional information.
+ * See: Effect KDoc for additional information.
  * 	at arrow.core.continuations.FoldContinuation.shift(Effect.kt:780)
  * 	at arrow.core.examples.exampleEffectGuide14.Example_effect_guide_14Kt$main$1$1$1$1.invokeSuspend(example-effect-guide-14.kt:17)
  * 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33) <13 internal lines>
@@ -913,6 +913,6 @@ public class ShiftLeakedException : IllegalStateException(
   shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
   This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
  
-  See: ... for additional information.
+  See: Effect KDoc for additional information.
   """.trimIndent()
 )
