@@ -179,17 +179,17 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     /**
      * [Prism] to focus into an [arrow.core.Either.Left]
      */
-    @JvmStatic
+    @JvmStatic @JvmName("eitherLeft")
     public fun <L, R> left(): Prism<Either<L, R>, L> = pLeft()
       
     /**
      * [Prism] to focus into an [arrow.core.Either.Right]
      */
-    @JvmStatic
+    @JvmStatic @JvmName("eitherRight")
     public fun <L, R> right(): Prism<Either<L, R>, R> = pRight()
 
     /**
-     * [Prism] to focus into an [arrow.core.Either.Left]
+     * Polymorphic [PPrism] to focus into an [arrow.core.Either.Left]
      */
     @JvmStatic
     public fun <L, R, E> pLeft(): PPrism<Either<L, R>, Either<E, R>, L, E> =
@@ -204,7 +204,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
       )
 
     /**
-     * [Prism] to focus into an [arrow.core.Either.Right]
+     * Polymorphic [PPrism] to focus into an [arrow.core.Either.Right]
      */
     @JvmStatic
     public fun <L, R, B> pRight(): PPrism<Either<L, R>, Either<L, B>, R, B> =
