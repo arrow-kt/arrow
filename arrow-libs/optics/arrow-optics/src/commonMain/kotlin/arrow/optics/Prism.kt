@@ -179,20 +179,42 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     /**
      * [Prism] to focus into an [arrow.core.Either.Left]
      */
-    @JvmStatic @JvmName("eitherLeft")
-    public fun <L, R> left(): Prism<Either<L, R>, L> =
+    @JvmStatic
+    public fun <L, R> left(): Prism<Either<L, R>, L> = pLeft()
+      
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Right]
+     */
+    @JvmStatic
+    public fun <L, R> right(): Prism<Either<L, R>, R> = pRight()
+
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Left]
+     */
+    @JvmStatic
+    public fun <L, R, E> pLeft(): PPrism<Either<L, R>, Either<E, R>, L, E> =
       Prism(
-        getOrModify = { e -> e.fold({ it.right() }, { e.left() }) },
+        getOrModify = { e ->
+          when (e) {
+            is Either.Left -> e.value.right()
+            is Either.Right -> e.left()
+          }
+        },
         reverseGet = { it.left() }
       )
 
     /**
      * [Prism] to focus into an [arrow.core.Either.Right]
      */
-    @JvmStatic @JvmName("eitherRight")
-    public fun <L, R> right(): Prism<Either<L, R>, R> =
-      Prism(
-        getOrModify = { e -> e.fold({ e.left() }, { it.right() }) },
+    @JvmStatic
+    public fun <L, R, B> pRight(): PPrism<Either<L, R>, Either<L, B>, R, B> =
+      PPrism(
+        getOrModify = { e ->
+          when (e) {
+            is Either.Left -> e.left()
+            is Either.Right -> e.value.right()
+          }
+        },
         reverseGet = { it.right() }
       )
   }
