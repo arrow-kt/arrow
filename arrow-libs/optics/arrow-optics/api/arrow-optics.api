@@ -607,6 +607,8 @@ public abstract interface class arrow/optics/PPrism : arrow/optics/PEvery, arrow
 	public abstract fun liftNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun none ()Larrow/optics/PPrism;
+	public static fun pLeft ()Larrow/optics/PPrism;
+	public static fun pRight ()Larrow/optics/PPrism;
 	public static fun pSome ()Larrow/optics/PPrism;
 	public abstract fun plus (Larrow/optics/PPrism;)Larrow/optics/PPrism;
 	public abstract fun reverseGet (Ljava/lang/Object;)Ljava/lang/Object;
@@ -624,6 +626,8 @@ public final class arrow/optics/PPrism$Companion {
 	public final fun none ()Larrow/optics/PPrism;
 	public final fun only (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/optics/PPrism;
 	public static synthetic fun only$default (Larrow/optics/PPrism$Companion;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Larrow/optics/PPrism;
+	public final fun pLeft ()Larrow/optics/PPrism;
+	public final fun pRight ()Larrow/optics/PPrism;
 	public final fun pSome ()Larrow/optics/PPrism;
 	public final fun some ()Larrow/optics/PPrism;
 }
