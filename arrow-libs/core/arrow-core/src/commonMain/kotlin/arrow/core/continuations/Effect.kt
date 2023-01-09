@@ -517,7 +517,7 @@ import kotlin.coroutines.resumeWithException
  * ErrorA
  * ```
  *
- * The example here will always print `ErrorA`, but never `ErrorB`. This is because `fa` is awaited first, and when it's `shifts` it will cancel `fb`.
+ * The example here will always print `ErrorA`, but never `ErrorB`. This is because `fa` is awaited first, and when it `shifts` it will cancel `fb`.
  * If instead we used `awaitAll`, then it would print `ErrorA` or `ErrorB` due to both `fa` and `fb` being awaited in parallel.
  *
  * #### launch
