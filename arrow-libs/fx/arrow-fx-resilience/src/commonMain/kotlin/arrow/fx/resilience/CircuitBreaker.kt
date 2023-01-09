@@ -1,11 +1,14 @@
-package arrow.fx.coroutines
+package arrow.fx.resilience
 
 import arrow.core.Either
 import arrow.core.continuations.AtomicRef
 import arrow.core.identity
-import arrow.fx.coroutines.CircuitBreaker.State.Closed
-import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
-import arrow.fx.coroutines.CircuitBreaker.State.Open
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.bracketCase
+import arrow.fx.coroutines.timeInMillis
+import arrow.fx.resilience.CircuitBreaker.State.Closed
+import arrow.fx.resilience.CircuitBreaker.State.HalfOpen
+import arrow.fx.resilience.CircuitBreaker.State.Open
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -42,7 +45,7 @@ import kotlin.time.DurationUnit
  * ```kotlin
  * import arrow.core.Either
  * import arrow.core.flatten
- * import arrow.fx.coroutines.CircuitBreaker
+ * import arrow.fx.resilience.CircuitBreaker
  * import kotlin.time.Duration
  * import kotlin.time.ExperimentalTime
  * import kotlinx.coroutines.delay
@@ -82,9 +85,9 @@ import kotlin.time.DurationUnit
  *
  * ```kotlin
  * import arrow.core.Either
- * import arrow.fx.coroutines.CircuitBreaker
- * import arrow.fx.coroutines.Schedule
- * import arrow.fx.coroutines.retry
+ * import arrow.fx.resilience.CircuitBreaker
+ * import arrow.fx.resilience.Schedule
+ * import arrow.fx.resilience.retry
  * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
  * import kotlinx.coroutines.delay
@@ -126,7 +129,6 @@ import kotlin.time.DurationUnit
  * ```
  * <!--- KNIT example-circuitbreaker-02.kt -->
  */
-@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("CircuitBreaker", "arrow.fx.resilience.CircuitBreaker"))
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
@@ -337,7 +339,7 @@ private constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.Closed] state.
+   * transitioning to the [CircuitBreaker.State.Closed] state.
    *
    * It is useful for gathering stats.
    *
@@ -345,7 +347,7 @@ private constructor(
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback will be executed when the state evolves into [CircuitBreaker.Closed].
+   * @param callback will be executed when the state evolves into [CircuitBreaker.State.Closed].
    * @return a new circuit breaker wrapping the state of the source.
    */
   public fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
@@ -363,7 +365,7 @@ private constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.HalfOpen] state.
+   * transitioning to the [CircuitBreaker.State.HalfOpen] state.
    *
    * It is useful for gathering stats.
    *
@@ -371,7 +373,7 @@ private constructor(
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback is to be executed when the state evolves into [CircuitBreaker.HalfOpen]
+   * @param callback is to be executed when the state evolves into [CircuitBreaker.State.HalfOpen]
    * @return a new circuit breaker wrapping the state of the source
    */
   public fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
@@ -389,7 +391,7 @@ private constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.Open] state.
+   * transitioning to the [CircuitBreaker.State.Open] state.
    *
    * It is useful for gathering stats.
    *
@@ -397,7 +399,7 @@ private constructor(
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback will be executed when the state evolves into [CircuitBreaker.Open]
+   * @param callback will be executed when the state evolves into [CircuitBreaker.State.Open]
    * @return a new circuit breaker wrapping the state of the source
    */
   public fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
@@ -682,7 +684,8 @@ private constructor(
       onHalfOpen: suspend () -> Unit = suspend { },
       onOpen: suspend () -> Unit = suspend { },
     ): CircuitBreaker =
-      of(
+      CircuitBreaker(
+        state = AtomicRef(Closed(0)),
         maxFailures = maxFailures
           .takeIf { it >= 0 }
           .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
