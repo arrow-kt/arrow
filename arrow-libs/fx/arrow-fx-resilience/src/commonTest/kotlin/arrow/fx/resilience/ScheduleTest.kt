@@ -26,6 +26,10 @@ internal data class SideEffect(var counter: Int = 0) {
   }
 }
 
+data class JustANumber(val n: Int) {
+  fun increment(): JustANumber = copy(n = n + 1)
+}
+
 @ExperimentalTime
 class ScheduleTest : StringSpec({
     class MyException : Exception()
@@ -254,10 +258,10 @@ class ScheduleTest : StringSpec({
     }
 
     "retry is stack-safe" {
-      val count = AtomicRef(0)
+      val count = AtomicRef(JustANumber(0))
       val l = Either.catch {
         Schedule.recurs<Throwable>(20_000).retry {
-          count.updateAndGet { it + 1 }
+          count.updateAndGet(JustANumber::increment)
           throw exception
         }
       }
@@ -335,16 +339,16 @@ private tailrec suspend fun <I, A> go(
   }
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B) {
-  val count = AtomicRef(0)
+  val count = AtomicRef(JustANumber(0))
   schedule.repeat {
-    count.updateAndGet { it + 1 }
+    count.updateAndGet(JustANumber::increment).n
   } shouldBe expected
 }
 
 private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: Flow<B>) {
-  val count = AtomicRef(0)
+  val count = AtomicRef(JustANumber(0))
   schedule.repeatAsFlow {
-    count.updateAndGet { it + 1 }
+    count.updateAndGet(JustANumber::increment).n
   }.zip(expected, ::Pair)
     .collect { (a, b) -> a shouldBe b }
 }
