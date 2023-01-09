@@ -522,8 +522,8 @@ import kotlin.coroutines.resumeWithException
  *
  * #### launch
  *
- * It's **not allowed** to call `shift` from within `launch`, this is because `launch` creates a separate unrelated child Job/Continuation.
- * Any calls to `shift` inside of `launch` will be ignored by `effect`, and result in an exception being thrown inside `launch`.
+ * It's **not allowed** to call `shift` from within `launch`. This is because `launch` creates a separate unrelated child Job/Continuation.
+ * Any calls to `shift` inside of `launch` will be ignored by `effect` and result in an exception being thrown inside `launch`.
  * Because KotlinX Coroutines ignores `CancellationException`, and thus swallows the `shift` call.
  *
  * <!--- INCLUDE
