@@ -2,9 +2,8 @@
 package arrow.fx.resilience.examples.exampleCircuitbreaker01
 
 import arrow.core.Either
-import arrow.core.flatten
 import arrow.fx.resilience.CircuitBreaker
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
 
@@ -12,9 +11,9 @@ import kotlinx.coroutines.delay
 suspend fun main(): Unit {
   val circuitBreaker = CircuitBreaker.of(
     maxFailures = 2,
-    resetTimeout = Duration.seconds(2),
+    resetTimeout = 2.seconds,
     exponentialBackoffFactor = 1.2,
-    maxResetTimeout = Duration.seconds(60),
+    maxResetTimeout = 60.seconds,
   )
   circuitBreaker.protectOrThrow { "I am in Closed: ${circuitBreaker.state()}" }.also(::println)
 

@@ -193,7 +193,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.resilience.*
  *
@@ -349,7 +349,7 @@ public sealed class Schedule<Input, Output> {
   public abstract infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>>
 
   public fun void(): Schedule<Input, Unit> =
-    map { Unit }
+    map { }
 
   /**
    * Changes the result of a [Schedule] to always be [b].
@@ -460,7 +460,7 @@ public sealed class Schedule<Input, Output> {
     val update: suspend (a: Input, s: State) -> Decision<State, Output>
   ) : Schedule<Input, Output>() {
 
-    public override suspend fun <C> repeatOrElseEither(
+    override suspend fun <C> repeatOrElseEither(
       fa: suspend () -> Input,
       orElse: suspend (Throwable, Output?) -> C
     ): Either<C, Output> {
@@ -776,7 +776,7 @@ public sealed class Schedule<Input, Output> {
      * Creates a Schedule that continues without delay and just returns its input.
      */
     public fun <A> identity(): Schedule<A, A> =
-      Schedule({ Unit }) { a, s ->
+      Schedule({ }) { a, s ->
         Decision.cont(0.0, s, Eval.now(a))
       }
 
@@ -830,7 +830,7 @@ public sealed class Schedule<Input, Output> {
      * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
     public fun <A> never(): Schedule<A, Nothing> =
-      Schedule(suspend { awaitCancellation() ; Unit }) { _, _ ->
+      Schedule<Unit, A, Nothing>(suspend { awaitCancellation() }) { _, _ ->
         Decision(false, 0.0, Unit, Eval.later { throw IllegalArgumentException("Impossible") })
       }
 
