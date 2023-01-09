@@ -198,6 +198,8 @@ public final class arrow/optics/POptional$DefaultImpls {
 public abstract interface class arrow/optics/PPrism : arrow/optics/POptional {
 	public static final field Companion Larrow/optics/PPrism$Companion;
 	public abstract fun compose (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static fun eitherLeft ()Larrow/optics/PPrism;
+	public static fun eitherRight ()Larrow/optics/PPrism;
 	public abstract fun first ()Larrow/optics/PPrism;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
@@ -205,6 +207,8 @@ public abstract interface class arrow/optics/PPrism : arrow/optics/POptional {
 	public abstract fun liftNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun none ()Larrow/optics/PPrism;
+	public static fun pLeft ()Larrow/optics/PPrism;
+	public static fun pRight ()Larrow/optics/PPrism;
 	public static fun pSome ()Larrow/optics/PPrism;
 	public abstract fun plus (Larrow/optics/PPrism;)Larrow/optics/PPrism;
 	public abstract fun reverseGet (Ljava/lang/Object;)Ljava/lang/Object;
@@ -215,11 +219,15 @@ public abstract interface class arrow/optics/PPrism : arrow/optics/POptional {
 }
 
 public final class arrow/optics/PPrism$Companion {
+	public final fun eitherLeft ()Larrow/optics/PPrism;
+	public final fun eitherRight ()Larrow/optics/PPrism;
 	public final fun id ()Larrow/optics/PPrism;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
 	public final fun none ()Larrow/optics/PPrism;
 	public final fun only (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/optics/PPrism;
 	public static synthetic fun only$default (Larrow/optics/PPrism$Companion;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Larrow/optics/PPrism;
+	public final fun pLeft ()Larrow/optics/PPrism;
+	public final fun pRight ()Larrow/optics/PPrism;
 	public final fun pSome ()Larrow/optics/PPrism;
 	public final fun some ()Larrow/optics/PPrism;
 }
@@ -387,6 +395,15 @@ public final class arrow/optics/dsl/AtKt {
 	public static final fun at (Larrow/optics/PLens;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/PLens;
 	public static final fun at (Larrow/optics/POptional;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/POptional;
 	public static final fun at (Larrow/optics/PTraversal;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/dsl/EitherKt {
+	public static final fun getLeft (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getLeft (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getLeft (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getRight (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun getRight (Larrow/optics/PPrism;)Larrow/optics/PPrism;
+	public static final fun getRight (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
 public final class arrow/optics/dsl/EveryKt {
