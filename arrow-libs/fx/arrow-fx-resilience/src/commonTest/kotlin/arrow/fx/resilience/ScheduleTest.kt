@@ -267,7 +267,7 @@ class ScheduleTest : StringSpec({
       }
 
       l.shouldBeTypeOf<Either.Left<MyException>>()
-      count.get() shouldBe 20_001
+      count.get().n shouldBe 20_001
     }
 
     "retry succeeds if no exception is thrown" {
