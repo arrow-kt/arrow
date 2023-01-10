@@ -2749,7 +2749,6 @@ public final class arrow/core/continuations/FoldContinuation : arrow/core/contin
 	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun getContext ()Lkotlin/coroutines/CoroutineContext;
 	public final fun getRecover ()Lkotlin/jvm/functions/Function2;
-	public final fun isActive ()Ljava/util/concurrent/atomic/AtomicReference;
 	public fun resumeWith (Ljava/lang/Object;)V
 	public final fun setRecover (Lkotlin/jvm/functions/Function2;)V
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

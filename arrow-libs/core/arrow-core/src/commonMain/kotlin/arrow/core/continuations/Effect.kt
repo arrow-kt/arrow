@@ -26,19 +26,19 @@ import kotlin.coroutines.resumeWithException
  *
  * <!--- TOC -->
 
-      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
-      * [Handling errors](#handling-errors)
-      * [Structured Concurrency](#structured-concurrency)
-        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
-          * [parZip](#parzip)
-          * [parTraverse](#partraverse)
-          * [raceN](#racen)
-          * [bracketCase / Resource](#bracketcase--resource)
-        * [KotlinX](#kotlinx)
-          * [withContext](#withcontext)
-          * [async](#async)
-          * [launch](#launch)
-          * [Leaking `shift`](#leaking-shift)
+ * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+ * [Handling errors](#handling-errors)
+ * [Structured Concurrency](#structured-concurrency)
+ * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+ * [parZip](#parzip)
+ * [parTraverse](#partraverse)
+ * [raceN](#racen)
+ * [bracketCase / Resource](#bracketcase--resource)
+ * [KotlinX](#kotlinx)
+ * [withContext](#withcontext)
+ * [async](#async)
+ * [launch](#launch)
+ * [Leaking `shift`](#leaking-shift)
 
  * <!--- END -->
  *
@@ -788,8 +788,9 @@ internal class FoldContinuation<R, B>(
 
   lateinit var recover: suspend (R) -> Any?
 
-  // Add AtomicBoolean to arrow-atomic
-  val isActive: AtomicRef<Boolean> = AtomicRef(true)
+  private val isActive: AtomicRef<Boolean> = AtomicRef(true)
+
+  internal fun complete(): Boolean = isActive.getAndSet(false)
 
   // Shift away from this Continuation by intercepting it, and completing it with
   // ShiftCancellationException
@@ -803,7 +804,7 @@ internal class FoldContinuation<R, B>(
   // CancellationException and thus effectively recovering from the cancellation/shift.
   // This means try/catch is also capable of recovering from monadic errors.
     // See: EffectSpec - try/catch tests
-    if (isActive.get()) throw Suspend(this, r, recover as suspend (Any?) -> Any?)
+    if (complete()) throw Suspend(this, r, recover as suspend (Any?) -> Any?)
     else throw ShiftLeakedException()
 
   // In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl
@@ -823,13 +824,13 @@ internal class FoldContinuation<R, B>(
     result.fold(parent::resume) { throwable ->
       when {
         throwable is Suspend && this === throwable.token -> {
-          isActive.set(false)
+          complete()
           suspend { throwable.recover(throwable.shifted) as B }.startCoroutineUnintercepted()
         }
 
         throwable is Suspend -> parent.resumeWith(result)
         else -> {
-          isActive.set(false)
+          complete()
           suspend { error(throwable.nonFatalOrThrow()) }.startCoroutineUnintercepted()
         }
       }
@@ -887,18 +888,18 @@ private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effec
       shift.recover = recover
       try {
         val fold: suspend EffectScope<R>.() -> B = {
-          val res = f(this).also { shift.isActive.set(false) }
+          val res = f(this).also { shift.complete() }
           transform(res)
         }
         fold.startCoroutineUninterceptedOrReturn(shift, shift)
       } catch (e: Suspend) {
         if (shift === e.token) {
-          shift.isActive.set(false)
+          shift.complete()
           val f: suspend () -> B = { e.recover(e.shifted) as B }
           f.startCoroutineUninterceptedOrReturn(cont)
         } else throw e
       } catch (e: Throwable) {
-        shift.isActive.set(false)
+        shift.complete()
         val f: suspend () -> B = { error(e.nonFatalOrThrow()) }
         f.startCoroutineUninterceptedOrReturn(cont)
       }
