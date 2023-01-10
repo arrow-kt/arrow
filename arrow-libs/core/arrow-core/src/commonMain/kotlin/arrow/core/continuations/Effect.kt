@@ -804,7 +804,7 @@ internal class FoldContinuation<R, B>(
   // CancellationException and thus effectively recovering from the cancellation/shift.
   // This means try/catch is also capable of recovering from monadic errors.
     // See: EffectSpec - try/catch tests
-    if (complete()) throw Suspend(this, r, recover as suspend (Any?) -> Any?)
+    if (isActive.get()) throw Suspend(this, r, recover as suspend (Any?) -> Any?)
     else throw ShiftLeakedException()
 
   // In contrast to `createCoroutineUnintercepted this doesn't create a new ContinuationImpl
