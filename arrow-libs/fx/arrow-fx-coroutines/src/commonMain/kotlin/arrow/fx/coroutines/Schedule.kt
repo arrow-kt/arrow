@@ -191,7 +191,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
