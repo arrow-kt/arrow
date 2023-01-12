@@ -5,6 +5,7 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -132,5 +133,13 @@ class EagerEffectSpec : StringSpec({
         }
       }.runCont()
     } shouldBe Either.Left(e)
+  }
+
+  "shift leaked results in ShiftLeakException" {
+    shouldThrow<ShiftLeakedException> {
+      effect {
+        suspend { shift<Unit>("failure") }
+      }.fold(::println) { it.invoke() }
+    }
   }
 })

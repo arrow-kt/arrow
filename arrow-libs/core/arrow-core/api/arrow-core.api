@@ -3023,6 +3023,10 @@ public final class arrow/core/continuations/ResultKt {
 public abstract class arrow/core/continuations/ShiftCancellationException : arrow/core/continuations/CancellationExceptionNoTrace {
 }
 
+public final class arrow/core/continuations/ShiftLeakedException : java/lang/IllegalStateException {
+	public fun <init> ()V
+}
+
 public final class arrow/core/continuations/Suspend : arrow/core/continuations/ShiftCancellationException {
 	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
 	public final fun getRecover ()Lkotlin/jvm/functions/Function2;

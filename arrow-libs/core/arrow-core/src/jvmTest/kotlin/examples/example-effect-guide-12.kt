@@ -10,12 +10,11 @@ import kotlinx.coroutines.launch
 suspend fun main() {
   val errorA = "ErrorA"
   val errorB = "ErrorB"
-  val int = 45
   effect<String, Int> {
     coroutineScope<Int> {
       launch { shift(errorA) }
       launch { shift(errorB) }
-      int
+      45
     }
-  }.fold({ fail("Shift can never finish") }, { it shouldBe int })
+  }.fold({ fail("Shift can never finish") }, ::println)
 }
