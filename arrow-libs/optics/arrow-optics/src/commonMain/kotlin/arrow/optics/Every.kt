@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Tuple10
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -42,7 +41,10 @@ public object Every {
         source.map(map)
 
       override fun <A> foldMap(M: Monoid<A>, source: Either<L, R>, map: (focus: R) -> A): A =
-        source.foldMap(M, map)
+        when (source) {
+          is Either.Left<L> -> M.empty()
+          is Either.Right<R> -> map(source.value)
+        }
     }
 
   @JvmStatic
@@ -315,44 +317,6 @@ public object Every {
             .combine(map(source.seventh))
             .combine(map(source.eighth))
             .combine(map(source.ninth))
-        }
-    }
-
-  /**
-   * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
-   */
-  @JvmStatic
-  public fun <A> tuple10(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> =
-    object : Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> {
-      override fun modify(
-        source: Tuple10<A, A, A, A, A, A, A, A, A, A>,
-        map: (focus: A) -> A
-      ): Tuple10<A, A, A, A, A, A, A, A, A, A> =
-        Tuple10(
-          map(source.first),
-          map(source.second),
-          map(source.third),
-          map(source.fourth),
-          map(source.fifth),
-          map(source.sixth),
-          map(source.seventh),
-          map(source.eighth),
-          map(source.ninth),
-          map(source.tenth)
-        )
-
-      override fun <R> foldMap(M: Monoid<R>, source: Tuple10<A, A, A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-            .combine(map(source.sixth))
-            .combine(map(source.seventh))
-            .combine(map(source.eighth))
-            .combine(map(source.ninth))
-            .combine(map(source.tenth))
         }
     }
 

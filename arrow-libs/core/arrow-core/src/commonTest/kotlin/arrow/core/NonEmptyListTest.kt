@@ -161,26 +161,6 @@ class NonEmptyListTest : StringSpec({
       }
     }
 
-    "zip10" {
-      checkAll(
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
-          .toNonEmptyListOrNull()
-        result shouldBe expected
-      }
-    }
-
     "max element" {
       checkAll(
         Arb.nonEmptyList(Arb.int())

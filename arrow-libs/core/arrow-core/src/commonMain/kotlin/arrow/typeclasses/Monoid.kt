@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.None
@@ -87,15 +86,6 @@ public interface Monoid<A> : Semigroup<A> {
       object : Monoid<Endo<A>> {
         override fun empty(): Endo<A> = Endo(::identity)
         override fun append(a: Endo<A>, b: Endo<A>): Endo<A> = Endo(a.f.compose(b.f))
-      }
-
-    @JvmStatic
-    @JvmName("constant")
-    public fun <A, T> const(MA: Monoid<A>): Monoid<Const<A, T>> =
-      object : Monoid<Const<A, T>> {
-        override fun empty(): Const<A, T> = Const(MA.empty())
-        override fun append(a: Const<A, T>, b: Const<A, T>): Const<A, T> =
-          a.combine(MA, b)
       }
 
     @JvmStatic

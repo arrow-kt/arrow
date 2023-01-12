@@ -187,34 +187,6 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip10" {
-      checkAll(
-        Arb.map(Arb.intSmall(), Arb.intSmall()),
-        Arb.map(Arb.intSmall(), Arb.intSmall())
-      ) { a, b ->
-        val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-
-        val expected = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
     "flatMap" {
       checkAll(
         Arb.map(Arb.string(), Arb.intSmall()),

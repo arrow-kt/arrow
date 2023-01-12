@@ -13,11 +13,6 @@ class EitherJvmTest : StringSpec({
       Arb.suspendFunThatThrowsFatalThrowable(),
       Arb.any()
     ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
-
-      val comparator: Comparator<Person> =
-        Comparator.comparingInt(Person::age)
-          .thenComparing(Person::name)
-
       shouldThrow<Throwable> {
         Either.resolve(
           f = { f() },

@@ -23,13 +23,13 @@ class ParMap7JvmTest : StringSpec({
         parallelCtx(7, mapCtxName) { _single, _mapCtx ->
           withContext(_single) {
             threadName() shouldStartWith "single"
-  
+
             val (s1, s2, s3, s4, s5, s6, s7) = parZip(
               _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName
             ) { a, b, c, d, e, f, g ->
               Tuple7(a, b, c, d, e, f, g)
             }
-  
+
             s1 shouldStartWith mapCtxName
             s2 shouldStartWith mapCtxName
             s3 shouldStartWith mapCtxName

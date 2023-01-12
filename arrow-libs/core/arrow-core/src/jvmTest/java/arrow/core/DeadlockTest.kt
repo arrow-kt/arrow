@@ -50,18 +50,4 @@ class DeadlockTest : StringSpec({
       }
     }
 
-    "classloader should not deadlock Eval initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Eval.Now(Unit)
-            } else {
-              Eval.Later { null }
-            }
-          }
-        }.joinAll()
-      }
-    }
-
 })

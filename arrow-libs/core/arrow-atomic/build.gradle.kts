@@ -53,5 +53,22 @@ kotlin {
         implementation(libs.kotlin.stdlibJS)
       }
     }
+
+    if (!enableCompatibilityMetadataVariant) {
+      commonTest {
+        dependencies {
+          implementation(projects.arrowFxCoroutines)
+          implementation(libs.kotest.frameworkApi)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
+        }
+      }
+      jvmTest {
+        dependencies {
+          runtimeOnly(libs.kotest.frameworkEngine)
+          runtimeOnly(libs.kotest.runnerJUnit5)
+        }
+      }
+    }
   }
 }

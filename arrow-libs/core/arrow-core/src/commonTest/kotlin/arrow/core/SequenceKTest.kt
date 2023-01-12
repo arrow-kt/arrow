@@ -1,10 +1,10 @@
 package arrow.core
 
-import arrow.typeclasses.Monoid
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
@@ -150,34 +150,6 @@ class SequenceKTest : StringSpec({
           .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
           .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
           .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-
-        result.toList() shouldBe expected.toList()
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
 
         result.toList() shouldBe expected.toList()
       }

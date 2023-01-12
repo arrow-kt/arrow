@@ -38,9 +38,6 @@ val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
     .forUseAtConfigurationTime().orNull?.toBoolean() == true
 
-include("arrow-continuations")
-project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
-
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 

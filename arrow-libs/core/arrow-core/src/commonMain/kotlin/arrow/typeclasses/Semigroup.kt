@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Ior
@@ -69,11 +68,6 @@ public fun interface Semigroup<A> {
     @JvmStatic
     public fun <A> endo(): Semigroup<Endo<A>> =
       Semigroup { f, g -> Endo(f.f.compose(g.f)) }
-
-    @JvmStatic
-    @JvmName("constant")
-    public fun <A, T> const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
-      Semigroup { a, b -> a.combine(SA, b) }
 
     @JvmStatic
     public fun <K, A> map(SG: Semigroup<A>): Semigroup<Map<K, A>> =

@@ -23,7 +23,6 @@ public final class arrow/optics/Every {
 	public static final fun sequence ()Larrow/optics/PTraversal;
 	public static final fun string ()Larrow/optics/PTraversal;
 	public static final fun triple ()Larrow/optics/PTraversal;
-	public static final fun tuple10 ()Larrow/optics/PTraversal;
 	public static final fun tuple4 ()Larrow/optics/PTraversal;
 	public static final fun tuple5 ()Larrow/optics/PTraversal;
 	public static final fun tuple6 ()Larrow/optics/PTraversal;
@@ -300,7 +299,6 @@ public abstract interface class arrow/optics/PTraversal {
 	public static fun option ()Larrow/optics/PTraversal;
 	public static fun pPair ()Larrow/optics/PTraversal;
 	public static fun pTriple ()Larrow/optics/PTraversal;
-	public static fun pTuple10 ()Larrow/optics/PTraversal;
 	public static fun pTuple4 ()Larrow/optics/PTraversal;
 	public static fun pTuple5 ()Larrow/optics/PTraversal;
 	public static fun pTuple6 ()Larrow/optics/PTraversal;
@@ -314,7 +312,6 @@ public abstract interface class arrow/optics/PTraversal {
 	public abstract fun size (Ljava/lang/Object;)I
 	public static fun string ()Larrow/optics/PTraversal;
 	public static fun triple ()Larrow/optics/PTraversal;
-	public static fun tuple10 ()Larrow/optics/PTraversal;
 	public static fun tuple4 ()Larrow/optics/PTraversal;
 	public static fun tuple5 ()Larrow/optics/PTraversal;
 	public static fun tuple6 ()Larrow/optics/PTraversal;
@@ -342,7 +339,6 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun option ()Larrow/optics/PTraversal;
 	public final fun pPair ()Larrow/optics/PTraversal;
 	public final fun pTriple ()Larrow/optics/PTraversal;
-	public final fun pTuple10 ()Larrow/optics/PTraversal;
 	public final fun pTuple4 ()Larrow/optics/PTraversal;
 	public final fun pTuple5 ()Larrow/optics/PTraversal;
 	public final fun pTuple6 ()Larrow/optics/PTraversal;
@@ -353,7 +349,6 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun sequence ()Larrow/optics/PTraversal;
 	public final fun string ()Larrow/optics/PTraversal;
 	public final fun triple ()Larrow/optics/PTraversal;
-	public final fun tuple10 ()Larrow/optics/PTraversal;
 	public final fun tuple4 ()Larrow/optics/PTraversal;
 	public final fun tuple5 ()Larrow/optics/PTraversal;
 	public final fun tuple6 ()Larrow/optics/PTraversal;

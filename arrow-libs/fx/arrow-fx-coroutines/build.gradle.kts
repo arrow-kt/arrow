@@ -2,9 +2,9 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
+  // alias(libs.plugins.kotest.multiplatform)
 }
 
-apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
 
 val enableCompatibilityMetadataVariant =
@@ -31,6 +31,7 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
+          implementation(projects.arrowCore)
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
