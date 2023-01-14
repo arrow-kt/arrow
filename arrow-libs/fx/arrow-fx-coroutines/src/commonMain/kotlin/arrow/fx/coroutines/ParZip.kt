@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -40,6 +41,39 @@ public suspend inline fun <A, B, C> parZip(
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline f: suspend CoroutineScope.(A, B) -> C
 ): C = parZip(Dispatchers.Default, fa, fb, f)
+
+/**
+ * Runs [fa], [fb] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param f function to map/combine value [A] and [B]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+):  Pair<A, B> = parZip(context, fa, fb) { a, b ->
+    Pair(a, b)
+}
 
 /**
  * Runs [fa], [fb] in parallel on [ctx] and combines their results using the provided function.
@@ -119,6 +153,42 @@ public suspend inline fun <A, B, C, D> parZip(
   crossinline fc: suspend CoroutineScope.() -> C,
   crossinline f: suspend CoroutineScope.(A, B, C) -> D
 ): D = parZip(Dispatchers.Default, fa, fb, fc, f)
+
+/**
+ * Runs [fa], [fb], [fc] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param f function to map/combine value [A], [B], and [C]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+):  Triple<A, B, C> = parZip(context, fa, fb, fc) { a, b, c ->
+  Triple(a, b, c)
+}
 
 /**
  * Runs [fa], [fb], [fc] in parallel on [ctx] and combines their results using the provided function.
@@ -205,6 +275,45 @@ public suspend inline fun <A, B, C, D, E> parZip(
   crossinline fd: suspend CoroutineScope.() -> D,
   crossinline f: suspend CoroutineScope.(A, B, C, D) -> E
 ): E = parZip(Dispatchers.Default, fa, fb, fc, fd, f)
+
+/**
+ * Runs [fa], [fb], [fc], [fd] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param f function to map/combine value [A], [B], [C], and [D]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+):  Tuple4<A, B, C, D> = parZip(context, fa, fb, fc, fd) { a, b, c, d->
+  Tuple4(a, b, c, d)
+}
 
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [ctx] and combines their results using the provided function.
@@ -300,6 +409,48 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
   crossinline fe: suspend CoroutineScope.() -> E,
   crossinline f: suspend CoroutineScope.(A, B, C, D, E) -> F
 ): F = parZip(Dispatchers.Default, fa, fb, fc, fd, fe, f)
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], and [E]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D, E> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+):  Tuple5<A, B, C, D, E> = parZip(context, fa, fb, fc, fd, fe) { a, b, c, d, e->
+  Tuple5(a, b, c, d, e)
+}
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [ctx] and combines their results using the provided function.
@@ -402,6 +553,51 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
   crossinline ff: suspend CoroutineScope.() -> F,
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F) -> G
 ): G = parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, f)
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *     { "Sixth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], and [F]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D, E, F> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+): Tuple6<A, B, C, D, E, F> = parZip(context, fa, fb, fc, fd, fe, ff) { a, b, c, d, e, f->
+  Tuple6(a, b, c, d, e, f)
+}
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [ctx] and combines their results using the provided function.
@@ -511,6 +707,54 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   crossinline fg: suspend CoroutineScope.() -> G,
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G) -> H
 ): H = parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, f)
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *     { "Sixth one is on ${Thread.currentThread().name}" }
+ *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param fg value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], [F], and [G]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D, E, F, G> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+  crossinline fg: suspend CoroutineScope.() -> G,
+): Tuple7<A, B, C, D, E, F, G> = parZip(context, fa, fb, fc, fd, fe, ff, fg) { a, b, c, d, e, f, g->
+  Tuple7(a, b, c, d, e, f, g)
+}
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [ctx] and combines their results using the provided function.
@@ -631,6 +875,57 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [ctx] and combines their results using the provided function.
  *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *     { "Sixth one is on ${Thread.currentThread().name}" }
+ *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *     { "Eighth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param fg value to parallel map
+ * @param fh value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], and [H]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+  crossinline fg: suspend CoroutineScope.() -> G,
+  crossinline fh: suspend CoroutineScope.() -> H,
+): Tuple8<A, B, C, D, E, F, G, H> = parZip(context, fa, fb, fc, fd, fe, ff, fg,  fh) { a, b, c, d, e, f, g, h->
+  Tuple8(a, b, c, d, e, f, g, h)
+}
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [ctx] and combines their results using the provided function.
+ *
  * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
  * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff] & [fg]
@@ -651,6 +946,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *     { "Fifth one is on ${Thread.currentThread().name}" },
  *     { "Sixth one is on ${Thread.currentThread().name}" },
  *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *     { "Eighth one is on ${Thread.currentThread().name}" }
  *   ) { a, b, c, d, e, f, g ->
  *       "$a\n$b\n$c\n$d\n$e\n$f\n$g"
  *     }
@@ -658,7 +954,6 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-14.kt -->
  *
  * @param fa value to parallel map
  * @param fb value to parallel map
@@ -694,4 +989,183 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   val fhh = async(ctx) { fh() }
   val res = awaitAll(faa, fbb, fcc, fdd, fee, fDef, fgg, fhh)
   f(res[0] as A, res[1] as B, res[2] as C, res[3] as D, res[4] as E, res[5] as F, res[6] as G, res[7] as H)
+}
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh], [fi] in parallel on [Dispatchers.Default] and combines
+ * their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     { "Sixth one is on ${Thread.currentThread().name}" },
+ *     { "Seventh one is on ${Thread.currentThread().name}" },
+ *     { "Eighth one is on ${Thread.currentThread().name}" }
+ *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *   ) { a, b, c, d, e, f, g, h, i->
+ *       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h\n$i"
+ *     }
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param fg value to parallel map
+ * @param fh value to parallel map
+ * @param fi value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H], [I]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext].
+ */
+public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+  crossinline fg: suspend CoroutineScope.() -> G,
+  crossinline fh: suspend CoroutineScope.() -> H,
+  crossinline fi: suspend CoroutineScope.() -> I,
+  crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H, I) -> J
+): J = parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, fh, fi, f)
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh], [fi] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *     { "Sixth one is on ${Thread.currentThread().name}" }
+ *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *     { "Eighth one is on ${Thread.currentThread().name}" }
+ *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param fg value to parallel map
+ * @param fh value to parallel map
+ * @param fi value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
+ *
+ * @see parZip for a function that can run on any [CoroutineContext]
+ */
+public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
+  context: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+  crossinline fg: suspend CoroutineScope.() -> G,
+  crossinline fh: suspend CoroutineScope.() -> H,
+  crossinline fi: suspend CoroutineScope.() -> I,
+): Tuple9<A, B, C, D, E, F, G, H, I> = parZip(context, fa, fb, fc, fd, fe, ff, fg,  fh, fi) { a, b, c, d, e, f, g, h, i->
+  Tuple9(a, b, c, d, e, f, g, h, i)
+}
+
+/**
+ * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh], [fi] in parallel on [ctx] and combines their results using the provided function.
+ *
+ * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
+ * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] & [fi]
+ * in parallel.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parZip(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     { "Sixth one is on ${Thread.currentThread().name}" },
+ *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *     { "Eighth one is on ${Thread.currentThread().name}" }
+ *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *   ) { a, b, c, d, e, f, g, h, i->
+ *       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h\n$i"
+ *     }
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ * @param fe value to parallel map
+ * @param ff value to parallel map
+ * @param fg value to parallel map
+ * @param fh value to parallel map
+ * @param fi value to parallel map
+ * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
+ *
+ * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
+ */
+public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend CoroutineScope.() -> A,
+  crossinline fb: suspend CoroutineScope.() -> B,
+  crossinline fc: suspend CoroutineScope.() -> C,
+  crossinline fd: suspend CoroutineScope.() -> D,
+  crossinline fe: suspend CoroutineScope.() -> E,
+  crossinline ff: suspend CoroutineScope.() -> F,
+  crossinline fg: suspend CoroutineScope.() -> G,
+  crossinline fh: suspend CoroutineScope.() -> H,
+  crossinline fi: suspend CoroutineScope.() -> I,
+  crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H, I) -> J
+): J = coroutineScope {
+  val faa = async(ctx) { fa() }
+  val fbb = async(ctx) { fb() }
+  val fcc = async(ctx) { fc() }
+  val fdd = async(ctx) { fd() }
+  val fee = async(ctx) { fe() }
+  val fDef = async(ctx) { ff() }
+  val fgg = async(ctx) { fg() }
+  val fhh = async(ctx) { fh() }
+  val fii = async(ctx) { fi() }
+  val res = awaitAll(faa, fbb, fcc, fdd, fee, fDef, fgg, fhh, fii)
+  f(res[0] as A, res[1] as B, res[2] as C, res[3] as D, res[4] as E, res[5] as F, res[6] as G, res[7] as H, res[8] as I)
 }
