@@ -26,19 +26,19 @@ import kotlin.coroutines.resumeWithException
  *
  * <!--- TOC -->
 
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Leaking `shift`](#leaking-shift)
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Leaking `shift`](#leaking-shift)
 
  * <!--- END -->
  *
