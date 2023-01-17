@@ -1,4 +1,4 @@
-package arrow.fx.coroutines.parMapN
+package arrow.fx.coroutines.parZip
 
 import arrow.core.Either
 import arrow.fx.coroutines.Atomic
@@ -24,8 +24,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 
-class ParMap2Test : StringSpec({
-    "parMapN 2 runs in parallel" {
+class ParZip2Test : StringSpec({
+    "parZip 2 runs in parallel" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         val r = Atomic("")
         val modifyGate = CompletableDeferred<Int>()
@@ -47,7 +47,7 @@ class ParMap2Test : StringSpec({
       }
     }
 
-    "Cancelling parMapN 2 cancels all participants" {
+    "Cancelling parZip 2 cancels all participants" {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -75,7 +75,7 @@ class ParMap2Test : StringSpec({
       }
     }
 
-    "parMapN 2 cancels losers if a failure occurs in one of the tasks" {
+    "parZip 2 cancels losers if a failure occurs in one of the tasks" {
       checkAll(Arb.throwable(), Arb.boolean()) { e, leftWinner ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -94,7 +94,7 @@ class ParMap2Test : StringSpec({
       }
     }
 
-    "parMapN CancellationException on right can cancel rest" {
+    "parZip CancellationException on right can cancel rest" {
       checkAll(Arb.string()) { msg ->
         val exit = CompletableDeferred<ExitCase>()
         val start = CompletableDeferred<Unit>()

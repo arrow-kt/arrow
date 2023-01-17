@@ -1,7 +1,7 @@
-package arrow.fx.coroutines.parMapN
+package arrow.fx.coroutines.parZip
 
 import arrow.core.Either
-import arrow.core.Tuple8
+import arrow.core.Tuple7
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
@@ -23,9 +23,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
 
-class ParMap8Test : StringSpec({
-    "parMapN 8 runs in parallel" {
-      checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g, h ->
+class ParZip7Test : StringSpec({
+    "parZip 7 runs in parallel" {
+      checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
         val modifyGate2 = CompletableDeferred<Unit>()
@@ -33,7 +33,6 @@ class ParMap8Test : StringSpec({
         val modifyGate4 = CompletableDeferred<Unit>()
         val modifyGate5 = CompletableDeferred<Unit>()
         val modifyGate6 = CompletableDeferred<Unit>()
-        val modifyGate7 = CompletableDeferred<Unit>()
 
         parZip(
           {
@@ -61,28 +60,23 @@ class ParMap8Test : StringSpec({
             modifyGate5.complete(Unit)
           },
           {
-            modifyGate7.await()
+            modifyGate1.await()
             r.update { i -> "$i$f" }
             modifyGate6.complete(Unit)
           },
           {
-            modifyGate1.await()
-            r.update { i -> "$i$g" }
-            modifyGate7.complete(Unit)
-          },
-          {
-            r.set("$h")
+            r.set("$g")
             modifyGate1.complete(Unit)
           }
-        ) { _a, _b, _c, _d, _e, _f, _g, _h ->
-          Tuple8(_a, _b, _c, _d, _e, _f, _g, _h)
+        ) { _a, _b, _c, _d, _e, _f, _g ->
+          Tuple7(_a, _b, _c, _d, _e, _f, _g)
         }
 
-        r.get() shouldBe "$h$g$f$e$d$c$b$a"
+        r.get() shouldBe "$g$f$e$d$c$b$a"
       }
     }
 
-    "Cancelling parMapN 8 cancels all participants" {
+    "Cancelling parZip 7 cancels all participants" {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -91,7 +85,6 @@ class ParMap8Test : StringSpec({
         val pe = CompletableDeferred<ExitCase>()
         val pf = CompletableDeferred<ExitCase>()
         val pg = CompletableDeferred<ExitCase>()
-        val ph = CompletableDeferred<ExitCase>()
 
         val loserA: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pa) }
         val loserB: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pb) }
@@ -100,15 +93,14 @@ class ParMap8Test : StringSpec({
         val loserE: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pe) }
         val loserF: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pf) }
         val loserG: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pg) }
-        val loserH: suspend CoroutineScope.() -> Int = { awaitExitCase(s, ph) }
 
         val fork = async {
-          parZip(loserA, loserB, loserC, loserD, loserE, loserF, loserG, loserH) { a, b, c, d, e, f, g, h ->
-            Tuple8(a, b, c, d, e, f, g, h)
+          parZip(loserA, loserB, loserC, loserD, loserE, loserF, loserG) { a, b, c, d, e, f, g ->
+            Tuple7(a, b, c, d, e, f, g)
           }
         }
 
-        repeat(8) { s.send(Unit) } // Suspend until all racers started
+        repeat(7) { s.send(Unit) } // Suspend until all racers started
         fork.cancel()
 
         pa.await().shouldBeTypeOf<ExitCase.Cancelled>()
@@ -118,14 +110,14 @@ class ParMap8Test : StringSpec({
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pg.await().shouldBeTypeOf<ExitCase.Cancelled>()
-        ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
 
-    "parMapN 8 cancels losers if a failure occurs in one of the tasks" {
+    "parZip 7 cancels losers if a failure occurs in one of the tasks" {
       checkAll(
         Arb.throwable(),
-        Arb.element(listOf(1, 2, 3, 4, 5, 6, 7, 8))
+        Arb.element(listOf(1, 2, 3, 4, 5, 6, 7))
       ) { e, winningTask ->
+
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -133,27 +125,24 @@ class ParMap8Test : StringSpec({
         val pd = CompletableDeferred<ExitCase>()
         val pf = CompletableDeferred<ExitCase>()
         val pg = CompletableDeferred<ExitCase>()
-        val ph = CompletableDeferred<ExitCase>()
 
-        val winner: suspend CoroutineScope.() -> Int = { repeat(7) { s.send(Unit) }; throw e }
+        val winner: suspend CoroutineScope.() -> Int = { repeat(6) { s.send(Unit) }; throw e }
         val loserA: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pa) }
         val loserB: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pb) }
         val loserC: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pc) }
         val loserD: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pd) }
         val loserF: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pf) }
         val loserG: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pg) }
-        val loserH: suspend CoroutineScope.() -> Int = { awaitExitCase(s, ph) }
 
         val r = Either.catch {
           when (winningTask) {
-            1 -> parZip(winner, loserA, loserB, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            2 -> parZip(loserA, winner, loserB, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            3 -> parZip(loserA, loserB, winner, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            4 -> parZip(loserA, loserB, loserC, winner, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            5 -> parZip(loserA, loserB, loserC, loserD, winner, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            6 -> parZip(loserA, loserB, loserC, loserD, loserF, winner, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-            7 -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, winner, loserH) { _, _, _, _, _, _, _, _ -> }
-            else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, loserH, winner) { _, _, _, _, _, _, _, _ -> }
+            1 -> parZip(winner, loserA, loserB, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            2 -> parZip(loserA, winner, loserB, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            3 -> parZip(loserA, loserB, winner, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            4 -> parZip(loserA, loserB, loserC, winner, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            5 -> parZip(loserA, loserB, loserC, loserD, winner, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            6 -> parZip(loserA, loserB, loserC, loserD, loserF, winner, loserG) { _, _, _, _, _, _, _ -> }
+            else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, winner) { _, _, _, _, _, _, _ -> }
           }
         }
 
@@ -163,13 +152,12 @@ class ParMap8Test : StringSpec({
         pd.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pg.await().shouldBeTypeOf<ExitCase.Cancelled>()
-        ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
         r should leftException(e)
       }
     }
 
-    "parMapN CancellationException on right can cancel rest" {
-      checkAll(Arb.string(), Arb.int(1..8)) { msg, cancel ->
+    "parZip CancellationException on right can cancel rest" {
+      checkAll(Arb.string(), Arb.int(1..7)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -177,28 +165,25 @@ class ParMap8Test : StringSpec({
         val pd = CompletableDeferred<ExitCase>()
         val pe = CompletableDeferred<ExitCase>()
         val pf = CompletableDeferred<ExitCase>()
-        val pg = CompletableDeferred<ExitCase>()
 
-        val winner: suspend CoroutineScope.() -> Int = { repeat(7) { s.send(Unit) }; throw CancellationException(msg) }
+        val winner: suspend CoroutineScope.() -> Int = { repeat(6) { s.send(Unit) }; throw CancellationException(msg) }
         val loserA: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pa) }
         val loserB: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pb) }
         val loserC: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pc) }
         val loserD: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pd) }
         val loserF: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pe) }
         val loserG: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pf) }
-        val loserH: suspend CoroutineScope.() -> Int = { awaitExitCase(s, pg) }
 
         try {
-            when (cancel) {
-              1 -> parZip(winner, loserA, loserB, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              2 -> parZip(loserA, winner, loserB, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              3 -> parZip(loserA, loserB, winner, loserC, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              4 -> parZip(loserA, loserB, loserC, winner, loserD, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              5 -> parZip(loserA, loserB, loserC, loserD, winner, loserF, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              6 -> parZip(loserA, loserB, loserC, loserD, loserF, winner, loserG, loserH) { _, _, _, _, _, _, _, _ -> }
-              7 -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, winner, loserH) { _, _, _, _, _, _, _, _ -> }
-              else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, loserH, winner) { _, _, _, _, _, _, _, _ -> }
-            }
+          when (cancel) {
+            1 -> parZip(winner, loserA, loserB, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            2 -> parZip(loserA, winner, loserB, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            3 -> parZip(loserA, loserB, winner, loserC, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            4 -> parZip(loserA, loserB, loserC, winner, loserD, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            5 -> parZip(loserA, loserB, loserC, loserD, winner, loserF, loserG) { _, _, _, _, _, _, _ -> }
+            6 -> parZip(loserA, loserB, loserC, loserD, loserF, winner, loserG) { _, _, _, _, _, _, _ -> }
+            else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, winner) { _, _, _, _, _, _, _ -> }
+          }
         } catch (e: CancellationException) {
           e.message shouldBe msg
         }
@@ -208,7 +193,6 @@ class ParMap8Test : StringSpec({
         pd.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
-        pg.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
   }
