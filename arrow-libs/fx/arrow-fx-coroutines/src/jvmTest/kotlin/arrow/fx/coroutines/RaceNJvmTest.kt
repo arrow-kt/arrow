@@ -2,15 +2,17 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class RaceNJvmTest : ArrowFxSpec(
-  spec = {
+class RaceNJvmTest : StringSpec({
     "race2 returns to original context" {
       val racerName = "race2"
       val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
@@ -21,8 +23,8 @@ class RaceNJvmTest : ArrowFxSpec(
             threadName() shouldStartWith singleThreadName
 
             val racedOn = when (choose) {
-              1 -> raceN(raceCtx, { threadName() }, { never<Nothing>() }).swap().orNull()
-              else -> raceN(raceCtx, { never<Nothing>() }, { threadName() }).orNull()
+              1 -> raceN(raceCtx, { threadName() }, { awaitCancellation() }).swap().getOrNull()
+              else -> raceN(raceCtx, { awaitCancellation() }, { threadName() }).getOrNull()
             }
 
             racedOn shouldStartWith racerName
@@ -43,8 +45,8 @@ class RaceNJvmTest : ArrowFxSpec(
 
             Either.catch {
               when (choose) {
-                1 -> raceN(raceCtx, { e.suspend() }, { never<Nothing>() }).swap().orNull()
-                else -> raceN(raceCtx, { never<Nothing>() }, { e.suspend() }).orNull()
+                1 -> raceN(raceCtx, { e.suspend() }, { awaitCancellation() }).swap().getOrNull()
+                else -> raceN(raceCtx, { awaitCancellation() }, { e.suspend() }).getOrNull()
               }
             } should leftException(e)
 
@@ -56,8 +58,8 @@ class RaceNJvmTest : ArrowFxSpec(
 
     "first racer out of 2 always wins on a single thread" {
       single.use { ctx ->
-        raceN(ctx, { threadName() }, { threadName() })
-      }.swap().orNull() shouldStartWith "single"
+            raceN(ctx, { threadName() }, { threadName() })
+          }.swap().getOrNull() shouldStartWith "single"
     }
 
     "race3 returns to original context" {
@@ -71,13 +73,13 @@ class RaceNJvmTest : ArrowFxSpec(
 
             val racedOn = when (choose) {
               1 ->
-                raceN(raceCtx, { threadName() }, { never<Nothing>() }, { never<Nothing>() })
+                raceN(raceCtx, { threadName() }, { awaitCancellation() }, { awaitCancellation() })
                   .fold(::identity, { null }, { null })
               2 ->
-                raceN(raceCtx, { never<Nothing>() }, { threadName() }, { never<Nothing>() })
+                raceN(raceCtx, { awaitCancellation() }, { threadName() }, { awaitCancellation() })
                   .fold({ null }, ::identity, { null })
               else ->
-                raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { threadName() })
+                raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { threadName() })
                   .fold({ null }, { null }, ::identity)
             }
 
@@ -100,13 +102,13 @@ class RaceNJvmTest : ArrowFxSpec(
             Either.catch {
               when (choose) {
                 1 ->
-                  raceN(raceCtx, { e.suspend() }, { never<Nothing>() }, { never<Nothing>() })
+                  raceN(raceCtx, { e.suspend() }, { awaitCancellation() }, { awaitCancellation() })
                     .fold(::identity, { null }, { null })
                 2 ->
-                  raceN(raceCtx, { never<Nothing>() }, { e.suspend() }, { never<Nothing>() })
+                  raceN(raceCtx, { awaitCancellation() }, { e.suspend() }, { awaitCancellation() })
                     .fold({ null }, ::identity, { null })
                 else ->
-                  raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { e.suspend() })
+                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { e.suspend() })
                     .fold({ null }, { null }, ::identity)
               }
             } should leftException(e)

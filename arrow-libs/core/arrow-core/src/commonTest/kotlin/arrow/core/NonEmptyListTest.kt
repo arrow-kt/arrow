@@ -1,20 +1,22 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
 import arrow.core.test.laws.SemigroupLaws
+import arrow.core.test.nonEmptyList
+import arrow.core.test.testLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class NonEmptyListTest : UnitSpec() {
-  init {
+class NonEmptyListTest : StringSpec({
 
     testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
 
@@ -60,8 +62,8 @@ class NonEmptyListTest : UnitSpec() {
 
     "sequence for Either should be consistent with traverseEither" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { Either.conditionally(it % 2 == 0, { it }, { it }) }.sequence() shouldBe
-          ints.traverse { Either.conditionally(it % 2 == 0, { it }, { it }) }
+        ints.map { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }.sequence() shouldBe
+          ints.traverse { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }
       }
     }
 
@@ -333,5 +335,4 @@ class NonEmptyListTest : UnitSpec() {
         }
       }
     }
-  }
-}
+})

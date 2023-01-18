@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.Eval
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
@@ -17,9 +18,14 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
 
+internal data class SideEffect(var counter: Int = 0) {
+  fun increment() {
+    counter++
+  }
+}
+
 @ExperimentalTime
-class ScheduleTest : ArrowFxSpec(
-  spec = {
+class ScheduleTest : StringSpec({
     class MyException : Exception()
 
     val exception = MyException()

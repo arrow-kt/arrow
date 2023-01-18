@@ -7,15 +7,17 @@ import arrow.core.invalidNel
 import arrow.core.sequence
 import arrow.core.validNel
 import arrow.typeclasses.Semigroup
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 
-class ParTraverseValidatedTest : ArrowFxSpec(
-  spec = {
+class ParTraverseValidatedTest : StringSpec({
     "parTraverseValidated can traverse effect full computations" {
       val ref = Atomic(0)
       (0 until 100).parTraverseValidated(Semigroup.nonEmptyList()) {

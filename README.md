@@ -28,6 +28,17 @@ Use the list below to learn more about Λrrow's main features.
 If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR
 to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo.
 
+## Arrow 2.0
+
+The next version of Arrow is [in active development](https://github.com/arrow-kt/arrow/pull/2778).
+If you want to try it, you need to add the following repository in your build file:
+
+```
+maven("https://oss.sonatype.org/content/repositories/snapshots")
+```
+
+and depend on the `2.0.0-SNAPSHOT` version of the desired library.
+
 ## Join Us
 
 Arrow is an inclusive community powered by awesome individuals like you. As an actively growing

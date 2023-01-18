@@ -31,7 +31,7 @@ class EffectSpec :
   StringSpec({
     "try/catch - can recover from shift" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
+        effect {
           try {
             shift(s)
           } catch (e: Throwable) {
@@ -43,7 +43,7 @@ class EffectSpec :
 
     "try/catch - can recover from shift suspended" {
       checkAll(Arb.int(), Arb.string()) { i, s ->
-        effect<String, Int> {
+        effect {
           try {
             shift(s.suspend())
           } catch (e: Throwable) {
@@ -144,7 +144,7 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { a }
 
-        effect<String, Int> {
+        effect {
           val aa = eager.bind()
           aa + b.suspend()
         }.runCont() shouldBe (a + b)
@@ -156,7 +156,7 @@ class EffectSpec :
         val eager: EagerEffect<String, Int> =
           eagerEffect { shift(a) }
 
-        effect<String, Int> {
+        effect {
           val aa = eager.bind()
           aa + b.suspend()
         }.runCont() shouldBe a
@@ -168,11 +168,11 @@ class EffectSpec :
     "suspended value" { effect<Nothing, Int> { 1.suspend() }.value() shouldBe 1 }
 
     "immediate short-circuit" {
-      effect<String, Nothing> { shift("hello") }.runCont() shouldBe "hello"
+      effect { shift<Nothing>("hello") }.runCont() shouldBe "hello"
     }
 
     "suspended short-circuit" {
-      effect<String, Nothing> { shift("hello".suspend()) }.runCont() shouldBe "hello"
+      effect { shift<Nothing>("hello".suspend()) }.runCont() shouldBe "hello"
     }
 
     "Rethrows immediate exceptions" {
@@ -215,7 +215,7 @@ class EffectSpec :
 
     "ensure null in either computation" {
       checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, shift ->
-        either<String, Int> {
+        either {
           ensure(predicate) { shift }
           success
         } shouldBe if (predicate) success.right() else shift.left()
@@ -227,10 +227,9 @@ class EffectSpec :
 
       checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, shift: String ->
         val res =
-          either<String, Int> {
-            val ii = i
-            ensureNotNull(ii) { shift }
-            square(ii) // Smart-cast by contract
+          either {
+            ensureNotNull(i) { shift }
+            square(i) // Smart-cast by contract
           }
         val expected = i?.let(::square)?.right() ?: shift.left()
         res shouldBe expected
@@ -241,7 +240,7 @@ class EffectSpec :
       val effect = effect<String, Int> { shift("Shift") }
       val e = RuntimeException("test")
       Either.catch {
-        effect<String, Int> {
+        effect {
           try {
             effect.bind()
           } catch (eagerShiftError: Eager) {
@@ -259,7 +258,7 @@ class EffectSpec :
       val effect = eagerEffect<String, Int> { shift("Shift") }
       val e = RuntimeException("test")
       Either.catch {
-        effect<String, Int> {
+        effect {
           try {
             effect.bind()
           } catch (eagerShiftError: Eager) {
@@ -272,15 +271,15 @@ class EffectSpec :
         }.runCont()
       } shouldBe Either.Left(e)
     }
-    
+
     "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
       checkAll(Arb.string()) { msg ->
         fun failure(): Effect<Failure, String> = effect {
           withContext(Dispatchers.Default) {}
           shift(Failure(msg))
         }
-        
-        effect<Failure, Int> {
+
+        effect {
           failure().bind()
           1
         }.fold(
@@ -289,30 +288,30 @@ class EffectSpec :
         ) shouldBe Failure(msg)
       }
     }
-  
+
     "#2779 - handleErrorWith does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           failed.handleErrorWith { str ->
             effect { shift(str.reversed().toList()) }
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "#2779 - bind nested in fold does not make nested Continuations hang" {
       checkAll(Arb.string()) { error ->
         val failed: Effect<String, Int> = effect {
           withContext(Dispatchers.Default) {}
           shift(error)
         }
-      
+
         val newError: Effect<List<Char>, Int> =
           effect {
             failed.fold({ r ->
@@ -321,11 +320,11 @@ class EffectSpec :
               }.bind()
             }, ::identity)
           }
-      
+
         newError.toEither() shouldBe Either.Left(error.reversed().toList())
       }
     }
-    
+
     "Can handle thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         effect<Int, String> {
@@ -337,10 +336,10 @@ class EffectSpec :
         ) shouldBe fallback()
       }
     }
-    
+
     "Can shift from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
-        effect<String, Int> {
+        effect {
           effect<Int, String> {
             throw RuntimeException(msg())
           }.fold(
@@ -351,7 +350,7 @@ class EffectSpec :
         }.runCont() shouldBe fallback()
       }
     }
-  
+
     "Can throw from thrown exceptions" {
       checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
         shouldThrow<IllegalStateException> {
@@ -363,6 +362,14 @@ class EffectSpec :
             { it.length }
           )
         }.message shouldBe fallback()
+      }
+    }
+
+    "shift leaked results in ShiftLeakException" {
+      shouldThrow<ShiftLeakedException> {
+        effect {
+          suspend { shift<Unit>("failure") }
+        }.fold(::println) { f -> f() }
       }
     }
   })

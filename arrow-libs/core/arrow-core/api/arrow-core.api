@@ -2594,6 +2594,11 @@ public final class arrow/core/continuations/AtomicRefKt {
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+public class arrow/core/continuations/CancellationExceptionNoTrace : java/util/concurrent/CancellationException {
+	public fun <init> ()V
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
+}
+
 public final class arrow/core/continuations/Eager : arrow/core/continuations/ShiftCancellationException {
 	public fun <init> (Larrow/core/continuations/Token;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
 	public final fun getRecover ()Lkotlin/jvm/functions/Function1;
@@ -3017,7 +3022,11 @@ public final class arrow/core/continuations/ResultKt {
 	public static final fun toResult (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public abstract class arrow/core/continuations/ShiftCancellationException : java/util/concurrent/CancellationException {
+public abstract class arrow/core/continuations/ShiftCancellationException : arrow/core/continuations/CancellationExceptionNoTrace {
+}
+
+public final class arrow/core/continuations/ShiftLeakedException : java/lang/IllegalStateException {
+	public fun <init> ()V
 }
 
 public final class arrow/core/continuations/Suspend : arrow/core/continuations/ShiftCancellationException {
@@ -3094,6 +3103,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 	public final fun Long ()Larrow/typeclasses/Monoid;
 	public final fun Short ()Larrow/typeclasses/Monoid;
 	public final fun constant (Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
+	public final synthetic fun either (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Monoid;)Larrow/typeclasses/Monoid;
 	public final fun endo ()Larrow/typeclasses/Monoid;
 	public final fun list ()Larrow/typeclasses/Monoid;

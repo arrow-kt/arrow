@@ -2,17 +2,16 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.test.UnitSpec
 import arrow.typeclasses.Monoid
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.boolean
+import io.kotest.property.checkAll
 
-class GetterTest : UnitSpec() {
-
-  init {
+class GetterTest : StringSpec({
 
     "asFold should behave as valid Fold: size" {
       checkAll(Arb.token()) { token ->
@@ -40,7 +39,7 @@ class GetterTest : UnitSpec() {
 
     "asFold should behave as valid Fold: combineAll" {
       checkAll(Arb.token()) { token ->
-        Getter.token().combineAll(Monoid.string(), token) shouldBe token.value
+        Getter.token().fold(Monoid.string(), token) shouldBe token.value
       }
     }
 
@@ -70,7 +69,7 @@ class GetterTest : UnitSpec() {
 
     "Finding a target using a predicate within a Getter should be wrapped in the correct option result" {
       checkAll(Arb.string(), Arb.boolean()) { value: String, predicate: Boolean ->
-        Getter.token().findOrNull(Token(value)) { predicate }?.let { true } ?: false shouldBe predicate
+        (Getter.token().findOrNull(Token(value)) { predicate }?.let { true } ?: false) shouldBe predicate
       }
     }
 
@@ -83,7 +82,7 @@ class GetterTest : UnitSpec() {
     "Zipping two lenses should yield a tuple of the targets" {
       checkAll(Arb.string()) { value: String ->
         Getter<String, Int> { it.length }.zip { it.uppercase() }
-          .get(value) shouldBe (value.length to value.toUpperCase())
+          .get(value) shouldBe (value.length to value.uppercase())
       }
     }
 
@@ -117,5 +116,5 @@ class GetterTest : UnitSpec() {
         first.get(int to token) shouldBe (int to token.value)
       }
     }
-  }
-}
+
+})

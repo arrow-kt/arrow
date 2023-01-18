@@ -667,7 +667,19 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  * <!--- KNIT example-iterable-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
-  this.align(b).map(fa)
+  buildList(maxOf(this.collectionSizeOrDefault(10), b.collectionSizeOrDefault(10))) {
+    val first = this@align.iterator()
+    val second = b.iterator()
+    while (first.hasNext() || second.hasNext()) {
+      val element: Ior<A, B> = when {
+        first.hasNext() && second.hasNext() -> Ior.Both(first.next(), second.next())
+        first.hasNext() -> first.next().leftIor()
+        second.hasNext() -> second.next().rightIor()
+        else -> throw IllegalStateException("this should never happen")
+      }
+      add(fa(element))
+    }
+  }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
@@ -686,18 +698,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  * <!--- KNIT example-iterable-08.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
-  alignRec(this, b)
-
-@Suppress("NAME_SHADOWING")
-private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
-  val ls = if (ls is List) ls else ls.toList()
-  val rs = if (rs is List) rs else rs.toList()
-  return when {
-    ls.isEmpty() -> rs.map { it.rightIor() }
-    rs.isEmpty() -> ls.map { it.leftIor() }
-    else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
-  }
-}
+  this.align(b, ::identity)
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]

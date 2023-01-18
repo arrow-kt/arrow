@@ -21,9 +21,6 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Install watchOS simulator
-        run: xcrun simctl create "Apple Watch Series 5 - 44mm" "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-5-44mm" "com.apple.CoreSimulator.SimRuntime.watchOS-9-1"
-
       - name: ios and watchos tests
         uses: gradle/gradle-build-action@v2
         with:
@@ -90,7 +87,7 @@ jobs:
           name: 'reports-windows'
           path: '**/build/reports/**'
 
-  ubuntu:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -118,7 +115,7 @@ jobs:
       - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check
+          arguments: check -x linuxX64Test -x jsTest
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
@@ -140,7 +137,61 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-ubuntu'
+          name: 'reports-jvm'
+          path: '**/build/reports/**'
+
+  js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jsTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jsTest
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-js'
+          path: '**/build/reports/**'
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: linuxX64Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: linuxX64Test
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-linux'
           path: '**/build/reports/**'
 
   update_api:

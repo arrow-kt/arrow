@@ -16,8 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
 class CountDownLatchSpec : StringSpec({
-  fun Arb.Companion.long(): Arb<Long> = Arb.long(1, 100)
-  
   "should raise an exception when constructed with a negative or zero capacity" {
     checkAll(Arb.long(Long.MIN_VALUE, 0)) { i ->
       shouldThrow<IllegalArgumentException> { CountDownLatch(i) }.message shouldBe
@@ -26,7 +24,7 @@ class CountDownLatchSpec : StringSpec({
   }
   
   "release and then await should complete" {
-    checkAll(Arb.long()) { count ->
+    checkAll(Arb.long(1, 100)) { count ->
       val latch = CountDownLatch(count)
       repeat(count.toInt()) { latch.countDown() }
       latch.await() shouldBe Unit
@@ -34,7 +32,7 @@ class CountDownLatchSpec : StringSpec({
   }
   
   "await and then release should complete" {
-    checkAll(Arb.long()) { count ->
+    checkAll(Arb.long(1, 100)) { count ->
       val latch = CountDownLatch(count)
       val job = launch { latch.await() }
       repeat(count.toInt()) { latch.countDown() }
@@ -43,7 +41,7 @@ class CountDownLatchSpec : StringSpec({
   }
   
   "await with > 1 latch unreleased should block" {
-    checkAll(Arb.long()) { count ->
+    checkAll(Arb.long(1, 100)) { count ->
       val latch = CountDownLatch(count)
       repeat(count.toInt() - 1) { latch.countDown() }
       withTimeoutOrNull(1) { latch.await() }.shouldBeNull()
@@ -52,7 +50,7 @@ class CountDownLatchSpec : StringSpec({
   }
   
   "multiple awaits should all complete" {
-    checkAll(Arb.long()) { count ->
+    checkAll(Arb.long(1, 100)) { count ->
       val latch = CountDownLatch(count)
       val jobs = (0 until count).map { launch { latch.await() } }
       repeat(count.toInt()) { latch.countDown() }
