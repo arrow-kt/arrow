@@ -283,10 +283,7 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
@@ -303,10 +300,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
   return destination.right()
 }
 
-@Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
@@ -325,27 +319,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
   return success(destination)
 }
 
-@Deprecated(
-  "traverseResult is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
-@Deprecated(
-  "sequenceResult is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
@@ -365,7 +350,6 @@ public inline fun <E, A, B> Iterable<A>.traverse(
           is Valid -> acc.also { it.value.add(res.value) }
           is Invalid -> acc
         }
-
         is Validated.Invalid -> when (acc) {
           is Valid -> res
           is Invalid -> Invalid(acc.value.combine(res.value))
@@ -374,10 +358,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(
     }
   }
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
@@ -386,30 +367,21 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(Semigroup.nonEmptyList(), f)
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
 public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
   traverse(semigroup, ::identity)
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
   traverse(Semigroup.nonEmptyList(), ::identity)
 
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
   traverse(f)
 
@@ -426,20 +398,14 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   return destination.some()
 }
 
-@Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseNullable is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
@@ -458,10 +424,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
   return acc.toList()
 }
 
-@Deprecated(
-  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
@@ -860,7 +823,6 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     } else {
       None
     }
-
     else -> {
       iterator().nextOrNone()
     }
@@ -894,7 +856,6 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       1 -> firstOrNone()
       else -> None
     }
-
     else -> {
       iterator().run { nextOrNone().filter { !hasNext() } }
     }
@@ -926,7 +887,6 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
     } else {
       None
     }
-
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -961,7 +921,6 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
       in indices -> Some(elementAt(index))
       else -> None
     }
-
     else -> iterator().skip(index).nextOrNone()
   }
 
@@ -971,7 +930,6 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
       next()
       skip(count - 1)
     }
-
     else -> this
   }
 
