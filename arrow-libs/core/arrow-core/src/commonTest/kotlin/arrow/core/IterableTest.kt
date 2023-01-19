@@ -21,6 +21,28 @@ import kotlin.math.min
 
 class IterableTest : StringSpec({
 
+  "flattenOrAccumulate(combine)" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .fold("") { acc, either -> "$acc${either.value}" }.left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate { a, b -> "$a$b" } shouldBe expected
+    }
+  }
+
+  "flattenOrAccumulate" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate() shouldBe expected
+    }
+  }
+
     "traverse Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()

@@ -589,6 +589,7 @@ public final class arrow/core/IterableKt {
 	public static final fun flattenOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Either;
+	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun foldMap (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getListUnit ()Ljava/util/List;

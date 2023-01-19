@@ -428,6 +428,45 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].
+ */
+public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  fold<Either<Error, A>, Either<Error, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors with into an [NonEmptyList].
+ */
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
 
@@ -447,24 +486,6 @@ public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(semigroup: 
       }
     }
   }
-
-public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
-  val buffer = mutableListOf<Error>()
-  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(10))) { acc, res ->
-    when (res) {
-      is Right -> when (acc) {
-        is Right -> acc.also { acc.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }
-  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
-}
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
