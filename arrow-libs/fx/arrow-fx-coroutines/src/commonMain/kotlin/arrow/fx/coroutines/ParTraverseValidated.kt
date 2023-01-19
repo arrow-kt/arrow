@@ -22,31 +22,35 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, n, semigroup) { it().bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 @JvmName("parSequenceValidatedNScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidatedN(
   semigroup: Semigroup<E>,
   n: Int
-): Validated<E, List<A>> =
-  parMapOrAccumulate(Dispatchers.Default, n, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, n, semigroup) { it().bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidatedN(
   semigroup: Semigroup<E>,
   n: Int
-): Validated<E, List<A>> =
-  parMapOrAccumulate(Dispatchers.Default, n, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [CoroutineContext].
@@ -61,8 +65,9 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(ctx, n, semigroup) { it().bind() }.toValidated()",
-    "arrow.fx.coroutines.parMapOrAccumulate"
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "arrow.fx.coroutines.parMapOrAccumulate",
+    "arrow.core.Validated"
   )
 )
 @JvmName("parSequenceValidatedNScoped")
@@ -70,22 +75,25 @@ public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
   n: Int
-): Validated<E, List<A>> =
-  parMapOrAccumulate(ctx, n, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(ctx, n, semigroup) { it().bind() }.toValidated()",
-    "arrow.fx.coroutines.parMapOrAccumulate"
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()",
+    "arrow.fx.coroutines.parMapOrAccumulate",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidatedN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
   n: Int
-): Validated<E, List<A>> =
-  parMapOrAccumulate(ctx, n, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -96,17 +104,19 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, n, semigroup) { f(it).bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
   semigroup: Semigroup<E>,
   n: Int,
   f: suspend CoroutineScope.(A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  parTraverseValidatedN(Dispatchers.Default, semigroup, n, f)
+): Validated<E, List<B>> = with(semigroup) {
+  parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated()
+}
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [CoroutineContext].
@@ -121,9 +131,10 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, n, semigroup) { f(it).bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
@@ -131,8 +142,9 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
   semigroup: Semigroup<E>,
   n: Int,
   f: suspend CoroutineScope.(A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  parMapOrAccumulate(ctx, n, semigroup) { f(it).bind() }.toValidated()
+): Validated<E, List<B>> = with(semigroup) {
+  parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated()
+}
 
 /**
  * Sequences all tasks in parallel on [Dispatchers.Default] and returns the result.
@@ -143,25 +155,31 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, semigroup) { it().bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 @JvmName("parSequenceValidatedScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  parMapOrAccumulate(Dispatchers.Default, semigroup) { it().bind() }.toValidated()
+  with(semigroup) {
+    parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+  }
 
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, semigroup) { it().bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  parMapOrAccumulate(Dispatchers.Default, semigroup) { it().bind() }.toValidated()
+  with(semigroup) {
+    parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+  }
 
 /**
  * Sequences all tasks in parallel on [ctx] and returns the result.
@@ -198,29 +216,33 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(ctx, semigroup) { it().bind() }.toValidated()",
-    "arrow.fx.coroutines.parMapOrAccumulate"
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "arrow.fx.coroutines.parMapOrAccumulate",
+    "arrow.core.Validated"
   )
 )
 @JvmName("parSequenceValidatedScoped")
 public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>.parSequenceValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>
-): Validated<E, List<A>> =
-  parMapOrAccumulate(ctx, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(ctx, semigroup) { it().bind() }.toValidated()",
-    "arrow.fx.coroutines.parMapOrAccumulate"
+    "with<Semigroup<E>, Validated<E, List<B>>> { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "arrow.fx.coroutines.parMapOrAccumulate",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>
-): Validated<E, List<A>> =
-  parMapOrAccumulate(ctx, semigroup) { it().bind() }.toValidated()
+): Validated<E, List<A>> = with(semigroup) {
+  parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated()
+}
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
@@ -231,16 +253,18 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(Dispatchers.Default, semigroup) { f(it).bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
-    "kotlinx.coroutines.Dispatchers"
+    "kotlinx.coroutines.Dispatchers",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   semigroup: Semigroup<E>,
   f: suspend CoroutineScope.(A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  parMapOrAccumulate(Dispatchers.Default, semigroup) { f(it).bind() }.toValidated()
+): Validated<E, List<B>> = with(semigroup) {
+  parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated()
+}
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -282,13 +306,15 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
 @Deprecated(
   "Prefer using more generic parMapOrAccumulate",
   ReplaceWith(
-    "parMapOrAccumulate(ctx, semigroup) { f(it).bind() }.toValidated()",
-    "arrow.fx.coroutines.parMapOrAccumulate"
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
+    "arrow.fx.coroutines.parMapOrAccumulate",
+    "arrow.core.Validated"
   )
 )
 public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
   ctx: CoroutineContext = EmptyCoroutineContext,
   semigroup: Semigroup<E>,
   f: suspend CoroutineScope.(A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  parMapOrAccumulate(ctx, semigroup) { f(it).bind() }.toValidated()
+): Validated<E, List<B>> = with(semigroup) {
+  parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated()
+}

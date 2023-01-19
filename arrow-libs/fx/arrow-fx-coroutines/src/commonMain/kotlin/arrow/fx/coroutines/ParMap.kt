@@ -5,7 +5,6 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.EffectScope
 import arrow.core.continuations.either
 import arrow.core.flattenOrAccumulate
-import arrow.typeclasses.Semigroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -34,17 +33,17 @@ public suspend fun <A, B> Iterable<A>.parMap(
 }
 
 /** Temporary intersection type, until we have context receivers */
-public class ScopedRaise<E>(
-  raise: EffectScope<E>,
+public class ScopedRaise<Error>(
+  raise: EffectScope<Error>,
   scope: CoroutineScope
-) : CoroutineScope by scope, EffectScope<E> by raise
+) : CoroutineScope by scope, EffectScope<Error> by raise
 
-public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
+public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
-  semigroup: Semigroup<E>,
-  transform: suspend ScopedRaise<E>.(A) -> B
-): Either<E, List<B>> =
+  combine: (Error, Error) -> Error,
+  transform: suspend ScopedRaise<Error>.(A) -> B
+): Either<Error, List<B>> =
   coroutineScope {
     val semaphore = Semaphore(concurrency)
     map {
@@ -55,14 +54,14 @@ public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
           }
         }
       }
-    }.awaitAll().flattenOrAccumulate(semigroup)
+    }.awaitAll().flattenOrAccumulate(combine)
   }
 
-public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
+public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
-  semigroup: Semigroup<E>,
-  transform: suspend ScopedRaise<E>.(A) -> B
-): Either<E, List<B>> =
+  combine: (Error, Error) -> Error,
+  transform: suspend ScopedRaise<Error>.(A) -> B
+): Either<Error, List<B>> =
   coroutineScope {
     map {
       async(context) {
@@ -70,14 +69,14 @@ public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
           transform(ScopedRaise(this, this@coroutineScope), it)
         }
       }
-    }.awaitAll().flattenOrAccumulate(semigroup)
+    }.awaitAll().flattenOrAccumulate(combine)
   }
 
-public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
+public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
-  transform: suspend ScopedRaise<E>.(A) -> B
-): Either<NonEmptyList<E>, List<B>> =
+  transform: suspend ScopedRaise<Error>.(A) -> B
+): Either<NonEmptyList<Error>, List<B>> =
   coroutineScope {
     val semaphore = Semaphore(concurrency)
     map {
@@ -91,10 +90,10 @@ public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
     }.awaitAll().flattenOrAccumulate()
   }
 
-public suspend fun <E, A, B> Iterable<A>.parMapOrAccumulate(
+public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
-  transform: suspend ScopedRaise<E>.(A) -> B
-): Either<NonEmptyList<E>, List<B>> =
+  transform: suspend ScopedRaise<Error>.(A) -> B
+): Either<NonEmptyList<Error>, List<B>> =
   coroutineScope {
     map {
       async(context) {
