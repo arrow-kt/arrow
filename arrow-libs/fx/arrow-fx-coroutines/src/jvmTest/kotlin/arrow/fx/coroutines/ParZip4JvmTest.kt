@@ -14,8 +14,8 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParMap4JvmTest : StringSpec({
-    "parMapN 4 returns to original context" {
+class ParZip4JvmTest : StringSpec({
+    "parZip 4 returns to original context" {
       val mapCtxName = "parMap4"
       val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { mapCtxName }) }
 
@@ -41,7 +41,7 @@ class ParMap4JvmTest : StringSpec({
 
     }
 
-    "parMapN 4 returns to original context on failure" {
+    "parZip 4 returns to original context on failure" {
       val mapCtxName = "parMap4"
       val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { mapCtxName }) }
 
@@ -89,7 +89,7 @@ class ParMap4JvmTest : StringSpec({
       }
     }
 
-    "parMapN 4 finishes on single thread" {
+    "parZip 4 finishes on single thread" {
       checkAll(Arb.string()) {
         val res = single.use { ctx ->
           parZip(
