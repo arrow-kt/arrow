@@ -2,12 +2,10 @@
 package arrow.fx.coroutines.examples.exampleParzip04
 
 import arrow.fx.coroutines.*
-import kotlinx.coroutines.Dispatchers
 
 suspend fun main(): Unit {
   //sampleStart
   val result = parZip(
-    Dispatchers.IO,
     { "First one is on ${Thread.currentThread().name}" },
     { "Second one is on ${Thread.currentThread().name}" },
     { "Third one is on ${Thread.currentThread().name}" }

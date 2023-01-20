@@ -10,10 +10,9 @@ suspend fun main(): Unit {
     Dispatchers.IO,
     { "First one is on ${Thread.currentThread().name}" },
     { "Second one is on ${Thread.currentThread().name}" },
-    { "Third one is on ${Thread.currentThread().name}" },
-    { "Fourth one is on ${Thread.currentThread().name}" }
-  ) { a, b, c, d ->
-      "$a\n$b\n$c\n$d"
+    { "Third one is on ${Thread.currentThread().name}" }
+  ) { a, b, c ->
+      "$a\n$b\n$c"
     }
   //sampleEnd
  println(result)
