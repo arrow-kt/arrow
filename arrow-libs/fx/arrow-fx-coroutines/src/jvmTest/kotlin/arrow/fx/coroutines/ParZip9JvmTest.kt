@@ -15,51 +15,52 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParZip8JvmTest : StringSpec({
+class ParZip9JvmTest : StringSpec({
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  "parZip 8 returns to original context" {
-    val mapCtxName = "parZip8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
+  "parZip 9 returns to original context" {
+    val zipCtxName = "parZip9"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(9, NamedThreadFactory { zipCtxName }) }
 
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
-          val (s1, s2, s3, s4, s5, s6, s7, s8) = parZip(
-            _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName
-          ) { a, b, c, d, e, f, g, h ->
-            Tuple8(a, b, c, d, e, f, g, h)
+          val (s1, s2, s3, s4, s5, s6, s7, s8, s9) = parZip(
+            _zipCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName
+          ) { a, b, c, d, e, f, g, h, i ->
+            Tuple9(a, b, c, d, e, f, g, h, i)
           }
 
-          s1 shouldStartWith mapCtxName
-          s2 shouldStartWith mapCtxName
-          s3 shouldStartWith mapCtxName
-          s4 shouldStartWith mapCtxName
-          s5 shouldStartWith mapCtxName
-          s6 shouldStartWith mapCtxName
-          s7 shouldStartWith mapCtxName
-          s8 shouldStartWith mapCtxName
+          s1 shouldStartWith zipCtxName
+          s2 shouldStartWith zipCtxName
+          s3 shouldStartWith zipCtxName
+          s4 shouldStartWith zipCtxName
+          s5 shouldStartWith zipCtxName
+          s6 shouldStartWith zipCtxName
+          s7 shouldStartWith zipCtxName
+          s8 shouldStartWith zipCtxName
+          s9 shouldStartWith zipCtxName
           threadName() shouldStartWith singleThreadName
         }
       }
 
   }
 
-  "parZip 8 returns to original context on failure" {
-    val mapCtxName = "parZip8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
+  "parZip 9 returns to original context on failure" {
+    val zipCtxName = "parZip9"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(9, NamedThreadFactory { zipCtxName }) }
 
-    checkAll(Arb.int(1..8), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+    checkAll(Arb.int(1..9), Arb.throwable()) { choose, e ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           Either.catch {
             when (choose) {
               1 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -68,9 +69,10 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               2 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() },
@@ -79,7 +81,8 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               3 -> parZip(
 
                 { awaitCancellation() },
@@ -89,9 +92,10 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
+                { awaitCancellation() }
               ) { _, _, _, _, _, _, _ -> Unit }
               4 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -100,9 +104,10 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               5 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -111,9 +116,10 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               6 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -122,9 +128,10 @@ class ParZip8JvmTest : StringSpec({
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               7 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -133,9 +140,22 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
+              8 -> parZip(
+                _zipCtx,
+                { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() }
+                { e.suspend() },
+                { awaitCancellation() }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               else -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -143,8 +163,9 @@ class ParZip8JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
+                { awaitCancellation() }
                 { e.suspend() }
-              ) { _, _, _, _, _, _, _, _ -> Unit }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
             }
           } should leftException(e)
           threadName() shouldStartWith singleThreadName
@@ -153,7 +174,7 @@ class ParZip8JvmTest : StringSpec({
     }
   }
 
-  "parZip 8 finishes on single thread" {
+  "parZip 9 finishes on single thread" {
     checkAll(Arb.string()) {
       val res = single.use { ctx ->
         parZip(
@@ -165,9 +186,10 @@ class ParZip8JvmTest : StringSpec({
           threadName,
           threadName,
           threadName,
+          threadName,
           threadName
-        ) { a, b, c, d, e, f, g, h ->
-          listOf(a, b, c, d, e, f, g, h)
+        ) { a, b, c, d, e, f, g, h, i ->
+          listOf(a, b, c, d, e, f, g, h, i)
         }
       }
       assertSoftly {

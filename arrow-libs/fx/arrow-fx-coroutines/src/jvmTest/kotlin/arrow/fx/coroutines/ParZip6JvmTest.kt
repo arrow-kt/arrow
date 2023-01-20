@@ -20,7 +20,7 @@ class ParZip6JvmTest : StringSpec({
     { Thread.currentThread().name }
 
   "parZip 6 returns to original context" {
-    val mapCtxName = "parMap6"
+    val mapCtxName = "parZip6"
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { mapCtxName }) }
 
       single.zip(mapCtx).use { (_single, _mapCtx) ->
@@ -46,7 +46,7 @@ class ParZip6JvmTest : StringSpec({
   }
 
   "parZip 6 returns to original context on failure" {
-    val mapCtxName = "parMap6"
+    val mapCtxName = "parZip6"
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { mapCtxName }) }
 
     checkAll(Arb.int(1..6), Arb.throwable()) { choose, e ->

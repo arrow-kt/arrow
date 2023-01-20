@@ -15,7 +15,7 @@ import java.util.concurrent.Executors
 
 class ParZip3JvmTest : StringSpec({
   "parZip 3 returns to original context" {
-    val mapCtxName = "parMap3"
+    val mapCtxName = "parZip3"
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
       single.zip(mapCtx).use { (_single, _mapCtx) ->
@@ -37,7 +37,7 @@ class ParZip3JvmTest : StringSpec({
   }
 
   "parZip 3 returns to original context on failure" {
-    val mapCtxName = "parMap3"
+    val mapCtxName = "parZip3"
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
