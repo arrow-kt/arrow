@@ -68,16 +68,16 @@ class ParZip9Test : StringSpec({
           },
           {
             modifyGate8.await()
-            r.update { i -> "$i$f" }
+            r.update { i -> "$i$g" }
             modifyGate7.complete(Unit)
           },
           {
             modifyGate1.await()
-            r.update { i -> "$i$g" }
+            r.update { i -> "$i$h" }
             modifyGate8.complete(Unit)
           },
           {
-            r.set("$h")
+            r.set("$i")
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e, _f, _g, _h, _i ->
