@@ -1,18 +1,43 @@
 package arrow.core
 
+import arrow.core.test.either
 import arrow.typeclasses.Semigroup
 import arrow.core.test.option
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
 class IterableTest : StringSpec({
+  "flattenOrAccumulate(combine)" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .fold("") { acc, either -> "$acc${either.value}" }.left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate { a, b -> "$a$b" } shouldBe expected
+    }
+  }
+
+  "flattenOrAccumulate" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate() shouldBe expected
+    }
+  }
+
     "mapAccumulating stack-safe, and runs in original order" {
       val acc = mutableListOf<Int>()
       val res = (0..20_000).mapOrAccumulate(Semigroup.string()) {

@@ -87,7 +87,7 @@ jobs:
           name: 'reports-windows'
           path: '**/build/reports/**'
 
-  jvm:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -112,10 +112,10 @@ jobs:
         with:
           arguments: compileTestKotlin
 
-      - name: jvmTest
+      - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jvmTest
+          arguments: check -x linuxX64Test -x jsTest
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
@@ -158,7 +158,7 @@ jobs:
       - name: jsTest
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jsTest --info
+          arguments: jsTest
 
       - name: Upload reports
         if: failure()

@@ -214,4 +214,11 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
+  "shift leaked results in ShiftLeakException" {
+    shouldThrow<ShiftLeakedException> {
+      effect {
+        suspend { raise("failure") }
+      }.fold(::println) { it.invoke() }
+    }
+  }
 })

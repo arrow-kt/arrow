@@ -389,6 +389,14 @@ class EffectSpec :
         } shouldBe elements.right()
       }
     }
+
+    "shift leaked results in ShiftLeakException" {
+      shouldThrow<ShiftLeakedException> {
+        effect {
+          suspend { raise("failure") }
+        }.fold(::println) { f -> f() }
+      }
+    }
   })
 
 private data class Failure(val msg: String)

@@ -4,6 +4,7 @@
 
 package arrow.core.continuations
 
+import arrow.atomic.Atomic
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
@@ -55,10 +56,12 @@ public inline fun <R, A, B> fold(
 ): B {
   val raise = DefaultRaise()
   return try {
-    transform(program(raise))
+    transform(program(raise)).also { raise.complete() }
   } catch (e: CancellationException) {
+    raise.complete()
     recover(e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
+    raise.complete()
     error(e.nonFatalOrThrow())
   }
 }
@@ -72,9 +75,26 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
 internal class DefaultRaise : Raise<Any?> {
-  override fun raise(r: Any?): Nothing = throw RaiseCancellationException(r, this)
+  private val isActive: Atomic<Boolean> = Atomic(true)
+
+  @PublishedApi
+  internal fun complete(): Boolean = isActive.getAndSet(false)
+
+  override fun raise(r: Any?): Nothing =
+    if (isActive.value) throw RaiseCancellationException(r, this)
+    else throw ShiftLeakedException()
 }
 
 /** CancellationException is required to cancel coroutines when raising from within them. */
 private class RaiseCancellationException(val _raised: Any?, val raise: Raise<Any?>) :
   CancellationException("Raised Continuation")
+
+public class ShiftLeakedException : IllegalStateException(
+  """
+  
+  shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
+  This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
+ 
+  See: Effect KDoc for additional information.
+  """.trimIndent()
+)

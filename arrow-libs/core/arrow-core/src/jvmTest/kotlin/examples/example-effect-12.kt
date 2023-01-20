@@ -11,12 +11,11 @@ import kotlinx.coroutines.launch
 suspend fun main() {
   val errorA = "ErrorA"
   val errorB = "ErrorB"
-  val int = 45
   effect<String, Int> {
     coroutineScope<Int> {
       launch { raise(errorA) }
       launch { raise(errorB) }
-      int
+      45
     }
-  }.fold({ fail("Raise can never finish") }, { it shouldBe int })
+  }.fold({ fail("Raise can never finish") }, ::println)
 }
