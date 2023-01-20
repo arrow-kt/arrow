@@ -30,9 +30,9 @@ import kotlinx.coroutines.awaitAll
  * ```
  * <!--- KNIT example-parzip-01.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param f function to map/combine value [A] and [B]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param f function to zip/combine value [A] and [B]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -61,9 +61,9 @@ public suspend inline fun <A, B, C> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param f function to map/combine value [A] and [B]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param f function to zip/combine value [A] and [B]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -101,9 +101,9 @@ public suspend inline fun <A, B> parZip(
  * ```
  * <!--- KNIT example-parzip-02.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param f function to map/combine value [A] and [B]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param f function to zip/combine value [A] and [B]
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -140,10 +140,10 @@ public suspend inline fun <A, B, C> parZip(
  * ```
  * <!--- KNIT example-parzip-03.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param f function to map/combine value [A], [B] and [C]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param f function to zip/combine value [A], [B] and [C]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -174,10 +174,10 @@ public suspend inline fun <A, B, C, D> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param f function to map/combine value [A], [B], and [C]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param f function to zip/combine value [A], [B], and [C]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -217,10 +217,10 @@ public suspend inline fun <A, B, C> parZip(
  * ```
  * <!--- KNIT example-parzip-04.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param f function to map/combine value [A], [B] and [C].
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param f function to zip/combine value [A], [B] and [C].
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -260,11 +260,11 @@ public suspend inline fun <A, B, C, D> parZip(
  * ```
  * <!--- KNIT example-parzip-05.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param f function to map/combine value [A], [B], [C] and [D]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C] and [D]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -297,11 +297,11 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param f function to map/combine value [A], [B], [C], and [D]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], and [D]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -344,11 +344,11 @@ public suspend inline fun <A, B, C, D> parZip(
  * ```
  * <!--- KNIT example-parzip-06.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param f function to map/combine value [A], [B], [C] and [D].
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C] and [D].
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -392,12 +392,12 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * ```
  * <!--- KNIT example-parzip-07.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D] and [E]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D] and [E]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -432,12 +432,12 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], and [E]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], and [E]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -482,12 +482,12 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * ```
  * <!--- KNIT example-parzip-08.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], and [E].
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], and [E].
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -534,13 +534,13 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * ```
  * <!--- KNIT example-parzip-09.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E] and [F]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E] and [F]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -577,13 +577,13 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], and [F]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], and [F]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -630,13 +630,13 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * ```
  * <!--- KNIT example-parzip-10.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E] and [F]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E] and [F]
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -686,14 +686,14 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * ```
  * <!--- KNIT example-parzip-11.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F] and [G]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F] and [G]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -732,14 +732,14 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], and [G]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], and [G]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -788,14 +788,14 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * ```
  * <!--- KNIT example-parzip-12.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F] and [G]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F] and [G]
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -848,15 +848,15 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * ```
  * <!--- KNIT example-parzip-13.kt -->
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G] and [H]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G] and [H]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -897,15 +897,15 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], and [H]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G], and [H]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -955,15 +955,15 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G] and [H]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G] and [H]
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
@@ -1018,16 +1018,16 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param fi value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H], [I]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param fi value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G], [H], [I]
  *
  * @see parZip for a function that can run on any [CoroutineContext].
  */
@@ -1070,16 +1070,16 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param fi value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param fi value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
  *
  * @see parZip for a function that can run on any [CoroutineContext]
  */
@@ -1131,16 +1131,16 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * }
  * ```
  *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param fc value to parallel map
- * @param fd value to parallel map
- * @param fe value to parallel map
- * @param ff value to parallel map
- * @param fg value to parallel map
- * @param fh value to parallel map
- * @param fi value to parallel map
- * @param f function to map/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
+ * @param fa value to parallel zip
+ * @param fb value to parallel zip
+ * @param fc value to parallel zip
+ * @param fd value to parallel zip
+ * @param fe value to parallel zip
+ * @param ff value to parallel zip
+ * @param fg value to parallel zip
+ * @param fh value to parallel zip
+ * @param fi value to parallel zip
+ * @param f function to zip/combine value [A], [B], [C], [D], [E], [F], [G], [H] and [I]
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
