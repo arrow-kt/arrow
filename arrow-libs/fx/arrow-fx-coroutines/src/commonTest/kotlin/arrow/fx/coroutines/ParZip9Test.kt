@@ -1,7 +1,7 @@
 package arrow.fx.coroutines.parZip
 
 import arrow.core.Either
-import arrow.core.Tuple8
+import arrow.core.Tuple9
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
@@ -165,7 +165,7 @@ class ParZip9Test : StringSpec({
             6 -> parZip(loserA, loserB, loserC, loserD, loserF, winner, loserG, loserH, loserI) { _, _, _, _, _, _, _, _, _ -> }
             7 -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, winner, loserH, loserI) { _, _, _, _, _, _, _, _, _ -> }
             8 -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, loserH, winner, loserI) { _, _, _, _, _, _, _, _, _ -> }
-            else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, loserH, loserI, winner) { _, _, _, _, _, _, _, _ -> }
+            else -> parZip(loserA, loserB, loserC, loserD, loserF, loserG, loserH, loserI, winner) { _, _, _, _, _, _, _, _, _-> }
           }
         }
 
@@ -183,7 +183,7 @@ class ParZip9Test : StringSpec({
 
     "parZip CancellationException on right can cancel rest" {
       checkAll(Arb.string(), Arb.int(1..9)) { msg, cancel ->
-        val s = Channel<Unit>(k
+        val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
         val pc = CompletableDeferred<ExitCase>()
