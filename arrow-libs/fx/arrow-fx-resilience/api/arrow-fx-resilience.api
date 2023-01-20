@@ -174,6 +174,7 @@ public final class arrow/fx/resilience/Schedule$Decision$Companion {
 }
 
 public final class arrow/fx/resilience/ScheduleKt {
+	public static final field NanosDeprecation Ljava/lang/String;
 	public static final fun retry (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElse (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElseEither (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

@@ -151,36 +151,33 @@ class ScheduleTest : StringSpec({
       sec * 1_000_000_000.0
 
     "Schedule.fibonacci()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.fibonacci<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
 
       val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val fib = fibs(i).drop(1).take(n)
+      val fib = fibs(secondsToNanos(10)).drop(1).take(n)
 
       res.all { it.cont } shouldBe true
       sum.toDouble(DurationUnit.NANOSECONDS) shouldBe fib.sum()
     }
 
     "Schedule.linear()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.linear<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
 
       val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val exp = linear(i).drop(1).take(n)
+      val exp = linear(secondsToNanos(10)).drop(1).take(n)
 
       res.all { it.cont } shouldBe true
       sum.toDouble(DurationUnit.NANOSECONDS) shouldBe exp.sum()
     }
 
     "Schedule.exponential()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.exponential<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
 
       val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val expSum = exp(i).drop(1).take(n).sum()
+      val expSum = exp(secondsToNanos(10)).drop(1).take(n).sum()
 
       res.all { it.cont } shouldBe true
       sum.toDouble(DurationUnit.NANOSECONDS) shouldBe expSum

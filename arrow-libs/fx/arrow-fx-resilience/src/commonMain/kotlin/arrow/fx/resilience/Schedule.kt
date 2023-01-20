@@ -278,6 +278,9 @@ public sealed class Schedule<Input, Output> {
    * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [zipContinue], [zipDuration] and a [zip] function
    */
   @ExperimentalTime
+  @Deprecated(NanosDeprecation,
+    ReplaceWith("combine(other, zipContinue, { a, b -> zipDuration(a.toDouble(DurationUnit.NANOSECONDS), b.toDouble(DurationUnit.NANOSECONDS)).nanoseconds }, zip)",
+      "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
   public fun <A : Input, B, C> combineNanos(
     other: Schedule<A, B>,
     zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
@@ -303,6 +306,9 @@ public sealed class Schedule<Input, Output> {
   public abstract fun modify(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output>
 
   @ExperimentalTime
+  @Deprecated(NanosDeprecation,
+    ReplaceWith("modify { output, d -> f(output, d.toDouble(DurationUnit.NANOSECONDS)).nanoseconds }",
+      "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
   public fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output> =
     modify { output, d -> f(output, d.toDouble(NANOSECONDS)).nanoseconds }
 
@@ -411,15 +417,18 @@ public sealed class Schedule<Input, Output> {
     modify { _, duration -> f(duration) }
 
   @ExperimentalTime
+  @Deprecated(NanosDeprecation,
+    ReplaceWith("delay { f(it.toDouble(DurationUnit.NANOSECONDS)).nanoseconds }",
+      "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
   public fun delayedNanos(f: suspend (duration: Double) -> Double): Schedule<Input, Output> =
-    modifyNanos { _, duration -> f(duration) }
+    delay { f(it.toDouble(NANOSECONDS)).nanoseconds }
 
   @ExperimentalTime
+  @Deprecated(NanosDeprecation,
+    ReplaceWith("jittered(suspend { genRand().nanoseconds })",
+      "kotlin.time.Duration.Companion.nanoseconds"))
   public fun jittered(genRand: suspend () -> Double): Schedule<Input, Output> =
-    modifyNanos { _, duration ->
-      val n = genRand.invoke()
-      (duration * n)
-    }
+    jittered(suspend { genRand().nanoseconds })
 
   @JvmName("jitteredDuration")
   public fun jittered(genRand: suspend () -> Duration): Schedule<Input, Output> =
@@ -436,7 +445,7 @@ public sealed class Schedule<Input, Output> {
    */
   @ExperimentalTime
   public fun jittered(random: Random = Random.Default): Schedule<Input, Output> =
-    jittered(suspend { random.nextDouble(0.0, 1.0) })
+    jittered(suspend { random.nextDouble(0.0, 1.0).nanoseconds })
 
   public fun <C> fold(initial: C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
     foldLazy(suspend { initial }) { acc, o -> f(acc, o) }
@@ -688,6 +697,9 @@ public sealed class Schedule<Input, Output> {
     val finish: Eval<B>
   ) {
 
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("Decision(cont, delayInNanos.nanoseconds, state, finish)",
+        "kotlin.time.Duration.Companion.nanoseconds"))
     public constructor(
       cont: Boolean,
       delayInNanos: Double,
@@ -696,6 +708,8 @@ public sealed class Schedule<Input, Output> {
     ) : this(cont, delayInNanos.nanoseconds, state, finish)
 
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("duration.toDouble(DurationUnit.NANOSECONDS)", "kotlin.time.DurationUnit"))
     val delayInNanos: Double
       get() = duration.toDouble(NANOSECONDS)
 
@@ -712,6 +726,9 @@ public sealed class Schedule<Input, Output> {
       bimap(::identity, g)
 
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("combine(other, f, { x, y -> g(x.toDouble(DurationUnit.NANOSECONDS), y.toDouble(DurationUnit.NANOSECONDS)).nanoseconds }, zip)",
+        "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <C, D, E> combineNanos(
       other: Decision<C, D>,
       f: (Boolean, Boolean) -> Boolean,
@@ -749,10 +766,14 @@ public sealed class Schedule<Input, Output> {
 
     public companion object {
       @ExperimentalTime
+      @Deprecated(NanosDeprecation,
+        ReplaceWith("cont(d.nanoseconds, a, b)", "kotlin.time.Duration.Companion.nanoseconds"))
       public fun <A, B> cont(d: Double, a: A, b: Eval<B>): Decision<A, B> =
         cont(d.nanoseconds, a, b)
 
       @ExperimentalTime
+      @Deprecated(NanosDeprecation,
+        ReplaceWith("done(d.nanoseconds, a, b)", "kotlin.time.Duration.Companion.nanoseconds"))
       public fun <A, B> done(d: Double, a: A, b: Eval<B>): Decision<A, B> =
         done(d.nanoseconds, a, b)
 
@@ -847,12 +868,13 @@ public sealed class Schedule<Input, Output> {
      * A common use case is to define a unfolding schedule and use the result to change the delay.
      *  For an example see the implementation of [spaced], [linear], [fibonacci] or [exponential]
      */
-    @Suppress("UNCHECKED_CAST")
     @JvmName("delayedNanos")
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("delayed(delaySchedule.map { it.nanoseconds }).map { it.toDouble(DurationUnit.NANOSECONDS) }",
+        "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <A> delayed(delaySchedule: Schedule<A, Double>): Schedule<A, Double> =
-      (delaySchedule.modifyNanos { a, b -> a + b } as ScheduleImpl<Any?, A, Double>)
-        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos)) }
+      delayed(delaySchedule.map { it.nanoseconds }).map { it.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule that uses another Schedule to generate the delay of this schedule.
@@ -898,17 +920,12 @@ public sealed class Schedule<Input, Output> {
     public fun <A> logOutput(f: suspend (A) -> Unit): Schedule<A, A> =
       identity<A>().logOutput(f)
 
-    @Suppress("UNCHECKED_CAST")
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("duration<A>().map { it.toDouble(DurationUnit.NANOSECONDS) }",
+        "kotlin.time.DurationUnit"))
     public fun <A> delayInNanos(): Schedule<A, Double> =
-      (forever<A>() as ScheduleImpl<Int, A, Int>).reconsider { _: A, decision ->
-        Decision(
-          cont = decision.cont,
-          duration = decision.duration,
-          state = decision.state,
-          finish = Eval.now(decision.delayInNanos)
-        )
-      }
+      duration<A>().map { it.toDouble(NANOSECONDS) }
 
     @Suppress("UNCHECKED_CAST")
     public fun <A> duration(): Schedule<A, Duration> =
@@ -942,8 +959,11 @@ public sealed class Schedule<Input, Output> {
      * @param interval fixed delay in nanoseconds
      */
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("spaced(interval.nanoseconds)",
+        "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <A> spaced(interval: Double): Schedule<A, Int> =
-      forever<A>().delayedNanos { d -> d + interval }
+      spaced(interval.nanoseconds)
 
     /**
      * Creates a Schedule that continues with a fixed delay.
@@ -959,12 +979,11 @@ public sealed class Schedule<Input, Output> {
      * @param one initial delay in nanoseconds
      */
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("fibonacci(one.nanoseconds).map { it.toDouble(DurationUnit.NANOSECONDS) }",
+        "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <A> fibonacci(one: Double): Schedule<A, Double> =
-      delayed(
-        unfold<A, Pair<Double, Double>>(Pair(0.0, one)) { (del, acc) ->
-          Pair(acc, del + acc)
-        }.map { it.first }
-      )
+      fibonacci<A>(one.nanoseconds).map { it.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule that continues with increasing delay by adding the last two delays.
@@ -982,8 +1001,11 @@ public sealed class Schedule<Input, Output> {
      * @param base the base delay in nanoseconds
      */
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("linear(base.nanoseconds).map { it.toDouble(DurationUnit.NANOSECONDS) }",
+        "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <A> linear(base: Double): Schedule<A, Double> =
-      delayed(forever<A>().map { base * it })
+      linear<A>(base.nanoseconds).map { it.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule which increases its delay linearly, by n * base where n is the number of executions.
@@ -998,8 +1020,11 @@ public sealed class Schedule<Input, Output> {
      * @param base the base delay in nanoseconds
      */
     @ExperimentalTime
+    @Deprecated(NanosDeprecation,
+      ReplaceWith("exponential(base.nanoseconds).map { it.toDouble(DurationUnit.NANOSECONDS) }",
+        "kotlin.time.DurationUnit", "kotlin.time.Duration.Companion.nanoseconds"))
     public fun <A> exponential(base: Double, factor: Double = 2.0): Schedule<A, Double> =
-      delayed(forever<A>().map { base * factor.pow(it).roundToInt() })
+      exponential<A>(base.nanoseconds).map { it.toDouble(NANOSECONDS) }
 
     /**
      * Creates a Schedule that increases its delay exponentially with a given factor and base.
@@ -1061,3 +1086,6 @@ private infix fun Duration.max(other: Duration): Duration =
 
 private infix fun Duration.min(other: Duration): Duration =
   if (this <= other) this else other
+
+public const val NanosDeprecation: String =
+  "Please prefer Duration-based APIs over those based on nanoseconds."
