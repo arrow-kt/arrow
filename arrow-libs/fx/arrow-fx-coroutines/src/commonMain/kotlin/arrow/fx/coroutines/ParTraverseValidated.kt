@@ -20,9 +20,9 @@ import kotlin.jvm.JvmName
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "kotlinx.coroutines.Dispatchers",
     "arrow.core.Validated"
@@ -37,9 +37,9 @@ public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>
 }
 
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "kotlinx.coroutines.Dispatchers",
     "arrow.core.Validated"
@@ -63,9 +63,9 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "arrow.core.Validated"
   )
@@ -80,9 +80,9 @@ public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>
 }
 
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it().bind() }.toValidated()",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, n, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated()",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "arrow.core.Validated"
   )
@@ -102,7 +102,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
     "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
@@ -129,7 +129,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
     "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, n, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
@@ -153,9 +153,9 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidatedN(
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "kotlinx.coroutines.Dispatchers",
     "arrow.core.Validated"
@@ -168,9 +168,9 @@ public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>
   }
 
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "kotlinx.coroutines.Dispatchers",
     "arrow.core.Validated"
@@ -214,9 +214,9 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  * <!--- KNIT example-partraversevalidated-01.kt -->
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "arrow.core.Validated"
   )
@@ -230,9 +230,9 @@ public suspend fun <E, A> Iterable<suspend CoroutineScope.() -> Validated<E, A>>
 }
 
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
-    "with<Semigroup<E>, Validated<E, List<B>>> { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it().bind() }.toValidated() }",
+    "with<Semigroup<E>, Validated<E, List<A>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { it.invoke().bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
     "arrow.core.Validated"
   )
@@ -251,7 +251,7 @@ public suspend fun <E, A> Iterable<suspend () -> Validated<E, A>>.parSequenceVal
  * Cancelling this operation cancels all running tasks.
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
     "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(Dispatchers.Default, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
@@ -304,7 +304,7 @@ public suspend fun <E, A, B> Iterable<A>.parTraverseValidated(
  * <!--- KNIT example-partraversevalidated-02.kt -->
  */
 @Deprecated(
-  "Prefer using more generic parMapOrAccumulate",
+  "Prefer using more generic parMapOrAccumulate. Remove the semigroup parameter if using NonEmptyList, or concrete combine function otherwise.",
   ReplaceWith(
     "with<Semigroup<E>, Validated<E, List<B>>>(semigroup) { this.parMapOrAccumulate(ctx, { a, b -> a.combine(b) }) { f(it).bind() }.toValidated() }",
     "arrow.fx.coroutines.parMapOrAccumulate",
