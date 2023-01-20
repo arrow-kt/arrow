@@ -691,6 +691,7 @@ import kotlin.jvm.JvmMultifileClass
  * import kotlinx.coroutines.coroutineScope
  * import kotlinx.coroutines.runBlocking
  * import arrow.core.continuations.effect
+ * import arrow.core.continuations.fold
  * import kotlin.time.Duration.Companion.seconds
  *
  * fun main(): Unit = runBlocking {
@@ -702,7 +703,7 @@ import kotlin.jvm.JvmMultifileClass
  *  effect<String, Int> {
  *    launch {
  *      delay(3.seconds)
- *      shift("error")
+ *      raise("error")
  *    }
  *    1
  *  }.fold(::println, ::println)

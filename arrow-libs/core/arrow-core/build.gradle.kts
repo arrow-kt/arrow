@@ -40,8 +40,6 @@ kotlin {
       }
       jvmTest {
         dependencies {
-          implementation(projects.arrowFxCoroutines)
-          runtimeOnly(libs.kotest.frameworkEngine)
           runtimeOnly(libs.kotest.runnerJUnit5)
         }
       }

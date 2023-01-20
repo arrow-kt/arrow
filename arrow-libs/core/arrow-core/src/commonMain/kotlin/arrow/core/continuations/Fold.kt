@@ -56,7 +56,8 @@ public inline fun <R, A, B> fold(
 ): B {
   val raise = DefaultRaise()
   return try {
-    transform(program(raise)).also { raise.complete() }
+    val a = program(raise).also { raise.complete() }
+    transform(a)
   } catch (e: CancellationException) {
     raise.complete()
     recover(e.raisedOrRethrow(raise))
@@ -81,8 +82,7 @@ internal class DefaultRaise : Raise<Any?> {
   internal fun complete(): Boolean = isActive.getAndSet(false)
 
   override fun raise(r: Any?): Nothing =
-    if (isActive.value) throw RaiseCancellationException(r, this)
-    else throw ShiftLeakedException()
+    if (isActive.value) throw RaiseCancellationException(r, this) else throw ShiftLeakedException()
 }
 
 /** CancellationException is required to cancel coroutines when raising from within them. */
