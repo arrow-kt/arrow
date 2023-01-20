@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.withTimeout
 
 internal data class SideEffect(var counter: Int = 0) {
   fun increment() {
@@ -279,6 +280,22 @@ class ScheduleTest : StringSpec({
         .retryOrElseEither({ throw ex }) { e, _ -> e }
 
       res.fold({ it shouldBe ex }, { fail("The impossible happened") })
+    }
+
+    "Schedule stops retrying if first of more predicates is met" {
+      val ex = Throwable("Hello")
+
+      val schedule = Schedule.exponential<Throwable>(1.0.milliseconds)
+        .untilOutput { it > 50.0.milliseconds }
+        .untilInput<Throwable> { it is IllegalStateException }
+
+      val result: Either<Throwable, Unit> = withTimeout(10.seconds) {
+        schedule.retryOrElseEither({
+          throw ex
+        }, { t, _ -> t })
+      }
+
+      result.fold({ it shouldBe ex }, { fail("The impossible happened") })
     }
   }
 )

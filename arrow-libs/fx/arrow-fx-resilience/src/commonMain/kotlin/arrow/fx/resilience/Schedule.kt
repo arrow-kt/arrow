@@ -369,16 +369,16 @@ public sealed class Schedule<Input, Output> {
     check { input, _ -> f(input) }
 
   /**
-   * `untilOutput(f) = whileOutput(f).not()`
+   * `untilOutput(f) = whileOutput { !f(it) }`
    */
   public fun untilOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
-    !whileOutput(f)
+    whileOutput { !f(it) }
 
   /**
-   * `untilInput(f) = whileInput(f).not()`
+   * `untilInput(f) = whileInput { !f(it) }`
    */
   public fun <A : Input> untilInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
-    !whileInput(f)
+    whileInput { !f(it) }
 
   public fun <B, C> dimap(f: suspend (B) -> Input, g: (Output) -> C): Schedule<B, C> =
     contramap(f).map(g)
