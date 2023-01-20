@@ -60,6 +60,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-02.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -99,7 +100,7 @@ public suspend inline fun <A, B> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-02.kt -->
+ * <!--- KNIT example-parzip-03.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -138,7 +139,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-03.kt -->
+ * <!--- KNIT example-parzip-04.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -173,6 +174,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-05.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -215,7 +217,7 @@ public suspend inline fun <A, B, C> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-04.kt -->
+ * <!--- KNIT example-parzip-06.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -258,7 +260,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-05.kt -->
+ * <!--- KNIT example-parzip-07.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -296,6 +298,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-08.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -342,7 +345,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-06.kt -->
+ * <!--- KNIT example-parzip-09.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -390,7 +393,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-07.kt -->
+ * <!--- KNIT example-parzip-10.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -431,6 +434,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-11.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -480,7 +484,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-08.kt -->
+ * <!--- KNIT example-parzip-12.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -532,7 +536,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-09.kt -->
+ * <!--- KNIT example-parzip-13.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -576,6 +580,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-14.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -628,7 +633,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-10.kt -->
+ * <!--- KNIT example-parzip-15.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -684,7 +689,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-11.kt -->
+ * <!--- KNIT example-parzip-16.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -731,6 +736,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-17.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -786,7 +792,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-12.kt -->
+ * <!--- KNIT example-parzip-18.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -846,7 +852,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
- * <!--- KNIT example-parzip-13.kt -->
+ * <!--- KNIT example-parzip-19.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -896,6 +902,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-20.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -954,6 +961,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-21.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -1017,6 +1025,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-22.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -1069,6 +1078,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-23.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
@@ -1130,6 +1140,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *  println(result)
  * }
  * ```
+ * <!--- KNIT example-parzip-24.kt -->
  *
  * @param fa value to parallel zip
  * @param fb value to parallel zip
