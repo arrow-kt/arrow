@@ -15,38 +15,38 @@ import java.util.concurrent.Executors
 
 class ParZip2JvmTest : StringSpec({
     "parZip 2 returns to original context" {
-      val mapCtxName = "parZip2"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
+      val zipCtxName = "parZip2"
+      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { zipCtxName }) }
 
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        single.zip(zipCtx).use { (_single, _zipCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 
             val (s1, s2) = parZip(
-              _mapCtx,
+              _zipCtx,
               { Thread.currentThread().name },
               { Thread.currentThread().name }) { a, b -> Pair(a, b) }
 
-            s1 shouldStartWith mapCtxName
-            s2 shouldStartWith mapCtxName
+            s1 shouldStartWith zipCtxName
+            s2 shouldStartWith zipCtxName
             threadName() shouldStartWith singleThreadName
           }
         }
     }
 
     "parZip 2 returns to original context on failure" {
-      val mapCtxName = "parZip2"
-      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
+      val zipCtxName = "parZip2"
+      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { zipCtxName }) }
 
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
-        single.zip(mapCtx).use { (_single, _mapCtx) ->
+        single.zip(zipCtx).use { (_single, _zipCtx) ->
           withContext(_single) {
             threadName() shouldStartWith singleThreadName
 
             Either.catch {
               when (choose) {
-                1 -> parZip(_mapCtx, { e.suspend() }, { awaitCancellation() }) { _, _ -> Unit }
-                else -> parZip(_mapCtx, { awaitCancellation() }, { e.suspend() }) { _, _ -> Unit }
+                1 -> parZip(_zipCtx, { e.suspend() }, { awaitCancellation() }) { _, _ -> Unit }
+                else -> parZip(_zipCtx, { awaitCancellation() }, { e.suspend() }) { _, _ -> Unit }
               }
             } should leftException(e)
 

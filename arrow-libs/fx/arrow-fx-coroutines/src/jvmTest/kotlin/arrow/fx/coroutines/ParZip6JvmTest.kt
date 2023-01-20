@@ -20,25 +20,25 @@ class ParZip6JvmTest : StringSpec({
     { Thread.currentThread().name }
 
   "parZip 6 returns to original context" {
-    val mapCtxName = "parZip6"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { mapCtxName }) }
+    val zipCtxName = "parZip6"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { zipCtxName }) }
 
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           val (s1, s2, s3, s4, s5, s6) = parZip(
-            _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName
+            _zipCtx, threadName, threadName, threadName, threadName, threadName, threadName
           ) { a, b, c, d, e, f ->
             Tuple6(a, b, c, d, e, f)
           }
 
-          s1 shouldStartWith mapCtxName
-          s2 shouldStartWith mapCtxName
-          s3 shouldStartWith mapCtxName
-          s4 shouldStartWith mapCtxName
-          s5 shouldStartWith mapCtxName
-          s6 shouldStartWith mapCtxName
+          s1 shouldStartWith zipCtxName
+          s2 shouldStartWith zipCtxName
+          s3 shouldStartWith zipCtxName
+          s4 shouldStartWith zipCtxName
+          s5 shouldStartWith zipCtxName
+          s6 shouldStartWith zipCtxName
           threadName() shouldStartWith singleThreadName
         }
       }
@@ -46,18 +46,18 @@ class ParZip6JvmTest : StringSpec({
   }
 
   "parZip 6 returns to original context on failure" {
-    val mapCtxName = "parZip6"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { mapCtxName }) }
+    val zipCtxName = "parZip6"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(6, NamedThreadFactory { zipCtxName }) }
 
     checkAll(Arb.int(1..6), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           Either.catch {
             when (choose) {
               1 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -66,7 +66,7 @@ class ParZip6JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _ -> Unit }
               2 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() },
@@ -75,7 +75,7 @@ class ParZip6JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _ -> Unit }
               3 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { e.suspend() },
@@ -84,7 +84,7 @@ class ParZip6JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _ -> Unit }
               4 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -93,7 +93,7 @@ class ParZip6JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _ -> Unit }
               5 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -102,7 +102,7 @@ class ParZip6JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _ -> Unit }
               else -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
