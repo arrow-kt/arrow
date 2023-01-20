@@ -165,7 +165,7 @@ public suspend inline fun <A, B, C, D> parZip(
   val fbb = async(ctx) { fb() }
   val fcc = async(ctx) { fc() }
   val (a, b, c) = awaitAll(faa, fbb, fcc)
-  f(a as A, b as B, c gitas C)
+  f(a as A, b as B, c as C)
 }
 
 /**
