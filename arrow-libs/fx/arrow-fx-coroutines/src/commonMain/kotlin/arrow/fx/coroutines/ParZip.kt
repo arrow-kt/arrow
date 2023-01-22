@@ -164,11 +164,11 @@ public suspend inline fun <A, B, C, D> parZip(
  *
  * suspend fun main(): Unit {
  *   //sampleStart
- *   val result = parZip(
+ *   val result: Triple<String, String, String> = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     fc = { "Third one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -290,9 +290,9 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     fd = { "Fourth one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -425,10 +425,10 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
- *     { "Fifth one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     fe = { "Fifth one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -570,11 +570,11 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
- *     { "Fifth one is on ${Thread.currentThread().name}" }
- *     { "Sixth one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     ff = { "Sixth one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -725,12 +725,12 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
- *     { "Fifth one is on ${Thread.currentThread().name}" }
- *     { "Sixth one is on ${Thread.currentThread().name}" }
- *     { "Seventh one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     { "Sixth one is on ${Thread.currentThread().name}" },
+ *     fg = { "Seventh one is on ${Thread.currentThread().name}" },
  *   )
  *   //sampleEnd
  *  println(result)
@@ -890,13 +890,13 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
- *     { "Fifth one is on ${Thread.currentThread().name}" }
- *     { "Sixth one is on ${Thread.currentThread().name}" }
- *     { "Seventh one is on ${Thread.currentThread().name}" }
- *     { "Eighth one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     { "Sixth one is on ${Thread.currentThread().name}" },
+ *     { "Seventh one is on ${Thread.currentThread().name}" },
+ *     fh = { "Eighth one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -952,10 +952,10 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *     { "Fourth one is on ${Thread.currentThread().name}" },
  *     { "Fifth one is on ${Thread.currentThread().name}" },
  *     { "Sixth one is on ${Thread.currentThread().name}" },
- *     { "Seventh one is on ${Thread.currentThread().name}" }
- *     { "Eighth one is on ${Thread.currentThread().name}" }
- *   ) { a, b, c, d, e, f, g ->
- *       "$a\n$b\n$c\n$d\n$e\n$f\n$g"
+ *     { "Seventh one is on ${Thread.currentThread().name}" },
+ *     fh = { "Eighth one is on ${Thread.currentThread().name}" }
+ *   ) { a, b, c, d, e, f, g, h ->
+ *       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h"
  *     }
  *   //sampleEnd
  *  println(result)
@@ -1016,8 +1016,8 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *     { "Fifth one is on ${Thread.currentThread().name}" },
  *     { "Sixth one is on ${Thread.currentThread().name}" },
  *     { "Seventh one is on ${Thread.currentThread().name}" },
- *     { "Eighth one is on ${Thread.currentThread().name}" }
- *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *     { "Eighth one is on ${Thread.currentThread().name}" },
+ *     fi = { "Ninth one is on ${Thread.currentThread().name}" }
  *   ) { a, b, c, d, e, f, g, h, i->
  *       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h\n$i"
  *     }
@@ -1065,14 +1065,14 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
  *   val result = parZip(
  *     Dispatchers.IO,
  *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *     { "Third one is on ${Thread.currentThread().name}" }
- *     { "Fourth one is on ${Thread.currentThread().name}" }
- *     { "Fifth one is on ${Thread.currentThread().name}" }
- *     { "Sixth one is on ${Thread.currentThread().name}" }
- *     { "Seventh one is on ${Thread.currentThread().name}" }
- *     { "Eighth one is on ${Thread.currentThread().name}" }
- *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" },
+ *     { "Fifth one is on ${Thread.currentThread().name}" },
+ *     { "Sixth one is on ${Thread.currentThread().name}" },
+ *     { "Seventh one is on ${Thread.currentThread().name}" },
+ *     { "Eighth one is on ${Thread.currentThread().name}" },
+ *     fi = { "Ninth one is on ${Thread.currentThread().name}" }
  *   )
  *   //sampleEnd
  *  println(result)
@@ -1130,9 +1130,9 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *     { "Fourth one is on ${Thread.currentThread().name}" },
  *     { "Fifth one is on ${Thread.currentThread().name}" },
  *     { "Sixth one is on ${Thread.currentThread().name}" },
- *     { "Seventh one is on ${Thread.currentThread().name}" }
- *     { "Eighth one is on ${Thread.currentThread().name}" }
- *     { "Ninth one is on ${Thread.currentThread().name}" }
+ *     { "Seventh one is on ${Thread.currentThread().name}" },
+ *     { "Eighth one is on ${Thread.currentThread().name}" },
+ *     fi = { "Ninth one is on ${Thread.currentThread().name}" }
  *   ) { a, b, c, d, e, f, g, h, i->
  *       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h\n$i"
  *     }

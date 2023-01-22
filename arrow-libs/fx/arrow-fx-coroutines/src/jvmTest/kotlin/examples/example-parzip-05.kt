@@ -6,11 +6,11 @@ import kotlinx.coroutines.Dispatchers
 
 suspend fun main(): Unit {
   //sampleStart
-  val result = parZip(
+  val result: Triple<String, String, String> = parZip(
     Dispatchers.IO,
     { "First one is on ${Thread.currentThread().name}" },
-    { "Second one is on ${Thread.currentThread().name}" }
-    { "Third one is on ${Thread.currentThread().name}" }
+    { "Second one is on ${Thread.currentThread().name}" },
+    fc = { "Third one is on ${Thread.currentThread().name}" }
   )
   //sampleEnd
  println(result)

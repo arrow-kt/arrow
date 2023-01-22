@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.Tuple8
+import arrow.core.Tuple9
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
@@ -68,7 +68,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               2 -> parZip(
@@ -80,20 +80,21 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               3 -> parZip(
-
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
+                { awaitCancellation() },
+                { awaitCancellation() },
                 { awaitCancellation() }
-                { awaitCancellation() }
-              ) { _, _, _, _, _, _, _ -> Unit }
+              ) { _, _, _, _, _, _, _, _, _ -> Unit }
               4 -> parZip(
                 _zipCtx,
                 { awaitCancellation() },
@@ -103,7 +104,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               5 -> parZip(
@@ -115,7 +116,7 @@ class ParZip9JvmTest : StringSpec({
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               6 -> parZip(
@@ -127,7 +128,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               7 -> parZip(
@@ -139,7 +140,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { e.suspend() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
               8 -> parZip(
@@ -150,7 +151,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
@@ -163,7 +164,7 @@ class ParZip9JvmTest : StringSpec({
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { awaitCancellation() }
+                { awaitCancellation() },
                 { e.suspend() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
             }

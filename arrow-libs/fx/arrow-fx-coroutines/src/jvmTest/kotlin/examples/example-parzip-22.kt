@@ -13,8 +13,8 @@ suspend fun main(): Unit {
     { "Fifth one is on ${Thread.currentThread().name}" },
     { "Sixth one is on ${Thread.currentThread().name}" },
     { "Seventh one is on ${Thread.currentThread().name}" },
-    { "Eighth one is on ${Thread.currentThread().name}" }
-    { "Ninth one is on ${Thread.currentThread().name}" }
+    { "Eighth one is on ${Thread.currentThread().name}" },
+    fi = { "Ninth one is on ${Thread.currentThread().name}" }
   ) { a, b, c, d, e, f, g, h, i->
       "$a\n$b\n$c\n$d\n$e\n$f\n$g\n$h\n$i"
     }

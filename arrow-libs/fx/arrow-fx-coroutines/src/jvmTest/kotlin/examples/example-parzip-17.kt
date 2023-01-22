@@ -9,12 +9,12 @@ suspend fun main(): Unit {
   val result = parZip(
     Dispatchers.IO,
     { "First one is on ${Thread.currentThread().name}" },
-    { "Second one is on ${Thread.currentThread().name}" }
-    { "Third one is on ${Thread.currentThread().name}" }
-    { "Fourth one is on ${Thread.currentThread().name}" }
-    { "Fifth one is on ${Thread.currentThread().name}" }
-    { "Sixth one is on ${Thread.currentThread().name}" }
-    { "Seventh one is on ${Thread.currentThread().name}" }
+    { "Second one is on ${Thread.currentThread().name}" },
+    { "Third one is on ${Thread.currentThread().name}" },
+    { "Fourth one is on ${Thread.currentThread().name}" },
+    { "Fifth one is on ${Thread.currentThread().name}" },
+    { "Sixth one is on ${Thread.currentThread().name}" },
+    fg = { "Seventh one is on ${Thread.currentThread().name}" },
   )
   //sampleEnd
  println(result)
