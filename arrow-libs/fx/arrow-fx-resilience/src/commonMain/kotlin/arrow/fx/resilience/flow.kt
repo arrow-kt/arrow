@@ -44,7 +44,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
     state = dec.state
 
     if (dec.cont) {
-      delay((dec.delayInNanos / 1_000_000).toLong())
+      delay(dec.duration)
       true
     } else {
       false
