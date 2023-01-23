@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.withTimeout
+import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.DurationUnit
 
 internal data class SideEffect(var counter: Int = 0) {
   fun increment() {
@@ -39,14 +41,14 @@ class ScheduleTest : StringSpec({
 
     "Schedule.identity()" {
       val dec = Schedule.identity<Int>().calculateSchedule1(1)
-      val expected = Schedule.Decision<Any?, Int>(true, 0.0, Unit, Eval.now(1))
+      val expected = Schedule.Decision<Any?, Int>(true, ZERO, Unit, Eval.now(1))
 
       dec eqv expected
     }
 
     "Schedule.unfold()" {
       val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-      val expected = Schedule.Decision<Any?, Int>(true, 0.0, 1, Eval.now(1))
+      val expected = Schedule.Decision<Any?, Int>(true, ZERO, 1, Eval.now(1))
 
       dec eqv expected
     }
@@ -74,10 +76,10 @@ class ScheduleTest : StringSpec({
       val n = 500
       val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
 
-      res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
+      res.dropLast(1).map { it.duration } shouldBe res.dropLast(1).map { ZERO }
       res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
 
-      res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
+      res.last() eqv Schedule.Decision(false, ZERO, n + 1, Eval.now(n + 1))
     }
 
     "Schedule.once() repeats 1 additional time" {
@@ -130,6 +132,7 @@ class ScheduleTest : StringSpec({
       count shouldBe ((n + 1) * 2)
     }
 
+    @Suppress("UNREACHABLE_CODE", "UNUSED_VARIABLE")
     "Schedule.never() times out" {
       withTimeoutOrNull(10.milliseconds) {
         val a: Nothing = Schedule.never<Int>().repeat {
@@ -143,48 +146,43 @@ class ScheduleTest : StringSpec({
       val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
 
       res.map { it.cont } shouldBe res.map { true }
-      res.map { it.delayInNanos.nanoseconds } shouldBe res.map { duration }
+      res.map { it.duration } shouldBe res.map { duration }
     }
 
     fun secondsToNanos(sec: Int): Double =
       sec * 1_000_000_000.0
 
     "Schedule.fibonacci()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.fibonacci<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
 
-      val sum = res.fold(0.0) { acc, v ->
-        acc + v.delayInNanos
-      }
-      val fib = fibs(i).drop(1).take(n)
+      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+      val fib = fibs(secondsToNanos(10)).drop(1).take(n)
 
       res.all { it.cont } shouldBe true
-      sum shouldBe fib.sum()
+      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe fib.sum()
     }
 
     "Schedule.linear()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.linear<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
 
-      val sum = res.fold(0.0) { acc, v -> acc + v.delayInNanos }
-      val exp = linear(i).drop(1).take(n)
+      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+      val exp = linear(secondsToNanos(10)).drop(1).take(n)
 
       res.all { it.cont } shouldBe true
-      sum shouldBe exp.sum()
+      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe exp.sum()
     }
 
     "Schedule.exponential()" {
-      val i = secondsToNanos(10)
       val n = 10
-      val res = Schedule.exponential<Any?>(i).calculateSchedule(0, n)
+      val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
 
-      val sum = res.fold(0.0) { acc, v -> acc + v.delayInNanos }
-      val expSum = exp(i).drop(1).take(n).sum()
+      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+      val expSum = exp(secondsToNanos(10)).drop(1).take(n).sum()
 
       res.all { it.cont } shouldBe true
-      sum shouldBe expSum
+      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe expSum
     }
 
     "repeat is stack-safe" {
@@ -197,7 +195,7 @@ class ScheduleTest : StringSpec({
 
     "repeat" {
       val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
       val n = 100
       val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
@@ -216,7 +214,7 @@ class ScheduleTest : StringSpec({
 
     "repeatAsFlow" {
       val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
+      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
       val n = 100
       val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
@@ -373,7 +371,7 @@ private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: 
 @ExperimentalTime
 private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>) {
   require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
-  require(delayInNanos.nanoseconds == other.delayInNanos.nanoseconds) { "Decision#delay.nanoseconds: ${this.delayInNanos.nanoseconds} shouldBe ${other.delayInNanos.nanoseconds}" }
+  require(duration == other.duration) { "Decision#duration: ${this.duration} shouldBe ${other.duration}" }
   if (cont) {
     val lh = finish.value()
     val rh = other.finish.value()
