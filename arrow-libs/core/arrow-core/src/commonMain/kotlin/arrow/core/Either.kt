@@ -11,7 +11,6 @@ import arrow.core.continuations.Token
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
@@ -824,17 +823,11 @@ public sealed class Either<out A, out B> {
    * @param ifRight transform the [Either.Right] type [B] to [C].
    * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
    */
-  @OptIn(ExperimentalContracts::class)
-  public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
-    contract {
-      callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
-      callsInPlace(ifRight, InvocationKind.AT_MOST_ONCE)
-    }
+  public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C =
     when (this) {
       is Right -> ifRight(value)
       is Left -> ifLeft(value)
     }
-  }
   
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
