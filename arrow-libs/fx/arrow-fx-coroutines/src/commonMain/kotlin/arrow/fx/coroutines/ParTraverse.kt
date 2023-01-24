@@ -5,35 +5,51 @@ package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default, n) { it() }",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
-  parSequenceN(Dispatchers.Default, n)
+  parMap(Dispatchers.Default, n) { it() }
 
 /**
  * Sequences all tasks in [n] parallel processes on [Dispatchers.Default] and return the result.
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default, n) { it() }",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 @JvmName("parSequenceNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(n: Int): List<A> =
-  parSequenceN(Dispatchers.Default, n)
+  parMap(Dispatchers.Default, n) { it() }
 
-public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
-  val s = Semaphore(n)
-  return parTraverse(ctx) {
-    s.withPermit { it.invoke() }
-  }
-}
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(ctx, n) { it() }",
+    "arrow.fx.coroutines.parMap"
+  )
+)
+public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  n: Int
+): List<A> = parMap(ctx, n) { it() }
 
 /**
  * Sequences all tasks in [n] parallel processes and return the result.
@@ -44,16 +60,28 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineCont
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(ctx, n) { it() }",
+    "arrow.fx.coroutines.parMap"
+  )
+)
 @JvmName("parSequenceNScoped")
-public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
-  val s = Semaphore(n)
-  return parTraverse(ctx) {
-    s.withPermit { it.invoke(this) }
-  }
-}
-
+public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequenceN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  n: Int
+): List<A> = parMap(ctx, n) { it() }
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default) { it() }",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
-  parSequence(Dispatchers.Default)
+  parMap(Dispatchers.Default) { it() }
 
 /**
  * Sequences all tasks in parallel on [Dispatchers.Default] and return the result
@@ -79,12 +107,27 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
  * ```
  * <!--- KNIT example-partraverse-01.kt -->
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default) { it() }",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(): List<A> =
-  parSequence(Dispatchers.Default)
+  parMap(Dispatchers.Default) { it() }
 
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(ctx) { it() }",
+    "arrow.fx.coroutines.parMap"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
-  parTraverse(ctx) { it.invoke() }
+  parMap(ctx) { it() }
 
 /**
  * Sequences all tasks in parallel and return the result
@@ -115,17 +158,31 @@ public suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineConte
  * ```
  * <!--- KNIT example-partraverse-02.kt -->
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(ctx) { it() }",
+    "arrow.fx.coroutines.parMap"
+  )
+)
 @JvmName("parSequenceScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> A>.parSequence(ctx: CoroutineContext = EmptyCoroutineContext): List<A> =
-  parTraverse(ctx) { it.invoke(this) }
+  parMap(ctx) { it() }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  */
-
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default, n, f)",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend CoroutineScope.(A) -> B): List<B> =
-  parTraverseN(Dispatchers.Default, n, f)
+  parMap(Dispatchers.Default, n, f)
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [ctx].
@@ -136,16 +193,18 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend CoroutineS
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(ctx, n, f)",
+    "arrow.fx.coroutines.parMap"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> B
-): List<B> {
-  val s = Semaphore(n)
-  return parTraverse(ctx) { a ->
-    s.withPermit { f(a) }
-  }
-}
+): List<B> = parMap(ctx, n, f)
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
@@ -169,8 +228,16 @@ public suspend fun <A, B> Iterable<A>.parTraverseN(
  * ```
  * <!--- KNIT example-partraverse-03.kt -->
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith(
+    "parMap(Dispatchers.Default, f)",
+    "arrow.fx.coroutines.parMap",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) -> B): List<B> =
-  parTraverse(Dispatchers.Default, f)
+  parMap(Dispatchers.Default, f)
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -200,9 +267,11 @@ public suspend fun <A, B> Iterable<A>.parTraverse(f: suspend CoroutineScope.(A) 
  * ```
  * <!--- KNIT example-partraverse-04.kt -->
  */
+@Deprecated(
+  "Function is being renamed to parMap in 2.x.x",
+  ReplaceWith("parMap(ctx, f)", "arrow.fx.coroutines.parMap")
+)
 public suspend fun <A, B> Iterable<A>.parTraverse(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> B
-): List<B> = coroutineScope {
-  map { async(ctx) { f.invoke(this, it) } }.awaitAll()
-}
+): List<B> = parMap(ctx, f)

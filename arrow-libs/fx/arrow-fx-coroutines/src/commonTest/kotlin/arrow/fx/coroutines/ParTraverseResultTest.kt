@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.sequence
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -58,7 +59,8 @@ class ParTraverseResultTest : StringSpec({
     "parTraverseResult identity is identity" {
       checkAll(Arb.list(Arb.result(Arb.int()))) { l ->
         val res = l.parTraverseResult { it }
-        res shouldBe l.sequence()
+        if (l.any { it.isFailure }) l.shouldContain(res)
+        else res shouldBe l.sequence()
       }
     }
 
