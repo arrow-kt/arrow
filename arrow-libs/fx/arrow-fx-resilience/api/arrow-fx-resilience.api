@@ -52,7 +52,7 @@ public final class arrow/fx/resilience/CircuitBreaker$State$Open : arrow/fx/resi
 	public final fun getExpiresAt ()J
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
-	public final fun getStartedAt ()J
+	public final fun getStartedAt ()Lkotlin/time/TimeMark;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -178,5 +178,9 @@ public final class arrow/fx/resilience/ScheduleKt {
 	public static final fun retry (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElse (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElseEither (Larrow/fx/resilience/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/resilience/TimeInMillisKt {
+	public static final fun timeInMillis ()J
 }
 
