@@ -2,6 +2,7 @@ package arrow.fx.stm
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.atomic.value
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlin.coroutines.resume

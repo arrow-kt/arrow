@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.Either
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should

@@ -1499,8 +1499,8 @@ public final class arrow/core/continuations/DefaultRaise : arrow/core/continuati
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/core/continuations/DefaultStateRaise : arrow/atomic/Atomic, arrow/core/continuations/Raise, arrow/core/continuations/StateRaise {
-	public fun <init> (Larrow/atomic/Atomic;Larrow/core/continuations/Raise;)V
+public final class arrow/core/continuations/DefaultStateRaise : arrow/core/continuations/Raise, arrow/core/continuations/StateRaise {
+	public fun <init> (Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/continuations/Raise;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -1508,9 +1508,7 @@ public final class arrow/core/continuations/DefaultStateRaise : arrow/atomic/Ato
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun compareAndSet (Ljava/lang/Object;Ljava/lang/Object;)Z
-	public fun getAndSet (Ljava/lang/Object;)Ljava/lang/Object;
-	public fun getValue ()Ljava/lang/Object;
+	public fun getState ()Ljava/util/concurrent/atomic/AtomicReference;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun mapOrAccumulate (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
@@ -1518,8 +1516,6 @@ public final class arrow/core/continuations/DefaultStateRaise : arrow/atomic/Ato
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun setAndGet (Ljava/lang/Object;)Ljava/lang/Object;
-	public fun setValue (Ljava/lang/Object;)V
 }
 
 public final class arrow/core/continuations/Effect {
@@ -1768,7 +1764,8 @@ public final class arrow/core/continuations/ShiftLeakedException : java/lang/Ill
 	public fun <init> ()V
 }
 
-public abstract interface class arrow/core/continuations/StateRaise : arrow/atomic/Atomic, arrow/core/continuations/Raise {
+public abstract interface class arrow/core/continuations/StateRaise : arrow/core/continuations/Raise {
+	public abstract fun getState ()Ljava/util/concurrent/atomic/AtomicReference;
 }
 
 public final class arrow/core/continuations/StateRaise$DefaultImpls {

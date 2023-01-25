@@ -5,31 +5,24 @@ import kotlin.native.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
-public actual fun <A> Atomic(initialValue: A): Atomic<A> =
-  AtomicRef(AtomicReference(initialValue.freeze()))
+public actual class Atomic<V> actual constructor(initialValue: V) {
+  private val inner = AtomicReference(initialValue.freeze())
 
-private class AtomicRef<V>(private val atom: AtomicReference<V>): Atomic<V> {
+  public actual fun get(): V = inner.value
 
-  override fun getAndSet(value: V): V {
-    if (atom.isFrozen) value.freeze()
-    while (true) {
-      val cur = atom.value
-      if (cur === value) return cur
-      if (atom.compareAndSwap(cur, value) === cur) return cur
-    }
+  public actual fun set(value: V) {
+    inner.value = value.freeze()
   }
-  
-  override fun compareAndSet(expected: V, new: V): Boolean =
-    atom.compareAndSet(expected, new.freeze())
-  
-  override var value: V
-    get() = atom.value
-    set(value) {
-      atom.value = value.freeze()
+
+  public actual fun compareAndSet(expected: V, new: V): Boolean =
+    inner.compareAndSet(expected, new.freeze())
+
+  public actual fun getAndSet(value: V): V {
+    if (inner.isFrozen) value.freeze()
+    while (true) {
+      val cur = inner.value
+      if (cur === value) return cur
+      if (inner.compareAndSwap(cur, value) === cur) return cur
     }
-  
-  override fun setAndGet(value: V): V {
-    this.value = value
-    return value
   }
 }

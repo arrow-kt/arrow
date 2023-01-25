@@ -4,49 +4,52 @@ import arrow.fx.coroutines.parMap
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
-class AtomicTest : StringSpec({
+class AtomicBooleanTest : StringSpec({
 
   "set get - successful" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val r = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val r = AtomicBoolean(x)
       r.value = y
       r.value shouldBe y
     }
   }
 
   "update get - successful" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val r = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val r = AtomicBoolean(x)
       r.update { y }
       r.value shouldBe y
     }
   }
 
   "getAndSet - successful" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val ref = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val ref = AtomicBoolean(x)
       ref.getAndSet(y) shouldBe x
       ref.value shouldBe y
     }
   }
 
   "getAndUpdate - successful" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val ref = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val ref = AtomicBoolean(x)
       ref.getAndUpdate { y } shouldBe x
       ref.value shouldBe y
     }
   }
 
   "updateAndGet - successful" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val ref = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val ref = AtomicBoolean(x)
       ref.updateAndGet {
         it shouldBe x
         y
@@ -55,34 +58,33 @@ class AtomicTest : StringSpec({
   }
 
   "tryUpdate - modification occurs successfully" {
-    checkAll(Arb.string()) { x ->
-      val ref = Atomic(x)
-      ref.tryUpdate { it + 1 }
-      ref.value shouldBe x + 1
+    checkAll(Arb.boolean()) { x ->
+      val ref = AtomicBoolean(x)
+      ref.tryUpdate { !it }
+      ref.value shouldBe !x
     }
   }
 
   "tryUpdate - should fail to update if modification has occurred" {
-    checkAll(Arb.string()) { x ->
-      val ref = Atomic(x)
+    checkAll(Arb.boolean()) { x ->
+      val ref = AtomicBoolean(x)
       ref.tryUpdate {
-        suspend { ref.update { it + "a" } }
-          .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { })
-        it + "b"
+        ref.update { b -> !b }
+        it
       } shouldBe false
     }
   }
 
   "consistent set update on strings" {
-    checkAll(Arb.string(), Arb.string()) { x, y ->
-      val set = suspend {
-        val r = Atomic(x)
+    checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
+      val set = {
+        val r = AtomicBoolean(x)
         r.update { y }
         r.value
       }
 
-      val update = suspend {
-        val r = Atomic(x)
+      val update = {
+        val r = AtomicBoolean(x)
         r.update { y }
         r.value
       }
@@ -90,12 +92,4 @@ class AtomicTest : StringSpec({
       set() shouldBe update()
     }
   }
-
-  "concurrent modifications" {
-    val finalValue = 50_000
-    val r = Atomic("")
-    (0 until finalValue).parMap { r.update { it + "a" } }
-    r.value shouldBe "a".repeat(finalValue)
-  }
-}
-)
+})

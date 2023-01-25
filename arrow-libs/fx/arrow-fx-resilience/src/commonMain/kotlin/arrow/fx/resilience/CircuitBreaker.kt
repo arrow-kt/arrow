@@ -1,6 +1,7 @@
 package arrow.fx.resilience
 
 import arrow.atomic.Atomic
+import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.coroutines.ExitCase

@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase

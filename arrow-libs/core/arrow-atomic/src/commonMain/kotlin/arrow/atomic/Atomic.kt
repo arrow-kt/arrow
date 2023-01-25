@@ -1,17 +1,17 @@
 package arrow.atomic
 
-public expect fun <A> Atomic(initialValue: A): Atomic<A>
-
 /**
  * [Atomic] value of [A].
  *
  * ```kotlin
- * import arrow.atomic.Atomic
+ * import arrow.atomic.AtomicInt
  * import arrow.atomic.update
+ * import arrow.atomic.value
+ * import arrow.fx.coroutines.parMap
  *
  * suspend fun main() {
- *   val count = Atomic(0)
- *   (0 until 20_000).forEach {
+ *   val count = AtomicInt(0)
+ *   (0 until 20_000).parMap {
  *     count.update(Int::inc)
  *   }
  *   println(count.value)
@@ -21,14 +21,25 @@ public expect fun <A> Atomic(initialValue: A): Atomic<A>
  *
  * [Atomic] also offers some other interesting operators such as [loop], [update], [tryUpdate], etc.
  *
- * **WARNING**: this class may not work as intended on [Int] and [Long] on Kotlin Native!
+ * **WARNING**: Use [AtomicInt] and [AtomicLong] for [Int] and [Long] on Kotlin Native!
  */
-public interface Atomic<A> {
-  public var value: A
-  public fun getAndSet(value: A): A
-  public fun setAndGet(value: A): A
-  public fun compareAndSet(expected: A, new: A): Boolean
+public expect class Atomic<V>(initialValue: V) {
+  public fun get(): V
+  public fun set(value: V)
+  public fun getAndSet(value: V): V
+
+  /**
+   * Compare current value with expected and set to new if they're the same. Note, 'compare' is checking
+   * the actual object id, not 'equals'.
+   */
+  public fun compareAndSet(expected: V, new: V): Boolean
 }
+
+public var <T> Atomic<T>.value: T
+  get() = get()
+  set(value) {
+    set(value)
+  }
 
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.

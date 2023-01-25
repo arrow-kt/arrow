@@ -4,7 +4,8 @@
 
 package arrow.core.continuations
 
-import arrow.atomic.Atomic
+import arrow.atomic.AtomicBoolean
+import arrow.atomic.value
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
@@ -76,7 +77,7 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
 internal class DefaultRaise : Raise<Any?> {
-  private val isActive: Atomic<Boolean> = Atomic(true)
+  private val isActive: AtomicBoolean = AtomicBoolean(true)
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)

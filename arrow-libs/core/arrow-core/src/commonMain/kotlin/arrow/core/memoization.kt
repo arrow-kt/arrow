@@ -4,6 +4,7 @@ package arrow.core
 
 import arrow.atomic.Atomic
 import arrow.atomic.loop
+import arrow.atomic.value
 import kotlin.jvm.JvmName
 
 /**
