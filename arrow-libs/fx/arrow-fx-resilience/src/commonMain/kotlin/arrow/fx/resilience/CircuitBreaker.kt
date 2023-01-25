@@ -5,15 +5,15 @@ import arrow.core.continuations.AtomicRef
 import arrow.core.identity
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
-import arrow.fx.coroutines.timeInMillis
 import arrow.fx.resilience.CircuitBreaker.State.Closed
 import arrow.fx.resilience.CircuitBreaker.State.HalfOpen
 import arrow.fx.resilience.CircuitBreaker.State.Open
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeMark
 
 /**
  * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
@@ -128,6 +128,7 @@ import kotlin.time.DurationUnit
  * ```
  * <!--- KNIT example-circuitbreaker-02.kt -->
  */
+@OptIn(ExperimentalTime::class)
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
@@ -160,7 +161,7 @@ private constructor(
     when (val curr = state.get()) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
-      is State.HalfOpen -> curr.awaitClose.await()
+      is HalfOpen -> curr.awaitClose.await()
     }
 
   /**
@@ -191,19 +192,16 @@ private constructor(
         markOrResetFailures(attempt)
       }
       is Open -> {
-        val now = timeInMillis()
-        if (now >= curr.expiresAt) {
+//        val now = timeInMillis()
+        val elapsedNow = curr.startedAt.elapsedNow()
+        if (elapsedNow >= curr.resetTimeout) {
           // The Open state has expired, so we are letting just one
           // task to execute, while transitioning into HalfOpen
-          if (!state.compareAndSet(
-              curr,
-              HalfOpen(curr.resetTimeout, curr.awaitClose)
-            )
-          ) protectOrThrow(fa) // retry!
+          if (!state.compareAndSet(curr, HalfOpen(curr.resetTimeout, curr.awaitClose))) protectOrThrow(fa) // retry!
           else attemptReset(fa, curr.resetTimeout, curr.awaitClose, curr.startedAt)
         } else {
           // Open isn't expired, so we need to fail
-          val expiresInMillis = curr.expiresAt - now
+          val expiresInMillis = elapsedNow - curr.resetTimeout
           onRejected.invoke()
           throw ExecutionRejected(
             "Rejected because the CircuitBreaker is in the Open state, attempting to close in $expiresInMillis millis",
@@ -211,7 +209,7 @@ private constructor(
           )
         }
       }
-      is State.HalfOpen -> {
+      is HalfOpen -> {
         // CircuitBreaker is in HalfOpen state, which means we still reject all
         // tasks, while waiting to see if our reset attempt succeeds or fails
         onRejected.invoke()
@@ -244,7 +242,7 @@ private constructor(
               else throw result.value
             } else {
               // N.B. this could be canceled, however we don't care
-              val now = timeInMillis()
+              val now = kotlin.time.TimeSource.Monotonic.markNow()
               // We've gone over the permitted failures threshold,
               // so we need to open the circuit breaker
               val update = Open(now, resetTimeout, CompletableDeferred())
@@ -276,7 +274,7 @@ private constructor(
     task: suspend () -> A,
     resetTimeout: Duration,
     awaitClose: CompletableDeferred<Unit>,
-    lastStartedAt: Long
+    lastStartedAt: TimeMark
   ): A =
     bracketCase(
       acquire = onHalfOpen,
@@ -302,7 +300,7 @@ private constructor(
             val nextTimeout: Duration =
               if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
               else value
-            val ts = timeInMillis()
+            val ts = kotlin.time.TimeSource.Monotonic.markNow()
             state.set(Open(ts, nextTimeout, awaitClose))
             onOpen.invoke()
           }
@@ -459,7 +457,7 @@ private constructor(
      *        `HalfOpen` to `Open`.
      */
     public class Open internal constructor(
-      public val startedAt: Long,
+      public val startedAt: TimeMark,
       public val resetTimeout: Duration,
       internal val awaitClose: CompletableDeferred<Unit>,
     ) : State() {
@@ -473,9 +471,13 @@ private constructor(
       )
       public val resetTimeoutNanos: Double
         get() = resetTimeout.toDouble(DurationUnit.NANOSECONDS)
-      
+
+      @Deprecated(
+        "This constructor will be removed in Arrow 2.0",
+        level = DeprecationLevel.WARNING
+      )
       public constructor(startedAt: Long, resetTimeout: Duration) : this(
-        startedAt,
+        kotlin.time.TimeSource.Monotonic.markNow(),
         resetTimeout,
         CompletableDeferred()
       )
@@ -488,14 +490,14 @@ private constructor(
         startedAt: Long,
         resetTimeoutNanos: Double,
         awaitClose: CompletableDeferred<Unit>,
-      ) : this(startedAt, resetTimeoutNanos.nanoseconds, awaitClose)
+      ) : this(kotlin.time.TimeSource.Monotonic.markNow(), resetTimeoutNanos.nanoseconds, awaitClose)
       
       @Deprecated(
         "This constructor will be removed in Arrow 2.0",
         level = DeprecationLevel.WARNING
       )
       public constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
-        startedAt,
+        kotlin.time.TimeSource.Monotonic.markNow(),
         resetTimeoutNanos.nanoseconds,
         CompletableDeferred()
       )
@@ -506,12 +508,10 @@ private constructor(
        * It is calculated as:
        * `startedAt + resetTimeout`
        */
-      public val expiresAt: Long = resetTimeout.plus(startedAt.milliseconds).toLong(DurationUnit.MILLISECONDS)
+      public val expiresAt: Long = timeInMillis() + (resetTimeout - startedAt.elapsedNow()).inWholeMilliseconds
 
       override fun equals(other: Any?): Boolean =
-        if (other is Open) this.startedAt == startedAt &&
-          this.resetTimeout == resetTimeout &&
-          this.expiresAt == expiresAt
+        if (other is Open) this.startedAt == startedAt && this.resetTimeout == resetTimeout
         else false
 
       override fun toString(): String =
