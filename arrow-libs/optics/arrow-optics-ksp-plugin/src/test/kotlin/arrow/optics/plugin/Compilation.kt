@@ -73,7 +73,7 @@ private fun classpathOf(dependency: String): File {
     ClassGraph().classpathFiles.firstOrNull { classpath ->
       dependenciesMatch(classpath, dependency)
     }
-  println("classpath: ${ClassGraph().classpathFiles}")
+//  println("classpath: ${ClassGraph().classpathFiles}")
   Assertions.assertThat(file)
     .`as`("$dependency not found in test runtime. Check your build configuration.")
     .isNotNull
