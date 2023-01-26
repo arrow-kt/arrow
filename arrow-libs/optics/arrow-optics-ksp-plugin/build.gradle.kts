@@ -47,9 +47,3 @@ dependencies {
     testRuntimeOnly(projects.arrowOptics)
   }
 }
-
-tasks {
-  withType<Test>().configureEach {
-    maxParallelForks = 1
-  }
-}
