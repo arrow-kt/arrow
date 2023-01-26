@@ -66,6 +66,7 @@ fun buildCompilation(text: String) = KotlinCompilation().apply {
   ).map { classpathOf(it) }
   symbolProcessorProviders = listOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+  verbose = false
 }
 
 private fun classpathOf(dependency: String): File {
