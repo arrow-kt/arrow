@@ -24,6 +24,10 @@ dependencyResolutionManagement {
   }
 }
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
 //CORE
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")
@@ -31,9 +35,8 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+include("arrow-atomic")
+project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
