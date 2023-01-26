@@ -87,7 +87,7 @@ jobs:
           name: 'reports-windows'
           path: '**/build/reports/**'
 
-  check:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -102,20 +102,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: compileKotlin
+      - name: build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: compileKotlin
-
-      - name: compileTestKotlin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileTestKotlin
-
-      - name: check
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: check -x linuxX64Test -x jsTest
+          arguments: build
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
@@ -138,60 +128,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-jvm'
-          path: '**/build/reports/**'
-
-  js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: jsTest
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: jsTest
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'reports-js'
-          path: '**/build/reports/**'
-
-  linux:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: linuxX64Test
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: linuxX64Test
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'reports-linux'
           path: '**/build/reports/**'
 
   update_api:
