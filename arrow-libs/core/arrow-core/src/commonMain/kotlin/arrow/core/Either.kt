@@ -900,7 +900,7 @@ public sealed class Either<out A, out B> {
   @OptIn(ExperimentalContracts::class)
   public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
     contract {
-      callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
     }
     return flatMap { Right(f(it)) }
   }
@@ -924,7 +924,7 @@ public sealed class Either<out A, out B> {
   @OptIn(ExperimentalContracts::class)
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
     contract {
-      callsInPlace(f,InvocationKind.EXACTLY_ONCE)
+      callsInPlace(f,InvocationKind.AT_MOST_ONCE)
     }
     return fold({ Left(f(it)) }, { Right(it) })
   }
@@ -961,7 +961,7 @@ public sealed class Either<out A, out B> {
   @OptIn(ExperimentalContracts::class)
   public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
     contract {
-      callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     return also { if (it.isRight()) action(it.value) }
   }
@@ -984,7 +984,7 @@ public sealed class Either<out A, out B> {
   @OptIn(ExperimentalContracts::class)
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
     contract {
-      callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     return also { if (it.isLeft()) action(it.value) }
   }
