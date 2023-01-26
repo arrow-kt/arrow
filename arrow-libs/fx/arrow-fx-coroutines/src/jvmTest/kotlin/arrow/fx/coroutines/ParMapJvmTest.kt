@@ -87,3 +87,5 @@ class ParMapJvmTest : StringSpec({
 
 private val emptyError: (Nothing, Nothing) -> Nothing =
   { _, _ -> throw AssertionError("Should not be called") }
+
+private val single = singleThreadContext("single")
