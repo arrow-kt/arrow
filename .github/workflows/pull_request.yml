@@ -115,7 +115,7 @@ jobs:
       - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x linuxX64Test -x jsTest --scan
+          arguments: check -x linuxX64Test -x jsBrowserTest -x jsNodeTest --scan
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
