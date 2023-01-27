@@ -105,7 +105,34 @@ jobs:
       - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: knitCheck apiCheck jvmTest --scan
+          arguments: knitCheck apiCheck --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-check'
+          path: '**/build/reports/**'
+
+  jvmTest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jsTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jvmTest --scan
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
@@ -127,7 +154,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-jvm'
+          name: 'reports-jvmTest'
           path: '**/build/reports/**'
 
   js:
