@@ -66,6 +66,7 @@ fun buildCompilation(text: String) = KotlinCompilation().apply {
   ).map { classpathOf(it) }
   symbolProcessorProviders = listOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+  verbose = false
 }
 
 private fun classpathOf(dependency: String): File {
@@ -73,7 +74,7 @@ private fun classpathOf(dependency: String): File {
     ClassGraph().classpathFiles.firstOrNull { classpath ->
       dependenciesMatch(classpath, dependency)
     }
-  println("classpath: ${ClassGraph().classpathFiles}")
+//  println("classpath: ${ClassGraph().classpathFiles}")
   Assertions.assertThat(file)
     .`as`("$dependency not found in test runtime. Check your build configuration.")
     .isNotNull

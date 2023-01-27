@@ -24,7 +24,7 @@ jobs:
       - name: ios and watchos tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
 
       - name: Upload reports
         if: failure()
@@ -51,7 +51,7 @@ jobs:
       - name: macos and tvos tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
 
       - name: Upload reports
         if: failure()
@@ -78,7 +78,7 @@ jobs:
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: mingwX64Test
+          arguments: mingwX64Test  --scan
 
       - name: Upload reports
         if: failure()
@@ -102,20 +102,37 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: compileKotlin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileKotlin
-
-      - name: compileTestKotlin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileTestKotlin
-
       - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x linuxX64Test -x jsTest
+          arguments: knitCheck apiCheck --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-check'
+          path: '**/build/reports/**'
+
+  jvmTest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jsTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jvmTest --scan
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
@@ -137,7 +154,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-jvm'
+          name: 'reports-jvmTest'
           path: '**/build/reports/**'
 
   js:
@@ -158,7 +175,7 @@ jobs:
       - name: jsTest
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jsTest
+          arguments: jsTest  --scan
 
       - name: Upload reports
         if: failure()
@@ -185,7 +202,7 @@ jobs:
       - name: linuxX64Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: linuxX64Test
+          arguments: linuxX64Test  --scan
 
       - name: Upload reports
         if: failure()

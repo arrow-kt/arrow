@@ -44,20 +44,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: compileKotlin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileKotlin
-
-      - name: compileTestKotlin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: compileTestKotlin
-
       - name: check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x linuxX64Test -x jsTest "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
+          arguments: knitCheck apiCheck jvmTest "-Psemver.scope=${{ github.event.inputs.scope }}" "-Psemver.stage=${{ github.event.inputs.stage }}"
 
   generate-tag:
     runs-on: ubuntu-latest
