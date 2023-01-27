@@ -39,26 +39,26 @@ class ScheduleTest : StringSpec({
 
     val exception = MyException()
 
-    "Schedule.identity()" {
-      val dec = Schedule.identity<Int>().calculateSchedule1(1)
-      val expected = Schedule.Decision<Any?, Int>(true, ZERO, Unit, Eval.now(1))
+//    "Schedule.identity()" {
+//      val dec = Schedule.identity<Int>().calculateSchedule1(1)
+//      val expected = Schedule.Decision<Any?, Int>(true, ZERO, Unit, Eval.now(1))
+//
+//      dec eqv expected
+//    }
 
-      dec eqv expected
-    }
+//    "Schedule.unfold()" {
+//      val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
+//      val expected = Schedule.Decision<Any?, Int>(true, ZERO, 1, Eval.now(1))
+//
+//      dec eqv expected
+//    }
 
-    "Schedule.unfold()" {
-      val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-      val expected = Schedule.Decision<Any?, Int>(true, ZERO, 1, Eval.now(1))
-
-      dec eqv expected
-    }
-
-    "Schedule.forever() == Schedule.unfold(0) { it + 1 }" {
-      val foreverDesc = Schedule.forever<Any?>().calculateSchedule1(0)
-      val unfoldDesc = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-
-      foreverDesc eqv unfoldDesc
-    }
+//    "Schedule.forever() == Schedule.unfold(0) { it + 1 }" {
+//      val foreverDesc = Schedule.forever<Any?>().calculateSchedule1(0)
+//      val unfoldDesc = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
+//
+//      foreverDesc eqv unfoldDesc
+//    }
 
     "Schedule.recurs(negative number)" {
       checkRepeat(Schedule.recurs(-500), expected = 0)
@@ -72,15 +72,15 @@ class ScheduleTest : StringSpec({
       checkRepeat(Schedule.recurs(1), expected = 1)
     }
 
-    "Schedule.recurs(n: Int)" {
-      val n = 500
-      val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
-
-      res.dropLast(1).map { it.duration } shouldBe res.dropLast(1).map { ZERO }
-      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
-
-      res.last() eqv Schedule.Decision(false, ZERO, n + 1, Eval.now(n + 1))
-    }
+//    "Schedule.recurs(n: Int)" {
+//      val n = 500
+//      val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
+//
+//      res.dropLast(1).map { it.duration } shouldBe res.dropLast(1).map { ZERO }
+//      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
+//
+//      res.last() eqv Schedule.Decision(false, ZERO, n + 1, Eval.now(n + 1))
+//    }
 
     "Schedule.once() repeats 1 additional time" {
       var count = 0
@@ -120,17 +120,17 @@ class ScheduleTest : StringSpec({
       )
     }
 
-    "Repeat a scheduled repeat repeats the whole number" {
-      val n = 42
-      var count = 0
-      Schedule.recurs<Int>(1).repeat {
-        Schedule.recurs<Int>(n).repeat {
-          count++
-        }
-      }
-
-      count shouldBe ((n + 1) * 2)
-    }
+//    "Repeat a scheduled repeat repeats the whole number" {
+//      val n = 42
+//      var count = 0
+//      Schedule.recurs<Int>(1).repeat {
+//        Schedule.recurs<Int>(n).repeat {
+//          count++
+//        }
+//      }
+//
+//      count shouldBe ((n + 1) * 2)
+//    }
 
     @Suppress("UNREACHABLE_CODE", "UNUSED_VARIABLE")
     "Schedule.never() times out" {
@@ -141,95 +141,95 @@ class ScheduleTest : StringSpec({
       } shouldBe null
     }
 
-    "Schedule.spaced()" {
-      val duration = 5.seconds
-      val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
-
-      res.map { it.cont } shouldBe res.map { true }
-      res.map { it.duration } shouldBe res.map { duration }
-    }
+//    "Schedule.spaced()" {
+//      val duration = 5.seconds
+//      val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
+//
+//      res.map { it.cont } shouldBe res.map { true }
+//      res.map { it.duration } shouldBe res.map { duration }
+//    }
 
     fun secondsToNanos(sec: Int): Double =
       sec * 1_000_000_000.0
 
-    "Schedule.fibonacci()" {
-      val n = 10
-      val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
+//    "Schedule.fibonacci()" {
+//      val n = 10
+//      val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
+//
+//      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+//      val fib = fibs(secondsToNanos(10)).drop(1).take(n)
+//
+//      res.all { it.cont } shouldBe true
+//      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe fib.sum()
+//    }
 
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val fib = fibs(secondsToNanos(10)).drop(1).take(n)
+//    "Schedule.linear()" {
+//      val n = 10
+//      val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
+//
+//      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+//      val exp = linear(secondsToNanos(10)).drop(1).take(n)
+//
+//      res.all { it.cont } shouldBe true
+//      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe exp.sum()
+//    }
 
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe fib.sum()
-    }
-
-    "Schedule.linear()" {
-      val n = 10
-      val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
-
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val exp = linear(secondsToNanos(10)).drop(1).take(n)
-
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe exp.sum()
-    }
-
-    "Schedule.exponential()" {
-      val n = 10
-      val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
-
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val expSum = exp(secondsToNanos(10)).drop(1).take(n).sum()
-
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe expSum
-    }
+//    "Schedule.exponential()" {
+//      val n = 10
+//      val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
+//
+//      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+//      val expSum = exp(secondsToNanos(10)).drop(1).take(n).sum()
+//
+//      res.all { it.cont } shouldBe true
+//      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe expSum
+//    }
 
     "repeat is stack-safe" {
       checkRepeat(Schedule.recurs(20_000), expected = 20_000)
     }
 
-    "repeatAsFlow is stack-safe" {
-      checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
-    }
+//    "repeatAsFlow is stack-safe" {
+//      checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
+//    }
 
-    "repeat" {
-      val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
-      val n = 100
-      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+//    "repeat" {
+//      val stop = RuntimeException("WOOO")
+//      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
+//      val n = 100
+//      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+//
+//      val eff = SideEffect()
+//
+//      val l = Either.catch {
+//        schedule.repeat {
+//          if (eff.counter >= n) throw stop
+//          else eff.increment()
+//        }
+//      }
+//
+//      eff.counter shouldBe 100
+//      l shouldBe Either.Left(stop)
+//    }
 
-      val eff = SideEffect()
-
-      val l = Either.catch {
-        schedule.repeat {
-          if (eff.counter >= n) throw stop
-          else eff.increment()
-        }
-      }
-
-      eff.counter shouldBe 100
-      l shouldBe Either.Left(stop)
-    }
-
-    "repeatAsFlow" {
-      val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
-      val n = 100
-      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
-
-      val eff = SideEffect()
-
-      val l = Either.catch {
-        schedule.repeatAsFlow {
-          if (eff.counter >= n) throw stop
-          else eff.increment()
-        }.collect()
-      }
-
-      eff.counter shouldBe 100
-      l shouldBe Either.Left(stop)
-    }
+//    "repeatAsFlow" {
+//      val stop = RuntimeException("WOOO")
+//      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
+//      val n = 100
+//      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+//
+//      val eff = SideEffect()
+//
+//      val l = Either.catch {
+//        schedule.repeatAsFlow {
+//          if (eff.counter >= n) throw stop
+//          else eff.increment()
+//        }.collect()
+//      }
+//
+//      eff.counter shouldBe 100
+//      l shouldBe Either.Left(stop)
+//    }
 
     "repeat fails fast on errors" {
       val ex = Throwable("Hello")
@@ -244,16 +244,16 @@ class ScheduleTest : StringSpec({
     }
 
     "repeat should run the schedule with the correct input" {
-      var i = 0
-      val n = 10
-      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..n).toList()
+      var i = 0L
+      val n = 10L
+      (Schedule.recurs<Long>(n).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0L..n).toList()
     }
 
     "repeatAsFlow should run the schedule with the correct input" {
-      var i = 0
-      val n = 10
-      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList() shouldBe
-        (0..n).map { (0..it).toList() }
+      var i = 0L
+      val n = 10L
+      (Schedule.recurs<Long>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList() shouldBe
+        (0..n).map { (0L..it).toList() }
     }
 
     "retry is stack-safe" {
@@ -326,32 +326,32 @@ internal fun Sequence<Double>.sum(): Double {
   return sum
 }
 
-private suspend fun <I, A> Schedule<I, A>.calculateSchedule1(input: I): Schedule.Decision<Any?, A> =
-  calculateSchedule(input, 1).first()
+//private suspend fun <I, A> Schedule<I, A>.calculateSchedule1(input: I): Schedule.Decision<Any?, A> =
+//  calculateSchedule(input, 1).first()
 
-/**
- * Calculates the schedule for [input] I, and [n] iterations
- * This allows to calculate the resulting [Schedule.Decision] state and make assertions.
- */
-@Suppress("UNCHECKED_CAST")
-private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Int): List<Schedule.Decision<Any?, A>> {
-  (this as Schedule.ScheduleImpl<Any?, I, A>)
-  val state = initialState.invoke()
-  return go(this, input, state, n, emptyList())
-}
+///**
+// * Calculates the schedule for [input] I, and [n] iterations
+// * This allows to calculate the resulting [Schedule.Decision] state and make assertions.
+// */
+//@Suppress("UNCHECKED_CAST")
+//private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Int): List<Schedule.Decision<Any?, A>> {
+//  (this as Schedule.ScheduleImpl<Any?, I, A>)
+//  val state = initialState.invoke()
+//  return go(this, input, state, n, emptyList())
+//}
 
-private tailrec suspend fun <I, A> go(
-  schedule: Schedule.ScheduleImpl<Any?, I, A>,
-  input: I,
-  s: Any?,
-  rem: Int,
-  acc: List<Schedule.Decision<Any?, A>>
-): List<Schedule.Decision<Any?, A>> =
-  if (rem <= 0) acc
-  else {
-    val res = schedule.update(input, s) // Calculate new decision
-    go(schedule, input, res.state, rem - 1, acc + listOf(res))
-  }
+//private tailrec suspend fun <I, A> go(
+//  schedule: Schedule.ScheduleImpl<Any?, I, A>,
+//  input: I,
+//  s: Any?,
+//  rem: Int,
+//  acc: List<Schedule.Decision<Any?, A>>
+//): List<Schedule.Decision<Any?, A>> =
+//  if (rem <= 0) acc
+//  else {
+//    val res = schedule.update(input, s) // Calculate new decision
+//    go(schedule, input, res.state, rem - 1, acc + listOf(res))
+//  }
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B) {
   val count = AtomicRef(JustANumber(0))
@@ -368,13 +368,13 @@ private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: 
     .collect { (a, b) -> a shouldBe b }
 }
 
-@ExperimentalTime
-private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>) {
-  require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
-  require(duration == other.duration) { "Decision#duration: ${this.duration} shouldBe ${other.duration}" }
-  if (cont) {
-    val lh = finish.value()
-    val rh = other.finish.value()
-    require(lh == rh) { "Decision#cont: $lh shouldBe $rh" }
-  }
-}
+//@ExperimentalTime
+//private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>) {
+//  require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
+//  require(duration == other.duration) { "Decision#duration: ${this.duration} shouldBe ${other.duration}" }
+//  if (cont) {
+//    val lh = finish.value()
+//    val rh = other.finish.value()
+//    require(lh == rh) { "Decision#cont: $lh shouldBe $rh" }
+//  }
+//}

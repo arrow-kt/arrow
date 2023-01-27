@@ -32,7 +32,7 @@ class FlowTest : StringSpec({
         flow {
           emit(a)
           if (++counter <= 11) throw bang
-        }.retry(Schedule.recurs(n))
+        }.retry(Schedule.recurs(n.toLong()))
           .collect()
       }
       e shouldBe bang
@@ -45,7 +45,7 @@ class FlowTest : StringSpec({
       val sum = flow {
         emit(a)
         if (++counter <= 5) throw RuntimeException("Bang!")
-      }.retry(Schedule.recurs(n))
+      }.retry(Schedule.recurs(n.toLong()))
         .reduce { acc, int -> acc + int }
 
       sum shouldBe a * 6

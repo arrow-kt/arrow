@@ -317,7 +317,7 @@ private data class ConstructorValues(
 /**
  * Recurs the effect [n] times, and collects the output along the way for easy asserting.
  */
-fun <A> recurAndCollect(n: Int): Schedule<A, List<A>> =
+fun <A> recurAndCollect(n: Long): Schedule<A, List<A>> =
   Schedule.recurs<A>(n).zipRight(Schedule.identity<A>().collect())
 
 tailrec suspend fun stackSafeSuspend(cb: CircuitBreaker, n: Int, acc: Int): Int =
