@@ -16,14 +16,6 @@ allprojects {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
   }
-
-  afterEvaluate {
-    tasks {
-      withType<Test>().configureEach {
-        maxParallelForks = 1
-      }
-    }
-  }
 }
 
 plugins {
