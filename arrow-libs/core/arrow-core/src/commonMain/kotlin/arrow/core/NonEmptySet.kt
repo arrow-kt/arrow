@@ -1,34 +1,31 @@
 package arrow.core
 
-public class NonEmptySet<out T>(
-  private val first: T,
-  private val rest: Set<T>,
-) : AbstractSet<T>() {
+public class NonEmptySet<out T> private constructor(
+  private val elements: Set<T>
+) : Set<T> by elements {
 
-  public val elements: Set<T> by lazy { setOf(first) + rest }
+  public constructor(first: T, rest: Set<T>): this(setOf(first) + rest)
 
-  public operator fun plus(other: NonEmptySet<@UnsafeVariance T>): NonEmptySet<T> =
-    NonEmptySet(this.first, rest + other.elements)
+  public operator fun plus(set: Set<@UnsafeVariance T>): NonEmptySet<T> = NonEmptySet(elements + set)
 
-  public operator fun plus(s: Set<@UnsafeVariance T>): NonEmptySet<T> =
-    NonEmptySet(first, rest + s)
+  public operator fun plus(element: @UnsafeVariance T): NonEmptySet<T> = NonEmptySet(elements + element)
 
-  public operator fun plus(s: @UnsafeVariance T): NonEmptySet<T> =
-    NonEmptySet(first, rest + s)
+  override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
-  override val size: Int
-    get() = elements.size
+  override fun equals(other: Any?): Boolean {
+    return elements == other
+  }
 
-  override fun iterator(): Iterator<T> = elements.iterator()
-
-  override fun toString(): String = "NonEmptySet(${elements.joinToString()})"
+  override fun hashCode(): Int {
+    return elements.hashCode()
+  }
 }
 
-public fun <T> nonEmptySetOf(fist: T, vararg rest: T): NonEmptySet<Any?> =
+public fun <T> nonEmptySetOf(fist: T, vararg rest: T): NonEmptySet<T> =
   NonEmptySet(fist, rest.toSet())
 
 public fun <T> Collection<T>.toNonEmptySetOrNull(): NonEmptySet<T>? =
-  firstOrNull()?.let { NonEmptySet(it, this.drop(1).toSet()) }
+  firstOrNull()?.let { NonEmptySet(it, minus(it).toSet()) }
 
 public fun <T> Collection<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
   toNonEmptySetOrNull().toOption()

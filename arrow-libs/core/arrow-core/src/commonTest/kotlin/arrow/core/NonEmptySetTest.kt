@@ -13,13 +13,13 @@ class NonEmptySetTest : StringSpec({
 
   "iterable.toNonEmptySetOrNull should round trip" {
     checkAll(Arb.nonEmptySet(Arb.int())) { nonEmptySet ->
-      nonEmptySet.elements.toNonEmptySetOrNull().shouldNotBeNull() shouldBe nonEmptySet
+      nonEmptySet.toNonEmptySetOrNull().shouldNotBeNull() shouldBe nonEmptySet
     }
   }
 
   "iterable.toNonEmptySetOrNone should round trip" {
     checkAll(Arb.nonEmptySet(Arb.int())) { nonEmptySet ->
-      nonEmptySet.elements.toNonEmptySetOrNone() shouldBe nonEmptySet.some()
+      nonEmptySet.toNonEmptySetOrNone() shouldBe nonEmptySet.some()
     }
   }
 
