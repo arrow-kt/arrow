@@ -1,23 +1,22 @@
 package arrow.core;
 
 import java.util.Arrays;
-
-import static arrow.core.NonEmptyListKt.*;
+import java.util.List;
 
 public class NonEmptyListUsage {
 
     public void testUsage() {
-        NonEmptyList<Integer> integers = nonEmptyListOf(1, 2, 3, 4, 5);
-        int i = compareTo(
-                nonEmptyListOf(1, 2, 3, 4, 5),
-                nonEmptyListOf(1, 2, 3, 4, 5)
+        // from the Java side, we just have List
+        List<Integer> integers = NonEmptyList.of(1, 2, 3, 4, 5);
+        int i = IterableKt.compareTo(
+                NonEmptyList.of(1, 2, 3, 4, 5),
+                NonEmptyList.of(1, 2, 3, 4, 5)
         );
-        NonEmptyList<Integer> flatten = flatten(nonEmptyListOf(
-                nonEmptyListOf(1, 2),
-                nonEmptyListOf(3, 4)
-        ));
+        // List<Integer> flatten = flatten(nonEmptyListOf(
+        //         nonEmptyListOf(1, 2),
+        //         nonEmptyListOf(3, 4)
+        // ));
         Option<NonEmptyList<Integer>> nonEmptyListOption = NonEmptyList.fromList(Arrays.asList(1, 2, 3));
-        NonEmptyList<Integer> integers1 = NonEmptyList.fromListUnsafe(Arrays.asList(1, 2, 3));
-        NonEmptyList<Integer> integers2 = NonEmptyListKt.toNonEmptyListOrNull(Arrays.asList(1, 2, 3));
+        List<Integer> integers2 = NonEmptyList.ofOrNull(Arrays.asList(1, 2, 3));
     }
 }
