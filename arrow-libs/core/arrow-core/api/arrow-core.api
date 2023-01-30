@@ -782,6 +782,36 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun unzip (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 }
 
+public final class arrow/core/NonEmptySet : java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun <init> (Ljava/lang/Object;Ljava/util/Set;)V
+	public fun add (Ljava/lang/Object;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public fun clear ()V
+	public fun contains (Ljava/lang/Object;)Z
+	public fun containsAll (Ljava/util/Collection;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSize ()I
+	public fun hashCode ()I
+	public fun isEmpty ()Z
+	public fun iterator ()Ljava/util/Iterator;
+	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptySet;
+	public final fun plus (Ljava/lang/Object;)Larrow/core/NonEmptySet;
+	public final fun plus (Ljava/util/Set;)Larrow/core/NonEmptySet;
+	public fun remove (Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public fun retainAll (Ljava/util/Collection;)Z
+	public final fun size ()I
+	public fun toArray ()[Ljava/lang/Object;
+	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/core/NonEmptySetKt {
+	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Larrow/core/NonEmptySet;
+	public static final fun toNonEmptySetOrNone (Ljava/util/Collection;)Larrow/core/Option;
+	public static final fun toNonEmptySetOrNull (Ljava/util/Collection;)Larrow/core/NonEmptySet;
+}
+
 public final class arrow/core/NonFatalKt {
 	public static final fun NonFatal (Ljava/lang/Throwable;)Z
 }
