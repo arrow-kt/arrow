@@ -9,6 +9,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.toNonEmptyListOrNull
 import arrow.core.toOption
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
@@ -16,9 +17,10 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
+import kotlin.math.max
 
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
-  Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
+  Arb.list(arb, max(range.first, 1) .. range.last).map { it.toNonEmptyListOrNull()!! }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
