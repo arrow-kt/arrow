@@ -1,6 +1,9 @@
 package arrow.core
 
-public class NonEmptySet<out T> private constructor(
+import kotlin.jvm.JvmInline
+
+@JvmInline
+public value class NonEmptySet<out T> private constructor(
   private val elements: Set<T>
 ) : Set<T> by elements {
 
@@ -19,11 +22,13 @@ public class NonEmptySet<out T> private constructor(
 
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
+  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean = when (other) {
-    is Set<*> -> elements == other
-    else -> false
+    is NonEmptySet<*> -> elements == other.elements
+    else -> elements == other
   }
 
+  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int {
     return elements.hashCode()
   }
