@@ -13,24 +13,15 @@ import arrow.core.identity
 )
 public object ResultEffect {
 
-  @Deprecated(
-    "This object introduces dangerous behavior.",
-    level = DeprecationLevel.ERROR
-  )
+  @Deprecated("This object introduces dangerous behavior.")
   public fun <A> Result<A>.bind(): A =
     getOrThrow()
   
-  @Deprecated(
-    "This object introduces dangerous behavior.",
-    level = DeprecationLevel.ERROR
-  )
+  @Deprecated("This object introduces dangerous behavior.")
   public fun <A> Either<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
   
-  @Deprecated(
-    "This object introduces dangerous behavior.",
-    level = DeprecationLevel.ERROR
-  )
+  @Deprecated("This object introduces dangerous behavior.")
   public fun <A> Validated<Throwable, A>.bind(): A =
     fold({ throw it }, ::identity)
 }
@@ -68,7 +59,7 @@ public object result {
    */
   @Deprecated(
     resultDSLDeprecation,
-    ReplaceWith("result(block)", "arrow.core.raise.result")
+    ReplaceWith("result { block() }", "arrow.core.raise.result")
   )
   public inline operator fun <A> invoke(block: ResultEffect.() -> A): Result<A> =
     kotlin.runCatching { block(ResultEffect) }
