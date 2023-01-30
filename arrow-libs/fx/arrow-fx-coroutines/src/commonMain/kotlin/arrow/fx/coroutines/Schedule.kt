@@ -192,7 +192,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
@@ -201,6 +201,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * ```
  * <!--- KNIT example-schedule-08.kt -->
  */
+@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("Schedule", "arrow.fx.resilience.Schedule"))
 public sealed class Schedule<Input, Output> {
 
   public abstract suspend fun <C> repeatOrElseEither(

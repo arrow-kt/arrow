@@ -3,14 +3,9 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.sequence
+import arrow.core.continuations.result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -23,12 +18,30 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(Dispatchers.Default, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 @JvmName("parSequenceResultNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResultN(n: Int): Result<List<A>> =
-  parTraverseResultN(Dispatchers.Default, n) { it() }
+  result { parMap(Dispatchers.Default, n) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(Dispatchers.Default, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(n: Int): Result<List<A>> =
-  parTraverseResultN(Dispatchers.Default, n) { it() }
+  result { parMap(Dispatchers.Default, n) { it().bind() } }
 
 /**
  * Traverses this [Iterable] and runs `suspend CoroutineScope.() -> Result<A>` in [n] parallel operations on [CoroutineContext].
@@ -40,18 +53,34 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(n: I
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 @JvmName("parSequenceResultNScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Result<List<A>> =
-  parTraverseResultN(ctx, n) { it() }
+  result { parMap(ctx, n) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Result<List<A>> =
-  parTraverseResultN(ctx, n) { it() }
+  result { parMap(ctx, n) { it().bind() } }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -59,11 +88,20 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResultN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(Dispatchers.Default, n) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseResultN(
   n: Int,
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
-  parTraverseResultN(Dispatchers.Default, n, f)
+  result { parMap(Dispatchers.Default, n) { f(it).bind() } }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [CoroutineContext].
@@ -75,16 +113,19 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx, n) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseResultN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> Result<B>
-): Result<List<B>> {
-  val semaphore = Semaphore(n)
-  return parTraverseResult(ctx) { a ->
-    semaphore.withPermit { f(a) }
-  }
-}
+): Result<List<B>> = result { parMap(ctx, n) { f(it).bind() } }
 
 /**
  * Sequences all tasks in parallel on [ctx] and returns the result.
@@ -98,14 +139,31 @@ public suspend fun <A, B> Iterable<A>.parTraverseResultN(
  *
  *
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 @JvmName("parSequenceResultScoped")
 public suspend fun <A> Iterable<suspend CoroutineScope.() -> Result<A>>.parSequenceResult(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Result<List<A>> = parTraverseResult(ctx) { it() }
+): Result<List<A>> = result { parMap(ctx) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Result<List<A>> = parTraverseResult(ctx) { it() }
+): Result<List<A>> =
+  result { parMap(ctx) { it().bind() } }
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
@@ -113,8 +171,17 @@ public suspend fun <A> Iterable<suspend () -> Result<A>>.parSequenceResult(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(Dispatchers.Default) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScope.(A) -> Result<B>): Result<List<B>> =
-  parTraverseResult(Dispatchers.Default, f)
+  result { parMap(Dispatchers.Default) { f(it).bind() } }
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -127,10 +194,16 @@ public suspend fun <A, B> Iterable<A>.parTraverseResult(f: suspend CoroutineScop
  * Cancelling this operation cancels all running tasks.
  *
  */
+@Deprecated(
+  "Prefer composing parMap with result DSL",
+  ReplaceWith(
+    "result<List<B>> { this.parMap(ctx) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.result"
+  )
+)
 public suspend fun <A, B> Iterable<A>.parTraverseResult(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Result<B>
 ): Result<List<B>> =
-  coroutineScope {
-    map { async(ctx) { f.invoke(this, it) } }.awaitAll().sequence()
-  }
+  result { parMap(ctx) { f(it).bind() } }

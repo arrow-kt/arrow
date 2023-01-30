@@ -1,11 +1,10 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 
-class TArrayTest : ArrowFxSpec(
-  spec = {
+class TArrayTest : StringSpec({
     "creating an array" {
       val t1 = TArray.new(10) { it }
       t1.size() shouldBeExactly 10

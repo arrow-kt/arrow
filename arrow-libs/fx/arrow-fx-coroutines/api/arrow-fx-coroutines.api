@@ -97,6 +97,19 @@ public final class arrow/fx/coroutines/CircuitBreaker$State$Open : arrow/fx/coro
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/fx/coroutines/CountDownLatch {
+	public fun <init> (J)V
+	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun count ()J
+	public final fun countDown ()V
+}
+
+public final class arrow/fx/coroutines/CyclicBarrier {
+	public fun <init> (I)V
+	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getCapacity ()I
+}
+
 public abstract class arrow/fx/coroutines/ExitCase {
 	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }
@@ -146,6 +159,21 @@ public final class arrow/fx/coroutines/FlowExtensions {
 	public static synthetic fun parMapUnordered$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun repeat (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/coroutines/Schedule;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class arrow/fx/coroutines/ParMapKt {
+	public static final fun parMap (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMap (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parMap$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun parMap$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun parMapOrAccumulate (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMapOrAccumulate (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMapOrAccumulate (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun parMapOrAccumulate (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun parMapOrAccumulate$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun parMapOrAccumulate$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun parMapOrAccumulate$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun parMapOrAccumulate$default (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/ParTraverse {
@@ -522,6 +550,24 @@ public final class arrow/fx/coroutines/ScheduleKt {
 	public static final fun retry (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElse (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun retryOrElseEither (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/ScopedRaise : arrow/core/continuations/EffectScope, kotlinx/coroutines/CoroutineScope {
+	public fun <init> (Larrow/core/continuations/EffectScope;Lkotlinx/coroutines/CoroutineScope;)V
+	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun ensure (ZLkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/Use {

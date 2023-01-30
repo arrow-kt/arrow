@@ -15,6 +15,12 @@ suspend fun main() {
       val fa = async<Int> { shift(errorA) }
       val fb = async<Int> { shift(errorB) }
       fa.await() + fb.await()
-    }.fold({ error -> error shouldBeIn listOf(errorA, errorB) }, { fail("Int can never be the result") })
+    }.fold(
+      { error ->
+        println(error)
+        error shouldBeIn listOf(errorA, errorB)
+      },
+      { fail("Int can never be the result") }
+    )
   }
 }

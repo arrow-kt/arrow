@@ -1,12 +1,11 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 
-class TSemaphoreTest : ArrowFxSpec(
-  spec = {
+class TSemaphoreTest : StringSpec({
     "creating a semaphore with a negative number of permits fails" {
       shouldThrow<IllegalArgumentException> { TSemaphore.new(-1) }
       shouldThrow<IllegalArgumentException> { atomically { newTSem(-1) } }

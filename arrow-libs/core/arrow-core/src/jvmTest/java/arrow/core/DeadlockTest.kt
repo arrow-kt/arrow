@@ -1,14 +1,12 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
+import io.kotest.core.spec.style.StringSpec
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class DeadlockTest : UnitSpec() {
-
-  init {
+class DeadlockTest : StringSpec({
 
     "classloader should not deadlock Validated initialization" {
       runBlocking {
@@ -79,5 +77,5 @@ class DeadlockTest : UnitSpec() {
         }.joinAll()
       }
     }
-  }
-}
+
+})

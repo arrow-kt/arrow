@@ -13,6 +13,7 @@ import arrow.core.raise.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
@@ -494,7 +495,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-either-16.kt -->
  *
  * For using Either's syntax on arbitrary data types.
- * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
+ * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` methods:
  *
  * ```kotlin
  * import arrow.core.right
@@ -764,10 +765,9 @@ import kotlin.jvm.JvmStatic
  *
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
- *
  */
 public sealed class Either<out A, out B> {
-
+  
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
    * Used only for performance instead of fold.
@@ -778,7 +778,7 @@ public sealed class Either<out A, out B> {
   )
   @JsName("_isRight")
   internal abstract val isRight: Boolean
-
+  
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
    * Used only for performance instead of fold.
@@ -789,19 +789,19 @@ public sealed class Either<out A, out B> {
   )
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
-
+  
   @OptIn(ExperimentalContracts::class)
   public fun isLeft(): Boolean {
     contract { returns(true) implies (this@Either is Left<A>) }
     return this@Either is Left<A>
   }
-
+  
   @OptIn(ExperimentalContracts::class)
   public fun isRight(): Boolean {
     contract { returns(true) implies (this@Either is Right<B>) }
     return this@Either is Right<B>
   }
-
+  
   /**
    * Transform an [Either] into a value of [C].
    * Alternative to using `when` to fold an [Either] into a value [C].
@@ -826,11 +826,17 @@ public sealed class Either<out A, out B> {
    * @param ifRight transform the [Either.Right] type [B] to [C].
    * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
    */
-  public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C =
-    when (this) {
+  @OptIn(ExperimentalContracts::class)
+  public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
+    contract {
+      callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(ifRight, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (this) {
       is Right -> ifRight(value)
       is Left -> ifLeft(value)
     }
+}
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
@@ -838,28 +844,28 @@ public sealed class Either<out A, out B> {
   )
   public inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fold({ initial }) { rightOperation(initial, it) }
-
+  
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }")
   )
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C =
     fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }
-
+  
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("fold({ f(c, it) }, { g(c, it) })")
   )
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
-
+  
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }")
   )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C =
     MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }
-
+  
   /**
    * Swap the generic parameters [A] and [B] of this [Either].
    *
@@ -877,7 +883,7 @@ public sealed class Either<out A, out B> {
    */
   public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
-
+  
   /**
    * Map, or transform, the right value [B] of this [Either] to a new value [C].
    *
@@ -893,9 +899,15 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-36.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> map(f: (right: B) -> C): Either<A, C> =
-    flatMap { Right(f(it)) }
+  @OptIn(ExperimentalContracts::class)
+  public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    }
+    return flatMap { Right(f(it)) }
+  }
 
+  
   /**
    * Map, or transform, the left value [A] of this [Either] to a new value [C].
    *
@@ -911,26 +923,28 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-37.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
-    when(this) {
-      is Right -> Right(value)
-      is Left -> Left(f(value))
+  @OptIn(ExperimentalContracts::class)
+  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
+    contract {
+      callsInPlace(f,InvocationKind.AT_MOST_ONCE)
     }
-
+    return fold({ Left(f(it)) }, { Right(it) })
+  }
+  
   @Deprecated(
     "tapLeft is being renamed to onLeft to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("onLeft(f)")
   )
   public inline fun tapLeft(f: (left: A) -> Unit): Either<A, B> =
     onLeft(f)
-
+  
   @Deprecated(
     "tap is being renamed to onRight to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("onRight(f)")
   )
   public inline fun tap(f: (right: B) -> Unit): Either<A, B> =
     onRight(f)
-
+  
   /**
    * Performs the given [action] on the encapsulated [B] value if this instance represents [Either.Right].
    * Returns the original [Either] unchanged.
@@ -946,9 +960,14 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-38.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> =
-    also { if (it.isRight()) action(it.value) }
-
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isRight()) action(it.value) }
+  }
+  
   /**
    * Performs the given [action] on the encapsulated [A] if this instance represents [Either.Left].
    * Returns the original [Either] unchanged.
@@ -966,7 +985,7 @@ public sealed class Either<out A, out B> {
    */
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> =
     also { if (it.isLeft()) action(it.value) }
-
+  
   /**
    * Map over Left and Right of this Either
    */
@@ -976,7 +995,7 @@ public sealed class Either<out A, out B> {
   )
   public inline fun <C, D> bimap(leftOperation: (left: A) -> C, rightOperation: (right: B) -> D): Either<C, D> =
     map(rightOperation).mapLeft(leftOperation)
-
+  
   /**
    * Returns `false` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -1002,7 +1021,7 @@ public sealed class Either<out A, out B> {
   )
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
-
+  
   /**
    * Returns `true` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -1022,13 +1041,13 @@ public sealed class Either<out A, out B> {
   )
   public inline fun all(predicate: (B) -> Boolean): Boolean =
     fold({ true }, predicate)
-
+  
   @Deprecated(
     "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("getOrNull()")
   )
   public fun orNull(): B? = fold({ null }, { it })
-
+  
   /**
    * Returns the encapsulated value [B] if this instance represents [Either.Right] or `null` if it is [Either.Left].
    *
@@ -1045,9 +1064,9 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNull(): B? = getOrElse { null }
-
+  
   public fun orNone(): Option<B> = getOrNone()
-
+  
   /**
    * Transforms [Either] into [Option],
    * where the encapsulated value [B] is wrapped in [Some] when this instance represents [Either.Right],
@@ -1068,14 +1087,14 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
-
+  
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or map",
     ReplaceWith("if (n <= 0) Right(emptyList()) else map { b -> List(n) { b } }")
   )
   public fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) Right(emptyList()) else map { b -> List(n) { b } }
-
+  
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
     ReplaceWith("fold({ emptyList() }, { fa(it).map(::Right) })")
@@ -1084,7 +1103,7 @@ public sealed class Either<out A, out B> {
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
     fold({ emptyList() }, { fa(it).map(::Right) })
-
+  
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
     ReplaceWith("fold({ None }, { right -> fa(right).map(::Right) })")
@@ -1093,18 +1112,18 @@ public sealed class Either<out A, out B> {
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Either<A, C>> =
     fold({ None }, { right -> fa(right).map(::Right) })
-
+  
   @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
     traverse(fa)
-
+  
   @Deprecated(
     RedundantAPI + "Use orNull() and Kotlin nullable types",
     ReplaceWith("orNull()?.let(fa)?.right()")
   )
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     orNull()?.let(fa)?.right()
-
+  
   // TODO will be renamed to mapAccumulating in 2.x.x. Backport, and deprecate in 1.x.x
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -1113,32 +1132,32 @@ public sealed class Either<out A, out B> {
       is Right -> fa(this.value).map(::Right)
       is Left -> this.valid()
     }
-
+  
   @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     traverse(fa)
-
+  
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fe(it).map { aa -> Left(aa) } }, { fa(it).map { c -> Right(c) } })")
   )
   public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { aa -> Left(aa) } }, { fa(it).map { c -> Right(c) } })
-
+  
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })")
   )
   public inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
     fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
-
+  
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })")
   )
   public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
     fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
-
+  
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })")
@@ -1148,14 +1167,14 @@ public sealed class Either<out A, out B> {
     fa: (B) -> Validated<AA, D>,
   ): Validated<AA, Either<C, D>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
-
+  
   @Deprecated(
     NicheAPI + "Prefer Kotlin nullable syntax instead",
     ReplaceWith("orNull()?.takeIf(predicate)")
   )
   public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     orNull()?.takeIf(predicate)
-
+  
   /**
    * Returns `true` if [Left]
    *
@@ -1176,7 +1195,7 @@ public sealed class Either<out A, out B> {
     ReplaceWith("(this is Either.Left<*>)")
   )
   public fun isEmpty(): Boolean = isLeft
-
+  
   /**
    * Returns `true` if [Right]
    *
@@ -1198,59 +1217,59 @@ public sealed class Either<out A, out B> {
     ReplaceWith("(this is Either.Right<*>)")
   )
   public fun isNotEmpty(): Boolean = isRight
-
+  
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   public data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
     override val isLeft = true
     override val isRight = false
-
+    
     override fun toString(): String = "Either.Left($value)"
-
+    
     public companion object {
       @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Left(Unit)"))
       @PublishedApi
       internal val leftUnit: Either<Unit, Nothing> = Left(Unit)
     }
   }
-
+  
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
   public data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
     override val isLeft = false
     override val isRight = true
-
+    
     override fun toString(): String = "Either.Right($value)"
-
+    
     public companion object {
       @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Right(Unit)"))
       @PublishedApi
       internal val unit: Either<Nothing, Unit> = Right(Unit)
     }
   }
-
+  
   override fun toString(): String = fold(
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-
+  
   public fun toValidatedNel(): ValidatedNel<A, B> =
     fold({ Validated.invalidNel(it) }, ::Valid)
-
+  
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
-
+  
   public companion object {
-
+    
     @Deprecated(
       RedundantAPI + "Prefer Kotlin nullable syntax, or ensureNotNull inside Either DSL",
       ReplaceWith("a?.right() ?: Unit.left()")
     )
     @JvmStatic
     public fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
-
+    
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
      * provided on second and third parameters. Second parameter represents function for creating
@@ -1270,7 +1289,7 @@ public sealed class Either<out A, out B> {
     @JvmStatic
     public inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) Right(ifTrue()) else Left(ifFalse())
-
+    
     @JvmStatic
     @JvmName("tryCatch")
     public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
@@ -1279,7 +1298,7 @@ public sealed class Either<out A, out B> {
       } catch (t: Throwable) {
         t.nonFatalOrThrow().left()
       }
-
+    
     @Deprecated(
       RedundantAPI + "Compose catch with flatten instead",
       ReplaceWith("catch(f).flatten()")
@@ -1288,7 +1307,7 @@ public sealed class Either<out A, out B> {
     @JvmName("tryCatchAndFlatten")
     public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
       catch(f).flatten()
-
+    
     @Deprecated(
       RedundantAPI + "Compose catch with mapLeft instead",
       ReplaceWith("catch(f).mapLeft(fe)")
@@ -1297,7 +1316,7 @@ public sealed class Either<out A, out B> {
     @JvmName("tryCatch")
     public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
       catch(f).mapLeft(fe)
-
+    
     /**
      * The resolve function can resolve any function that yields an Either into one type of value.
      *
@@ -1318,14 +1337,12 @@ public sealed class Either<out A, out B> {
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
     ): B =
-      catch(f).flatMap {
-        it.fold({ e: E -> catch { error(e) } }, { a: A -> catch { success(a) } }).flatten()
-      }.recover { t: Throwable ->
-        throwable(t).bind()
-      }.getOrElse { t: Throwable ->
-        unrecoverableState(t)
-        throw t
-      }
+      catch(f)
+        .fold(
+          { t: Throwable -> throwable(t) },
+          { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
+        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
 
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
@@ -1352,7 +1369,7 @@ public sealed class Either<out A, out B> {
     )
     public fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
       { it.map(f) }
-
+    
     @JvmStatic
     @Deprecated(
       RedundantAPI + "Prefer explicitly creating lambdas",
@@ -1361,7 +1378,7 @@ public sealed class Either<out A, out B> {
     public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
   }
-
+  
   @Deprecated(
     RedundantAPI + "Map with Unit",
     ReplaceWith("map { }")
@@ -1451,7 +1468,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  */
 @Deprecated(
   RedundantAPI + "Use other getOrElse signature",
-  ReplaceWith("getOrHandle(default)")
+  ReplaceWith("getOrElse(default)")
 )
 public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
   fold({ default(it) }, ::identity)
@@ -1693,7 +1710,7 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
       is Left -> Left(SGA.run { value.combine(b.value) })
       is Right -> this
     }
-
+    
     is Right -> when (b) {
       is Left -> b
       is Right -> Right(SGB.run { this@combine.value.combine(b.value) })

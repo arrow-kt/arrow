@@ -12,21 +12,23 @@ import kotlin.jvm.JvmMultifileClass
  * to map all values of `R`, `Throwable` and `A` to a value of `B`.
  *
  * <!--- TOC -->
- * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
- * [Handling errors](#handling-errors)
- * [recover](#recover)
- * [catch](#catch)
- * [Structured Concurrency](#structured-concurrency)
- * [Arrow Fx Coroutines](#arrow-fx-coroutines)
- * [parZip](#parzip)
- * [parTraverse](#partraverse)
- * [raceN](#racen)
- * [bracketCase / Resource](#bracketcase--resource)
- * [KotlinX](#kotlinx)
- * [withContext](#withcontext)
- * [async](#async)
- * [launch](#launch)
- * [Strange edge cases](#strange-edge-cases)
+
+      * [Writing a program with Effect<R, A>](#writing-a-program-with-effect<r-a>)
+      * [Handling errors](#handling-errors)
+        * [recover](#recover)
+        * [catch](#catch)
+      * [Structured Concurrency](#structured-concurrency)
+        * [Arrow Fx Coroutines](#arrow-fx-coroutines)
+          * [parZip](#parzip)
+          * [parTraverse](#partraverse)
+          * [raceN](#racen)
+          * [bracketCase / Resource](#bracketcase--resource)
+        * [KotlinX](#kotlinx)
+          * [withContext](#withcontext)
+          * [async](#async)
+          * [launch](#launch)
+          * [Strange edge cases](#strange-edge-cases)
+
  * <!--- END -->
  *
  * ## Writing a program with Effect<R, A>
@@ -65,7 +67,7 @@ import kotlin.jvm.JvmMultifileClass
  *   ensure(path.isNotEmpty()) { EmptyPath }
  * }
  * ```
- * <!--- KNIT example-effect-01.kt -->
+ * <!--- KNIT example-raise-01.kt -->
  *
  * Now that we have the path, we can read from the `File` and return it as a domain model `Content`.
  * We also want to take a look at what exceptions reading from a file might occur `FileNotFoundException` & `SecurityError`,
@@ -140,7 +142,7 @@ import kotlin.jvm.JvmMultifileClass
  *       .body.shouldNotBeEmpty()
  * }
  * ```
- * <!--- KNIT example-effect-02.kt -->
+ * <!--- KNIT example-raise-02.kt -->
  *
  * The functions above are available out of the box, but it's easy to define your own extension functions in terms
  * of `fold`. Implementing the `toEither()` operator is as simple as:
@@ -161,7 +163,7 @@ import kotlin.jvm.JvmMultifileClass
  * suspend fun <A> Effect<None, A>.toOption(): Option<A> =
  *   fold(::identity) { Some(it) }
  * ```
- * <!--- KNIT example-effect-03.kt -->
+ * <!--- KNIT example-raise-03.kt -->
  *
  * Adding your own syntax to `Raise<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
  *
@@ -306,7 +308,7 @@ import kotlin.jvm.JvmMultifileClass
  *   }
  * ```
  *
- * <!--- KNIT example-effect-04.kt -->
+ * <!--- KNIT example-raise-04.kt -->
  *
  * Note:
  *  Handling errors can also be done with `try/catch` but this is **not recommended**, it uses `CancellationException` which is used to cancel `Coroutine`s and is advised not to capture in Kotlin.
@@ -357,7 +359,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exit.await().shouldBeTypeOf<ExitCase>()
  * }
  * ```
- * <!--- KNIT example-effect-05.kt -->
+ * <!--- KNIT example-raise-05.kt -->
  *
  * #### parTraverse
  * <!--- INCLUDE
@@ -392,7 +394,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exits.forEach { exit -> exit.getOrNull()?.shouldBeTypeOf<ExitCase.Cancelled>() }
  * }
  * ```
- * <!--- KNIT example-effect-06.kt -->
+ * <!--- KNIT example-raise-06.kt -->
  *
  * `parTraverse` will launch 5 tasks, for every element in `1..5`.
  * The last task to get scheduled will `raise` with "error", and it will cancel the other launched tasks before returning.
@@ -429,7 +431,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exit.getOrNull()?.shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-07.kt -->
+ * <!--- KNIT example-raise-07.kt -->
  *
  * `raceN` races `n` suspend functions in parallel, and cancels all participating functions when a winner is found.
  * We can consider the function that `raise`s the winner of the race, except with a raised value instead of a successful one.
@@ -465,7 +467,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-08.kt -->
+ * <!--- KNIT example-raise-08.kt -->
  *
  * <!--- INCLUDE
  * import arrow.core.continuations.effect
@@ -501,7 +503,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
  * }
  * ```
- * <!--- KNIT example-effect-09.kt -->
+ * <!--- KNIT example-raise-09.kt -->
  *
  * ### KotlinX
  * #### withContext
@@ -567,7 +569,7 @@ import kotlin.jvm.JvmMultifileClass
  *   exit.await().shouldBeInstanceOf<ExitCase>()
  * }
  * ```
- * <!--- KNIT example-effect-10.kt -->
+ * <!--- KNIT example-raise-10.kt -->
  *
  * #### async
  *
@@ -594,7 +596,7 @@ import kotlin.jvm.JvmMultifileClass
  *   }
  * }
  * ```
- * <!--- KNIT example-effect-11.kt -->
+ * <!--- KNIT example-raise-11.kt -->
  *
  * #### launch
  *
@@ -620,7 +622,7 @@ import kotlin.jvm.JvmMultifileClass
  *   }.fold({ fail("Raise can never finish") }, { it shouldBe int })
  * }
  * ```
- * <!--- KNIT example-effect-12.kt -->
+ * <!--- KNIT example-raise-12.kt -->
  *
  * #### Strange edge cases
  *
@@ -659,7 +661,7 @@ import kotlin.jvm.JvmMultifileClass
  *
  *   leakedAsync.invoke().await()
  * ```
- * <!--- KNIT example-effect-13.kt -->
+ * <!--- KNIT example-raise-13.kt -->
  */
 public typealias Effect<R, A> = suspend Raise<R>.() -> A
 
