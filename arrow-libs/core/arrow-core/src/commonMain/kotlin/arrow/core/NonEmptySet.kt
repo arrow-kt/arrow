@@ -13,7 +13,7 @@ public class NonEmptySet<out T> private constructor(
     NonEmptySet(elements + element)
 
   public fun <R> map(transform: (@UnsafeVariance T) -> R): NonEmptySet<R> =
-    NonEmptySet(elements.map { transform(it) }.toSet())
+    NonEmptySet(elements.mapTo(mutableSetOf(), transform))
 
   override fun isEmpty(): Boolean = false
 
