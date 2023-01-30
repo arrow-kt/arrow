@@ -235,12 +235,12 @@ public final class arrow/fx/coroutines/ParZipKt {
 
 public final class arrow/fx/coroutines/Platform {
 	public static final field INSTANCE Larrow/fx/coroutines/Platform;
-	public final fun composeErrors (Larrow/core/NonEmptyList;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/lang/Object;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;Ljava/util/List;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/lang/Throwable;[Ljava/lang/Throwable;)Ljava/lang/Throwable;
 	public final fun composeErrors (Ljava/util/List;)Ljava/lang/Throwable;
+	public final fun composeErrors-GZgkXh4 (Ljava/util/List;)Ljava/lang/Throwable;
 	public final fun composeErrorsNullable (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
 }
 
