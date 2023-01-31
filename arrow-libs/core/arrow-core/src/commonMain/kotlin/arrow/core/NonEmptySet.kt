@@ -29,9 +29,8 @@ public value class NonEmptySet<out T> private constructor(
   }
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
-  override fun hashCode(): Int {
-    return elements.hashCode()
-  }
+  override fun hashCode(): Int =
+    elements.hashCode()
 }
 
 public fun <T> nonEmptySetOf(first: T, vararg rest: T): NonEmptySet<T> =
