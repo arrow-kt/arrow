@@ -29,7 +29,7 @@ public annotation class EffectDSL
  * fun Raise<String>.failure(): Int = raise("failed")
  *
  * fun Raise<Nothing>.recovered(): String =
- *   recover({ program() }) { failure: String ->
+ *   recover({ failure() }) { failure: String ->
  *     "Recovered from $failure"
  *   }
  * ```
@@ -91,7 +91,7 @@ public interface Raise<in R> {
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
-   * Any _logical failure_ raised are raised in `this` [Raise] context,
+   * Any _logical failure_ is raised in `this` [Raise] context,
    * and thus short-circuits the computation.
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
