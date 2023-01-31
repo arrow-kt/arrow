@@ -15,8 +15,8 @@ import kotlin.jvm.JvmName
  * or raise an exception into [suspend].
  *
  * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.recover
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.recover
  *
  * object User
  * object Error
@@ -39,8 +39,8 @@ public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: susp
  * or raise an exception into [suspend].
  *
  * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.catch
  *
  * object User
  * object Error
@@ -61,8 +61,8 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Ra
  * This is useful for wrapping foreign code, such as database, network calls, etc.
  *
  * ```kotlin
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.catch
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.catch
  *
  * object User
  * object Error

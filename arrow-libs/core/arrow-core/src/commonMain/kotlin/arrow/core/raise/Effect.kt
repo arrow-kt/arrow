@@ -42,10 +42,10 @@ import kotlin.jvm.JvmMultifileClass
  * changing, especially unexpectedly, away from the computation and finishing the `Continuation` with `R`.
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.Effect
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.ensureNotNull
- * import arrow.core.continuations.ensure
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.ensureNotNull
+ * import arrow.core.raise.ensure
  * -->
  * ```kotlin
  * object EmptyPath
@@ -78,15 +78,15 @@ import kotlin.jvm.JvmMultifileClass
  * import arrow.core.Ior
  * import arrow.core.None
  * import arrow.core.Validated
- * import arrow.core.continuations.Effect
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
- * import arrow.core.continuations.toEither
- * import arrow.core.continuations.toValidated
- * import arrow.core.continuations.toIor
- * import arrow.core.continuations.toOption
- * import arrow.core.continuations.ensureNotNull
- * import arrow.core.continuations.ensure
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
+ * import arrow.core.raise.toEither
+ * import arrow.core.raise.toValidated
+ * import arrow.core.raise.toIor
+ * import arrow.core.raise.toOption
+ * import arrow.core.raise.ensureNotNull
+ * import arrow.core.raise.ensure
  * import io.kotest.matchers.collections.shouldNotBeEmpty
  * import io.kotest.matchers.shouldBe
  * import io.kotest.matchers.types.shouldBeInstanceOf
@@ -152,8 +152,8 @@ import kotlin.jvm.JvmMultifileClass
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
- * import arrow.core.continuations.Effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.fold
  * import arrow.core.identity
  * -->
  * ```kotlin
@@ -198,10 +198,10 @@ import kotlin.jvm.JvmMultifileClass
  * We define a `val failed` of type `Effect<String, Int>`, that represents a failed effect with value "failed".
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.Effect
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.recover
- * import arrow.core.continuations.catch
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.recover
+ * import arrow.core.raise.catch
  * -->
  * ```kotlin
  * val failed: Effect<String, Int> =
@@ -326,8 +326,8 @@ import kotlin.jvm.JvmMultifileClass
  * Since `awaitExitCase` suspends forever, it can only result in `Cancelled(CancellationException)`.
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parZip
@@ -363,8 +363,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * #### parTraverse
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parTraverse
@@ -401,8 +401,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * #### raceN
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import arrow.core.merge
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
@@ -439,8 +439,8 @@ import kotlin.jvm.JvmMultifileClass
  *
  * #### bracketCase / Resource
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.bracketCase
  * import io.kotest.assertions.fail
@@ -470,8 +470,8 @@ import kotlin.jvm.JvmMultifileClass
  * <!--- KNIT example-raise-08.kt -->
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.ResourceScope
  * import arrow.fx.coroutines.autoCloseable
@@ -511,11 +511,11 @@ import kotlin.jvm.JvmMultifileClass
  * When `raise` is called from within `withContext` it will cancel all `Job`s running inside the `CoroutineScope` of `withContext`.
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.Effect
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
- * import arrow.core.continuations.ensureNotNull
- * import arrow.core.continuations.ensure
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
+ * import arrow.core.raise.ensureNotNull
+ * import arrow.core.raise.ensure
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import io.kotest.assertions.fail
@@ -576,8 +576,8 @@ import kotlin.jvm.JvmMultifileClass
  * When calling `raise` from `async` you should **always** call `await`, otherwise `raise` can leak out of its scope.
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.collections.shouldBeIn
  * import kotlinx.coroutines.async
@@ -601,8 +601,8 @@ import kotlin.jvm.JvmMultifileClass
  * #### launch
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  * import kotlinx.coroutines.coroutineScope
@@ -631,8 +631,8 @@ import kotlin.jvm.JvmMultifileClass
  * Below we capture `raise` from inside the DSL, and then invoke it outside its context `Raise<String>`.
  *
  * <!--- INCLUDE
- * import arrow.core.continuations.effect
- * import arrow.core.continuations.fold
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.fold
  * import kotlinx.coroutines.Deferred
  * import kotlinx.coroutines.async
  * import kotlinx.coroutines.coroutineScope

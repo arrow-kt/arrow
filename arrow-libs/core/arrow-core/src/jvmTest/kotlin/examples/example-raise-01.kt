@@ -1,10 +1,10 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleRaise01
 
-import arrow.core.continuations.Effect
-import arrow.core.continuations.effect
-import arrow.core.continuations.ensureNotNull
-import arrow.core.continuations.ensure
+import arrow.core.raise.Effect
+import arrow.core.raise.effect
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.ensure
 
 object EmptyPath
 

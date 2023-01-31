@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.continuations.Effect
-import arrow.core.continuations.fold
+import arrow.core.raise.Effect
+import arrow.core.raise.fold
 import arrow.core.identity
 
 suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> =

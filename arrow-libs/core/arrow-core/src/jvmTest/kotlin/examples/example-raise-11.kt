@@ -1,8 +1,8 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleRaise11
 
-import arrow.core.continuations.effect
-import arrow.core.continuations.fold
+import arrow.core.raise.effect
+import arrow.core.raise.fold
 import io.kotest.assertions.fail
 import io.kotest.matchers.collections.shouldBeIn
 import kotlinx.coroutines.async

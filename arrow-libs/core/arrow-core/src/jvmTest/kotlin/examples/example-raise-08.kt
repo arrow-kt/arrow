@@ -1,8 +1,8 @@
 // This file was automatically generated from Effect.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleRaise08
 
-import arrow.core.continuations.effect
-import arrow.core.continuations.fold
+import arrow.core.raise.effect
+import arrow.core.raise.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
 import io.kotest.assertions.fail
