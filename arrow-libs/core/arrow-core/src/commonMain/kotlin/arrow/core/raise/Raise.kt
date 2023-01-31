@@ -135,7 +135,7 @@ public interface Raise<in R> {
   
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
-   * Any _logical failure_ raised are raised in `this` [Raise] context,
+   * Any _logical failure_ is raised in `this` [Raise] context,
    * and thus short-circuits the computation.
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
