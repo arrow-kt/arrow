@@ -6,6 +6,12 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
+import arrow.optics.test.tuple4
+import arrow.optics.test.tuple5
+import arrow.optics.test.tuple6
+import arrow.optics.test.tuple7
+import arrow.optics.test.tuple8
+import arrow.optics.test.tuple9
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -83,6 +89,93 @@ class TupleTest : StringSpec({
         aGen = Arb.triple(Arb.boolean(), Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),
         funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple4 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple4(),
+        aGen = Arb.tuple4(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple5 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple5(),
+        aGen = Arb.tuple5(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple6 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple6(),
+        aGen = Arb.tuple6(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple7 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple7(),
+        aGen = Arb.tuple7(
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
+        ),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple8 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple8(),
+        aGen = Arb.tuple8(
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
+        ),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.boolean()),
+      )
+    )
+
+    testLaws(
+      "Traversal tuple9 - ",
+      TraversalLaws.laws(
+        traversal = Traversal.tuple9(),
+        aGen = Arb.tuple9(
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean(),
+          Arb.boolean()
+        ),
+        bGen = Arb.boolean(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 

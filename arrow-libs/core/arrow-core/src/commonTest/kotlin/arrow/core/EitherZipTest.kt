@@ -29,17 +29,16 @@ class EitherZipTest : StringSpec({
       Arb.either(Arb.string(), Arb.double()),
       Arb.either(Arb.string(), Arb.char()),
       Arb.either(Arb.string(), Arb.string()),
-      Arb.either(Arb.string(), Arb.boolean()),
       Arb.either(Arb.string(), Arb.boolean())
-    ) { a, b, c, d, e, f, g, h, i, j ->
-      val res = a.zip({ e1, e2 -> "$e1$e2" }, b, c, d, e, f, g, h, i, j, ::Tuple10)
-      val all = listOf(a, b, c, d, e, f, g, h, i, j)
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = a.zip({ e1, e2 -> "$e1$e2" }, b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
       
       val expected = if (all.any { it.isLeft() }) {
         all.filterIsInstance<Either.Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
       } else {
         all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
-          Tuple10(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8], it[9]).right()
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
       
@@ -57,17 +56,16 @@ class EitherZipTest : StringSpec({
       Arb.either(Arb.string(), Arb.double()),
       Arb.either(Arb.string(), Arb.char()),
       Arb.either(Arb.string(), Arb.string()),
-      Arb.either(Arb.string(), Arb.boolean()),
       Arb.either(Arb.string(), Arb.boolean())
-    ) { a, b, c, d, e, f, g, h, i, j ->
-      val res = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-      val all = listOf(a, b, c, d, e, f, g, h, i, j)
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
       
       val expected = if (all.any { it.isLeft() }) {
         all.filterIsInstance<Either.Left<String>>().map { it.value }.toNonEmptyListOrNull()!!.left()
       } else {
         all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
-          Tuple10(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8], it[9]).right()
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
       
@@ -88,11 +86,10 @@ class EitherZipTest : StringSpec({
       Arb.either(Arb.nonEmptyList(Arb.string()), Arb.double()),
       Arb.either(Arb.nonEmptyList(Arb.string()), Arb.char()),
       Arb.either(Arb.nonEmptyList(Arb.string()), Arb.string()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.boolean()),
       Arb.either(Arb.nonEmptyList(Arb.string()), Arb.boolean())
-    ) { a, b, c, d, e, f, g, h, i, j ->
-      val res = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-      val all = listOf(a, b, c, d, e, f, g, h, i, j)
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
       
       val expected = if (all.any { it.isLeft() }) {
         all.filterIsInstance<Either.Left<NonEmptyList<String>>>()
@@ -100,7 +97,7 @@ class EitherZipTest : StringSpec({
           .toNonEmptyListOrNull()!!.left()
       } else {
         all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
-          Tuple10(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8], it[9]).right()
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
       

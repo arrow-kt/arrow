@@ -1,38 +1,25 @@
 package arrow.atomic
 
-public actual fun <A> Atomic(initialValue: A): Atomic<A> =
-  AtomicRef(initialValue)
+public actual class Atomic<V> actual constructor(initialValue: V) {
+  private var internalValue: V = initialValue
 
-private class AtomicRef<V>(private var internalValue: V) : Atomic<V> {
-  
-  /**
-   * Compare current value with expected and set to new if they're the same. Note, 'compare' is checking
-   * the actual object id, not 'equals'.
-   */
-  override fun compareAndSet(expected: V, new: V): Boolean {
-    return if (expected === internalValue) {
+  public actual fun get(): V = internalValue
+
+  public actual fun set(value: V) {
+    internalValue = value
+  }
+
+  public actual fun compareAndSet(expected: V, new: V): Boolean =
+    if (expected === internalValue) {
       internalValue = new
       true
     } else {
       false
     }
-  }
-  
-  override fun getAndSet(value: V): V {
-    val oldValue = internalValue
+
+  public actual fun getAndSet(value: V): V {
+    val old = internalValue
     internalValue = value
-    return oldValue
+    return old
   }
-  
-  override fun setAndGet(value: V): V {
-    this.internalValue = value
-    return value
-  }
-  
-  
-  override var value: V
-    get() = internalValue
-    set(value) {
-      internalValue = value
-    }
 }

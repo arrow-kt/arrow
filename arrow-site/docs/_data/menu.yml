@@ -3,12 +3,7 @@ nav:
       url: https://media.arrow-kt.io
 
     - title: Training
-      icon: <i class="far fa-angle-down"></i>
-      externals:
-        - company: 47 Degrees
-          url: https://www.47deg.com/
-        - company: Instil
-          url: https://instil.co/
+      url: https://academy.47deg.com/courses/functional-programming-in-kotlin-and-arrow
 
     - title: Support
       url: https://www.47deg.com/services/

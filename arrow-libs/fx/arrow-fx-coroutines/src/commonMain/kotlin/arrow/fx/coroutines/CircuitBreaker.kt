@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.atomic.Atomic
+import arrow.atomic.value
 import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
@@ -41,9 +42,8 @@ import kotlin.time.DurationUnit
  *
  * ```kotlin
  * import arrow.core.Either
- * import arrow.core.flatten
  * import arrow.fx.coroutines.CircuitBreaker
- * import kotlin.time.Duration
+ * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
  * import kotlinx.coroutines.delay
  *
@@ -52,9 +52,9 @@ import kotlin.time.DurationUnit
  * //sampleStart
  *   val circuitBreaker = CircuitBreaker.of(
  *     maxFailures = 2,
- *     resetTimeout = Duration.seconds(2),
+ *     resetTimeout = 2.seconds,
  *     exponentialBackoffFactor = 1.2,
- *     maxResetTimeout = Duration.seconds(60),
+ *     maxResetTimeout = 60.seconds,
  *   )
  *   circuitBreaker.protectOrThrow { "I am in Closed: ${circuitBreaker.state()}" }.also(::println)
  *
@@ -99,9 +99,9 @@ import kotlin.time.DurationUnit
  *   //sampleStart
  *   val circuitBreaker = CircuitBreaker.of(
  *     maxFailures = 2,
- *     resetTimeout = seconds(2),
+ *     resetTimeout = 2.seconds,
  *     exponentialBackoffFactor = 2.0, // enable exponentialBackoffFactor
- *     maxResetTimeout = seconds(60), // limit exponential back-off time
+ *     maxResetTimeout = 60.seconds, // limit exponential back-off time
  *   )
  *
  *   suspend fun <A> resilient(schedule: Schedule<Throwable, *>, f: suspend () -> A): A =
@@ -116,16 +116,17 @@ import kotlin.time.DurationUnit
  *
  *   // Retry once and when the CircuitBreaker opens after 2 failures then retry with exponential back-off with same time as CircuitBreaker's resetTimeout
  *   val fiveTimesWithBackOff = Schedule.recurs<Throwable>(1) andThen
- *     Schedule.exponential(seconds(2)) and Schedule.recurs(5)
+ *     Schedule.exponential(2.seconds) and Schedule.recurs(5)
  *
  *   Either.catch {
  *     resilient(fiveTimesWithBackOff, ::apiCall)
- *   }.let { println("exponential(seconds(2)) and recurs(5) always retries with actual apiCall: $it") }
+ *   }.let { println("exponential(2.seconds) and recurs(5) always retries with actual apiCall: $it") }
  *   //sampleEnd
  * }
  * ```
  * <!--- KNIT example-circuitbreaker-02.kt -->
  */
+@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("CircuitBreaker", "arrow.fx.resilience.CircuitBreaker"))
 public class CircuitBreaker
 private constructor(
   private val state: Atomic<State>,

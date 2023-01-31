@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.continuations.ensureNotNull
 import arrow.core.continuations.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
@@ -23,22 +22,6 @@ class OptionTest : StringSpec({
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
-      /*FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
-        Arb.string().map(Option.Companion::invoke),
-        Arb.option(Arb.string()),
-        Option<String>::equals,
-        option::invoke
-      ) {
-        it.bind()
-      },
-      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(
-        Arb.string().map(Option.Companion::invoke),
-        Arb.option(Arb.string()),
-        Option<String>::equals,
-        option::eager
-      ) {
-        it.bind()
-      }*/
     )
 
     "ensure null in option computation" {

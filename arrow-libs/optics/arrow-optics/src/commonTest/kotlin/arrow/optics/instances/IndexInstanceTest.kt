@@ -30,7 +30,7 @@ class IndexInstanceTest : StringSpec({
       "Index sequence - ",
       OptionalLaws.laws(
         optionalGen = Arb.int().map { Index.sequence<String>().index(it) },
-        aGen = Arb.sequence(Arb.string()),
+        aGen = Arb.list(Arb.string()).map { it.asSequence() },
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
         eqa = { a, b -> a.toList() == b.toList() }

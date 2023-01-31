@@ -1,6 +1,7 @@
 package arrow.fx.stm.internal
 
 import arrow.atomic.Atomic
+import arrow.atomic.value
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
 import kotlinx.coroutines.suspendCancellableCoroutine

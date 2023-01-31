@@ -9,8 +9,10 @@ import arrow.core.Some
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.left
 import arrow.core.right
 import arrow.typeclasses.Monoid
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
@@ -177,6 +179,48 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
       Prism(
         getOrModify = { option -> option.fold({ Right(Unit) }, { Left(option) }) },
         reverseGet = { _ -> None }
+      )
+
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Left]
+     */
+    @JvmStatic @JvmName("eitherLeft")
+    public fun <L, R> left(): Prism<Either<L, R>, L> = pLeft()
+      
+    /**
+     * [Prism] to focus into an [arrow.core.Either.Right]
+     */
+    @JvmStatic @JvmName("eitherRight")
+    public fun <L, R> right(): Prism<Either<L, R>, R> = pRight()
+
+    /**
+     * Polymorphic [PPrism] to focus into an [arrow.core.Either.Left]
+     */
+    @JvmStatic
+    public fun <L, R, E> pLeft(): PPrism<Either<L, R>, Either<E, R>, L, E> =
+      Prism(
+        getOrModify = { e ->
+          when (e) {
+            is Either.Left -> e.value.right()
+            is Either.Right -> e.left()
+          }
+        },
+        reverseGet = { it.left() }
+      )
+
+    /**
+     * Polymorphic [PPrism] to focus into an [arrow.core.Either.Right]
+     */
+    @JvmStatic
+    public fun <L, R, B> pRight(): PPrism<Either<L, R>, Either<L, B>, R, B> =
+      PPrism(
+        getOrModify = { e ->
+          when (e) {
+            is Either.Left -> e.left()
+            is Either.Right -> e.value.right()
+          }
+        },
+        reverseGet = { it.right() }
       )
   }
 }

@@ -2,6 +2,7 @@ package arrow.fx.coroutines.parMapN
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple7
 import arrow.fx.coroutines.ExitCase

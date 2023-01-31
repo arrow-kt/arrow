@@ -1,7 +1,5 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-enableFeaturePreview("VERSION_CATALOGS")
-
 rootProject.name = "arrow"
 
 pluginManagement {
@@ -24,6 +22,10 @@ dependencyResolutionManagement {
   }
 }
 
+val enableCompatibilityMetadataVariant =
+  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
+    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+
 //CORE
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")
@@ -34,13 +36,6 @@ project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
-
-include("arrow-continuations")
-project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
-
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 
@@ -50,6 +45,9 @@ project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-corout
 
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
+
+include("arrow-fx-resilience")
+project(":arrow-fx-resilience").projectDir = file("arrow-libs/fx/arrow-fx-resilience")
 
 // OPTICS
 include("arrow-optics")

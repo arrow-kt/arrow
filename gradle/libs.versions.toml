@@ -11,11 +11,11 @@ jUnitVintage = "5.8.2"
 kotest = "5.5.4"
 kotestGradle = "5.5.4"
 kover = "0.6.1"
-kotlin = "1.7.22"
+kotlin = "1.8.0"
 kotlinBinaryCompatibilityValidator = "0.12.1"
 kotlinCompileTesting = "1.4.9"
 knit = "0.4.0"
-kspVersion = "1.7.22-1.0.8"
+kspVersion = "1.8.0-1.0.8"
 kotlinxSerialization = "1.4.1"
 mockWebServer = "4.10.0"
 retrofit = "2.9.0"
@@ -30,6 +30,7 @@ jUnitVintageEngine = { module = "org.junit.vintage:junit-vintage-engine", versio
 junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jUnitJupiter" }
 junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jUnitJupiter" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-frameworkApi = { module = "io.kotest:kotest-framework-api", version.ref = "kotest" }
 kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }

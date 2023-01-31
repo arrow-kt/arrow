@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
 import arrow.atomic.loop
+import arrow.atomic.value
 import kotlinx.coroutines.CompletableDeferred
 
 /**

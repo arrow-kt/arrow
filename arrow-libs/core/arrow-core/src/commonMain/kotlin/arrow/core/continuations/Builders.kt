@@ -97,7 +97,7 @@ public class IorRaise<E> @PublishedApi internal constructor(
     }
 
   private fun combine(other: E): E =
-    effect.updateAndGet { state ->
+    effect.state.updateAndGet { state ->
       state.map { e -> e.combine(other) }.orElse { Some(other) }
     }.getOrElse { other }
 }

@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.Eval
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
@@ -192,7 +191,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin
- * import kotlin.time.milliseconds
+ * import kotlin.time.Duration.Companion.milliseconds
  * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
@@ -201,6 +200,7 @@ import kotlin.time.DurationUnit.NANOSECONDS
  * ```
  * <!--- KNIT example-schedule-08.kt -->
  */
+@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("Schedule", "arrow.fx.resilience.Schedule"))
 public sealed class Schedule<Input, Output> {
 
   public abstract suspend fun <C> repeatOrElseEither(
@@ -474,12 +474,12 @@ public sealed class Schedule<Input, Output> {
         try {
           val a = fa.invoke()
           val step = update(a, state)
-          if (!step.cont) return Either.Right(step.finish.value())
+          if (!step.cont) return Either.Right(step.finish())
           else {
             delay((step.delayInNanos / 1_000_000).toLong())
 
             // Set state before looping again
-            last = { step.finish.value() }
+            last = { step.finish() }
             state = step.state
           }
         } catch (e: Throwable) {
@@ -503,11 +503,11 @@ public sealed class Schedule<Input, Output> {
             val a = fa.invoke()
             val step = update(a, state)
             if (!step.cont) {
-              emit(Either.Right(step.finish.value()))
+              emit(Either.Right(step.finish()))
               loop = false
             } else {
               delay((step.delayInNanos / 1_000_000).toLong())
-              val output = step.finish.value()
+              val output = step.finish()
               // Set state before looping again and emit Output
               emit(Either.Right(output))
               last = { output }
@@ -530,7 +530,7 @@ public sealed class Schedule<Input, Output> {
       updated { f ->
         { a: A, s: State ->
           val dec = f(a, s)
-          if (dec.cont) pred(a, dec.finish.value()).let { dec.copy(cont = it) }
+          if (dec.cont) pred(a, dec.finish()).let { dec.copy(cont = it) }
           else dec
         }
       }
@@ -587,7 +587,7 @@ public sealed class Schedule<Input, Output> {
       updated { update ->
         { a: Input, s: State ->
           val step = update(a, s)
-          val d = f(step.finish.value(), step.delayInNanos)
+          val d = f(step.finish(), step.delayInNanos)
           step.copy(delayInNanos = d)
         }
       }
@@ -602,14 +602,14 @@ public sealed class Schedule<Input, Output> {
     override fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
       updated { update ->
         { a: Input, s: State ->
-          update(a, s).also { f(it.finish.value()) }
+          update(a, s).also { f(it.finish()) }
         }
       }
 
     override fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
       ScheduleImpl(suspend { Pair(initialState.invoke(), initial.invoke()) }) { i, s ->
         val dec = update(i, s.first)
-        val c = if (dec.cont) f(s.second, dec.finish.value()) else s.second
+        val c = if (dec.cont) f(s.second, dec.finish()) else s.second
         dec.bimap({ state -> Pair(state, c) }, { c })
       }
 
@@ -618,7 +618,7 @@ public sealed class Schedule<Input, Output> {
       (other as ScheduleImpl<Any?, Output, B>).let { other ->
         ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s ->
           val dec1 = update(i, s.first)
-          val dec2 = other.update(dec1.finish.value(), s.second)
+          val dec2 = other.update(dec1.finish(), s.second)
           dec1.combineNanos(dec2, { a, b -> a && b }, { a, b -> a + b }, { _, b -> b })
         }
       }
@@ -687,7 +687,7 @@ public sealed class Schedule<Input, Output> {
     val cont: Boolean,
     val delayInNanos: Double,
     val state: A,
-    val finish: Eval<B>
+    val finish: () -> B
   ) {
 
     @ExperimentalTime
@@ -698,7 +698,7 @@ public sealed class Schedule<Input, Output> {
       copy(cont = !cont)
 
     public fun <C, D> bimap(f: (A) -> C, g: (B) -> D): Decision<C, D> =
-      Decision(cont, delayInNanos, f(state), finish.map(g))
+      Decision(cont, delayInNanos, f(state), { g(finish()) })
 
     public fun <C> mapLeft(f: (A) -> C): Decision<C, B> =
       bimap(f, ::identity)
@@ -715,7 +715,7 @@ public sealed class Schedule<Input, Output> {
       f(cont, other.cont),
       g(delayInNanos, other.delayInNanos),
       Pair(state, other.state),
-      finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
+      { zip(finish(), other.finish()) }
     )
 
     @ExperimentalTime
@@ -728,7 +728,7 @@ public sealed class Schedule<Input, Output> {
       f(cont, other.cont),
       g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).toDouble(NANOSECONDS),
       Pair(state, other.state),
-      finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
+      { zip(finish(), other.finish()) }
     )
 
     override fun equals(other: Any?): Boolean =
@@ -736,21 +736,21 @@ public sealed class Schedule<Input, Output> {
       else cont == other.cont &&
         state == other.state &&
         delayInNanos == other.delayInNanos &&
-        finish.value() == other.finish.value()
+        finish() == other.finish()
 
     public companion object {
-      public fun <A, B> cont(d: Double, a: A, b: Eval<B>): Decision<A, B> =
+      public fun <A, B> cont(d: Double, a: A, b: () -> B): Decision<A, B> =
         Decision(true, d, a, b)
 
-      public fun <A, B> done(d: Double, a: A, b: Eval<B>): Decision<A, B> =
+      public fun <A, B> done(d: Double, a: A, b: () -> B): Decision<A, B> =
         Decision(false, d, a, b)
 
       @ExperimentalTime
-      public fun <A, B> cont(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
+      public fun <A, B> cont(d: Duration, a: A, b: () -> B): Decision<A, B> =
         cont(d.toDouble(NANOSECONDS), a, b)
 
       @ExperimentalTime
-      public fun <A, B> done(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
+      public fun <A, B> done(d: Duration, a: A, b: () -> B): Decision<A, B> =
         done(d.toDouble(NANOSECONDS), a, b)
     }
   }
@@ -771,7 +771,7 @@ public sealed class Schedule<Input, Output> {
      */
     public fun <A> identity(): Schedule<A, A> =
       Schedule({ Unit }) { a, s ->
-        Decision.cont(0.0, s, Eval.now(a))
+        Decision.cont(0.0, s, { a })
       }
 
     /**
@@ -788,7 +788,7 @@ public sealed class Schedule<Input, Output> {
     public fun <I, A> unfoldLazy(c: suspend () -> A, f: suspend (A) -> A): Schedule<I, A> =
       Schedule(c) { _: I, acc ->
         val a = f(acc)
-        Decision.cont(0.0, a, Eval.now(a))
+        Decision.cont(0.0, a, { a })
       }
 
     /**
@@ -808,8 +808,8 @@ public sealed class Schedule<Input, Output> {
      */
     public fun <A> recurs(n: Int): Schedule<A, Int> =
       Schedule(suspend { 0 }) { _: A, acc ->
-        if (acc < n) Decision.cont(0.0, acc + 1, Eval.now(acc + 1))
-        else Decision.done(0.0, acc, Eval.now(acc))
+        if (acc < n) Decision.cont(0.0, acc + 1, { acc + 1 })
+        else Decision.done(0.0, acc, { acc })
       }
 
     /**
@@ -825,7 +825,7 @@ public sealed class Schedule<Input, Output> {
      */
     public fun <A> never(): Schedule<A, Nothing> =
       Schedule(suspend { arrow.fx.coroutines.never<Unit>() }) { _, _ ->
-        Decision(false, 0.0, Unit, Eval.later { throw IllegalArgumentException("Impossible") })
+        Decision(false, 0.0, Unit, { throw IllegalArgumentException("Impossible") })
       }
 
     /**
@@ -842,7 +842,7 @@ public sealed class Schedule<Input, Output> {
     @JvmName("delayedNanos")
     public fun <A> delayed(delaySchedule: Schedule<A, Double>): Schedule<A, Double> =
       (delaySchedule.modifyNanos { a, b -> a + b } as ScheduleImpl<Any?, A, Double>)
-        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos)) }
+        .reconsider { _, dec -> dec.copy(finish = { dec.delayInNanos }) }
 
     /**
      * Creates a Schedule that uses another Schedule to generate the delay of this schedule.
@@ -856,7 +856,7 @@ public sealed class Schedule<Input, Output> {
     @JvmName("delayedDuration")
     public fun <A> delayed(delaySchedule: Schedule<A, Duration>): Schedule<A, Duration> =
       (delaySchedule.modify { a, b -> a + b } as ScheduleImpl<Any?, A, Duration>)
-        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos.nanoseconds)) }
+        .reconsider { _, dec -> dec.copy(finish = { dec.delayInNanos.nanoseconds }) }
 
     /**
      * Creates a Schedule which collects all its inputs in a list.
@@ -894,7 +894,7 @@ public sealed class Schedule<Input, Output> {
           cont = decision.cont,
           delayInNanos = decision.delayInNanos,
           state = decision.state,
-          finish = Eval.now(decision.delayInNanos)
+          finish = { decision.delayInNanos }
         )
       }
 
@@ -905,7 +905,7 @@ public sealed class Schedule<Input, Output> {
           cont = decision.cont,
           delayInNanos = decision.delayInNanos,
           state = decision.state,
-          finish = Eval.now(decision.delayInNanos.nanoseconds)
+          finish = { decision.delayInNanos.nanoseconds }
         )
       }
 
@@ -919,7 +919,7 @@ public sealed class Schedule<Input, Output> {
           cont = decision.cont,
           delayInNanos = decision.delayInNanos,
           state = decision.state,
-          finish = Eval.now(decision.cont)
+          finish = { decision.cont }
         )
       }
 
@@ -1037,7 +1037,7 @@ public suspend fun <A, B, C> Schedule<Throwable, B>.retryOrElseEither(
       state = dec.state
 
       if (dec.cont) delay((dec.delayInNanos / 1_000_000).toLong())
-      else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish.value()))
+      else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish()))
     }
   }
 }

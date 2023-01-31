@@ -2,7 +2,6 @@ package arrow.core.test
 
 import arrow.core.Either
 import arrow.core.Endo
-import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.Option
@@ -69,9 +68,6 @@ fun Arb.Companion.unit(): Arb<Unit> =
 
 fun <A, B> Arb.Companion.ior(arbA: Arb<A>, arbB: Arb<B>): Arb<Ior<A, B>> =
   arbA.alignWith(arbB) { it }
-
-fun <A> Arb<A>.eval(): Arb<Eval<A>> =
-  map { Eval.now(it) }
 
 private fun <A, B, R> Arb<A>.alignWith(arbB: Arb<B>, transform: (Ior<A, B>) -> R): Arb<R> =
   Arb.bind(this, arbB) { a, b -> transform(Ior.Both(a, b)) }

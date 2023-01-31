@@ -3,13 +3,16 @@
 package arrow.core.continuations
 
 import arrow.atomic.Atomic
+import arrow.atomic.value
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * Intersection of Atomic<State> & Raise<R>.
  * Will be replaced by `context(Atomic<State>, Raise<R>)` later
  */
-public interface StateRaise<State, R> : Atomic<State>, Raise<R>
+public interface StateRaise<State, R> : Raise<R> {
+  public val state: Atomic<State>
+}
 
 public typealias StateEffect<State, R, A> = suspend StateRaise<State, R>.() -> A
 
@@ -34,6 +37,6 @@ public inline fun <State, R, A, B> fold(
 /** Default intersection boilerplate. PublishedApi to support _inline_ */
 @PublishedApi
 internal class DefaultStateRaise<State, R>(
-  state: Atomic<State>,
+  override val state: Atomic<State>,
   raise: Raise<R>,
-) : StateRaise<State, R>, Atomic<State> by state, Raise<R> by raise {}
+) : StateRaise<State, R>, Raise<R> by raise {}

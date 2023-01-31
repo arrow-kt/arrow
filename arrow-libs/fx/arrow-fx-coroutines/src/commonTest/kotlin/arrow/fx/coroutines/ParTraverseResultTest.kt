@@ -19,11 +19,11 @@ import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseResultTest : StringSpec({
     "parTraverseResult can traverse effect full computations" {
-      val ref: Atomic<Int> = Atomic(0)
+      val ref = Atomic(0)
       (0 until 100).parTraverseResult {
         Result.success(ref.update { it + 1 })
       }
-      ref.value shouldBe 100
+      ref.get() shouldBe 100
     }
 
     "parTraverseResult runs in parallel" {

@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -56,6 +55,7 @@ import kotlin.time.ExperimentalTime
  *
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
+@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("retry", "arrow.fx.resilience.retry"))
 public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
   (schedule as Schedule.ScheduleImpl<Any?, Throwable, B>)
   var dec: Schedule.Decision<Any?, B>

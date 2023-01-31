@@ -267,5 +267,5 @@ class STMTest : StringSpec({
         // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
         atomically { tq.flush() } shouldBe emptyList()
     }
-  }
-)
+
+})

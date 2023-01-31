@@ -301,7 +301,7 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
         is Right -> acc.also { acc.value.add(res.value) }
         is Left -> acc
       }
-      
+
       is Left -> when (acc) {
         is Right -> res
         is Left -> Left(semigroup.append(acc.value, res.value))
@@ -325,7 +325,46 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
         is Right -> acc.also { acc.value.add(res.value) }
         is Left -> acc
       }
-      
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].
+ */
+public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  fold<Either<Error, A>, Either<Error, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors with into an [NonEmptyList].
+ */
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
       is Left -> when (acc) {
         is Right -> Left(buffer.also { it.add(res.value) })
         is Left -> Left(buffer.also { it.add(res.value) })
@@ -536,7 +575,19 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  * <!--- KNIT example-iterable-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
-  this.align(b).map(fa)
+  buildList(maxOf(this.collectionSizeOrDefault(10), b.collectionSizeOrDefault(10))) {
+    val first = this@align.iterator()
+    val second = b.iterator()
+    while (first.hasNext() || second.hasNext()) {
+      val element: Ior<A, B> = when {
+        first.hasNext() && second.hasNext() -> Ior.Both(first.next(), second.next())
+        first.hasNext() -> first.next().leftIor()
+        second.hasNext() -> second.next().rightIor()
+        else -> throw IllegalStateException("this should never happen")
+      }
+      add(fa(element))
+    }
+  }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
@@ -555,18 +606,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  * <!--- KNIT example-iterable-08.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
-  alignRec(this, b)
-
-@Suppress("NAME_SHADOWING")
-private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
-  val ls = if (ls is List) ls else ls.toList()
-  val rs = if (rs is List) rs else rs.toList()
-  return when {
-    ls.isEmpty() -> rs.map { it.rightIor() }
-    rs.isEmpty() -> ls.map { it.leftIor() }
-    else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
-  }
-}
+  this.align(b, ::identity)
 
 /**
  * aligns two structures and combine them with the given [Semigroup.append]
@@ -687,7 +727,7 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     } else {
       None
     }
-    
+
     else -> {
       iterator().nextOrNone()
     }
@@ -721,7 +761,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       1 -> firstOrNone()
       else -> None
     }
-    
+
     else -> {
       iterator().run { nextOrNone().filter { !hasNext() } }
     }
@@ -753,7 +793,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
     } else {
       None
     }
-    
+
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -788,7 +828,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
       in indices -> Some(elementAt(index))
       else -> None
     }
-    
+
     else -> iterator().skip(index).nextOrNone()
   }
 
@@ -798,7 +838,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
       next()
       skip(count - 1)
     }
-    
+
     else -> this
   }
 
@@ -905,13 +945,13 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
   val left = ArrayList<A>(collectionSizeOrDefault(10))
   val right = ArrayList<B>(collectionSizeOrDefault(10))
-  
+
   for (either in this)
     when (either) {
       is Left -> left.add(either.value)
       is Right -> right.add(either.value)
     }
-  
+
   return Pair(left, right)
 }
 
