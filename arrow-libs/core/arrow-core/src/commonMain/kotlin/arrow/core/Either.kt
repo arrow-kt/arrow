@@ -878,8 +878,14 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-35.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> map(f: (right: B) -> C): Either<A, C> =
-    flatMap { Right(f(it)) }
+  @OptIn(ExperimentalContracts::class)
+  public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    }
+    return flatMap { Right(f(it)) }
+  }
+
   
   /**
    * Map, or transform, the left value [A] of this [Either] to a new value [C].
@@ -896,8 +902,13 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-36.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
-    fold({ Left(f(it)) }, { Right(it) })
+  @OptIn(ExperimentalContracts::class)
+  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
+    contract {
+      callsInPlace(f,InvocationKind.AT_MOST_ONCE)
+    }
+    return fold({ Left(f(it)) }, { Right(it) })
+  }
   
   @Deprecated(
     "tapLeft is being renamed to onLeft to be more consistent with the Kotlin Standard Library naming",
@@ -928,8 +939,13 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-37.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> =
-    also { if (it.isRight()) action(it.value) }
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isRight()) action(it.value) }
+  }
   
   /**
    * Performs the given [action] on the encapsulated [A] if this instance represents [Either.Left].
@@ -946,8 +962,13 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-38.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> =
-    also { if (it.isLeft()) action(it.value) }
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isLeft()) action(it.value) }
+  }
   
   /**
    * Map over Left and Right of this Either
