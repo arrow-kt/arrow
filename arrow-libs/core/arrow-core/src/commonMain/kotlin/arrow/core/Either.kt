@@ -836,7 +836,7 @@ public sealed class Either<out A, out B> {
       is Right -> ifRight(value)
       is Left -> ifLeft(value)
     }
-}
+  }
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
@@ -983,8 +983,13 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-39.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> =
-    also { if (it.isLeft()) action(it.value) }
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isLeft()) action(it.value) }
+  }
   
   /**
    * Map over Left and Right of this Either
