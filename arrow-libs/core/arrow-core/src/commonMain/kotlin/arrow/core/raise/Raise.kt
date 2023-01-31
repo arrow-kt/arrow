@@ -19,20 +19,25 @@ import kotlin.jvm.JvmName
 public annotation class EffectDSL
 
 /**
+ * <!--- TEST_NAME RaiseKnitTest -->
+ *
  * The [Raise] DSL allows you to work with _logical failures_ of type [R].
  * A _logical failure_ does not necessarily mean that the computation has failed,
  * but that it has stopped or _short-circuited_.
  *
  * The [Raise] DSL allows you to [raise] _logical failure_ of type [R], and you can [recover] from them.
  *
+ * <!--- INCLUDE
+ * import arrow.core.raise.Raise
+ * import arrow.core.raise.recover
+ * -->
  * ```kotlin
  * fun Raise<String>.failure(): Int = raise("failed")
  *
- * fun Raise<Nothing>.recovered(): String =
- *   recover({ program() }) { failure: String ->
- *     "Recovered from $failure"
- *   }
+ * fun Raise<Nothing>.recovered(): Int =
+ *   recover({ failure() }) { _: String -> 1 }
  * ```
+ * <!--- KNIT example-raise-dsl-01.kt -->
  *
  * Above we defined a function `failure` that raises a logical failure of type [String] with value `"failed"`.
  * And in the function `recovered` we recover from the failure by providing a fallback value,
@@ -41,24 +46,63 @@ public annotation class EffectDSL
  * Since we defined programs in terms of [Raise] they _seamlessly work with any of the builders_ available in Arrow,
  * or any you might build for your custom types.
  *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.Ior
+ * import arrow.core.raise.Effect
+ * import arrow.core.raise.Raise
+ * import arrow.core.raise.either
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.ior
+ * import arrow.core.raise.toEither
+ * import arrow.typeclasses.Semigroup
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun Raise<String>.failure(): Int = raise("failed")
+ * -->
  * ```kotlin
- * fun main() {
+ * suspend fun test() {
  *   val either: Either<String, Int> =
- *     either { failure() } // returns Left("failed")
+ *     either { failure() }
  *
  *   val effect: Effect<String, Int> =
  *     effect { failure() }
  *
  *   val ior: Ior<String, Int> =
- *     ior { failure() }
+ *     ior(Semigroup.string()) { failure() }
  *
- *   println(either)
+ *   either shouldBe Either.Left("failed")
+ *   effect.toEither() shouldBe Either.Left("failed")
+ *   ior shouldBe Ior.Left("failed")
  * }
  * ```
+ * <!--- KNIT example-raise-dsl-02.kt -->
+ * <!--- TEST lines.isEmpty() -->
  *
- * ```text
- * Either.Right(Recovered from failed)
+ * And we can apply the same technique to recover from the failures using the [Raise] DSL based error handlers available in Arrow.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.Raise
+ * import arrow.core.raise.either
+ * import arrow.core.raise.recover
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun Raise<String>.failure(): Int = raise("failed")
+ *
+ * fun Raise<Nothing>.recovered(): Int = recover({ failure() }) { _: String -> 1 }
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   val either = either { failure() }
+ *     .recover { _: String -> recovered() }
+ *
+ *   either shouldBe Either.Right(1)
+ * }
  * ```
+ * <!--- KNIT example-raise-dsl-03.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public interface Raise<in R> {
   
@@ -114,18 +158,27 @@ public interface Raise<in R> {
    * Any encountered [Either.Left] will be raised as a _logical failure_ in `this` [Raise] context.
    * You can wrap the [bind] call in [recover] if you want to attempt to recover from any _logical failure_.
    *
+   * <!--- INCLUDE
+   * import arrow.core.Either
+   * import arrow.core.right
+   * import arrow.core.raise.either
+   * import arrow.core.raise.recover
+   * import io.kotest.matchers.shouldBe
+   * -->
    * ```kotlin
-   * fun main() {
+   * fun test() {
+   *   val one: Either<Nothing, Int> = 1.right()
    *   val left: Either<String, Int> = Either.Left("failed")
+   *
    *   either {
-   *     recover({ left.bind() }) { failure : String ->
-   *       "Recovered from $failure"
-   *     }
-   *   }.also(::println)
+   *     val x = one.bind()
+   *     val y = recover({ left.bind() }) { failure : String -> 1 }
+   *     x + y
+   *   } shouldBe Either.Right(2)
+   * }
    * ```
-   * ```text
-   * Either.Right(Recovered from failed)
-   * ```
+   * <!--- KNIT example-raise-dsl-04.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public fun <A> Either<R, A>.bind(): A = when (this) {
     is Either.Left -> raise(value)
@@ -143,21 +196,36 @@ public interface Raise<in R> {
    * because [Result] works with [Throwable] as its error type you need to [transform] [Throwable] to [R].
    *
    * Note that this functions can currently not be _inline_ without Context Receivers,
-   * but you can rely on [recover] if you want to run any suspend code in your error handler.
+   * and thus doesn't allow suspension in its error handler.
+   * To do so, use [Result.recover] and [bind].
    *
+   * <!--- INCLUDE
+   * import arrow.core.Either
+   * import arrow.core.raise.either
+   * import arrow.core.raise.recover
+   * import kotlinx.coroutines.delay
+   * import io.kotest.matchers.shouldBe
+   * -->
    * ```kotlin
-   * fun main() {
+   * suspend fun test() {
+   *   val one: Result<Int> = Result.success(1)
    *   val failure: Result<Int> = Result.failure(RuntimeException("Boom!"))
+   *
    *   either {
-   *     recover({ failure.bind() }) { failure: Throwable ->
-   *       delay(10)
+   *     val x = one.bind { -1 }
+   *     val y = failure.bind { failure: Throwable ->
    *       raise("Something bad happened: ${failure.message}")
    *     }
-   *   }.also(::println)
+   *     val z = failure.recover { failure: Throwable ->
+   *       delay(10)
+   *       1
+   *     }.bind { raise("Something bad happened: ${it.message}") }
+   *     x + y + z
+   *   } shouldBe Either.Left("Something bad happened: Boom!")
+   * }
    * ```
-   * ```text
-   * Either.Left(Something bad happened: Boom!)
-   * ```
+   * <!--- KNIT example-raise-dsl-05.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public fun <A> Result<A>.bind(transform: (Throwable) -> R): A =
     fold(::identity) { throwable -> raise(transform(throwable)) }
@@ -167,21 +235,34 @@ public interface Raise<in R> {
    * because [Option] works with [None] as its error type you need to [transform] [None] to [R].
    *
    * Note that this functions can currently not be _inline_ without Context Receivers,
-   * but you can rely on [recover] if you want to run any suspend code in your error handler.
+   * and thus doesn't allow suspension in its error handler.
+   * To do so, use [Option.recover] and [bind].
    *
+   * <!--- INCLUDE
+   * import arrow.core.Either
+   * import arrow.core.None
+   * import arrow.core.Option
+   * import arrow.core.recover
+   * import arrow.core.raise.either
+   * import kotlinx.coroutines.delay
+   * import io.kotest.matchers.shouldBe
+   * -->
    * ```kotlin
-   * fun main() {
+   * suspend fun test() {
    *   val empty: Option<Int> = None
    *   either {
-   *     recover({ empty.bind() }) { failure: None ->
+   *     val x: Int = empty.bind { _: None -> 1 }
+   *     val y: Int = empty.bind { _: None -> raise("Something bad happened: Boom!") }
+   *     val z: Int = empty.recover { _: None ->
    *       delay(10)
-   *       raise("Something bad happened: ${failure.message}")
-   *     }
-   *   }.also(::println)
+   *       1
+   *     }.bind { raise("Something bad happened: Boom!") }
+   *     x + y + z
+   *   } shouldBe Either.Left("Something bad happened: Boom!")
+   * }
    * ```
-   * ```text
-   * Either.Left(Something bad happened: Boom!)
-   * ```
+   * <!--- KNIT example-raise-dsl-06.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
     when (this) {
@@ -194,21 +275,25 @@ public interface Raise<in R> {
    * and recover from any _logical error_ of type [E] by providing a fallback value of type [A],
    * or raising a new error of type [R].
    *
+   * <!--- INCLUDE
+   * import arrow.core.Either
+   * import arrow.core.raise.either
+   * import arrow.core.raise.effect
+   * import io.kotest.matchers.shouldBe
+   * -->
    * ```kotlin
-   * suspend fun main() {
+   * suspend fun test() {
    *   either<Nothing, Int> {
    *     effect { raise("failed") }.recover { str -> str.length }
-   *   }.also(::println)
+   *   } shouldBe Either.Right(6)
    *
-   *   either<Int, Nothing> {
+   *   either {
    *     effect { raise("failed") }.recover { str -> raise(-1) }
-   *   }.also(::println)
+   *   } shouldBe Either.Left(-1)
    * }
    * ```
-   * ```text
-   * Either.Right(6)
-   * Either.Left(-1)
-   * ```
+   * <!--- KNIT example-raise-dsl-07.kt -->
+   * <!--- TEST lines.isEmpty() -->
    */
   @EffectDSL
   public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<R>.(E) -> A): A =
