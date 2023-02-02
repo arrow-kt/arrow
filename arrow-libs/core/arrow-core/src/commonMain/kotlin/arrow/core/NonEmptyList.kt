@@ -215,38 +215,6 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
     NonEmptyList(all.padZip(other))
 
   public companion object {
-
-    @JvmStatic @JvmName("of")
-    public fun <A> of(first: A, vararg tail: A): NonEmptyList<A> =
-      NonEmptyList(listOf(first) + tail)
-
-    @JvmStatic @JvmName("ofOrNull")
-    public fun <A> ofOrNull(list: Iterable<A>): NonEmptyList<A>? =
-      list.firstOrNull()?.let { NonEmptyList(list.toList()) }
-
-    @Deprecated(
-      "Use toNonEmptyListOrNull instead",
-      ReplaceWith(
-        "l.toNonEmptyListOrNull().toOption()",
-        "import arrow.core.toNonEmptyListOrNull",
-        "import arrow.core.toOption"
-      )
-    )
-    @JvmStatic @JvmName("fromList")
-    public fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
-      if (l.isEmpty()) None else Some(NonEmptyList(l))
-
-    @Deprecated(
-      "Use toNonEmptyListOrNull instead",
-      ReplaceWith(
-        "l.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException(\"Empty list doesn't contain element at index 0.\")",
-        "import arrow.core.toNonEmptyListOrNull"
-      )
-    )
-    @JvmStatic @JvmName("fromListUnsafe")
-    public inline fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
-      NonEmptyList(l)
-
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
       nonEmptyListOf(Unit)
@@ -378,8 +346,10 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
 public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   all.unzip(f).let { (a, b) -> NonEmptyList(a) to NonEmptyList(b) }
 
+@JvmName("toNonEmptyListOrNull")
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
-  NonEmptyList.ofOrNull(this)
+  toList().let { if (it.isEmpty()) null else NonEmptyList(it) }
 
+@JvmName("toNonEmptyListOrNone")
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
   toNonEmptyListOrNull().toOption()
