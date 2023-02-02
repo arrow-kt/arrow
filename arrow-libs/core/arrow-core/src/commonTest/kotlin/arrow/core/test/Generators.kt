@@ -5,10 +5,12 @@ import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toNonEmptySetOrNull
 import arrow.core.toOption
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
@@ -17,12 +19,14 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.Dispatchers
+import kotlin.math.max
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.coroutines.Continuation
@@ -35,6 +39,9 @@ import kotlin.coroutines.startCoroutine
 
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
   Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
+
+fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
+  Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
