@@ -679,18 +679,30 @@ public sealed class Option<out A> {
   public inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith("fold<Option<Option<B>>>({ None }) { value -> f(value).map(::Some) }")
+  )
   public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
       is None -> this
       is Some -> f(value).map { Some(it) }
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith("fold<Map<K, Option<V>>>({ emptyMap() }) { value -> f(value).mapValues { Some(it.value) } }")
+  )
   public inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
     when (this) {
       is None -> emptyMap()
       is Some -> f(value).mapValues { Some(it.value) }
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith("fold<Option<B>?>({ null }) { value -> f(value)?.let(::Some) }")
+  )
   public inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
     when (this) {
       is None -> null
@@ -767,10 +779,18 @@ public sealed class Option<out A> {
       is None -> null
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("MB.run { this.fold({ empty() }) {a -> empty().combine(f(a)) } }")
+  )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     foldLeft(empty()) { b, a -> b.combine(f(a)) }
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("fold({ initial }) { operation(initial, it) }")
+  )
   public inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
     when (this) {
       is Some -> operation(initial, value)
@@ -795,12 +815,20 @@ public sealed class Option<out A> {
       )
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("fold({ null }) { value -> operation(initial(value), value) }")
+  )
   public inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
     when (this) {
       is None -> null
       is Some -> operation(initial(value), value)
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("fold({ Eval.now(null) }) { value -> operation(value, Eval.now(initial(value))) }")
+  )
   public inline fun <B> reduceRightEvalOrNull(
     initial: (A) -> B,
     operation: (A, acc: Eval<B>) -> Eval<B>
@@ -813,11 +841,23 @@ public sealed class Option<out A> {
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ emptyList() }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Some")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
     fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Either.Right")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <AA, B> traverse(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
@@ -830,6 +870,12 @@ public sealed class Option<out A> {
   public inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
     traverse(fa)
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Valid")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <AA, B> traverse(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
@@ -985,11 +1031,20 @@ public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
  * @receiver Option of Either
  * @return a tuple containing Option of [Either.Left] and another Option of its [Either.Right] value.
  */
-public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> {
-  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
-  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
-  return asep to bsep
-}
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ None to None }) { either -> either.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
+    "arrow.core.None", "arrow.core.Some"
+  )
+)
+public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }) { either ->
+    either.fold(
+      { Some(it) to None },
+      { None to Some(it) }
+    )
+  }
 
 /**
  * Separate the inner [Validated] value into the [Validated.Invalid] and [Validated.Valid].
@@ -997,12 +1052,28 @@ public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<
  * @receiver Option of Either
  * @return a tuple containing Option of [Validated.Invalid] and another Option of its [Validated.Valid] value.
  */
-public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> {
-  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
-  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
-  return asep to bsep
-}
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ None to None }) { validated -> validated.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
+    "arrow.core.None", "arrow.core.Some"
+  )
+)
+public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }) { validated ->
+    validated.fold(
+      { Some(it) to None },
+      { None to Some(it) }
+    )
+  }
 
+@Deprecated(
+  "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ emptyList() }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Some",
+  )
+)
 public fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
   traverse(::identity)
 
@@ -1010,6 +1081,12 @@ public fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
 public fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   sequence()
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Either.Right")
+)
 public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
   traverse(::identity)
 
@@ -1017,6 +1094,12 @@ public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
 public fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
   sequence()
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Valid")
+)
 public fun <A, B> Option<Validated<A, B>>.sequence(): Validated<A, Option<B>> =
   traverse(::identity)
 
@@ -1033,16 +1116,37 @@ public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<
     }
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit map",
+  ReplaceWith(
+    "map { iterable -> iterable.fold(MA) }",
+    "arrow.typeclasses.Monoid"
+  )
+)
 public fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
   map { iterable ->
     iterable.fold(MA)
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap",
+  ReplaceWith(
+    "flatMap<B> { either -> either.fold<Option<B>>({ None }, ::Some) }",
+    "arrow.core.Option", "arrow.core.Some"
+  )
+)
 public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
   flatMap { either ->
     either.fold({ None }, { b -> Some(b) })
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap",
+  ReplaceWith(
+    "flatMap<B> { validated -> validated.fold<Option<B>>({ None }, ::Some) }",
+    "arrow.core.Option", "arrow.core.Some"
+  )
+)
 public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
   flatMap { validated ->
     validated.fold({ None }, { b -> Some(b) })
