@@ -537,8 +537,6 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public static final fun extract-impl (Ljava/util/List;)Ljava/lang/Object;
 	public static final fun flatMap-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun foldLeft-impl (Ljava/util/List;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static final fun fromList (Ljava/util/List;)Larrow/core/Option;
-	public static final fun fromListUnsafe (Ljava/util/List;)Ljava/util/List;
 	public fun get (I)Ljava/lang/Object;
 	public static fun get-impl (Ljava/util/List;I)Ljava/lang/Object;
 	public final fun getAll ()Ljava/util/List;
@@ -561,8 +559,6 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public static fun listIterator-impl (Ljava/util/List;)Ljava/util/ListIterator;
 	public static fun listIterator-impl (Ljava/util/List;I)Ljava/util/ListIterator;
 	public static final fun map-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public static final fun of (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/List;
-	public static final fun ofOrNull (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun padZip-vcjLgH4 (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
 	public static final fun plus-0-xjo5U (Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;
 	public static final fun plus-0-xjo5U (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
@@ -597,11 +593,7 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 }
 
 public final class arrow/core/NonEmptyList$Companion {
-	public final fun fromList (Ljava/util/List;)Larrow/core/Option;
-	public final fun fromListUnsafe (Ljava/util/List;)Ljava/util/List;
 	public final fun getUnit-1X0FA-Y ()Ljava/util/List;
-	public final fun of (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/List;
-	public final fun ofOrNull (Ljava/lang/Iterable;)Ljava/util/List;
 }
 
 public final class arrow/core/NonEmptyListKt {
