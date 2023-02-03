@@ -47,7 +47,7 @@ public typealias Null = Nothing?
 
 @JvmInline
 public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
-  @EffectDSL
+  @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
   override fun raise(r: Nothing?): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = bind { raise(null) }
