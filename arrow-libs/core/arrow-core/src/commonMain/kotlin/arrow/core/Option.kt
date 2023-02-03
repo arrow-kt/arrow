@@ -1155,9 +1155,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
-  option {
-    when (this@recover) {
-      is None -> recover(this, None)
-      is Some -> value
-    }
+  when (this@recover) {
+    is None -> option { recover(this, None) }
+    is Some -> this@recover
   }

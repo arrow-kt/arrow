@@ -2057,11 +2057,9 @@ public const val RedundantAPI: String =
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> =
-  either {
-    when (this@recover) {
-      is Left -> recover(this, value)
-      is Right -> value
-    }
+  when (this@recover) {
+    is Left -> either { recover(this, value) }
+    is Right -> this@recover
   }
 
 /**
@@ -2098,11 +2096,9 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(Throwable) -> A): Either<E, A> =
-  either {
-    when (this@catch) {
-      is Left -> catch(this, value)
-      is Right -> value
-    }
+  when (this@catch) {
+    is Left -> either { catch(this, value) }
+    is Right -> this@catch
   }
 
 @JvmName("catchReified")
