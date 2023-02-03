@@ -21,6 +21,7 @@ import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.Dispatchers
+import kotlin.math.max
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
 import kotlin.coroutines.Continuation
@@ -32,7 +33,7 @@ import kotlin.coroutines.startCoroutine
 // copied from kotest-extensions-arrow
 
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
-  Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
+  Arb.list(arb, max(range.first, 1) .. range.last).map { NonEmptyList(it) }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }

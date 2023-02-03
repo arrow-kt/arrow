@@ -5,6 +5,7 @@ import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -378,7 +379,7 @@ class EffectSpec :
       checkAll(Arb.list(Arb.int(), range = 2 .. 100)) { errors ->
         either<NonEmptyList<Int>, List<String>> {
           mapOrAccumulate(errors) { raise(it) }
-        } shouldBe NonEmptyList.fromListUnsafe(errors).left()
+        } shouldBe errors.toNonEmptyListOrNull()!!.left()
       }
     }
 
