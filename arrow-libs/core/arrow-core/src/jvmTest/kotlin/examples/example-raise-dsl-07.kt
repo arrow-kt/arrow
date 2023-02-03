@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 
 suspend fun test() {
   either<Nothing, Int> {
-    recover({ raise("failed") })  { str -> str.length }
+    recover({ raise("failed") }) { str -> str.length }
   } shouldBe Either.Right(6)
 
   either {
