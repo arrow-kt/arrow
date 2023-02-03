@@ -22,6 +22,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
+        implementation(projects.arrowAtomic)
         implementation(projects.arrowFxCoroutines)
         compileOnly(libs.kotlin.stdlibCommon)
         implementation(libs.coroutines.core)

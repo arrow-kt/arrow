@@ -1,6 +1,6 @@
 package arrow.fx.resilience
 
-import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -106,7 +106,7 @@ class SagaSpec : StringSpec({
 
   "Saga can parTraverse" {
     checkAll(Arb.list(Arb.int())) { iis ->
-      saga { iis.parTraverse { saga({ it }) { fail("Doesn't run") } } }.transact() shouldBe iis
+      saga { iis.parMap { saga({ it }) { fail("Doesn't run") } } }.transact() shouldBe iis
     }
   }
 

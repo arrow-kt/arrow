@@ -1,7 +1,7 @@
 package arrow.fx.resilience
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.updateAndGet
+import arrow.atomic.Atomic
+import arrow.atomic.updateAndGet
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.NonCancellable
@@ -118,7 +118,7 @@ public suspend fun <A> Saga<A>.transact(): A {
 // Internal implementation of the `saga { }` builder.
 @PublishedApi
 internal class SagaBuilder(
-  private val stack: AtomicRef<List<suspend () -> Unit>> = AtomicRef(emptyList())
+  private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
 ) : SagaScope {
 
   @SagaDSLMarker
