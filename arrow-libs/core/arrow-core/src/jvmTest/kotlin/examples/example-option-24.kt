@@ -6,9 +6,9 @@ import arrow.core.None
 import arrow.core.Option
 
 fun main() {
-  Some(12).exists { it > 10 } // Result: 12
-  Some(7).exists { it > 10 }  // Result: null
+  Some(12).exists { it > 10 } // Result: true
+  Some(7).exists { it > 10 }  // Result: false
 
   val none: Option<Int> = None
-  none.exists { it > 10 }      // Result: null
+  none.exists { it > 10 }      // Result: false
 }

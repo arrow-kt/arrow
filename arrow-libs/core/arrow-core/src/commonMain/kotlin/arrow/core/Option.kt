@@ -657,7 +657,28 @@ public sealed class Option<out A> {
    */
   public fun isDefined(): Boolean = !isEmpty()
 
+  @Deprecated(
+    "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNull()")
+  )
   public fun orNull(): A? = fold({ null }, ::identity)
+
+  /**
+   * Returns the encapsulated value [A] if this instance represents [Some] or `null` if it is [None].
+   *
+   * ```kotlin
+   * import arrow.core.None
+   * import arrow.core.Some
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *   Some(12).getOrNull() shouldBe 12
+   *   None.getOrNull() shouldBe null
+   * }
+   * ```
+   * <!--- KNIT example-option-23.kt -->
+   */
+  public fun getOrNull(): A? = getOrElse { null }
 
   /**
    * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -743,7 +764,12 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL or fold",
-    ReplaceWith("fold<Option<Option<B>>>({ None }) { value -> f(value).map(::Some) }")
+    ReplaceWith(
+      "fold<Option<Option<B>>>({ None }) { value -> f(value).map(::Some) }",
+      "arrow.core.None",
+      "arrow.core.Option",
+      "arrow.core.Some"
+    )
   )
   public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
@@ -753,7 +779,11 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL or fold",
-    ReplaceWith("fold<Map<K, Option<V>>>({ emptyMap() }) { value -> f(value).mapValues { Some(it.value) } }")
+    ReplaceWith(
+      "fold<Map<K, Option<V>>>({ emptyMap() }) { value -> f(value).mapValues { Some(it.value) } }",
+      "arrow.core.Option",
+      "arrow.core.Some"
+    )
   )
   public inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
     when (this) {
@@ -763,7 +793,10 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL or fold",
-    ReplaceWith("fold<Option<B>?>({ null }) { value -> f(value)?.let(::Some) }")
+    ReplaceWith(
+      "getOrNull()?.let { value -> f(value)?.let(::Some) }",
+      "arrow.core.Some"
+    )
   )
   public inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
     when (this) {
@@ -808,7 +841,7 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-option-23.kt -->
+   * <!--- KNIT example-option-24.kt -->
    *
    * @param predicate the predicate to test
    */
@@ -837,7 +870,7 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: null
    * }
    * ```
-   * <!--- KNIT example-option-24.kt -->
+   * <!--- KNIT example-option-25.kt -->
    */
   @Deprecated(
     NicheAPI + "Prefer Kotlin nullable syntax instead",
@@ -887,7 +920,7 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ null }) { value -> operation(initial(value), value) }")
+    ReplaceWith("getOrNull()?.let { value -> operation(initial(value), value) }")
   )
   public inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
     when (this) {
@@ -1285,7 +1318,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
- * <!--- KNIT example-option-25.kt -->
+ * <!--- KNIT example-option-26.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this
