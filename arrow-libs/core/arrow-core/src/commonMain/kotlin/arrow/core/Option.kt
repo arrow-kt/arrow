@@ -635,11 +635,8 @@ public sealed class Option<out A> {
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
-  @OptIn(ExperimentalContracts::class)
-  public fun isEmpty(): Boolean {
-    contract { returns(true) implies (this@Option is None) }
-    return this@Option is None
-  }
+  public abstract fun isEmpty(): Boolean
+
   @OptIn(ExperimentalContracts::class)
   public fun isNotEmpty(): Boolean {
     contract { returns(true) implies (this@Option is Some<A>) }
@@ -1041,10 +1038,14 @@ public sealed class Option<out A> {
 }
 
 public object None : Option<Nothing>() {
+  public override fun isEmpty(): Boolean = true
+
   override fun toString(): String = "Option.None"
 }
 
 public data class Some<out T>(val value: T) : Option<T>() {
+  public override fun isEmpty(): Boolean = false
+
   override fun toString(): String = "Option.Some($value)"
 
   public companion object {
