@@ -1125,18 +1125,48 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
     }
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith(
+    "orElse { Some(f(Unit)) }",
+    "arrow.core.Some",
+    "arrow.core.orElse"
+  )
+)
 public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
   handleErrorWith { Some(f(Unit)) }
 
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith(
+    "orElse { f(Unit) }",
+    "arrow.core.orElse"
+  )
+)
 public inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
   if (isEmpty()) f(Unit) else this
 
 public fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit map with orElse",
+  ReplaceWith(
+    "map(fb).orElse { Some(fe(Unit)) }",
+    "arrow.core.Some",
+    "arrow.core.orElse"
+  )
+)
 public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
   map(fb).handleError(fe)
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap with orElse",
+  ReplaceWith(
+    "flatMap(fb).orElse(fe)",
+    "arrow.core.orElse"
+  )
+)
 public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
   flatMap(fb).handleErrorWith(fe)
 
@@ -1149,6 +1179,13 @@ public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatmap",
+  ReplaceWith(
+    "flatMap { it.fold({ None }, { a -> Some(a) }) }",
+    "arrow.core.None", "arrow.core.Some"
+  )
+)
 public fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
 
