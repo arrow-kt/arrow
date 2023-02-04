@@ -3,6 +3,9 @@ package arrow.core
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -430,20 +433,70 @@ public sealed class Option<out A> {
    * import arrow.core.none
    *
    * fun main() {
-   *   Some(12).tapNone { println("flower") } // Result: Some(12)
-   *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+   *   Some(12).onNone { println("flower") } // Result: Some(12)
+   *   none<Int>().onNone { println("flower") }  // Result: prints "flower" and returns: None
    * }
    * ```
    * <!--- KNIT example-option-19.kt -->
    */
-  public inline fun tapNone(f: () -> Unit): Option<A> =
-    when (this) {
-      is None -> {
-        f()
-        this
-      }
-      is Some -> this
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onNone(action: () -> Unit): Option<A>  {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
+    return also { if (it.isEmpty()) action() }
+  }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `some`.
+   * When applied the result is ignored and the original
+   * Some value is returned
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).onSome { println("flower") } // Result: prints "flower" and returns: Some(12)
+   *   none<Int>().onSome { println("flower") }  // Result: None
+   * }
+   * ```
+   * <!--- KNIT example-option-20.kt -->
+   */
+  @OptIn(ExperimentalContracts::class)
+  public inline fun onSome(action: (A) -> Unit): Option<A>  {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isNotEmpty()) action(it.value) }
+  }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `None`.
+   * When applied the result is ignored and the original
+   * None value is returned
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).tapNone { println("flower") } // Result: Some(12)
+   *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+   * }
+   * ```
+   * <!--- KNIT example-option-21.kt -->
+   */
+  @Deprecated(
+    "tapNone is being renamed to onNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("onNone(f)")
+  )
+  public inline fun tapNone(f: () -> Unit): Option<A> =
+    onNone(f)
 
   /**
    * The given function is applied as a fire and forget effect
@@ -461,16 +514,14 @@ public sealed class Option<out A> {
    *   none<Int>().tap { println("flower") }  // Result: None
    * }
    * ```
-   * <!--- KNIT example-option-20.kt -->
+   * <!--- KNIT example-option-22.kt -->
    */
+  @Deprecated(
+    "tap is being renamed to onNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("onSome(f)")
+  )
   public inline fun tap(f: (A) -> Unit): Option<A> =
-    when (this) {
-      is None -> this
-      is Some -> {
-        f(this.value)
-        this
-      }
-    }
+    onSome(f)
 
   public inline fun <B, C, D, E> zip(
     b: Option<B>,
@@ -584,9 +635,16 @@ public sealed class Option<out A> {
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
-  public abstract fun isEmpty(): Boolean
-
-  public fun isNotEmpty(): Boolean = !isEmpty()
+  @OptIn(ExperimentalContracts::class)
+  public fun isEmpty(): Boolean {
+    contract { returns(true) implies (this@Option is None) }
+    return this@Option is None
+  }
+  @OptIn(ExperimentalContracts::class)
+  public fun isNotEmpty(): Boolean {
+    contract { returns(true) implies (this@Option is Some<A>) }
+    return this@Option is Some<A>
+  }
 
   /**
    * alias for [isDefined]
@@ -676,6 +734,10 @@ public sealed class Option<out A> {
    *
    * @param predicate the predicate to test
    */
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or fold or map",
+    ReplaceWith("fold({ false }, predicate)")
+  )
   public inline fun all(predicate: (A) -> Boolean): Boolean =
     fold({ true }, predicate)
 
@@ -746,10 +808,14 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-option-21.kt -->
+   * <!--- KNIT example-option-23.kt -->
    *
    * @param predicate the predicate to test
    */
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or fold or map",
+    ReplaceWith("fold({ true }, predicate)")
+  )
   public inline fun exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
 
   /**
@@ -771,8 +837,12 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: null
    * }
    * ```
-   * <!--- KNIT example-option-22.kt -->
+   * <!--- KNIT example-option-24.kt -->
    */
+  @Deprecated(
+    NicheAPI + "Prefer Kotlin nullable syntax instead",
+    ReplaceWith("getOrNull()?.takeIf(predicate)")
+  )
   public inline fun findOrNull(predicate: (A) -> Boolean): A? =
     when (this) {
       is Some -> if (predicate(value)) value else null
@@ -838,6 +908,10 @@ public sealed class Option<out A> {
       is Some -> operation(value, Eval.now(initial(value)))
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { List(n) { it } }")
+  )
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 
@@ -893,11 +967,23 @@ public sealed class Option<out A> {
 
   public fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
+  @Deprecated(
+    RedundantAPI + "Replace with map with Unit",
+    ReplaceWith("map { }")
+  )
   public fun void(): Option<Unit> =
-    map { Unit }
+    map { }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { left to it }")
+  )
   public fun <L> pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { it to right }")
+  )
   public fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
 
   public infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
@@ -913,18 +999,15 @@ public sealed class Option<out A> {
 }
 
 public object None : Option<Nothing>() {
-  override fun isEmpty(): Boolean = true
-
   override fun toString(): String = "Option.None"
 }
 
 public data class Some<out T>(val value: T) : Option<T>() {
-  override fun isEmpty(): Boolean = false
-
   override fun toString(): String = "Option.Some($value)"
 
   public companion object {
     @PublishedApi
+    @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Some(Unit)"))
     internal val unit: Option<Unit> = Some(Unit)
   }
 }
@@ -973,6 +1056,10 @@ public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
   getOrElse { MA.empty() }
 
+@Deprecated(
+  RedundantAPI + "Prefer if-else statement inside option DSL, or replace with explicit flatMap",
+  ReplaceWith("this.flatMap { b -> b.takeIf(predicate)?.let(::Some) ?: None.also(error) }")
+)
 public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
   when (this) {
     is Some ->
@@ -1010,6 +1097,10 @@ public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option
 public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
   flatMap(fb).handleErrorWith(fe)
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or map",
+  ReplaceWith("MA.run { this.map { List(n) { it }.fold(empty()) { acc, v -> acc + v } } }")
+)
 public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   if (n <= 0) Some(empty())
   else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
@@ -1179,7 +1270,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
- * <!--- KNIT example-option-23.kt -->
+ * <!--- KNIT example-option-25.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this

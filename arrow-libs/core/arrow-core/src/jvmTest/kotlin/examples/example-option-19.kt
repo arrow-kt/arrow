@@ -5,6 +5,6 @@ import arrow.core.Some
 import arrow.core.none
 
 fun main() {
-  Some(12).tapNone { println("flower") } // Result: Some(12)
-  none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+  Some(12).onNone { println("flower") } // Result: Some(12)
+  none<Int>().onNone { println("flower") }  // Result: prints "flower" and returns: None
 }
