@@ -851,7 +851,7 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MB.run { this.fold({ empty() }) {a -> empty().combine(f(a)) } }")
+    ReplaceWith("MB.run { this.fold({ empty() }) { a -> empty().combine(f(a)) } }")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     foldLeft(empty()) { b, a -> b.combine(f(a)) }
@@ -897,7 +897,10 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ Eval.now(null) }) { value -> operation(value, Eval.now(initial(value))) }")
+    ReplaceWith(
+      "fold({ Eval.now(null) }) { value -> operation(value, Eval.now(initial(value))) }",
+      "arrow.core.Eval"
+    )
   )
   public inline fun <B> reduceRightEvalOrNull(
     initial: (A) -> B,
@@ -930,7 +933,10 @@ public sealed class Option<out A> {
     NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
     ReplaceWith(
       "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
-      "arrow.core.Either.Right")
+      "arrow.core.Either.Right",
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -948,7 +954,10 @@ public sealed class Option<out A> {
     NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
     ReplaceWith(
       "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
-      "arrow.core.Valid")
+      "arrow.core.Valid",
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -1126,7 +1135,7 @@ public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
   NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
   ReplaceWith(
     "fold({ None to None }) { either -> either.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
-    "arrow.core.None", "arrow.core.Some"
+    "arrow.core.None", "arrow.core.Some", "arrow.core.Option"
   )
 )
 public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> =
@@ -1147,7 +1156,7 @@ public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<
   NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
   ReplaceWith(
     "fold({ None to None }) { validated -> validated.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
-    "arrow.core.None", "arrow.core.Some"
+    "arrow.core.None", "arrow.core.Some", "arrow.core.Option"
   )
 )
 public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> =
@@ -1176,7 +1185,10 @@ public fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
   ReplaceWith(
     "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
-    "arrow.core.Either.Right")
+    "arrow.core.Either.Right",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
 )
 public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
   traverse(::identity)
@@ -1189,7 +1201,10 @@ public fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Opti
   NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
   ReplaceWith(
     "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
-    "arrow.core.Valid")
+    "arrow.core.Valid",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
 )
 public fun <A, B> Option<Validated<A, B>>.sequence(): Validated<A, Option<B>> =
   traverse(::identity)
@@ -1223,7 +1238,7 @@ public fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
   NicheAPI + "Prefer using the Option DSL or explicit flatMap",
   ReplaceWith(
     "flatMap<B> { either -> either.fold<Option<B>>({ None }, ::Some) }",
-    "arrow.core.Option", "arrow.core.Some"
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
   )
 )
 public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
@@ -1235,7 +1250,7 @@ public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
   NicheAPI + "Prefer using the Option DSL or explicit flatMap",
   ReplaceWith(
     "flatMap<B> { validated -> validated.fold<Option<B>>({ None }, ::Some) }",
-    "arrow.core.Option", "arrow.core.Some"
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
   )
 )
 public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
