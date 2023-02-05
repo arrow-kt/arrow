@@ -646,12 +646,20 @@ public sealed class Option<out A> {
   /**
    * alias for [isDefined]
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNotEmpty. This will be removed towards Arrow 2.0",
+    ReplaceWith("isNotEmpty()")
+  )
   public fun nonEmpty(): Boolean = isDefined()
 
   /**
    * Returns true if the option is an instance of [Some], false otherwise.
    * @note Used only for performance instead of fold.
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNotEmpty. This will be removed towards Arrow 2.0",
+    ReplaceWith("isNotEmpty()")
+  )
   public fun isDefined(): Boolean = !isEmpty()
 
   @Deprecated(
@@ -704,6 +712,13 @@ public sealed class Option<out A> {
    *
    * @param f the function to apply.
    * */
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or fold or map",
+    ReplaceWith(
+      "flatMap { fromNullable(f(it)) }",
+      "arrow.core.Option.Companion.fromNullable"
+    )
+  )
   public inline fun <B> mapNotNull(f: (A) -> B?): Option<B> =
     flatMap { a -> fromNullable(f(a)) }
 
@@ -1025,6 +1040,10 @@ public sealed class Option<out A> {
   )
   public fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or flatMap",
+    ReplaceWith("flatMap { value }")
+  )
   public infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
   } else {
@@ -1072,14 +1091,33 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default(
 public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> =
   if (isEmpty()) alternative() else this
 
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith("orElse(value)")
+)
 public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
   value
 } else {
   this
 }
 
+@Deprecated(
+  RedundantAPI + "Prefer using fromNullable",
+  ReplaceWith(
+    "Option.fromNullable(this)",
+    "arrow.core.Option"
+  )
+)
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
+@Deprecated(
+  NicheAPI + "Prefer using if-else statement",
+  ReplaceWith(
+    "if (this) { Some(f()) } else { None }",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
+)
 public inline fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
     Some(f())
@@ -1117,6 +1155,14 @@ public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Bool
 /**
  * Returns an Option containing all elements that are instances of specified type parameter [B].
  */
+@Deprecated(
+  NicheAPI + "Prefer using option DSL or flatMap",
+  ReplaceWith(
+    "flatMap { when (it) { is B -> Some(it) else -> None } }",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
+)
 public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
   flatMap {
     when (it) {
