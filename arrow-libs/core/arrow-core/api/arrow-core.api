@@ -203,7 +203,6 @@ public abstract class arrow/core/Either {
 public final class arrow/core/Either$Companion {
 	public final fun conditionally (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun fromNullable (Ljava/lang/Object;)Larrow/core/Either;
-	public final fun getUnit ()Larrow/core/Either;
 	public final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun resolve (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
