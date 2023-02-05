@@ -15,28 +15,38 @@ import arrow.core.identity
 import arrow.core.orElse
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
-  fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+}
 
-public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
-  fold({ block(NullableRaise(this)) }, { null }, ::identity)
+public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return fold({ block(NullableRaise(this)) }, { null }, ::identity)
+}
 
-public inline fun <A> result(action: ResultRaise.() -> A): Result<A> =
-  fold({ action(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::success)
+public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::success)
+}
 
-public inline fun <A> option(action: OptionRaise.() -> A): Option<A> =
-  fold({ action(OptionRaise(this)) }, ::identity, ::Some)
+public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
+}
 
-public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference action: IorRaise<E>.() -> A): Ior<E, A> {
+public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
   val state: AtomicRef<Option<E>> = AtomicRef(None)
   return fold<E, A, Ior<E, A>>(
-    { action(IorRaise(semigroup, state, this)) },
+    { block(IorRaise(semigroup, state, this)) },
     { e -> throw e },
     { e -> Ior.Left(state.get().getOrElse { e }) },
     { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }

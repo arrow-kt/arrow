@@ -1,9 +1,14 @@
 @file:JvmMultifileClass
 @file:JvmName("Effect")
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 package arrow.core.raise
 
 import arrow.core.nonFatalOrThrow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -22,28 +27,60 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
   error: suspend (error: Throwable) -> B,
   recover: suspend (raised: R) -> B,
   transform: suspend (value: A) -> B,
-): B = fold({ invoke() }, { error(it) }, { recover(it) }, { transform(it) })
+): B {
+  contract {
+    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return fold({ invoke() }, { error(it) }, { recover(it) }, { transform(it) })
+}
 
 public suspend fun <R, A, B> Effect<R, A>.fold(
   recover: suspend (raised: R) -> B,
   transform: suspend (value: A) -> B,
-): B = fold({ throw it }, recover, transform)
-
-public inline fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B =
-  fold({ throw it }, recover, transform)
+): B {
+  contract {
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return fold({ throw it }, recover, transform)
+}
 
 public inline fun <R, A, B> EagerEffect<R, A>.fold(
   error: (error: Throwable) -> B,
   recover: (raised: R) -> B,
   transform: (value: A) -> B,
-): B = fold({ invoke(this) }, error, recover, transform)
+): B {
+  contract {
+    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return fold({ invoke(this) }, error, recover, transform)
+}
+
+public inline fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B {
+  contract {
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return fold({ throw it }, recover, transform)
+}
 
 @JvmName("_foldOrThrow")
 public inline fun <R, A, B> fold(
   @BuilderInference program: Raise<R>.() -> A,
   recover: (raised: R) -> B,
   transform: (value: A) -> B,
-): B = fold(program, { throw it }, recover, transform)
+): B {
+  contract {
+    callsInPlace(program, EXACTLY_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return fold(program, { throw it }, recover, transform)
+}
 
 @JvmName("_fold")
 public inline fun <R, A, B> fold(
@@ -52,6 +89,12 @@ public inline fun <R, A, B> fold(
   recover: (raised: R) -> B,
   transform: (value: A) -> B,
 ): B {
+  contract {
+    callsInPlace(program, EXACTLY_ONCE)
+    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
   val raise = DefaultRaise()
   return try {
     transform(program(raise))
