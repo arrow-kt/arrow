@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+@file:Suppress("DSL_SCOPE_VIOLATION")
 
 buildscript {
   repositories {
@@ -67,7 +67,7 @@ allprojects {
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 tasks {
   val generateDoc by creating(Exec::class) {

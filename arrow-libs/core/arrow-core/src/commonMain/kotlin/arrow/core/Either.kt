@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
 import arrow.core.Either.Companion.resolve
@@ -789,16 +790,20 @@ public sealed class Either<out A, out B> {
   )
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
-  
-  @OptIn(ExperimentalContracts::class)
+
   public fun isLeft(): Boolean {
-    contract { returns(true) implies (this@Either is Left<A>) }
+    contract {
+      returns(true) implies (this@Either is Left<A>)
+      returns(false) implies (this@Either is Right<B>)
+    }
     return this@Either is Left<A>
   }
-  
-  @OptIn(ExperimentalContracts::class)
+
   public fun isRight(): Boolean {
-    contract { returns(true) implies (this@Either is Right<B>) }
+    contract {
+      returns(true) implies (this@Either is Right<B>)
+      returns(false) implies (this@Either is Left<A>)
+    }
     return this@Either is Right<B>
   }
   
@@ -826,7 +831,6 @@ public sealed class Either<out A, out B> {
    * @param ifRight transform the [Either.Right] type [B] to [C].
    * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
     contract {
       callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
@@ -899,7 +903,6 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-36.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
@@ -923,10 +926,9 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-37.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
     contract {
-      callsInPlace(f,InvocationKind.AT_MOST_ONCE)
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
     }
     return fold({ Left(f(it)) }, { Right(it) })
   }
@@ -960,7 +962,6 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-38.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -983,7 +984,6 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-39.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -1051,7 +1051,13 @@ public sealed class Either<out A, out B> {
     "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("getOrNull()")
   )
-  public fun orNull(): B? = fold({ null }, { it })
+  public fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Either is Left<A>)
+      returnsNotNull() implies (this@Either is Right<B>)
+    }
+    return fold({ null }, { it })
+  }
   
   /**
    * Returns the encapsulated value [B] if this instance represents [Either.Right] or `null` if it is [Either.Left].
@@ -1068,7 +1074,13 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-41.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public fun getOrNull(): B? = getOrElse { null }
+  public fun getOrNull(): B? {
+    contract {
+      returns(null) implies (this@Either is Left<A>)
+      returnsNotNull() implies (this@Either is Right<B>)
+    }
+    return getOrElse { null }
+  }
   
   public fun orNone(): Option<B> = getOrNone()
   
@@ -1297,21 +1309,25 @@ public sealed class Either<out A, out B> {
     
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
-      try {
+    public inline fun <R> catch(f: () -> R): Either<Throwable, R> {
+      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
+      return try {
         f().right()
       } catch (t: Throwable) {
         t.nonFatalOrThrow().left()
       }
-    
+    }
+
     @Deprecated(
       RedundantAPI + "Compose catch with flatten instead",
       ReplaceWith("catch(f).flatten()")
     )
     @JvmStatic
     @JvmName("tryCatchAndFlatten")
-    public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
-      catch(f).flatten()
+    public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> {
+      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
+      return catch(f).flatten()
+    }
     
     @Deprecated(
       RedundantAPI + "Compose catch with mapLeft instead",
@@ -1319,8 +1335,13 @@ public sealed class Either<out A, out B> {
     )
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
-      catch(f).mapLeft(fe)
+    public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+      }
+      return catch(f).mapLeft(fe)
+    }
     
     /**
      * The resolve function can resolve any function that yields an Either into one type of value.
@@ -1341,13 +1362,21 @@ public sealed class Either<out A, out B> {
       error: (e: E) -> Either<Throwable, B>,
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
-    ): B =
-      catch(f)
+    ): B {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(success, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(error, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(throwable, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(unrecoverableState, InvocationKind.AT_MOST_ONCE)
+      }
+      return catch(f)
         .fold(
           { t: Throwable -> throwable(t) },
           { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
+    }
 
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
@@ -1398,11 +1427,13 @@ public sealed class Either<out A, out B> {
  *
  * @param f The function to bind across [Right].
  */
-public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either<A, C> =
-  when (this) {
+public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either<A, C> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
     is Right -> f(this.value)
     is Left -> this
   }
+}
 
 public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
@@ -1430,8 +1461,10 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  * <!--- KNIT example-either-46.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B =
-  fold(default, ::identity)
+public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
+  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold(default, ::identity)
+}
 
 /**
  * Returns the value from this [Right] or null if this is a [Left].
@@ -1668,10 +1701,6 @@ public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> =
 public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
   this?.let { default().left() } ?: null.right()
 
-/**
- * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
- * This is like `flatMap` for the exception.
- */
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
   ReplaceWith(
@@ -1679,8 +1708,10 @@ public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
     "arrow.core.recover"
   )
 )
-public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  recover { a -> f(a).bind() }
+public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { a -> f(a).bind() }
+}
 
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
@@ -1689,8 +1720,10 @@ public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>)
     "arrow.core.recover"
   )
 )
-public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  recover { a -> f(a) }
+public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { a -> f(a) }
+}
 
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
@@ -1699,8 +1732,13 @@ public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
     "arrow.core.recover"
   )
 )
-public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  map(fa).recover { a -> fe(a) }
+public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> {
+  contract {
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+  }
+  return map(fa).recover { a -> fe(a) }
+}
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
@@ -1759,8 +1797,10 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
     "arrow.core.raise.either"
   )
 )
-public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
-  either { f(bind(), fb.bind()) }
+public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return either { f(bind(), fb.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline arrow.core.raise.either DSL",
@@ -1784,8 +1824,10 @@ public inline fun <A, B, C, D, E> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   map: (B, C, D) -> E,
-): Either<A, E> =
-  either { map(bind(), c.bind(), d.bind()) }
+): Either<A, E> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1799,8 +1841,10 @@ public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   d: Either<A, D>,
   e: Either<A, E>,
   map: (B, C, D, E) -> F,
-): Either<A, F> =
-  either { map(bind(), c.bind(), d.bind(), e.bind()) }
+): Either<A, F> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1815,8 +1859,10 @@ public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   e: Either<A, E>,
   f: Either<A, F>,
   map: (B, C, D, E, F) -> G,
-): Either<A, G> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
+): Either<A, G> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1832,8 +1878,10 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   f: Either<A, F>,
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H,
-): Either<A, H> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
+): Either<A, H> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1850,8 +1898,10 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   g: Either<A, G>,
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I,
-): Either<A, I> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
+): Either<A, I> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1869,8 +1919,10 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   h: Either<A, H>,
   i: Either<A, I>,
   map: (B, C, D, E, F, G, H, I) -> J,
-): Either<A, J> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
+): Either<A, J> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1889,8 +1941,10 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   i: Either<A, I>,
   j: Either<A, J>,
   map: (B, C, D, E, F, G, H, I, J) -> K,
-): Either<A, K> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
+): Either<A, K> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
+}
 
 @Deprecated(
   "Prefer using the inline either DSL",
@@ -1910,8 +1964,10 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   j: Either<A, J>,
   k: Either<A, K>,
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
-): Either<A, L> =
-  either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
+): Either<A, L> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
+}
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
@@ -1931,8 +1987,13 @@ public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> B
   NicheAPI + "Prefer using a simple fold, or when expression",
   ReplaceWith("fold(fa, fb)")
 )
-public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
-  fold(fa, fb)
+public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return fold(fa, fb)
+}
 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
@@ -2056,11 +2117,13 @@ public const val RedundantAPI: String =
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> =
+public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
+  contract { callsInPlace(recover, InvocationKind.EXACTLY_ONCE) }
   when (this@recover) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
   }
+}
 
 /**
  * Catch allows for transforming [Throwable] in the [Either.Left] side.
@@ -2095,13 +2158,17 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(Throwable) -> A): Either<E, A> =
-  when (this@catch) {
+public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(Throwable) -> A): Either<E, A> {
+  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  return when (this@catch) {
     is Left -> either { catch(this, value) }
     is Right -> this@catch
   }
+}
 
 @JvmName("catchReified")
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> =
-  catch { e -> if (e is T) catch(e) else throw e }
+public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> {
+  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  return catch { e -> if (e is T) catch(e) else throw e }
+}
