@@ -5,6 +5,7 @@ package arrow.core
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Either.Right.Companion.unit
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
@@ -1262,7 +1263,6 @@ public sealed class Either<out A, out B> {
     override fun toString(): String = "Either.Right($value)"
     
     public companion object {
-      @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Right(Unit)"))
       @PublishedApi
       internal val unit: Either<Nothing, Unit> = Right(Unit)
     }
@@ -1412,9 +1412,6 @@ public sealed class Either<out A, out B> {
     public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
 
-
-    @PublishedApi
-    internal val unit: Either<Nothing, Unit> = Right(Unit)
 
     public inline fun <E, A, B, Z> zipOrAccumulate(
       combine: (E, E) -> E,
@@ -2273,13 +2270,13 @@ public inline fun <A, B, C, D, E> Either<A, B>.zip(
   return zip(
     c,
     d,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
+    unit,
+    unit,
+    unit,
+    unit,
+    unit,
+    unit,
+    unit
   ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
 }
 
@@ -2294,12 +2291,12 @@ public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
     c,
     d,
     e,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
+    unit,
+    unit,
+    unit,
+    unit,
+    unit,
+    unit
   ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
 }
 
@@ -2316,11 +2313,11 @@ public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
     d,
     e,
     f,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
+    unit,
+    unit,
+    unit,
+    unit,
+    unit
   ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
 }
 
@@ -2333,7 +2330,7 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   map: (B, C, D, E, F, G) -> H,
 ): Either<A, H> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ ->
+  return zip(c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ ->
     map(
       b,
       c,
@@ -2355,7 +2352,7 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H) -> I,
 ): Either<A, I> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ ->
+  return zip(c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ ->
     map(
       b,
       c,
@@ -2379,7 +2376,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H, I) -> J,
 ): Either<A, J> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  return zip(c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
 }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
@@ -2394,7 +2391,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J) -> K,
 ): Either<A, K> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  return zip(c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
 }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(

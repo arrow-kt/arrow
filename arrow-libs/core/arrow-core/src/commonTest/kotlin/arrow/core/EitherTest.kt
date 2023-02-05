@@ -606,9 +606,9 @@ class EitherTest : StringSpec({
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Either.Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
       } else {
-        all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
@@ -633,9 +633,9 @@ class EitherTest : StringSpec({
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Either.Left<String>>().map { it.value }.toNonEmptyListOrNull()!!.left()
+        all.filterIsInstance<Left<String>>().map { it.value }.toNonEmptyListOrNull()!!.left()
       } else {
-        all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
@@ -663,11 +663,11 @@ class EitherTest : StringSpec({
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Either.Left<NonEmptyList<String>>>()
+        all.filterIsInstance<Left<NonEmptyList<String>>>()
           .flatMap { it.value }
           .toNonEmptyListOrNull()!!.left()
       } else {
-        all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
