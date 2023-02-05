@@ -2118,7 +2118,7 @@ public const val RedundantAPI: String =
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
-  contract { callsInPlace(recover, InvocationKind.EXACTLY_ONCE) }
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
   return when(this) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
