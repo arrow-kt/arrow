@@ -92,7 +92,7 @@ public suspend inline fun <A> guaranteeCase(
   } catch (e: CancellationException) {
     runReleaseAndRethrow(e) { finalizer(ExitCase.Cancelled(e)) }
   } catch (t: Throwable) {
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { finalizer(ExitCase.Failure(t.nonFatalOrThrow())) }
+    runReleaseAndRethrow(t.nonFatalOrThrow()) { finalizer(ExitCase.Failure(t)) }
   }
   withContext(NonCancellable) { finalizer(ExitCase.Completed) }
   return res

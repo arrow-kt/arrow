@@ -782,6 +782,47 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun unzip (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 }
 
+public final class arrow/core/NonEmptySet : java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun add (Ljava/lang/Object;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public static final synthetic fun box-impl (Ljava/util/Set;)Larrow/core/NonEmptySet;
+	public fun clear ()V
+	public static fun constructor-impl (Ljava/lang/Object;Ljava/util/Set;)Ljava/util/Set;
+	public fun contains (Ljava/lang/Object;)Z
+	public static fun contains-impl (Ljava/util/Set;Ljava/lang/Object;)Z
+	public fun containsAll (Ljava/util/Collection;)Z
+	public static fun containsAll-impl (Ljava/util/Set;Ljava/util/Collection;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/Set;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/Set;Ljava/util/Set;)Z
+	public fun getSize ()I
+	public static fun getSize-impl (Ljava/util/Set;)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/Set;)I
+	public fun isEmpty ()Z
+	public static fun isEmpty-impl (Ljava/util/Set;)Z
+	public fun iterator ()Ljava/util/Iterator;
+	public static fun iterator-impl (Ljava/util/Set;)Ljava/util/Iterator;
+	public static final fun map-J9TPrxk (Ljava/util/Set;Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
+	public static final fun plus-J9TPrxk (Ljava/util/Set;Ljava/lang/Object;)Ljava/util/Set;
+	public static final fun plus-J9TPrxk (Ljava/util/Set;Ljava/util/Set;)Ljava/util/Set;
+	public fun remove (Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public fun retainAll (Ljava/util/Collection;)Z
+	public synthetic fun size ()I
+	public fun toArray ()[Ljava/lang/Object;
+	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/Set;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/Set;
+}
+
+public final class arrow/core/NonEmptySetKt {
+	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;
+	public static final fun toNonEmptySetOrNone (Ljava/util/Collection;)Larrow/core/Option;
+	public static final fun toNonEmptySetOrNull (Ljava/util/Collection;)Ljava/util/Set;
+}
+
 public final class arrow/core/NonFatalKt {
 	public static final fun NonFatal (Ljava/lang/Throwable;)Z
 }
