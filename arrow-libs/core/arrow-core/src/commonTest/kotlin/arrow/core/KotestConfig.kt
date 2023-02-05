@@ -9,7 +9,4 @@ class KotestConfig : AbstractProjectConfig() {
   override suspend fun beforeProject() {
     PropertyTesting.defaultIterationCount = 250
   }
-
-  override val timeout: Duration = 30.seconds
-  override val invocationTimeout: Long = 30.seconds.inWholeMilliseconds
 }
