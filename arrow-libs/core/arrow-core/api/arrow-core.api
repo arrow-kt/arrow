@@ -209,6 +209,33 @@ public final class arrow/core/Either$Companion {
 	public final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun tryCatchAndFlatten (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function7;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function6;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function5;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function7;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function6;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function5;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
+	public final fun zipOrAccumulate (Lkotlin/jvm/functions/Function2;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function9;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function8;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function7;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function6;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function5;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function4;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function3;)Larrow/core/Either;
+	public final fun zipOrAccumulateNonEmptyList (Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 }
 
 public final class arrow/core/Either$Left : arrow/core/Either {
@@ -285,6 +312,8 @@ public final class arrow/core/EitherKt {
 	public static final fun sequenceNullable (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
+	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
+	public static final fun toEitherNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;
@@ -300,6 +329,7 @@ public final class arrow/core/EitherKt {
 
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
+	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
