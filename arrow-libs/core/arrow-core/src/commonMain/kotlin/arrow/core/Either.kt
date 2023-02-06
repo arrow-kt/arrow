@@ -797,16 +797,16 @@ public sealed class Either<out A, out B> {
 
   public fun isLeft(): Boolean {
     contract {
-      returns(true) implies (this@Either is Left<*>)
-      returns(false) implies (this@Either is Right<*>)
+      returns(true) implies (this@Either is Left<A>)
+      returns(false) implies (this@Either is Right<B>)
     }
     return this@Either is Left<A>
   }
 
   public fun isRight(): Boolean {
     contract {
-      returns(true) implies (this@Either is Right<*>)
-      returns(false) implies (this@Either is Left<*>)
+      returns(true) implies (this@Either is Right<B>)
+      returns(false) implies (this@Either is Left<A>)
     }
     return this@Either is Right<B>
   }
@@ -970,7 +970,7 @@ public sealed class Either<out A, out B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return also { if (it.isRight()) action(it.value as B) }
+    return also { if (it.isRight()) action(it.value) }
   }
   
   /**
@@ -992,7 +992,7 @@ public sealed class Either<out A, out B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return also { if (it.isLeft()) action(it.value as A) }
+    return also { if (it.isLeft()) action(it.value) }
   }
   
   /**
