@@ -2199,10 +2199,10 @@ public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> {
 }
 
 @Deprecated(
-  RedundantAPI + "Prefer the new recover API",
+  RedundantAPI + "Prefer using the Either DSL or explicit fold with right",
   ReplaceWith(
-    "map(fa).recover { a -> fe(a) }",
-    "arrow.core.recover"
+    "fold({ a -> fe(a) }, fa).right()",
+    "arrow.core.right"
   )
 )
 public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> {
@@ -2210,7 +2210,7 @@ public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Eit
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
   }
-  return map(fa).recover { a -> fe(a) }
+  return fold({ a -> fe(a) }, fa).right()
 }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =

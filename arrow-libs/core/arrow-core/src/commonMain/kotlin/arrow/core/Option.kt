@@ -1299,10 +1299,10 @@ public fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
 @Deprecated(
-  NicheAPI + "Prefer using the Option DSL or explicit map with orElse",
+  NicheAPI + "Prefer using the Option DSL or explicit fold with some",
   ReplaceWith(
-    "map(fb).recover { fe(Unit) }",
-    "arrow.core.recover"
+    "fold({ fe(Unit) }, fb).some()",
+    "arrow.core.some"
   )
 )
 public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> {
@@ -1310,7 +1310,7 @@ public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
   }
-  return map(fb).recover { fe(Unit) }
+  return fold({ fe(Unit) }, fb).some()
 }
 
 @Deprecated(
