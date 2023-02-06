@@ -2204,19 +2204,12 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
     { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
   )
 
-// TODO this will get replaced by accumulating zipOrAccumulate in 2.x.x
+@Deprecated(
+  RedundantAPI + "Prefer zipOrAccumulate",
+  ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
+)
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  when (this) {
-    is Left -> when (b) {
-      is Left -> Left(SGA.run { value.combine(b.value) })
-      is Right -> this
-    }
-    
-    is Right -> when (b) {
-      is Left -> b
-      is Right -> Right(SGB.run { this@combine.value.combine(b.value) })
-    }
-  }
+  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
