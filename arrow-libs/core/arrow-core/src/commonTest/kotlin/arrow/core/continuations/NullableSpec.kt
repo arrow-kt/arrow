@@ -13,7 +13,7 @@ import io.kotest.property.checkAll
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
-      nullable {
+      nullable.eager {
         ensure(predicate)
         i
       } shouldBe if (predicate) i else null

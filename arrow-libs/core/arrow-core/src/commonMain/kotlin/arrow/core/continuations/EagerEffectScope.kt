@@ -7,6 +7,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
+import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
@@ -14,6 +15,11 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 
 /** Context of the [EagerEffect] DSL. */
+@Deprecated(
+  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith("Raise<R>", "arrow.core.raise.Raise")
+)
 @RestrictsSuspension
 public interface EagerEffectScope<in R> {
 
@@ -64,7 +70,10 @@ public interface EagerEffectScope<in R> {
     fold({ r -> left = r }, { a -> right = a })
     return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
-
+  
+  public suspend fun <B> arrow.core.raise.EagerEffect<R, B>.bind(): B =
+    fold({ shift(it) }, ::identity)
+  
   /**
    * Folds [Either] into [EagerEffect], by returning [B] or a shift with [R].
    *
@@ -261,6 +270,11 @@ public interface EagerEffectScope<in R> {
  * ```
  * <!--- KNIT example-eager-effect-scope-09.kt -->
  */
+@Deprecated(
+  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith("ensureNotNull(value, shift)", "arrow.core.raise.ensureNotNull")
+)
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EagerEffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }

@@ -7,7 +7,10 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.RestrictsSuspension
 
-@Deprecated(deprecateInFavorOfEffectScope)
+@Deprecated(
+  "NullableEffect<A> is replaced with arrow.core.raise.NullableRaise",
+  ReplaceWith("NullableRaise", "arrow.core.raise.NullableRaise")
+)
 public fun interface NullableEffect<A> : Effect<A?> {
   public suspend fun <B> B?.bind(): B =
     this ?: control().shift(null)
@@ -68,7 +71,13 @@ public fun interface NullableEffect<A> : Effect<A?> {
  * ```
  * <!--- KNIT example-nullable-computations-02.kt -->
  */
-@Deprecated(deprecateInFavorOfEffectScope, ReplaceWith("ensureNotNull", "arrow.core.continuations.ensureNotNull"))
+@Deprecated(
+  "Replaced by Raise, replace arrow.core.computations.ensureNotNull to arrow.core.raise.ensureNotNull",
+  ReplaceWith(
+    "ensureNotNull(value)",
+    "import arrow.core.raise.ensureNotNull"
+  )
+)
 @OptIn(ExperimentalContracts::class) // Contracts not available on open functions, so made it top-level.
 public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   contract {
@@ -78,18 +87,25 @@ public suspend fun <B : Any> NullableEffect<*>.ensureNotNull(value: B?): B {
   return value ?: control().shift(null)
 }
 
-@Deprecated(deprecatedInFavorOfEagerEffectScope)
+@Deprecated(
+  "RestrictedNullableEffect<A> is replaced with arrow.core.raise.NullableRaise",
+  ReplaceWith("NullableRaise", "arrow.core.raise.NullableRaise")
+)
 @RestrictsSuspension
 public fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
-@Deprecated(deprecateInFavorOfEffectOrEagerEffect, ReplaceWith("nullable", "arrow.core.continuations.nullable"))
+@Deprecated(nullableDSLDeprecation, ReplaceWith("nullable", "arrow.core.raise.nullable"))
 @Suppress("ClassName")
 public object nullable {
-  @Deprecated(deprecateInFavorOfEagerEffect, ReplaceWith("nullable.eager(func)", "arrow.core.continuations.nullable"))
+  @Deprecated(nullableDSLDeprecation, ReplaceWith("nullable(func)", "arrow.core.raise.nullable"))
   public inline fun <A> eager(crossinline func: suspend RestrictedNullableEffect<A>.() -> A?): A? =
     Effect.restricted(eff = { RestrictedNullableEffect { it } }, f = func, just = { it })
-
-  @Deprecated(deprecateInFavorOfEffect, ReplaceWith("nullable(func)", "arrow.core.continuations.nullable"))
+  
+  @Deprecated(nullableDSLDeprecation, ReplaceWith("nullable(func)", "arrow.core.raise.nullable"))
   public suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }
+
+private const val nullableDSLDeprecation =
+  "The nullable DSL has been moved to arrow.core.raise.nullable.\n" +
+    "Replace import arrow.core.computations.* with arrow.core.raise.*"
