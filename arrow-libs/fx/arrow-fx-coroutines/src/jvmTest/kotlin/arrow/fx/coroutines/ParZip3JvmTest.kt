@@ -13,54 +13,54 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParMap3JvmTest : StringSpec({
-  "parMapN 3 returns to original context" {
-    val mapCtxName = "parMap3"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+class ParZip3JvmTest : StringSpec({
+  "parZip 3 returns to original context" {
+    val zipCtxName = "parZip3"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { zipCtxName }) }
 
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           val (s1, s2, s3) = parZip(
-            _mapCtx,
+            _zipCtx,
             { Thread.currentThread().name },
             { Thread.currentThread().name },
             { Thread.currentThread().name }) { a, b, c -> Triple(a, b, c) }
 
-          s1 shouldStartWith mapCtxName
-          s2 shouldStartWith mapCtxName
-          s3 shouldStartWith mapCtxName
+          s1 shouldStartWith zipCtxName
+          s2 shouldStartWith zipCtxName
+          s3 shouldStartWith zipCtxName
           threadName() shouldStartWith singleThreadName
         }
       }
   }
 
-  "parMapN 3 returns to original context on failure" {
-    val mapCtxName = "parMap3"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+  "parZip 3 returns to original context on failure" {
+    val zipCtxName = "parZip3"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { zipCtxName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           Either.catch {
             when (choose) {
               1 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _ -> Unit }
               2 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() }
               ) { _, _, _ -> Unit }
               else -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { e.suspend() }
@@ -74,7 +74,7 @@ class ParMap3JvmTest : StringSpec({
     }
   }
 
-  "parMapN 3 finishes on single thread" {
+  "parZip 3 finishes on single thread" {
     checkAll(Arb.string()) {
       val res = single.use { ctx ->
         parZip(
