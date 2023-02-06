@@ -790,6 +790,7 @@ public sealed class Option<out A> {
   /**
    * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
    */
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
     when (this) {
       None -> when (b) {
@@ -808,6 +809,7 @@ public sealed class Option<out A> {
    *
    * @note This function works like a regular `align` function, but is then mapped by the `map` function.
    */
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
     return align(b).map(f)
@@ -975,6 +977,7 @@ public sealed class Option<out A> {
       is None -> initial
     }
 
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
     align(other) { ior ->
       ior.fold(
@@ -984,6 +987,7 @@ public sealed class Option<out A> {
       )
     }
 
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public inline fun <B, C> padZip(other: Option<B>, f: (A?, B?) -> C): Option<C> =
     align(other) { ior ->
       ior.fold(
@@ -1333,6 +1337,7 @@ public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
 public fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
 
+@Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
 public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
   align(b) {
     it.fold(::identity, ::identity) { a, b ->
@@ -1430,9 +1435,11 @@ public fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Opti
 public fun <A, B> Option<Validated<A, B>>.sequence(): Validated<A, Option<B>> =
   traverse(::identity)
 
+@Deprecated(NicheAPI + "Prefer using a when expression")
 public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
 
+@Deprecated(NicheAPI + "Prefer using a when expression")
 public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
   when (val option = this.map(f)) {
     is None -> None to None
