@@ -2,16 +2,17 @@
 package arrow.fx.coroutines.examples.exampleParzip05
 
 import arrow.fx.coroutines.*
-import kotlinx.coroutines.Dispatchers
 
 suspend fun main(): Unit {
   //sampleStart
-  val result: Triple<String, String, String> = parZip(
-    Dispatchers.IO,
+  val result = parZip(
     { "First one is on ${Thread.currentThread().name}" },
     { "Second one is on ${Thread.currentThread().name}" },
-    fc = { "Third one is on ${Thread.currentThread().name}" }
-  )
+    { "Third one is on ${Thread.currentThread().name}" },
+    { "Fourth one is on ${Thread.currentThread().name}" }
+  ) { a, b, c, d ->
+      "$a\n$b\n$c\n$d"
+    }
   //sampleEnd
  println(result)
 }

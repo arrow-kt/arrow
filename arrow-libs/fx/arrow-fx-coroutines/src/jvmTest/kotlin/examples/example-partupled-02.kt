@@ -1,19 +1,17 @@
-// This file was automatically generated from ParZip.kt by Knit tool. Do not edit.
-package arrow.fx.coroutines.examples.exampleParzip04
+// This file was automatically generated from ParTupled.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.examplePartupled02
 
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.Dispatchers
 
 suspend fun main(): Unit {
   //sampleStart
-  val result = parZip(
+  val result: Triple<String, String, String> = parTupled(
     Dispatchers.IO,
     { "First one is on ${Thread.currentThread().name}" },
     { "Second one is on ${Thread.currentThread().name}" },
     { "Third one is on ${Thread.currentThread().name}" }
-  ) { a, b, c ->
-      "$a\n$b\n$c"
-    }
+  )
   //sampleEnd
  println(result)
 }

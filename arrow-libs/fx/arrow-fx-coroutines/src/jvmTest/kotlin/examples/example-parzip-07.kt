@@ -9,9 +9,10 @@ suspend fun main(): Unit {
     { "First one is on ${Thread.currentThread().name}" },
     { "Second one is on ${Thread.currentThread().name}" },
     { "Third one is on ${Thread.currentThread().name}" },
-    { "Fourth one is on ${Thread.currentThread().name}" }
-  ) { a, b, c, d ->
-      "$a\n$b\n$c\n$d"
+    { "Fourth one is on ${Thread.currentThread().name}" },
+    { "Fifth one is on ${Thread.currentThread().name}" }
+  ) { a, b, c, d, e ->
+      "$a\n$b\n$c\n$d\n$e"
     }
   //sampleEnd
  println(result)
