@@ -8,6 +8,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Runs [fa], [fb] in parallel on [ctx] and combines their results as a tuple.
  *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ *
  * ```kotlin
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
@@ -38,6 +41,9 @@ public suspend inline fun <A, B> parTupled(
 
 /**
  * Runs [fa], [fb], [fc] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -72,6 +78,9 @@ public suspend inline fun <A, B, C> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -109,6 +118,9 @@ public suspend inline fun <A, B, C, D> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -149,6 +161,9 @@ public suspend inline fun <A, B, C, D, E> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -192,6 +207,9 @@ public suspend inline fun <A, B, C, D, E, F> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -238,6 +256,9 @@ public suspend inline fun <A, B, C, D, E, F, G> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -287,6 +308,9 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parTupled(
 
 /**
  * Runs [fa], [fb], [fc], [fd], [fe], [ff], [fg], [fh], [fi] in parallel on [ctx] and combines their results as a tuple.
+ *
+ * Coroutine context is inherited from caller, additional context elements can be specified with [context] argument.
+ * If the context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
