@@ -397,41 +397,35 @@ public sealed class Option<out A> {
   public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
     zip(other, ::Pair)
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C> zip(
     b: Option<B>,
     map: (A, B) -> C
   ): Option<C> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+    return option { map(bind(), b.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D> zip(
     b: Option<B>,
     c: Option<C>,
     map: (A, B, C) -> D
   ): Option<D> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      c,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+    return option { map(bind(), b.bind(), c.bind()) }
   }
 
   /**
@@ -540,6 +534,13 @@ public sealed class Option<out A> {
     return onSome(f)
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E> zip(
     b: Option<B>,
     c: Option<C>,
@@ -547,19 +548,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D) -> E
   ): Option<E> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      c,
-      d,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F> zip(
     b: Option<B>,
     c: Option<C>,
@@ -568,17 +566,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E) -> F
   ): Option<F> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e
-      )
-    }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G> zip(
     b: Option<B>,
     c: Option<C>,
@@ -588,18 +585,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F) -> G
   ): Option<G> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e,
-        f
-      )
-    }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H> zip(
     b: Option<B>,
     c: Option<C>,
@@ -610,9 +605,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G) -> H
   ): Option<H> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I> zip(
     b: Option<B>,
     c: Option<C>,
@@ -624,9 +626,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H) -> I
   ): Option<I> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, Some.unit, Some.unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I, J> zip(
     b: Option<B>,
     c: Option<C>,
@@ -639,9 +648,16 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I) -> J
   ): Option<J> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, i, Some.unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
     b: Option<B>,
     c: Option<C>,
@@ -655,11 +671,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I, J) -> K
   ): Option<K> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return if (this is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
-      Some(map(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-    } else {
-      None
-    }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
   }
 
   /**
@@ -1262,26 +1274,25 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
 @Deprecated(
   NicheAPI + "Prefer using the orElse method",
   ReplaceWith(
-    "orElse { Some(f(Unit)) }",
-    "arrow.core.Some",
-    "arrow.core.orElse"
+    "recover { f(Unit) }",
+    "arrow.core.recover"
   )
 )
 public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-  return handleErrorWith { Some(f(Unit)) }
+  return recover { f(Unit) }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the orElse method",
   ReplaceWith(
-    "orElse { f(Unit) }",
-    "arrow.core.orElse"
+    "recover { f(Unit).bind() }",
+    "arrow.core.recover"
   )
 )
 public inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-  return if (isEmpty()) f(Unit) else this
+  return recover { f(Unit).bind() }
 }
 
 public fun <A> Option<Option<A>>.flatten(): Option<A> =
@@ -1290,9 +1301,8 @@ public fun <A> Option<Option<A>>.flatten(): Option<A> =
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or explicit map with orElse",
   ReplaceWith(
-    "map(fb).orElse { Some(fe(Unit)) }",
-    "arrow.core.Some",
-    "arrow.core.orElse"
+    "map(fb).recover { fe(Unit) }",
+    "arrow.core.recover"
   )
 )
 public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> {
@@ -1300,14 +1310,14 @@ public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
   }
-  return map(fb).handleError(fe)
+  return map(fb).recover { fe(Unit) }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or explicit flatMap with orElse",
   ReplaceWith(
-    "flatMap(fb).orElse(fe)",
-    "arrow.core.orElse"
+    "flatMap(fb).recover { fe(Unit).bind() }",
+    "arrow.core.recover"
   )
 )
 public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> {
@@ -1315,7 +1325,7 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
   }
-  return flatMap(fb).handleErrorWith(fe)
+  return flatMap(fb).recover { fe(Unit).bind() }
 }
 
 @Deprecated(
