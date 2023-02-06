@@ -1,9 +1,13 @@
+@file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
 import arrow.core.Ior.*
 import arrow.core.Ior.Right.Companion.unit
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
 
 public typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -147,24 +151,47 @@ public sealed class Ior<out A, out B> {
    * @param fab the function to apply if this is a [Both]
    * @return the results of applying the function
    */
-  public inline fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C = when (this) {
-    is Left -> fa(value)
-    is Right -> fb(value)
-    is Both -> fab(leftValue, rightValue)
+  public inline fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C {
+    contract {
+      callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(fab, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (this) {
+      is Left -> fa(value)
+      is Right -> fb(value)
+      is Both -> fab(leftValue, rightValue)
+    }
   }
-  
-  public inline fun <C> foldLeft(c: C, f: (C, B) -> C): C =
-    fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
-  
-  public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C = MN.run {
-    foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
+
+  public inline fun <C> foldLeft(c: C, f: (C, B) -> C): C {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
   }
-  
-  public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
-    fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
-  
-  public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C = MN.run {
-    bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
+
+  public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return MN.run {
+      foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
+    }
+  }
+
+  public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(g, InvocationKind.AT_MOST_ONCE)
+    }
+    return fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
+  }
+
+  public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(g, InvocationKind.AT_MOST_ONCE)
+    }
+    return MN.run {
+      bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
+    }
   }
   
   /**
@@ -182,13 +209,15 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-04.kt -->
    */
-  public inline fun <D> map(f: (B) -> D): Ior<A, D> =
-    when (this) {
+  public inline fun <D> map(f: (B) -> D): Ior<A, D> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is Left -> Left(value)
       is Right -> Right(f(value))
       is Both -> Both(leftValue, f(rightValue))
     }
-  
+  }
+
   /**
    * Apply `fa` if this is a [Left] or [Both] to `A`
    * and apply `fb` if this is [Right] or [Both] to `B`
@@ -205,12 +234,18 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-05.kt -->
    */
-  public inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
-    { Left(fa(it)) },
-    { Right(fb(it)) },
-    { a, b -> Both(fa(a), fb(b)) }
-  )
-  
+  public inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> {
+    contract {
+      callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    }
+    return fold(
+      { Left(fa(it)) },
+      { Right(fb(it)) },
+      { a, b -> Both(fa(a), fb(b)) }
+    )
+  }
+
   /**
    * The given function is applied if this is a [Left] or [Both] to `A`.
    *
@@ -226,12 +261,15 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-06.kt -->
    */
-  public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
-    { Left(fa(it)) },
-    ::Right,
-    { a, b -> Both(fa(a), b) }
-  )
-  
+  public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> {
+    contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
+    return fold(
+      { Left(fa(it)) },
+      ::Right,
+      { a, b -> Both(fa(a), b) }
+    )
+  }
+
   /**
    * If this is a [Left], then return the left value in [Right] or vice versa,
    * when this is [Both] , left and right values are swap
@@ -327,9 +365,14 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-10.kt -->
    */
-  public fun orNull(): B? =
-    fold({ null }, { it }, { _, b -> b })
-  
+  public fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Ior is Left<A>)
+      returnsNotNull() implies ((this@Ior is Right<B>) || (this@Ior is Both<A, B>))
+    }
+    return fold({ null }, { it }, { _, b -> b })
+  }
+
   /**
    * Returns the [Left] value or `A` if this is [Left] or [Both]
    * and [null] if this is a [Right].
@@ -349,9 +392,14 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-11.kt -->
    */
-  public fun leftOrNull(): A? =
-    fold({ it }, { null }, { a, _ -> a })
-  
+  public fun leftOrNull(): A? {
+    contract {
+      returns(null) implies (this@Ior is Right<B>)
+      returnsNotNull() implies ((this@Ior is Left<A>) || (this@Ior is Both<A, B>))
+    }
+    return fold({ it }, { null }, { a, _ -> a })
+  }
+
   public data class Left<out A>(val value: A) : Ior<A, Nothing>() {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = true
@@ -440,9 +488,11 @@ public sealed class Ior<out A, out B> {
       { b -> fa(b)?.let { Right(it) } },
       { a, b -> fa(b)?.let { Both(a, it) } }
     )
-  
-  public inline fun all(predicate: (B) -> Boolean): Boolean =
-    fold({ true }, predicate, { _, b -> predicate(b) })
+
+  public inline fun all(predicate: (B) -> Boolean): Boolean {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return fold({ true }, predicate, { _, b -> predicate(b) })
+  }
   
   /**
    * Returns `false` if [Left] or returns the result of the application of
@@ -462,19 +512,35 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-12.kt -->
    */
-  public inline fun exists(predicate: (B) -> Boolean): Boolean =
-    fold({ false }, predicate, { _, b -> predicate(b) })
-  
-  public inline fun findOrNull(predicate: (B) -> Boolean): B? =
-    when (this) {
+  public inline fun exists(predicate: (B) -> Boolean): Boolean {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return fold({ false }, predicate, { _, b -> predicate(b) })
+  }
+
+  public inline fun findOrNull(predicate: (B) -> Boolean): B? {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is Left -> null
       is Right -> if (predicate(this.value)) this.value else null
       is Both -> if (predicate(this.rightValue)) this.rightValue else null
     }
-  
-  public fun isEmpty(): Boolean = isLeft
-  
-  public fun isNotEmpty(): Boolean = !isLeft
+  }
+
+  public fun isEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Left<A>)
+      returns(false) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
+    }
+    return isLeft
+  }
+
+  public fun isNotEmpty(): Boolean {
+    contract {
+      returns(false) implies (this@Ior is Left<A>)
+      returns(true) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
+    }
+    return !isLeft
+  }
   
   public fun void(): Ior<A, Unit> =
     map { Unit }
@@ -498,8 +564,10 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A,
     }
   }
 
-public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
-  fold({ default() }, ::identity, { _, b -> b })
+public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B {
+  contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold({ default() }, ::identity, { _, b -> b })
+}
 
 public fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
@@ -587,28 +655,32 @@ public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair
 public inline fun <A, B, C, D> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
-  map: (B, C) -> D,
-): Ior<A, D> =
-  zip(SA, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ ->
-    map(b, c)
-  }
+  map: (B, C) -> D
+): Ior<A, D> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+}
 
 public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
   d: Ior<A, D>,
-  map: (B, C, D) -> E,
-): Ior<A, E> =
-  zip(SA, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  map: (B, C, D) -> E
+): Ior<A, E> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+}
 
 public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
   d: Ior<A, D>,
   e: Ior<A, E>,
-  map: (B, C, D, E) -> F,
-): Ior<A, F> =
-  zip(SA, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  map: (B, C, D, E) -> F
+): Ior<A, F> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+}
 
 public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -616,9 +688,11 @@ public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   d: Ior<A, D>,
   e: Ior<A, E>,
   f: Ior<A, F>,
-  map: (B, C, D, E, F) -> G,
-): Ior<A, G> =
-  zip(SA, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  map: (B, C, D, E, F) -> G
+): Ior<A, G> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+}
 
 public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -627,9 +701,11 @@ public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   e: Ior<A, E>,
   f: Ior<A, F>,
   g: Ior<A, G>,
-  map: (B, C, D, E, F, G) -> H,
-): Ior<A, H> =
-  zip(SA, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  map: (B, C, D, E, F, G) -> H
+): Ior<A, H> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+}
 
 public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -639,9 +715,11 @@ public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   f: Ior<A, F>,
   g: Ior<A, G>,
   h: Ior<A, H>,
-  map: (B, C, D, E, F, G, H) -> I,
-): Ior<A, I> =
-  zip(SA, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  map: (B, C, D, E, F, G, H) -> I
+): Ior<A, I> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+}
 
 public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -652,9 +730,11 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   g: Ior<A, G>,
   h: Ior<A, H>,
   i: Ior<A, I>,
-  map: (B, C, D, E, F, G, H, I) -> J,
-): Ior<A, J> =
-  zip(SA, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  map: (B, C, D, E, F, G, H, I) -> J
+): Ior<A, J> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+}
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -666,9 +746,11 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   h: Ior<A, H>,
   i: Ior<A, I>,
   j: Ior<A, J>,
-  map: (B, C, D, E, F, G, H, I, J) -> K,
-): Ior<A, K> =
-  zip(SA, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  map: (B, C, D, E, F, G, H, I, J) -> K
+): Ior<A, K> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(SA, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+}
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -683,6 +765,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   k: Ior<A, K>,
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
 ): Ior<A, L> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
   // If any of the values is Right or Both then we can calculate L otherwise it results in MY_NULL
   val rightValue: Any? = if (
     (this@zip.isRight || this@zip.isBoth) &&

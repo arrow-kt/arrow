@@ -1,6 +1,8 @@
 package arrow.core
 
 import arrow.typeclasses.Semigroup
+import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -144,33 +146,37 @@ public typealias Nel<A> = NonEmptyList<A>
  * - `a.zip(b, c) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `zip`
  *
  */
-public class NonEmptyList<out A>(
-  public val head: A,
-  public val tail: List<A>
-) : AbstractList<A>() {
-
-  private constructor(list: List<A>) : this(list[0], list.drop(1))
-
-  override val size: Int =
-    1 + tail.size
-
+@JvmInline
+public value class NonEmptyList<out A> @PublishedApi internal constructor(
   public val all: List<A>
-    get() = toList()
+) : List<A> by all {
 
-  public override operator fun get(index: Int): A {
-    if (index < 0 || index >= size) throw IndexOutOfBoundsException("$index is not in 1..${size - 1}")
-    return if (index == 0) head else tail[index - 1]
+  public constructor(head: A, tail: List<A>): this(listOf(head) + tail)
+
+  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
+  override fun equals(other: Any?): Boolean = when (other) {
+    is NonEmptyList<*> -> this.all == other.all
+    else -> this.all == other
   }
+
+  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
+  override fun hashCode(): Int = all.hashCode()
 
   override fun isEmpty(): Boolean = false
 
-  public fun toList(): List<A> = listOf(head) + tail
+  public fun toList(): List<A> = all
+
+  public val head: A
+    get() = all.first()
+
+  public val tail: List<A>
+    get() = all.drop(1)
 
   public inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
-    NonEmptyList(f(head), tail.map(f))
+    NonEmptyList(all.map(f))
 
   public inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-    f(head) + tail.flatMap { f(it).all }
+    NonEmptyList(all.flatMap { f(it).all })
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     NonEmptyList(all + l.all)
@@ -182,69 +188,33 @@ public class NonEmptyList<out A>(
     NonEmptyList(all + a)
 
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-    this.tail.fold(f(b, this.head), f)
+    all.fold(b, f)
 
-  public fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
-    val buf = mutableListOf<B>()
-    tailrec fun consume(list: List<A>): List<B> =
-      if (list.isEmpty()) {
-        buf
-      } else {
-        val tail = list.subList(1, list.size)
-        buf += f(NonEmptyList(list[0], tail))
-        consume(tail)
+  public fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> =
+    buildList {
+      var current = all
+      while (current.isNotEmpty()) {
+        add(f(NonEmptyList(current)))
+        current = current.drop(1)
       }
-    return NonEmptyList(f(this), consume(this.tail))
-  }
+    }.let(::NonEmptyList)
 
   public fun extract(): A =
     this.head
-
-  override fun equals(other: Any?): Boolean =
-    super.equals(other)
-
-  override fun hashCode(): Int =
-    super.hashCode()
 
   override fun toString(): String =
     "NonEmptyList(${all.joinToString()})"
 
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
-    NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
+    NonEmptyList(all.align(b))
 
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    SA.run {
-      NonEmptyList(head.combine(b.head), tail.salign(SA, b.tail).toList())
-    }
+    NonEmptyList(all.salign(SA, b).toList())
 
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
-    NonEmptyList(head to other.head, tail.padZip(other.tail))
+    NonEmptyList(all.padZip(other))
 
   public companion object {
-
-    @Deprecated(
-      "Use toNonEmptyListOrNull instead",
-      ReplaceWith(
-        "l.toNonEmptyListOrNull().toOption()",
-        "import arrow.core.toNonEmptyListOrNull",
-        "import arrow.core.toOption"
-      )
-    )
-    @JvmStatic
-    public fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
-      if (l.isEmpty()) None else Some(NonEmptyList(l))
-
-    @Deprecated(
-      "Use toNonEmptyListOrNull instead",
-      ReplaceWith(
-        "l.toNonEmptyListOrNull() ?: throw IndexOutOfBoundsException(\"Empty list doesn't contain element at index 0.\")",
-        "import arrow.core.toNonEmptyListOrNull"
-      )
-    )
-    @JvmStatic
-    public fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
-      NonEmptyList(l)
-
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
       nonEmptyListOf(Unit)
@@ -257,20 +227,14 @@ public class NonEmptyList<out A>(
     b: NonEmptyList<B>,
     map: (A, B) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head),
-      tail.zip(b.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, map))
 
   public inline fun <B, C, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     map: (A, B, C) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head),
-      tail.zip(b.tail, c.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, map))
 
   public inline fun <B, C, D, Z> zip(
     b: NonEmptyList<B>,
@@ -278,10 +242,7 @@ public class NonEmptyList<out A>(
     d: NonEmptyList<D>,
     map: (A, B, C, D) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head),
-      tail.zip(b.tail, c.tail, d.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, map))
 
   public inline fun <B, C, D, E, Z> zip(
     b: NonEmptyList<B>,
@@ -290,10 +251,7 @@ public class NonEmptyList<out A>(
     e: NonEmptyList<E>,
     map: (A, B, C, D, E) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, map))
 
   public inline fun <B, C, D, E, F, Z> zip(
     b: NonEmptyList<B>,
@@ -303,10 +261,7 @@ public class NonEmptyList<out A>(
     f: NonEmptyList<F>,
     map: (A, B, C, D, E, F) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, f.all, map))
 
   public inline fun <B, C, D, E, F, G, Z> zip(
     b: NonEmptyList<B>,
@@ -317,10 +272,7 @@ public class NonEmptyList<out A>(
     g: NonEmptyList<G>,
     map: (A, B, C, D, E, F, G) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, map))
 
   public inline fun <B, C, D, E, F, G, H, Z> zip(
     b: NonEmptyList<B>,
@@ -332,10 +284,7 @@ public class NonEmptyList<out A>(
     h: NonEmptyList<H>,
     map: (A, B, C, D, E, F, G, H) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, map))
 
   public inline fun <B, C, D, E, F, G, H, I, Z> zip(
     b: NonEmptyList<B>,
@@ -348,10 +297,7 @@ public class NonEmptyList<out A>(
     i: NonEmptyList<I>,
     map: (A, B, C, D, E, F, G, H, I) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, map))
 
   public inline fun <B, C, D, E, F, G, H, I, J, Z> zip(
     b: NonEmptyList<B>,
@@ -365,17 +311,16 @@ public class NonEmptyList<out A>(
     j: NonEmptyList<J>,
     map: (A, B, C, D, E, F, G, H, I, J) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail, map)
-    )
+    NonEmptyList(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, map))
 }
 
+@JvmName("nonEmptyListOf")
 public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
-  NonEmptyList(head, t.asList())
+  NonEmptyList(listOf(head) + t)
 
+@JvmName("nel")
 public inline fun <A> A.nel(): NonEmptyList<A> =
-  nonEmptyListOf(this)
+  NonEmptyList(listOf(this))
 
 public operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A>): Int =
   all.compareTo(other.all)
@@ -399,15 +344,12 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
   this.unzip(::identity)
 
 public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
-  this.map(f).let { nel ->
-    nel.tail.unzip().let {
-      NonEmptyList(nel.head.first, it.first) to
-        NonEmptyList(nel.head.second, it.second)
-    }
-  }
+  all.unzip(f).let { (a, b) -> NonEmptyList(a) to NonEmptyList(b) }
 
+@JvmName("toNonEmptyListOrNull")
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
-  firstOrNull()?.let { NonEmptyList(it, drop(1)) }
+  toList().let { if (it.isEmpty()) null else NonEmptyList(it) }
 
+@JvmName("toNonEmptyListOrNone")
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
   toNonEmptyListOrNull().toOption()

@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -9,7 +11,7 @@ apply(from = property("TEST_COVERAGE"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
@@ -22,6 +24,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
+        implementation(projects.arrowAtomic)
         implementation(projects.arrowFxCoroutines)
         compileOnly(libs.kotlin.stdlibCommon)
         implementation(libs.coroutines.core)
