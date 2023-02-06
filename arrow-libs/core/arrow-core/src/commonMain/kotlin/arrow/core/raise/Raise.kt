@@ -1,25 +1,21 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-
+@file:JvmMultifileClass
+@file:JvmName("RaiseKt")
 package arrow.core.raise
 
 import arrow.core.Either
-import arrow.core.EmptyValue
-import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.continuations.EffectScope
-import arrow.core.emptyCombine
 import arrow.core.identity
-import arrow.core.nel
-import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @DslMarker
@@ -313,89 +309,6 @@ public interface Raise<in R> {
   public fun <A> EagerEffect<R, A>.catch(
     @BuilderInference catch: Raise<R>.(Throwable) -> A,
   ): A = fold({ catch(it) }, { raise(it) }, { it })
-
-  /**
-   * Accumulate the errors from running both [action1] and [action2]
-   * using the given [semigroup].
-   */
-  @RaiseDSL
-  public fun <A, B, C> zipOrAccumulate(
-    semigroup: Semigroup<@UnsafeVariance R>,
-    @BuilderInference action1: Raise<R>.() -> A,
-    @BuilderInference action2: Raise<R>.() -> B,
-    @BuilderInference block: Raise<R>.(A, B) -> C
-  ): C {
-    val result1 = recover(action1) { e1 ->
-      // try to execute the second
-      recover(action2) { e2 -> raise(semigroup.run { e1 + e2 }) }
-      // if the second succeeds, just raise the first one
-      raise(e1)
-    }
-    return block(result1, action2())
-  }
-
-  /**
-   * Accumulate the errors from running [action1], [action2], and [action3]
-   * using the given [semigroup].
-   */
-  @RaiseDSL
-  public fun <A, B, C, D> zipOrAccumulate(
-    semigroup: Semigroup<@UnsafeVariance R>,
-    @BuilderInference action1: Raise<R>.() -> A,
-    @BuilderInference action2: Raise<R>.() -> B,
-    @BuilderInference action3: Raise<R>.() -> C,
-    @BuilderInference block: Raise<R>.(A, B, C) -> D
-  ): D = zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2) { x, y -> x to y } },
-    action3
-  ) { xy, z -> block(xy.first, xy.second, z) }
-
-  /**
-   * Accumulate the errors from running [action1], [action2], [action3], and [action4]
-   * using the given [semigroup].
-   */
-  @RaiseDSL
-  public fun <A, B, C, D, E> zipOrAccumulate(
-    semigroup: Semigroup<@UnsafeVariance R>,
-    @BuilderInference action1: Raise<R>.() -> A,
-    @BuilderInference action2: Raise<R>.() -> B,
-    @BuilderInference action3: Raise<R>.() -> C,
-    @BuilderInference action4: Raise<R>.() -> D,
-    @BuilderInference block: Raise<R>.(A, B, C, D) -> E
-  ): E = zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3) { x, y, z -> Triple(x, y, z) } },
-    action4
-  ) { xyz, z -> block(xyz.first, xyz.second, xyz.third, z) }
-
-  /**
-   * Accumulate the errors obtained by executing the [block]
-   * over every element of [this] using the given [semigroup].
-   */
-  @RaiseDSL
-  public fun <A, B> Iterable<A>.mapOrAccumulate(
-    semigroup: Semigroup<@UnsafeVariance R>,
-    @BuilderInference block: Raise<R>.(A) -> B
-  ): List<B> {
-    // this could be implemented using [zipOrAccumulate],
-    // but we can have a faster implementation using [MutableList]
-    var error: Any? = EmptyValue
-    val results = mutableListOf<B>()
-    forEach {
-      fold<R, B, Unit>({
-        block(it)
-      }, { newError ->
-        error = semigroup.emptyCombine(error, newError)
-      }, {
-        results.add(it)
-      })
-    }
-    when (val e = error) {
-      is EmptyValue -> return results
-      else -> raise(EmptyValue.unbox(e))
-    }
-  }
 }
 
 /**
@@ -490,70 +403,3 @@ public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R)
   }
   return value ?: raise(raise())
 }
-
-@RaiseDSL
-public inline fun <R, A> Raise<NonEmptyList<R>>.mapErrorNel(
-  crossinline block: Raise<R>.() -> A
-): A = recover(block) { raise(it.nel()) }
-
-/**
- * Accumulate the errors obtained by executing the [block]
- * over every element of [list].
- */
-@RaiseDSL
-public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
-  list: Iterable<A>,
-  @BuilderInference crossinline block: Raise<R>.(A) -> B
-): List<B> =
-  list.mapOrAccumulate(Semigroup.nonEmptyList()) { elt -> mapErrorNel { block(elt) } }
-
-/**
- * Accumulate the errors from running both [action1] and [action2].
- */
-@RaiseDSL
-public inline fun <R, A, B, C> Raise<NonEmptyList<R>>.zipOrAccumulate(
-  @BuilderInference crossinline action1: Raise<R>.() -> A,
-  @BuilderInference crossinline action2: Raise<R>.() -> B,
-  @BuilderInference crossinline block: Raise<R>.(A, B) -> C
-): C = zipOrAccumulate(
-  Semigroup.nonEmptyList(),
-  { mapErrorNel(action1) },
-  { mapErrorNel(action2) },
-  { x, y -> mapErrorNel { block(x, y) } }
-)
-
-/**
- * Accumulate the errors from running [action1], [action2], and [action3].
- */
-@RaiseDSL
-public inline fun <R, A, B, C, D> Raise<NonEmptyList<R>>.zipOrAccumulate(
-  @BuilderInference crossinline action1: Raise<R>.() -> A,
-  @BuilderInference crossinline action2: Raise<R>.() -> B,
-  @BuilderInference crossinline action3: Raise<R>.() -> C,
-  @BuilderInference crossinline block: Raise<R>.(A, B, C) -> D
-): D = zipOrAccumulate(
-  Semigroup.nonEmptyList(),
-  { mapErrorNel(action1) },
-  { mapErrorNel(action2) },
-  { mapErrorNel(action3) },
-  { x, y, z -> mapErrorNel { block(x, y, z) } }
-)
-
-/**
- * Accumulate the errors from running [action1], [action2], [action3], and [action4].
- */
-@RaiseDSL
-public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
-  @BuilderInference crossinline action1: Raise<R>.() -> A,
-  @BuilderInference crossinline action2: Raise<R>.() -> B,
-  @BuilderInference crossinline action3: Raise<R>.() -> C,
-  @BuilderInference crossinline action4: Raise<R>.() -> D,
-  @BuilderInference crossinline block: Raise<R>.(A, B, C, D) -> E
-): E = zipOrAccumulate(
-  Semigroup.nonEmptyList(),
-  { mapErrorNel(action1) },
-  { mapErrorNel(action2) },
-  { mapErrorNel(action3) },
-  { mapErrorNel(action4) },
-  { x, y, z, u -> mapErrorNel { block(x, y, z, u) } }
-)
