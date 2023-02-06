@@ -1,5 +1,5 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleOption25
+package arrow.core.examples.exampleOption28
 
 import arrow.core.Option
 import arrow.core.none

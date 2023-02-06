@@ -51,14 +51,30 @@ public value class OptionEagerEffectScope(private val cont: EagerEffectScope<Non
     ensure(value) { None }
 }
 
+@Deprecated(
+  optionDSLDeprecation,
+  ReplaceWith("option", "arrow.core.raise.option")
+)
 @Suppress("ClassName")
 public object option {
+  @Deprecated(
+    optionDSLDeprecation,
+    ReplaceWith("option(f)", "arrow.core.raise.option")
+  )
   public inline fun <A> eager(crossinline f: suspend OptionEagerEffectScope.() -> A): Option<A> =
     eagerEffect<None, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(OptionEagerEffectScope(this))
     }.toOption()
-
+  
+  @Deprecated(
+    optionDSLDeprecation,
+    ReplaceWith("option(f)", "arrow.core.raise.option")
+  )
   public suspend inline operator fun <A> invoke(crossinline f: suspend OptionEffectScope.() -> A): Option<A> =
     effect<None, A> { f(OptionEffectScope(this)) }.toOption()
 }
+
+private const val optionDSLDeprecation =
+  "The option DSL has been moved to arrow.core.raise.option.\n" +
+    "Replace import arrow.core.computations.option with arrow.core.raise.option"
