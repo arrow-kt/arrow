@@ -835,7 +835,7 @@ public sealed class Option<out A> {
    */
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL, or fold or map",
-    ReplaceWith("fold({ false }, predicate)")
+    ReplaceWith("fold({ true }, predicate)")
   )
   public inline fun all(predicate: (A) -> Boolean): Boolean {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
@@ -931,7 +931,7 @@ public sealed class Option<out A> {
    */
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL, or fold or map",
-    ReplaceWith("fold({ true }, predicate)")
+    ReplaceWith("fold({ false }, predicate)")
   )
   public inline fun exists(predicate: (A) -> Boolean): Boolean {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
