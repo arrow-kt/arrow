@@ -446,7 +446,6 @@ public sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-19.kt -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun onNone(action: () -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -472,7 +471,6 @@ public sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-20.kt -->
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun onSome(action: (A) -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -678,11 +676,19 @@ public sealed class Option<out A> {
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
-  public abstract fun isEmpty(): Boolean
+  public fun isEmpty(): Boolean {
+    contract {
+      returns(false) implies (this@Option is Some<A>)
+      returns(true) implies (this@Option is None)
+    }
+    return this@Option is None
+  }
 
-  @OptIn(ExperimentalContracts::class)
   public fun isNotEmpty(): Boolean {
-    contract { returns(true) implies (this@Option is Some<A>) }
+    contract {
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
     return this@Option is Some<A>
   }
 
@@ -732,7 +738,13 @@ public sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-23.kt -->
    */
-  public fun getOrNull(): A? = getOrElse { null }
+  public fun getOrNull(): A? {
+    contract {
+      returns(null) implies (this@Option is None)
+      returnsNotNull() implies (this@Option is Some<A>)
+    }
+    return getOrElse { null }
+  }
 
   /**
    * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -1144,14 +1156,10 @@ public sealed class Option<out A> {
 }
 
 public object None : Option<Nothing>() {
-  public override fun isEmpty(): Boolean = true
-
   override fun toString(): String = "Option.None"
 }
 
 public data class Some<out T>(val value: T) : Option<T>() {
-  public override fun isEmpty(): Boolean = false
-
   override fun toString(): String = "Option.Some($value)"
 
   public companion object {
@@ -1226,7 +1234,11 @@ public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
 
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside option DSL, or replace with explicit flatMap",
-  ReplaceWith("this.flatMap { b -> b.takeIf(predicate)?.let(::Some) ?: None.also(error) }")
+  ReplaceWith(
+    "this.flatMap { b -> b.takeIf(predicate)?.let(::Some) ?: None.also(error) }",
+    "arrow.core.Some",
+    "arrow.core.None"
+  )
 )
 public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> {
   contract {
