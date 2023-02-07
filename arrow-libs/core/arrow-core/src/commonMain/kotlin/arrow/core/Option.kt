@@ -1193,13 +1193,6 @@ public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) 
   this
 }
 
-@Deprecated(
-  RedundantAPI + "Prefer using fromNullable",
-  ReplaceWith(
-    "Option.fromNullable(this)",
-    "arrow.core.Option"
-  )
-)
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
 @Deprecated(
