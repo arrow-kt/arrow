@@ -4,7 +4,7 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import arrow.core.left
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should

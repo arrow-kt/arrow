@@ -1,8 +1,8 @@
 // This file was automatically generated from ErrorHandlers.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEffectError02
 
-import arrow.core.continuations.effect
-import arrow.core.continuations.catch
+import arrow.core.raise.effect
+import arrow.core.raise.catch
 
 object User
 object Error

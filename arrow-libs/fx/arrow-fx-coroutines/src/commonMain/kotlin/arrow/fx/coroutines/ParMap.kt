@@ -2,8 +2,8 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.Raise
-import arrow.core.continuations.either
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.core.flattenOrAccumulate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async

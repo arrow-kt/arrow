@@ -3,7 +3,7 @@ package arrow.fx.coroutines
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
-import arrow.core.continuations.result
+import arrow.core.raise.result
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.result.shouldBeFailure

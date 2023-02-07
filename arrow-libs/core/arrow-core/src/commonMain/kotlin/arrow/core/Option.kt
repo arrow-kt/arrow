@@ -1,6 +1,9 @@
 @file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
+import arrow.core.Either.Right
+import arrow.core.raise.OptionRaise
+import arrow.core.raise.option
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
@@ -10,7 +13,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- *
+ * <!--- TEST_NAME OptionKnitTest -->
  *
  * If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
  * Kotlin tries to solve the problem by getting rid of `null` values altogether, and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
@@ -412,6 +415,7 @@ public sealed class Option<out A> {
         f()
         this
       }
+
       is Some -> this
     }
   }
@@ -661,6 +665,7 @@ public sealed class Option<out A> {
         None -> None
         is Some -> Some(b.value.rightIor())
       }
+
       is Some -> when (b) {
         None -> Some(this.value.leftIor())
         is Some -> Some(Pair(this.value, b.value).bothIor())
@@ -928,6 +933,7 @@ public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Bool
         error()
         None
       }
+
     is None -> this
   }
 }
@@ -1062,6 +1068,7 @@ public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
       is Some -> Some(SGA.run { value.combine(b.value) })
       None -> this
     }
+
     None -> b
   }
 
@@ -1071,3 +1078,53 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
     other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
   }
 )
+
+/**
+ * Recover from any [None] if encountered.
+ *
+ * The recover DSL allows you to recover from any [None] value by:
+ *  - Computing a fallback value [A]
+ *  - Shifting a _new error_ of [None] into the [Option].
+ *
+ * ```kotlin
+ * import arrow.core.Option
+ * import arrow.core.none
+ * import arrow.core.Some
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Option<Int> = none()
+ *   val fallback: Option<Int> = error.recover { 5 }
+ *   fallback shouldBe Some(5)
+ * }
+ * ```
+ * <!--- KNIT example-option-22.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
+ * When shifting a new error [None] into the [Option]:
+ *
+ * ```kotlin
+ * import arrow.core.Option
+ * import arrow.core.none
+ * import arrow.core.Some
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Option<Int> = none()
+ *   fun fallback(): Option<Int> = Some(5)
+ *   fun failure(): Option<Int> = none()
+ *
+ *   error.recover { fallback().bind() } shouldBe Some(5)
+ *   error.recover { failure().bind() } shouldBe none()
+ * }
+ * ```
+ * <!--- KNIT example-option-23.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
+  when (this@recover) {
+    is None -> option { recover(this, None) }
+    is Some -> this@recover
+  }

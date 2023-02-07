@@ -3,7 +3,7 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.continuations.result
+import arrow.core.raise.result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.ContinuationInterceptor

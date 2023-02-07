@@ -2,7 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.left
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow

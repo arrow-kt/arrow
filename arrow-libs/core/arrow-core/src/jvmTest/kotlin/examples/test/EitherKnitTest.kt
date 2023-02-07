@@ -32,12 +32,24 @@ class EitherKnitTest : StringSpec({
     arrow.core.examples.exampleEither41.test()
   }
 
-  "ExampleEither47" {
-    arrow.core.examples.exampleEither47.test()
+  "ExampleEither46" {
+    arrow.core.examples.exampleEither46.test()
   }
 
-  "ExampleEither52" {
-    arrow.core.examples.exampleEither52.test()
+  "ExampleEither51" {
+    arrow.core.examples.exampleEither51.test()
+  }
+
+  "ExampleEither55" {
+    arrow.core.examples.exampleEither55.test()
+  }
+
+  "ExampleEither56" {
+    arrow.core.examples.exampleEither56.test()
+  }
+
+  "ExampleEither57" {
+    arrow.core.examples.exampleEither57.test()
   }
 
 }) {

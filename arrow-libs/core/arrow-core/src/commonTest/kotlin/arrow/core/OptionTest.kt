@@ -1,6 +1,6 @@
 package arrow.core
 
-import arrow.core.continuations.option
+import arrow.core.raise.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.testLaws
