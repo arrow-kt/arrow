@@ -6,10 +6,10 @@ import com.google.devtools.ksp.symbol.*
 import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
-  val sourceClassName = declaration.qualifiedNameOrSimpleName
+  val sourceClassName = declaration.qualifiedNameOrSimpleName.sanitizeDelimited()
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
   val simpleName = declaration.nameWithParentClass
-  val packageName = pckg.asString()
+  val packageName = pckg.asString().sanitizeDelimited()
   val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
     Visibility.INTERNAL -> "internal"
     else -> "public"
