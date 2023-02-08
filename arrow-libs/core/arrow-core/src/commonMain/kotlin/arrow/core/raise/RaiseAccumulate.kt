@@ -552,10 +552,7 @@ public inline fun <R, A, B> Raise<R>.mapOrAccumulate(
       })
     }
   }
-  return when (val e = EmptyValue.unbox<R>(error)) {
-    null -> results
-    else -> raise(e)
-  }
+  return if (error === EmptyValue) results else raise(EmptyValue.unbox<R>(error))
 }
 
 /**
