@@ -28,7 +28,7 @@ class IterableTest : StringSpec({
           .fold("") { acc, either -> "$acc${either.value}" }.left()
         else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
 
-      list.flattenOrAccumulate { a, b -> "$a$b" } shouldBe expected
+      list.flattenOrAccumulate(String::plus) shouldBe expected
     }
   }
 
@@ -41,6 +41,34 @@ class IterableTest : StringSpec({
 
       list.flattenOrAccumulate() shouldBe expected
     }
+  }
+
+  "mapAccumulating stack-safe, and runs in original order" {
+    val acc = mutableListOf<Int>()
+    val res = (0..20_000).mapOrAccumulate(String::plus) {
+      acc.add(it)
+      it
+    }
+    res shouldBe acc.right()
+    res shouldBe (0..20_000).toList().right()
+  }
+
+  "mapAccumulating accumulates" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      val res: Either<NonEmptyList<Int>, List<Int>> =
+        ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
+
+      val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
+        .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()
+
+      res shouldBe expected
+    }
+  }
+
+  "mapAccumulating with String::plus" {
+    listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
+      raise("fail")
+    } shouldBe Either.Left("failfailfail")
   }
 
     "traverse Either stack-safe" {
