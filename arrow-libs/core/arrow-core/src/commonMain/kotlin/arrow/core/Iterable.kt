@@ -288,11 +288,11 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
  * Returns [Either] a [List] containing the results of applying the given [transform] function
  * to each element in the original collection,
  * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
- * The [semigroup] is used to accumulate all the _logical errors_.
+ * The [combine] function is used to accumulate all the _logical errors_.
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  semigroup: Semigroup<Error>,
+  combine: (Error, Error) -> Error,
   @BuilderInference transform: Raise<Error>.(A) -> B,
 ): Either<Error, List<B>> =
   fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
@@ -304,7 +304,7 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
 
       is Left -> when (acc) {
         is Right -> res
-        is Left -> Left(semigroup.append(acc.value, res.value))
+        is Left -> Left(combine(acc.value, res.value))
       }
     }
   }
