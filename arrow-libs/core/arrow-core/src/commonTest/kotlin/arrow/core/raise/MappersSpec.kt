@@ -2,6 +2,7 @@ package arrow.core.raise
 
 import arrow.core.Ior
 import arrow.core.None
+import arrow.core.merge
 import arrow.core.none
 import arrow.core.test.either
 import arrow.core.toOption
@@ -133,6 +134,18 @@ class MappersSpec : StringSpec({
   "eagerEffect - toResult() - exception" {
     checkAll(Arb.string()) { a ->
       eagerEffect<Throwable, String> { throw boom }.toResult() shouldBe failure(boom)
+    }
+  }
+
+  "effect - merge" {
+    checkAll(Arb.either(Arb.string(), Arb.string())) { a ->
+      effect { a.bind() }.merge() shouldBe a.merge()
+    }
+  }
+
+  "eagerEffect - merge" {
+    checkAll(Arb.either(Arb.string(), Arb.string())) { a ->
+      eagerEffect { a.bind() }.merge() shouldBe a.merge()
     }
   }
 })
