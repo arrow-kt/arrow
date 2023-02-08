@@ -15,51 +15,51 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParMap8JvmTest : StringSpec({
+class ParZip8JvmTest : StringSpec({
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  "parMapN 8 returns to original context" {
-    val mapCtxName = "parMap8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
+  "parZip 8 returns to original context" {
+    val zipCtxName = "parZip8"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { zipCtxName }) }
 
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           val (s1, s2, s3, s4, s5, s6, s7, s8) = parZip(
-            _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName
+            _zipCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName
           ) { a, b, c, d, e, f, g, h ->
             Tuple8(a, b, c, d, e, f, g, h)
           }
 
-          s1 shouldStartWith mapCtxName
-          s2 shouldStartWith mapCtxName
-          s3 shouldStartWith mapCtxName
-          s4 shouldStartWith mapCtxName
-          s5 shouldStartWith mapCtxName
-          s6 shouldStartWith mapCtxName
-          s7 shouldStartWith mapCtxName
-          s8 shouldStartWith mapCtxName
+          s1 shouldStartWith zipCtxName
+          s2 shouldStartWith zipCtxName
+          s3 shouldStartWith zipCtxName
+          s4 shouldStartWith zipCtxName
+          s5 shouldStartWith zipCtxName
+          s6 shouldStartWith zipCtxName
+          s7 shouldStartWith zipCtxName
+          s8 shouldStartWith zipCtxName
           threadName() shouldStartWith singleThreadName
         }
       }
 
   }
 
-  "parMapN 8 returns to original context on failure" {
-    val mapCtxName = "parMap8"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { mapCtxName }) }
+  "parZip 8 returns to original context on failure" {
+    val zipCtxName = "parZip8"
+    val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(8, NamedThreadFactory { zipCtxName }) }
 
     checkAll(Arb.int(1..8), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
+      single.zip(zipCtx).use { (_single, _zipCtx) ->
         withContext(_single) {
           threadName() shouldStartWith singleThreadName
 
           Either.catch {
             when (choose) {
               1 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { e.suspend() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -70,7 +70,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _ -> Unit }
               2 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { e.suspend() },
                 { awaitCancellation() },
@@ -91,7 +91,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _ -> Unit }
               4 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -102,7 +102,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _ -> Unit }
               5 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -113,7 +113,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _ -> Unit }
               6 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -124,7 +124,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _ -> Unit }
               7 -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -135,7 +135,7 @@ class ParMap8JvmTest : StringSpec({
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _ -> Unit }
               else -> parZip(
-                _mapCtx,
+                _zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -153,7 +153,7 @@ class ParMap8JvmTest : StringSpec({
     }
   }
 
-  "parMapN 8 finishes on single thread" {
+  "parZip 8 finishes on single thread" {
     checkAll(Arb.string()) {
       val res = single.use { ctx ->
         parZip(
