@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.typeclasses.Semigroup
 
+@Deprecated("Const is deprecated in Arrow Core and will be removed in 2.x.x. \n If Const is crucial for you, please let us know on the Arrow Github. Thanks!\n" + " https://github.com/arrow-kt/arrow/issues\n")
 public data class Const<A, out T>(private val value: A) {
 
   @Suppress("UNCHECKED_CAST")
