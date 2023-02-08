@@ -676,6 +676,10 @@ public sealed class Option<out A> {
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    ReplaceWith("isNone()")
+  )
   public fun isEmpty(): Boolean {
     contract {
       returns(false) implies (this@Option is Some<A>)
@@ -684,7 +688,35 @@ public sealed class Option<out A> {
     return this@Option is None
   }
 
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
+  )
   public fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
+    return this@Option is Some<A>
+  }
+
+  /**
+   * Returns true if the option is [None], false otherwise.
+   * @note Used only for performance instead of fold.
+   */
+  public fun isNone(): Boolean {
+    contract {
+      returns(false) implies (this@Option is Some<A>)
+      returns(true) implies (this@Option is None)
+    }
+    return this@Option is None
+  }
+
+  /**
+   * Returns true if the option is [Some], false otherwise.
+   * @note Used only for performance instead of fold.
+   */
+  public fun isSome(): Boolean {
     contract {
       returns(true) implies (this@Option is Some<A>)
       returns(false) implies (this@Option is None)
@@ -696,8 +728,8 @@ public sealed class Option<out A> {
    * alias for [isDefined]
    */
   @Deprecated(
-    "Duplicated API. Please use Option's member function isNotEmpty. This will be removed towards Arrow 2.0",
-    ReplaceWith("isNotEmpty()")
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
   )
   public fun nonEmpty(): Boolean = isDefined()
 
@@ -706,8 +738,8 @@ public sealed class Option<out A> {
    * @note Used only for performance instead of fold.
    */
   @Deprecated(
-    "Duplicated API. Please use Option's member function isNotEmpty. This will be removed towards Arrow 2.0",
-    ReplaceWith("isNotEmpty()")
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
   )
   public fun isDefined(): Boolean = !isEmpty()
 
@@ -1268,6 +1300,38 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
     }
   }
 
+/**
+ * Returns true if this option is nonempty '''and''' the predicate
+ * $p returns true when applied to this $option's value.
+ * Otherwise, returns false.
+ *
+ * Example:
+ * ```kotlin
+ * import arrow.core.Some
+ * import arrow.core.None
+ * import arrow.core.Option
+ *
+ * fun main() {
+ *   Some(12).isSome { it > 10 } // Result: true
+ *   Some(7).isSome { it > 10 }  // Result: false
+ *
+ *   val none: Option<Int> = None
+ *   none.isSome { it > 10 }      // Result: false
+ * }
+ * ```
+ * <!--- KNIT example-option-26.kt -->
+ *
+ * @param predicate the predicate to test
+ */
+public inline fun <A> Option<A>.isSome(predicate: (A) -> Boolean): Boolean {
+  contract {
+    callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+    returns(true) implies (this@isSome is Some<A>)
+    returns(false) implies (this@isSome is None)
+  }
+  return this is Some<A> && predicate(value)
+}
+
 @Deprecated(
   NicheAPI + "Prefer using the orElse method",
   ReplaceWith(
@@ -1520,7 +1584,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
- * <!--- KNIT example-option-26.kt -->
+ * <!--- KNIT example-option-27.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this
@@ -1564,7 +1628,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  *   fallback shouldBe Some(5)
  * }
  * ```
- * <!--- KNIT example-option-27.kt -->
+ * <!--- KNIT example-option-28.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [None] into the [Option]:
@@ -1585,7 +1649,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  *   error.recover { failure().bind() } shouldBe none()
  * }
  * ```
- * <!--- KNIT example-option-28.kt -->
+ * <!--- KNIT example-option-29.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
