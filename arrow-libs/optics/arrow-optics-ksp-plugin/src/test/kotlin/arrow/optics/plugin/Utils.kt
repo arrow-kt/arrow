@@ -1,9 +1,6 @@
 package arrow.optics.plugin
 
-const val `package` =
-  """
-    package `as`.`by`.`do`.`in`.`is`.`it`
-  """
+const val `package` = "package `as`.`by`.`do`.`in`.`is`.`it`"
 
 const val imports =
   """

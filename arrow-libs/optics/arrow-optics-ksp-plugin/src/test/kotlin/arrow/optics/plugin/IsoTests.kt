@@ -9,6 +9,7 @@ class IsoTests {
   @Test
   fun `Isos will be generated for data class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class IsoData(
@@ -23,6 +24,7 @@ class IsoTests {
   @Test
   fun `Isos will be generated for generic data class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class IsoData<A>(
@@ -37,6 +39,7 @@ class IsoTests {
   @Test
   fun `Isos will be generated for data class with secondary constructors`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class IsoSecondaryConstructor(val fieldNumber: Int, val fieldString: String) {
@@ -52,6 +55,7 @@ class IsoTests {
   @Test
   fun `Iso generation requires companion object declaration`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class IsoNoCompanion(
@@ -63,6 +67,7 @@ class IsoTests {
   @Test
   fun `Isos cannot be generated for huge classes`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class IsoXXL(
@@ -92,6 +97,8 @@ class IsoTests {
       |) {
       |  companion object
       |}
-      """.failsWith { it.contains("IsoXXL".isoTooBigErrorMessage) }
+      """.failsWith {
+      it.contains("${`package`.removePrefix("package ").replace("`", "")}.IsoXXL".isoTooBigErrorMessage)
+    }
   }
 }
