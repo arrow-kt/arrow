@@ -1260,14 +1260,6 @@ public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Bool
 /**
  * Returns an Option containing all elements that are instances of specified type parameter [B].
  */
-@Deprecated(
-  NicheAPI + "Prefer using option DSL or flatMap",
-  ReplaceWith(
-    "flatMap { when (it) { is B -> Some(it) else -> None } }",
-    "arrow.core.None",
-    "arrow.core.Some"
-  )
-)
 public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
   flatMap {
     when (it) {
