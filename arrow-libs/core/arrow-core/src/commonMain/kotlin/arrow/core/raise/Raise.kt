@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 package arrow.core.raise
@@ -10,6 +11,7 @@ import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.continuations.EffectScope
 import arrow.core.identity
+import arrow.core.recover
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -387,7 +389,7 @@ public inline fun <reified T : Throwable, R, A> Raise<R>.catch(
 }
 
 @RaiseDSL
-public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R): Unit {
+public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies condition

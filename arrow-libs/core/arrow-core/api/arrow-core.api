@@ -3185,6 +3185,11 @@ public final class arrow/core/continuations/result {
 	public final fun invoke-gIAlu-s (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public class arrow/core/raise/CancellationExceptionNoTrace : java/util/concurrent/CancellationException {
+	public fun <init> ()V
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
+}
+
 public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun <init> ()V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3199,6 +3204,7 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun complete ()Z
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -3206,49 +3212,6 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class arrow/core/raise/Effect {
-	public static final fun _fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun _foldOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
-	public static final fun catch (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
-	public static final fun either (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
-	public static final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun ior (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
-	public static final fun merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun merge (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun nullable (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun option (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
-	public static final fun orNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun orNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun raisedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/raise/DefaultRaise;)Ljava/lang/Object;
-	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
-	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
-	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
-	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toIor (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
-	public static final fun toIor (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
-	public static final fun toOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
-	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toResult (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun toResult (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun toValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
-	public static final fun toValidated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/core/raise/EffectKt {
-	public static final fun eagerEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public static final fun effect (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 }
 
 public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise, arrow/typeclasses/Semigroup {
@@ -3438,14 +3401,51 @@ public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang
 }
 
 public final class arrow/core/raise/RaiseKt {
+	public static final fun _fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun _foldOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun catch (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
+	public static final fun catch (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun eagerEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public static final fun effect (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun either (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun ensure (Larrow/core/raise/Raise;ZLkotlin/jvm/functions/Function0;)V
 	public static final fun ensureNotNull (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun ior (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun mapErrorNel (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun merge (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun nullable (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun option (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun orNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun orNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raisedOrRethrow (Ljava/util/concurrent/CancellationException;Larrow/core/raise/DefaultRaise;)Ljava/lang/Object;
 	public static final fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
+	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toIor (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static final fun toIor (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun toOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toResult (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun toResult (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun toValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
+	public static final fun toValidated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function10;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function8;)Ljava/lang/Object;

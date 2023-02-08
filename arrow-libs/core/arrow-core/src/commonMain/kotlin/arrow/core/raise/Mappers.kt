@@ -1,5 +1,5 @@
 @file:JvmMultifileClass
-@file:JvmName("Effect")
+@file:JvmName("RaiseKt")
 package arrow.core.raise
 
 import arrow.core.Either
