@@ -75,7 +75,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - catch" {
+  "recover - raise" {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -84,20 +84,161 @@ class EffectSpec : StringSpec({
           ll shouldBe l()
           i()
         }
-      }.fold(::identity, ::identity) shouldBe i()
+      }.fold({ unreachable() }, ::identity) shouldBe i()
     }
   }
 
-  "recover - no catch" {
+  "recover - raise and transform error" {
+    checkAll(
+      Arb.long().suspend(),
+      Arb.string().suspend()
+    ) { l, s ->
+      effect {
+        effect<Long, Int> {
+          raise(l())
+        } recover { ll ->
+          ll shouldBe l()
+          raise(s())
+        }
+      }.fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  "recover - success" {
+    checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
+      effect<String, Int> {
+        effect<Long, Int> { i() } recover { unreachable() }
+      }.fold({ unreachable() }, ::identity) shouldBe i()
+    }
+  }
+
+  "recover + catch - raise and recover" {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
-          i()
-        } recover { ll ->
+          raise(l())
+        }.recover({ ll ->
           ll shouldBe l()
-          i() + 1
+          i()
+        }, { unreachable() })
+      }.fold({ unreachable() }, ::identity) shouldBe i()
+    }
+  }
+
+  "recover + catch - raise and transform error" {
+    checkAll(Arb.long().suspend(), Arb.string().suspend()) { l, s ->
+      effect {
+        effect<Long, Int> {
+          raise(l())
+        }.recover({ ll ->
+          ll shouldBe l()
+          raise(s())
+        }, { unreachable() })
+      }.fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  val boom = RuntimeException("boom")
+
+  "recover + catch - throw and recover" {
+    checkAll(Arb.int().suspend()) { i ->
+      effect<String, Int> {
+        effect<Long, Int> {
+          throw boom
+        }.recover(
+          { unreachable() },
+          { e ->
+            e shouldBe boom
+            i()
+          })
+      }.fold({ unreachable() }, ::identity) shouldBe i()
+    }
+  }
+
+  "recover + catch - throw and transform error" {
+    checkAll(Arb.string().suspend()) { s ->
+      effect {
+        effect<Long, Int> {
+          throw boom
+        }.recover({ unreachable() },
+          { e ->
+            e shouldBe boom
+            raise(s())
+          })
+      }.fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  "recover + catch - raise and throw" {
+    checkAll(Arb.long().suspend(), Arb.string().suspend()) { l, s ->
+      effect<String, Int> {
+        effect<Long, Int> {
+          raise(l())
+        }.recover({ ll ->
+          ll shouldBe l()
+          throw boom
+        }, { unreachable() })
+      }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom
+    }
+  }
+
+  "recover + catch - throw and throw" {
+    val boom2 = ArithmeticException("boom2")
+    effect<String, Int> {
+      effect<Long, Int> {
+        throw boom
+      }.recover({ unreachable() },
+        { e ->
+          e shouldBe boom
+          throw boom2
+        })
+    }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
+  }
+
+  "recover + catch - success" {
+    checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
+      effect<String, Int> {
+        effect<Long, Int> { i() }
+          .recover({ unreachable() }, { unreachable() })
+      }.fold({ unreachable() }, ::identity) shouldBe i()
+    }
+  }
+
+  "catch - throw and throw" {
+    val boom2 = ArithmeticException("boom2")
+    effect {
+      effect<String, Int> {
+        throw boom
+      } catch { e ->
+        e shouldBe boom
+        throw boom2
+      }
+    }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
+  }
+
+  "catch - throw and transform error" {
+    checkAll(Arb.string().suspend()) { s ->
+      effect {
+        effect<String, Int> {
+          throw boom
+        } catch { e ->
+          e shouldBe boom
+          raise(s())
         }
-      }.fold(::identity, ::identity) shouldBe i()
+      }.fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  "catch - throw and recover" {
+    checkAll(Arb.int().suspend()) { i ->
+      effect {
+        effect<String, Int> {
+          throw boom
+        } catch { e ->
+          e shouldBe boom
+          i()
+        }
+      }.fold({ unreachable() }, ::identity) shouldBe i()
     }
   }
 
@@ -122,6 +263,32 @@ class EffectSpec : StringSpec({
       effect {
         val bb = b()
         val aa = eager()
+        aa + bb
+      }.fold(::identity, ::identity) shouldBe a
+    }
+  }
+
+  "eagerEffect can be consumed within an Effect computation with bind" {
+    checkAll(Arb.int(), Arb.int().suspend()) { a, b ->
+      val eager: EagerEffect<String, Int> =
+        eagerEffect { a }
+
+      effect {
+        val bb = b()
+        val aa = eager.bind()
+        aa + bb
+      }.fold(::identity, ::identity) shouldBe (a + b())
+    }
+  }
+
+  "eagerEffect raise short-circuits effect computation  with bind" {
+    checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
+      val eager: EagerEffect<String, Int> =
+        eagerEffect { raise(a) }
+
+      effect {
+        val bb = b()
+        val aa = eager.bind()
         aa + bb
       }.fold(::identity, ::identity) shouldBe a
     }
