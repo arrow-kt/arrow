@@ -59,7 +59,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - catch" {
+  "recover - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -72,7 +72,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - no catch" {
+  "recover - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -85,7 +85,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - raise from catch" {
+  "recover - raise from catch" {
     checkAll(Arb.long(), Arb.string()) { l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
@@ -139,7 +139,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - happy path" {
+  "recover - happy path" {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
@@ -148,7 +148,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and recover" {
+  "recover - error path and recover" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
         raise(int)
@@ -158,7 +158,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and re-raise" {
+  "recover - error path and re-raise" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
         raise(int)
@@ -168,8 +168,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  @Suppress("UNREACHABLE_CODE")
-  "catch - error path and throw" {
+  "recover - error path and throw" {
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
@@ -181,7 +180,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - happy path" {
+  "catch - happy path" {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
@@ -190,7 +189,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - error path and recover" {
+  "catch - error path and recover" {
     checkAll(Arb.string(), Arb.string()) { msg, fallback ->
       eagerEffect<Int, String> {
         throw RuntimeException(msg)
@@ -199,7 +198,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - error path and re-raise" {
+  "catch - error path and re-raise" {
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
@@ -208,7 +207,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "attempt - error path and throw" {
+  "catch - error path and throw" {
     checkAll(Arb.string(), Arb.string()) { msg, msg2 ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
@@ -217,5 +216,28 @@ class EagerEffectSpec : StringSpec({
           .fold({ unreachable() }, { unreachable() })
       }.message.shouldNotBeNull() shouldBe msg2
     }
+  }
+
+  "catch - reified exception and recover" {
+    eagerEffect<Nothing, Int> {
+      throw ArithmeticException()
+    }.catch { _: ArithmeticException -> 1 }
+      .fold({ unreachable() }, ::identity) shouldBe 1
+  }
+
+  "catch - reified exception and raise" {
+    eagerEffect<String, Int> {
+      throw ArithmeticException("Boom!")
+    }.catch { e: ArithmeticException -> raise(e.message.shouldNotBeNull()) }
+      .fold(::identity) { unreachable() } shouldBe "Boom!"
+  }
+
+  "catch - reified exception and no match" {
+    shouldThrow<RuntimeException> {
+      eagerEffect<Nothing, Int> {
+        throw RuntimeException("Boom!")
+      }.catch { _: ArithmeticException -> 1 }
+        .fold({ unreachable() }, { unreachable() })
+    }.message shouldBe "Boom!"
   }
 })

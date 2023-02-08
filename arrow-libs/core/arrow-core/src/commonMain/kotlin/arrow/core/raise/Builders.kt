@@ -35,7 +35,7 @@ public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
 
 public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
   contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::success)
+  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
 }
 
 public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {

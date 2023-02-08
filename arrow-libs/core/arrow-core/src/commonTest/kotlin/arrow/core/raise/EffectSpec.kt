@@ -75,7 +75,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "attempt - catch" {
+  "recover - catch" {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -88,7 +88,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "attempt - no catch" {
+  "recover - no catch" {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -295,7 +295,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - happy path" {
+  "recover - happy path" {
     checkAll(Arb.string().suspend()) { str ->
       effect<Int, String> {
         str()
@@ -304,7 +304,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and recover" {
+  "recover - error path and recover" {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
       effect<Int, String> {
         raise(int())
@@ -314,7 +314,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and re-raise" {
+  "recover - error path and re-raise" {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
       effect<Int, Unit> {
         raise(int())
@@ -324,7 +324,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and throw" {
+  "recover - error path and throw" {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
       shouldThrow<RuntimeException> {
         effect<Int, String> {
@@ -336,41 +336,99 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "attempt - happy path" {
+  "catch - happy path" {
     checkAll(Arb.string().suspend()) { str ->
       effect<Int, String> {
         str()
-      }.catch { fail("It should never catch a success value") }
-        .fold(::identity, ::identity) shouldBe str()
+      }.catch { unreachable() }
+        .fold({ unreachable() }, ::identity) shouldBe str()
     }
   }
 
-  "attempt - error path and recover" {
+  "catch - error path and recover" {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       effect<Int, String> {
         throw RuntimeException(msg())
       }.catch { fallback() }
-        .fold(::identity, ::identity) shouldBe fallback()
+        .fold({ unreachable() }, { unreachable() }, ::identity) shouldBe fallback()
     }
   }
 
-  "attempt - error path and re-raise" {
+  "catch - error path and re-raise" {
     checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
       effect<Int, Unit> {
         throw RuntimeException(msg())
       }.catch { raise(fallback()) }
-        .fold(::identity, ::identity) shouldBe fallback()
+        .fold({ unreachable() }, ::identity) { unreachable() } shouldBe fallback()
     }
   }
 
-  "attempt - error path and throw" {
+  "catch - error path and throw" {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, msg2 ->
-      shouldThrow<RuntimeException> {
-        effect<Int, String> {
-          throw RuntimeException(msg())
-        }.catch { throw RuntimeException(msg2()) }
-          .fold(::identity, ::identity)
-      }.message.shouldNotBeNull() shouldBe msg2()
+      effect<Int, String> {
+        throw RuntimeException(msg())
+      }.catch { throw IllegalStateException(msg2()) }
+        .fold(::identity, { unreachable() }, { unreachable() })
+        .shouldBeTypeOf<IllegalStateException>()
+        .message shouldBe msg2()
+    }
+  }
+
+  "catch - reified error path and recover " {
+    checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
+      effect<Int, String> {
+        throw ArithmeticException(msg())
+      }.catch { e: ArithmeticException ->
+        e.message shouldBe msg()
+        fallback()
+      }.fold({ unreachable() }, { unreachable() }, ::identity) shouldBe fallback()
+    }
+  }
+
+  "catch - reified error path and raise " {
+    checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, error ->
+      effect<Int, String> {
+        throw ArithmeticException(msg())
+      }.catch { e: ArithmeticException ->
+        e.message shouldBe msg()
+        raise(error())
+      }.fold({ unreachable() }, ::identity) { unreachable() } shouldBe error()
+    }
+  }
+
+  "catch - reified error path and no match " {
+    checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, error ->
+      effect<Int, String> {
+        throw RuntimeException(msg())
+      }.catch { _: ArithmeticException ->
+        unreachable()
+      }.fold(
+        ::identity,
+        { unreachable() }
+      ) { unreachable() }
+        .shouldBeTypeOf<RuntimeException>()
+        .message shouldBe msg()
+    }
+  }
+
+  "catch - success" {
+    checkAll(Arb.string().suspend()) { msg ->
+      effect<Int, String> {
+        msg()
+      }.catch()
+        .fold({ unreachable() }, ::identity) shouldBe Result.success(msg())
+    }
+  }
+
+  "catch - exception" {
+    checkAll(Arb.string().suspend()) { msg ->
+      effect<Int, String> {
+        throw RuntimeException(msg())
+      }.catch()
+        .fold({ unreachable() }, { unreachable() }, ::identity)
+        .exceptionOrNull()
+        .shouldNotBeNull()
+        .message shouldBe msg()
     }
   }
 
@@ -391,11 +449,13 @@ class EffectSpec : StringSpec({
   }
 
   "shift leaked results in RaiseLeakException" {
-    shouldThrow<IllegalStateException> {
-      effect {
-        suspend { raise("failure") }
-      }.fold({ fail("Cannot be here") }) { f -> f() }
-    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+    effect {
+      suspend { raise("failure") }
+    }.fold(
+      {
+        it.message shouldStartWith "raise or bind was called outside of its DSL scope"
+      },
+      { unreachable() }) { f -> f() }
   }
 
   "shift leaked results in RaiseLeakException with exception" {
@@ -420,10 +480,12 @@ class EffectSpec : StringSpec({
       effect {
         leak.complete { raise("failure") }
         raise("Boom!")
-      }.fold({
-        it shouldBe "Boom!"
-        leak.await().invoke()
-      }) { fail("Cannot be here") }
+      }.fold(
+        { unreachable() },
+        {
+          it shouldBe "Boom!"
+          leak.await().invoke()
+        }) { fail("Cannot be here") }
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
 })
@@ -454,4 +516,4 @@ internal suspend fun <A> A.suspend(): A = suspendCoroutineUninterceptedOrReturn 
 }
 
 internal fun unreachable(): Nothing =
-  fail("It should never rexach this point")
+  fail("It should never reach this point")

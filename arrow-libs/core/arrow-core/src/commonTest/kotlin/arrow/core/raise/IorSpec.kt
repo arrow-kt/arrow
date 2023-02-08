@@ -3,6 +3,7 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.typeclasses.Semigroup
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -25,6 +26,14 @@ class IorSpec : StringSpec({
       val two = Ior.Both(", World!", 2).bind()
       one + two
     } shouldBe Ior.Both("Hello, World!", 3)
+  }
+
+  "Accumulates and short-circuits with Left" {
+    ior(Semigroup.string()) {
+      val one = Ior.Both("Hello", 1).bind()
+      val two: Int = Ior.Left(", World!").bind()
+      one + two
+    } shouldBe Ior.Left("Hello, World!")
   }
 
   "Accumulates with Either" {
@@ -58,5 +67,14 @@ class IorSpec : StringSpec({
       val two: Int = Either.Left(", World!").bind()
       one + two
     } shouldBe Ior.Left("Hello, World!")
+  }
+
+  "Ior rethrows exception" {
+    val boom = RuntimeException("Boom!")
+    shouldThrow<RuntimeException> {
+      ior(Semigroup.string()) {
+       throw boom
+      }
+    }.message shouldBe "Boom!"
   }
 })
