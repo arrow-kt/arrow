@@ -170,8 +170,10 @@ public abstract class arrow/core/Either {
 	public final fun getOrNull ()Ljava/lang/Object;
 	public final fun isEmpty ()Z
 	public final fun isLeft ()Z
+	public final fun isLeft (Lkotlin/jvm/functions/Function1;)Z
 	public final fun isNotEmpty ()Z
 	public final fun isRight ()Z
+	public final fun isRight (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;

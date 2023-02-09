@@ -1,17 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither50
 
-import arrow.core.*
+import arrow.core.Either.Right
+import arrow.core.Either.Left
+import arrow.core.getOrHandle
 
-suspend fun main(): Unit {
-  //sampleStart
-  Either.Right(7).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
-    .let(::println) // Either.Left(Value '7' is not equal to 10")
-
-  Either.Right(10).filterOrOther({ it == 10 }, { "Value '$it' is not equal to 10" })
-    .let(::println) // Either.Right(10)
-
-  Either.Left(12).filterOrOther({ str: String -> str.contains("impossible") }, { -1 })
-    .let(::println) // Either.Left(12)
-  //sampleEnd
+fun main() {
+  Right(12).getOrHandle { 17 } // Result: 12
+  Left(12).getOrHandle { it + 5 } // Result: 17
 }

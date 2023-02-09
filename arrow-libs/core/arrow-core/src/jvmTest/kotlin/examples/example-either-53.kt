@@ -1,9 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither53
 
-import arrow.core.rightIfNotNull
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.core.merge
 
-fun main() {
-  "value".rightIfNotNull { "left" } // Right(b="value")
-  null.rightIfNotNull { "left" }    // Left(a="left")
+fun test() {
+  Right(12).merge() // Result: 12
+  Left(12).merge() // Result: 12
 }
