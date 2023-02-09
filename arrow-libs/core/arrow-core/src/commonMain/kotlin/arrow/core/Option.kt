@@ -725,6 +725,37 @@ public sealed class Option<out A> {
   }
 
   /**
+   * Returns true if this option is nonempty '''and''' the predicate
+   * $p returns true when applied to this $option's value.
+   * Otherwise, returns false.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
+   *
+   * fun main() {
+   *   Some(12).isSome { it > 10 } // Result: true
+   *   Some(7).isSome { it > 10 }  // Result: false
+   *
+   *   val none: Option<Int> = None
+   *   none.isSome { it > 10 }      // Result: false
+   * }
+   * ```
+   * <!--- KNIT example-option-23.kt -->
+   *
+   * @param predicate the predicate to test
+   */
+  public inline fun isSome(predicate: (A) -> Boolean): Boolean {
+    contract {
+      callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
+    return this@Option is Some<A> && predicate(value)
+  }
+  /**
    * alias for [isDefined]
    */
   @Deprecated(
@@ -768,7 +799,7 @@ public sealed class Option<out A> {
    *   None.getOrNull() shouldBe null
    * }
    * ```
-   * <!--- KNIT example-option-23.kt -->
+   * <!--- KNIT example-option-24.kt -->
    */
   public fun getOrNull(): A? {
     contract {
@@ -969,13 +1000,13 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-option-24.kt -->
+   * <!--- KNIT example-option-25.kt -->
    *
    * @param predicate the predicate to test
    */
   @Deprecated(
-    NicheAPI + "Prefer using the Option DSL, or fold or map",
-    ReplaceWith("fold({ false }, predicate)")
+    RedundantAPI + "Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome(predicate)")
   )
   public inline fun exists(predicate: (A) -> Boolean): Boolean {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
@@ -1001,7 +1032,7 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: null
    * }
    * ```
-   * <!--- KNIT example-option-25.kt -->
+   * <!--- KNIT example-option-26.kt -->
    */
   @Deprecated(
     NicheAPI + "Prefer Kotlin nullable syntax instead",
@@ -1299,38 +1330,6 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
       else -> None
     }
   }
-
-/**
- * Returns true if this option is nonempty '''and''' the predicate
- * $p returns true when applied to this $option's value.
- * Otherwise, returns false.
- *
- * Example:
- * ```kotlin
- * import arrow.core.Some
- * import arrow.core.None
- * import arrow.core.Option
- *
- * fun main() {
- *   Some(12).isSome { it > 10 } // Result: true
- *   Some(7).isSome { it > 10 }  // Result: false
- *
- *   val none: Option<Int> = None
- *   none.isSome { it > 10 }      // Result: false
- * }
- * ```
- * <!--- KNIT example-option-26.kt -->
- *
- * @param predicate the predicate to test
- */
-public inline fun <A> Option<A>.isSome(predicate: (A) -> Boolean): Boolean {
-  contract {
-    callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
-    returns(true) implies (this@isSome is Some<A>)
-    returns(false) implies (this@isSome is None)
-  }
-  return this is Some<A> && predicate(value)
-}
 
 @Deprecated(
   NicheAPI + "Prefer using the orElse method",
