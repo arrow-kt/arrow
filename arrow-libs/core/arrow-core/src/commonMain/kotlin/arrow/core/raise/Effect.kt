@@ -1,9 +1,11 @@
 @file:JvmMultifileClass
+@file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class)
 package arrow.core.raise
 
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 /**
  * [Effect] represents a function of `suspend Raise<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.

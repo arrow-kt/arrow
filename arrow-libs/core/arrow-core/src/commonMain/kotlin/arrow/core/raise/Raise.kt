@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 package arrow.core.raise
@@ -10,6 +11,7 @@ import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.continuations.EffectScope
 import arrow.core.identity
+import arrow.core.recover
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -279,7 +281,7 @@ public interface Raise<in R> {
 
   @RaiseDSL
   public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<R>.(E) -> A): A =
-    recover({ invoke() }) { resolve(it) }
+    fold<E, A, A>({ this@recover.invoke(this) }, { throw it }, { resolve(it) }) { it }
 
   /** @see [recover] */
   @RaiseDSL
@@ -295,18 +297,17 @@ public interface Raise<in R> {
    */
   @RaiseDSL
   public suspend fun <E, A> Effect<E, A>.recover(
-    @BuilderInference action: suspend Raise<E>.() -> A,
     @BuilderInference recover: suspend Raise<R>.(E) -> A,
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
-  ): A = fold({ action(this) }, { catch(it) }, { recover(it) }, { it })
+  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
 
   @RaiseDSL
-  public suspend fun <A> Effect<R, A>.catch(
+  public suspend infix fun <A> Effect<R, A>.catch(
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
   ): A = fold({ catch(it) }, { raise(it) }, { it })
 
   @RaiseDSL
-  public fun <A> EagerEffect<R, A>.catch(
+  public infix fun <A> EagerEffect<R, A>.catch(
     @BuilderInference catch: Raise<R>.(Throwable) -> A,
   ): A = fold({ catch(it) }, { raise(it) }, { it })
 }
@@ -387,7 +388,7 @@ public inline fun <reified T : Throwable, R, A> Raise<R>.catch(
 }
 
 @RaiseDSL
-public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R): Unit {
+public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies condition

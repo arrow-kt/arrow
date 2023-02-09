@@ -1,5 +1,5 @@
 @file:JvmMultifileClass
-@file:JvmName("Effect")
+@file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class)
 package arrow.core.raise
 
