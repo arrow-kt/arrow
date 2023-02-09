@@ -778,7 +778,7 @@ public sealed class Either<out A, out B> {
    * Used only for performance instead of fold.
    */
   @Deprecated(
-    RedundantAPI + "isRight()",
+    RedundantAPI + "Use isRight()",
     ReplaceWith("isRight()")
   )
   @JsName("_isRight")
@@ -1063,6 +1063,25 @@ public sealed class Either<out A, out B> {
   public inline fun <C, D> bimap(leftOperation: (left: A) -> C, rightOperation: (right: B) -> D): Either<C, D> =
     map(rightOperation).mapLeft(leftOperation)
 
+  /**
+   * Returns `false` if [Left] or returns the result of the application of
+   * the given predicate to the [Right] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.Either.Left
+   *
+   * fun main() {
+   *  Either.Right(12).exists { it > 10 } // Result: true
+   *  Either.Right(7).exists { it > 10 }  // Result: false
+   *
+   *  val left: Either<Int, Int> = Left(12)
+   *  left.exists { it > 10 }      // Result: false
+   * }
+   * ```
+   * <!--- KNIT example-either-40.kt -->
+   */
   @Deprecated(
     NicheAPI + "Prefer isRight",
     ReplaceWith("isRight(predicate)")
@@ -1251,7 +1270,7 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-44.kt -->
    */
   @Deprecated(
-    RedundantAPI + "isLeft()",
+    RedundantAPI + "Use isLeft()",
     ReplaceWith("isLeft()")
   )
   public fun isEmpty(): Boolean = isLeft
@@ -1273,7 +1292,7 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-45.kt -->
    */
   @Deprecated(
-    RedundantAPI + "isRight()",
+    RedundantAPI + "Use isRight()",
     ReplaceWith("isRight()")
   )
   public fun isNotEmpty(): Boolean = isRight
