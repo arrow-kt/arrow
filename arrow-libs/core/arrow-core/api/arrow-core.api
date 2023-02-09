@@ -905,14 +905,20 @@ public abstract class arrow/core/Option {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Option;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public static final fun invoke (Ljava/lang/Object;)Larrow/core/Option;
 	public final fun isDefined ()Z
 	public abstract fun isEmpty ()Z
+	public final fun isNone ()Z
 	public final fun isNotEmpty ()Z
+	public final fun isSome ()Z
+	public final fun isSome (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun mapNotNull (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun nonEmpty ()Z
+	public final fun onNone (Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
+	public final fun onSome (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun orNull ()Ljava/lang/Object;
 	public final fun padZip (Larrow/core/Option;)Larrow/core/Option;
 	public final fun padZip (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
