@@ -2,9 +2,12 @@
 package arrow.core.examples.exampleEither42
 
 import arrow.core.Either
-import io.kotest.matchers.shouldBe
+import arrow.core.Either.Left
 
-fun test() {
-  Either.Right(12).getOrNull() shouldBe 12
-  Either.Left(12).getOrNull() shouldBe null
+fun main() {
+ Either.Right(12).exists { it > 10 } // Result: true
+ Either.Right(7).exists { it > 10 }  // Result: false
+
+ val left: Either<Int, Int> = Left(12)
+ left.exists { it > 10 }      // Result: false
 }

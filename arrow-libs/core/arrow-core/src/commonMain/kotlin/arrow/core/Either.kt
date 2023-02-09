@@ -1080,7 +1080,7 @@ public sealed class Either<out A, out B> {
    *  left.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-40.kt -->
+   * <!--- KNIT example-either-42.kt -->
    */
   @Deprecated(
     NicheAPI + "Prefer isRight",
@@ -1133,7 +1133,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNull() shouldBe null
    * }
    * ```
-   * <!--- KNIT example-either-42.kt -->
+   * <!--- KNIT example-either-43.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNull(): B? {
@@ -1162,7 +1162,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNone() shouldBe None
    * }
    * ```
-   * <!--- KNIT example-either-43.kt -->
+   * <!--- KNIT example-either-44.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
@@ -1267,7 +1267,7 @@ public sealed class Either<out A, out B> {
    *   Either.Right("foo").isEmpty() // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-44.kt -->
+   * <!--- KNIT example-either-45.kt -->
    */
   @Deprecated(
     RedundantAPI + "Use isLeft()",
@@ -1289,7 +1289,7 @@ public sealed class Either<out A, out B> {
    *   //sampleEnd
    * }
    * ```
-   * <!--- KNIT example-either-45.kt -->
+   * <!--- KNIT example-either-46.kt -->
    */
   @Deprecated(
     RedundantAPI + "Use isRight()",
@@ -1455,7 +1455,7 @@ public sealed class Either<out A, out B> {
      *   println(result)
      *  }
      *  ```
-     * <!--- KNIT example-either-46.kt -->
+     * <!--- KNIT example-either-47.kt -->
      */
     @JvmStatic
     @Deprecated(
@@ -1989,7 +1989,7 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  *   Either.Left(12).getOrElse { it + 5 } shouldBe 17
  * }
  * ```
- * <!--- KNIT example-either-47.kt -->
+ * <!--- KNIT example-either-48.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
@@ -2010,7 +2010,7 @@ public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  *   Left(12).orNull()  // Result: null
  * }
  * ```
- * <!--- KNIT example-either-48.kt -->
+ * <!--- KNIT example-either-49.kt -->
  */
 @Deprecated(
   "Duplicated API. Please use Either's member function orNull. This will be removed towards Arrow 2.0",
@@ -2033,7 +2033,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  *   Left(12).getOrHandle { it + 5 } // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-49.kt -->
+ * <!--- KNIT example-either-50.kt -->
  */
 @Deprecated(
   RedundantAPI + "Use other getOrElse signature",
@@ -2065,7 +2065,7 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  *   left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-50.kt -->
+ * <!--- KNIT example-either-51.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
@@ -2102,7 +2102,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-either-51.kt -->
+ * <!--- KNIT example-either-52.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
@@ -2125,7 +2125,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-52.kt -->
+ * <!--- KNIT example-either-53.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
@@ -2151,7 +2151,7 @@ public inline fun <A> Either<A, A>.merge(): A =
  *   Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-53.kt -->
+ * <!--- KNIT example-either-54.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit flatMap",
@@ -2212,7 +2212,7 @@ public fun <A> A.right(): Either<Nothing, A> = Right(this)
  *   null.rightIfNotNull { "left" }    // Left(a="left")
  * }
  * ```
- * <!--- KNIT example-either-54.kt -->
+ * <!--- KNIT example-either-55.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer Kotlin nullable syntax",
@@ -2306,7 +2306,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-either-55.kt -->
+ * <!--- KNIT example-either-56.kt -->
  */
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
@@ -2626,7 +2626,7 @@ public fun <E> E.toEitherNel(): EitherNel<E, Nothing> =
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
- * <!--- KNIT example-either-56.kt -->
+ * <!--- KNIT example-either-57.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
@@ -2643,7 +2643,7 @@ public fun <E> E.toEitherNel(): EitherNel<E, Nothing> =
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
- * <!--- KNIT example-either-57.kt -->
+ * <!--- KNIT example-either-58.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
@@ -2684,7 +2684,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  *   failure shouldBe Either.Left("failure")
  * }
  * ```
- * <!--- KNIT example-either-58.kt -->
+ * <!--- KNIT example-either-59.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
