@@ -778,8 +778,8 @@ public sealed class Either<out A, out B> {
    * Used only for performance instead of fold.
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Right<*>)")
+    RedundantAPI + "isRight()",
+    ReplaceWith("isRight()")
   )
   @JsName("_isRight")
   internal abstract val isRight: Boolean
@@ -789,8 +789,8 @@ public sealed class Either<out A, out B> {
    * Used only for performance instead of fold.
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Left<*>)")
+    RedundantAPI + "Use isLeft()",
+    ReplaceWith("isLeft()")
   )
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
@@ -1251,8 +1251,8 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-44.kt -->
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Left<*>)")
+    RedundantAPI + "isLeft()",
+    ReplaceWith("isLeft()")
   )
   public fun isEmpty(): Boolean = isLeft
 
@@ -1273,8 +1273,8 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-45.kt -->
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Right<*>)")
+    RedundantAPI + "isRight()",
+    ReplaceWith("isRight()")
   )
   public fun isNotEmpty(): Boolean = isRight
 
