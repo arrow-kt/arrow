@@ -6,8 +6,8 @@ env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
-  ios_watchos:
-    runs-on: macos-latest
+  update_api:
+    runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
@@ -21,71 +21,16 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: ios and watchos tests
+      - name: apiDump
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
+          arguments: apiDump
 
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v3
+      - name: "Commit new API files"
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: 'reports-ios_watchos'
-          path: '**/build/reports/**'
-
-  macos_tvos:
-    runs-on: macos-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: macos and tvos tests
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'reports-macos_tvos'
-          path: '**/build/reports/**'
-
-  windows:
-    runs-on: windows-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: mingwX64Test  --scan
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'reports-windows'
-          path: '**/build/reports/**'
+          commit_message: Update API files
+          file_pattern: arrow-libs/**/api/*.api
 
   check:
     runs-on: ubuntu-latest
@@ -102,7 +47,7 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: check
+      - name: Knit and API check
         uses: gradle/gradle-build-action@v2
         with:
           arguments: knitCheck apiCheck --scan
@@ -114,7 +59,7 @@ jobs:
           name: 'reports-check'
           path: '**/build/reports/**'
 
-  jvmTest:
+  jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -129,7 +74,7 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: jvmTest
+      - name: JVM test
         uses: gradle/gradle-build-action@v2
         with:
           arguments: jvmTest --scan
@@ -172,16 +117,153 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: jsTest
+      - name: JS tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jsTest  --scan
+          arguments: jsTest --scan
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: 'reports-js'
+          path: '**/build/reports/**'
+
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: iOS tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: iosSimulatorArm64Test iosX64Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-ios'
+          path: '**/build/reports/**'
+
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: macOS tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: macosX64Test --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-macos'
+          path: '**/build/reports/**'
+
+  tvos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: tvOS tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: tvosSimulatorArm64Test tvosX64Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-tvos'
+          path: '**/build/reports/**'
+
+  watchos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: watchOS tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: watchosSimulatorArm64Test watchosX64Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-watchos'
+          path: '**/build/reports/**'
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Windows (MinGW) tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: mingwX64Test --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-windows'
           path: '**/build/reports/**'
 
   linux:
@@ -199,10 +281,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: linuxX64Test
+      - name: Linux tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: linuxX64Test  --scan
+          arguments: linuxX64Test --scan
 
       - name: Upload reports
         if: failure()
@@ -211,7 +293,7 @@ jobs:
           name: 'reports-linux'
           path: '**/build/reports/**'
 
-  update_api:
+  android:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -226,13 +308,14 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: apiDump
+      - name: Android tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: apiDump
+          arguments: androidNativeX64Test --scan
 
-      - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
         with:
-          commit_message: Update API files
-          file_pattern: arrow-libs/**/api/*.api
+          name: 'reports-android'
+          path: '**/build/reports/**'

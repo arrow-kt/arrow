@@ -1,6 +1,6 @@
 [versions]
 animalSniffer = "1.6.0"
-arrowGradleConfig = "0.11.0-alpha.1"
+arrowGradleConfig = "0.12.0-rc.1"
 assertj = "3.23.1"
 coroutines = "1.6.4"
 classgraph = "4.8.151"
