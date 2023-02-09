@@ -3,8 +3,12 @@ package arrow.core.examples.exampleEither36
 
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
+import io.kotest.assertions.fail
 
 fun test() {
-  Either.Right(12).map { _: Int ->"flower" } shouldBe Either.Right("flower")
-  Either.Left(12).map { _: Nothing -> "flower" } shouldBe Either.Left(12)
+  Either.Right(1)
+    .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
+
+  Either.Left(RuntimeException("Boom!"))
+    .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
 }
