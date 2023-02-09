@@ -80,7 +80,7 @@ internal fun evalAnnotatedPrismElement(
   }
 
 internal val KSDeclaration.qualifiedNameOrSimpleName: String
-  get() = (qualifiedName ?: simpleName).asString()
+  get() = (qualifiedName ?: simpleName).asSanitizedString()
 
 internal fun KSClassDeclaration.sealedSubclassFqNameList(): List<String> =
   getSealedSubclasses().mapNotNull { it.qualifiedName?.asString() }.toList()
@@ -135,10 +135,10 @@ internal fun KSClassDeclaration.getConstructorTypesNames(): List<String> =
 
 internal fun KSType.qualifiedString(): String = when (declaration) {
   is KSTypeParameter -> {
-    val n = declaration.simpleName.asString().sanitizeDelimited()
+    val n = declaration.simpleName.asSanitizedString()
     if (isMarkedNullable) "$n?" else n
   }
-  else -> when (val qname = declaration.qualifiedName?.asString()?.sanitizeDelimited()) {
+  else -> when (val qname = declaration.qualifiedName?.asSanitizedString()) {
     null -> toString()
     else -> {
       val withArgs = when {

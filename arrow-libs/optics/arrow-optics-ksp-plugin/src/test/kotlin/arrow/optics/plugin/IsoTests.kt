@@ -97,8 +97,6 @@ class IsoTests {
       |) {
       |  companion object
       |}
-      """.failsWith {
-      it.contains("${`package`.removePrefix("package ").replace("`", "")}.IsoXXL".isoTooBigErrorMessage)
-    }
+      """.failsWith { it.contains("${`package`.removePrefix("package ")}.IsoXXL".isoTooBigErrorMessage) }
   }
 }

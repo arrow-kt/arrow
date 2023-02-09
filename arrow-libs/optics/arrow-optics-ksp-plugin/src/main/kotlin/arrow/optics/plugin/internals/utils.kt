@@ -1,5 +1,7 @@
 package arrow.optics.plugin.internals
 
+import com.google.devtools.ksp.symbol.KSName
+
 /**
  * From Eugenio's https://github.com/Takhion/kotlin-metadata If this [isNotBlank] then it adds the
  * optional [prefix] and [postfix].
@@ -10,10 +12,8 @@ fun String.plusIfNotBlank(prefix: String = "", postfix: String = "") =
 /**
  * Sanitizes each delimited section if it matches with Kotlin reserved keywords.
  */
-fun String.sanitizeDelimited(delimiter: String = ".", separator: String = delimiter) =
-  if (isNotBlank() && contains(delimiter)) {
-    splitToSequence(delimiter).joinToString(separator) { if (kotlinKeywords.contains(it)) "`$it`" else it }
-  } else this
+fun KSName.asSanitizedString(delimiter: String = ".", separator: String = delimiter) =
+  asString().splitToSequence(delimiter).joinToString(separator) { if (kotlinKeywords.contains(it)) "`$it`" else it }
 
 
 private val kotlinKeywords = setOf(
