@@ -680,13 +680,7 @@ public sealed class Option<out A> {
     "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
     ReplaceWith("isNone()")
   )
-  public fun isEmpty(): Boolean {
-    contract {
-      returns(false) implies (this@Option is Some<A>)
-      returns(true) implies (this@Option is None)
-    }
-    return this@Option is None
-  }
+  public abstract fun isEmpty(): Boolean
 
   @Deprecated(
     "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
@@ -1219,10 +1213,22 @@ public sealed class Option<out A> {
 }
 
 public object None : Option<Nothing>() {
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    replaceWith = ReplaceWith("isNone()")
+  )
+  public override fun isEmpty(): Boolean = true
+
   override fun toString(): String = "Option.None"
 }
 
 public data class Some<out T>(val value: T) : Option<T>() {
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    replaceWith = ReplaceWith("isNone()")
+  )
+  public override fun isEmpty(): Boolean = false
+
   override fun toString(): String = "Option.Some($value)"
 
   public companion object {

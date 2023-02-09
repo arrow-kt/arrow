@@ -867,6 +867,7 @@ public final class arrow/core/NonFatalOrThrowKt {
 
 public final class arrow/core/None : arrow/core/Option {
 	public static final field INSTANCE Larrow/core/None;
+	public fun isEmpty ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -905,7 +906,7 @@ public abstract class arrow/core/Option {
 	public final fun getOrNull ()Ljava/lang/Object;
 	public static final fun invoke (Ljava/lang/Object;)Larrow/core/Option;
 	public final fun isDefined ()Z
-	public final fun isEmpty ()Z
+	public abstract fun isEmpty ()Z
 	public final fun isNone ()Z
 	public final fun isNotEmpty ()Z
 	public final fun isSome ()Z
@@ -1597,6 +1598,7 @@ public final class arrow/core/Some : arrow/core/Option {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
+	public fun isEmpty ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
