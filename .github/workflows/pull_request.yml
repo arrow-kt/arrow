@@ -308,6 +308,9 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+
       - name: Android tests
         uses: gradle/gradle-build-action@v2
         with:
