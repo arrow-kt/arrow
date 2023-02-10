@@ -477,6 +477,7 @@ public abstract class arrow/core/Ior {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullables (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public abstract fun isBoth ()Z
 	public final fun isEmpty ()Z
 	public abstract fun isLeft ()Z
