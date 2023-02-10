@@ -281,9 +281,9 @@ public sealed class Ior<out A, out B> {
    * import arrow.core.Ior
    *
    * fun main() {
-   *   Ior.Right(12).map { "flower" } // Result: Right(12)
-   *   Ior.Left(12).map { "flower" }  // Result: Left("power")
-   *   Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
+   *   Ior.Right(12).mapLeft { "flower" } // Result: Right(12)
+   *   Ior.Left(12).mapLeft { "flower" }  // Result: Left("power")
+   *   Ior.Both(12, "power").mapLeft { "flower $it" }  // Result: Both("flower 12", "power")
    * }
    * ```
    * <!--- KNIT example-ior-06.kt -->
