@@ -46,5 +46,20 @@ class DSLTests {
       """.compilationSucceeds()
   }
 
+  @Test
+  fun `DSL for a data class with property named as a package directive`() {
+    """
+      |package main.program
+      |
+      |$imports
+      |
+      |@optics
+      |data class Source(val program: String) {
+      |  companion object
+      |}
+      |
+      """.compilationSucceeds()
+  }
+
   // Db.content.at(At.map(), One).set(db, None)
 }
