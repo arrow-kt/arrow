@@ -9,7 +9,7 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
   val sourceClassName = declaration.qualifiedNameOrSimpleName
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
   val simpleName = declaration.nameWithParentClass
-  val packageName = pckg.asString()
+  val packageName = pckg.asSanitizedString()
   val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
     Visibility.INTERNAL -> "internal"
     else -> "public"

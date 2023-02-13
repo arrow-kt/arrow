@@ -7,6 +7,7 @@ class DSLTests {
   @Test
   fun `DSL is generated for complex model with Every`() {
     """
+      |$`package`
       |$imports
       |$dslModel
       |$dslValues
@@ -19,6 +20,7 @@ class DSLTests {
   @Test
   fun `DSL is generated for complex model with At`() {
     """
+      |$`package`
       |$imports
       |$dslModel
       |$dslValues
@@ -32,6 +34,7 @@ class DSLTests {
     // it's important to keep the 'Source' name for the class,
     // because files in the test are named 'Source.kt'
     """
+      |$`package`
       |$imports
       |
       |@optics
