@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -10,7 +12,7 @@ apply(from = property("ANIMALSNIFFER"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
@@ -24,9 +26,12 @@ dependencies {
   compileOnly(libs.squareup.retrofit)
 
   if (!enableCompatibilityMetadataVariant) {
+    testImplementation(projects.arrowCore)
+    testImplementation(libs.kotest.frameworkEngine)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.property)
     testCompileOnly(libs.kotlin.reflect)
     testRuntimeOnly(libs.kotest.runnerJUnit5)
-    testImplementation(project(":arrow-core-test"))
     testImplementation(libs.squareup.okhttpMockWebServer)
     testImplementation(libs.squareup.retrofitConverterGson)
     testImplementation(libs.squareup.retrofitConverterMoshi)

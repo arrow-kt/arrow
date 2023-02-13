@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -10,7 +12,7 @@ apply(plugin = "io.kotest.multiplatform")
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 
 if (enableCompatibilityMetadataVariant) {
@@ -29,7 +31,10 @@ kotlin {
     if(!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-core-test"))
+          implementation(projects.arrowCore)
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
         }
       }
       jvmTest {

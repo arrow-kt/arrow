@@ -4,6 +4,8 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
@@ -428,6 +430,96 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
+ * The [combine] function is used to accumulate all the _logical errors_.
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<Error, List<B>> =
+  fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ into a [NonEmptyList] that were _raised_ while applying the [transform] function.
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<NonEmptyList<Error>, List<B>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].
+ */
+public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  fold<Either<Error, A>, Either<Error, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+/**
+ * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors with into an [NonEmptyList].
+ */
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
+    when (res) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
 
@@ -632,7 +724,19 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  * <!--- KNIT example-iterable-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
-  this.align(b).map(fa)
+  buildList(maxOf(this.collectionSizeOrDefault(10), b.collectionSizeOrDefault(10))) {
+    val first = this@align.iterator()
+    val second = b.iterator()
+    while (first.hasNext() || second.hasNext()) {
+      val element: Ior<A, B> = when {
+        first.hasNext() && second.hasNext() -> Ior.Both(first.next(), second.next())
+        first.hasNext() -> first.next().leftIor()
+        second.hasNext() -> second.next().rightIor()
+        else -> throw IllegalStateException("this should never happen")
+      }
+      add(fa(element))
+    }
+  }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
@@ -651,18 +755,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  * <!--- KNIT example-iterable-08.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
-  alignRec(this, b)
-
-@Suppress("NAME_SHADOWING")
-private fun <X, Y> alignRec(ls: Iterable<X>, rs: Iterable<Y>): List<Ior<X, Y>> {
-  val ls = if (ls is List) ls else ls.toList()
-  val rs = if (rs is List) rs else rs.toList()
-  return when {
-    ls.isEmpty() -> rs.map { it.rightIor() }
-    rs.isEmpty() -> ls.map { it.leftIor() }
-    else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
-  }
-}
+  this.align(b, ::identity)
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]

@@ -3,19 +3,15 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx5g -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+  ios_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 60
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -25,32 +21,195 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      # For watchOS x86 simulator. Remove with Kotlin 1.8.
-      - uses: maxim-lobanov/setup-xcode@v1
-        if: matrix.os == 'macos-latest'
-        with:
-          xcode-version: '13.4.1'
-
-      - name: build
+      - name: ios and watchos tests
         uses: gradle/gradle-build-action@v2
-        if: matrix.os != 'windows-latest'
         with:
-          arguments: --full-stacktrace build
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-ios_watchos'
+          path: '**/build/reports/**'
+
+  macos_tvos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: macos and tvos tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-macos_tvos'
+          path: '**/build/reports/**'
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
 
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2
-        if: matrix.os == 'windows-latest'
         with:
-          arguments: --full-stacktrace mingwX64Test
+          arguments: mingwX64Test  --scan
 
       - name: Upload reports
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: 'reports-${{ matrix.os }}'
+          name: 'reports-windows'
           path: '**/build/reports/**'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: check
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: knitCheck apiCheck --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-check'
+          path: '**/build/reports/**'
+
+  jvmTest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jvmTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jvmTest --scan
+
+      - name: Create code coverage report
+        if: "! github.event.pull_request.head.repo.fork "
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: koverMergedReport
+
+      - name: Add coverage report to PR
+        if: "! github.event.pull_request.head.repo.fork "
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: build/reports/kover/merged/xml/report.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Kover Report
+          update-comment: true
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-jvmTest'
+          path: '**/build/reports/**'
+
+  js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jsTest
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: jsTest  --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-js'
+          path: '**/build/reports/**'
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: linuxX64Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: linuxX64Test  --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-linux'
+          path: '**/build/reports/**'
 
   update_api:
     runs-on: ubuntu-latest
@@ -67,13 +226,10 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: apiDump
         uses: gradle/gradle-build-action@v2
         with:
           arguments: apiDump
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
 
       - name: "Commit new API files"
         uses: stefanzweifel/git-auto-commit-action@v4

@@ -1,14 +1,20 @@
+@file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
 import arrow.core.Either.Right
+import arrow.core.raise.OptionRaise
+import arrow.core.raise.option
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 /**
- *
+ * <!--- TEST_NAME OptionKnitTest -->
  *
  * If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
  * Kotlin tries to solve the problem by getting rid of `null` values altogether, and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
@@ -364,18 +370,24 @@ public sealed class Option<out A> {
      * Ignores exceptions and returns None if one is thrown
      */
     public inline fun <A> catch(f: () -> A): Option<A> {
+      contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
       val recover: (Throwable) -> Option<A> = { None }
       return catch(recover, f)
     }
 
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> =
-      try {
+    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+      }
+      return try {
         Some(f())
       } catch (t: Throwable) {
         recover(t.nonFatalOrThrow())
       }
+    }
 
     @JvmStatic
     public fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
@@ -385,38 +397,86 @@ public sealed class Option<out A> {
   public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
     zip(other, ::Pair)
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C> zip(
     b: Option<B>,
     map: (A, B) -> C
-  ): Option<C> =
-    zip(
-      b,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+  ): Option<C> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D> zip(
     b: Option<B>,
     c: Option<C>,
     map: (A, B, C) -> D
-  ): Option<D> =
-    zip(
-      b,
-      c,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  ): Option<D> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind()) }
+  }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `None`.
+   * When applied the result is ignored and the original
+   * None value is returned
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).onNone { println("flower") } // Result: Some(12)
+   *   none<Int>().onNone { println("flower") }  // Result: prints "flower" and returns: None
+   * }
+   * ```
+   * <!--- KNIT example-option-19.kt -->
+   */
+  public inline fun onNone(action: () -> Unit): Option<A>  {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isEmpty()) action() }
+  }
+
+  /**
+   * The given function is applied as a fire and forget effect
+   * if this is a `some`.
+   * When applied the result is ignored and the original
+   * Some value is returned
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   Some(12).onSome { println("flower") } // Result: prints "flower" and returns: Some(12)
+   *   none<Int>().onSome { println("flower") }  // Result: None
+   * }
+   * ```
+   * <!--- KNIT example-option-20.kt -->
+   */
+  public inline fun onSome(action: (A) -> Unit): Option<A>  {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isNotEmpty()) action(it.value) }
+  }
 
   /**
    * The given function is applied as a fire and forget effect
@@ -434,16 +494,16 @@ public sealed class Option<out A> {
    *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
    * }
    * ```
-   * <!--- KNIT example-option-19.kt -->
+   * <!--- KNIT example-option-21.kt -->
    */
-  public inline fun tapNone(f: () -> Unit): Option<A> =
-    when (this) {
-      is None -> {
-        f()
-        this
-      }
-      is Some -> this
-    }
+  @Deprecated(
+    "tapNone is being renamed to onNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("onNone(f)")
+  )
+  public inline fun tapNone(f: () -> Unit): Option<A> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return onNone(f)
+  }
 
   /**
    * The given function is applied as a fire and forget effect
@@ -461,52 +521,59 @@ public sealed class Option<out A> {
    *   none<Int>().tap { println("flower") }  // Result: None
    * }
    * ```
-   * <!--- KNIT example-option-20.kt -->
+   * <!--- KNIT example-option-22.kt -->
    */
-  public inline fun tap(f: (A) -> Unit): Option<A> =
-    when (this) {
-      is None -> this
-      is Some -> {
-        f(this.value)
-        this
-      }
-    }
+  @Deprecated(
+    "tap is being renamed to onNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("onSome(f)")
+  )
+  public inline fun tap(f: (A) -> Unit): Option<A> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return onSome(f)
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E> zip(
     b: Option<B>,
     c: Option<C>,
     d: Option<D>,
     map: (A, B, C, D) -> E
-  ): Option<E> =
-    zip(
-      b,
-      c,
-      d,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+  ): Option<E> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F> zip(
     b: Option<B>,
     c: Option<C>,
     d: Option<D>,
     e: Option<E>,
     map: (A, B, C, D, E) -> F
-  ): Option<F> =
-    zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e
-      )
-    }
+  ): Option<F> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G> zip(
     b: Option<B>,
     c: Option<C>,
@@ -514,18 +581,18 @@ public sealed class Option<out A> {
     e: Option<E>,
     f: Option<F>,
     map: (A, B, C, D, E, F) -> G
-  ): Option<G> =
-    zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e,
-        f
-      )
-    }
+  ): Option<G> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H> zip(
     b: Option<B>,
     c: Option<C>,
@@ -534,9 +601,18 @@ public sealed class Option<out A> {
     f: Option<F>,
     g: Option<G>,
     map: (A, B, C, D, E, F, G) -> H
-  ): Option<H> =
-    zip(b, c, d, e, f, g, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+  ): Option<H> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I> zip(
     b: Option<B>,
     c: Option<C>,
@@ -546,9 +622,18 @@ public sealed class Option<out A> {
     g: Option<G>,
     h: Option<H>,
     map: (A, B, C, D, E, F, G, H) -> I
-  ): Option<I> =
-    zip(b, c, d, e, f, g, h, Some.unit, Some.unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+  ): Option<I> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I, J> zip(
     b: Option<B>,
     c: Option<C>,
@@ -559,9 +644,18 @@ public sealed class Option<out A> {
     h: Option<H>,
     i: Option<I>,
     map: (A, B, C, D, E, F, G, H, I) -> J
-  ): Option<J> =
-    zip(b, c, d, e, f, g, h, i, Some.unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+  ): Option<J> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
+  }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
     b: Option<B>,
     c: Option<C>,
@@ -573,33 +667,141 @@ public sealed class Option<out A> {
     i: Option<I>,
     j: Option<J>,
     map: (A, B, C, D, E, F, G, H, I, J) -> K
-  ): Option<K> =
-    if (this is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
-      Some(map(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-    } else {
-      None
-    }
+  ): Option<K> {
+    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
+  }
 
   /**
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    ReplaceWith("isNone()")
+  )
   public abstract fun isEmpty(): Boolean
 
-  public fun isNotEmpty(): Boolean = !isEmpty()
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
+  )
+  public fun isNotEmpty(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
+    return this@Option is Some<A>
+  }
 
+  /**
+   * Returns true if the option is [None], false otherwise.
+   * @note Used only for performance instead of fold.
+   */
+  public fun isNone(): Boolean {
+    contract {
+      returns(false) implies (this@Option is Some<A>)
+      returns(true) implies (this@Option is None)
+    }
+    return this@Option is None
+  }
+
+  /**
+   * Returns true if the option is [Some], false otherwise.
+   * @note Used only for performance instead of fold.
+   */
+  public fun isSome(): Boolean {
+    contract {
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
+    return this@Option is Some<A>
+  }
+
+  /**
+   * Returns true if this option is nonempty '''and''' the predicate
+   * $p returns true when applied to this $option's value.
+   * Otherwise, returns false.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Some
+   * import arrow.core.None
+   * import arrow.core.Option
+   *
+   * fun main() {
+   *   Some(12).isSome { it > 10 } // Result: true
+   *   Some(7).isSome { it > 10 }  // Result: false
+   *
+   *   val none: Option<Int> = None
+   *   none.isSome { it > 10 }      // Result: false
+   * }
+   * ```
+   * <!--- KNIT example-option-23.kt -->
+   *
+   * @param predicate the predicate to test
+   */
+  public inline fun isSome(predicate: (A) -> Boolean): Boolean {
+    contract {
+      callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+      returns(true) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is None)
+    }
+    return this@Option is Some<A> && predicate(value)
+  }
   /**
    * alias for [isDefined]
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
+  )
   public fun nonEmpty(): Boolean = isDefined()
 
   /**
    * Returns true if the option is an instance of [Some], false otherwise.
    * @note Used only for performance instead of fold.
    */
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome()")
+  )
   public fun isDefined(): Boolean = !isEmpty()
 
-  public fun orNull(): A? = fold({ null }, ::identity)
+  @Deprecated(
+    "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNull()")
+  )
+  public fun orNull(): A? {
+    contract {
+      returns(null) implies (this@Option is None)
+      returnsNotNull() implies (this@Option is Some<A>)
+    }
+    return fold({ null }, ::identity)
+  }
+
+  /**
+   * Returns the encapsulated value [A] if this instance represents [Some] or `null` if it is [None].
+   *
+   * ```kotlin
+   * import arrow.core.None
+   * import arrow.core.Some
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *   Some(12).getOrNull() shouldBe 12
+   *   None.getOrNull() shouldBe null
+   * }
+   * ```
+   * <!--- KNIT example-option-24.kt -->
+   */
+  public fun getOrNull(): A? {
+    contract {
+      returns(null) implies (this@Option is None)
+      returnsNotNull() implies (this@Option is Some<A>)
+    }
+    return getOrElse { null }
+  }
 
   /**
    * Returns a [Some<$B>] containing the result of applying $f to this $option's
@@ -611,12 +813,20 @@ public sealed class Option<out A> {
    * @param f the function to apply
    * @see flatMap
    */
-  public inline fun <B> map(f: (A) -> B): Option<B> =
-    flatMap { a -> Some(f(a)) }
+  public inline fun <B> map(f: (A) -> B): Option<B> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return flatMap { a -> Some(f(a)) }
+  }
 
-  public inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
-    is None -> ifEmpty()
-    is Some<A> -> ifSome(value)
+  public inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R {
+    contract {
+      callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(ifSome, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (this) {
+      is None -> ifEmpty()
+      is Some<A> -> ifSome(value)
+    }
   }
 
   /**
@@ -628,8 +838,17 @@ public sealed class Option<out A> {
    *
    * @param f the function to apply.
    * */
-  public inline fun <B> mapNotNull(f: (A) -> B?): Option<B> =
-    flatMap { a -> fromNullable(f(a)) }
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or fold or map",
+    ReplaceWith(
+      "flatMap { fromNullable(f(it)) }",
+      "arrow.core.Option.Companion.fromNullable"
+    )
+  )
+  public inline fun <B> mapNotNull(f: (A) -> B?): Option<B> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return flatMap { a -> fromNullable(f(a)) }
+  }
 
   /**
    * Returns the result of applying $f to this $option's value if
@@ -641,21 +860,25 @@ public sealed class Option<out A> {
    * @param f the function to apply
    * @see map
    */
-  public inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
-    when (this) {
+  public inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is None -> this
       is Some -> f(value)
     }
+  }
 
   /**
    * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
    */
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
     when (this) {
       None -> when (b) {
         None -> None
         is Some -> Some(b.value.rightIor())
       }
+
       is Some -> when (b) {
         None -> Some(this.value.leftIor())
         is Some -> Some(Pair(this.value, b.value).bothIor())
@@ -667,8 +890,11 @@ public sealed class Option<out A> {
    *
    * @note This function works like a regular `align` function, but is then mapped by the `map` function.
    */
-  public inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
-    align(b).map(f)
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
+  public inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> {
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return align(b).map(f)
+  }
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -676,21 +902,51 @@ public sealed class Option<out A> {
    *
    * @param predicate the predicate to test
    */
-  public inline fun all(predicate: (A) -> Boolean): Boolean =
-    fold({ true }, predicate)
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or fold or map",
+    ReplaceWith("fold({ true }, predicate)")
+  )
+  public inline fun all(predicate: (A) -> Boolean): Boolean {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return fold({ true }, predicate)
+  }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith(
+      "fold<Option<Option<B>>>({ None }) { value -> f(value).map(::Some) }",
+      "arrow.core.None",
+      "arrow.core.Option",
+      "arrow.core.Some"
+    )
+  )
   public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
     when (this) {
       is None -> this
       is Some -> f(value).map { Some(it) }
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith(
+      "fold<Map<K, Option<V>>>({ emptyMap() }) { value -> f(value).mapValues { Some(it.value) } }",
+      "arrow.core.Option",
+      "arrow.core.Some"
+    )
+  )
   public inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
     when (this) {
       is None -> emptyMap()
       is Some -> f(value).mapValues { Some(it.value) }
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or fold",
+    ReplaceWith(
+      "getOrNull()?.let { value -> f(value)?.let(::Some) }",
+      "arrow.core.Some"
+    )
+  )
   public inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
     when (this) {
       is None -> null
@@ -703,8 +959,10 @@ public sealed class Option<out A> {
    *
    *  @param predicate the predicate used for testing.
    */
-  public inline fun filter(predicate: (A) -> Boolean): Option<A> =
-    flatMap { a -> if (predicate(a)) Some(a) else None }
+  public inline fun filter(predicate: (A) -> Boolean): Option<A> {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return flatMap { a -> if (predicate(a)) Some(a) else None }
+  }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -712,8 +970,10 @@ public sealed class Option<out A> {
    *
    * @param predicate the predicate used for testing.
    */
-  public inline fun filterNot(predicate: (A) -> Boolean): Option<A> =
-    flatMap { a -> if (!predicate(a)) Some(a) else None }
+  public inline fun filterNot(predicate: (A) -> Boolean): Option<A> {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return flatMap { a -> if (!predicate(a)) Some(a) else None }
+  }
 
   /**
    * Returns true if this option is nonempty '''and''' the predicate
@@ -734,11 +994,18 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-option-21.kt -->
+   * <!--- KNIT example-option-25.kt -->
    *
    * @param predicate the predicate to test
    */
-  public inline fun exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
+  @Deprecated(
+    RedundantAPI + "Please use Option's member function isSome. This will be removed towards Arrow 2.0",
+    ReplaceWith("isSome(predicate)")
+  )
+  public inline fun exists(predicate: (A) -> Boolean): Boolean {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return fold({ false }, predicate)
+  }
 
   /**
    * Returns the $option's value if this option is nonempty '''and''' the predicate
@@ -759,24 +1026,39 @@ public sealed class Option<out A> {
    *   none.exists { it > 10 }      // Result: null
    * }
    * ```
-   * <!--- KNIT example-option-22.kt -->
+   * <!--- KNIT example-option-26.kt -->
    */
-  public inline fun findOrNull(predicate: (A) -> Boolean): A? =
-    when (this) {
+  @Deprecated(
+    NicheAPI + "Prefer Kotlin nullable syntax instead",
+    ReplaceWith("getOrNull()?.takeIf(predicate)")
+  )
+  public inline fun findOrNull(predicate: (A) -> Boolean): A? {
+    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is Some -> if (predicate(value)) value else null
       is None -> null
     }
+  }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("MB.run { this.fold({ empty() }) { a -> empty().combine(f(a)) } }")
+  )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     foldLeft(empty()) { b, a -> b.combine(f(a)) }
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("fold({ initial }) { operation(initial, it) }")
+  )
   public inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
     when (this) {
       is Some -> operation(initial, value)
       is None -> initial
     }
 
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
     align(other) { ior ->
       ior.fold(
@@ -786,6 +1068,7 @@ public sealed class Option<out A> {
       )
     }
 
+  @Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
   public inline fun <B, C> padZip(other: Option<B>, f: (A?, B?) -> C): Option<C> =
     align(other) { ior ->
       ior.fold(
@@ -795,12 +1078,23 @@ public sealed class Option<out A> {
       )
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("getOrNull()?.let { value -> operation(initial(value), value) }")
+  )
   public inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
     when (this) {
       is None -> null
       is Some -> operation(initial(value), value)
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith(
+      "fold({ Eval.now(null) }) { value -> operation(value, Eval.now(initial(value))) }",
+      "arrow.core.Eval"
+    )
+  )
   public inline fun <B> reduceRightEvalOrNull(
     initial: (A) -> B,
     operation: (A, acc: Eval<B>) -> Eval<B>
@@ -810,50 +1104,102 @@ public sealed class Option<out A> {
       is Some -> operation(value, Eval.now(initial(value)))
     }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { List(n) { it } }")
+  )
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ emptyList() }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Some")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
-    fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
+  public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> {
+    contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
+    return fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
+  }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Either.Right",
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, B> traverse(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
-    when (this) {
+  public inline fun <AA, B> traverse(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> {
+    contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is Some -> fa(value).map { Some(it) }
       is None -> Right(this)
     }
+  }
 
   @Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
     traverse(fa)
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
+      "arrow.core.Valid",
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  public inline fun <AA, B> traverse(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
-    when (this) {
+  public inline fun <AA, B> traverse(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> {
+    contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
       is Some -> fa(value).map { Some(it) }
       is None -> Valid(this)
     }
+  }
 
   @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, B> traverseValidated(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
     traverse(fa)
 
-  public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
-    fold({ ifEmpty().left() }, { it.right() })
+  public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> {
+    contract { callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE) }
+    return fold({ ifEmpty().left() }, { it.right() })
+  }
 
   public fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
+  @Deprecated(
+    RedundantAPI + "Replace with map with Unit",
+    ReplaceWith("map { }")
+  )
   public fun void(): Option<Unit> =
-    map { Unit }
+    map { }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { left to it }")
+  )
   public fun <L> pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or map",
+    ReplaceWith("map { it to right }")
+  )
   public fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
 
+  @Deprecated(
+    NicheAPI + "Prefer using the Option DSL or flatMap",
+    ReplaceWith("flatMap { value }")
+  )
   public infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
   } else {
@@ -867,18 +1213,27 @@ public sealed class Option<out A> {
 }
 
 public object None : Option<Nothing>() {
-  override fun isEmpty(): Boolean = true
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    replaceWith = ReplaceWith("isNone()")
+  )
+  public override fun isEmpty(): Boolean = true
 
   override fun toString(): String = "Option.None"
 }
 
 public data class Some<out T>(val value: T) : Option<T>() {
-  override fun isEmpty(): Boolean = false
+  @Deprecated(
+    "Duplicated API. Please use Option's member function isNone. This will be removed towards Arrow 2.0",
+    replaceWith = ReplaceWith("isNone()")
+  )
+  public override fun isEmpty(): Boolean = false
 
   override fun toString(): String = "Option.Some($value)"
 
   public companion object {
     @PublishedApi
+    @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Some(Unit)"))
     internal val unit: Option<Unit> = Some(Unit)
   }
 }
@@ -889,7 +1244,10 @@ public data class Some<out T>(val value: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-public inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
+public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
+  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold({ default() }, ::identity)
+}
 
 /**
  * Returns this option's if the option is nonempty, otherwise
@@ -897,9 +1255,15 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default(
  *
  * @param alternative the default option if this is empty.
  */
-public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> =
-  if (isEmpty()) alternative() else this
+public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> {
+  contract { callsInPlace(alternative, InvocationKind.AT_MOST_ONCE) }
+  return if (isEmpty()) alternative() else this
+}
 
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith("orElse(value)")
+)
 public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
   value
 } else {
@@ -908,12 +1272,22 @@ public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) 
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
-public inline fun <A> Boolean.maybe(f: () -> A): Option<A> =
-  if (this) {
+@Deprecated(
+  NicheAPI + "Prefer using if-else statement",
+  ReplaceWith(
+    "if (this) { Some(f()) } else { None }",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
+)
+public inline fun <A> Boolean.maybe(f: () -> A): Option<A> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return if (this) {
     Some(f())
   } else {
     None
   }
+}
 
 public fun <A> A.some(): Option<A> = Some(this)
 
@@ -927,16 +1301,30 @@ public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
   getOrElse { MA.empty() }
 
-public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
-  when (this) {
+@Deprecated(
+  RedundantAPI + "Prefer if-else statement inside option DSL, or replace with explicit flatMap",
+  ReplaceWith(
+    "this.flatMap { b -> b.takeIf(predicate)?.let(::Some) ?: None.also(error) }",
+    "arrow.core.Some",
+    "arrow.core.None"
+  )
+)
+public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> {
+  contract {
+    callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(error, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (this) {
     is Some ->
       if (predicate(value)) this
       else {
         error()
         None
       }
+
     is None -> this
   }
+}
 
 /**
  * Returns an Option containing all elements that are instances of specified type parameter [B].
@@ -949,29 +1337,83 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
     }
   }
 
-public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
-  handleErrorWith { Some(f(Unit)) }
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith(
+    "recover { f(Unit) }",
+    "arrow.core.recover"
+  )
+)
+public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { f(Unit) }
+}
 
-public inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
-  if (isEmpty()) f(Unit) else this
+@Deprecated(
+  NicheAPI + "Prefer using the orElse method",
+  ReplaceWith(
+    "recover { f(Unit).bind() }",
+    "arrow.core.recover"
+  )
+)
+public inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { f(Unit).bind() }
+}
 
 public fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
-public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
-  map(fb).handleError(fe)
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit fold with some",
+  ReplaceWith(
+    "fold({ fe(Unit) }, fb).some()",
+    "arrow.core.some"
+  )
+)
+public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> {
+  contract {
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return fold({ fe(Unit) }, fb).some()
+}
 
-public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
-  flatMap(fb).handleErrorWith(fe)
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap with orElse",
+  ReplaceWith(
+    "flatMap(fb).recover { fe(Unit).bind() }",
+    "arrow.core.recover"
+  )
+)
+public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> {
+  contract {
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return flatMap(fb).recover { fe(Unit).bind() }
+}
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or map",
+  ReplaceWith("MA.run { this.map { List(n) { it }.fold(empty()) { acc, v -> acc + v } } }")
+)
 public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   if (n <= 0) Some(empty())
   else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatmap",
+  ReplaceWith(
+    "flatMap { it.fold({ None }, { a -> Some(a) }) }",
+    "arrow.core.None", "arrow.core.Some"
+  )
+)
 public fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
 
+@Deprecated(NicheAPI + "Prefer using a simple fold, or when expression")
 public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
   align(b) {
     it.fold(::identity, ::identity) { a, b ->
@@ -985,11 +1427,20 @@ public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
  * @receiver Option of Either
  * @return a tuple containing Option of [Either.Left] and another Option of its [Either.Right] value.
  */
-public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> {
-  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
-  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
-  return asep to bsep
-}
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ None to None }) { either -> either.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
+    "arrow.core.None", "arrow.core.Some", "arrow.core.Option"
+  )
+)
+public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }) { either ->
+    either.fold(
+      { Some(it) to None },
+      { None to Some(it) }
+    )
+  }
 
 /**
  * Separate the inner [Validated] value into the [Validated.Invalid] and [Validated.Valid].
@@ -997,32 +1448,74 @@ public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<
  * @receiver Option of Either
  * @return a tuple containing Option of [Validated.Invalid] and another Option of its [Validated.Valid] value.
  */
-public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> {
-  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
-  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
-  return asep to bsep
-}
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ None to None }) { validated -> validated.fold<Pair<Option<A>, Option<B>>>({ Some(it) to None }, { None to Some(it) }) }",
+    "arrow.core.None", "arrow.core.Some", "arrow.core.Option"
+  )
+)
+public fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }) { validated ->
+    validated.fold(
+      { Some(it) to None },
+      { None to Some(it) }
+    )
+  }
 
+@Deprecated(
+  "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ emptyList() }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Some",
+  )
+)
 public fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
   traverse(::identity)
 
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceEither is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
   sequence()
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ Right(None) }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Either.Right",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
+)
 public fun <A, B> Option<Either<A, B>>.sequence(): Either<A, Option<B>> =
   traverse(::identity)
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
   sequence()
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ Valid(None) }) { a -> fa(a).map(::Some) }",
+    "arrow.core.Valid",
+    "arrow.core.None",
+    "arrow.core.Some"
+  )
+)
 public fun <A, B> Option<Validated<A, B>>.sequence(): Validated<A, Option<B>> =
   traverse(::identity)
 
+@Deprecated(NicheAPI + "Prefer using a when expression")
 public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
 
+@Deprecated(NicheAPI + "Prefer using a when expression")
 public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
   when (val option = this.map(f)) {
     is None -> None to None
@@ -1033,16 +1526,37 @@ public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<
     }
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit map",
+  ReplaceWith(
+    "map { iterable -> iterable.fold(MA) }",
+    "arrow.typeclasses.Monoid"
+  )
+)
 public fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
   map { iterable ->
     iterable.fold(MA)
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap",
+  ReplaceWith(
+    "flatMap<B> { either -> either.fold<Option<B>>({ None }, ::Some) }",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
+  )
+)
 public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
   flatMap { either ->
     either.fold({ None }, { b -> Some(b) })
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using the Option DSL or explicit flatMap",
+  ReplaceWith(
+    "flatMap<B> { validated -> validated.fold<Option<B>>({ None }, ::Some) }",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
+  )
+)
 public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
   flatMap { validated ->
     validated.fold({ None }, { b -> Some(b) })
@@ -1075,7 +1589,7 @@ public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A
  *   println(result)
  *  }
  *  ```
- * <!--- KNIT example-option-23.kt -->
+ * <!--- KNIT example-option-27.kt -->
  */
 public fun <B, A : B> Option<A>.widen(): Option<B> =
   this
@@ -1088,6 +1602,7 @@ public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
       is Some -> Some(SGA.run { value.combine(b.value) })
       None -> this
     }
+
     None -> b
   }
 
@@ -1097,3 +1612,53 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
     other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
   }
 )
+
+/**
+ * Recover from any [None] if encountered.
+ *
+ * The recover DSL allows you to recover from any [None] value by:
+ *  - Computing a fallback value [A]
+ *  - Shifting a _new error_ of [None] into the [Option].
+ *
+ * ```kotlin
+ * import arrow.core.Option
+ * import arrow.core.none
+ * import arrow.core.Some
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Option<Int> = none()
+ *   val fallback: Option<Int> = error.recover { 5 }
+ *   fallback shouldBe Some(5)
+ * }
+ * ```
+ * <!--- KNIT example-option-28.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
+ * When shifting a new error [None] into the [Option]:
+ *
+ * ```kotlin
+ * import arrow.core.Option
+ * import arrow.core.none
+ * import arrow.core.Some
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Option<Int> = none()
+ *   fun fallback(): Option<Int> = Some(5)
+ *   fun failure(): Option<Int> = none()
+ *
+ *   error.recover { fallback().bind() } shouldBe Some(5)
+ *   error.recover { failure().bind() } shouldBe none()
+ * }
+ * ```
+ * <!--- KNIT example-option-29.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
+  when (this@recover) {
+    is None -> option { recover(this, None) }
+    is Some -> this@recover
+  }

@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   `java-platform`
   alias(libs.plugins.arrowGradleConfig.publish)

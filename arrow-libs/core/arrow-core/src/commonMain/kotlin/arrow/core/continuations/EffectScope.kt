@@ -7,11 +7,17 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.identity
+import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 
 /** Context of the [Effect] DSL. */
+@Deprecated(
+  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith("Raise<R>", "arrow.core.raise.Raise")
+)
 public interface EffectScope<in R> {
   /**
    * Short-circuit the [Effect] computation with value [R].
@@ -30,7 +36,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-01.kt -->
    */
   public suspend fun <B> shift(r: R): B
-
+  
   /**
    * Runs the [Effect] to finish, returning [B] or [shift] in case of [R].
    *
@@ -56,7 +62,7 @@ public interface EffectScope<in R> {
    * <!--- KNIT example-effect-scope-02.kt -->
    */
   public suspend fun <B> Effect<R, B>.bind(): B = fold(this@EffectScope::shift, ::identity)
-
+  
   /**
    * Runs the [EagerEffect] to finish, returning [B] or [shift] in case of [R],
    * bridging eager computations into suspending.
@@ -89,7 +95,13 @@ public interface EffectScope<in R> {
     fold({ r -> left = r }, { a -> right = a })
     return if (left === EmptyValue) EmptyValue.unbox(right) else shift(EmptyValue.unbox(left))
   }
-
+  
+  public suspend fun <B> arrow.core.raise.Effect<R, B>.bind(): B =
+    fold(this@EffectScope::shift, ::identity)
+  
+  public suspend fun <B> arrow.core.raise.EagerEffect<R, B>.bind(): B =
+    fold({ shift(it) }, ::identity)
+  
   /**
    * Folds [Either] into [Effect], by returning [B] or a shift with [R].
    *
@@ -113,7 +125,7 @@ public interface EffectScope<in R> {
       is Either.Left -> shift(value)
       is Either.Right -> value
     }
-
+  
   /**
    * Folds [Validated] into [Effect], by returning [B] or a shift with [R].
    *
@@ -137,7 +149,7 @@ public interface EffectScope<in R> {
       is Validated.Valid -> value
       is Validated.Invalid -> shift(value)
     }
-
+  
   /**
    * Folds [Result] into [Effect], by returning [B] or a transforming [Throwable] into [R] and
    * shifting the result.
@@ -160,7 +172,7 @@ public interface EffectScope<in R> {
    */
   public suspend fun <B> Result<B>.bind(transform: (Throwable) -> R): B =
     fold(::identity) { throwable -> shift(transform(throwable)) }
-
+  
   /**
    * Folds [Option] into [Effect], by returning [B] or a transforming [None] into [R] and shifting the
    * result.
@@ -189,7 +201,7 @@ public interface EffectScope<in R> {
       None -> shift(shift())
       is Some -> value
     }
-
+  
   /**
    * ensure that condition is `true`, if it's `false` it will `shift` with the provided value [R].
    * Monadic version of [kotlin.require].
@@ -213,7 +225,7 @@ public interface EffectScope<in R> {
    */
   public suspend fun ensure(condition: Boolean, shift: () -> R): Unit =
     if (condition) Unit else shift(shift())
-
+  
   /**
    * Encloses an action for which you want to catch any `shift`.
    * [attempt] is used in combination with [catch].
@@ -226,12 +238,17 @@ public interface EffectScope<in R> {
    * the chance for a later [catch] to change the shifted value.
    * This is useful to simulate re-throwing of exceptions.
    */
+  @Deprecated(
+    "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+      "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick. Add missing imports and you're good to go!",
+    ReplaceWith("effect(f)", "arrow.core.raise.effect")
+  )
   @OptIn(ExperimentalTypeInference::class)
   public suspend fun <E, A> attempt(
     @BuilderInference
     f: suspend EffectScope<E>.() -> A,
   ): suspend EffectScope<E>.() -> A = f
-
+  
   /**
    * When the [Effect] has shifted with [R] it will [recover]
    * the shifted value to [A], and when it ran the computation to
@@ -259,7 +276,16 @@ public interface EffectScope<in R> {
    * ```
    * <!--- KNIT example-effect-scope-09.kt -->
    */
+  @Deprecated(
+    "This method is renamed to recover in the new Raise type."  +
+      "Apply the ReplaceWith refactor, and then a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick. Add missing imports and you're good to go!",
+    ReplaceWith("recover(f)")
+  )
   public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).catch(
+    recover: suspend EffectScope<R>.(E) -> A,
+  ): A = effect(this).fold({ recover(it) }, ::identity)
+  
+  public suspend infix fun <E, A> (suspend EffectScope<E>.() -> A).recover(
     recover: suspend EffectScope<R>.(E) -> A,
   ): A = effect(this).fold({ recover(it) }, ::identity)
 }
@@ -285,6 +311,11 @@ public interface EffectScope<in R> {
  * ```
  * <!--- KNIT example-effect-scope-10.kt -->
  */
+@Deprecated(
+  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith("ensureNotNull(value, shift)", "arrow.core.raise.ensureNotNull")
+)
 @OptIn(ExperimentalContracts::class)
 public suspend fun <R, B : Any> EffectScope<R>.ensureNotNull(value: B?, shift: () -> R): B {
   contract { returns() implies (value != null) }

@@ -1,26 +1,76 @@
 package arrow.core
 
-import arrow.core.test.UnitSpec
-import arrow.core.test.generators.either
-import arrow.core.test.generators.functionAToB
-import arrow.core.test.generators.option
+import arrow.core.test.either
+import arrow.core.test.functionAToB
+import arrow.core.test.option
 import arrow.typeclasses.Semigroup
-import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
-class IterableTest : UnitSpec() {
-  init {
+class IterableTest : StringSpec({
+
+  "flattenOrAccumulate(combine)" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .fold("") { acc, either -> "$acc${either.value}" }.left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate(String::plus) shouldBe expected
+    }
+  }
+
+  "flattenOrAccumulate" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val expected =
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+          .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
+        else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
+
+      list.flattenOrAccumulate() shouldBe expected
+    }
+  }
+
+  "mapAccumulating stack-safe, and runs in original order" {
+    val acc = mutableListOf<Int>()
+    val res = (0..20_000).mapOrAccumulate(String::plus) {
+      acc.add(it)
+      it
+    }
+    res shouldBe acc.right()
+    res shouldBe (0..20_000).toList().right()
+  }
+
+  "mapAccumulating accumulates" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      val res: Either<NonEmptyList<Int>, List<Int>> =
+        ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
+
+      val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
+        .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()
+
+      res shouldBe expected
+    }
+  }
+
+  "mapAccumulating with String::plus" {
+    listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
+      raise("fail")
+    } shouldBe Either.Left("failfailfail")
+  }
+
     "traverse Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
@@ -499,5 +549,5 @@ class IterableTest : UnitSpec() {
         list.separateValidated() shouldBe ints.partition { it % 2 == 0 }
       }
     }
-  }
-}
+
+})

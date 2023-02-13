@@ -1,10 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither43
 
-import arrow.core.*
+import arrow.core.Either
+import io.kotest.matchers.shouldBe
 
- fun main(args: Array<String>) {
-  //sampleStart
-  Either.Left("foo").isEmpty()  // Result: true
-  Either.Right("foo").isEmpty() // Result: false
+fun test() {
+  Either.Right(12).getOrNull() shouldBe 12
+  Either.Left(12).getOrNull() shouldBe null
 }

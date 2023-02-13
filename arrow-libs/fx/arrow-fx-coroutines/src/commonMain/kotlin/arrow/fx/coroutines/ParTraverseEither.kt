@@ -1,16 +1,12 @@
 @file:JvmMultifileClass
 @file:JvmName("ParTraverse")
+
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -22,12 +18,30 @@ import kotlin.jvm.JvmName
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n) { it() }
+  either { parMap(Dispatchers.Default, n) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 @JvmName("parSequenceEitherNScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEitherN(n: Int): Either<A, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n) { it() }
+  either { parMap(Dispatchers.Default, n) { it().bind() } }
 
 /**
  * Sequences all tasks in [n] parallel processes on [ctx] and return the result.
@@ -38,18 +52,34 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 @JvmName("parSequenceEitherNScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Either<A, List<B>> =
-  parTraverseEitherN(ctx, n) { it() }
+  either { parMap(ctx, n) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx, n) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int
 ): Either<A, List<B>> =
-  parTraverseEitherN(ctx, n) { it() }
+  either { parMap(ctx, n) { it().bind() } }
 
 /**
  * Sequences all tasks in parallel on [Dispatchers.Default] and return the result.
@@ -58,12 +88,30 @@ public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
-  parTraverseEither(Dispatchers.Default) { it() }
+  either { parMap(Dispatchers.Default) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(): Either<A, List<B>> =
-  parTraverseEither(Dispatchers.Default) { it() }
+  either { parMap(Dispatchers.Default) { it().bind() } }
 
 /**
  * Sequences all tasks in parallel on [ctx] and return the result.
@@ -98,16 +146,30 @@ public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.pa
  * ```
  * <!--- KNIT example-partraverseeither-01.kt -->
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 @JvmName("parSequenceEitherScoped")
 public suspend fun <A, B> Iterable<suspend CoroutineScope.() -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Either<A, List<B>> =
-  parTraverseEither(ctx) { it() }
+): Either<A, List<B>> = either { parMap(ctx) { it().bind() } }
 
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx) { it().bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither(
   ctx: CoroutineContext = EmptyCoroutineContext
-): Either<A, List<B>> =
-  parTraverseEither(ctx) { it() }
+): Either<A, List<B>> = either { parMap(ctx) { it().bind() } }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -116,11 +178,19 @@ public suspend fun <A, B> Iterable<suspend () -> Either<A, B>>.parSequenceEither
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default, n) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
   n: Int,
   f: suspend CoroutineScope.(A) -> Either<E, B>
-): Either<E, List<B>> =
-  parTraverseEitherN(Dispatchers.Default, n, f)
+): Either<E, List<B>> = either { parMap(Dispatchers.Default, n) { f(it).bind() } }
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
@@ -133,16 +203,19 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx, n) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   n: Int,
   f: suspend CoroutineScope.(A) -> Either<E, B>
-): Either<E, List<B>> {
-  val semaphore = Semaphore(n)
-  return parTraverseEither(ctx) { a ->
-    semaphore.withPermit { f(a) }
-  }
-}
+): Either<E, List<B>> = either { parMap(ctx, n) { f(it).bind() } }
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [Dispatchers.Default].
@@ -151,10 +224,19 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEitherN(
  *
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(Dispatchers.Default) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either",
+    "kotlinx.coroutines.Dispatchers"
+  )
+)
 public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =
-  parTraverseEither(Dispatchers.Default, f)
+  either { parMap(Dispatchers.Default) { f(it).bind() } }
 
 /**
  * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
@@ -193,12 +275,16 @@ public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
  * ```
  * <!--- KNIT example-partraverseeither-02.kt -->
  */
+@Deprecated(
+  "Prefer composing parMap with either DSL",
+  ReplaceWith(
+    "either<E, List<B>> { this.parMap(ctx) { f(it).bind() } }",
+    "arrow.fx.coroutines.parMap",
+    "arrow.core.continuations.either"
+  )
+)
 public suspend fun <A, B, E> Iterable<A>.parTraverseEither(
   ctx: CoroutineContext = EmptyCoroutineContext,
   f: suspend CoroutineScope.(A) -> Either<E, B>
 ): Either<E, List<B>> =
-  either {
-    coroutineScope {
-      map { async(ctx) { f.invoke(this, it).bind() } }.awaitAll()
-    }
-  }
+  either { parMap(ctx) { f(it).bind() } }

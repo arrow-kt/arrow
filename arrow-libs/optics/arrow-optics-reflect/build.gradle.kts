@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -9,7 +11,7 @@ apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
@@ -24,9 +26,13 @@ dependencies {
   implementation(libs.kotlin.stdlibJDK8)
 
   if(!enableCompatibilityMetadataVariant) {
-    testImplementation(project(":arrow-optics-test"))
     testImplementation(libs.kotlin.stdlibJDK8)
     testImplementation(libs.junitJupiterEngine)
     testImplementation(libs.kotlin.reflect)
+
+    testImplementation(libs.kotest.frameworkEngine)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.property)
+    testRuntimeOnly(libs.kotest.runnerJUnit5)
   }
 }

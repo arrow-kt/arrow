@@ -13,7 +13,7 @@ import io.kotest.property.checkAll
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
-      nullable {
+      nullable.eager {
         ensure(predicate)
         i
       } shouldBe if (predicate) i else null
@@ -24,9 +24,8 @@ class NullableSpec : StringSpec({
     fun square(i: Int): Int = i * i
     checkAll(Arb.int().orNull()) { i: Int? ->
       nullable {
-        val ii = i
-        ensureNotNull(ii)
-        square(ii) // Smart-cast by contract
+        ensureNotNull(i)
+        square(i) // Smart-cast by contract
       } shouldBe i?.let(::square)
     }
   }

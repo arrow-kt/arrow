@@ -1,7 +1,7 @@
 <a href="https://arrow-kt.io" title="Arrow website"><img src="img/logo/arrow-dark.svg" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Kotlin version](https://img.shields.io/badge/Kotlin-1.6-blue)](https://kotlinlang.org/docs/whatsnew16.html)
+[![Kotlin version](https://img.shields.io/badge/Kotlin-1.8.10-blue)](https://kotlinlang.org/docs/whatsnew18.html)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-grey.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
@@ -27,6 +27,17 @@ Use the list below to learn more about Λrrow's main features.
 
 If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR
 to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo.
+
+## Arrow 2.0
+
+The next version of Arrow is [in active development](https://github.com/arrow-kt/arrow/pull/2778).
+If you want to try it, you need to add the following repository in your build file:
+
+```
+maven("https://oss.sonatype.org/content/repositories/snapshots")
+```
+
+and depend on the `2.0.0-SNAPSHOT` version of the desired library.
 
 ## Join Us
 

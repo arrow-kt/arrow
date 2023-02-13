@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -13,7 +15,7 @@ apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
@@ -45,5 +47,11 @@ dependencies {
     testRuntimeOnly(projects.arrowAnnotations)
     testRuntimeOnly(projects.arrowCore)
     testRuntimeOnly(projects.arrowOptics)
+  }
+}
+
+tasks {
+  withType<Test>().configureEach {
+    maxParallelForks = 1
   }
 }

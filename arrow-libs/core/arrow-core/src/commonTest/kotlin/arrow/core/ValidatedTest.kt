@@ -2,11 +2,11 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.test.UnitSpec
+import arrow.core.test.validated
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.core.test.generators.validated
 import io.kotest.assertions.fail
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
@@ -14,12 +14,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 
 @Suppress("RedundantSuspendModifier")
-class ValidatedTest : UnitSpec() {
-
-  init {
-
+class ValidatedTest : StringSpec({
     "fold should call function on Invalid" {
       val exception = Exception("My Exception")
       val result: Validated<Throwable, String> = Invalid(exception)
@@ -243,7 +241,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "withEither should return Valid(result) if f return Right" {
-      Valid(10).withEither { it.map { it + 5 } } shouldBe Valid(15)
+      Valid(10).withEither { it.map { n -> n + 5 } } shouldBe Valid(15)
       Invalid(10).withEither { Right(5) } shouldBe Valid(5)
     }
 
@@ -515,5 +513,4 @@ class ValidatedTest : UnitSpec() {
         Valid(x).andThen { Invalid(it + y) } shouldBe Invalid(x + y)
       }
     }
-  }
-}
+})

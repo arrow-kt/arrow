@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -12,7 +14,7 @@ apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 if (enableCompatibilityMetadataVariant) {
   tasks.withType<Test>().configureEach {
@@ -24,6 +26,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
+        api(projects.arrowAtomic)
         api(projects.arrowContinuations)
         api(projects.arrowAnnotations)
         api(libs.kotlin.stdlibCommon)
@@ -32,8 +35,10 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(project(":arrow-core-test"))
-          implementation(project(":arrow-fx-coroutines"))
+          implementation(projects.arrowFxCoroutines)
+          implementation(libs.kotest.frameworkEngine)
+          implementation(libs.kotest.assertionsCore)
+          implementation(libs.kotest.property)
         }
       }
 
