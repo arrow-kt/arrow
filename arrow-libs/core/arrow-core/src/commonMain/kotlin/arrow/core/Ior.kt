@@ -177,7 +177,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ c }, { it + c }, { _, b -> b + c })")
+    ReplaceWith("fold({ c }, { f(c, it) }, { _, b -> f(c, b) })")
   )
   public inline fun <C> foldLeft(c: C, f: (C, B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
