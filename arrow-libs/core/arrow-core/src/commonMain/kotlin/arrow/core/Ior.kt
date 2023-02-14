@@ -559,7 +559,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a)?.let { Left(it) } },{ b -> fb(b)?.let { Right(it) } },{ a, b -> fromNullables(fa(a), fb(b)) })")
+    ReplaceWith("fold({ a -> fa(a)?.let { Ior.Left(it) } },{ b -> fb(b)?.let { Ior.Right(it) } },{ a, b -> fromNullables(fa(a), fb(b)) })")
   )
   public inline fun <C, D> bicrosswalkNull(
     fa: (A) -> C?,
@@ -573,7 +573,8 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a).map { Left(it) } },{ b -> fb(b).map { Right(it) } },{ a, b -> fa(a).zip(fb(b)) { aa, c -> Both(aa, c) } })")
+    ReplaceWith("fold({ a -> fa(a).map { Ior.Left(it) } },{ b -> fb(b).map { Ior.Right(it) } },{ a, b -> fa(a).zip(fb(b)) { aa, c -> Ior.Both(aa, c) } })",
+      "arrow.core.Ior")
   )
   public inline fun <AA, C> bitraverse(fa: (A) -> Iterable<AA>, fb: (B) -> Iterable<C>): List<Ior<AA, C>> =
     fold(
@@ -585,7 +586,9 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a).map { Left(it) } },{ b -> fb(b).map { Right(it) } },{ a, b -> either { Both(fa(a).bind(), fb(b).bind())} })")
+    ReplaceWith("fold({ a -> fa(a).map { Ior.Left(it) } },{ b -> fb(b).map { Ior.Right(it) } },{ a, b -> either { Ior.Both(fa(a).bind(), fb(b).bind())} })",
+      "arrow.core.Ior",
+      "arrow.core.raise.either")
   )
   public inline fun <AA, C, D> bitraverseEither(
     fa: (A) -> Either<AA, C>,
@@ -599,7 +602,9 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a).map { Left(it) } },{ b -> fb(b).map { Right(it) } },{ a, b -> option { Both(fa(a).bind(), fb(b).bind())} })")
+    ReplaceWith("fold({ a -> fa(a).map { Ior.Left(it) } },{ b -> fb(b).map { Ior.Right(it) } },{ a, b -> option { Ior.Both(fa(a).bind(), fb(b).bind())} })",
+      "arrow.core.Ior",
+      "arrow.core.raise.option")
   )
   public inline fun <C, D> bitraverseOption(
     fa: (A) -> Option<C>,
@@ -613,7 +618,8 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a)?.let { Left(it) } },{ b -> fb(b)?.let { Right(it) } }, { a, b -> nullable { Both( fa(a).bind(), fb(b).bind()) } })")
+    ReplaceWith("fold({ a -> fa(a)?.let { Ior.Left(it) } },{ b -> fb(b)?.let { Ior.Right(it) } }, { a, b -> nullable { Ior.Both( fa(a).bind(), fb(b).bind()) } })",
+      "arrow.core.Ior", "arrow.core.raise.nullable")
   )
   public inline fun <C, D> bitraverseNullable(
     fa: (A) -> C?,
@@ -638,7 +644,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ emptyList() },{ b -> fa(b).map { Right(it) } },{ a, b -> fa(b).map { Both(a, it) } })")
+    ReplaceWith("fold({ emptyList() },{ b -> fa(b).map { Ior.Right(it) } },{ a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   public inline fun <C> crosswalk(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
@@ -649,7 +656,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ emptyMap() },{ b -> fa(b).mapValues { Right(it.value)} },{ a, b -> fa(b).mapValues { Both(a, it.value) })")
+    ReplaceWith("fold({ emptyMap() },{ b -> fa(b).mapValues { Ior.Right(it.value)} },{ a, b -> fa(b).mapValues { Ior.Both(a, it.value) })",
+      "arrow.core.Ior")
   )
   public inline fun <K, V> crosswalkMap(fa: (B) -> Map<K, V>): Map<K, Ior<A, V>> =
     fold(
@@ -660,7 +668,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> Left(a) },{ b -> fa(b)?.let { Right(it) } },{ a, b -> fa(b)?.let { Both(a, it) } })")
+    ReplaceWith("fold({ a -> Ior.Left(a) },{ b -> fa(b)?.let { Ior.Right(it) } },{ a, b -> fa(b)?.let { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   public inline fun <A, B, C> crosswalkNull(ior: Ior<A, B>, fa: (B) -> C?): Ior<A, C>? =
     ior.fold(
@@ -806,7 +815,7 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using isRight and isBoth",
-    ReplaceWith("(isRight() || this.isBoth())")
+    ReplaceWith("(this.isRight() || this.isBoth())")
   )
   public fun isNotEmpty(): Boolean {
     contract {
@@ -818,7 +827,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> listOf(Left(a)) }, { b -> fa(b).map { Right(it) } }, { a, b -> fa(b).map { Both(a, it) } })")
+    ReplaceWith("fold({ a -> listOf(Ior.Left(a)) }, { b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -840,7 +850,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> Either.Right(Left(a)) }, { b -> fa(b).map { Right(it) } }, { a, b -> fa(b).map { Both(a, it) } })")
+    ReplaceWith("fold({ a -> Either.Right(Ior.Left(a)) }, { b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -855,7 +866,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> Some(Left(a)) }, { b -> fa(b).map { Right(it) } }, { a, b -> fa(b).map { Both(a, it) } })")
+    ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, { b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -877,7 +889,8 @@ public inline fun <AA, C, D> bitraverseValidated(
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> Left(a) }, {b -> fa(b)?.let { Right(it) } }, { a, b -> fa(b)?.let { Both(a, it) } })")
+    ReplaceWith("fold({ a -> Ior.Left(a) }, {b -> fa(b)?.let { Ior.Right(it) } }, { a, b -> fa(b)?.let { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )
   public inline fun <C> traverseNullable(fa: (B) -> C?): Ior<A, C>? {
     contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
@@ -892,7 +905,8 @@ public inline fun <AA, C, D> bitraverseValidated(
   @OverloadResolutionByLambdaReturnType
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> Valid(Left(a)) }, {b -> fa(b).map { Right(it) } }, { a, b -> fa(b).map { Both(a, it) } })")
+    ReplaceWith("fold({ a -> Valid(Ior.Left(a)) }, {b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
   )public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> {
     contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
     return fold(
@@ -947,7 +961,8 @@ public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Left(it) } }, {b -> identity(b).map{ Right(it) } }, { a, b -> identity(a).zip(identity(b)) { aa, c -> Both(aa, c) } })")
+  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> identity(a).zip(identity(b)) { aa, c -> Ior.Both(aa, c) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
   fold({a -> identity(a).map { Left(it) } },
@@ -956,7 +971,9 @@ public fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Left(it) } }, {b -> identity(b).map{ Right(it) } }, { a, b -> either { Both(identity(a).bind(), identity(b).bind()) } })")
+  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> either { Ior.Both(identity(a).bind(), identity(b).bind()) } })",
+    "arrow.core.Ior",
+    "arrow.core.raise.either")
 )
 public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<A, Ior<B, C>> =
   fold({ a -> identity(a).map{ Left(it) } },
@@ -965,7 +982,9 @@ public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Left(it) } }, {b -> identity(b).map{ Right(it) } }, { a, b -> option { Both(identity(a).bind(), identity(b).bind()) } })")
+  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> option { Both(identity(a).bind(), identity(b).bind()) } })",
+    "arrow.core.Ior",
+    "arrow.core.raise.option")
 )
 public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>> =
   fold({ a -> identity(a).map{ Left(it) } },
@@ -974,7 +993,9 @@ public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a)?.let{ Left(it) } }, {b -> identity(b)?.let{ Right(it) } }, { a, b -> nullable { Both(identity(a).bind(), identity(b).bind()) } })")
+  ReplaceWith("fold({ a -> identity(a)?.let{ Ior.Left(it) } }, {b -> identity(b)?.let{ Ior.Right(it) } }, { a, b -> nullable { Ior.Both(identity(a).bind(), identity(b).bind()) } })",
+    "arrow.core.Ior",
+    "arrow.core.raise.nullable")
 )
 public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
   fold(
@@ -1034,7 +1055,8 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): 
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> listOf(Left(a)) }, {b -> identity(b).map { Right(it) } }, { a, b -> identity(b).map{ Both(a, it) } })")
+  ReplaceWith("fold({ a -> listOf(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, Iterable<B>>.sequence(): List<Ior<A, B>> =
   fold(
@@ -1048,7 +1070,8 @@ public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>>
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Either.Right(Left(a)) }, {b -> identity(b).map { Right(it) } }, { a, b -> identity(b).map{ Both(a, it) } })")
+  ReplaceWith("fold({ a -> Either.Right(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B, C> Ior<A, Either<B, C>>.sequence(): Either<B, Ior<A, C>> =
   fold(
@@ -1062,7 +1085,8 @@ public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Some(Left(a)) }, {b -> identity(b).map { Right(it) } }, { a, b -> identity(b).map{ Both(a, it) } })")
+  ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
   fold(
@@ -1076,7 +1100,8 @@ public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Left(a) }, {b -> identity(b)?.let { Right(it) } }, { a, b -> identity(b)?.let{ Both(a, it) } })")
+  ReplaceWith("fold({ a -> Ior.Left(a) }, {b -> identity(b)?.let { Ior.Right(it) } }, { a, b -> identity(b)?.let{ Ior.Both(a, it) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
   fold(
@@ -1090,7 +1115,8 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Valid(Left(a)) }, {b -> identity(b).map { Right(it) } }, { a, b -> identity(b).map { Both(a, it) } })")
+  ReplaceWith("fold({ a -> Valid(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map { Ior.Both(a, it) } })",
+    "arrow.core.Ior")
 )
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>> =
   fold(
