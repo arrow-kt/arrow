@@ -1156,16 +1156,16 @@ public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ Pair(this@zip.bind(), fb.bind()) }")
+  ReplaceWith("ior(SA) { Pair(this@zip.bind(), fb.bind()) }", "arrow.core.raise.ior")
 )
 public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> {
 
-  return ior(SA){ Pair(this@zip.bind(), fb.bind()) }
+  return ior(SA) { Pair(this@zip.bind(), fb.bind()) }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind()) }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind()) }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1173,14 +1173,14 @@ public inline fun <A, B, C, D> Ior<A, B>.zip(
   map: (B, C) -> D
 ): Ior<A, D> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()) }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()) }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1189,14 +1189,14 @@ public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   map: (B, C, D) -> E
 ): Ior<A, E> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1206,14 +1206,14 @@ public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   map: (B, C, D, E) -> F
 ): Ior<A, F> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1224,14 +1224,14 @@ public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   map: (B, C, D, E, F) -> G
 ): Ior<A, G> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1243,14 +1243,14 @@ public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   map: (B, C, D, E, F, G) -> H
 ): Ior<A, H> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1263,14 +1263,14 @@ public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H) -> I
 ): Ior<A, I> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1284,14 +1284,14 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I) -> J
 ): Ior<A, J> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1306,14 +1306,14 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Ior<A, K> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return ior(SA){
+  return ior(SA) {
     map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind())
   }
 }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA){ map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind() }")
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   SA: Semigroup<A>,
