@@ -14,6 +14,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.js.JsName
 import kotlin.jvm.JvmStatic
 
 public typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -55,7 +56,8 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-01.kt -->
    */
-  public abstract val isRight: Boolean
+  @JsName("_isRight")
+  internal abstract val isRight: Boolean
 
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
@@ -73,7 +75,8 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-02.kt -->
    */
-  public abstract val isLeft: Boolean
+  @JsName("_isLeft")
+  internal abstract val isLeft: Boolean
 
   /**
    * Returns `true` if this is a [Both], `false` otherwise.
@@ -90,7 +93,37 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-03.kt -->
    */
-  public abstract val isBoth: Boolean
+  @JsName("_isBoth")
+  internal abstract val isBoth: Boolean
+
+
+  public fun isLeft(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Left<A>
+  }
+
+  public fun isRight(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Right<B>
+  }
+
+  public fun isBoth(): Boolean {
+    contract {
+      returns(false) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(true) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Right<B>
+  }
+
 
   public companion object {
     /**
@@ -681,9 +714,87 @@ public inline fun <AA, C, D> bitraverseValidated(
     return getOrNull()?.takeIf(predicate)
   }
 
+
+  /**
+   * Returns `false` if [Right] or [Both], or returns the result of the application of
+   * the given predicate to the [Left] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
+   *   val left: Ior<Int, Int> = Ior.Left(12)
+   *   left.isLeft { it > 10 }      // Result: true
+   * }
+   * ```
+   * <!--- KNIT example-ior-14.kt -->
+   */
+  public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Left<A>)
+      returns(false) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
+    }
+    return this@Ior is Left<A> && predicate(value)
+  }
+
+  /**
+   * Returns `false` if [Left] or [Both], or returns the result of the application of
+   * the given predicate to the [Right] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
+   *   val left: Ior<Int, Int> = Ior.Left(12)
+   *   left.exists { it > 10 }      // Result: true
+   * }
+   * ```
+   * <!--- KNIT example-ior-15.kt -->
+   */
+  public inline fun isRight(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Right<B>)
+      returns(false) implies (this@Ior is Left<A> || this@Ior is Both<A, B>)
+    }
+    return this@Ior is Right<B> && predicate(value)
+  }
+
+  /**
+   * Returns `false` if [Right] or [Both], or returns the result of the application of
+   * the given predicate to the [Left] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isLeft { it > 10, it > 6 }    // Result: true
+   *   val left: Ior<Int, Int> = Ior.Left(12)
+   *   left.exists { it > 10 }      // Result: false
+   * }
+   * ```
+   * <!--- KNIT example-ior-16.kt -->
+   */
+  public inline fun isBoth(leftPredicate: (A) -> Boolean, rightPredicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Both<A, B>)
+      returns(false) implies (this@Ior is Left<A> || this@Ior is Right<B>)
+    }
+    return this@Ior is Both<A, B> && leftPredicate(leftValue) && rightPredicate(rightValue)
+  }
+
+
+
   @Deprecated(
     NicheAPI + "Prefer using isLeft",
-    ReplaceWith("isLeft")
+    ReplaceWith("isLeft()")
   )
   public fun isEmpty(): Boolean {
     contract {
@@ -694,8 +805,8 @@ public inline fun <AA, C, D> bitraverseValidated(
   }
 
   @Deprecated(
-    NicheAPI + "Prefer using isRight",
-    ReplaceWith("isRight")
+    NicheAPI + "Prefer using isRight and isBoth",
+    ReplaceWith("(isRight() || this.isBoth())")
   )
   public fun isNotEmpty(): Boolean {
     contract {
@@ -1002,7 +1113,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-ior-14.kt -->
+ * <!--- KNIT example-ior-17.kt -->
  */
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this
@@ -1191,16 +1302,16 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
   // If any of the values is Right or Both then we can calculate L otherwise it results in MY_NULL
   val rightValue: Any? = if (
-    (this@zip.isRight || this@zip.isBoth) &&
-    (c.isRight || c.isBoth) &&
-    (d.isRight || d.isBoth) &&
-    (e.isRight || e.isBoth) &&
-    (f.isRight || f.isBoth) &&
-    (g.isRight || g.isBoth) &&
-    (h.isRight || h.isBoth) &&
-    (i.isRight || i.isBoth) &&
-    (j.isRight || j.isBoth) &&
-    (k.isRight || k.isBoth)
+    (this@zip.isRight() || this@zip.isBoth()) &&
+    (c.isRight() || c.isBoth()) &&
+    (d.isRight() || d.isBoth()) &&
+    (e.isRight() || e.isBoth()) &&
+    (f.isRight() || f.isBoth()) &&
+    (g.isRight() || g.isBoth()) &&
+    (h.isRight() || h.isBoth()) &&
+    (i.isRight() || i.isBoth()) &&
+    (j.isRight() || j.isBoth()) &&
+    (k.isRight() || k.isBoth())
   ) {
     map(
       this@zip.orNull() as B,
