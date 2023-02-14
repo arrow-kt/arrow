@@ -478,11 +478,14 @@ public abstract class arrow/core/Ior {
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullables (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
 	public final fun getOrNull ()Ljava/lang/Object;
-	public abstract fun isBoth ()Z
+	public final fun isBoth ()Z
+	public final fun isBoth (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Z
 	public final fun isEmpty ()Z
-	public abstract fun isLeft ()Z
+	public final fun isLeft ()Z
+	public final fun isLeft (Lkotlin/jvm/functions/Function1;)Z
 	public final fun isNotEmpty ()Z
-	public abstract fun isRight ()Z
+	public final fun isRight ()Z
+	public final fun isRight (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Ior;
 	public final fun leftOrNull ()Ljava/lang/Object;
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
@@ -517,9 +520,6 @@ public final class arrow/core/Ior$Both : arrow/core/Ior {
 	public final fun getLeftValue ()Ljava/lang/Object;
 	public final fun getRightValue ()Ljava/lang/Object;
 	public fun hashCode ()I
-	public fun isBoth ()Z
-	public fun isLeft ()Z
-	public fun isRight ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -540,9 +540,6 @@ public final class arrow/core/Ior$Left : arrow/core/Ior {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
-	public fun isBoth ()Z
-	public fun isLeft ()Z
-	public fun isRight ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -558,9 +555,6 @@ public final class arrow/core/Ior$Right : arrow/core/Ior {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
-	public fun isBoth ()Z
-	public fun isLeft ()Z
-	public fun isRight ()Z
 	public fun toString ()Ljava/lang/String;
 }
 
