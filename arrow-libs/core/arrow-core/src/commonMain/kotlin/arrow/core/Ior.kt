@@ -733,10 +733,10 @@ public inline fun <AA, C, D> bitraverseValidated(
    * import arrow.core.Ior
    *
    * fun main() {
-   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
+   *   val right: Ior<Int, Int> = Ior.Right(12)
+   *   right.isLeft { it > 10 }   // Result: false
    *   Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
-   *   val left: Ior<Int, Int> = Ior.Left(12)
-   *   left.isLeft { it > 10 }      // Result: true
+   *   Ior.Left(12).isLeft { it > 10 }      // Result: true
    * }
    * ```
    * <!--- KNIT example-ior-14.kt -->
@@ -758,10 +758,10 @@ public inline fun <AA, C, D> bitraverseValidated(
    * import arrow.core.Ior
    *
    * fun main() {
-   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
-   *   Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
+   *   Ior.Right(12).isRight { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isRight { it > 10 }    // Result: false
    *   val left: Ior<Int, Int> = Ior.Left(12)
-   *   left.exists { it > 10 }      // Result: true
+   *   left.isRight { it > 10 }      // Result: true
    * }
    * ```
    * <!--- KNIT example-ior-15.kt -->
@@ -775,18 +775,19 @@ public inline fun <AA, C, D> bitraverseValidated(
   }
 
   /**
-   * Returns `false` if [Right] or [Both], or returns the result of the application of
-   * the given predicate to the [Left] value.
+   * Returns `false` if [Right] or [Left], or returns the result of the application of
+   * the given predicate to the [Both] value.
    *
    * Example:
    * ```kotlin
    * import arrow.core.Ior
    *
    * fun main() {
-   *   Ior.Right(12).isLeft { it > 10 }   // Result: false
-   *   Ior.Both(12, 7).isLeft { it > 10, it > 6 }    // Result: true
-   *   val left: Ior<Int, Int> = Ior.Left(12)
-   *   left.exists { it > 10 }      // Result: false
+   *     val right: Ior<Int, Int> = Ior.Right(12)
+   *     right.isBoth( {it > 10}, {it > 6 })   // Result: false
+   *     Ior.Both(12, 7).isBoth( {it > 10}, {it > 6 })// Result: true
+   *     val left: Ior<Int, Int> = Ior.Left(12)
+   *     left.isBoth ( {it > 10}, {it > 6 })      // Result: false
    * }
    * ```
    * <!--- KNIT example-ior-16.kt -->
