@@ -867,7 +867,8 @@ public inline fun <AA, C, D> bitraverseValidated(
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
     ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, { b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
-      "arrow.core.Ior")
+      "arrow.core.Ior",
+      "arrow.core.Some")
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -1086,7 +1087,8 @@ public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
-    "arrow.core.Ior")
+    "arrow.core.Ior",
+    "arrow.core.Some")
 )
 public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
   fold(
@@ -1116,7 +1118,8 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith("fold({ a -> Valid(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map { Ior.Both(a, it) } })",
-    "arrow.core.Ior")
+    "arrow.core.Ior",
+    "arrow.core.Valid")
 )
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>> =
   fold(
