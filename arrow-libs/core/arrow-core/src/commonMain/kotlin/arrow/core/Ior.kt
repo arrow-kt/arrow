@@ -961,47 +961,47 @@ public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> identity(a).zip(identity(b)) { aa, c -> Ior.Both(aa, c) } })",
+  ReplaceWith("fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> a.zip(b) { aa, c -> Ior.Both(aa, c) } })",
     "arrow.core.Ior")
 )
 public fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
-  fold({a -> identity(a).map { Left(it) } },
-        { b -> identity(b).map{ Right(it) } },
-        { a, b -> identity(a).zip(identity(b)) { aa, c -> Both(aa, c) } })
+  fold({a -> a.map { Left(it) } },
+        { b -> b.map{ Right(it) } },
+        { a, b -> a.zip(b) { aa, c -> Both(aa, c) } })
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> either { Ior.Both(identity(a).bind(), identity(b).bind()) } })",
+  ReplaceWith("fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> either { Ior.Both(a.bind(), b.bind()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.either")
 )
 public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<A, Ior<B, C>> =
-  fold({ a -> identity(a).map{ Left(it) } },
-        { b -> identity(b).map{ Right(it) } },
-        { a, b -> either { Both(identity(a).bind(), identity(b).bind()) } })
+  fold({ a -> a.map{ Left(it) } },
+        { b -> b.map{ Right(it) } },
+        { a, b -> either { Both(a.bind(), b.bind()) } })
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a).map { Ior.Left(it) } }, {b -> identity(b).map{ Ior.Right(it) } }, { a, b -> option { Both(identity(a).bind(), identity(b).bind()) } })",
+  ReplaceWith("fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> option { Both(a.bind(), b.bind()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.option")
 )
 public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>> =
-  fold({ a -> identity(a).map{ Left(it) } },
-        { b -> identity(b).map{ Right(it) } },
-        { a, b -> option { Both(identity(a).bind(), identity(b).bind()) } })
+  fold({ a -> a.map{ Left(it) } },
+        { b -> b.map{ Right(it) } },
+        { a, b -> option { Both(a.bind(), b.bind()) } })
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> identity(a)?.let{ Ior.Left(it) } }, {b -> identity(b)?.let{ Ior.Right(it) } }, { a, b -> nullable { Ior.Both(identity(a).bind(), identity(b).bind()) } })",
+  ReplaceWith("fold({ a -> a?.let{ Ior.Left(it) } }, {b -> b?.let{ Ior.Right(it) } }, { a, b -> nullable { Ior.Both(a.bind(), b.bind()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.nullable")
 )
 public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
   fold(
-        { a -> identity(a)?.let{ Left(it) } },
-        { b -> identity(b)?.let{ Right(it) } },
-        { a, b -> nullable { Both(identity(a).bind(), identity(b).bind()) } })
+        { a -> a?.let{ Left(it) } },
+        { b -> b?.let{ Right(it) } },
+        { a, b -> nullable { Both(a.bind(), b.bind()) } })
 
 public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
   bitraverseValidated(SA, ::identity, ::identity)
@@ -1055,14 +1055,14 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): 
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> listOf(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+  ReplaceWith("fold({ a -> listOf(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
     "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, Iterable<B>>.sequence(): List<Ior<A, B>> =
   fold(
         { a -> listOf(Left(a)) },
-        { b -> identity(b).map { Right(it) } },
-        { a, b -> identity(b).map{ Both(a, it) } })
+        { b -> b.map { Right(it) } },
+        { a, b -> b.map{ Both(a, it) } })
 
 @Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>> =
@@ -1070,14 +1070,14 @@ public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>>
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Either.Right(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+  ReplaceWith("fold({ a -> Either.Right(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
     "arrow.core.Ior")
 )
 public fun <A, B, C> Ior<A, Either<B, C>>.sequence(): Either<B, Ior<A, C>> =
   fold(
         { a -> Either.Right(Left(a)) },
-        { b -> identity(b).map { Right(it) } },
-        { a, b -> identity(b).map { Both(a, it) } })
+        { b -> b.map { Right(it) } },
+        { a, b -> b.map { Both(a, it) } })
 
 @Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
@@ -1085,14 +1085,14 @@ public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map{ Ior.Both(a, it) } })",
+  ReplaceWith("fold({ a -> Some(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
     "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, Option<B>>.sequence(): Option<Ior<A, B>> =
   fold(
         { a -> Some(Left(a)) },
-        { b -> identity(b).map { Right(it) } },
-        { a, b -> identity(b).map { Both(a, it) } })
+        { b -> b.map { Right(it) } },
+        { a, b -> b.map { Both(a, it) } })
 
 @Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
@@ -1100,14 +1100,14 @@ public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Ior.Left(a) }, {b -> identity(b)?.let { Ior.Right(it) } }, { a, b -> identity(b)?.let{ Ior.Both(a, it) } })",
+  ReplaceWith("fold({ a -> Ior.Left(a) }, {b -> b?.let { Ior.Right(it) } }, { a, b -> b?.let{ Ior.Both(a, it) } })",
     "arrow.core.Ior")
 )
 public fun <A, B> Ior<A, B?>.sequence(): Ior<A, B>? =
   fold(
         { a -> Left(a) },
-        { b -> identity(b)?.let { Right(it) } },
-        { a, b -> identity(b)?.let{ Both(a, it) } })
+        { b -> b?.let { Right(it) } },
+        { a, b -> b?.let{ Both(a, it) } })
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, Ior<A, C>> =
@@ -1115,14 +1115,14 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-  ReplaceWith("fold({ a -> Valid(Ior.Left(a)) }, {b -> identity(b).map { Ior.Right(it) } }, { a, b -> identity(b).map { Ior.Both(a, it) } })",
+  ReplaceWith("fold({ a -> Valid(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map { Ior.Both(a, it) } })",
     "arrow.core.Ior")
 )
 public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>> =
   fold(
         { a -> Valid(Left(a)) },
-        { b -> identity(b).map { Right(it) } },
-        { a, b -> identity(b).map { Both(a, it) } })
+        { b -> b.map { Right(it) } },
+        { a, b -> b.map { Both(a, it) } })
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
