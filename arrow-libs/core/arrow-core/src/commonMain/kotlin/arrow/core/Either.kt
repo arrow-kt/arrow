@@ -1481,7 +1481,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
     }
@@ -1494,7 +1494,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
     }
@@ -1508,7 +1508,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
     }
@@ -1523,7 +1523,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
     }
@@ -1539,7 +1539,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, FF) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, e, f, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
     }
@@ -1556,7 +1556,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, e, f, g, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
     }
@@ -1574,7 +1574,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
     }
@@ -1593,29 +1593,8 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G, H, I) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
-    }
-
-    @Suppress("DuplicatedCode")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      j: Either<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value))
       } else {
         var accumulatedError: Any? = EmptyValue
         accumulatedError = if (a is Left) a.value else accumulatedError
@@ -1627,7 +1606,6 @@ public sealed class Either<out A, out B> {
         accumulatedError = if (g is Left) EmptyValue.combine(accumulatedError, g.value, combine) else accumulatedError
         accumulatedError = if (h is Left) EmptyValue.combine(accumulatedError, h.value, combine) else accumulatedError
         accumulatedError = if (i is Left) EmptyValue.combine(accumulatedError, i.value, combine) else accumulatedError
-        accumulatedError = if (j is Left) EmptyValue.combine(accumulatedError, j.value, combine) else accumulatedError
 
         @Suppress("UNCHECKED_CAST")
         (Left(accumulatedError as E))
@@ -1640,7 +1618,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
     }
@@ -1652,7 +1630,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
     }
@@ -1665,7 +1643,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
     }
@@ -1679,7 +1657,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
     }
@@ -1694,7 +1672,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, FF) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
     }
@@ -1710,7 +1688,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
     }
@@ -1727,7 +1705,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
     }
@@ -1745,28 +1723,8 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G, H, I) -> Z,
     ): Either<NonEmptyList<E>, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
-    }
-
-    @Suppress("DuplicatedCode")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      j: Either<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value))
       } else {
         val list = buildList(9) {
           if (a is Left) add(a.value)
@@ -1778,7 +1736,6 @@ public sealed class Either<out A, out B> {
           if (g is Left) add(g.value)
           if (h is Left) add(h.value)
           if (i is Left) add(i.value)
-          if (j is Left) add(j.value)
         }
         Left(NonEmptyList(list[0], list.drop(1)))
       }
@@ -1791,7 +1748,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
     }
@@ -1804,7 +1761,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
     }
@@ -1818,7 +1775,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
     }
@@ -1833,7 +1790,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
     }
@@ -1849,7 +1806,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, FF) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
     }
@@ -1866,7 +1823,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
     }
@@ -1884,7 +1841,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
     }
@@ -1900,32 +1857,11 @@ public sealed class Either<out A, out B> {
       g: EitherNel<E, G>,
       h: EitherNel<E, H>,
       i: EitherNel<E, I>,
-      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+      transform: (A, B, C, D, EE, F, G, H, I) -> Z
     ): EitherNel<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
-    }
-
-    @Suppress("DuplicatedCode")
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, F>,
-      g: EitherNel<E, G>,
-      h: EitherNel<E, H>,
-      i: EitherNel<E, I>,
-      j: EitherNel<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value))
       } else {
         val list = buildList {
           if (a is Left) addAll(a.value)
@@ -1937,7 +1873,6 @@ public sealed class Either<out A, out B> {
           if (g is Left) addAll(g.value)
           if (h is Left) addAll(h.value)
           if (i is Left) addAll(i.value)
-          if (j is Left) addAll(j.value)
         }
         Left(NonEmptyList(list[0], list.drop(1)))
       }

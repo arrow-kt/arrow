@@ -2,9 +2,11 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.Tuple9
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.core.test.either
 import arrow.core.toNonEmptyListOrNull
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -16,11 +18,16 @@ import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.byte
+import io.kotest.property.arbitrary.char
+import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.flatMap
+import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.coroutines.Continuation
@@ -654,6 +661,85 @@ class EffectSpec : StringSpec({
           leak.await().invoke()
         }) { fail("Cannot be here") }
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+  }
+
+  "zipOrAccumulate results in all Right transformed, or all Left combined according to combine" {
+    checkAll(
+      Arb.either(Arb.string(), Arb.short()),
+      Arb.either(Arb.string(), Arb.byte()),
+      Arb.either(Arb.string(), Arb.int()),
+      Arb.either(Arb.string(), Arb.long()),
+      Arb.either(Arb.string(), Arb.float()),
+      Arb.either(Arb.string(), Arb.double()),
+      Arb.either(Arb.string(), Arb.char()),
+      Arb.either(Arb.string(), Arb.string()),
+      Arb.either(Arb.string(), Arb.boolean())
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = either {
+        zipOrAccumulate(
+          String::plus,
+          { a.bind() },
+          { b.bind() },
+          { c.bind() },
+          { d.bind() },
+          { e.bind() },
+          { f.bind() },
+          { g.bind() },
+          { h.bind() },
+          { i.bind() }
+        ) { aa, bb, cc, dd, ee, ff, gg, hh, ii -> Tuple9(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+      }
+      val all = listOf(a, b, c, d, e, f, g, h, i)
+
+      val expected = if (all.any { it.isLeft() }) {
+        all.filterIsInstance<Either.Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+      } else {
+        all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
+        }
+      }
+
+      res shouldBe expected
+    }
+  }
+
+  "zipOrAccumulate without Semigroup results in all Right transformed, or all Left in a NonEmptyList" {
+    checkAll(
+      Arb.either(Arb.string(), Arb.short()),
+      Arb.either(Arb.string(), Arb.byte()),
+      Arb.either(Arb.string(), Arb.int()),
+      Arb.either(Arb.string(), Arb.long()),
+      Arb.either(Arb.string(), Arb.float()),
+      Arb.either(Arb.string(), Arb.double()),
+      Arb.either(Arb.string(), Arb.char()),
+      Arb.either(Arb.string(), Arb.string()),
+      Arb.either(Arb.string(), Arb.boolean())
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = either<NonEmptyList<String>, Tuple9<Short, Byte, Int, Long, Float, Double, Char, String, Boolean>> {
+        zipOrAccumulate(
+          { a.bind() },
+          { b.bind() },
+          { c.bind() },
+          { d.bind() },
+          { e.bind() },
+          { f.bind() },
+          { g.bind() },
+          { h.bind() },
+          { i.bind() }
+        ) { aa, bb, cc, dd, ee, ff, gg, hh, ii -> Tuple9(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+      }
+      val all = listOf(a, b, c, d, e, f, g, h, i)
+
+      val expected = if (all.any { it.isLeft() }) {
+        all.filterIsInstance<Either.Left<String>>().map { it.value }.toNonEmptyListOrNull()!!.left()
+      } else {
+        all.filterIsInstance<Either.Right<Any?>>().map { it.value }.let {
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
+        }
+      }
+
+      res shouldBe expected
+    }
   }
 })
 
