@@ -1149,7 +1149,7 @@ public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
 
 @Deprecated(
   NicheAPI + "Prefer using widen",
-  ReplaceWith("widen")
+  ReplaceWith("widen", "arrow.core.widen)
 )
 public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
