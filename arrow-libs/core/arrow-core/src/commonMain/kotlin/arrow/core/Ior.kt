@@ -121,7 +121,7 @@ public sealed class Ior<out A, out B> {
       returns(false) implies (this@Ior is Ior.Left<A>)
       returns(true) implies (this@Ior is Ior.Both<A,B>)
     }
-    return this@Ior is Ior.Right<B>
+    return this@Ior is Ior.Both<A, B>
   }
 
 
