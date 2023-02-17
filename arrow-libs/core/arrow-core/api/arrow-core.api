@@ -281,7 +281,9 @@ public final class arrow/core/EitherKt {
 	public static final fun bisequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun catch (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combine (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Either;)Larrow/core/Either;
+	public static final fun combine (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
+	public static final fun combineAll (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combineK (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun compareTo (Larrow/core/Either;Larrow/core/Either;)I
 	public static final fun contains (Larrow/core/Either;Ljava/lang/Object;)Z
@@ -625,6 +627,7 @@ public final class arrow/core/IterableKt {
 	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun fold (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun foldMap (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun foldMap (Ljava/lang/Iterable;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getListUnit ()Ljava/util/List;
 	public static final fun ifThen (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Iterable;
 	public static final fun interleave (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
@@ -641,9 +644,11 @@ public final class arrow/core/IterableKt {
 	public static final fun reduceRightNull (Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun replicate (Ljava/lang/Iterable;I)Ljava/util/List;
 	public static final fun replicate (Ljava/lang/Iterable;ILarrow/typeclasses/Monoid;)Ljava/util/List;
+	public static final fun replicate (Ljava/lang/Iterable;ILjava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun rightPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun rightPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun salign (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;)Ljava/lang/Iterable;
+	public static final fun salign (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Ljava/lang/Iterable;)Ljava/lang/Iterable;
 	public static final fun separateEither (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Either;
@@ -652,6 +657,7 @@ public final class arrow/core/IterableKt {
 	public static final fun sequence (Ljava/lang/Iterable;)Ljava/lang/Object;
 	public static final fun sequence (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun sequence (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequence (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 	public static final fun sequenceEither (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun sequenceNullable (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun sequenceOption (Ljava/lang/Iterable;)Larrow/core/Option;
@@ -668,6 +674,7 @@ public final class arrow/core/IterableKt {
 	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverseEither (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseNullable (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun traverseOption (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
@@ -1555,11 +1562,13 @@ public final class arrow/core/SequenceKt {
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun salign (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun salign (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun separateEither (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Option;
 	public static final fun sequence (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequence (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 	public static final fun sequenceEither (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequenceOption (Lkotlin/sequences/Sequence;)Larrow/core/Option;
 	public static final fun sequenceValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
@@ -1569,6 +1578,7 @@ public final class arrow/core/SequenceKt {
 	public static final fun traverse (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverse (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverseEither (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseOption (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun traverseValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
@@ -3580,6 +3590,10 @@ public final class arrow/typeclasses/Monoid$DefaultImpls {
 	public static fun plus (Larrow/typeclasses/Monoid;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class arrow/typeclasses/MonoidKt {
+	public static final field MonoidDeprecation Ljava/lang/String;
+}
+
 public abstract interface class arrow/typeclasses/Semigroup {
 	public static final field Companion Larrow/typeclasses/Semigroup$Companion;
 	public static fun Boolean ()Larrow/typeclasses/Semigroup;
@@ -3637,6 +3651,10 @@ public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup :
 public final class arrow/typeclasses/Semigroup$DefaultImpls {
 	public static fun maybeCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun plus (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class arrow/typeclasses/SemigroupKt {
+	public static final field SemigroupDeprecation Ljava/lang/String;
 }
 
 public abstract interface class arrow/typeclasses/Semiring {
