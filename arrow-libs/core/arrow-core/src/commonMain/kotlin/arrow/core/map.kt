@@ -2,8 +2,8 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 
@@ -267,7 +267,7 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   traverse(semigroup, f)
 
 public inline fun <K, E, A, B> Map<K, A>.traverse(
-  semigroup: Semigroup<E>,
+  combine: (E, E) -> E,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
   foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
@@ -278,17 +278,28 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
       }
       is Invalid -> when (acc) {
         is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+        is Invalid -> combine(acc.value, res.value).invalid()
       }
     }
   }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { traverse({ x, y -> x.combine(y) }, f) }"))
+public inline fun <K, E, A, B> Map<K, A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, Map<K, B>> =
+  semigroup.run { traverse({ x, y -> x.combine(y) }, f) }
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   sequence(semigroup)
 
+public fun <K, E, A> Map<K, Validated<E, A>>.sequence(combine: (E, E) -> E): Validated<E, Map<K, A>> =
+  traverse(combine, ::identity)
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { sequence { x, y -> x.combine(y) } }"))
 public fun <K, E, A> Map<K, Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  traverse(semigroup, ::identity)
+  semigroup.run { sequence { x, y -> x.combine(y) } }
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -505,14 +516,18 @@ public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pa
 
 public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
+public fun <K, A> Map<K, A>.combine(combineA: (A, A) -> A, b: Map<K, A>): Map<K, A> =
+  if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, my[k]?.let { combineA(b, it) } ?: b) }
+  else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combineA(a, it) } ?: a) }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("with(SG) { combine({ x, y -> x + y }, b) }"))
 public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
-  if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
-  else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
+  combine({ x, y -> x + y }, b)
 }
 
-@Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
+@Deprecated("use fold instead", ReplaceWith("SG.run { fold(emptyMap()) { x, y -> x + y } }", "arrow.core.fold"))
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(Monoid.map(SG))
+  SG.run { fold(emptyMap()) { x, y -> x + y } }
 
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
