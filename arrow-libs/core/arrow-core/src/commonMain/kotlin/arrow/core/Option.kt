@@ -5,7 +5,9 @@ import arrow.core.Either.Right
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -1042,10 +1044,10 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MB.run { this.fold({ empty() }) { a -> empty().combine(f(a)) } }")
+    ReplaceWith("MB.run { this.fold({ empty() }) { empty().combine(f(it)) } }")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-    foldLeft(empty()) { b, a -> b.combine(f(a)) }
+    fold({ empty() }) { empty().combine(f(it)) }
   }
 
   @Deprecated(
@@ -1293,9 +1295,13 @@ public fun <A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
-@Deprecated("use fold instead", ReplaceWith("fold(Monoid.option(MA))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
+@Deprecated("use fold instead", ReplaceWith("fold(None as Option<A>) { x, y -> x.combine(combine, y) }"))
+public fun <A> Iterable<Option<A>>.combineAll(combine: (A, A) -> A): Option<A> =
+  fold(None as Option<A>) { x, y -> x.combine(combine, y) }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("MA.run { combineAll { x, y -> x + y } }"))
 public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
-  fold(Monoid.option(MA))
+  MA.run { combineAll { x, y -> x + y } }
 
 @Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
@@ -1396,11 +1402,15 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or map",
-  ReplaceWith("MA.run { this.map { List(n) { it }.fold(empty()) { acc, v -> acc + v } } }")
+  ReplaceWith("this.map { List(n) { it }.fold(empty(), combine) }")
 )
+public fun <A> Option<A>.replicate(n: Int, initial: A, combine: (A, A) -> A): Option<A> =
+  if (n <= 0) Some(initial)
+  else map { a -> List(n) { a }.fold(initial, combine) }
+
+@Deprecated(MonoidDeprecation, ReplaceWith("MA.run { replicate(n, empty()) { acc, v -> acc + v } }"))
 public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
-  if (n <= 0) Some(empty())
-  else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
+  replicate(n, empty()) { acc, v -> acc + v }
 }
 
 @Deprecated(
@@ -1596,15 +1606,18 @@ public fun <B, A : B> Option<A>.widen(): Option<B> =
 
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
-public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+public fun <A> Option<A>.combine(combineA: (A, A) -> A, b: Option<A>): Option<A> =
   when (this) {
     is Some -> when (b) {
-      is Some -> Some(SGA.run { value.combine(b.value) })
+      is Some -> Some(combineA(value, b.value))
       None -> this
     }
-
     None -> b
   }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SGA.run { combine({ x, y -> x + y }, b) }"))
+public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+  SGA.run { combine({ x, y -> x + y }, b) }
 
 public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },

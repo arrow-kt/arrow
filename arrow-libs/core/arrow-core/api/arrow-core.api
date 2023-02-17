@@ -781,6 +781,7 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 	public final fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public final fun plus (Ljava/util/List;)Larrow/core/NonEmptyList;
 	public final fun salign (Larrow/typeclasses/Semigroup;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public final fun salign (Lkotlin/jvm/functions/Function2;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun toList ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
 	public final fun zip (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
@@ -813,6 +814,7 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun sequence (Larrow/core/NonEmptyList;)Larrow/core/Either;
 	public static final fun sequence (Larrow/core/NonEmptyList;)Larrow/core/Option;
 	public static final fun sequence (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequence (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 	public static final fun sequenceEither (Larrow/core/NonEmptyList;)Larrow/core/Either;
 	public static final fun sequenceOption (Larrow/core/NonEmptyList;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
@@ -821,6 +823,7 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun traverse (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverse (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverseEither (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseOption (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun traverseValidated (Larrow/core/NonEmptyList;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
@@ -972,8 +975,10 @@ public final class arrow/core/Option$Companion {
 
 public final class arrow/core/OptionKt {
 	public static final fun combine (Larrow/core/Option;Larrow/typeclasses/Semigroup;Larrow/core/Option;)Larrow/core/Option;
+	public static final fun combine (Larrow/core/Option;Lkotlin/jvm/functions/Function2;Larrow/core/Option;)Larrow/core/Option;
 	public static final fun combineAll (Larrow/core/Option;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Larrow/core/Option;
+	public static final fun combineAll (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun compareTo (Larrow/core/Option;Larrow/core/Option;)I
 	public static final fun ensure (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Larrow/core/Option;)Larrow/core/Option;
@@ -988,6 +993,7 @@ public final class arrow/core/OptionKt {
 	public static final fun redeem (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun redeemWith (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun replicate (Larrow/core/Option;ILarrow/typeclasses/Monoid;)Larrow/core/Option;
+	public static final fun replicate (Larrow/core/Option;ILjava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun rethrow (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun salign (Larrow/core/Option;Larrow/typeclasses/Semigroup;Larrow/core/Option;)Larrow/core/Option;
 	public static final fun separateEither (Larrow/core/Option;)Lkotlin/Pair;
@@ -2373,6 +2379,7 @@ public final class arrow/core/Tuple9$Companion {
 
 public final class arrow/core/TupleNKt {
 	public static final fun combine (Lkotlin/Pair;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Lkotlin/Pair;)Lkotlin/Pair;
+	public static final fun combine (Lkotlin/Pair;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/Pair;)Lkotlin/Pair;
 	public static final fun compareTo (Larrow/core/Tuple10;Larrow/core/Tuple10;)I
 	public static final fun compareTo (Larrow/core/Tuple4;Larrow/core/Tuple4;)I
 	public static final fun compareTo (Larrow/core/Tuple5;Larrow/core/Tuple5;)I

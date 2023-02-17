@@ -3,6 +3,7 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
@@ -215,10 +216,12 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
+  public fun salign(combine: (A, A) -> @UnsafeVariance A, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
+    NonEmptyList(combine(head, b.head), tail.salign(combine, b.tail).toList())
+
+  @Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { salign({ x, y -> x.combine(y) }, b) }"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    SA.run {
-      NonEmptyList(head.combine(b.head), tail.salign(SA, b.tail).toList())
-    }
+    SA.run { salign({ x, y -> x.combine(y) }, b) }
 
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
     NonEmptyList(head to other.head, tail.padZip(other.tail))
@@ -450,7 +453,7 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> NonEmptyList<A>.traverse(
-  semigroup: Semigroup<E>,
+  combine: (E, E) -> E,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
   fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
@@ -461,17 +464,30 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
       }
       is Invalid -> when (acc) {
         is Valid -> res
-        is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
+        is Invalid -> Invalid(combine(acc.value, res.value))
       }
     }
   }.map { requireNotNull(it.toNonEmptyListOrNull()) }
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { traverse({ x, y -> x.combine(y) }, f) }"))
+public inline fun <E, A, B> NonEmptyList<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, NonEmptyList<B>> =
+  semigroup.run { traverse({ x, y -> x.combine(y) }, f) }
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
   sequence(semigroup)
 
+public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(combine: (E, E) -> E): Validated<E, NonEmptyList<A>> =
+  traverse(combine, ::identity)
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { sequence { x, y -> x.combine(y) } }"))
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverse(semigroup, ::identity)
+  semigroup.run { sequence { x, y -> x.combine(y) } }
 
 @Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",
