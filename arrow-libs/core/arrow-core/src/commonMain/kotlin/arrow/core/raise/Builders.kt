@@ -15,6 +15,7 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.orElse
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -43,16 +44,20 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
   return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
 }
 
-public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> {
+public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> {
   contract { callsInPlace(block, EXACTLY_ONCE) }
   val state: Atomic<Option<E>> = Atomic(None)
   return fold<E, A, Ior<E, A>>(
-    { block(IorRaise(semigroup, state, this)) },
+    { block(IorRaise(combineError, state, this)) },
     { e -> throw e },
     { e -> Ior.Left(state.get().getOrElse { e }) },
     { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
   )
 }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { ior({ x, y -> x + y}, block) }"))
+public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> =
+  semigroup.run { ior({ x, y -> x + y}, block) }
 
 public typealias Null = Nothing?
 
@@ -93,10 +98,10 @@ public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
 }
 
 public class IorRaise<E> @PublishedApi internal constructor(
-  semigroup: Semigroup<E>,
+  private val combineError: (E, E) -> E,
   private val state: Atomic<Option<E>>,
   private val raise: Raise<E>,
-) : Raise<E>, Semigroup<E> by semigroup {
+) : Raise<E> {
 
   override fun raise(r: E): Nothing = raise.raise(combine(r))
 
@@ -112,6 +117,6 @@ public class IorRaise<E> @PublishedApi internal constructor(
 
   private fun combine(other: E): E =
     state.updateAndGet { prev ->
-      prev.map { e -> e.combine(other) }.orElse { Some(other) }
+      prev.map { combineError(it, other) }.orElse { Some(other) }
     }.getOrElse { other }
 }
