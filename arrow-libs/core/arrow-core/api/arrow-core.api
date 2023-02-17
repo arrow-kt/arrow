@@ -705,6 +705,7 @@ public final class arrow/core/MapKt {
 	public static final fun align (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun align (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun combine (Ljava/util/Map;Larrow/typeclasses/Semigroup;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun combine (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;)Ljava/util/Map;
 	public static final fun filterMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun filterOption (Ljava/util/Map;)Ljava/util/Map;
@@ -717,12 +718,14 @@ public final class arrow/core/MapKt {
 	public static final fun sequence (Ljava/util/Map;)Larrow/core/Either;
 	public static final fun sequence (Ljava/util/Map;)Larrow/core/Option;
 	public static final fun sequence (Ljava/util/Map;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
+	public static final fun sequence (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 	public static final fun sequenceEither (Ljava/util/Map;)Larrow/core/Either;
 	public static final fun sequenceOption (Ljava/util/Map;)Larrow/core/Option;
 	public static final fun sequenceValidated (Ljava/util/Map;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun traverse (Ljava/util/Map;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverse (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverse (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public static final fun traverse (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun traverseEither (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun traverseOption (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun traverseValidated (Ljava/util/Map;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
@@ -1518,6 +1521,7 @@ public final class arrow/core/Partials {
 
 public final class arrow/core/PredefKt {
 	public static final fun emptyCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun emptyCombine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun identity (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
