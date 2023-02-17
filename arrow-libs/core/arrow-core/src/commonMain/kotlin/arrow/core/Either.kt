@@ -2068,10 +2068,10 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: default().left() }")
+  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default(it)) }")
 )
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
-  ensure(default, predicate)
+  flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
  * Returns [Right] with the existing value of [Right] if this is a [Right] and the given
