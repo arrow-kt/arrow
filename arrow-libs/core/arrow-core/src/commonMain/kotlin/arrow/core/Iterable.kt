@@ -7,7 +7,9 @@ import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.Result.Companion.success
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -342,23 +344,31 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(
-  semigroup: Semigroup<E>,
+  combine: (E, E) -> E,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  semigroup.run {
-    fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-      when (val res = f(a)) {
-        is Validated.Valid -> when (acc) {
-          is Valid -> acc.also { it.value.add(res.value) }
-          is Invalid -> acc
-        }
-        is Validated.Invalid -> when (acc) {
-          is Valid -> res
-          is Invalid -> Invalid(acc.value.combine(res.value))
-        }
+  fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
+    when (val res = f(a)) {
+      is Validated.Valid -> when (acc) {
+        is Valid -> acc.also { it.value.add(res.value) }
+        is Invalid -> acc
+      }
+      is Validated.Invalid -> when (acc) {
+        is Valid -> res
+        is Invalid -> Invalid(combine(acc.value, res.value))
       }
     }
   }
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { traverse({ x, y -> x.combine(y) }, f) }"))
+public inline fun <E, A, B> Iterable<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> = semigroup.run {
+  traverse({ x, y -> x.combine(y) }, f)
+}
 
 @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
@@ -367,21 +377,26 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(Semigroup.nonEmptyList(), f)
+  traverse({ x, y -> x + y }, f)
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
-public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
+public fun <E, A> Iterable<Validated<E, A>>.sequence(combine: (E, E) -> E): Validated<E, List<A>> =
+  traverse(combine, ::identity)
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { sequence { x, y -> x.combine(y) } }"))
+public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> = semigroup.run {
+  sequence { x, y -> x.combine(y) }
+}
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  traverse(Semigroup.nonEmptyList(), ::identity)
+  sequence { x, y -> x + y }
 
 @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
@@ -758,17 +773,27 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
 
 /**
+ * aligns two structures and combine them with [combine]
+ */
+public fun <A> Iterable<A>.salign(
+  combine: (A, A) -> A,
+  other: Iterable<A>
+): Iterable<A> =
+  align(other) {
+    it.fold(::identity, ::identity) { a, b ->
+      combine(a, b)
+    }
+  }
+
+/**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
+@Deprecated(SemigroupDeprecation, ReplaceWith("SG.run { salign({ a, b -> a.combine(b) }, other) }"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
 ): Iterable<A> = SG.run {
-  align(other) {
-    it.fold(::identity, ::identity) { a, b ->
-      a.combine(b)
-    }
-  }
+  salign({ a, b -> a.combine(b) }, other)
 }
 
 /**
@@ -1148,16 +1173,20 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
+@Deprecated(MonoidDeprecation, ReplaceWith("MA.run { fold(empty()) { acc, a -> acc.combine(a) } }"))
 public fun <A> Iterable<A>.fold(MA: Monoid<A>): A = MA.run {
-  this@fold.fold(empty()) { acc, a ->
-    acc.combine(a)
-  }
+  this@fold.fold(empty()) { acc, a -> acc.combine(a) }
 }
 
+public fun <A, B> Iterable<A>.foldMap(
+  initial: B,
+  combine: (B, B) -> B,
+  f: (A) -> B
+): B = this.fold(initial) { acc: B, x: A -> combine(acc, f(x)) }
+
+@Deprecated(MonoidDeprecation, ReplaceWith("MB.run { foldMap(empty(), { acc, a -> acc.combine(a) }, f) }"))
 public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-  this@foldMap.fold(empty()) { acc, a ->
-    acc.combine(f(a))
-  }
+  this@foldMap.foldMap(empty(), { acc, a -> acc.combine(a) }, f)
 }
 
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
@@ -1199,9 +1228,14 @@ public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
   if (n <= 0) emptyList()
   else toList().let { l -> List(n) { l } }
 
-public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
-  if (n <= 0) listOf(MA.empty())
-  else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
+public fun <A> Iterable<A>.replicate(n: Int, empty: A, combine: (A, A) -> A): List<A> =
+  if (n <= 0) listOf(empty)
+  else zip(replicate(n - 1, empty, combine), combine)
+
+@Deprecated(MonoidDeprecation, ReplaceWith("MA.run { replicate(n, MA.empty()) { a, xs -> a.combine(xs) } }"))
+public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> = MA.run {
+  replicate(n, MA.empty()) { a, xs -> a.combine(xs) }
+}
 
 public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }

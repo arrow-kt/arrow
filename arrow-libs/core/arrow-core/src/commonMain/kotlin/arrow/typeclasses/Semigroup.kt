@@ -12,6 +12,10 @@ import arrow.core.compose
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
+public const val SemigroupDeprecation: String =
+  "Please switch to functions using a binary function as argument."
+
+@Deprecated(SemigroupDeprecation)
 public fun interface Semigroup<A> {
   /**
    * Combine two [A] values.

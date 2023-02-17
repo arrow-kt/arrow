@@ -15,6 +15,10 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.collections.plus as _plus
 
+public const val MonoidDeprecation: String =
+  "Please switch to functions using a binary function and initial value as arguments."
+
+@Deprecated(MonoidDeprecation)
 public interface Monoid<A> : Semigroup<A> {
   /**
    * A zero value for this A

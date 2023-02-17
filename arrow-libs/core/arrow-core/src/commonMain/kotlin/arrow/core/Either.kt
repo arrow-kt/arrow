@@ -6,15 +6,14 @@ import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.Either.Right.Companion.unit
-import arrow.core.computations.ResultEffect.bind
-import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.Effect
-import arrow.core.continuations.Token
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -2279,17 +2278,31 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
 
 @Deprecated(
   RedundantAPI + "Prefer zipOrAccumulate",
+  ReplaceWith("Either.zipOrAccumulate(combineA, this, b, combineB)")
+)
+public fun <A, B> Either<A, B>.combine(combineA: (A, A) -> A, combineB: (B, B) -> B, b: Either<A, B>): Either<A, B> =
+  Either.zipOrAccumulate(combineA, this, b, combineB)
+
+@Deprecated(
+  SemigroupDeprecation + "Prefer zipOrAccumulate",
   ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
 )
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
+  combine({ a, bb -> SGA.run { a.combine(bb) }  }, { a, bb -> SGB.run { a.combine(bb) } }, b)
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
-  ReplaceWith("fold(Monoid.either(MA, MB))", "arrow.core.fold", "arrow.typeclasses.Monoid")
+  ReplaceWith("fold(initialB.right()) { x: Either<A, B>, y -> Either.zipOrAccumulate(combineA, x, y, combineB) }", "arrow.core.fold", "arrow.core.right")
+)
+public fun <A, B> Iterable<Either<A, B>>.combineAll(combineA: (A, A) -> A, initialB: B, combineB: (B, B) -> B): Either<A, B> =
+  fold(initialB.right()) { x: Either<A, B>, y -> Either.zipOrAccumulate(combineA, x, y, combineB) }
+
+@Deprecated(
+  MonoidDeprecation,
+  ReplaceWith("combineAll({ x, y -> MA.run { x.combine(y) } }, MB.empty(), { x, y -> MB.run { x.combine(y) } })")
 )
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
-  fold(Monoid.either(MA, MB))
+  combineAll({ x, y -> MA.run { x.combine(y) } }, MB.empty(), { x, y -> MB.run { x.combine(y) } })
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>

@@ -4,6 +4,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 
 public fun <B, C, D, E> Sequence<B>.zip(
@@ -574,18 +575,22 @@ public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, 
   this.rightPadZip(other) { a, b -> a to b }
 
 /**
+ * aligns two structures and combine them with the given [combine]
+ */
+public fun <A> Sequence<A>.salign(
+  combine: (A, A) -> A,
+  other: Sequence<A>
+): Sequence<A> =
+  align(other) { it.fold(::identity, ::identity, combine) }
+
+/**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
+@Deprecated(SemigroupDeprecation, ReplaceWith("SG.run { salign({ a, b -> a.combine(b) }, other) }"))
 public fun <A> Sequence<A>.salign(
   SG: Semigroup<A>,
   other: Sequence<A>
-): Sequence<A> = SG.run {
-  align(other) {
-    it.fold(::identity, ::identity) { a, b ->
-      a.combine(b)
-    }
-  }
-}
+): Sequence<A> = SG.run { salign({ a, b -> a.combine(b) }, other) }
 
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
@@ -635,8 +640,12 @@ public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   sequence().map { it.asSequence() }
 
+public fun <E, A> Sequence<Validated<E, A>>.sequence(combine: (E, E) -> E): Validated<E, List<A>> =
+  traverse(combine, ::identity)
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { sequence { x, y -> x.combine(y) } }"))
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
+  semigroup.run { sequence { x, y -> x.combine(y) } }
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
@@ -722,7 +731,7 @@ public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequen
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public fun <E, A, B> Sequence<A>.traverse(
-  semigroup: Semigroup<E>,
+  combine: (E, E) -> E,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
   fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
@@ -733,10 +742,20 @@ public fun <E, A, B> Sequence<A>.traverse(
       }
       is Invalid -> when (acc) {
         is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+        is Invalid -> combine(acc.value, res.value).invalid()
       }
     }
   }
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { traverse({ x, y -> x.combine(y) }, f) }"))
+public fun <E, A, B> Sequence<A>.traverse(
+  semigroup: Semigroup<E>,
+  f: (A) -> Validated<E, B>
+): Validated<E, List<B>> = semigroup.run {
+  traverse({ x, y -> x.combine(y) }, f)
+}
 
 @Deprecated(
   "traverseValidated is being renamed to traverse to simplify the Arrow API",
