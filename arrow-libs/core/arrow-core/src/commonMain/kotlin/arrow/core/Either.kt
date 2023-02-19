@@ -1341,12 +1341,22 @@ public sealed class Either<out A, out B> {
 
   public companion object {
 
+    public inline fun <E> ensure(condition: Boolean, onError: () -> E): Either<E, Unit> {
+      contract { callsInPlace(onError, InvocationKind.AT_MOST_ONCE) }
+      return if (condition) Unit.right() else onError().left()
+    }
+
+    public inline fun <A : Any, E> ensureNotNull(a: A?, onError: () -> E): Either<E, A> {
+      contract { callsInPlace(onError, InvocationKind.AT_MOST_ONCE) }
+      return a?.right() ?: onError().left()
+    }
+
     @Deprecated(
       RedundantAPI + "Prefer Kotlin nullable syntax, or ensureNotNull inside Either DSL",
-      ReplaceWith("a?.right() ?: Unit.left()")
+      ReplaceWith("Either.ensureNotNull(a) { }", "arrow.core.Either")
     )
     @JvmStatic
-    public fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
+    public fun <A> fromNullable(a: A?): Either<Unit, A> = ensureNotNull(a) { }
 
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
@@ -2154,8 +2164,8 @@ public inline fun <A> Either<A, A>.merge(): A =
  * <!--- KNIT example-either-54.kt -->
  */
 @Deprecated(
-  RedundantAPI + "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { b -> b?.right() ?: default().left() }")
+  RedundantAPI + "Prefer Kotlin ensureNotNull syntax inside either DSL, or replace with explicit flatMap",
+  ReplaceWith("flatMap { Either.ensureNotNull(it, default) }", "arrow.core.ensureNotNull")
 )
 public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   flatMap { b -> b?.right() ?: default().left() }
@@ -2215,19 +2225,19 @@ public fun <A> A.right(): Either<Nothing, A> = Right(this)
  * <!--- KNIT example-either-55.kt -->
  */
 @Deprecated(
-  RedundantAPI + "Prefer Kotlin nullable syntax",
-  ReplaceWith("this?.right() ?: default().left()")
+  RedundantAPI + "Prefer Kotlin ensureNotNull syntax inside either DSL, or replace with top-level ensureNotNull",
+  ReplaceWith("let { Either.ensureNotNull(it, default) }", "arrow.core.Either")
 )
 public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> =
-  this?.right() ?: default().left()
+  let { Either.ensureNotNull(this, default) }
 
 /**
  * Returns [Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
  * [Left].
  */
 @Deprecated(
-  RedundantAPI + "Prefer Kotlin nullable syntax",
-  ReplaceWith("this?.let { default().left() } ?: null.right()")
+  RedundantAPI + "Prefer Kotlin ensure syntax inside either DSL, or replace with top-level ensure",
+  ReplaceWith("let { Either.ensure(this == null, default) }", "arrow.core.Either")
 )
 public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
   this?.let { default().left() } ?: null.right()
