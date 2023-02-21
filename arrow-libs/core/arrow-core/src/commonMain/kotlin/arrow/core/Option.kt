@@ -745,7 +745,6 @@ public sealed class Option<out A> {
     contract {
       callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
       returns(true) implies (this@Option is Some<A>)
-      returns(false) implies (this@Option is None)
     }
     return this@Option is Some<A> && predicate(value)
   }
