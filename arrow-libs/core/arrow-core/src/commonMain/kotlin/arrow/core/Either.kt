@@ -1144,6 +1144,10 @@ public sealed class Either<out A, out B> {
     return getOrElse { null }
   }
 
+  @Deprecated(
+    "orNone is being renamed to getOrNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNone()")
+  )
   public fun orNone(): Option<B> = getOrNone()
 
   /**
@@ -1338,6 +1342,9 @@ public sealed class Either<out A, out B> {
 
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
+
+  public fun toIor(): Ior<A, B> =
+    fold({ Ior.Left(it) }, { Ior.Right(it) })
 
   public companion object {
 
@@ -1950,6 +1957,13 @@ public sealed class Either<out A, out B> {
   )
   public fun void(): Either<A, Unit> =
     map { }
+
+  @Deprecated(
+    "Facilitates the migration from Validated to Either, you can simply remove this method call.",
+    ReplaceWith("this")
+  )
+  public fun toEither(): Either<A, B> =
+    this
 }
 
 /**
@@ -2602,7 +2616,7 @@ public const val RedundantAPI: String =
 public fun <E, A> Either<E, A>.toEitherNel(): EitherNel<E, A> =
   mapLeft { nonEmptyListOf(it) }
 
-public fun <E> E.toEitherNel(): EitherNel<E, Nothing> =
+public fun <E> E.leftNel(): EitherNel<E, Nothing> =
   nonEmptyListOf(this).left()
 
 /**
