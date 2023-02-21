@@ -14,6 +14,7 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
 class OptionTest : StringSpec({
@@ -422,6 +423,105 @@ class OptionTest : StringSpec({
     "catch should return None when f throws" {
       val exception = Exception("Boom!")
       Option.catch { throw exception } shouldBe None
+    }
+
+    "invoke operator should return Some" {
+      checkAll(Arb.int()) { a: Int ->
+        Option(a) shouldBe Some(a)
+      }
+    }
+
+    "lift" {
+      val f: (Int) -> String = { a -> a.toString() }
+      val lifted = Option.lift(f)
+      checkAll(Arb.int()) { a: Int ->
+        lifted(Some(a)) shouldBe Some(a.toString())
+      }
+    }
+
+    "isNone should return true if None and false if Some" {
+      none.isNone() shouldBe true
+      none.isSome() shouldBe false
+    }
+
+    "isSome should return true if Some and false if None" {
+      some.isSome() shouldBe true
+      some.isNone() shouldBe false
+    }
+
+    "getOrNull" {
+      none.getOrNull() shouldBe null
+      some.getOrNull() shouldBe "kotlin"
+    }
+
+    "isSome with predicate" {
+      some.isSome { it.startsWith('k') } shouldBe true
+      some.isSome { it.startsWith('j') } shouldBe false
+      none.isSome { it.startsWith('k') } shouldBe false
+    }
+
+    "flatten" {
+      checkAll(Arb.int()) { a: Int ->
+        Some(Some(a)).flatten() shouldBe Some(a)
+        Some(None).flatten() shouldBe None
+      }
+    }
+
+    "unzip Some values" {
+      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+        val op: Option<Pair<Int, String>> = Pair(a, b).toOption()
+        op.unzip() shouldBe Pair(Option(a), Option(b))
+      }
+    }
+
+    "unzip None values" {
+      val op: Option<Pair<Int, String>> = None
+      op.unzip() shouldBe Pair(None, None)
+    }
+
+    "unzip with function" {
+      val f: (Int) -> Pair<String, Long> = { c -> Pair(c.toString(), c.toLong()) }
+      checkAll(Arb.int()) { c: Int ->
+        Option(c).unzip(f) shouldBe Pair(Option(c.toString()), Option(c.toLong()))
+      }
+    }
+
+    "widen" {
+      checkAll(Arb.string()) { a: String ->
+        val widen: Option<CharSequence> = Option(a).widen()
+        widen.map { it.length } shouldBe Some(a.length)
+      }
+    }
+
+    "compareTo with Some values" {
+      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
+        val opA = Option(a)
+        val opB = Option(b)
+        (opA > opB) shouldBe (a > b)
+        (opA >= opB) shouldBe (a >= b)
+        (opA < opB) shouldBe (a < b)
+        (opA <= opB) shouldBe (a <= b)
+        (opA == opB) shouldBe (a == b)
+        (opA != opB) shouldBe (a != b)
+      }
+    }
+
+    "compareTo with None values" {
+      val opA = Option(1)
+      val opB = None
+      (opA > opB) shouldBe true
+      (opA >= opB) shouldBe true
+      (opA < opB) shouldBe false
+      (opA <= opB) shouldBe false
+      (opA == opB) shouldBe false
+      (opA != opB) shouldBe true
+
+      (none > some) shouldBe false
+      (none >= some) shouldBe false
+      (none < some) shouldBe true
+      (none <= some) shouldBe true
+      (none == some) shouldBe false
+      (none != some) shouldBe true
     }
 })
 
