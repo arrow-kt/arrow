@@ -14,11 +14,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
 
       - name: Dokka
         id: Dokka
         run: ./gradlew cleanDocs dokkaHtmlMultiModule -Pgithubpages=true
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Auto update docs
+      - name: Push
+        run: |
+          git add .
+          git commit -m "Update github pages"
+          git push
