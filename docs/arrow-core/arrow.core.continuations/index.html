@@ -1,0 +1,321 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>arrow.core.continuations</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/nativeMain">native</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-core::arrow.core.continuations////PointingToDeclaration//-1427358444">
+  <div class="breadcrumbs"><a href="../index.html">arrow-core</a><span class="delimiter">/</span><span class="current">arrow.core.continuations</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="1475988742%2FClasslikes%2F-1427358444" anchor-label="AtomicRef" id="1475988742%2FClasslikes%2F-1427358444" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/nativeMain :arrow-core:dokkaHtmlPartial/jvmMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/nativeMain :arrow-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/nativeMain :arrow-core:dokkaHtmlPartial/jvmMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-atomic-ref/index.html"><span>Atomic</span><wbr><span><span>Ref</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1475988742%2FClasslikes%2F-1427358444"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/jsMain" data-toggle=":arrow-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/jvmMain" data-toggle=":arrow-core:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-core:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-atomic-ref/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic-ref/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-atomic-ref/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic-ref/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicReference.html">AtomicReference</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-atomic-ref/index.html">V</a><span class="token operator">&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-atomic-ref/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic-ref/index.html">V</a></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1964005884%2FClasslikes%2F-1427358444" anchor-label="CancellationExceptionNoTrace" id="1964005884%2FClasslikes%2F-1427358444" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/jvmMain :arrow-core:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/jvmMain :arrow-core:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain :arrow-core:dokkaHtmlPartial/jsMain :arrow-core:dokkaHtmlPartial/jvmMain :arrow-core:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-cancellation-exception-no-trace/index.html"><span>Cancellation</span><wbr><span>Exception</span><wbr><span>No</span><wbr><span><span>Trace</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1964005884%2FClasslikes%2F-1427358444"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-core:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/jsMain" data-toggle=":arrow-core:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/jvmMain" data-toggle=":arrow-core:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":arrow-core:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-core:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-cancellation-exception-no-trace/index.html">CancellationExceptionNoTrace</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-cancellation-exception-no-trace/index.html">CancellationExceptionNoTrace</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-cancellation-exception-no-trace/index.html">CancellationExceptionNoTrace</a> : <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CancellationException.html">CancellationException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-cancellation-exception-no-trace/index.html">CancellationExceptionNoTrace</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1134163860%2FClasslikes%2F601698448" anchor-label="OptionEagerEffectScope" id="1134163860%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-option-eager-effect-scope/index.html"><span>Option</span><wbr><span>Eager</span><wbr><span>Effect</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1134163860%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="-option-eager-effect-scope/index.html">OptionEagerEffectScope</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cont<span class="token operator">: </span><a href="../../arrow-core/arrow.core.continuations/-eager-effect-scope/index.html">EagerEffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="../../arrow-core/arrow.core.continuations/-eager-effect-scope/index.html">EagerEffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1517277600%2FClasslikes%2F601698448" anchor-label="OptionEffectScope" id="1517277600%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-option-effect-scope/index.html"><span>Option</span><wbr><span>Effect</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1517277600%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="-option-effect-scope/index.html">OptionEffectScope</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cont<span class="token operator">: </span><a href="../../arrow-core/arrow.core.continuations/-effect-scope/index.html">EffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="../../arrow-core/arrow.core.continuations/-effect-scope/index.html">EffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1326156564%2FClasslikes%2F601698448" anchor-label="ResultEagerEffectScope" id="-1326156564%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-result-eager-effect-scope/index.html"><span>Result</span><wbr><span>Eager</span><wbr><span>Effect</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1326156564%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="-result-eager-effect-scope/index.html">ResultEagerEffectScope</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cont<span class="token operator">: </span><a href="../../arrow-core/arrow.core.continuations/-eager-effect-scope/index.html">EagerEffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="../../arrow-core/arrow.core.continuations/-eager-effect-scope/index.html">EagerEffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-861774520%2FClasslikes%2F601698448" anchor-label="ResultEffectScope" id="-861774520%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-result-effect-scope/index.html"><span>Result</span><wbr><span>Effect</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-861774520%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="-result-effect-scope/index.html">ResultEffectScope</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cont<span class="token operator">: </span><a href="../../arrow-core/arrow.core.continuations/-effect-scope/index.html">EffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="../../arrow-core/arrow.core.continuations/-effect-scope/index.html">EffectScope</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2094133334%2FClasslikes%2F601698448" anchor-label="ShiftCancellationException" id="-2094133334%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-shift-cancellation-exception/index.html"><span>Shift</span><wbr><span>Cancellation</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2094133334%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-shift-cancellation-exception/index.html">ShiftCancellationException</a> : <a href="-cancellation-exception-no-trace/index.html">CancellationExceptionNoTrace</a></div><div class="brief "><p class="paragraph"><strong>AVOID USING THIS TYPE, it's meant for low-level cancellation code</strong> When in need in low-level code, you can use this type to differentiate between a foreign <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a> and the one from <a href="../../arrow-core/arrow.core.continuations/-effect/index.html">Effect</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1199447529%2FClasslikes%2F601698448" anchor-label="ShiftLeakedException" id="1199447529%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-shift-leaked-exception/index.html"><span>Shift</span><wbr><span>Leaked</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1199447529%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-shift-leaked-exception/index.html">ShiftLeakedException</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-state-exception/index.html">IllegalStateException</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="263585548%2FFunctions%2F601698448" anchor-label="ensureNotNull" id="263585548%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="ensure-not-null.html"><span>ensure</span><wbr><span>Not</span><wbr><span><span>Null</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="263585548%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="ensure-not-null.html">B</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-nullable-eager-effect-scope/index.html">NullableEagerEffectScope</a><span class="token punctuation">.</span><a href="ensure-not-null.html"><span class="token function">ensureNotNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="ensure-not-null.html">B</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="ensure-not-null.html">B</a></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="ensure-not-null.html">B</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-nullable-effect-scope/index.html">NullableEffectScope</a><span class="token punctuation">.</span><a href="ensure-not-null.html"><span class="token function">ensureNotNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="ensure-not-null.html">B</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="ensure-not-null.html">B</a></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="ensure-not-null.html">B</a><span class="token operator">&gt; </span><a href="-option-eager-effect-scope/index.html">OptionEagerEffectScope</a><span class="token punctuation">.</span><a href="ensure-not-null.html"><span class="token function">ensureNotNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="ensure-not-null.html">B</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="ensure-not-null.html">B</a></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="ensure-not-null.html">B</a><span class="token operator">&gt; </span><a href="-option-effect-scope/index.html">OptionEffectScope</a><span class="token punctuation">.</span><a href="ensure-not-null.html"><span class="token function">ensureNotNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="ensure-not-null.html">B</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="ensure-not-null.html">B</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-911423153%2FFunctions%2F601698448" anchor-label="getAndUpdate" id="-911423153%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-and-update.html"><span>get</span><wbr><span>And</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-911423153%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-and-update.html">V</a><span class="token operator">&gt; </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-and-update.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="get-and-update.html"><span class="token function">getAndUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="get-and-update.html">V</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="get-and-update.html">V</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-and-update.html">V</a></div><div class="brief "><p class="paragraph">Updates variable atomically using the specified <a href="get-and-update.html">function</a> of its value and returns its old value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="122226146%2FFunctions%2F601698448" anchor-label="loop" id="122226146%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="loop.html"><span><span>loop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="122226146%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="loop.html">V</a><span class="token operator">&gt; </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="loop.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="loop.html"><span class="token function">loop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="loop.html">V</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html">Nothing</a></div><div class="brief "><p class="paragraph">Infinite loop that reads this atomic variable and performs the specified <a href="loop.html">action</a> on its value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-844206802%2FFunctions%2F601698448" anchor-label="merge" id="-844206802%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="merge.html"><span><span>merge</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-844206802%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="merge.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="merge.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="merge.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="merge.html"><span class="token function">merge</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="merge.html">A</a></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="merge.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-effect/index.html">Effect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="merge.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="merge.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="merge.html"><span class="token function">merge</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="merge.html">A</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1594210458%2FFunctions%2F601698448" anchor-label="toOption" id="-1594210458%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="to-option.html"><span>to</span><wbr><span><span>Option</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1594210458%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="to-option.html"><span class="token function">toOption</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-effect/index.html">Effect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../arrow.core/-none/index.html">None</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="to-option.html"><span class="token function">toOption</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-option.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1261050648%2FFunctions%2F601698448" anchor-label="toResult" id="1261050648%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="to-result.html"><span>to</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1261050648%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="to-result.html"><span class="token function">toResult</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt; </span><a href="../../arrow-core/arrow.core.continuations/-effect/index.html">Effect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="to-result.html"><span class="token function">toResult</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="to-result.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1136605232%2FFunctions%2F601698448" anchor-label="update" id="1136605232%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1136605232%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update.html">V</a><span class="token operator">&gt; </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="update.html">V</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="update.html">V</a></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-558303055%2FFunctions%2F601698448" anchor-label="updateAndGet" id="-558303055%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="update-and-get.html"><span>update</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-558303055%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update-and-get.html">V</a><span class="token operator">&gt; </span><a href="-atomic-ref/index.html">AtomicRef</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update-and-get.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="update-and-get.html"><span class="token function">updateAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="update-and-get.html">V</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="update-and-get.html">V</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="update-and-get.html">V</a></div><div class="brief "><p class="paragraph">Updates variable atomically using the specified <a href="update-and-get.html">function</a> of its value and returns its new value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

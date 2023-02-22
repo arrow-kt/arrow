@@ -1,0 +1,717 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>STM</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-stm::arrow.fx.stm/STM///PointingToDeclaration//-2117640706">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-fx-stm</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.stm</a><span class="delimiter">/</span><span class="current">STM</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>STM</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">STM</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-stm/src/commonMain/kotlin/arrow/fx/stm/STM.kt#L7">source</a>)</span></span></div><h1 class="">Consistent and safe concurrent state updates</h1><p class="paragraph">Software transactional memory, or STM, is an abstraction for concurrent state modification. With <a href="index.html">STM</a> one can write code that concurrently accesses state and that can easily be composed without exposing details of how it ensures safety guarantees. Programs running within an <a href="index.html">STM</a> transaction will neither deadlock nor have race-conditions.</p><blockquote class="quotation"><p class="paragraph">The api of <a href="index.html">STM</a> is based on the haskell package <a href="https://hackage.haskell.org/package/stm">stm</a> and the implementation is based on the GHC implementation for fine-grained locks.</p></blockquote><p class="paragraph">The base building blocks of <a href="index.html">STM</a> are <a href="../-t-var/index.html">TVar</a>'s and the primitives <a href="retry.html">retry</a>, <a href="or-else.html">orElse</a> and <a href="catch.html">catch</a>.</p><h2 class=""> STM Datastructures</h2><p class="paragraph">There are several datastructures built on top of <a href="../-t-var/index.html">TVar</a>'s already provided out of the box:</p><ul><li><p class="paragraph"><a href="../-t-queue/index.html">TQueue</a>: A transactional mutable queue</p></li><li><p class="paragraph"><a href="../-t-m-var/index.html">TMVar</a>: A mutable transactional variable that may be empty</p></li><li><p class="paragraph"><a href="../-t-set/index.html">TSet</a>, <a href="../-t-map/index.html">TMap</a>: Transactional Set and Map</p></li><li><p class="paragraph"><a href="../-t-array/index.html">TArray</a>: Array of <a href="../-t-var/index.html">TVar</a>'s</p></li><li><p class="paragraph"><a href="../-t-semaphore/index.html">TSemaphore</a>: Transactional semaphore</p></li><li><p class="paragraph"><a href="../-t-var/index.html">TVar</a>: A transactional mutable variable</p></li></ul><p class="paragraph">All of these structures (excluding <a href="../-t-var/index.html">TVar</a>) are built upon <a href="../-t-var/index.html">TVar</a>'s and the <a href="index.html">STM</a> primitives and implementing other datastructures with <a href="index.html">STM</a> can be done by composing the existing structures.</p><h2 class=""> Reading and writing to concurrent state:</h2><p class="paragraph">In order to modify transactional datastructures we have to be inside the <a href="index.html">STM</a> context. This is achieved either by defining our functions with <a href="index.html">STM</a> as the receiver or using <a href="../stm.html">stm</a> to create lambda functions with <a href="index.html">STM</a> as the receiver.</p><p class="paragraph">Running a transaction is then done using <a href="../atomically.html">atomically</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.atomically<br>import arrow.fx.stm.TVar<br>import arrow.fx.stm.STM<br><br>//sampleStart<br>fun STM.transfer(from: TVar&lt;Int&gt;, to: TVar&lt;Int&gt;, amount: Int): Unit {<br>  withdraw(from, amount)<br>  deposit(to, amount)<br>}<br><br>fun STM.deposit(acc: TVar&lt;Int&gt;, amount: Int): Unit {<br>  val current = acc.read()<br>  acc.write(current + amount)<br>  // or the shorthand acc.modify { it + amount }<br>}<br><br>fun STM.withdraw(acc: TVar&lt;Int&gt;, amount: Int): Unit {<br>  val current = acc.read()<br>  if (current - amount &gt;= 0) acc.write(current - amount)<br>  else throw IllegalStateException("Not enough money in the account!")<br>}<br>//sampleEnd<br><br>suspend fun main() {<br>  val acc1 = TVar.new(500)<br>  val acc2 = TVar.new(300)<br>  println("Balance account 1: ${acc1.unsafeRead()}")<br>  println("Balance account 2: ${acc2.unsafeRead()}")<br>  println("Performing transaction")<br>  atomically { transfer(acc1, acc2, 50) }<br>  println("Balance account 1: ${acc1.unsafeRead()}")<br>  println("Balance account 2: ${acc2.unsafeRead()}")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-stm-01.kt --><p class="paragraph">This example shows a banking service moving money from one account to the other with <a href="index.html">STM</a>. Should the first account not have enough money we throw an exception. This code is guaranteed to never deadlock and to never produce an invalid state by committing after the read state has changed concurrently.</p><blockquote class="quotation"><p class="paragraph">Note: A transaction that sees an invalid state (a <a href="../-t-var/index.html">TVar</a> that was read has been changed concurrently) will restart and try again. This usually means we rerun the function entirely, therefore it is recommended to keep transactions small and to never use code that has side-effects inside. However no kotlin interface can actually keep you from doing side effects inside STM. Using side-effects such as access to resources, logging or network access comes with severe disadvantages:</p></blockquote><ul><li><p class="paragraph">Transactions may be aborted at any time so accessing resources may never trigger finalizers</p></li><li><p class="paragraph">Transactions may rerun an arbitrary amount of times before finishing and thus all effects will rerun.</p></li></ul><h2 class=""> Retrying manually</h2><p class="paragraph">It is sometimes beneficial to manually abort the current transaction if, for example, an invalid state has been read. E.g. a <a href="../-t-queue/index.html">TQueue</a> had no elements to read. The aborted transaction will automatically restart once any previously accessed variable has changed.</p><p class="paragraph">This is achieved by the primitive <a href="retry.html">retry</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.atomically<br>import arrow.fx.stm.TVar<br>import arrow.fx.stm.STM<br>import kotlinx.coroutines.runBlocking<br>import kotlinx.coroutines.async<br>import kotlinx.coroutines.delay<br><br>//sampleStart<br>fun STM.transfer(from: TVar&lt;Int&gt;, to: TVar&lt;Int&gt;, amount: Int): Unit {<br>  withdraw(from, amount)<br>  deposit(to, amount)<br>}<br><br>fun STM.deposit(acc: TVar&lt;Int&gt;, amount: Int): Unit {<br>  val current = acc.read()<br>  acc.write(current + amount)<br>  // or the shorthand acc.modify { it + amount }<br>}<br><br>fun STM.withdraw(acc: TVar&lt;Int&gt;, amount: Int): Unit {<br>  val current = acc.read()<br>  if (current - amount &gt;= 0) acc.write(current - amount)<br>  else retry() // we now retry if there is not enough money in the account<br>  // this can also be achieved by using `check(current - amount &gt;= 0); acc.write(it + amount)`<br>}<br>//sampleEnd<br><br>fun main(): Unit = runBlocking {<br>  val acc1 = TVar.new(0)<br>  val acc2 = TVar.new(300)<br>  println("Balance account 1: ${acc1.unsafeRead()}")<br>  println("Balance account 2: ${acc2.unsafeRead()}")<br>  async {<br>    println("Sending money - Searching")<br>    delay(2000)<br>    println("Sending money - Found some")<br>    atomically { acc1.write(100_000_000) }<br>  }<br>  println("Performing transaction")<br>  atomically {<br>    println("Trying to transfer")<br>    transfer(acc1, acc2, 50)<br>  }<br>  println("Balance account 1: ${acc1.unsafeRead()}")<br>  println("Balance account 2: ${acc2.unsafeRead()}")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-stm-02.kt --><p class="paragraph">Here in this (silly) example we changed <code class="lang-kotlin">withdraw</code> to use <a href="retry.html">retry</a> and thus wait until enough money is in the account, which after a few seconds just happens to be the case.</p><p class="paragraph"><a href="retry.html">retry</a> can be used to implement a lot of complex transactions and many datastructures like <a href="../-t-m-var/index.html">TMVar</a> or <a href="../-t-queue/index.html">TQueue</a> use to to great effect.</p><h2 class=""> Branching with <a href="or-else.html">orElse</a></h2><p class="paragraph"><a href="or-else.html">orElse</a> is another important primitive which allows a user to detect if a branch called <a href="retry.html">retry</a> and then use a fallback instead. If the fallback retries as well the whole transaction retries.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import kotlinx.coroutines.runBlocking<br>import arrow.fx.stm.atomically<br>import arrow.fx.stm.TVar<br>import arrow.fx.stm.STM<br>import arrow.fx.stm.stm<br><br>//sampleStart<br>fun STM.transaction(v: TVar&lt;Int&gt;): Int? =<br>  stm {<br>    val result = v.read()<br>    check(result in 0..10)<br>    result<br>  } orElse { null }<br>//sampleEnd<br><br>fun main(): Unit = runBlocking {<br>  val v = TVar.new(100)<br>  println("Value is ${v.unsafeRead()}")<br>  atomically { transaction(v) }<br>    .also { println("Transaction returned $it") }<br>  println("Set value to 5")<br>  println("Value is ${v.unsafeRead()}")<br>  atomically { v.write(5) }<br>  atomically { transaction(v) }<br>    .also { println("Transaction returned $it") }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-stm-03.kt --><p class="paragraph">This example uses <a href="../stm.html">stm</a> which is a helper just like the stdlib function <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">suspend</a> to ease use of an infix function like <a href="or-else.html">orElse</a>. In this transaction, when the value inside the variable is not in the correct range, the transaction retries (due to <a href="../check.html">check</a> calling <a href="retry.html">retry</a>). If it is in the correct range it simply returns the value. <a href="or-else.html">orElse</a> here intercepts a call to <a href="retry.html">retry</a> and executes the alternative which simply returns null.</p><h2 class=""> Exceptions</h2><p class="paragraph">Throwing inside <a href="index.html">STM</a> will let the exception bubble up to either a <a href="catch.html">catch</a> handler or to <a href="../atomically.html">atomically</a> which will rethrow it.</p><blockquote class="quotation"><p class="paragraph">Note: Using <code class="lang-kotlin">try {...} catch (e: Exception) {...}</code> is not encouraged because any state change inside <code class="lang-kotlin">try</code> will not be undone when an exception occurs! The recommended way of catching exceptions is to use <a href="catch.html">catch</a> which properly rolls back the transaction!</p></blockquote><p class="paragraph">Further reading:</p><ul><li><p class="paragraph"><a href="https://www.microsoft.com/en-us/research/publication/composable-memory-transactions/">Composable memory transactions, by Tim Harris, Simon Marlow, Simon Peyton Jones, and Maurice Herlihy, in ACM Conference on Principles and Practice of Parallel Programming 2005.</a></p></li></ul></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Extensions">Extensions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="1070918292%2FFunctions%2F-2117640706" anchor-label="acquire" id="1070918292%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="acquire.html"><span><span>acquire</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1070918292%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="acquire.html"><span class="token function">acquire</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Acquire 1 permit from a <a href="../-t-semaphore/index.html">TSemaphore</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="acquire.html"><span class="token function">acquire</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Acquire <a href="acquire.html">n</a> permit from a <a href="../-t-semaphore/index.html">TSemaphore</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1106940076%2FFunctions%2F-2117640706" anchor-label="available" id="-1106940076%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="available.html"><span><span>available</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1106940076%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="available.html"><span class="token function">available</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Returns the currently available number of permits in a <a href="../-t-semaphore/index.html">TSemaphore</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1267889592%2FFunctions%2F-2117640706" anchor-label="catch" id="1267889592%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="catch.html"><span><span>catch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1267889592%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="catch.html">A</a><span class="token operator">&gt; </span><a href="catch.html"><span class="token function">catch</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword"></span><a href="index.html">STM</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="catch.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">onError<span class="token operator">: </span><span class="token keyword"></span><a href="index.html">STM</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="catch.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="catch.html">A</a></div><div class="brief "><p class="paragraph">Run <a href="catch.html">f</a> and handle any exception thrown with <a href="catch.html">onError</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="349383412%2FFunctions%2F-2117640706" anchor-label="flush" id="349383412%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="flush.html"><span><span>flush</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="349383412%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="flush.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="flush.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="flush.html"><span class="token function">flush</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="flush.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Drains all entries of a <a href="../-t-queue/index.html">TQueue</a> into a single list.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1454073771%2FFunctions%2F-2117640706" anchor-label="fold" id="-1454073771%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="fold.html"><span><span>fold</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1454073771%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="fold.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="fold.html">B</a><span class="token operator">&gt; </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="fold.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="fold.html"><span class="token function">fold</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">init<span class="token operator">: </span><a href="fold.html">B</a><span class="token punctuation">, </span></span><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="fold.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="fold.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="fold.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="fold.html">B</a></div><div class="brief "><p class="paragraph">Fold a <a href="../-t-array/index.html">TArray</a> to a single value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-885892565%2FFunctions%2F-2117640706" anchor-label="get" id="-885892565%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-885892565%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get.html">A</a><span class="token operator">&gt; </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">i<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get.html">A</a></div><div class="brief "><p class="paragraph">Read a variable from the <a href="../-t-array/index.html">TArray</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="get.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="get.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="get.html">K</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get.html">V</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Alias of <a href="lookup.html">STM.lookup</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1294641541%2FFunctions%2F-2117640706" anchor-label="insert" id="-1294641541%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="insert.html"><span><span>insert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1294641541%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="insert.html">A</a><span class="token operator">&gt; </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="insert.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="insert.html"><span class="token function">insert</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="insert.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds an element to the set.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="insert.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="insert.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="insert.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="insert.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="insert.html"><span class="token function">insert</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="insert.html">K</a><span class="token punctuation">, </span></span><span class="parameter ">v<span class="token operator">: </span><a href="insert.html">V</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a key value pair to the map</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1902047523%2FFunctions%2F-2117640706" anchor-label="isEmpty" id="-1902047523%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="is-empty.html"><span>is</span><wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1902047523%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-empty.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-empty.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="is-empty.html"><span class="token function">isEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if a <a href="../-t-m-var/index.html">TMVar</a> is empty. This function never retries.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-empty.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-empty.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="is-empty.html"><span class="token function">isEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if a <a href="../-t-queue/index.html">TQueue</a> is empty.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1046463341%2FFunctions%2F-2117640706" anchor-label="isNotEmpty" id="1046463341%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="is-not-empty.html"><span>is</span><wbr><span>Not</span><wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1046463341%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-not-empty.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-not-empty.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="is-not-empty.html"><span class="token function">isNotEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if a <a href="../-t-m-var/index.html">TMVar</a> is not empty. This function never retries.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-not-empty.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="is-not-empty.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="is-not-empty.html"><span class="token function">isNotEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if a <a href="../-t-queue/index.html">TQueue</a> is not empty.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="323976573%2FFunctions%2F-2117640706" anchor-label="lookup" id="323976573%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="lookup.html"><span><span>lookup</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="323976573%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="lookup.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="lookup.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="lookup.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="lookup.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="lookup.html"><span class="token function">lookup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="lookup.html">K</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="lookup.html">V</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Lookup a value at the specific key <a href="lookup.html">k</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1316023002%2FFunctions%2F-2117640706" anchor-label="member" id="1316023002%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="member.html"><span><span>member</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1316023002%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="member.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="member.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="member.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="member.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="member.html"><span class="token function">member</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="member.html">K</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if a key <a href="member.html">k</a> is in the map</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="member.html">A</a><span class="token operator">&gt; </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="member.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="member.html"><span class="token function">member</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="member.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Check if an element is already in the set</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1687238236%2FFunctions%2F-2117640706" anchor-label="modify" id="-1687238236%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="modify.html"><span><span>modify</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1687238236%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="modify.html">A</a><span class="token operator">&gt; </span><a href="../-t-var/index.html">TVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="modify.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="modify.html"><span class="token function">modify</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="modify.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="modify.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Modify the value of a <a href="../-t-var/index.html">TVar</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-137840393%2FFunctions%2F-2117640706" anchor-label="newTVar" id="-137840393%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="new-t-var.html"><span>new</span><wbr><span><span>TVar</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-137840393%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="new-t-var.html">A</a><span class="token operator">&gt; </span><a href="new-t-var.html"><span class="token function">newTVar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="new-t-var.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-var/index.html">TVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="new-t-var.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Create a new <a href="../-t-var/index.html">TVar</a> inside a transaction, because <a href="../-t-var/-companion/new.html">TVar.new</a> is not possible inside <a href="index.html">STM</a> transactions.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1507036764%2FFunctions%2F-2117640706" anchor-label="orElse" id="-1507036764%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="or-else.html"><span>or</span><wbr><span><span>Else</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1507036764%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="or-else.html">A</a><span class="token operator">&gt; </span><span class="token keyword"></span><a href="index.html">STM</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="or-else.html">A</a><span class="token punctuation">.</span><a href="or-else.html"><span class="token function">orElse</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><span class="token keyword"></span><a href="index.html">STM</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="or-else.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="or-else.html">A</a></div><div class="brief "><p class="paragraph">Run the given transaction and fallback to the other one if the first one calls <a href="retry.html">retry</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-52802781%2FFunctions%2F-2117640706" anchor-label="peek" id="-52802781%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="peek.html"><span><span>peek</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-52802781%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="peek.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="peek.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="peek.html"><span class="token function">peek</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="peek.html">A</a></div><div class="brief "><p class="paragraph">Read the front element of a <a href="../-t-queue/index.html">TQueue</a> without removing it.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1435239406%2FFunctions%2F-2117640706" anchor-label="plusAssign" id="1435239406%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="plus-assign.html"><span>plus</span><wbr><span><span>Assign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1435239406%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="plus-assign.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="plus-assign.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">kv<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="plus-assign.html">V</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Add a key value pair to the map</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="plus-assign.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Append an element to the <a href="../-t-queue/index.html">TQueue</a>. Alias for <a href="write.html">STM.write</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">A</a><span class="token operator">&gt; </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="plus-assign.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="plus-assign.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds an element to the set. Alias of <a href="insert.html">STM.insert</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2074735314%2FFunctions%2F-2117640706" anchor-label="put" id="-2074735314%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="put.html"><span><span>put</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2074735314%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="put.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="put.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="put.html"><span class="token function">put</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="put.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Put a value into an empty <a href="../-t-m-var/index.html">TMVar</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-8778669%2FFunctions%2F-2117640706" anchor-label="read" id="-8778669%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="read.html"><span><span>read</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-8778669%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="read.html">A</a></div><div class="brief "><p class="paragraph">Read a value from a <a href="../-t-m-var/index.html">TMVar</a> without removing it.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="read.html">A</a></div><div class="brief "><p class="paragraph">Remove the front element from the <a href="../-t-queue/index.html">TQueue</a> or retry if the <a href="../-t-queue/index.html">TQueue</a> is empty.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt; </span><a href="../-t-var/index.html">TVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="read.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="read.html">A</a></div><div class="brief "><p class="paragraph">Read the value from a <a href="../-t-var/index.html">TVar</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1167009482%2FFunctions%2F-2117640706" anchor-label="release" id="-1167009482%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="release.html"><span><span>release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1167009482%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Release a permit back to the <a href="../-t-semaphore/index.html">TSemaphore</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Release <a href="release.html">n</a> permits back to the <a href="../-t-semaphore/index.html">TSemaphore</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1895546214%2FFunctions%2F-2117640706" anchor-label="remove" id="-1895546214%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove.html"><span><span>remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1895546214%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="remove.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="remove.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="remove.html"><span class="token function">remove</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="remove.html">K</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove a key value pair from a map</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove.html">A</a><span class="token operator">&gt; </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="remove.html"><span class="token function">remove</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="remove.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove an element from the set.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1819125072%2FFunctions%2F-2117640706" anchor-label="removeAll" id="-1819125072%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove-all.html"><span>remove</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1819125072%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove-all.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="remove-all.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="remove-all.html"><span class="token function">removeAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pred<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="remove-all.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Filter a <a href="../-t-queue/index.html">TQueue</a>, removing all elements for which <a href="remove-all.html">pred</a> returns false.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-969059790%2FFunctions%2F-2117640706" anchor-label="retry" id="-969059790%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="retry.html"><span><span>retry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-969059790%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="retry.html"><span class="token function">retry</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html">Nothing</a></div><div class="brief "><p class="paragraph">Abort and retry the current transaction.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="810535145%2FFunctions%2F-2117640706" anchor-label="set" id="810535145%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set.html"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="810535145%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">A</a><span class="token operator">&gt; </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">i<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">a<span class="token operator">: </span><a href="set.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Set a variable in the <a href="../-t-array/index.html">TArray</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="set.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="set.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="set.html">K</a><span class="token punctuation">, </span></span><span class="parameter ">v<span class="token operator">: </span><a href="set.html">V</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Alias for <a href="insert.html">STM.insert</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="375818813%2FFunctions%2F-2117640706" anchor-label="size" id="375818813%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="size.html"><span><span>size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="375818813%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="size.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="size.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="size.html"><span class="token function">size</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Return the current number of elements in a <a href="../-t-queue/index.html">TQueue</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="783368901%2FFunctions%2F-2117640706" anchor-label="swap" id="783368901%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="swap.html"><span><span>swap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="783368901%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="swap.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="swap.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="swap.html"><span class="token function">swap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="swap.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="swap.html">A</a></div><div class="brief "><p class="paragraph">Swap the content of a <a href="../-t-m-var/index.html">TMVar</a> or retry if it is empty.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="swap.html">A</a><span class="token operator">&gt; </span><a href="../-t-var/index.html">TVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="swap.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="swap.html"><span class="token function">swap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="swap.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="swap.html">A</a></div><div class="brief "><p class="paragraph">Swap the content of the <a href="../-t-var/index.html">TVar</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-237659742%2FFunctions%2F-2117640706" anchor-label="take" id="-237659742%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="take.html"><span><span>take</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-237659742%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="take.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="take.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="take.html"><span class="token function">take</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="take.html">A</a></div><div class="brief "><p class="paragraph">Read the value from a <a href="../-t-m-var/index.html">TMVar</a> and empty it.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1406640018%2FFunctions%2F-2117640706" anchor-label="transform" id="-1406640018%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="transform.html"><span><span>transform</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1406640018%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="transform.html">A</a><span class="token operator">&gt; </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="transform.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="transform.html"><span class="token function">transform</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="transform.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="transform.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Modify each element in a <a href="../-t-array/index.html">TArray</a> by applying <a href="transform.html">f</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1732459350%2FFunctions%2F-2117640706" anchor-label="tryAcquire" id="-1732459350%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-acquire.html"><span>try</span><wbr><span><span>Acquire</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1732459350%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="try-acquire.html"><span class="token function">tryAcquire</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-t-semaphore/index.html">TSemaphore</a><span class="token punctuation">.</span><a href="try-acquire.html"><span class="token function">tryAcquire</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Like <a href="acquire.html">TSemaphore.acquire</a> except that it returns whether or not acquisition was successful.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1608393282%2FFunctions%2F-2117640706" anchor-label="tryPeek" id="1608393282%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-peek.html"><span>try</span><wbr><span><span>Peek</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1608393282%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-peek.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-peek.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="try-peek.html"><span class="token function">tryPeek</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="try-peek.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Same as <a href="peek.html">TQueue.peek</a> except it returns null if the <a href="../-t-queue/index.html">TQueue</a> is empty.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="490626671%2FFunctions%2F-2117640706" anchor-label="tryPut" id="490626671%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-put.html"><span>try</span><wbr><span><span>Put</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="490626671%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-put.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-put.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="try-put.html"><span class="token function">tryPut</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="try-put.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Same as <a href="put.html">TMVar.put</a> except that it returns true or false if was successful or it retried.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="600328065%2FFunctions%2F-2117640706" anchor-label="tryRead" id="600328065%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-read.html"><span>try</span><wbr><span><span>Read</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="600328065%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-read.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-read.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="try-read.html"><span class="token function">tryRead</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="try-read.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Same as <a href="read.html">TMVar.read</a> except that it returns null if the <a href="../-t-m-var/index.html">TMVar</a> is empty and thus never retries.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-read.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-read.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="try-read.html"><span class="token function">tryRead</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="try-read.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Same as <a href="read.html">TQueue.read</a> except it returns null if the <a href="../-t-queue/index.html">TQueue</a> is empty.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1015356765%2FFunctions%2F-2117640706" anchor-label="tryTake" id="-1015356765%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-take.html"><span>try</span><wbr><span><span>Take</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1015356765%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-take.html">A</a><span class="token operator">&gt; </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-take.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="try-take.html"><span class="token function">tryTake</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="try-take.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Same as <a href="take.html">TMVar.take</a> except it returns null if the <a href="../-t-m-var/index.html">TMVar</a> is empty and thus never retries.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-671670497%2FFunctions%2F-2117640706" anchor-label="update" id="-671670497%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-671670497%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="update.html">V</a><span class="token operator">&gt; </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="update.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="update.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">k<span class="token operator">: </span><a href="update.html">K</a><span class="token punctuation">, </span></span><span class="parameter ">fn<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="update.html">V</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="update.html">V</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Update a value at a key if it exists.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="621595668%2FFunctions%2F-2117640706" anchor-label="write" id="621595668%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="write.html"><span><span>write</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="621595668%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="write.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Append an element to the <a href="../-t-queue/index.html">TQueue</a>.</p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write.html">A</a><span class="token operator">&gt; </span><a href="../-t-var/index.html">TVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="write.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Set the value of a <a href="../-t-var/index.html">TVar</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1852323222%2FFunctions%2F-2117640706" anchor-label="writeFront" id="-1852323222%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="write-front.html"><span>write</span><wbr><span><span>Front</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1852323222%2FFunctions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write-front.html">A</a><span class="token operator">&gt; </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="write-front.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="write-front.html"><span class="token function">writeFront</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="write-front.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Prepend an element to the <a href="../-t-queue/index.html">TQueue</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="tabbedcontent">Extensions</h2>
+      <div class="table" data-togglable="Extensions"><a data-name="1083366114%2FExtensions%2F-2117640706" anchor-label="check" id="1083366114%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../check.html"><span><span>check</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1083366114%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../check.html"><span class="token function">check</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Retry if <a href="../check.html">b</a> is false otherwise does nothing.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1647505412%2FExtensions%2F-2117640706" anchor-label="newEmptyTMVar" id="1647505412%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-empty-t-m-var.html"><span>new</span><wbr><span>Empty</span><wbr><span><span>TMVar</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1647505412%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-empty-t-m-var.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-empty-t-m-var.html"><span class="token function">newEmptyTMVar</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-empty-t-m-var.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2086538010%2FExtensions%2F-2117640706" anchor-label="newTArray" id="-2086538010%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-array.html"><span>new</span><wbr><span><span>TArray</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2086538010%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-array.html"><span class="token function">newTArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">size<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="../new-t-array.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-array.html"><span class="token function">newTArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">size<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">a<span class="token operator">: </span><a href="../new-t-array.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-array.html"><span class="token function">newTArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>arr<span class="token operator">: </span><a href="../new-t-array.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-array.html"><span class="token function">newTArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">xs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-array/index.html">TArray</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-array.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="968488458%2FExtensions%2F-2117640706" anchor-label="newTMap" id="968488458%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-map.html"><span>new</span><wbr><span><span>TMap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="968488458%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../new-t-map.html">V</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-map.html"><span class="token function">newTMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fn<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../new-t-map.html">K</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../new-t-map.html">V</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../new-t-map.html">V</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-map.html"><span class="token function">newTMap</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-map/index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../new-t-map.html">V</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1370328977%2FExtensions%2F-2117640706" anchor-label="newTMVar" id="1370328977%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-m-var.html"><span>new</span><wbr><span><span>TMVar</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1370328977%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-m-var.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-m-var.html"><span class="token function">newTMVar</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="../new-t-m-var.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-m-var/index.html">TMVar</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-m-var.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2113339960%2FExtensions%2F-2117640706" anchor-label="newTQueue" id="-2113339960%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-queue.html"><span>new</span><wbr><span><span>TQueue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2113339960%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-queue.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-queue.html"><span class="token function">newTQueue</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-queue/index.html">TQueue</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-queue.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="998541340%2FExtensions%2F-2117640706" anchor-label="newTSem" id="998541340%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-sem.html"><span>new</span><wbr><span><span>TSem</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="998541340%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-sem.html"><span class="token function">newTSem</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initial<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-semaphore/index.html">TSemaphore</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2058710910%2FExtensions%2F-2117640706" anchor-label="newTSet" id="2058710910%2FExtensions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../new-t-set.html"><span>new</span><wbr><span><span>TSet</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2058710910%2FExtensions%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-set.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-set.html"><span class="token function">newTSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fn<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../new-t-set.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-set.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-set.html">A</a><span class="token operator">&gt; </span><a href="index.html">STM</a><span class="token punctuation">.</span><a href="../new-t-set.html"><span class="token function">newTSet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-t-set/index.html">TSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../new-t-set.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Decision</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-resilience::arrow.fx.resilience/Schedule.Decision///PointingToDeclaration//-880363011">
+  <div class="breadcrumbs"><a href="../../../index.html">arrow-fx-resilience</a><span class="delimiter">/</span><a href="../../index.html">arrow.fx.resilience</a><span class="delimiter">/</span><a href="../index.html">Schedule</a><span class="delimiter">/</span><span class="current">Decision</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Decision</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Decision</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>cont<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>duration<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>state<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>finish<span class="token operator">: </span><a href="../../../../arrow-core/arrow.core/-eval/index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-resilience/src/commonMain/kotlin/arrow/fx/resilience/Schedule.kt#L690">source</a>)</span></span></div><p class="paragraph">A single decision. Contains the decision to continue, the delay, the new state and the (lazy) result of a Schedule.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="-608902530%2FConstructors%2F-880363011" anchor-label="Decision" id="-608902530%2FConstructors%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-decision.html"><span><span>Decision</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-608902530%2FConstructors%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">B</a><span class="token operator">&gt; </span><a href="-decision.html"><span class="token function">Decision</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cont<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">duration<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter ">state<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">finish<span class="token operator">: </span><a href="../../../../arrow-core/arrow.core/-eval/index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-1419577689%2FClasslikes%2F-880363011" anchor-label="Companion" id="-1419577689%2FClasslikes%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1419577689%2FClasslikes%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-2088931430%2FFunctions%2F-880363011" anchor-label="bimap" id="-2088931430%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="bimap.html"><span><span>bimap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2088931430%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="bimap.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="bimap.html">D</a><span class="token operator">&gt; </span><a href="bimap.html"><span class="token function">bimap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="bimap.html">C</a><span class="token punctuation">, </span></span><span class="parameter ">g<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">B</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="bimap.html">D</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="bimap.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="bimap.html">D</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="27390187%2FFunctions%2F-880363011" anchor-label="combine" id="27390187%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="combine.html"><span><span>combine</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27390187%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="combine.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">D</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">E</a><span class="token operator">&gt; </span><a href="combine.html"><span class="token function">combine</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="combine.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">D</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">g<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter ">zip<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">D</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="combine.html">E</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="combine.html">E</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1799543559%2FFunctions%2F-880363011" anchor-label="equals" id="1799543559%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1799543559%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1584891393%2FFunctions%2F-880363011" anchor-label="hashCode" id="-1584891393%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1584891393%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="721559406%2FFunctions%2F-880363011" anchor-label="map" id="721559406%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="map.html"><span><span>map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="721559406%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map.html">D</a><span class="token operator">&gt; </span><a href="map.html"><span class="token function">map</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">g<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">B</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="map.html">D</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map.html">D</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="821970517%2FFunctions%2F-880363011" anchor-label="mapLeft" id="821970517%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="map-left.html"><span>map</span><wbr><span><span>Left</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="821970517%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token operator">&gt; </span><a href="map-left.html"><span class="token function">mapLeft</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="map-left.html">C</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1412822061%2FFunctions%2F-880363011" anchor-label="not" id="1412822061%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="not.html"><span><span>not</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1412822061%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="not.html"><span class="token function">not</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="1936184648%2FProperties%2F-880363011" anchor-label="cont" id="1936184648%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="cont.html"><span><span>cont</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1936184648%2FProperties%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><a data-name="1936184648%2FProperties%2F-880363011" anchor-label="cont" id="1936184648%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="cont.html">cont</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-19840346%2FProperties%2F-880363011" anchor-label="duration" id="-19840346%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="duration.html"><span><span>duration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-19840346%2FProperties%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><a data-name="-19840346%2FProperties%2F-880363011" anchor-label="duration" id="-19840346%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="duration.html">duration</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1316426809%2FProperties%2F-880363011" anchor-label="finish" id="-1316426809%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="finish.html"><span><span>finish</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1316426809%2FProperties%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><a data-name="-1316426809%2FProperties%2F-880363011" anchor-label="finish" id="-1316426809%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="finish.html">finish</a><span class="token operator">: </span><a href="../../../../arrow-core/arrow.core/-eval/index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-607633553%2FProperties%2F-880363011" anchor-label="state" id="-607633553%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="state.html"><span><span>state</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-607633553%2FProperties%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><a data-name="-607633553%2FProperties%2F-880363011" anchor-label="state" id="-607633553%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="state.html">state</a><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

@@ -1,0 +1,308 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>AtomicLong</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-atomic:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-atomic::arrow.atomic/AtomicLong///PointingToDeclaration//1403183484">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-atomic</a><span class="delimiter">/</span><a href="../index.html">arrow.atomic</a><span class="delimiter">/</span><span class="current">AtomicLong</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Atomic</span><wbr><span><span>Long</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jvmMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-atomic/src/commonMain/kotlin/arrow/atomic/AtomicLong.kt#L3">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-atomic/src/jsMain/kotlin/arrow/atomic/AtomicLong.kt#L3">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="index.html">AtomicLong</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicLong.html">AtomicLong</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-atomic/src/nativeMain/kotlin/arrow/atomic/AtomicLong.kt#L7">source</a>)</span></span></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Extensions">Extensions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="-1242878644%2FConstructors%2F-659786014" anchor-label="AtomicLong" id="-1242878644%2FConstructors%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-atomic-long.html"><span>Atomic</span><wbr><span><span>Long</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1242878644%2FConstructors%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="-atomic-long.html"><span class="token function">AtomicLong</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="-atomic-long.html"><span class="token function">AtomicLong</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="-atomic-long.html"><span class="token function">AtomicLong</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-1043913165%2FFunctions%2F-659786014" anchor-label="addAndGet" id="-1043913165%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="add-and-get.html"><span>add</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1043913165%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-and-get.html"><span class="token function">addAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">delta<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-and-get.html"><span class="token function">addAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">delta<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="add-and-get.html"><span class="token function">addAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">delta<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1687327779%2FFunctions%2F-659786014" anchor-label="compareAndSet" id="-1687327779%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="compare-and-set.html"><span>compare</span><wbr><span>And</span><wbr><span><span>Set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1687327779%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="compare-and-set.html"><span class="token function">compareAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">expected<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">new<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="compare-and-set.html"><span class="token function">compareAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">expected<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">new<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="compare-and-set.html"><span class="token function">compareAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">expected<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">new<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1630244780%2FFunctions%2F-659786014" anchor-label="decrementAndGet" id="-1630244780%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="decrement-and-get.html"><span>decrement</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1630244780%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="decrement-and-get.html"><span class="token function">decrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="decrement-and-get.html"><span class="token function">decrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="decrement-and-get.html"><span class="token function">decrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1427486864%2FFunctions%2F-659786014" anchor-label="get" id="-1427486864%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1427486864%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-459628108%2FFunctions%2F-659786014" anchor-label="getAndSet" id="-459628108%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-and-set.html"><span>get</span><wbr><span>And</span><wbr><span><span>Set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-459628108%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-and-set.html"><span class="token function">getAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-and-set.html"><span class="token function">getAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-and-set.html"><span class="token function">getAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1668470264%2FFunctions%2F-659786014" anchor-label="incrementAndGet" id="1668470264%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="increment-and-get.html"><span>increment</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1668470264%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="increment-and-get.html"><span class="token function">incrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="increment-and-get.html"><span class="token function">incrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="increment-and-get.html"><span class="token function">incrementAndGet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1518164779%2FFunctions%2F-659786014" anchor-label="set" id="-1518164779%2FFunctions%2F-659786014" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain :arrow-atomic:dokkaHtmlPartial/jsMain :arrow-atomic:dokkaHtmlPartial/nativeMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set.html"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1518164779%2FFunctions%2F-659786014"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                  <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":arrow-atomic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/jsMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/jsMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/nativeMain" data-toggle=":arrow-atomic:dokkaHtmlPartial/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic:dokkaHtmlPartial/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div>                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="tabbedcontent">Extensions</h2>
+      <div class="table" data-togglable="Extensions"><a data-name="1171832830%2FExtensions%2F1639817412" anchor-label="getAndUpdate" id="1171832830%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../get-and-update.html"><span>get</span><wbr><span>And</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1171832830%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../get-and-update.html"><span class="token function">getAndUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Updates variable atomically using the specified <a href="../get-and-update.html">function</a> of its value and returns its old value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1263136876%2FExtensions%2F1639817412" anchor-label="loop" id="1263136876%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../loop.html"><span><span>loop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1263136876%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../loop.html"><span class="token function">loop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html">Nothing</a></div><div class="brief "><p class="paragraph">Infinite loop that reads this atomic variable and performs the specified <a href="../loop.html">action</a> on its value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="299426500%2FExtensions%2F1639817412" anchor-label="tryUpdate" id="299426500%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../try-update.html"><span>try</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="299426500%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../try-update.html"><span class="token function">tryUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-7892257%2FExtensions%2F1639817412" anchor-label="update" id="-7892257%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-7892257%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="122487904%2FExtensions%2F1639817412" anchor-label="updateAndGet" id="122487904%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../update-and-get.html"><span>update</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="122487904%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../update-and-get.html"><span class="token function">updateAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">function<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Updates variable atomically using the specified <a href="../update-and-get.html">function</a> of its value and returns its new value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-154911291%2FExtensions%2F1639817412" anchor-label="value" id="-154911291%2FExtensions%2F1639817412" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-atomic:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-atomic:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../value.html"><span><span>value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-154911291%2FExtensions%2F1639817412"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="index.html">AtomicLong</a><span class="token punctuation">.</span><a href="../value.html">value</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

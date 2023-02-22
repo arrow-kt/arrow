@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Atomic</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/Atomic///PointingToDeclaration//-245591949">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">Atomic</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Atomic</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">Atomic</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/Atomic.kt#L5">source</a>)</span></span></div><p class="paragraph">An <a href="index.html">Atomic</a> with an initial value of <a href="index.html">A</a>.</p><p class="paragraph"><a href="index.html">Atomic</a> wraps <code class="lang-kotlin">atomic</code>, so that you can also use it on a top-level function or pass it around. In other languages this data type is also known as <code class="lang-kotlin">Ref</code>, <code class="lang-kotlin">IORef</code> or Concurrent safe Reference. So in case you don't need to pass around an atomic reference, or use it in top-level functions it's advised to use <code class="lang-kotlin">atomic</code> from Atomic Fu directly.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.coroutines.*<br><br>suspend fun main() {<br>  val count = Atomic(0)<br><br>  (0 until 20_000).parTraverse {<br>    count.update(Int::inc)<br>  }<br>  println(count.get())<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-atomic-01.kt --><p class="paragraph"><a href="index.html">Atomic</a> also offers some other interesting operators such as <a href="modify.html">modify</a>, <a href="try-update.html">tryUpdate</a>, <a href="access.html">access</a>&amp;<a href="lens.html">lens</a>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="276394891%2FClasslikes%2F-245591949" anchor-label="Companion" id="276394891%2FClasslikes%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="276394891%2FClasslikes%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="2015751602%2FFunctions%2F-245591949" anchor-label="access" id="2015751602%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="access.html"><span><span>access</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2015751602%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="access.html"><span class="token function">access</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Obtains a snapshot of the current value, and a setter for updating it.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="615715054%2FFunctions%2F-245591949" anchor-label="get" id="615715054%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="615715054%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Obtains the current value. Since <a href="../../../arrow-core/arrow.core.continuations/-atomic-ref/index.html">AtomicRef</a> is always guaranteed to have a value, the returned action completes immediately after being bound.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-568768965%2FFunctions%2F-245591949" anchor-label="getAndSet" id="-568768965%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-and-set.html"><span>get</span><wbr><span>And</span><wbr><span><span>Set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-568768965%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-and-set.html"><span class="token function">getAndSet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Replaces the current value with <a href="get-and-set.html">a</a>, returning the <i>old</i> value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="570912230%2FFunctions%2F-245591949" anchor-label="getAndUpdate" id="570912230%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-and-update.html"><span>get</span><wbr><span>And</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="570912230%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-and-update.html"><span class="token function">getAndUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Modifies the current value using the supplied update function and returns the <i>old</i> value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1174076102%2FFunctions%2F-245591949" anchor-label="lens" id="1174076102%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="lens.html"><span><span>lens</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1174076102%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="lens.html">B</a><span class="token operator">&gt; </span><a href="lens.html"><span class="token function">lens</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">get<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="lens.html">B</a><span class="token punctuation">, </span></span><span class="parameter ">set<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="lens.html">B</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Atomic</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="lens.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates an <a href="../../../arrow-core/arrow.core.continuations/-atomic-ref/index.html">AtomicRef</a> for <a href="lens.html">B</a> based on provided a <a href="lens.html">get</a> and <a href="lens.html">set</a> operation.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="714021387%2FFunctions%2F-245591949" anchor-label="modify" id="714021387%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="modify.html"><span><span>modify</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="714021387%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="modify.html">B</a><span class="token operator">&gt; </span><a href="modify.html"><span class="token function">modify</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="modify.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="modify.html">B</a></div><div class="brief "><p class="paragraph">Modify allows to inspect the state <a href="index.html">A</a> of the <a href="../../../arrow-core/arrow.core.continuations/-atomic-ref/index.html">AtomicRef</a>, update it and extract a different state <a href="modify.html">B</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1359544183%2FFunctions%2F-245591949" anchor-label="modifyGet" id="1359544183%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="modify-get.html"><span>modify</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1359544183%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="modify-get.html">B</a><span class="token operator">&gt; </span><a href="modify-get.html"><span class="token function">modifyGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="modify-get.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="modify-get.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">ModifyGet allows to inspect state <a href="index.html">A</a>, update it and extract a different state <a href="modify-get.html">B</a>. In contrast to <a href="modify.html">modify</a>, it returns a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a> of the updated state <a href="index.html">A</a> and the extracted state <a href="modify-get.html">B</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1977419868%2FFunctions%2F-245591949" anchor-label="set" id="1977419868%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set.html"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1977419868%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the current value to <a href="set.html">a</a>. The returned action completes after the reference has been successfully set.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1165144773%2FFunctions%2F-245591949" anchor-label="setAndGet" id="-1165144773%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-and-get.html"><span>set</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1165144773%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-and-get.html"><span class="token function">setAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Replaces the current value with <a href="set-and-get.html">a</a>, returning the <i>new</i> value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-895041218%2FFunctions%2F-245591949" anchor-label="tryModify" id="-895041218%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-modify.html"><span>try</span><wbr><span><span>Modify</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-895041218%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="try-modify.html">B</a><span class="token operator">&gt; </span><a href="try-modify.html"><span class="token function">tryModify</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="try-modify.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="try-modify.html">B</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Attempts to inspect the state, uptade it, and extract a different state.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1591159726%2FFunctions%2F-245591949" anchor-label="tryUpdate" id="-1591159726%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="try-update.html"><span>try</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1591159726%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="try-update.html"><span class="token function">tryUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Attempts to modify the current value once, in contrast to <a href="update.html">update</a> which calls <a href="try-update.html">f</a> until it succeeds.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1851507099%2FFunctions%2F-245591949" anchor-label="update" id="-1851507099%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1851507099%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Updates the current value using the supplied function <a href="update.html">f</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-151242300%2FFunctions%2F-245591949" anchor-label="updateAndGet" id="-151242300%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="update-and-get.html"><span>update</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-151242300%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="update-and-get.html"><span class="token function">updateAndGet</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Modifies the current value using the supplied update function and returns the <i>new</i> value.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

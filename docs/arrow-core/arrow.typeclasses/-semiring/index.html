@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Semiring</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.32.1+2023-02-22T17-49-18-189485Z
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-core::arrow.typeclasses/Semiring///PointingToDeclaration//601698448">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.typeclasses</a><span class="delimiter">/</span><span class="current">Semiring</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Semiring</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">Semiring</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/typeclasses/Semiring.kt#L12">source</a>)</span></span></div><p class="paragraph">The <a href="index.html">Semiring</a> type class for a given type <code class="lang-kotlin">A</code> combines both a commutative additive <a href="../-monoid/index.html">Monoid</a> and a multiplicative <a href="../-monoid/index.html">Monoid</a>. It requires the multiplicative <a href="../-monoid/index.html">Monoid</a> to distribute over the additive one. The operations of the multiplicative <a href="../-monoid/index.html">Monoid</a> have been renamed to <a href="one.html">one</a> and <a href="combine-multiplicate.html">combineMultiplicate</a> for easier use.</p><p class="paragraph">The <a href="one.html">one</a> function serves exactly like the empty function for an additive <a href="../-monoid/index.html">Monoid</a>, just adapted for the multiplicative version. This forms the following law:</p><p class="paragraph">Please note that the empty function has been renamed to <a href="zero.html">zero</a> to get a consistent naming style inside the semiring.</p><p class="paragraph">Currently, <a href="index.html">Semiring</a> instances are defined for all available number types.</p><h3 class=""> Examples</h3><p class="paragraph">Here a some examples:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.typeclasses.Semiring<br><br>fun main(args: Array&lt;String&gt;) {<br>  val result =<br>  //sampleStart<br>  Semiring.int().run { 1.combine(2) }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-semiring-01.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.typeclasses.Semiring<br><br>fun main(args: Array&lt;String&gt;) {<br>  val result =<br>  //sampleStart<br>  Semiring.int().run { 2.combineMultiplicate(3) }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-semiring-02.kt --><p class="paragraph">The type class <code class="lang-kotlin">Semiring</code> also has support for the <code class="lang-kotlin">+</code> <code class="lang-kotlin">*</code> syntax:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.typeclasses.Semiring<br><br>fun main(args: Array&lt;String&gt;) {<br>  val result =<br>  //sampleStart<br>  Semiring.int().run {<br>     1 + 2<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-semiring-03.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.typeclasses.Semiring<br><br>fun main(args: Array&lt;String&gt;) {<br>  val result =<br>  //sampleStart<br>  Semiring.int().run {<br>     2 * 3<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-semiring-04.kt --></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-641946323%2FClasslikes%2F601698448" anchor-label="Companion" id="-641946323%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-641946323%2FClasslikes%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="110732005%2FFunctions%2F601698448" anchor-label="combine" id="110732005%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="combine.html"><span><span>combine</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="110732005%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token punctuation">.</span><a href="combine.html"><span class="token function">combine</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1715852030%2FFunctions%2F601698448" anchor-label="combineMultiplicate" id="-1715852030%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="combine-multiplicate.html"><span>combine</span><wbr><span><span>Multiplicate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1715852030%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token punctuation">.</span><a href="combine-multiplicate.html"><span class="token function">combineMultiplicate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Multiplicatively combine two <a href="index.html">A</a> values.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1908837409%2FFunctions%2F601698448" anchor-label="maybeCombineAddition" id="1908837409%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="maybe-combine-addition.html"><span>maybe</span><wbr><span>Combine</span><wbr><span><span>Addition</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1908837409%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token operator">?</span><span class="token punctuation">.</span><a href="maybe-combine-addition.html"><span class="token function">maybeCombineAddition</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Maybe additively combine two <a href="index.html">A</a> values.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1811654246%2FFunctions%2F601698448" anchor-label="maybeCombineMultiplicate" id="-1811654246%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="maybe-combine-multiplicate.html"><span>maybe</span><wbr><span>Combine</span><wbr><span><span>Multiplicate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1811654246%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token operator">?</span><span class="token punctuation">.</span><a href="maybe-combine-multiplicate.html"><span class="token function">maybeCombineMultiplicate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Maybe multiplicatively combine two <a href="index.html">A</a> values.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2003345152%2FFunctions%2F601698448" anchor-label="one" id="2003345152%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="one.html"><span><span>one</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2003345152%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="one.html"><span class="token function">one</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">A one value for this A</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1042924408%2FFunctions%2F601698448" anchor-label="plus" id="1042924408%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="plus.html"><span><span>plus</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1042924408%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token punctuation">.</span><a href="plus.html"><span class="token function">plus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="580783934%2FFunctions%2F601698448" anchor-label="times" id="580783934%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="times.html"><span><span>times</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="580783934%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="index.html">A</a><span class="token punctuation">.</span><a href="times.html"><span class="token function">times</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="index.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="64259148%2FFunctions%2F601698448" anchor-label="zero" id="64259148%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="zero.html"><span><span>zero</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="64259148%2FFunctions%2F601698448"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="zero.html"><span class="token function">zero</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">A zero value for this A</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+
