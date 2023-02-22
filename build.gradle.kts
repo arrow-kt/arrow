@@ -118,16 +118,19 @@ tasks {
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 
   withType<DokkaMultiModuleTask>().configureEach {
-    outputDirectory.set(rootDir.resolve("arrow-site/docs/apidocs"))
+    outputDirectory.set(docFolder())
     moduleName.set("Arrow")
   }
 
   register<Delete>("cleanDocs") {
-    val folder = rootDir.resolve("arrow-site/docs/apidocs")
+    val folder = docFolder()
     val content = folder.listFiles()?.filter { it != folder }
     delete(content)
   }
 }
+
+fun docFolder(): File =
+  project.properties["githubpages"]?.let { file("docs").also { it.mkdir() } } ?: rootDir.resolve("arrow-site/docs/apidocs")
 
 apiValidation {
   val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
