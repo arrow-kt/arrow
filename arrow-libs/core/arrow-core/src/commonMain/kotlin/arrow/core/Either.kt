@@ -833,10 +833,7 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
-    contract {
-      returns(true) implies (this@Either is Left<A>)
-      returns(false) implies (this@Either is Right<B>)
-    }
+    contract { returns(true) implies (this@Either is Left<A>) }
     return this@Either is Left<A> && predicate(value)
   }
 
@@ -862,10 +859,7 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun isRight(predicate: (B) -> Boolean): Boolean {
-    contract {
-      returns(true) implies (this@Either is Right<B>)
-      returns(false) implies (this@Either is Left<A>)
-    }
+    contract { returns(true) implies (this@Either is Right<B>) }
     return this@Either is Right<B> && predicate(value)
   }
 
