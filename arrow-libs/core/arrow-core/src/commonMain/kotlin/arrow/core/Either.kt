@@ -927,10 +927,10 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }")
+    ReplaceWith("MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }")
   )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C =
-    MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }
+    MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }
 
   /**
    * Swap the generic parameters [A] and [B] of this [Either].
@@ -1207,14 +1207,14 @@ public sealed class Either<out A, out B> {
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     orNull()?.let(fa)?.right()
 
-  // TODO will be renamed to mapAccumulating in 2.x.x. Backport, and deprecate in 1.x.x
+  @Deprecated(
+    NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith("fold({ it.left().valid() }, { fa(it).map(::Right) })")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    when (this) {
-      is Right -> fa(this.value).map(::Right)
-      is Left -> this.valid()
-    }
+    fold({ it.left().valid() }, { fa(it).map(::Right) })
 
   @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =

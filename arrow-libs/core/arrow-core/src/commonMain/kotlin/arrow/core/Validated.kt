@@ -8,11 +8,22 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-@Deprecated(DeprMsg + "ValidatedNel is being replaced by EitherNel")
+@Deprecated(
+  DeprMsg + "ValidatedNel is being replaced by EitherNel",
+  ReplaceWith("EitherNel<E, A>", "arrow.core.EitherNel")
+)
 public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
+@Deprecated(
+  DeprMsg + "Use Right to construct Either values instead",
+  ReplaceWith("Either.Right(value)", "arrow.core.Either")
+)
 public typealias Valid<A> = Validated.Valid<A>
 
+@Deprecated(
+  DeprMsg + "Use Left to construct Either values instead",
+  ReplaceWith("Either.Left(value)", "arrow.core.Either")
+)
 public typealias Invalid<E> = Validated.Invalid<E>
 
 @Deprecated(DeprMsg + "You can find more details about how to migrate on the Github release page, or the 1.2.0 release post.")
@@ -51,7 +62,10 @@ public sealed class Validated<out E, out A> {
     )
     @JvmStatic
     public inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
-      o.toEither(ifNone).toValidated()
+      o.fold(
+        { Invalid(ifNone()) },
+        { Valid(it) }
+      )
 
     /**
      * Converts a nullable `A?` to a `Validated<E, A>`, where the provided `ifNull` output value is returned as [Invalid]
@@ -63,7 +77,7 @@ public sealed class Validated<out E, out A> {
     )
     @JvmStatic
     public inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
-      value?.valid() ?: ifNull().invalid()
+      value?.let(::Valid) ?: Invalid(ifNull())
 
     @Deprecated(
       DeprMsg + "Use Either.catch instead",
@@ -161,11 +175,25 @@ public sealed class Validated<out E, out A> {
   public fun void(): Validated<E, Unit> =
     map { Unit }
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ emptyList() }, { fa(it).map(::Valid) })",
+      "arrow.core.Valid"
+    )
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
     fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ it.invalid().right() }, { fa(it).map(::Valid) })",
+      "arrow.core.invalid", "arrow.core.right", "arrow.core.Valid"
+    )
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <EE, B> traverse(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
@@ -178,6 +206,13 @@ public sealed class Validated<out E, out A> {
   public inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
     traverse(fa)
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith(
+      "fold({ None }, { fa(it).map(::Valid) })",
+      "arrow.core.None", "arrow.core.Valid"
+    )
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <B> traverse(fa: (A) -> Option<B>): Option<Validated<E, B>> =
@@ -190,12 +225,20 @@ public sealed class Validated<out E, out A> {
   public inline fun <B> traverseOption(fa: (A) -> Option<B>): Option<Validated<E, B>> =
     traverse(fa)
 
+  @Deprecated(
+    DeprAndNicheMsg + "Use orNull() and Kotlin nullable types",
+    ReplaceWith("orNull()?.let(fa)?.valid()", "arrow.core.valid")
+  )
   public inline fun <B> traverseNullable(fa: (A) -> B?): Validated<E, B>? =
     when (this) {
       is Valid -> fa(this.value)?.let { Valid(it) }
       is Invalid -> null
     }
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer when or fold instead",
+    ReplaceWith("fold({ fe(c, it) }, { fa(c, it) })")
+  )
   public inline fun <B> bifoldLeft(
     c: B,
     fe: (B, E) -> B,
@@ -203,25 +246,57 @@ public sealed class Validated<out E, out A> {
   ): B =
     fold({ fe(c, it) }, { fa(c, it) })
 
-  public inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B): B = MN.run {
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer when or fold instead",
+    ReplaceWith("MN.run { fold({ empty().combine(g(it)) }, { empty().combine(f(it)) }) }")
+  )
+  public inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B): B =  MN.run {
     bifoldLeft(MN.empty(), { c, b -> c.combine(g(b)) }) { c, a -> c.combine(f(a)) }
   }
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer explicit fold instead",
+    ReplaceWith(
+      "fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })",
+      "arrow.core.Valid", "arrow.core.Invalid"
+    )
+  )
   public inline fun <EE, B> bitraverse(fe: (E) -> Iterable<EE>, fa: (A) -> Iterable<B>): List<Validated<EE, B>> =
     fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer explicit fold instead",
+    ReplaceWith(
+      "fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })",
+      "arrow.core.Valid", "arrow.core.Invalid"
+    )
+  )
   public inline fun <EE, B, C> bitraverseEither(
     fe: (E) -> Either<EE, B>,
     fa: (A) -> Either<EE, C>
   ): Either<EE, Validated<B, C>> =
     fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer explicit fold instead",
+    ReplaceWith(
+      "fold({ fe(it).map(::Invalid) }, { fa(it).map(::Valid) })",
+      "arrow.core.Valid", "arrow.core.Invalid"
+    )
+  )
   public inline fun <B, C> bitraverseOption(
     fe: (E) -> Option<B>,
     fa: (A) -> Option<C>
   ): Option<Validated<B, C>> =
     fold({ fe(it).map(::Invalid) }, { fa(it).map(::Valid) })
 
+  @Deprecated(
+    DeprAndNicheMsg + "Prefer explicit fold instead",
+    ReplaceWith(
+      "fold({ fe(it)?.let(::Invalid) }, { fa(it)?.let(::Valid) })",
+      "arrow.core.Valid", "arrow.core.Invalid"
+    )
+  )
   public inline fun <B, C> bitraverseNullable(
     fe: (E) -> B?,
     fa: (A) -> C?
@@ -350,7 +425,7 @@ public sealed class Validated<out E, out A> {
     ReplaceWith("fold({ emptyList() }, ::listOf)")
   )
   public fun toList(): List<A> =
-    fold({ emptyList() }, ::listOf)
+    fold({ listOf() }, ::listOf)
 
   /** Lift the Invalid value into a NonEmptyList. */
   @Deprecated(
@@ -369,7 +444,7 @@ public sealed class Validated<out E, out A> {
     ReplaceWith("toEither().let(f).toValidated()")
   )
   public inline fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> =
-    toEither().let(f).toValidated()
+    fromEither(f(toEither()))
 
   /**
    * From [arrow.typeclasses.Bifunctor], maps both types of this Validated.
@@ -427,7 +502,6 @@ public sealed class Validated<out E, out A> {
         f(this.value)
         this
       }
-
       is Valid -> this
     }
 
@@ -470,7 +544,7 @@ public sealed class Validated<out E, out A> {
     ReplaceWith("toEither().fold({ b }) { f(b, it) }")
   )
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-    toEither().fold({ b }) { f(b, it) }
+    fold({ b }, { f(b, it) })
 
   @Deprecated(
     DeprMsg + "Use widen on Either after refactoring",
@@ -488,7 +562,7 @@ public sealed class Validated<out E, out A> {
   )
 )
 public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
-  Either.zipOrAccumulate({ a, b -> SE.run { a.combine(b) } }, toEither(), fb.toEither(), ::Pair).toValidated()
+  zip(SE, fb, ::Pair)
 
 @Deprecated(
   DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
@@ -903,7 +977,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, j, f)
 
 /**
- * Given [A] is a subtype of [B], re-type this value from Validated<E, A> to Validated<E, B>
+ * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
  *
  * ```kotlin
  * import arrow.core.*
@@ -933,26 +1007,63 @@ public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
 public fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
   this
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer using the Either DSL, or map",
+  ReplaceWith("(0 until (n.coerceAtLeast(0))).mapOrAccumulate({ a, b -> SE.run { a.combine(b) } }) { bind() }.toValidated()")
+)
 public fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
   if (n <= 0) emptyList<A>().valid()
   else this.zip(SE, replicate(SE, n - 1)) { a, xs -> listOf(a) + xs }
 
+@Deprecated(DeprAndNicheMsg)
 public fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): Validated<E, A> =
   if (n <= 0) MA.empty().valid()
   else this@replicate.zip(SE, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer explicit fold instead",
+  ReplaceWith(
+    "fold({ it.map { Invalid(it) } }, { it.map { Valid(it) } })",
+    "arrow.core.Valid", "arrow.core.Invalid"
+  )
+)
 public fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
   bitraverse(::identity, ::identity)
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer explicit fold instead",
+  ReplaceWith(
+    "fold({ it.map { Invalid(it) } }, { it.map { Valid(it) } })",
+    "arrow.core.Valid", "arrow.core.Invalid"
+  )
+)
 public fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
   bitraverseEither(::identity, ::identity)
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer explicit fold instead",
+  ReplaceWith(
+    "fold({ it.map(::Invalid) }, { it.map(::Valid) })",
+    "arrow.core.Valid", "arrow.core.Invalid"
+  )
+)
 public fun <A, B> Validated<Option<A>, Option<B>>.bisequenceOption(): Option<Validated<A, B>> =
   bitraverseOption(::identity, ::identity)
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer explicit fold instead",
+  ReplaceWith(
+    "fold({ it?.let(::Invalid) }, { it?.let(::Valid) })",
+    "arrow.core.Valid", "arrow.core.Invalid"
+  )
+)
 public fun <A, B> Validated<A?, B?>.bisequenceNullable(): Validated<A, B>? =
   bitraverseNullable(::identity, ::identity)
 
+@Deprecated(
+  DeprAndNicheMsg + "Use fold on Either after refactoring",
+  ReplaceWith("MA.run { fold({ empty() }) { empty().combine(it) } }")
+)
 public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
   foldLeft(empty()) { acc, a -> acc.combine(a) }
 }
@@ -961,6 +1072,13 @@ public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ emptyList() }, { it.map(::Valid) })",
+    "arrow.core.Valid"
+  )
+)
 public fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
   traverse(::identity)
 
@@ -971,6 +1089,13 @@ public fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
 public fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
   sequence()
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ it.invalid().right() }, { it.map(::Valid) })",
+    "arrow.core.invalid", "arrow.core.right", "arrow.core.Valid"
+  )
+)
 public fun <E, A, B> Validated<A, Either<E, B>>.sequence(): Either<E, Validated<A, B>> =
   traverse(::identity)
 
@@ -981,6 +1106,13 @@ public fun <E, A, B> Validated<A, Either<E, B>>.sequence(): Either<E, Validated<
 public fun <A, B> Validated<A, Option<B>>.sequenceOption(): Option<Validated<A, B>> =
   sequence()
 
+@Deprecated(
+  DeprAndNicheMsg + "Prefer using the Either DSL, or explicit fold or when",
+  ReplaceWith(
+    "fold({ None }, { it.map(::Valid) })",
+    "arrow.core.None", "arrow.core.Valid"
+  )
+)
 public fun <A, B> Validated<A, Option<B>>.sequence(): Option<Validated<A, B>> =
   traverse(::identity)
 
@@ -991,6 +1123,10 @@ public fun <A, B> Validated<A, Option<B>>.sequence(): Option<Validated<A, B>> =
 public fun <A, B> Validated<A, B?>.sequenceNullable(): Validated<A, B>? =
   sequence()
 
+@Deprecated(
+  DeprAndNicheMsg + "Use orNull() and Kotlin nullable types",
+  ReplaceWith("orNull()?.valid()", "arrow.core.valid")
+)
 public fun <A, B> Validated<A, B?>.sequence(): Validated<A, B>? =
   traverseNullable(::identity)
 
@@ -1012,7 +1148,7 @@ public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compa
   ReplaceWith("toEither().getOrElse { default() }")
 )
 public inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
-  toEither().getOrElse { default() }
+  fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid
@@ -1022,14 +1158,14 @@ public inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
   ReplaceWith("toEither().getOrNull()")
 )
 public fun <E, A> Validated<E, A>.orNull(): A? =
-  toEither().getOrNull()
+  getOrElse { null }
 
 @Deprecated(
   DeprMsg + "Use getOrNone on Either after refactoring",
   ReplaceWith("toEither().getOrNone()")
 )
 public fun <E, A> Validated<E, A>.orNone(): Option<A> =
-  toEither().getOrNone()
+  fold({ None }, { Some(it) })
 
 /**
  * Return the Valid value, or the result of f if Invalid
@@ -1039,7 +1175,7 @@ public fun <E, A> Validated<E, A>.orNone(): Option<A> =
   ReplaceWith("toEither().getOrElse(f)")
 )
 public inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
-  toEither().getOrElse(f)
+  fold({ f(it) }, ::identity)
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
@@ -1053,16 +1189,15 @@ public inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
   )
 )
 public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
-  toEither().recover { e -> that().mapLeft { ee -> SE.run { e.combine(ee) } }.bind() }.toValidated()
-//  fold(
-//    { e ->
-//      that().fold(
-//        { ee -> Invalid(SE.run { e.combine(ee) }) },
-//        { Valid(it) }
-//      )
-//    },
-//    { Valid(it) }
-//  )
+  fold(
+    { e ->
+      that().fold(
+        { ee -> Invalid(SE.run { e.combine(ee) }) },
+        { Valid(it) }
+      )
+    },
+    { Valid(it) }
+  )
 
 /**
  * Apply a function to a Valid value, returning a new Validation that may be valid or invalid
@@ -1085,7 +1220,10 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
   ReplaceWith("toEither().flatMap { f(it).toEither() }.toValidated()")
 )
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
-  toEither().flatMap { f(it).toEither() }.toValidated()
+  when (this) {
+    is Validated.Valid -> f(value)
+    is Validated.Invalid -> this
+  }
 
 /**
  * Return this if it is Valid, or else fall back to the given default.
@@ -1097,42 +1235,54 @@ public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): 
   ReplaceWith("toEither().recover { default().bind() }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
-  toEither().recover { default().bind() }.toValidated()
+  fold(
+    { default() },
+    { Valid(it) }
+  )
 
 @Deprecated(
   DeprMsg + "Use recover on Either instead after refactoring.",
   ReplaceWith("toEither().recover { e -> f(e).bind() }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
-  toEither().recover { e -> f(e).bind() }.toValidated()
+  when (this) {
+    is Validated.Valid -> this
+    is Validated.Invalid -> f(this.value)
+  }
 
 @Deprecated(
   DeprMsg + "Use recover on Either instead after refactoring.",
   ReplaceWith("toEither().recover<E, Nothing, A> { e -> f(e) }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
-  toEither().recover<E, Nothing, A> { e -> f(e) }.toValidated()
+  when (this) {
+    is Validated.Valid -> this
+    is Validated.Invalid -> Valid(f(this.value))
+  }
 
 @Deprecated(
   DeprMsg + "Use fold on Either instead after refactoring.",
   ReplaceWith("fold(fe, fa).valid()")
 )
 public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
-  fold(fe, fa).valid()
+  when (this) {
+    is Validated.Valid -> map(fa)
+    is Validated.Invalid -> Valid(fe(this.value))
+  }
 
 @Deprecated(
   DeprMsg + "Validated is deprecated in favor of Either",
   ReplaceWith("toEither().valid()")
 )
 public fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
-  toEither().valid()
+  map { Right(it) }.handleError { Left(it) }
 
 @Deprecated(
   DeprMsg + "Use merge() on Either instead after refactoring.",
   ReplaceWith("toEither().merge()")
 )
 public inline fun <A> Validated<A, A>.merge(): A =
-  toEither().merge()
+  fold(::identity, ::identity)
 
 @Deprecated(
   DeprMsg + "Use Either.zipOrAccumulate instead",
@@ -1143,11 +1293,12 @@ public fun <E, A> Validated<E, A>.combine(
   SA: Semigroup<A>,
   y: Validated<E, A>
 ): Validated<E, A> =
-  Either.zipOrAccumulate(
-    { a, b -> SE.run { a.combine(b) } },
-    toEither(),
-    y.toEither(),
-    { a, b -> SA.run { a.combine(b) } }).toValidated()
+  when {
+    this is Valid && y is Valid -> Valid(SA.run { value.combine(y.value) })
+    this is Invalid && y is Invalid -> Invalid(SE.run { value.combine(y.value) })
+    this is Invalid -> this
+    else -> y
+  }
 
 @Deprecated(
   DeprAndNicheMsg,
@@ -1157,8 +1308,13 @@ public fun <E, A> Validated<E, A>.combine(
   )
 )
 public fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Validated<E, A> {
-  return toEither().recover { e -> y.toEither().recover { ee -> raise(SE.run { e.combine(ee) }) }.bind() }
-    .toValidated()
+  return when (this) {
+    is Valid -> this
+    is Invalid -> when (y) {
+      is Invalid -> Invalid(SE.run { this@combineK.value.combine(y.value) })
+      is Valid -> y
+    }
+  }
 }
 
 /**
@@ -1169,7 +1325,7 @@ public fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>)
   ReplaceWith("toEither().toIor()")
 )
 public fun <E, A> Validated<E, A>.toIor(): Ior<E, A> =
-  toEither().toIor()
+  fold({ Ior.Left(it) }, { Ior.Right(it) })
 
 @Deprecated(
   DeprMsg + "Use right instead to construct the equivalent Either value",
