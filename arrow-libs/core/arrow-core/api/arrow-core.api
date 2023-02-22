@@ -160,6 +160,7 @@ public abstract class arrow/core/Either {
 	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun bitraverseValidated (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun conditionally (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public final fun exist (Lkotlin/jvm/functions/Function1;)Z
 	public final fun exists (Lkotlin/jvm/functions/Function1;)Z
 	public final fun findOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
