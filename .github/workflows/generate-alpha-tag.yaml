@@ -2,8 +2,6 @@ name: generate-alpha-tag
 
 on:
   push:
-    paths-ignore:
-      - 'docs/**'
     branches:
       - main
 
