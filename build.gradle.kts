@@ -1,5 +1,9 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+
 buildscript {
   repositories {
     mavenCentral()
@@ -69,6 +73,30 @@ val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
     .orNull?.toBoolean() == true
 
+subprojects {
+  this@subprojects.tasks.withType<DokkaTaskPartial>().configureEach {
+    this@subprojects.extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
+      dokkaSourceSets.named(kotlinSourceSet.name) {
+        perPackageOption {
+          matchingRegex.set(".*\\.internal.*")
+          suppress.set(true)
+        }
+        skipDeprecated.set(true)
+        reportUndocumented.set(false)
+        val baseUrl: String = checkNotNull(properties["pom.smc.url"]?.toString())
+
+        kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
+          sourceLink {
+            localDirectory.set(srcDir)
+            remoteUrl.set(uri("$baseUrl/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
+            remoteLineSuffix.set("#L")
+          }
+        }
+      }
+    }
+  }
+}
+
 tasks {
   val generateDoc by creating(Exec::class) {
     group = "documentation"
@@ -86,7 +114,23 @@ tasks {
   dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
   dokkaJekyllMultiModule { removeChildTasks(undocumentedProjects) }
+
+  getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
+
+  withType<DokkaMultiModuleTask>().configureEach {
+    outputDirectory.set(docFolder())
+    moduleName.set("Arrow")
+  }
+
+  register<Delete>("cleanDocs") {
+    val folder = docFolder()
+    val content = folder.listFiles()?.filter { it != folder }
+    delete(content)
+  }
 }
+
+fun docFolder(): File =
+  project.properties["githubpages"]?.let { file("docs").also { it.mkdir() } } ?: rootDir.resolve("arrow-site/docs/apidocs")
 
 apiValidation {
   val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
