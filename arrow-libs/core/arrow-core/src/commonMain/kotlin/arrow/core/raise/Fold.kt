@@ -1,10 +1,12 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+
 package arrow.core.raise
 
 import arrow.atomic.AtomicBoolean
 import arrow.core.nonFatalOrThrow
+import arrow.core.Either
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -95,7 +97,7 @@ public inline fun <R, A, B> fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  val raise = DefaultRaise()
+  val raise = DefaultRaise(false)
   return try {
     val res = program(raise)
     raise.complete()
@@ -109,24 +111,93 @@ public inline fun <R, A, B> fold(
   }
 }
 
+public fun <R, A> Effect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): Effect<R, A> =
+  effect { traced({ bind() }, recover) }
+
+public fun <R, A> EagerEffect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): EagerEffect<R, A> =
+  eagerEffect { traced({ bind() }, recover) }
+
+/**
+ * Inspect a [Traced] value of [R].
+ *
+ * Tracing [R] can be useful to know where certain errors, or failures are coming from.
+ * Let's say you have a `DomainError`, but it might be raised from many places in the project.
+ *
+ * You would have to manually _trace_ where this error is coming from,
+ * instead [Traced] offers you ways to inspect the actual stacktrace of where the raised value occurred.
+ *
+ * Beware that tracing can only track the [Raise.bind] or [Raise.raise] call that resulted in the [R] value,
+ * and not any location of where the [R], or [Either.Left] value was created.
+ *
+ * ```kotlin
+ * public fun main() {
+ *   val error = effect<String, Int> { raise("error") }
+ *   error.traced { (trace, _: String) -> trace.printStackTrace() }
+ *     .fold({ require(it == "error") }, { error("impossible") })
+ * }
+ * ```
+ * ```text
+ * arrow.core.continuations.RaiseCancellationException: Raised Continuation
+ *   at arrow.core.continuations.DefaultRaise.raise(Fold.kt:77)
+ *   at MainKtKt$main$error$1.invoke(MainKt.kt:6)
+ *   at MainKtKt$main$error$1.invoke(MainKt.kt:6)
+ *   at arrow.core.continuations.Raise$DefaultImpls.bind(Raise.kt:22)
+ *   at arrow.core.continuations.DefaultRaise.bind(Fold.kt:74)
+ *   at arrow.core.continuations.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
+ *   at arrow.core.continuations.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
+ *   at arrow.core.continuations.Effect__FoldKt.fold(Fold.kt:92)
+ *   at arrow.core.continuations.Effect.fold(Unknown Source)
+ *   at MainKtKt.main(MainKt.kt:8)
+ *   at MainKtKt.main(MainKt.kt)
+ * ```
+ *
+ * NOTE:
+ * This implies a performance penalty of creating a stacktrace when calling [Raise.raise],
+ * but **this only occurs** when composing `traced`.
+ * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
+ */
+public inline fun <R, A> Raise<R>.traced(
+  @BuilderInference program: Raise<R>.() -> A,
+  recover: Raise<R>.(traces: Traced<R>) -> Unit,
+): A {
+  val nested = DefaultRaise(true)
+  return try {
+    program.invoke(nested)
+  } catch (e: RaiseCancellationExceptionNoTrace) {
+    val r: R = e.raisedOrRethrow(nested)
+    recover(Traced(e, r))
+    raise(r)
+  }
+}
+
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
-  if (this is RaiseCancellationException && this.raise === raise) raised as R
-  else throw this
+  when {
+    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
+    this is RaiseCancellationException && this.raise === raise -> raised as R
+    else -> throw this
+  }
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
-internal class DefaultRaise : Raise<Any?> {
+internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
   private val isActive = AtomicBoolean(true)
+
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
-  override fun raise(r: Any?): Nothing =
-    if (isActive.value) throw RaiseCancellationException(r, this) else throw RaiseLeakedException()
+  override fun raise(r: Any?): Nothing = when {
+    isActive.value && !isTraced -> throw RaiseCancellationExceptionNoTrace(r, this)
+    isActive.value && !isTraced -> throw RaiseCancellationException(r, this)
+    else -> throw RaiseLeakedException()
+  }
 }
 
 /** CancellationException is required to cancel coroutines when raising from within them. */
+private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
+  CancellationExceptionNoTrace()
+
 private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationExceptionNoTrace()
 
 public expect open class CancellationExceptionNoTrace() : CancellationException
