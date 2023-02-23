@@ -1956,7 +1956,7 @@ public sealed class Either<out A, out B> {
     "Facilitates the migration from Validated to Either, you can simply remove this method call.",
     ReplaceWith("this")
   )
-  public fun toEither(): Either<A, B> =
+  public inline fun toEither(): Either<A, B> =
     this
 }
 
