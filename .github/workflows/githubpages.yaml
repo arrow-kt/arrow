@@ -1,0 +1,27 @@
+name: githubpages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  githubpages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
+
+      - name: Dokka
+        id: Dokka
+        run: ./gradlew cleanDocs dokkaHtmlMultiModule -Pgithubpages=true
+
+      - name: Push
+        run: |
+          git add .
+          git commit -m "Update github pages"
+          git push
