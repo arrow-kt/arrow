@@ -33,5 +33,5 @@ internal fun <T> Semigroup<T>.emptyCombine(first: Any?, second: T): T =
  * Apply the [combine] function if [first] is not empty, otherwise return [second].
  */
 @PublishedApi
-internal fun <T> emptyCombine(first: Any?, second: T, combine: (T, T) -> T): T =
+internal inline fun <T> emptyCombine(first: Any?, second: T, combine: (T, T) -> T): T =
   if (first == EmptyValue) second else combine(first as T, second)

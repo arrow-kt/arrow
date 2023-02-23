@@ -55,10 +55,6 @@ public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInferen
   )
 }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { ior({ x, y -> x + y}, block) }"))
-public inline fun <E, A> ior(semigroup: Semigroup<E>, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> =
-  semigroup.run { ior({ x, y -> x + y}, block) }
-
 public typealias Null = Nothing?
 
 @JvmInline

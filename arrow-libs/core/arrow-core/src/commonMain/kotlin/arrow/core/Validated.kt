@@ -4,6 +4,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -352,28 +353,32 @@ public sealed class Validated<out E, out A> {
     fold(::Valid, ::Invalid)
 }
 
-public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
-  zip(SE, fb, ::Pair)
+public inline fun <E, A, B> Validated<E, A>.zip(combineError: (E, E) -> E, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
+  zip(combineError, fb, ::Pair)
 
+public inline fun <E, A, B, Z> Validated<E, A>.zip(combineError: (E, E) -> E, fb: Validated<E, B>, f: (A, B) -> Z): Validated<E, Z> =
+  when (this) {
+    is Invalid -> when (fb) {
+      is Invalid -> Invalid(combineError(this.value, fb.value))
+      is Valid -> Invalid(this.value)
+    }
+    is Valid -> when (fb) {
+      is Invalid -> Invalid(fb.value)
+      is Valid -> Valid(f(this.value, fb.value))
+    }
+  }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SE.run { zip({ x, y -> x + y }, fb, ::Pair) }"))
+public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
+  SE.run { zip({ x, y -> x + y }, fb, ::Pair) }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SE.run { zip({ x, y -> x + y }, b, f) }"))
 public inline fun <E, A, B, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,
   b: Validated<E, B>,
   f: (A, B) -> Z
 ): Validated<E, Z> =
-  zip(
-    SE,
-    b,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit,
-    Valid.unit
-  ) { a, b, _, _, _, _, _, _, _, _ ->
-    f(a, b)
-  }
+  SE.run { zip({ x, y -> x + y }, b, f) }
 
 public inline fun <E, A, B, C, Z> Validated<E, A>.zip(
   SE: Semigroup<E>,

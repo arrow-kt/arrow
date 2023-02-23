@@ -5,7 +5,9 @@ import arrow.core.Ior.Both
 import arrow.core.Ior.Left
 import arrow.core.Ior.Right
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -27,7 +29,7 @@ public typealias IorNel<A, B> = Ior<Nel<A>, B>
  * [Ior]<`A`,`B`> is similar to [Either]<`A`,`B`>, except that it can represent the simultaneous presence of
  * an `A` and a `B`. It is right-biased so methods such as `map` and `flatMap` operate on the
  * `B` value. Some methods, like `flatMap`, handle the presence of two [Ior.Both] values using a
- * [Semigroup]<`A`>, while other methods, like [toEither], ignore the `A` value in a [Ior.Both Both].
+ * combination function, while other methods, like [toEither], ignore the `A` value in a [Ior.Both Both].
  *
  * [Ior]<`A`,`B`> is isomorphic to [Either]<[Either]<`A`,`B`>, [Pair]<`A`,`B`>>, but provides methods biased toward `B`
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
@@ -170,10 +172,11 @@ public sealed class Ior<out A, out B> {
     return fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
   }
 
+  @Deprecated(MonoidDeprecation, ReplaceWith("MN.run { foldLeft(MN.empty()) { b, a -> b + f(a) } }"))
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
     return MN.run {
-      foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
+      foldLeft(MN.empty()) { b, a -> b + f(a) }
     }
   }
 
@@ -185,13 +188,14 @@ public sealed class Ior<out A, out B> {
     return fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
   }
 
+  @Deprecated(MonoidDeprecation, ReplaceWith("MN.run { bifoldLeft(MN.empty(), { c, a -> c + f(a) }, { c, b -> c + g(b) }) }"))
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
       callsInPlace(g, InvocationKind.AT_MOST_ONCE)
     }
     return MN.run {
-      bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
+      bifoldLeft(MN.empty(), { c, a -> c + f(a) }, { c, b -> c + g(b) })
     }
   }
 
@@ -526,15 +530,23 @@ public sealed class Ior<out A, out B> {
     )
 
   public inline fun <AA, C, D> bitraverseValidated(
-    SA: Semigroup<AA>,
+    combine: (AA, AA) -> AA,
     fa: (A) -> Validated<AA, C>,
     fb: (B) -> Validated<AA, D>
   ): Validated<AA, Ior<C, D>> =
     fold(
       { a -> fa(a).map { Left(it) } },
       { b -> fb(b).map { Right(it) } },
-      { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Both(aa, c) } }
+      { a, b -> fa(a).zip(combine, fb(b)) { aa, c -> Both(aa, c) } }
     )
+
+  @Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { bitraverseValidated({ x, y -> x + y }, fa, fb) }"))
+  public inline fun <AA, C, D> bitraverseValidated(
+    SA: Semigroup<AA>,
+    fa: (A) -> Validated<AA, C>,
+    fb: (B) -> Validated<AA, D>
+  ): Validated<AA, Ior<C, D>> =
+    SA.run { bitraverseValidated({ x, y -> x + y }, fa, fb) }
 
   public inline fun <C> crosswalk(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
@@ -684,18 +696,26 @@ public sealed class Ior<out A, out B> {
  *
  * @param f The function to bind across [Ior.Right].
  */
-public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> =
+public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Ior<A, D>): Ior<A, D> =
   when (this) {
     is Left -> this
     is Right -> f(value)
-    is Both -> with(SG) {
+    is Both ->
       f(this@flatMap.rightValue).fold(
-        { a -> Left(this@flatMap.leftValue.combine(a)) },
+        { a -> Left(combine(this@flatMap.leftValue, a)) },
         { d -> Both(this@flatMap.leftValue, d) },
-        { ll, rr -> Both(this@flatMap.leftValue.combine(ll), rr) }
+        { ll, rr -> Both(combine(this@flatMap.leftValue, ll), rr) }
       )
-    }
   }
+
+/**
+ * Binds the given function across [Ior.Right].
+ *
+ * @param f The function to bind across [Ior.Right].
+ */
+@Deprecated(SemigroupDeprecation, ReplaceWith("SG.run { flatMap({ x, y -> x + y}, f) }"))
+public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> =
+  SG.run { flatMap({ x, y -> x + y}, f) }
 
 public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B {
   contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
@@ -720,57 +740,64 @@ public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>
 public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
   bitraverseNullable(::identity, ::identity)
 
-public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
-  bitraverseValidated(SA, ::identity, ::identity)
+public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(combine: (A, A) -> A): Validated<A, Ior<B, C>> =
+  bitraverseValidated(combine, ::identity, ::identity)
 
-public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
-  with(SA) {
-    with(SB) {
-      when (val a = this@combine) {
-        is Ior.Left -> when (other) {
-          is Ior.Left -> Ior.Left(a.value + other.value)
-          is Ior.Right -> Ior.Both(a.value, other.value)
-          is Ior.Both -> Ior.Both(a.value + other.leftValue, other.rightValue)
-        }
-        is Ior.Right -> when (other) {
-          is Ior.Left -> Ior.Both(other.value, a.value)
-          is Ior.Right -> Ior.Right(a.value + other.value)
-          is Ior.Both -> Ior.Both(other.leftValue, a.value + other.rightValue)
-        }
-        is Ior.Both -> when (other) {
-          is Ior.Left -> Ior.Both(a.leftValue + other.value, a.rightValue)
-          is Ior.Right -> Ior.Both(a.leftValue, a.rightValue + other.value)
-          is Ior.Both -> Ior.Both(a.leftValue + other.leftValue, a.rightValue + other.rightValue)
-        }
-      }
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { bisequenceValidated { x, y -> x + y } }"))
+public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
+  SA.run { bisequenceValidated { x, y -> x + y } }
+
+public fun <A, B> Ior<A, B>.combine(combineA: (A, A) -> A, combineB: (B, B) -> B, other: Ior<A, B>): Ior<A, B> =
+  when (val a = this@combine) {
+    is Ior.Left -> when (other) {
+      is Ior.Left -> Ior.Left(combineA(a.value, other.value))
+      is Ior.Right -> Ior.Both(a.value, other.value)
+      is Ior.Both -> Ior.Both(combineA(a.value, other.leftValue), other.rightValue)
+    }
+    is Ior.Right -> when (other) {
+      is Ior.Left -> Ior.Both(other.value, a.value)
+      is Ior.Right -> Ior.Right(combineB(a.value, other.value))
+      is Ior.Both -> Ior.Both(other.leftValue, combineB(a.value, other.rightValue))
+    }
+    is Ior.Both -> when (other) {
+      is Ior.Left -> Ior.Both(combineA(a.leftValue, other.value), a.rightValue)
+      is Ior.Right -> Ior.Both(a.leftValue, combineB(a.rightValue, other.value))
+      is Ior.Both -> Ior.Both(combineA(a.leftValue, other.leftValue), combineB(a.rightValue, other.rightValue))
     }
   }
 
-@Suppress("NOTHING_TO_INLINE")
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { SB.run { combine({ x, y -> x + y }, { x, y -> x + y }, other) }}"))
+public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
+  SA.run { SB.run { combine({ x, y -> x + y }, { x, y -> x + y }, other) }}
+
+public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A, B> =
+  flatMap(combine, ::identity)
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { flatten { x, y -> x + y } }"))
 public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
-  flatMap(SA, ::identity)
+  SA.run { flatten { x, y -> x + y } }
 
+public fun <A, B> Ior<A, B>.replicate(combineA: (A, A) -> A, n: Int): Ior<A, List<B>> =
+  this.map { listOf(it) }.replicate(combineA, n, emptyList()) { x, y -> x + y }
+
+public fun <A, B> Ior<A, B>.replicate(combineA: (A, A) -> A, n: Int, emptyB: B, combineB: (B, B) -> B): Ior<A, B> =
+  if (n <= 0) Ior.Right(emptyB)
+  else when (this) {
+    is Ior.Right -> Ior.Right(List(n) { value }.fold(emptyB, combineB))
+    is Ior.Left -> this
+    is Ior.Both -> bimap(
+      { List(n - 1) { leftValue }.fold(leftValue, combineA) },
+      { List(n) { rightValue }.fold(emptyB, combineB) }
+    )
+  }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { replicate({ x, y -> x + y }, n) }"))
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
-  if (n <= 0) Ior.Right(emptyList())
-  else when (this) {
-    is Ior.Right -> Ior.Right(List(n) { value })
-    is Ior.Left -> this
-    is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } },
-      { List(n) { rightValue } }
-    )
-  }
+  SA.run { replicate({ x, y -> x + y }, n) }
 
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { MB.run { replicate({ x, y -> x + y }, n, empty(), { x, y -> x + y }) } }"))
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
-  if (n <= 0) Ior.Right(MB.empty())
-  else when (this) {
-    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })
-    is Ior.Left -> this
-    is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
-      { MB.run { List(n) { rightValue }.fold() } }
-    )
-  }
+  SA.run { MB.run { replicate({ x, y -> x + y }, n, empty(), { x, y -> x + y }) } }
 
 public fun <A, B> Ior<A, Iterable<B>>.sequence(): List<Ior<A, B>> =
   traverse(::identity)
@@ -826,18 +853,43 @@ public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
 public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
 
-public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
-  zip(SA, fb, ::Pair)
+public fun <A, B, C> Ior<A, B>.zip(combine: (A, A) -> A, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
+  zip(combine, fb, ::Pair)
 
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, fb) }"))
+public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
+  SA.run { zip({ x, y -> x + y }, fb) }
+
+public inline fun <A, B, C, D> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  map: (B, C) -> D
+): Ior<A, D> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, map) }"))
 public inline fun <A, B, C, D> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
   map: (B, C) -> D
 ): Ior<A, D> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+  return SA.run { zip({ x, y -> x + y }, c, map) }
 }
 
+public inline fun <A, B, C, D, E> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  map: (B, C, D) -> E
+): Ior<A, E> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, map) }"))
 public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -845,9 +897,21 @@ public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   map: (B, C, D) -> E
 ): Ior<A, E> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  return SA.run { zip({ x, y -> x + y }, c, d, map) }
 }
 
+public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  map: (B, C, D, E) -> F
+): Ior<A, F> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, map) }"))
 public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -856,9 +920,22 @@ public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   map: (B, C, D, E) -> F
 ): Ior<A, F> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, map) }
 }
 
+public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  map: (B, C, D, E, F) -> G
+): Ior<A, G> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, f, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, f, map) }"))
 public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -868,9 +945,23 @@ public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   map: (B, C, D, E, F) -> G
 ): Ior<A, G> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, Right.unit, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, map) }
 }
 
+public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  map: (B, C, D, E, F, G) -> H
+): Ior<A, H> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, d, c, e, f, g, map) }"))
 public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -881,9 +972,24 @@ public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   map: (B, C, D, E, F, G) -> H
 ): Ior<A, H> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, g, map) }
 }
 
+public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  map: (B, C, D, E, F, G, H) -> I
+): Ior<A, I> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, map) }"))
 public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -895,9 +1001,25 @@ public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H) -> I
 ): Ior<A, I> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, map) }
 }
 
+public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  map: (B, C, D, E, F, G, H, I) -> J
+): Ior<A, J> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, map) }"))
 public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -910,9 +1032,26 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I) -> J
 ): Ior<A, J> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, map) }
 }
 
+public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
+  combine: (A, A) -> A,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  j: Ior<A, J>,
+  map: (B, C, D, E, F, G, H, I, J) -> K
+): Ior<A, K> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(combine, c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, j, map) }"))
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -926,11 +1065,11 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Ior<A, K> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, j, map) }
 }
 
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
-  SA: Semigroup<A>,
+  combine: (A, A) -> A,
   c: Ior<A, C>,
   d: Ior<A, D>,
   e: Ior<A, E>,
@@ -970,49 +1109,62 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
     )
   } else EmptyValue
 
-  val leftValue: Any? = SA.run {
-    var accumulatedLeft: Any? = EmptyValue
+  var accumulatedLeft: Any? = EmptyValue
 
-    if (this@zip is Left) return@zip Left(this@zip.value)
-    accumulatedLeft =
-      if (this@zip is Both) this@zip.leftValue else accumulatedLeft
+  if (this@zip is Left) return Left(this@zip.value)
+  accumulatedLeft = if (this@zip is Both) this@zip.leftValue else accumulatedLeft
 
-    if (c is Left) return@zip Left(emptyCombine(accumulatedLeft, c.value))
-    accumulatedLeft = if (c is Both) emptyCombine(accumulatedLeft, c.leftValue) else accumulatedLeft
+  if (c is Left) return Left(emptyCombine(accumulatedLeft, c.value, combine))
+  accumulatedLeft = if (c is Both) emptyCombine(accumulatedLeft, c.leftValue, combine) else accumulatedLeft
 
-    if (d is Left) return@zip Left(emptyCombine(accumulatedLeft, d.value))
-    accumulatedLeft = if (d is Both) emptyCombine(accumulatedLeft, d.leftValue) else accumulatedLeft
+  if (d is Left) return Left(emptyCombine(accumulatedLeft, d.value, combine))
+  accumulatedLeft = if (d is Both) emptyCombine(accumulatedLeft, d.leftValue, combine) else accumulatedLeft
 
-    if (e is Left) return@zip Left(emptyCombine(accumulatedLeft, e.value))
-    accumulatedLeft = if (e is Both) emptyCombine(accumulatedLeft, e.leftValue) else accumulatedLeft
+  if (e is Left) return Left(emptyCombine(accumulatedLeft, e.value, combine))
+  accumulatedLeft = if (e is Both) emptyCombine(accumulatedLeft, e.leftValue, combine) else accumulatedLeft
 
-    if (f is Left) return@zip Left(emptyCombine(accumulatedLeft, f.value))
-    accumulatedLeft = if (f is Both) emptyCombine(accumulatedLeft, f.leftValue) else accumulatedLeft
+  if (f is Left) return Left(emptyCombine(accumulatedLeft, f.value, combine))
+  accumulatedLeft = if (f is Both) emptyCombine(accumulatedLeft, f.leftValue, combine) else accumulatedLeft
 
-    if (g is Left) return@zip Left(emptyCombine(accumulatedLeft, g.value))
-    accumulatedLeft = if (g is Both) emptyCombine(accumulatedLeft, g.leftValue) else accumulatedLeft
+  if (g is Left) return Left(emptyCombine(accumulatedLeft, g.value, combine))
+  accumulatedLeft = if (g is Both) emptyCombine(accumulatedLeft, g.leftValue, combine) else accumulatedLeft
 
-    if (h is Left) return@zip Left(emptyCombine(accumulatedLeft, h.value))
-    accumulatedLeft = if (h is Both) emptyCombine(accumulatedLeft, h.leftValue) else accumulatedLeft
+  if (h is Left) return Left(emptyCombine(accumulatedLeft, h.value, combine))
+  accumulatedLeft = if (h is Both) emptyCombine(accumulatedLeft, h.leftValue, combine) else accumulatedLeft
 
-    if (i is Left) return@zip Left(emptyCombine(accumulatedLeft, i.value))
-    accumulatedLeft = if (i is Both) emptyCombine(accumulatedLeft, i.leftValue) else accumulatedLeft
+  if (i is Left) return Left(emptyCombine(accumulatedLeft, i.value, combine))
+  accumulatedLeft = if (i is Both) emptyCombine(accumulatedLeft, i.leftValue, combine) else accumulatedLeft
 
-    if (j is Left) return@zip Left(emptyCombine(accumulatedLeft, j.value))
-    accumulatedLeft = if (j is Both) emptyCombine(accumulatedLeft, j.leftValue) else accumulatedLeft
+  if (j is Left) return Left(emptyCombine(accumulatedLeft, j.value, combine))
+  accumulatedLeft = if (j is Both) emptyCombine(accumulatedLeft, j.leftValue, combine) else accumulatedLeft
 
-    if (k is Left) return@zip Left(emptyCombine(accumulatedLeft, k.value))
-    accumulatedLeft = if (k is Both) emptyCombine(accumulatedLeft, k.leftValue) else accumulatedLeft
-
-    accumulatedLeft
-  }
+  if (k is Left) return Left(emptyCombine(accumulatedLeft, k.value, combine))
+  accumulatedLeft = if (k is Both) emptyCombine(accumulatedLeft, k.leftValue, combine) else accumulatedLeft
 
   return when {
-    rightValue != EmptyValue && leftValue == EmptyValue -> Right(rightValue as L)
-    rightValue != EmptyValue && leftValue != EmptyValue -> Both(leftValue as A, rightValue as L)
-    rightValue == EmptyValue && leftValue != EmptyValue -> Left(leftValue as A)
+    rightValue != EmptyValue && accumulatedLeft == EmptyValue -> Right(rightValue as L)
+    rightValue != EmptyValue && accumulatedLeft != EmptyValue -> Both(accumulatedLeft as A, rightValue as L)
+    rightValue == EmptyValue && accumulatedLeft != EmptyValue -> Left(accumulatedLeft as A)
     else -> throw ArrowCoreInternalException
   }
+}
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, j, k, map) }"))
+public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
+  SA: Semigroup<A>,
+  c: Ior<A, C>,
+  d: Ior<A, D>,
+  e: Ior<A, E>,
+  f: Ior<A, F>,
+  g: Ior<A, G>,
+  h: Ior<A, H>,
+  i: Ior<A, I>,
+  j: Ior<A, J>,
+  k: Ior<A, K>,
+  map: (B, C, D, E, F, G, H, I, J, K) -> L
+): Ior<A, L> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return SA.run { zip({ x, y -> x + y }, c, d, e, f, g, h, i, j, k, map) }
 }
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(other: Ior<A, B>): Int = fold(

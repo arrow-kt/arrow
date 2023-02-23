@@ -13,7 +13,6 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.emptyCombine
 import arrow.core.nel
-import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -24,16 +23,17 @@ import kotlin.jvm.JvmName
 
 /**
  * Accumulate the errors from running both [action1] and [action2]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference block: Raise<R>.(A, B) -> C
 ): C {
   contract {
+    callsInPlace(combineError, InvocationKind.AT_MOST_ONCE)
     callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
     callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
   }
@@ -48,18 +48,18 @@ public inline fun <R, A, B, C> Raise<R>.zipOrAccumulate(
     is Either.Left<R> ->
       when (result2) {
         is Either.Right<B> -> raise(result1.value)
-        is Either.Left<R> -> raise(semigroup.run { result1.value + result2.value })
+        is Either.Left<R> -> raise(combineError(result1.value, result2.value))
       }
   }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], and [action3]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -71,19 +71,19 @@ public inline fun <R, A, B, C, D> Raise<R>.zipOrAccumulate(
     callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2) { x, y -> x to y } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2) { x, y -> x to y } },
     action3
   ) { xy, z -> block(xy.first, xy.second, z) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], and [action4]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -97,19 +97,19 @@ public inline fun <R, A, B, C, D, E> Raise<R>.zipOrAccumulate(
     callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3) { x, y, z -> Triple(x, y, z) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3) { x, y, z -> Triple(x, y, z) } },
     action4
   ) { xyz, z -> block(xyz.first, xyz.second, xyz.third, z) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E, F> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -125,19 +125,19 @@ public inline fun <R, A, B, C, D, E, F> Raise<R>.zipOrAccumulate(
     callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3, action4) { x, y, z, u -> Tuple4(x, y, z, u) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3, action4) { x, y, z, u -> Tuple4(x, y, z, u) } },
     action5
   ) { xyzu, v -> block(xyzu.first, xyzu.second, xyzu.third, xyzu.fourth, v) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E, F, G> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -155,19 +155,19 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<R>.zipOrAccumulate(
     callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3, action4, action5) { x, y, z, u, v -> Tuple5(x, y, z, u, v) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3, action4, action5) { x, y, z, u, v -> Tuple5(x, y, z, u, v) } },
     action6
   ) { xyzuv, w -> block(xyzuv.first, xyzuv.second, xyzuv.third, xyzuv.fourth, xyzuv.fifth, w) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E, F, G, H> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -187,19 +187,19 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<R>.zipOrAccumulate(
     callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3, action4, action5, action6) { x, y, z, u, v, w -> Tuple6(x, y, z, u, v, w) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3, action4, action5, action6) { x, y, z, u, v, w -> Tuple6(x, y, z, u, v, w) } },
     action7
   ) { xyzuvw, a -> block(xyzuvw.first, xyzuvw.second, xyzuvw.third, xyzuvw.fourth, xyzuvw.fifth, xyzuvw.sixth, a) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -221,19 +221,19 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<R>.zipOrAccumulate(
     callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3, action4, action5, action6, action7) { x, y, z, u, v, w, a -> Tuple7(x, y, z, u, v, w, a) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3, action4, action5, action6, action7) { x, y, z, u, v, w, a -> Tuple7(x, y, z, u, v, w, a) } },
     action8
   ) { xyzuvwa, b -> block(xyzuvwa.first, xyzuvwa.second, xyzuvwa.third, xyzuvwa.fourth, xyzuvwa.fifth, xyzuvwa.sixth, xyzuvwa.seventh, b) }
 }
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9]
- * using the given [semigroup].
+ * using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<R>.zipOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   @BuilderInference action1: Raise<R>.() -> A,
   @BuilderInference action2: Raise<R>.() -> B,
   @BuilderInference action3: Raise<R>.() -> C,
@@ -257,8 +257,8 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<R>.zipOrAccumulate(
     callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    semigroup,
-    { zipOrAccumulate(semigroup, action1, action2, action3, action4, action5, action6, action7, action8) { x, y, z, u, v, w, a, b -> Tuple8(x, y, z, u, v, w, a, b) } },
+    combineError,
+    { zipOrAccumulate(combineError, action1, action2, action3, action4, action5, action6, action7, action8) { x, y, z, u, v, w, a, b -> Tuple8(x, y, z, u, v, w, a, b) } },
     action9
   ) { xyzuvwab, c -> block(xyzuvwab.first, xyzuvwab.second, xyzuvwab.third, xyzuvwab.fourth, xyzuvwab.fifth, xyzuvwab.sixth, xyzuvwab.seventh, xyzuvwab.eighth, c) }
 }
@@ -290,7 +290,7 @@ public inline fun <R, A, B, C> Raise<NonEmptyList<R>>.zipOrAccumulate(
     callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { x, y -> mapErrorNel { block(x, y) } }
@@ -313,7 +313,7 @@ public inline fun <R, A, B, C, D> Raise<NonEmptyList<R>>.zipOrAccumulate(
     callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -339,7 +339,7 @@ public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
     callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -368,7 +368,7 @@ public inline fun <R, A, B, C, D, E, F> Raise<NonEmptyList<R>>.zipOrAccumulate(
     callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -400,7 +400,7 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<NonEmptyList<R>>.zipOrAccumulat
     callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -435,7 +435,7 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<NonEmptyList<R>>.zipOrAccumu
     callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -473,7 +473,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<R>>.zipOrAcc
     callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -514,7 +514,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<R>>.zipOr
     callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
   }
   return zipOrAccumulate(
-    Semigroup.nonEmptyList(),
+    { x, y -> x + y },
     { mapErrorNel(action1) },
     { mapErrorNel(action2) },
     { mapErrorNel(action3) },
@@ -530,11 +530,11 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<R>>.zipOr
 
 /**
  * Accumulate the errors obtained by executing the [block]
- * over every element of [list] using the given [semigroup].
+ * over every element of [list] using the given [combineError].
  */
 @RaiseDSL
 public inline fun <R, A, B> Raise<R>.mapOrAccumulate(
-  semigroup: Semigroup<@UnsafeVariance R>,
+  combineError: (R, R) -> R,
   list: Iterable<A>,
   @BuilderInference block: Raise<R>.(A) -> B
 ): List<B> {
@@ -546,7 +546,7 @@ public inline fun <R, A, B> Raise<R>.mapOrAccumulate(
       fold<R, B, Unit>({
         block(it)
       }, { newError ->
-        error = semigroup.emptyCombine(error, newError)
+        error = emptyCombine(error, newError, combineError)
       }, {
         add(it)
       })
@@ -567,4 +567,4 @@ public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
   @BuilderInference crossinline block: Raise<R>.(A) -> B
 ): List<B> =
-  mapOrAccumulate(Semigroup.nonEmptyList(), list) { elt -> mapErrorNel { block(elt) } }
+  mapOrAccumulate({ x, y -> x + y }, list) { elt -> mapErrorNel { block(elt) } }
