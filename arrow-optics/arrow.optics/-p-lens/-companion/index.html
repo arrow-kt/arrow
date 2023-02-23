@@ -1,0 +1,295 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Companion</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.34.1+eeb4c14
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-optics::arrow.optics/PLens.Companion///PointingToDeclaration//-682136119">
+  <div class="breadcrumbs"><a href="../../../index.html">arrow-optics</a><span class="delimiter">/</span><a href="../../index.html">arrow.optics</a><span class="delimiter">/</span><a href="../index.html">PLens</a><span class="delimiter">/</span><span class="current">Companion</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Companion</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/optics/arrow-optics/src/commonMain/kotlin/arrow/optics/Lens.kt#L88">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="1480292501%2FFunctions%2F-682136119" anchor-label="codiagonal" id="1480292501%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="codiagonal.html"><span><span>codiagonal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1480292501%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="codiagonal.html">S</a><span class="token operator">&gt; </span><a href="codiagonal.html"><span class="token function">codiagonal</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="codiagonal.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="codiagonal.html">S</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="codiagonal.html">S</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> that takes either <a href="codiagonal.html">S</a> or <a href="codiagonal.html">S</a> and strips the choice of <a href="codiagonal.html">S</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1541918299%2FFunctions%2F-682136119" anchor-label="id" id="1541918299%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="id.html"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1541918299%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="id.html">S</a><span class="token operator">&gt; </span><a href="id.html"><span class="token function">id</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../-p-iso/index.html">PIso</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="id.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="id.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="id.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="id.html">S</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="454755712%2FFunctions%2F-682136119" anchor-label="invoke" id="454755712%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="invoke.html"><span><span>invoke</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="454755712%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="invoke.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">B</a><span class="token operator">&gt; </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">get<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="invoke.html">S</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="invoke.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">set<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="invoke.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">B</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="invoke.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="invoke.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="invoke.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Invoke operator overload to create a <a href="../index.html">PLens</a> of type <code class="lang-kotlin">S</code> with target <code class="lang-kotlin">A</code>. Can also be used to construct <a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1067151656%2FFunctions%2F-682136119" anchor-label="nonEmptyListHead" id="-1067151656%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="non-empty-list-head.html"><span>non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span><span>Head</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1067151656%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="non-empty-list-head.html">A</a><span class="token operator">&gt; </span><a href="non-empty-list-head.html"><span class="token function">nonEmptyListHead</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="non-empty-list-head.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="non-empty-list-head.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to operate on the head of a <a href="../../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-969783704%2FFunctions%2F-682136119" anchor-label="nonEmptyListTail" id="-969783704%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="non-empty-list-tail.html"><span>non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span><span>Tail</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-969783704%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="non-empty-list-tail.html">A</a><span class="token operator">&gt; </span><a href="non-empty-list-tail.html"><span class="token function">nonEmptyListTail</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="non-empty-list-tail.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="non-empty-list-tail.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to operate on the tail of a <a href="../../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1440584462%2FFunctions%2F-682136119" anchor-label="pairFirst" id="1440584462%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="pair-first.html"><span>pair</span><wbr><span><span>First</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1440584462%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-first.html">B</a><span class="token operator">&gt; </span><a href="pair-first.html"><span class="token function">pairFirst</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-first.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-first.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to focus into the first value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-527137860%2FFunctions%2F-682136119" anchor-label="pairPFirst" id="-527137860%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="pair-p-first.html"><span>pair</span><wbr><span><span>PFirst</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-527137860%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">R</a><span class="token operator">&gt; </span><a href="pair-p-first.html"><span class="token function">pairPFirst</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-first.html">R</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-first.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> to focus into the first value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-102640902%2FFunctions%2F-682136119" anchor-label="pairPSecond" id="-102640902%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="pair-p-second.html"><span>pair</span><wbr><span><span>PSecond</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-102640902%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">R</a><span class="token operator">&gt; </span><a href="pair-p-second.html"><span class="token function">pairPSecond</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">R</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-p-second.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> to focus into the second value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="767208936%2FFunctions%2F-682136119" anchor-label="pairSecond" id="767208936%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="pair-second.html"><span>pair</span><wbr><span><span>Second</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="767208936%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-second.html">B</a><span class="token operator">&gt; </span><a href="pair-second.html"><span class="token function">pairSecond</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="pair-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-second.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="pair-second.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to focus into the second value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-221431854%2FFunctions%2F-682136119" anchor-label="tripleFirst" id="-221431854%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-first.html"><span>triple</span><wbr><span><span>First</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-221431854%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-first.html">C</a><span class="token operator">&gt; </span><a href="triple-first.html"><span class="token function">tripleFirst</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-first.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-first.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to focus into the first value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-510036104%2FFunctions%2F-682136119" anchor-label="triplePFirst" id="-510036104%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-p-first.html"><span>triple</span><wbr><span><span>PFirst</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-510036104%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">R</a><span class="token operator">&gt; </span><a href="triple-p-first.html"><span class="token function">triplePFirst</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-first.html">R</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-first.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> to focus into the first value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="427513534%2FFunctions%2F-682136119" anchor-label="triplePSecond" id="427513534%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-p-second.html"><span>triple</span><wbr><span><span>PSecond</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="427513534%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">R</a><span class="token operator">&gt; </span><a href="triple-p-second.html"><span class="token function">triplePSecond</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">R</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-second.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> to focus into the second value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-210014047%2FFunctions%2F-682136119" anchor-label="triplePThird" id="-210014047%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-p-third.html"><span>triple</span><wbr><span><span>PThird</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-210014047%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-third.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">R</a><span class="token operator">&gt; </span><a href="triple-p-third.html"><span class="token function">triplePThird</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">PLens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-third.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-p-third.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">R</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-p-third.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../index.html">PLens</a> to focus into the third value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="784310692%2FFunctions%2F-682136119" anchor-label="tripleSecond" id="784310692%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-second.html"><span>triple</span><wbr><span><span>Second</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="784310692%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-second.html">C</a><span class="token operator">&gt; </span><a href="triple-second.html"><span class="token function">tripleSecond</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-second.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-second.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-second.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-second.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to focus into the second value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="78590203%2FFunctions%2F-682136119" anchor-label="tripleThird" id="78590203%2FFunctions%2F-682136119" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="triple-third.html"><span>triple</span><wbr><span><span>Third</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="78590203%2FFunctions%2F-682136119"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-third.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-third.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-third.html">C</a><span class="token operator">&gt; </span><a href="triple-third.html"><span class="token function">tripleThird</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="triple-third.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-third.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-third.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="triple-third.html">C</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="../../index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> to focus into the third value of a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-triple/index.html">Triple</a></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Resource</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.34.1+eeb4c14
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/Resource///PointingToDeclaration//-245591949">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">Resource</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Resource</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/Resource.kt#L22">source</a>)</span></span></div><p class="paragraph"><a href="index.html">Resource</a> models resource allocation and releasing. It is especially useful when multiple resources that depend on each other need to be acquired and later released in reverse order. The capability of <i>installing</i> resources is called <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a>, and <a href="index.html">Resource</a> defines the value associating the <code class="lang-kotlin">acquisition</code> step, and the <code class="lang-kotlin">finalizer</code>. <a href="index.html">Resource</a> allocates and releases resources in a safe way that co-operates with Structured Concurrency, and KotlinX Coroutines.</p><p class="paragraph">It is especially useful when multiple resources that depend on each other need to be acquired, and later released in reverse order. Or when you want to compose other <code class="lang-kotlin">suspend</code> functionality into resource safe programs, such as concurrency, parallelism or Arrow's Effect.</p><p class="paragraph">Creating a <a href="index.html">Resource</a> <i>value</i> can be done using the <a href="../resource.html">resource</a> function, and running a program using <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a> can be done using <a href="../resource-scope.html">resourceScope</a>, or <a href="use.html">use</a>. Upon termination all finalizers are then guaranteed to run afterwards in reverse order of acquisition.</p><p class="paragraph">The following program is <strong>not-safe</strong> because it is prone to leak <code class="lang-kotlin">dataSource</code> and <code class="lang-kotlin">userProcessor</code> when an exception, or cancellation signal occurs whilst using the service.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">class UserProcessor {<br>  fun start(): Unit = println("Creating UserProcessor")<br>  fun shutdown(): Unit = println("Shutting down UserProcessor")<br>}<br><br>class DataSource {<br>  fun connect(): Unit = println("Connecting dataSource")<br>  fun close(): Unit = println("Closed dataSource")<br>}<br><br>class Service(val db: DataSource, val userProcessor: UserProcessor) {<br>  suspend fun processData(): List&lt;String&gt; = throw RuntimeException("I'm going to leak resources by not closing them")<br>}<br><br>suspend fun main(): Unit {<br>  val userProcessor = UserProcessor().also { it.start() }<br>  val dataSource = DataSource().also { it.connect() }<br>  val service = Service(dataSource, userProcessor)<br><br>  service.processData()<br><br>  dataSource.close()<br>  userProcessor.shutdown()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-01.kt --><p class="paragraph">If we were using Kotlin JVM, we might've relied on <code class="lang-kotlin">Closeable</code> or <code class="lang-kotlin">AutoCloseable</code> and rewritten our code to:</p><!-- INCLUDE
+import java.io.Closeable
+
+class UserProcessor : Closeable {
+fun start(): Unit = println("Creating UserProcessor")
+override fun close(): Unit = println("Shutting down UserProcessor")
+}
+
+class DataSource : Closeable {
+fun connect(): Unit = println("Connecting dataSource")
+override fun close(): Unit = println("Closed dataSource")
+}
+
+class Service(val db: DataSource, val userProcessor: UserProcessor) {
+suspend fun processData(): List<String> = throw RuntimeException("I'm going to leak resources by not closing them")
+}
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main(): Unit {<br>  UserProcessor().use { userProcessor -&gt;<br>    userProcessor.start()<br>    DataSource().use { dataSource -&gt;<br>      dataSource.connect()<br>      Service(dataSource, userProcessor).processData()<br>    }<br>  }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-02.kt --><p class="paragraph">However, while we fixed closing of <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> there are issues still with this code:</p><ol><li><p class="paragraph">It requires implementing <code class="lang-kotlin">Closeable</code> or <code class="lang-kotlin">AutoCloseable</code>, only possible for Kotlin JVM, not available for Kotlin MPP</p></li><li><p class="paragraph">Requires implementing interface, or wrapping external types with i.e. <code class="lang-kotlin">class CloseableOf&lt;A&gt;(val type: A): Closeable</code>.</p></li><li><p class="paragraph">Requires nesting of different resources in callback tree, not composable.</p></li><li><p class="paragraph">Enforces <code class="lang-kotlin">close</code> method name, renamed <code class="lang-kotlin">UserProcessor#shutdown</code> to <code class="lang-kotlin">close</code></p></li><li><p class="paragraph">Cannot run suspend functions upon <i>fun close(): Unit</i>.</p></li><li><p class="paragraph">No exit signal, we don't know if we exited successfully, with an error or cancellation.</p></li></ol><p class="paragraph"><a href="index.html">Resource</a> solves of these issues. It defines 3 different steps:</p><ol><li><p class="paragraph">Acquiring the resource of <code class="lang-kotlin">A</code>.</p></li><li><p class="paragraph">Using <code class="lang-kotlin">A</code>.</p></li><li><p class="paragraph">Releasing <code class="lang-kotlin">A</code> with <a href="../-exit-case/-completed/index.html">ExitCase.Completed</a>, <a href="../-exit-case/-failure/index.html">ExitCase.Failure</a> or <a href="../-exit-case/-cancelled/index.html">ExitCase.Cancelled</a>.</p></li></ol><p class="paragraph">We rewrite our previous example to <a href="index.html">Resource</a> below by:</p><ol><li><p class="paragraph">Define <a href="index.html">Resource</a> for <code class="lang-kotlin">UserProcessor</code>.</p></li><li><p class="paragraph">Define <a href="index.html">Resource</a> for <code class="lang-kotlin">DataSource</code>, that also logs the <a href="../-exit-case/index.html">ExitCase</a>.</p></li><li><p class="paragraph">Compose <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> <a href="index.html">Resource</a> together into a <a href="index.html">Resource</a> for <code class="lang-kotlin">Service</code>.</p></li></ol><!-- INCLUDE
+import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.resource
+import arrow.fx.coroutines.resourceScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class UserProcessor {
+suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
+suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
+    println("Shutting down UserProcessor")
+}
+}
+
+class DataSource {
+fun connect(): Unit = println("Connecting dataSource")
+fun close(): Unit = println("Closed dataSource")
+}
+
+class Service(val db: DataSource, val userProcessor: UserProcessor) {
+suspend fun processData(): List<String> = throw RuntimeException("I'm going to leak resources by not closing them")
+}
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor: Resource&lt;UserProcessor&gt; = resource({<br>  UserProcessor().also { it.start() }<br>}) { p, _ -&gt; p.shutdown() }<br><br>val dataSource: Resource&lt;DataSource&gt; = resource({<br>  DataSource().also { it.connect() }<br>}) { ds, exitCase -&gt;<br>  println("Releasing $ds with exit: $exitCase")<br>  withContext(Dispatchers.IO) { ds.close() }<br>}<br><br>val service: Resource&lt;Service&gt; = resource {<br>  Service(dataSource.bind(), userProcessor.bind())<br>}<br><br>suspend fun main(): Unit = resourceScope {<br>  val data = service.bind().processData()<br>  println(data)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-03.kt --><p class="paragraph">There is a lot going on in the snippet above, which we'll analyse in the sections below. Looking at the above example it should already give you some idea if the capabilities of <a href="index.html">Resource</a>.</p><h2 class=""> Resource constructors</h2><p class="paragraph"><a href="index.html">Resource</a> works entirely through a DSL, which allows <i>installing</i> a <code class="lang-kotlin">Resource</code> through the <code class="lang-kotlin">suspend fun &lt;A&gt; install(acquire: suspend () -&gt; A, release: suspend (A, ExitCase) -&gt; Unit): A</code> function.</p><p class="paragraph"><code class="lang-kotlin">acquire</code> is used to <i>allocate</i> the <code class="lang-kotlin">Resource</code>, and before returning the resource <code class="lang-kotlin">A</code> it also install the <code class="lang-kotlin">release</code> handler into the <code class="lang-kotlin">ResourceScope</code>.</p><p class="paragraph">We can use <code class="lang-kotlin">suspend fun</code> with <code class="lang-kotlin">Scope</code> as an extension function receiver to create synthetic constructors for our <code class="lang-kotlin">Resource</code>s. If you're using <i>context receivers</i> you can also use <code class="lang-kotlin">context(Scope)</code> instead.</p><!-- INCLUDE
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class UserProcessor {
+suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
+suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
+    println("Shutting down UserProcessor")
+}
+}
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun ResourceScope.userProcessor(): UserProcessor =<br>  install({  UserProcessor().also { it.start() } }) { processor, _ -&gt;<br>    processor.shutdown()<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can of course also create <code class="lang-kotlin">lazy</code> representations of this by wrapping <code class="lang-kotlin">install</code> in <a href="../resource.html">resource</a> and returning the <code class="lang-kotlin">suspend lambda</code> value instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor: Resource&lt;UserProcessor&gt; = resource {<br>  val x: UserProcessor = install(<br>    {  UserProcessor().also { it.start() } },<br>    { processor, _ -&gt; processor.shutdown() }<br>  )<br>  x<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">There is also a convenience operator for this pattern, but you might have preferred <code class="lang-kotlin">ResourceScope::userProcessor</code> instead since it yields the same result.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor2: Resource&lt;UserProcessor&gt; = resource({<br>  UserProcessor().also { it.start() }<br>}) { processor, _ -&gt; processor.shutdown() }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-04.kt --><h2 class=""> Scope DSL</h2><p class="paragraph">The <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a> DSL allows you to <i>install</i> resources, and interact with them in a safe way.</p><p class="paragraph">Arrow offers the same elegant <code class="lang-kotlin">bind</code> DSL for Resource composition as you might be familiar with from Arrow Core. Which we've already seen above, in our first example. What is more interesting, is that we can also compose it with any other existing pattern from Arrow! Let's compose our <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> in parallel, so that their <code class="lang-kotlin">start</code> and <code class="lang-kotlin">connect</code> methods can run in parallel.</p><!-- INCLUDE
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resourceScope
+import arrow.fx.coroutines.parZip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class UserProcessor {
+suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
+suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
+    println("Shutting down UserProcessor")
+}
+}
+
+class DataSource {
+suspend fun connect(): Unit = withContext(Dispatchers.IO) { println("Connecting dataSource") }
+suspend fun close(): Unit = withContext(Dispatchers.IO) { println("Closed dataSource") }
+}
+
+class Service(val db: DataSource, val userProcessor: UserProcessor) {
+suspend fun processData(): List<String> = (0..10).map { "Processed : $it" }
+}
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun ResourceScope.userProcessor(): UserProcessor =<br>  install({ UserProcessor().also { it.start() } }){ p,_ -&gt; p.shutdown() }<br><br>suspend fun ResourceScope.dataSource(): DataSource =<br>  install({ DataSource().also { it.connect() } }) { ds, _ -&gt; ds.close() }<br><br>suspend fun main(): Unit = resourceScope {<br>  val service = parZip({ userProcessor() }, { dataSource() }) { userProcessor, ds -&gt;<br>    Service(ds, userProcessor)<br>  }<br>  val data = service.processData()<br>  println(data)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-05.kt --><h2 class=""> Conclusion</h2><p class="paragraph"><a href="index.html">Resource</a> guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the <span data-unresolved-link="kotlinx.coroutines/Job///PointingToDeclaration/">kotlinx.coroutines.Job</span> is running gets canceled.</p><p class="paragraph">To achieve this <a href="index.html">Resource</a> ensures that the <code class="lang-kotlin">acquire</code>&amp;<code class="lang-kotlin">release</code> step are <span data-unresolved-link="kotlinx.coroutines/NonCancellable///PointingToDeclaration/">NonCancellable</span>. If a cancellation signal, or an exception is received during <code class="lang-kotlin">acquire</code>, the resource is assumed to not have been acquired and thus will not trigger the release function. =&gt; Any composed resources that are already acquired they will be guaranteed to release as expected.</p><p class="paragraph">If you don't need a data-type like <a href="index.html">Resource</a> but want a function alternative to <code class="lang-kotlin">try/catch/finally</code> with automatic error composition, and automatic <span data-unresolved-link="kotlinx.coroutines/NonCancellable///PointingToDeclaration/">NonCancellable</span> <code class="lang-kotlin">acquire</code> and <code class="lang-kotlin">release</code> steps use <a href="../bracket-case.html">bracketCase</a> or <a href="../bracket.html">bracket</a>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Extensions">Extensions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-1559173624%2FClasslikes%2F-245591949" anchor-label="Companion" id="-1559173624%2FClasslikes%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1559173624%2FClasslikes%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="2076549532%2FFunctions%2F-245591949" anchor-label="allocate" id="2076549532%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="allocate.html"><span><span>allocate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2076549532%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.coroutines/DelicateCoroutinesApi///PointingToDeclaration/"><span class="token annotation builtin">DelicateCoroutinesApi</span></span></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="allocate.html"><span class="token function">allocate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Deconstruct <a href="index.html">Resource</a> into an <a href="index.html">A</a> and a <code class="lang-kotlin">release</code> handler. The <code class="lang-kotlin">release</code> action <strong>must</strong> always be called, if  never called, then the resource <a href="index.html">A</a> will leak. The <code class="lang-kotlin">release</code> step is already made <code class="lang-kotlin">NonCancellable</code> to guarantee correct invocation like <code class="lang-kotlin">Resource</code> or <code class="lang-kotlin">bracketCase</code>, and it will automatically rethrow, and compose, the exceptions as needed.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1632277329%2FFunctions%2F-245591949" anchor-label="use" id="-1632277329%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="use.html"><span><span>use</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1632277329%2FFunctions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">infix suspend tailrec </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="use.html">B</a><span class="token operator">&gt; </span><a href="use.html"><span class="token function">use</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="use.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="use.html">B</a></div><div class="brief "><p class="paragraph">Use the created resource When done will run all finalizers</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="tabbedcontent">Extensions</h2>
+      <div class="table" data-togglable="Extensions"><a data-name="-1264735013%2FExtensions%2F-245591949" anchor-label="asFlow" id="-1264735013%2FExtensions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../as-flow.html"><span>as</span><wbr><span><span>Flow</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1264735013%2FExtensions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../as-flow.html">A</a><span class="token operator">&gt; </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../as-flow.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../as-flow.html"><span class="token function">asFlow</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../as-flow.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs <a href="use.html">Resource.use</a> and emits <a href="../as-flow.html">A</a> of the resource</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2109962504%2FExtensions%2F-245591949" anchor-label="release" id="-2109962504%2FExtensions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../release.html"><span><span>release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2109962504%2FExtensions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release.html">A</a><span class="token operator">&gt; </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../release.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Composes a <a href="../release.html">release</a> action to a <a href="use.html">Resource.use</a> action creating a <a href="index.html">Resource</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2090624287%2FExtensions%2F-245591949" anchor-label="releaseCase" id="2090624287%2FExtensions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../release-case.html"><span>release</span><wbr><span><span>Case</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2090624287%2FExtensions%2F-245591949"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release-case.html">A</a><span class="token operator">&gt; </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release-case.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../release-case.html"><span class="token function">releaseCase</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../release-case.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../release-case.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Composes a <a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/index.html">releaseCase</a> action to a <a href="use.html">Resource.use</a> action creating a <a href="index.html">Resource</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

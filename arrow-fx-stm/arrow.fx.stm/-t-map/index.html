@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>TMap</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.34.1+eeb4c14
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-stm::arrow.fx.stm/TMap///PointingToDeclaration//-2117640706">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-fx-stm</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.stm</a><span class="delimiter">/</span><span class="current">TMap</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>TMap</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">TMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">V</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-stm/src/commonMain/kotlin/arrow/fx/stm/TMap.kt#L9">source</a>)</span></span></div><p class="paragraph">A <a href="index.html">TMap</a> is a concurrent transactional implementation of a key value hashmap.</p><p class="paragraph">Based on a Hash-Array-Mapped-Trie implementation. While this does mean that a read may take up to 5 steps to be resolved (depending on how well distributed the hash function is), it also means that structural changes can be isolated and thus do not increase contention with other transactions. This effectively means concurrent access to different values is unlikely to interfere with each other.</p><blockquote class="quotation"><p class="paragraph">Hash conflicts are resolved by chaining.</p></blockquote><h2 class=""> Creating a <a href="index.html">TMap</a></h2><p class="paragraph">Depending on whether or not you are in a transaction you can use either <a href="../new-t-map.html">STM.newTMap</a> or <a href="-companion/new.html">TMap.new</a> to create a new <a href="index.html">TMap</a>.</p><p class="paragraph">There are a few alternatives because <a href="index.html">TMap</a> can be supplied a custom hash strategy. If no argument is given it defaults to <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/hash-code.html">Any.hashCode</a>.</p><h2 class=""> Reading an element with a key</h2><p class="paragraph">Reading from a <a href="index.html">TMap</a> can be done using either <a href="../-s-t-m/lookup.html">STM.lookup</a> or its alias <a href="../-s-t-m/get.html">STM.get</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap.set(1, "Hello")<br>    tmap[2] = "World"<br><br>    tmap.lookup(1) + tmap[2]<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-01.kt --><blockquote class="quotation"><p class="paragraph">If the key is not present <a href="../-s-t-m/lookup.html">STM.lookup</a> will not retry, instead it returns <code class="lang-kotlin">null</code>.</p></blockquote><h2 class=""> Inserting a value</h2><p class="paragraph">Inserting can be done using either <a href="../-s-t-m/insert.html">STM.insert</a> or its alias <a href="../-s-t-m/set.html">STM.set</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap.insert(1, "Hello")<br>    tmap[2] = "World"<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-02.kt --><p class="paragraph">Another option when adding elements is to use <a href="../-s-t-m/plus-assign.html">STM.plusAssign</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap += (1 to "Hello")<br>    tmap += (2 to "World")<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-03.kt --><h2 class=""> Updating an existing value <a href="index.html">TMap</a>:</h2><p class="paragraph">Using <a href="../-s-t-m/update.html">STM.update</a> it is possible to update an existing value of a <a href="index.html">TMap</a>. If the value is not present it does nothing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap[2] = "World"<br><br>    tmap.update(1) { it.reversed() }<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-04.kt --><h2 class=""> Checking membership</h2><p class="paragraph">Using <a href="../-s-t-m/member.html">STM.member</a> it is possible to check if a <a href="index.html">TMap</a> contains a value for a key:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap.member(1)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-05.kt --><h2 class=""> Removing a value from a <a href="index.html">TMap</a></h2><p class="paragraph">Removing is done by using <a href="../-s-t-m/remove.html">STM.remove</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap[1] = "Hello"<br><br>    tmap.remove(1)<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-06.kt --><h2 class=""> Where are operations like <code class="lang-kotlin">isEmpty</code> or <code class="lang-kotlin">size</code>?</h2><p class="paragraph">This is a design tradeoff. It is entirely possible to track size however this usually requires one additional <a href="../-t-var/index.html">TVar</a> for size and almost every operation would modify that. That will lead to contention and thus decrease performance.</p><p class="paragraph">Should this feature interest you and performance is not as important please open an issue. It is most certainly possible to add another version of <a href="index.html">TMap</a> that keeps track of its size.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-950782831%2FClasslikes%2F-2117640706" anchor-label="Companion" id="-950782831%2FClasslikes%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-950782831%2FClasslikes%2F-2117640706"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+

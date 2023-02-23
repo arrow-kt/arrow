@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CircuitBreaker</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.34.1+eeb4c14
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-fx-resilience::arrow.fx.resilience/CircuitBreaker///PointingToDeclaration//-880363011">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-fx-resilience</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.resilience</a><span class="delimiter">/</span><span class="current">CircuitBreaker</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Circuit</span><wbr><span><span>Breaker</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CircuitBreaker</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-resilience/src/commonMain/kotlin/arrow/fx/resilience/CircuitBreaker.kt#L18">source</a>)</span></span></div><p class="paragraph">A <a href="index.html">CircuitBreaker</a> is used to <code class="lang-kotlin">protect</code> resources or services from being overloaded When a service is being overloaded, interacting with it more will only worsen its overloaded state. Especially when combined with retry mechanisms such as <a href="../-schedule/index.html">Schedule</a>, in some cases simply using a back-off retry policy might not be sufficient during peak traffics.</p><p class="paragraph">To allow such overloaded resources from overloading, <a href="index.html">CircuitBreaker</a> can help you <code class="lang-kotlin">protect</code> the service by failing-fast. Thus <a href="index.html">CircuitBreaker</a> helps us to achieve stability and prevent cascading failures in distributed systems.</p><p class="paragraph"><a href="index.html">CircuitBreaker</a> has three <a href="-state/index.html">CircuitBreaker.State</a>:</p><ol><li><p class="paragraph"><a href="-state/-closed/index.html">Closed</a>: This is its normal state, where requests are being made. The state in which <a href="index.html">CircuitBreaker</a> starts.</p></li><ul><li><p class="paragraph">When an exception occurs it increments the failure counter</p></li><li><p class="paragraph">A successful request will reset the failure counter to zero</p></li><li><p class="paragraph">When the failure counter reaches the <a href="../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/max-failures.html">maxFailures</a> threshold, the breaker is tripped into the <a href="-state/-open/index.html">Open</a> state</p></li></ul><li><p class="paragraph"><a href="-state/-open/index.html">Open</a>: The <a href="index.html">CircuitBreaker</a> will short-circuit/fail-fast all requests</p></li><ul><li><p class="paragraph">All requests short-circuit/fail-fast with <code class="lang-kotlin">ExecutionRejected</code></p></li><li><p class="paragraph">If a request is made after the configured <a href="../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/reset-timeout.html">resetTimeout</a> passes, the <a href="index.html">CircuitBreaker</a> is tripped into the a <a href="-state/-half-open/index.html">HalfOpen</a> state, allowing one request to go through as a test.</p></li></ul><li><p class="paragraph"><a href="-state/-half-open/index.html">HalfOpen</a>: The <a href="index.html">CircuitBreaker</a> is in this state while it's allowing a request to go through, as a <code class="lang-kotlin">test request</code></p></li><ul><li><p class="paragraph">All other requests made while <code class="lang-kotlin">test request</code> is still running will short-circuit/fail-fast.</p></li><li><p class="paragraph">If the <code class="lang-kotlin">test request</code> succeeds then the <a href="index.html">CircuitBreaker</a> is tripped back into <a href="-state/-closed/index.html">Closed</a>, with the resetTimeout and the failures count also reset to initial values.</p></li><li><p class="paragraph">If the <code class="lang-kotlin">test request</code> fails, then the <a href="index.html">CircuitBreaker</a> is tripped back into <a href="-state/-open/index.html">Open</a>, the <a href="../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/reset-timeout.html">resetTimeout</a> is multiplied by the <a href="../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/exponential-backoff-factor.html">exponentialBackoffFactor</a>, up to the configured <a href="../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/max-reset-timeout.html">maxResetTimeout</a>.</p></li></ul></ol><p class="paragraph">Let's say we'd want to create a <a href="index.html">CircuitBreaker</a> that only allows us to call a remote service twice, and then whenever more than two requests fail with an exception, the circuit breaker starts short-circuiting failing-fast.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Either<br>import arrow.fx.resilience.CircuitBreaker<br>import kotlin.time.Duration.Companion.seconds<br>import kotlin.time.ExperimentalTime<br>import kotlinx.coroutines.delay<br><br>@ExperimentalTime<br>suspend fun main(): Unit {<br>//sampleStart<br>  val circuitBreaker = CircuitBreaker.of(<br>    maxFailures = 2,<br>    resetTimeout = 2.seconds,<br>    exponentialBackoffFactor = 1.2,<br>    maxResetTimeout = 60.seconds,<br>  )<br>  circuitBreaker.protectOrThrow { "I am in Closed: ${circuitBreaker.state()}" }.also(::println)<br><br>  println("Service getting overloaded . . .")<br><br>  Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)<br>  Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)<br>  circuitBreaker.protectEither { }.also { println("I am Open and short-circuit with ${it}. ${circuitBreaker.state()}") }<br><br>  println("Service recovering . . .").also { delay(2000) }<br><br>  circuitBreaker.protectOrThrow { "I am running test-request in HalfOpen: ${circuitBreaker.state()}" }.also(::println)<br>  println("I am back to normal state closed ${circuitBreaker.state()}")<br>//sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-circuitbreaker-01.kt --><p class="paragraph">A common pattern to make fault-tolerant/resilient systems is to compose a <a href="index.html">CircuitBreaker</a> with a backing-off policy retry Schedule to guarantee not overloading the resource and the client interacting with it. but also not the client that is interacting with the resource. Below you can see how the simple <code class="lang-kotlin">retry</code> function will result in <code class="lang-kotlin">Either.Left&lt;CircuitBreaker.RejectedExecution&gt;</code>, but when we combine it with another schedule, it will always call the <code class="lang-kotlin">CircuitBreaker</code> on times that it could've entered the <a href="-state/-half-open/index.html">HalfOpen</a> state. The reason why <a href="../-schedule/index.html">Schedule</a> is not sufficient to make your system resilient is because you also have to take into account parallel calls to your functions, ; In contrast, a <a href="index.html">CircuitBreaker</a> can track failures of every function call or even different functions to the same resource or service.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Either<br>import arrow.fx.resilience.CircuitBreaker<br>import arrow.fx.resilience.Schedule<br>import arrow.fx.resilience.retry<br>import kotlin.time.Duration.Companion.seconds<br>import kotlin.time.ExperimentalTime<br>import kotlinx.coroutines.delay<br><br>@ExperimentalTime<br>suspend fun main(): Unit {<br>  suspend fun apiCall(): Unit {<br>    println("apiCall . . .")<br>    throw RuntimeException("Overloaded service")<br>  }<br><br>  //sampleStart<br>  val circuitBreaker = CircuitBreaker.of(<br>    maxFailures = 2,<br>    resetTimeout = 2.seconds,<br>    exponentialBackoffFactor = 2.0, // enable exponentialBackoffFactor<br>    maxResetTimeout = 60.seconds, // limit exponential back-off time<br>  )<br><br>  suspend fun &lt;A&gt; resilient(schedule: Schedule&lt;Throwable, *&gt;, f: suspend () -&gt; A): A =<br>    schedule.retry { circuitBreaker.protectOrThrow(f) }<br><br>  Either.catch {<br>    resilient(Schedule.recurs(5), ::apiCall)<br>  }.let { println("recurs(5) apiCall twice and 4x short-circuit result from CircuitBreaker: $it") }<br><br>  delay(2000)<br>  println("CircuitBreaker ready to half-open")<br><br>  // Retry once and when the CircuitBreaker opens after 2 failures then retry with exponential back-off with same time as CircuitBreaker's resetTimeout<br>  val fiveTimesWithBackOff = Schedule.recurs&lt;Throwable&gt;(1) andThen<br>    Schedule.exponential(2.seconds) and Schedule.recurs(5)<br><br>  Either.catch {<br>    resilient(fiveTimesWithBackOff, ::apiCall)<br>  }.let { println("exponential(2.seconds) and recurs(5) always retries with actual apiCall: $it") }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-circuitbreaker-02.kt --></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="1059243689%2FClasslikes%2F-880363011" anchor-label="Companion" id="1059243689%2FClasslikes%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1059243689%2FClasslikes%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2143071551%2FClasslikes%2F-880363011" anchor-label="ExecutionRejected" id="2143071551%2FClasslikes%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-execution-rejected/index.html"><span>Execution</span><wbr><span><span>Rejected</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2143071551%2FClasslikes%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-execution-rejected/index.html">ExecutionRejected</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>reason<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>state<span class="token operator">: </span><a href="-state/index.html">CircuitBreaker.State</a></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-235350332%2FClasslikes%2F-880363011" anchor-label="State" id="-235350332%2FClasslikes%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-state/index.html"><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-235350332%2FClasslikes%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-state/index.html">State</a></div><div class="brief "><p class="paragraph">The initial state when initializing a <a href="index.html">CircuitBreaker</a> is <a href="-state/-closed/index.html">Closed</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-1939121482%2FFunctions%2F-880363011" anchor-label="awaitClose" id="-1939121482%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="await-close.html"><span>await</span><wbr><span><span>Close</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1939121482%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="await-close.html"><span class="token function">awaitClose</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Awaits for this <code class="lang-kotlin">CircuitBreaker</code> to be <a href="-state/-closed/index.html">CircuitBreaker.State.Closed</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-603256389%2FFunctions%2F-880363011" anchor-label="doOnClosed" id="-603256389%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="do-on-closed.html"><span>do</span><wbr><span>On</span><wbr><span><span>Closed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-603256389%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="do-on-closed.html"><span class="token function">doOnClosed</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">CircuitBreaker</a></div><div class="brief "><p class="paragraph">Returns a new circuit breaker that wraps the state of the source and that will fire the given callback upon the circuit breaker transitioning to the <a href="-state/-closed/index.html">CircuitBreaker.State.Closed</a> state.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1345544020%2FFunctions%2F-880363011" anchor-label="doOnHalfOpen" id="-1345544020%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="do-on-half-open.html"><span>do</span><wbr><span>On</span><wbr><span>Half</span><wbr><span><span>Open</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1345544020%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="do-on-half-open.html"><span class="token function">doOnHalfOpen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">CircuitBreaker</a></div><div class="brief "><p class="paragraph">Returns a new circuit breaker that wraps the state of the source and that will fire the given callback upon the circuit breaker transitioning to the <a href="-state/-half-open/index.html">CircuitBreaker.State.HalfOpen</a> state.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1738549159%2FFunctions%2F-880363011" anchor-label="doOnOpen" id="-1738549159%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="do-on-open.html"><span>do</span><wbr><span>On</span><wbr><span><span>Open</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1738549159%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="do-on-open.html"><span class="token function">doOnOpen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">CircuitBreaker</a></div><div class="brief "><p class="paragraph">Returns a new circuit breaker that wraps the state of the source and that will fire the given callback upon the circuit breaker transitioning to the <a href="-state/-open/index.html">CircuitBreaker.State.Open</a> state.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="143364402%2FFunctions%2F-880363011" anchor-label="doOnRejectedTask" id="143364402%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="do-on-rejected-task.html"><span>do</span><wbr><span>On</span><wbr><span>Rejected</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="143364402%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="do-on-rejected-task.html"><span class="token function">doOnRejectedTask</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">CircuitBreaker</a></div><div class="brief "><p class="paragraph">Returns a new circuit breaker that wraps the state of the source and that upon a task being rejected will execute the given <code class="lang-kotlin">callback</code>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="924421186%2FFunctions%2F-880363011" anchor-label="protectEither" id="924421186%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="protect-either.html"><span>protect</span><wbr><span><span>Either</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="924421186%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="protect-either.html">A</a><span class="token operator">&gt; </span><a href="protect-either.html"><span class="token function">protectEither</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fa<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="protect-either.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-execution-rejected/index.html">CircuitBreaker.ExecutionRejected</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="protect-either.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker. If an exception in <a href="protect-either.html">fa</a> occurs, other than an <a href="-execution-rejected/index.html">ExecutionRejected</a> exception, it will be rethrown.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="65303212%2FFunctions%2F-880363011" anchor-label="protectOrThrow" id="65303212%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="protect-or-throw.html"><span>protect</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="65303212%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend tailrec </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="protect-or-throw.html">A</a><span class="token operator">&gt; </span><a href="protect-or-throw.html"><span class="token function">protectOrThrow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fa<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="protect-or-throw.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="protect-or-throw.html">A</a></div><div class="brief "><p class="paragraph">Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker. If an exception in <a href="protect-or-throw.html">fa</a> occurs it will be rethrown</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1281646705%2FFunctions%2F-880363011" anchor-label="state" id="1281646705%2FFunctions%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="state.html"><span><span>state</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1281646705%2FFunctions%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="state.html"><span class="token function">state</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-state/index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph">Returns the current <a href="-state/index.html">CircuitBreaker.State</a>, meant for debugging purposes.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+
