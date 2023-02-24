@@ -398,7 +398,7 @@ public interface PTraversal<S, T, A, B> {
      * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
      */
     @JvmStatic
-    public fun <A> option(): Traversal<Option<A>, A> =
+    public inline fun <reified A> option(): Traversal<Option<A>, A> =
       Every.option()
 
     @JvmStatic

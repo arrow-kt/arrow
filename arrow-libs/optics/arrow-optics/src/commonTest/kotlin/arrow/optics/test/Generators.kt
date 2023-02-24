@@ -28,7 +28,7 @@ fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Seq
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
 
-fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
+inline fun <reified B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
 
 fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {

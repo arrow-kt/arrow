@@ -150,7 +150,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * [PPrism] to focus into an [arrow.core.Some]
      */
     @JvmStatic
-    public fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
+    public inline fun <reified A, reified B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
       PPrism(
         getOrModify = { option -> option.fold({ Left(None) }, ::Right) },
         reverseGet = ::Some
@@ -160,14 +160,14 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * [Prism] to focus into an [arrow.core.Some]
      */
     @JvmStatic
-    public fun <A> some(): Prism<Option<A>, A> =
+    public inline fun <reified A> some(): Prism<Option<A>, A> =
       pSome()
 
     /**
      * [Prism] to focus into an [arrow.core.None]
      */
     @JvmStatic
-    public fun <A> none(): Prism<Option<A>, Unit> =
+    public inline fun <reified A> none(): Prism<Option<A>, Unit> =
       Prism(
         getOrModify = { option -> option.fold({ Right(Unit) }, { Left(option) }) },
         reverseGet = { _ -> None }
@@ -221,7 +221,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-public fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
+public inline fun <S, reified A> Prism(crossinline getOption: (source: S) -> Option<A>, crossinline reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }
 )

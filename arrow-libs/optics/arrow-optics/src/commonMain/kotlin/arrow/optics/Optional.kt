@@ -10,7 +10,7 @@ import kotlin.jvm.JvmStatic
  */
 public typealias Optional<S, A> = POptional<S, S, A, A>
 
-public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
+public inline fun <S, reified A> Optional(crossinline getOption: (source: S) -> Option<A>, noinline set: (source: S, focus: A) -> S): Optional<S, A> =
   POptional({ s -> getOption(s).toEither { s } }, set)
 
 /**
@@ -184,7 +184,7 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
      * [Optional] to safely operate on the head of a list
      */
     @JvmStatic
-    public fun <A> listHead(): Optional<List<A>, A> = Optional(
+    public inline fun <reified A> listHead(): Optional<List<A>, A> = Optional(
       getOption = { if (it.isNotEmpty()) Some(it[0]) else None },
       set = { list, newHead -> if (list.isNotEmpty()) newHead prependTo list.drop(1) else emptyList() }
     )
@@ -202,7 +202,7 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
      * [Optional] to safely operate in a nullable value.
      */
     @JvmStatic
-    public fun <A> nullable(): Optional<A?, A> = Optional(
+    public inline fun <reified A> nullable(): Optional<A?, A> = Optional(
       getOption = { it.toOption() },
       set = { source, new -> source?.let { new } }
     )
@@ -211,6 +211,6 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
      * [Optional] to safely operate in a nullable value.
      */
     @JvmStatic
-    public fun <A> notNull(): Optional<A?, A> = nullable()
+    public inline fun <reified A> notNull(): Optional<A?, A> = nullable()
   }
 }

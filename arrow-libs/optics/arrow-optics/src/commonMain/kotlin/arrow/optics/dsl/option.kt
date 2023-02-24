@@ -12,7 +12,7 @@ import arrow.optics.Traversal
  * @receiver [Optional], [Lens], or [Prism] with a focus in [Option]<[S]>
  * @return [Optional] with a focus in [S]
  */
-public inline val <T, S> Optional<T, Option<S>>.some: Optional<T, S> inline get() = this.compose(Prism.some())
+public inline val <T, reified S> Optional<T, Option<S>>.some: Optional<T, S> inline get() = this.compose(Prism.some())
 
 /**
  * DSL to compose a [Prism] with focus [arrow.core.Some] with a [Traversal] with a focus of [Option]<[S]>
@@ -20,4 +20,4 @@ public inline val <T, S> Optional<T, Option<S>>.some: Optional<T, S> inline get(
  * @receiver [Traversal] with a focus in [Option]<[S]>
  * @return [Traversal] with a focus in [S]
  */
-public inline val <T, S> Traversal<T, Option<S>>.some: Traversal<T, S> inline get() = this.compose(Prism.some())
+public inline val <T, reified S> Traversal<T, Option<S>>.some: Traversal<T, S> inline get() = this.compose(Prism.some())

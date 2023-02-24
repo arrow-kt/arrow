@@ -12,7 +12,7 @@ import arrow.optics.Traversal
  * @receiver [Optional], [Lens], or [Prism] with a focus in <[S]?>
  * @return [Optional] with a focus in [S]
  */
-public inline val <T, S> Optional<T, S?>.notNull: Optional<T, S> inline get() = this.compose(POptional.notNull())
+public inline val <T, reified S> Optional<T, S?>.notNull: Optional<T, S> inline get() = this.compose(POptional.notNull())
 
 /**
  * DSL to compose a [Traversal] with focus on a nullable type with [notNull].
@@ -20,4 +20,4 @@ public inline val <T, S> Optional<T, S?>.notNull: Optional<T, S> inline get() = 
  * @receiver [Traversal] with a focus in <[S]?>
  * @return [Traversal] with a focus in [S]
  */
-public inline val <T, S> Traversal<T, S?>.notNull: Traversal<T, S> inline get() = this.compose(POptional.notNull())
+public inline val <T, reified S> Traversal<T, S?>.notNull: Traversal<T, S> inline get() = this.compose(POptional.notNull())
