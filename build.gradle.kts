@@ -81,6 +81,7 @@ subprojects {
           matchingRegex.set(".*\\.internal.*")
           suppress.set(true)
         }
+        if (project.name == "arrow-fx-coroutines") externalDocumentationLink("https://kotlinlang.org/api/kotlinx.coroutines/")
         skipDeprecated.set(true)
         reportUndocumented.set(false)
         val baseUrl: String = checkNotNull(properties["pom.smc.url"]?.toString())

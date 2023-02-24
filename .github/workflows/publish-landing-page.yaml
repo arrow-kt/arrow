@@ -2,8 +2,6 @@ name: Publish landing page
 
 on:
   push:
-    paths-ignore:
-      - 'docs/**'
     branches:
       - main
     paths:
