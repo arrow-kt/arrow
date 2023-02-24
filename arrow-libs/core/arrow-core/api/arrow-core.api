@@ -3204,7 +3204,7 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun <init> ()V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3229,7 +3229,7 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise, arrow/typ
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3255,7 +3255,7 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3264,7 +3264,7 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3312,7 +3312,7 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3321,7 +3321,7 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3367,7 +3367,7 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 public abstract interface class arrow/core/raise/Raise {
 	public abstract fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3389,7 +3389,7 @@ public abstract interface class arrow/core/raise/Raise {
 public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun attempt (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3478,7 +3478,7 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3486,7 +3486,7 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

@@ -281,9 +281,9 @@ public interface Raise<in R> {
    * <!--- TEST lines.isEmpty() -->
    */
   @RaiseDSL
-  public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
+  public fun <A> Option<A>.bind(transform: Raise<R>.() -> R): A =
     when (this) {
-      None -> transform(None)
+      None -> raise(transform())
       is Some -> value
     }
 
