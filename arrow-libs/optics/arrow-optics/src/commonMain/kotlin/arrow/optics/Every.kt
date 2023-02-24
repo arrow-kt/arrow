@@ -1,16 +1,6 @@
 package arrow.optics
 
-import arrow.core.Either
-import arrow.core.NonEmptyList
-import arrow.core.Option
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
-import arrow.core.foldLeft
-import arrow.core.foldMap
+import arrow.core.*
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
@@ -84,7 +74,7 @@ public object Every {
    * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
    */
   @JvmStatic
-  public fun <A> option(): Traversal<Option<A>, A> =
+  public inline fun <reified A> option(): Traversal<Option<A>, A> =
     object : Traversal<Option<A>, A> {
       override fun modify(source: Option<A>, map: (focus: A) -> A): Option<A> =
         source.map(map)
