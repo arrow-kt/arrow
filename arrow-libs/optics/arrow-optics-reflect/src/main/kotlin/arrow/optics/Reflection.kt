@@ -36,7 +36,7 @@ public val <S, A> KProperty1<S, A>.lens: Lens<S, A>
   )
 
 /** [Optional] that focuses on a nullable field */
-public val <S, A> KProperty1<S, A?>.optional: Optional<S, A>
+public inline val <S, reified A> KProperty1<S, A?>.optional: Optional<S, A>
   get() = lens compose Optional.nullable()
 
 public val <S, A> KProperty1<S, List<A>>.every: Traversal<S, A>
