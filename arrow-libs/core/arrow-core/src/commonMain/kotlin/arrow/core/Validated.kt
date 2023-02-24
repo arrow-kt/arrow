@@ -339,7 +339,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     DeprMsg + "Use fold on Either after refactoring",
-    ReplaceWith("fold(fe, fa)")
+    ReplaceWith("toEither().fold(fe, fa)")
   )
   public inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
@@ -459,7 +459,7 @@ public sealed class Validated<out E, out A> {
    */
   @Deprecated(
     DeprMsg + "Use map on Either after refactoring",
-    ReplaceWith("toEither().mapLeft(f).toValidated()")
+    ReplaceWith("toEither().map(f).toValidated()")
   )
   public inline fun <B> map(f: (A) -> B): Validated<E, B> =
     bimap(::identity, f)
@@ -494,7 +494,7 @@ public sealed class Validated<out E, out A> {
    */
   @Deprecated(
     DeprMsg + "Use onLeft on Either after refactoring",
-    ReplaceWith("toEither().onRight(f).toValidated()")
+    ReplaceWith("toEither().onLeft(f).toValidated()")
   )
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
     when (this) {
@@ -547,7 +547,7 @@ public sealed class Validated<out E, out A> {
     fold({ b }, { f(b, it) })
 
   @Deprecated(
-    DeprMsg + "Use widen on Either after refactoring",
+    DeprMsg + "Use swap on Either after refactoring",
     ReplaceWith("toEither().swap()")
   )
   public fun swap(): Validated<A, E> =
@@ -1132,7 +1132,7 @@ public fun <A, B> Validated<A, B?>.sequence(): Validated<A, B>? =
 
 @Deprecated(
   DeprMsg + "Use compareTo on Either after refactoring",
-  ReplaceWith("toEither().getOrElse { default() }")
+  ReplaceWith("toEither(). compareTo(other.toEither())")
 )
 public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
   fold(
