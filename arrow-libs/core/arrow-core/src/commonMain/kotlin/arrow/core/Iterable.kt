@@ -1049,6 +1049,6 @@ public infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
   listOf(this) + list
 
 public inline fun <reified T> Iterable<Option<T>>.filterOption(): List<T> =
-  flatMap { it.fold(::emptyList, ::listOf) }
+  flatMap { it.fold(::emptyList) { listOf(it) } }
 
 public inline fun <reified T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()
