@@ -720,7 +720,7 @@ public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
 /**
  * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
  */
-public fun <T> Iterable<T>.firstOrNone(): Option<T> =
+public inline fun <reified T> Iterable<T>.firstOrNone(): Option<T> =
   when (this) {
     is Collection -> if (!isEmpty()) {
       Some(first())
@@ -733,7 +733,7 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     }
   }
 
-private fun <T> Iterator<T>.nextOrNone(): Option<T> =
+@PublishedApi internal inline fun <reified T> Iterator<T>.nextOrNone(): Option<T> =
   if (hasNext()) {
     Some(next())
   } else {
@@ -743,7 +743,7 @@ private fun <T> Iterator<T>.nextOrNone(): Option<T> =
 /**
  * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
  */
-public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
+public inline fun <reified T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
   for (element in this) {
     if (predicate(element)) {
       return Some(element)
@@ -755,7 +755,7 @@ public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option
 /**
  * Returns single element as [Some(element)][Some], or [None] if the iterable is empty or has more than one element.
  */
-public fun <T> Iterable<T>.singleOrNone(): Option<T> =
+public inline fun <reified T> Iterable<T>.singleOrNone(): Option<T> =
   when (this) {
     is Collection -> when (size) {
       1 -> firstOrNone()
@@ -770,7 +770,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
 /**
  * Returns the single element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
  */
-public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
+public inline fun <reified T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
   val list = mutableListOf<T>()
   for (element in this) {
     if (predicate(element)) {
@@ -786,7 +786,7 @@ public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Optio
 /**
  * Returns the last element as [Some(element)][Some], or [None] if the iterable is empty.
  */
-public fun <T> Iterable<T>.lastOrNone(): Option<T> =
+public inline fun <reified T> Iterable<T>.lastOrNone(): Option<T> =
   when (this) {
     is Collection -> if (!isEmpty()) {
       Some(last())
@@ -808,7 +808,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
 /**
  * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
  */
-public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
+public inline fun <reified T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
   var value: Any? = EmptyValue
   for (element in this) {
     if (predicate(element)) {
@@ -821,7 +821,7 @@ public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<
 /**
  * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this iterable.
  */
-public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
+public inline fun <reified T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
   when {
     index < 0 -> None
     this is Collection -> when (index) {
@@ -832,7 +832,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
     else -> iterator().skip(index).nextOrNone()
   }
 
-private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
+@PublishedApi internal tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
   when {
     count > 0 && hasNext() -> {
       next()
@@ -1048,7 +1048,7 @@ public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>
 public infix fun <T> T.prependTo(list: Iterable<T>): List<T> =
   listOf(this) + list
 
-public fun <T> Iterable<Option<T>>.filterOption(): List<T> =
+public inline fun <reified T> Iterable<Option<T>>.filterOption(): List<T> =
   flatMap { it.fold(::emptyList, ::listOf) }
 
-public fun <T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()
+public inline fun <reified T> Iterable<Option<T>>.flattenOption(): List<T> = filterOption()

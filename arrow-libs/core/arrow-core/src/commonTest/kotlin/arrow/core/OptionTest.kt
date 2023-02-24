@@ -44,7 +44,7 @@ class OptionTest : StringSpec({
     }
 
     "short circuit null" {
-      option {
+      option<Any?> {
         val number: Int = "s".length
         ensureNotNull(number.takeIf { it > 1 })
         throw IllegalStateException("This should not be executed")
@@ -55,10 +55,7 @@ class OptionTest : StringSpec({
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
         val res = option.tap { effect += 1 }
-        val expected = when (option) {
-          is Some -> 1
-          is None -> 0
-        }
+        val expected = option.fold({ 0 }, { 1 })
         effect shouldBe expected
         res shouldBe option
       }
@@ -68,10 +65,7 @@ class OptionTest : StringSpec({
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
         val res = option.tapNone { effect += 1 }
-        val expected = when (option) {
-          is Some -> 0
-          is None -> 1
-        }
+        val expected = option.fold({ 1 }, { 0 })
         effect shouldBe expected
         res shouldBe option
       }
@@ -140,7 +134,7 @@ class OptionTest : StringSpec({
       none.align(some) { "$it" } shouldBe Some("Ior.Right(kotlin)")
       none.align(none) { "$it" } shouldBe None
 
-      val nullable = null.some()
+      val nullable: Option<Any?> = null.some()
       some align nullable shouldBe Some(Ior.Both("kotlin", null))
       nullable align some shouldBe Some(Ior.Both(null, "kotlin"))
       nullable align nullable shouldBe Some(Ior.Both(null, null))
@@ -168,7 +162,7 @@ class OptionTest : StringSpec({
       someAny.filterIsInstance<Int>() shouldBe None
 
       val someNullableAny: Option<Any?> = null.some()
-      someNullableAny.filterIsInstance<String?>() shouldBe Some(null)
+      someNullableAny.filterIsInstance<String?>() shouldBe Some<Any?>(null)
       someNullableAny.filterIsInstance<String>() shouldBe None
 
       val noneAny: Option<Any> = none
@@ -208,10 +202,10 @@ class OptionTest : StringSpec({
       emptyIterable.firstOrNone() shouldBe None
 
       val nullableIterable1 = iterableOf(null, 2, 3, 4, 5, 6)
-      nullableIterable1.firstOrNone() shouldBe Some(null)
+      nullableIterable1.firstOrNone() shouldBe Some<Any?>(null)
 
       val nullableIterable2 = iterableOf(1, 2, 3, null, 5, null)
-      nullableIterable2.firstOrNone { it == null } shouldBe Some(null)
+      nullableIterable2.firstOrNone { it == null } shouldBe Some<Any?>(null)
     }
 
     "Collection.firstOrNone" {
@@ -222,7 +216,7 @@ class OptionTest : StringSpec({
       emptyList.firstOrNone() shouldBe None
 
       val nullableList = listOf(null, 2, 3, 4, 5, 6)
-      nullableList.firstOrNone() shouldBe Some(null)
+      nullableList.firstOrNone() shouldBe Some<Any?>(null)
     }
 
     "Iterable.singleOrNone" {
@@ -235,10 +229,10 @@ class OptionTest : StringSpec({
       singleIterable.singleOrNone { it == 3 } shouldBe Some(3)
 
       val nullableSingleIterable1 = iterableOf<Int?>(null)
-      nullableSingleIterable1.singleOrNone() shouldBe Some(null)
+      nullableSingleIterable1.singleOrNone() shouldBe Some<Any?>(null)
 
       val nullableSingleIterable2 = iterableOf(1, 2, 3, null, 5, 6)
-      nullableSingleIterable2.singleOrNone { it == null } shouldBe Some(null)
+      nullableSingleIterable2.singleOrNone { it == null } shouldBe Some<Any?>(null)
 
       val nullableSingleIterable3 = iterableOf(1, 2, 3, null, 5, null)
       nullableSingleIterable3.singleOrNone { it == null } shouldBe None
@@ -251,8 +245,8 @@ class OptionTest : StringSpec({
       val singleList = listOf(3)
       singleList.singleOrNone() shouldBe Some(3)
 
-      val nullableSingleList = listOf(null)
-      nullableSingleList.singleOrNone() shouldBe Some(null)
+      val nullableSingleList: List<Any?> = listOf(null)
+      nullableSingleList.singleOrNone() shouldBe Some<Any?>(null)
     }
 
     "Iterable.lastOrNone" {
@@ -265,10 +259,10 @@ class OptionTest : StringSpec({
       emptyIterable.lastOrNone() shouldBe None
 
       val nullableIterable1 = iterableOf(1, 2, 3, 4, 5, null)
-      nullableIterable1.lastOrNone() shouldBe Some(null)
+      nullableIterable1.lastOrNone() shouldBe Some<Any?>(null)
 
       val nullableIterable2 = iterableOf(null, 2, 3, null, 5, 6)
-      nullableIterable2.lastOrNone { it == null } shouldBe Some(null)
+      nullableIterable2.lastOrNone { it == null } shouldBe Some<Any?>(null)
     }
 
     "Collection.lastOrNone" {
@@ -279,7 +273,7 @@ class OptionTest : StringSpec({
       emptyList.lastOrNone() shouldBe None
 
       val nullableList = listOf(1, 2, 3, 4, 5, null)
-      nullableList.lastOrNone() shouldBe Some(null)
+      nullableList.lastOrNone() shouldBe Some<Any?>(null)
     }
 
     "Iterable.elementAtOrNone" {
@@ -289,7 +283,7 @@ class OptionTest : StringSpec({
       iterable.elementAtOrNone(index = 100) shouldBe None
 
       val nullableIterable = iterableOf(1, 2, null, 4, 5, 6)
-      nullableIterable.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
+      nullableIterable.elementAtOrNone(index = 3 - 1) shouldBe Some<Any?>(null)
     }
 
     "Collection.elementAtOrNone" {
@@ -299,7 +293,7 @@ class OptionTest : StringSpec({
       list.elementAtOrNone(index = 100) shouldBe None
 
       val nullableList = listOf(1, 2, null, 4, 5, 6)
-      nullableList.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
+      nullableList.elementAtOrNone(index = 3 - 1) shouldBe Some<Any?>(null)
     }
 
     "and" {
@@ -365,7 +359,7 @@ class OptionTest : StringSpec({
 
     "catch should return None when f throws" {
       val exception = Exception("Boom!")
-      Option.catch { throw exception } shouldBe None
+      Option.catch<Any?> { throw exception } shouldBe None
     }
 })
 

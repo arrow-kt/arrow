@@ -2,6 +2,8 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Some
+import arrow.core.filter
+import arrow.core.map
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb

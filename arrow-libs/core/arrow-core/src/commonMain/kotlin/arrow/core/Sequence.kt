@@ -765,5 +765,5 @@ public fun <A> Sequence<A>.void(): Sequence<Unit> =
 public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
 
-public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> =
+public inline fun <reified A> Sequence<Option<A>>.filterOption(): Sequence<A> =
   mapNotNull { it.orNull() }

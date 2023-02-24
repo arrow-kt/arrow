@@ -3,6 +3,7 @@ package arrow.core.examples.exampleOption11
 
 import arrow.core.Option
 import arrow.core.none
+import arrow.core.fold
 
 val fold =
  none<Int>().fold({ 1 }, { it * 3 })

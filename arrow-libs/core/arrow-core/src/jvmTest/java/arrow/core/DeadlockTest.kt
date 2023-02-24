@@ -29,7 +29,7 @@ class DeadlockTest : StringSpec({
             if (i % 2 == 0) {
               None
             } else {
-              Some(null)
+              Some<Any?>(null)
             }
           }
         }.joinAll()

@@ -1,9 +1,7 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleOption14
 
-import arrow.core.firstOrNone
-import arrow.core.toOption
-import arrow.core.Option
+import arrow.core.*
 
 val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
 

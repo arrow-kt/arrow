@@ -28,8 +28,8 @@ class EitherKnitTest : StringSpec({
     arrow.core.examples.exampleEither40.test()
   }
 
-  "ExampleEither41" {
-    arrow.core.examples.exampleEither41.test()
+  "ExampleEither44" {
+    arrow.core.examples.exampleEither44.test()
   }
 
   "ExampleEither46" {

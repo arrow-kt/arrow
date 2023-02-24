@@ -3,11 +3,7 @@
 @file:JvmName("RaiseKt")
 package arrow.core.raise
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.identity
+import arrow.core.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -202,46 +198,6 @@ public interface Raise<in R> {
   public fun <A> Result<A>.bind(transform: (Throwable) -> R): A =
     fold(::identity) { throwable -> raise(transform(throwable)) }
 
-  /**
-   * Extract the [Some] value out of [Option],
-   * because [Option] works with [None] as its error type you need to [transform] [None] to [R].
-   *
-   * Note that this functions can currently not be _inline_ without Context Receivers,
-   * and thus doesn't allow suspension in its error handler.
-   * To do so, use [Option.recover] and [bind].
-   *
-   * <!--- INCLUDE
-   * import arrow.core.Either
-   * import arrow.core.None
-   * import arrow.core.Option
-   * import arrow.core.recover
-   * import arrow.core.raise.either
-   * import kotlinx.coroutines.delay
-   * import io.kotest.matchers.shouldBe
-   * -->
-   * ```kotlin
-   * suspend fun test() {
-   *   val empty: Option<Int> = None
-   *   either {
-   *     val x: Int = empty.bind { _: None -> 1 }
-   *     val y: Int = empty.bind { _: None -> raise("Something bad happened: Boom!") }
-   *     val z: Int = empty.recover { _: None ->
-   *       delay(10)
-   *       1
-   *     }.bind { raise("Something bad happened: Boom!") }
-   *     x + y + z
-   *   } shouldBe Either.Left("Something bad happened: Boom!")
-   * }
-   * ```
-   * <!--- KNIT example-raise-dsl-06.kt -->
-   * <!--- TEST lines.isEmpty() -->
-   */
-  public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
-    when (this) {
-      None -> transform(None)
-      is Some -> value
-    }
-
   @RaiseDSL
   public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<R>.(E) -> A): A =
     recover({ invoke() }) { resolve(it) }
@@ -275,6 +231,41 @@ public interface Raise<in R> {
     @BuilderInference catch: Raise<R>.(Throwable) -> A,
   ): A = fold({ catch(it) }, { raise(it) }, { it })
 }
+
+/**
+ * Extract the [Some] value out of [Option],
+ * because [Option] works with [None] as its error type you need to [transform] [None] to [R].
+ *
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.recover
+ * import arrow.core.raise.bind
+ * import arrow.core.raise.either
+ * import kotlinx.coroutines.delay
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * suspend fun test() {
+ *   val empty: Option<Int> = None
+ *   either {
+ *     val x: Int = empty.bind { _: Option<Nothing> -> 1 }
+ *     val y: Int = empty.bind { _: Option<Nothing> -> raise("Something bad happened: Boom!") }
+ *     val z: Int = empty.recover { _: Option<Nothing> ->
+ *       delay(10)
+ *       1
+ *     }.bind { raise("Something bad happened: Boom!") }
+ *     x + y + z
+ *   } shouldBe Either.Left("Something bad happened: Boom!")
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-06.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+public inline fun <reified A> Option<A>.bind(transform: (Option<Nothing>) -> A): A =
+  getOrElse { transform(None) }
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],

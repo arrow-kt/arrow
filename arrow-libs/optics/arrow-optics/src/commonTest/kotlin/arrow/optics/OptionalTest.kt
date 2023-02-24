@@ -2,8 +2,11 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.map
+import arrow.core.fold
 import arrow.core.getOrElse
 import arrow.core.identity
+import arrow.core.toList
 import arrow.core.toOption
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws

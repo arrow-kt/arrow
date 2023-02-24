@@ -103,10 +103,10 @@ public fun interface Semigroup<A> {
     ) : Semigroup<Option<A>> {
 
       override fun append(a: Option<A>, b: Option<A>): Option<A> =
-        a.combine(SGA, b)
+        a.combine(SGA as Semigroup<Any?>, b) as Option<A>
 
       override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
-        b?.let { combine(SGA, it) } ?: this
+        b?.let { combine(SGA as Semigroup<Any?>, it) as Option<A> } ?: this
     }
 
     private class MapSemigroup<K, A>(private val SG: Semigroup<A>) : Semigroup<Map<K, A>> {

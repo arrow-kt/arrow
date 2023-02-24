@@ -1064,30 +1064,7 @@ public sealed class Either<out A, out B> {
     }
     return getOrElse { null }
   }
-  
-  public fun orNone(): Option<B> = getOrNone()
-  
-  /**
-   * Transforms [Either] into [Option],
-   * where the encapsulated value [B] is wrapped in [Some] when this instance represents [Either.Right],
-   * or [None] if it is [Either.Left].
-   *
-   * ```kotlin
-   * import arrow.core.Either
-   * import arrow.core.Some
-   * import arrow.core.None
-   * import io.kotest.matchers.shouldBe
-   *
-   * fun test() {
-   *   Either.Right(12).getOrNone() shouldBe Some(12)
-   *   Either.Left(12).getOrNone() shouldBe None
-   * }
-   * ```
-   * <!--- KNIT example-either-41.kt -->
-   * <!--- TEST lines.isEmpty() -->
-   */
-  public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or map",
     ReplaceWith("if (n <= 0) Right(emptyList()) else map { b -> List(n) { b } }")
@@ -1119,7 +1096,7 @@ public sealed class Either<out A, out B> {
    *   Either.Right("foo").isEmpty() // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-42.kt -->
+   * <!--- KNIT example-either-41.kt -->
    */
   @Deprecated(
     RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
@@ -1141,7 +1118,7 @@ public sealed class Either<out A, out B> {
    *   //sampleEnd
    * }
    * ```
-   * <!--- KNIT example-either-43.kt -->
+   * <!--- KNIT example-either-42.kt -->
    */
   @Deprecated(
     RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
@@ -1319,7 +1296,7 @@ public sealed class Either<out A, out B> {
      *   println(result)
      *  }
      *  ```
-     * <!--- KNIT example-either-44.kt -->
+     * <!--- KNIT example-either-43.kt -->
      */
     @JvmStatic
     @Deprecated(
@@ -1816,6 +1793,30 @@ public sealed class Either<out A, out B> {
     map { }
 }
 
+public inline fun <A, reified B> Either<A, B>.orNone(): Option<B> = getOrNone()
+
+/**
+ * Transforms [Either] into [Option],
+ * where the encapsulated value [B] is wrapped in [Some] when this instance represents [Either.Right],
+ * or [None] if it is [Either.Left].
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.Some
+ * import arrow.core.None
+ * import arrow.core.getOrNone
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   Either.Right(12).getOrNone() shouldBe Some(12)
+ *   Either.Left(12).getOrNone<Int, Any>() shouldBe None
+ * }
+ * ```
+ * <!--- KNIT example-either-44.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+public inline fun <A, reified B> Either<A, B>.getOrNone(): Option<B> = fold({ None }, { Some(it) })
+
 /**
  * Binds the given function across [Right], that is,
  * Map, or transform, the right value [B] of this [Either] into a new [Either] with a right value of type [C].
@@ -2238,7 +2239,7 @@ public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
     "arrow.core.right",
   )
 )
-public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
+public inline fun <A, reified B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
   sequence()
 
 @Deprecated(
@@ -2250,7 +2251,7 @@ public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
     "arrow.core.left"
   )
 )
-public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
+public inline fun <A, reified B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
   orNull()?.orNull()?.right().toOption()
 
 @Deprecated(

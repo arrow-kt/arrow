@@ -1,6 +1,7 @@
 package arrow.core.raise
 
 import arrow.core.None
+import arrow.core.map
 import arrow.core.toOption
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -21,7 +22,7 @@ class OptionSpec : StringSpec({
   }
 
   "short circuit option" {
-    option {
+    option<Any?> {
       val number: Int = "s".length
       ensureNotNull(number.takeIf { it > 1 })
       throw IllegalStateException("This should not be executed")
@@ -39,7 +40,7 @@ class OptionSpec : StringSpec({
   }
 
   "eager short circuit null" {
-    option {
+    option<Any?> {
       val number: Int = "s".length
       ensureNotNull(number.takeIf { it > 1 })
       throw IllegalStateException("This should not be executed")

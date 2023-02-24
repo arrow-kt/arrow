@@ -61,7 +61,7 @@ fun Arb.Companion.longSmall(): Arb<Long> =
 
 fun <A> Arb.Companion.endo(arb: Arb<A>): Arb<Endo<A>> = arb.map { a: A -> Endo { a } }
 
-fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
+inline fun <reified B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
 
 fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {

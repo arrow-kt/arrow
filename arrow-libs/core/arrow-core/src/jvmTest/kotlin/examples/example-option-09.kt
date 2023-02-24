@@ -1,9 +1,7 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleOption09
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 
 val number: Option<Int> = Some(3)
 val noNumber: Option<Int> = None

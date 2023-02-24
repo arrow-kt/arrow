@@ -3,6 +3,7 @@ package arrow.core.examples.exampleOption18
 
 import arrow.core.Some
 import arrow.core.none
+import arrow.core.tap
 
 fun main() {
   Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)

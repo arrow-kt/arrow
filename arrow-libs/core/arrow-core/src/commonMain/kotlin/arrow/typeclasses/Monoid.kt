@@ -105,10 +105,10 @@ public interface Monoid<A> : Semigroup<A> {
     ) : Monoid<Option<A>> {
   
       override fun append(a: Option<A>, b: Option<A>): Option<A> =
-        a.combine(MA, b)
+        a.combine(MA as Semigroup<Any?>, b) as Option<A>
       
       override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
-        b?.let { combine(MA, it) } ?: this
+        b?.let { combine(MA as Semigroup<Any?>, it) as Option<A> } ?: this
 
       override fun empty(): Option<A> = None
     }

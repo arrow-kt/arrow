@@ -1,7 +1,8 @@
 @file:OptIn(ExperimentalContracts::class)
+
 package arrow.core
 
-import arrow.core.Either.Right
+import arrow.core.Option.Companion.fromNullable
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
@@ -9,8 +10,15 @@ import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+
+@RequiresOptIn(
+  message =
+  "This declaration is part of the internals of Option. Great caution must be taken to avoid ClassCastExceptions"
+)
+internal annotation class OptionInternals
 
 /**
  * <!--- TEST_NAME OptionKnitTest -->
@@ -23,9 +31,7 @@ import kotlin.jvm.JvmStatic
  * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
  * ```kotlin
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.none
+ * import arrow.core.*
  *
  * //sampleStart
  * val someValue: Option<String> = Some("I am wrapped in something")
@@ -41,9 +47,7 @@ import kotlin.jvm.JvmStatic
  * Let's write a function that may or may not give us a string, thus returning `Option<String>`:
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * //sampleStart
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
@@ -55,10 +59,7 @@ import kotlin.jvm.JvmStatic
  * Using `getOrElse`, we can provide a default value `"No value"` when the optional argument `None` does not exist:
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.getOrElse
+ * import arrow.core.*
  *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
@@ -75,10 +76,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-03.kt -->
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
- * import arrow.core.getOrElse
+ * import arrow.core.*
  *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
@@ -97,16 +95,14 @@ import kotlin.jvm.JvmStatic
  * Checking whether option has value:
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  *
  *  //sampleStart
- * val valueSome = maybeItWillReturnSomething(true) is None
- * val valueNone = maybeItWillReturnSomething(false) is None
+ * val valueSome = maybeItWillReturnSomething(true).isEmpty()
+ * val valueNone = maybeItWillReturnSomething(false).isEmpty()
  * //sampleEnd
  * fun main() {
  *  println("valueSome = $valueSome")
@@ -117,7 +113,7 @@ import kotlin.jvm.JvmStatic
  * Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
  *
  * ```kotlin
- * import arrow.core.Option
+ * import arrow.core.*
  *
  * //sampleStart
  * val myString: String? = "Nullable string"
@@ -132,16 +128,14 @@ import kotlin.jvm.JvmStatic
  * Option can also be used with when statements:
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * //sampleStart
  * val someValue: Option<Double> = Some(20.0)
- * val value = when(someValue) {
- *  is Some -> someValue.value
- *  is None -> 0.0
- * }
+ * val value = someValue.fold(
+ *  { 0.0 },
+ *  { it }
+ * )
  * //sampleEnd
  * fun main () {
  *  println("value = $value")
@@ -150,16 +144,14 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-07.kt -->
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * //sampleStart
  * val noValue: Option<Double> = None
- * val value = when(noValue) {
- *  is Some -> noValue.value
- *  is None -> 0.0
- * }
+ * val value = noValue.fold(
+ *  { 0.0 },
+ *  { it }
+ * )
  * //sampleEnd
  * fun main () {
  *  println("value = $value")
@@ -172,9 +164,7 @@ import kotlin.jvm.JvmStatic
  * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the option:
  *
  * ```kotlin
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * //sampleStart
  * val number: Option<Int> = Some(3)
@@ -193,8 +183,7 @@ import kotlin.jvm.JvmStatic
  * Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  *
  * ```kotlin
- * import arrow.core.Option
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * val fold =
  * //sampleStart
@@ -209,6 +198,7 @@ import kotlin.jvm.JvmStatic
  * ```kotlin
  * import arrow.core.Option
  * import arrow.core.none
+ * import arrow.core.fold
  *
  * val fold =
  * //sampleStart
@@ -223,8 +213,7 @@ import kotlin.jvm.JvmStatic
  * Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
  *
  * ```kotlin
- * import arrow.core.some
- * import arrow.core.none
+ * import arrow.core.*
  *
  * //sampleStart
  *  val some = 1.some()
@@ -238,7 +227,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-option-12.kt -->
  *
  * ```kotlin
- * import arrow.core.toOption
+ * import arrow.core.*
  *
  * //sampleStart
  * val nullString: String? = null
@@ -257,9 +246,7 @@ import kotlin.jvm.JvmStatic
  * You can easily convert between `A?` and `Option<A>` by using the `toOption()` extension or `Option.fromNullable` constructor.
  *
  * ```kotlin
- * import arrow.core.firstOrNone
- * import arrow.core.toOption
- * import arrow.core.Option
+ * import arrow.core.*
  *
  * //sampleStart
  * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
@@ -278,7 +265,7 @@ import kotlin.jvm.JvmStatic
  * ### Transforming the inner contents
  *
  * ```kotlin
- * import arrow.core.Some
+ * import arrow.core.*
  *
  * fun main() {
  * val value =
@@ -293,7 +280,7 @@ import kotlin.jvm.JvmStatic
  * ### Computing over independent values
  *
  * ```kotlin
- * import arrow.core.Some
+ * import arrow.core.*
  *
  *  val value =
  * //sampleStart
@@ -310,22 +297,28 @@ import kotlin.jvm.JvmStatic
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
  * Originally based on the Scala Koans.
  */
-public sealed class Option<out A> {
+@JvmInline
+public value class Option<out A> @OptionInternals private constructor(@property:OptionInternals @PublishedApi internal val underlying: Any) {
 
   public companion object {
 
-    @JvmStatic
-    public fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
+    // This is simply an alias to constructor-impl
+    @PublishedApi
+    @OptionInternals
+    internal fun <A> construct(value: Any): Option<A> = Option(value)
 
     @JvmStatic
-    public operator fun <A> invoke(a: A): Option<A> = Some(a)
+    public inline fun <reified A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
+
+    @JvmStatic
+    public inline operator fun <reified A> invoke(a: A): Option<A> = Some(a)
 
     @JvmStatic
     @JvmName("tryCatchOrNone")
     /**
      * Ignores exceptions and returns None if one is thrown
      */
-    public inline fun <A> catch(f: () -> A): Option<A> {
+    public inline fun <reified A> catch(f: () -> A): Option<A> {
       contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
       val recover: (Throwable) -> Option<A> = { None }
       return catch(recover, f)
@@ -333,7 +326,7 @@ public sealed class Option<out A> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
+    public inline fun <reified A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
       contract {
         callsInPlace(f, InvocationKind.EXACTLY_ONCE)
         callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
@@ -346,529 +339,650 @@ public sealed class Option<out A> {
     }
 
     @JvmStatic
-    public fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
+    public inline fun <reified A, reified B> lift(crossinline f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
   }
 
-  public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
-    zip(other, ::Pair)
-
-  public inline fun <B, C> zip(
-    b: Option<B>,
-    map: (A, B) -> C
-  ): Option<C> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
-  }
-
-  public inline fun <B, C, D> zip(
-    b: Option<B>,
-    c: Option<C>,
-    map: (A, B, C) -> D
-  ): Option<D> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      c,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
-  }
-
-  /**
-   * The given function is applied as a fire and forget effect
-   * if this is a `None`.
-   * When applied the result is ignored and the original
-   * None value is returned
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Some
-   * import arrow.core.none
-   *
-   * fun main() {
-   *   Some(12).tapNone { println("flower") } // Result: Some(12)
-   *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
-   * }
-   * ```
-   * <!--- KNIT example-option-17.kt -->
-   */
-  public inline fun tapNone(f: () -> Unit): Option<A> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> {
-        f()
-        this
-      }
-
-      is Some -> this
-    }
-  }
-
-  /**
-   * The given function is applied as a fire and forget effect
-   * if this is a `some`.
-   * When applied the result is ignored and the original
-   * Some value is returned
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Some
-   * import arrow.core.none
-   *
-   * fun main() {
-   *   Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
-   *   none<Int>().tap { println("flower") }  // Result: None
-   * }
-   * ```
-   * <!--- KNIT example-option-18.kt -->
-   */
-  public inline fun tap(f: (A) -> Unit): Option<A> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> this
-      is Some -> {
-        f(this.value)
-        this
-      }
-    }
-  }
-
-  public inline fun <B, C, D, E> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    map: (A, B, C, D) -> E
-  ): Option<E> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(
-      b,
-      c,
-      d,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
-    ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
-  }
-
-  public inline fun <B, C, D, E, F> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    map: (A, B, C, D, E) -> F
-  ): Option<F> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e
-      )
-    }
-  }
-
-  public inline fun <B, C, D, E, F, G> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    f: Option<F>,
-    map: (A, B, C, D, E, F) -> G
-  ): Option<G> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
-      map(
-        a,
-        b,
-        c,
-        d,
-        e,
-        f
-      )
-    }
-  }
-
-  public inline fun <B, C, D, E, F, G, H> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    f: Option<F>,
-    g: Option<G>,
-    map: (A, B, C, D, E, F, G) -> H
-  ): Option<H> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
-  }
-
-  public inline fun <B, C, D, E, F, G, H, I> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    f: Option<F>,
-    g: Option<G>,
-    h: Option<H>,
-    map: (A, B, C, D, E, F, G, H) -> I
-  ): Option<I> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, Some.unit, Some.unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
-  }
-
-  public inline fun <B, C, D, E, F, G, H, I, J> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    f: Option<F>,
-    g: Option<G>,
-    h: Option<H>,
-    i: Option<I>,
-    map: (A, B, C, D, E, F, G, H, I) -> J
-  ): Option<J> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, i, Some.unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
-  }
-
-  public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
-    b: Option<B>,
-    c: Option<C>,
-    d: Option<D>,
-    e: Option<E>,
-    f: Option<F>,
-    g: Option<G>,
-    h: Option<H>,
-    i: Option<I>,
-    j: Option<J>,
-    map: (A, B, C, D, E, F, G, H, I, J) -> K
-  ): Option<K> {
-    contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return if (this is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
-      Some(map(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-    } else {
-      None
-    }
-  }
-
-  /**
-   * Returns true if the option is [None], false otherwise.
-   * @note Used only for performance instead of fold.
-   */
-  public abstract fun isEmpty(): Boolean
-
-  public fun isNotEmpty(): Boolean = !isEmpty()
-
-  /**
-   * alias for [isDefined]
-   */
-  public fun nonEmpty(): Boolean = isDefined()
-
-  /**
-   * Returns true if the option is an instance of [Some], false otherwise.
-   * @note Used only for performance instead of fold.
-   */
-  public fun isDefined(): Boolean = !isEmpty()
-
-  public fun orNull(): A? {
-    contract {
-      returns(null) implies (this@Option is None)
-      returnsNotNull() implies (this@Option is Some<A>)
-    }
-    return fold({ null }, ::identity)
-  }
-
-  /**
-   * Returns a [Some<$B>] containing the result of applying $f to this $option's
-   * value if this $option is nonempty. Otherwise return $none.
-   *
-   * @note This is similar to `flatMap` except here,
-   * $f does not need to wrap its result in an $option.
-   *
-   * @param f the function to apply
-   * @see flatMap
-   */
-  public inline fun <B> map(f: (A) -> B): Option<B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return flatMap { a -> Some(f(a)) }
-  }
-
-  public inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R {
-    contract {
-      callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE)
-      callsInPlace(ifSome, InvocationKind.AT_MOST_ONCE)
-    }
-    return when (this) {
-      is None -> ifEmpty()
-      is Some<A> -> ifSome(value)
-    }
-  }
-
-  /**
-   * Returns $none if the result of applying $f to this $option's value is null.
-   * Otherwise returns the result.
-   *
-   * @note This is similar to `.flatMap { Option.fromNullable(null)) }`
-   * and primarily for convenience.
-   *
-   * @param f the function to apply.
-   * */
-  public inline fun <B> mapNotNull(f: (A) -> B?): Option<B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return flatMap { a -> fromNullable(f(a)) }
-  }
-
-  /**
-   * Returns the result of applying $f to this $option's value if
-   * this $option is nonempty.
-   * Returns $none if this $option is empty.
-   * Slightly different from `map` in that $f is expected to
-   * return an $option (which could be $none).
-   *
-   * @param f the function to apply
-   * @see map
-   */
-  public inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> this
-      is Some -> f(value)
-    }
-  }
-
-  /**
-   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
-   */
-  public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
-    when (this) {
-      None -> when (b) {
-        None -> None
-        is Some -> Some(b.value.rightIor())
-      }
-
-      is Some -> when (b) {
-        None -> Some(this.value.leftIor())
-        is Some -> Some(Pair(this.value, b.value).bothIor())
-      }
-    }
-
-  /**
-   * Align two options (`this` on the left and [b] on the right) as one Option of [Ior], and then, if it's not [None], map it using [f].
-   *
-   * @note This function works like a regular `align` function, but is then mapped by the `map` function.
-   */
-  public inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return align(b).map(f)
-  }
-
-  /**
-   * Returns true if this option is empty '''or''' the predicate
-   * $predicate returns true when applied to this $option's value.
-   *
-   * @param predicate the predicate to test
-   */
-  public inline fun all(predicate: (A) -> Boolean): Boolean {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return fold({ true }, predicate)
-  }
-
-  public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
-    when (this) {
-      is None -> this
-      is Some -> f(value).map { Some(it) }
-    }
-
-  public inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
-    when (this) {
-      is None -> emptyMap()
-      is Some -> f(value).mapValues { Some(it.value) }
-    }
-
-  public inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
-    when (this) {
-      is None -> null
-      is Some -> f(value)?.let { Some(it) }
-    }
-
-  /**
-   * Returns this $option if it is nonempty '''and''' applying the predicate $p to
-   * this $option's value returns true. Otherwise, return $none.
-   *
-   *  @param predicate the predicate used for testing.
-   */
-  public inline fun filter(predicate: (A) -> Boolean): Option<A> {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return flatMap { a -> if (predicate(a)) Some(a) else None }
-  }
-
-  /**
-   * Returns this $option if it is nonempty '''and''' applying the predicate $p to
-   * this $option's value returns false. Otherwise, return $none.
-   *
-   * @param predicate the predicate used for testing.
-   */
-  public inline fun filterNot(predicate: (A) -> Boolean): Option<A> {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return flatMap { a -> if (!predicate(a)) Some(a) else None }
-  }
-
-  /**
-   * Returns true if this option is nonempty '''and''' the predicate
-   * $p returns true when applied to this $option's value.
-   * Otherwise, returns false.
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Some
-   * import arrow.core.None
-   * import arrow.core.Option
-   *
-   * fun main() {
-   *   Some(12).exists { it > 10 } // Result: true
-   *   Some(7).exists { it > 10 }  // Result: false
-   *
-   *   val none: Option<Int> = None
-   *   none.exists { it > 10 }      // Result: false
-   * }
-   * ```
-   * <!--- KNIT example-option-19.kt -->
-   *
-   * @param predicate the predicate to test
-   */
-  public inline fun exists(predicate: (A) -> Boolean): Boolean {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return fold({ false }, predicate)
-  }
-
-  /**
-   * Returns the $option's value if this option is nonempty '''and''' the predicate
-   * $p returns true when applied to this $option's value.
-   * Otherwise, returns null.
-   *
-   * Example:
-   * ```kotlin
-   * import arrow.core.Some
-   * import arrow.core.None
-   * import arrow.core.Option
-   *
-   * fun main() {
-   *   Some(12).exists { it > 10 } // Result: 12
-   *   Some(7).exists { it > 10 }  // Result: null
-   *
-   *   val none: Option<Int> = None
-   *   none.exists { it > 10 }      // Result: null
-   * }
-   * ```
-   * <!--- KNIT example-option-20.kt -->
-   */
-  public inline fun findOrNull(predicate: (A) -> Boolean): A? {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is Some -> if (predicate(value)) value else null
-      is None -> null
-    }
-  }
-
-  public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-    foldLeft(empty()) { b, a -> b.combine(f(a)) }
-  }
-
-  public inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    when (this) {
-      is Some -> operation(initial, value)
-      is None -> initial
-    }
-
-  public fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
-    align(other) { ior ->
-      ior.fold(
-        { it to null },
-        { null to it },
-        { a, b -> a to b }
-      )
-    }
-
-  public inline fun <B, C> padZip(other: Option<B>, f: (A?, B?) -> C): Option<C> =
-    align(other) { ior ->
-      ior.fold(
-        { f(it, null) },
-        { f(null, it) },
-        { a, b -> f(a, b) }
-      )
-    }
-
-  public inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
-    when (this) {
-      is None -> null
-      is Some -> operation(initial(value), value)
-    }
-
-  public fun replicate(n: Int): Option<List<A>> =
-    if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
-
-  public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> {
-    contract { callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE) }
-    return fold({ ifEmpty().left() }, { it.right() })
-  }
-
-  public fun toList(): List<A> = fold(::emptyList) { listOf(it) }
-
-  public fun void(): Option<Unit> =
-    map { Unit }
-
-  public fun <L> pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
-
-  public fun <R> pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
-
-  public infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
-    None
-  } else {
-    value
-  }
-
-  override fun toString(): String = fold(
+  override fun toString(): String = fold<Any?, String>(
     { "Option.None" },
     { "Option.Some($it)" }
   )
 }
 
-public object None : Option<Nothing>() {
-  override fun isEmpty(): Boolean = true
+@PublishedApi
+internal inline fun <reified T> isTypeOption(): Boolean =
+  boxedSomeUnit is T && Unit !is T // Checks that a known Option value inhertis from that type but that a regular Any value doesn't
 
-  override fun toString(): String = "Option.None"
+@PublishedApi
+@OptionInternals
+internal val <A> Option<A>.value: A
+  get() =
+    when (underlying) {
+      is NestedNull -> if (underlying.nesting == 0U) null else NestedNull(underlying.nesting - 1U)
+      is NestedNone ->
+        if (underlying.nesting == 0U) error("Cannot unpack the value of an Option.None")
+        else NestedNone(underlying.nesting - 1U)
+
+      else -> underlying
+    } as A
+
+public inline fun <reified A, reified B> Option<A>.zip(other: Option<B>): Option<Pair<A, B>> =
+  zip(other, ::Pair)
+
+public inline fun <reified A, reified B, reified C> Option<A>.zip(
+  b: Option<B>,
+  map: (A, B) -> C
+): Option<C> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(
+    b,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit
+  ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
 }
 
-public data class Some<out T>(val value: T) : Option<T>() {
-  override fun isEmpty(): Boolean = false
+public inline fun <reified A, reified B, reified C, reified D> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  map: (A, B, C) -> D
+): Option<D> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(
+    b,
+    c,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit
+  ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+}
 
-  override fun toString(): String = "Option.Some($value)"
+/**
+ * The given function is applied as a fire and forget effect
+ * if this is a `None`.
+ * When applied the result is ignored and the original
+ * None value is returned
+ *
+ * Example:
+ * ```kotlin
+ * import arrow.core.Some
+ * import arrow.core.none
+ * import arrow.core.tapNone
+ *
+ * fun main() {
+ *   Some(12).tapNone { println("flower") } // Result: Some(12)
+ *   none<Int>().tapNone { println("flower") }  // Result: prints "flower" and returns: None
+ * }
+ * ```
+ * <!--- KNIT example-option-17.kt -->
+ */
+public inline fun <A> Option<A>.tapNone(f: () -> Unit): Option<A> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  if (this == None) f()
+  return this
+}
 
-  public companion object {
-    @PublishedApi
-    internal val unit: Option<Unit> = Some(Unit)
+/**
+ * The given function is applied as a fire and forget effect
+ * if this is a `some`.
+ * When applied the result is ignored and the original
+ * Some value is returned
+ *
+ * Example:
+ * ```kotlin
+ * import arrow.core.Some
+ * import arrow.core.none
+ * import arrow.core.tap
+ *
+ * fun main() {
+ *   Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
+ *   none<Int>().tap { println("flower") }  // Result: None
+ * }
+ * ```
+ * <!--- KNIT example-option-18.kt -->
+ */
+public inline fun <reified A> Option<A>.tap(f: (A) -> Unit): Option<A> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return fold(
+    {
+      this
+    },
+    { value ->
+      f(value)
+      this
+    }
+  )
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  map: (A, B, C, D) -> E
+): Option<E> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(
+    b,
+    c,
+    d,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit,
+    someUnit
+  ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  map: (A, B, C, D, E) -> F
+): Option<F> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(b, c, d, e, someUnit, someUnit, someUnit, someUnit, someUnit) { a, b, c, d, e, f, _, _, _, _ ->
+    map(
+      a,
+      b,
+      c,
+      d,
+      e
+    )
   }
 }
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F, reified G> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  f: Option<F>,
+  map: (A, B, C, D, E, F) -> G
+): Option<G> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(b, c, d, e, f, someUnit, someUnit, someUnit, someUnit) { a, b, c, d, e, f, _, _, _, _ ->
+    map(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f
+    )
+  }
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F, reified G, reified H> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  f: Option<F>,
+  g: Option<G>,
+  map: (A, B, C, D, E, F, G) -> H
+): Option<H> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(b, c, d, e, f, g, someUnit, someUnit, someUnit) { a, b, c, d, e, f, g, _, _, _ ->
+    map(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g
+    )
+  }
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F, reified G, reified H, reified I> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  f: Option<F>,
+  g: Option<G>,
+  h: Option<H>,
+  map: (A, B, C, D, E, F, G, H) -> I
+): Option<I> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(b, c, d, e, f, g, h, someUnit, someUnit) { a, b, c, d, e, f, g, h, _, _ ->
+    map(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h
+    )
+  }
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F, reified G, reified H, reified I, reified J> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  f: Option<F>,
+  g: Option<G>,
+  h: Option<H>,
+  i: Option<I>,
+  map: (A, B, C, D, E, F, G, H, I) -> J
+): Option<J> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return zip(b, c, d, e, f, g, h, i, someUnit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+}
+
+public inline fun <reified A, reified B, reified C, reified D, reified E, reified F, reified G, reified H, reified I, reified J, reified K> Option<A>.zip(
+  b: Option<B>,
+  c: Option<C>,
+  d: Option<D>,
+  e: Option<E>,
+  f: Option<F>,
+  g: Option<G>,
+  h: Option<H>,
+  i: Option<I>,
+  j: Option<J>,
+  map: (A, B, C, D, E, F, G, H, I, J) -> K
+): Option<K> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  val a =
+    this.getOrElse {
+      return None
+    }
+  val b =
+    b.getOrElse {
+      return None
+    }
+  val c =
+    c.getOrElse {
+      return None
+    }
+  val d =
+    d.getOrElse {
+      return None
+    }
+  val e =
+    e.getOrElse {
+      return None
+    }
+  val f =
+    f.getOrElse {
+      return None
+    }
+  val g =
+    g.getOrElse {
+      return None
+    }
+  val h =
+    h.getOrElse {
+      return None
+    }
+  val i =
+    i.getOrElse {
+      return None
+    }
+  val j =
+    j.getOrElse {
+      return None
+    }
+  return Some(map(a, b, c, d, e, f, g, h, i, j))
+}
+
+/**
+ * Returns true if the option is [None], false otherwise.
+ * @note Used only for performance instead of fold.
+ */
+public fun <A> Option<A>.isEmpty(): Boolean = this == None
+
+public fun <A> Option<A>.isNotEmpty(): Boolean = !isEmpty()
+
+/**
+ * alias for [isDefined]
+ */
+public fun <A> Option<A>.nonEmpty(): Boolean = isDefined()
+
+/**
+ * Returns true if the option is an instance of [Some], false otherwise.
+ * @note Used only for performance instead of fold.
+ */
+public fun <A> Option<A>.isDefined(): Boolean = !isEmpty()
+
+public inline fun <reified A> Option<A>.orNull(): A? {
+  return fold({ null }, ::identity)
+}
+
+/**
+ * Returns a [Some<$B>] containing the result of applying $f to this $option's
+ * value if this $option is nonempty. Otherwise return $none.
+ *
+ * @note This is similar to `flatMap` except here,
+ * $f does not need to wrap its result in an $option.
+ *
+ * @param f the function to apply
+ * @see flatMap
+ */
+public inline fun <reified A, reified B> Option<A>.map(f: (A) -> B): Option<B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return flatMap { a -> Some(f(a)) }
+}
+
+@OptIn(OptionInternals::class)
+public inline fun <reified A, R> Option<A>.fold(ifEmpty: () -> R, ifSome: (A) -> R): R {
+  contract {
+    callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ifSome, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (this) {
+    None -> ifEmpty()
+    else -> {
+      val value = value
+      if (isTypeOption<A>() && value != null) Option.construct<Any>(value).invokeBlockOnOption(ifSome)
+      else ifSome(value)
+    }
+  }
+}
+
+/**
+ * This function is used to ensure that an Option doesn't get boxed when it gets passed
+ * to the $block. It unsafely casts it inside, but because it is inline, the compiler ultimately doesn't box
+ * the Option.
+ */
+@PublishedApi
+internal inline fun <R, A> Option<*>.invokeBlockOnOption(block: (A) -> R): R {
+  return block(this as A)
+}
+
+/**
+ * Returns $none if the result of applying $f to this $option's value is null.
+ * Otherwise returns the result.
+ *
+ * @note This is similar to `.flatMap { Option.fromNullable(null)) }`
+ * and primarily for convenience.
+ *
+ * @param f the function to apply.
+ * */
+public inline fun <reified A, reified B> Option<A>.mapNotNull(f: (A) -> B?): Option<B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return flatMap { a -> fromNullable(f(a)) }
+}
+
+/**
+ * Returns the result of applying $f to this $option's value if
+ * this $option is nonempty.
+ * Returns $none if this $option is empty.
+ * Slightly different from `map` in that $f is expected to
+ * return an $option (which could be $none).
+ *
+ * @param f the function to apply
+ * @see map
+ */
+public inline fun <reified A, B> Option<A>.flatMap(f: (A) -> Option<B>): Option<B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return fold({ None }, f)
+}
+
+/**
+ * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
+ */
+public inline infix fun <reified A, reified B> Option<A>.align(b: Option<B>): Option<Ior<A, B>> =
+  fold({
+    b.fold({ None }) { Some(it.rightIor()) }
+  },
+    { a ->
+      b.fold({
+        Some(a.leftIor())
+      },
+        {
+          Some(Pair(a, it).bothIor())
+        })
+    })
+
+/**
+ * Align two options (`this` on the left and [b] on the right) as one Option of [Ior], and then, if it's not [None], map it using [f].
+ *
+ * @note This function works like a regular `align` function, but is then mapped by the `map` function.
+ */
+public inline fun <reified A, reified B, reified C> Option<A>.align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return align(b).map(f)
+}
+
+/**
+ * Returns true if this option is empty '''or''' the predicate
+ * $predicate returns true when applied to this $option's value.
+ *
+ * @param predicate the predicate to test
+ */
+public inline fun <reified A> Option<A>.all(predicate: (A) -> Boolean): Boolean {
+  contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+  return fold({ true }, predicate)
+}
+
+public inline fun <reified A, reified B> Option<A>.crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
+  fold({ None }, { f(it).map(::Some) })
+
+public inline fun <reified A, K, reified V> Option<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
+  fold({ emptyMap() }) { value ->
+    f(value).mapValues { Some(it.value) }
+  }
+
+public inline fun <reified A, reified B> Option<A>.crosswalkNull(f: (A) -> B?): Option<B>? =
+  fold({ null }) {
+    f(it)?.let(::Some)
+  }
+
+/**
+ * Returns this $option if it is nonempty '''and''' applying the predicate $p to
+ * this $option's value returns true. Otherwise, return $none.
+ *
+ *  @param predicate the predicate used for testing.
+ */
+public inline fun <reified A> Option<A>.filter(predicate: (A) -> Boolean): Option<A> {
+  contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+  return flatMap { a -> if (predicate(a)) Some(a) else None }
+}
+
+/**
+ * Returns this $option if it is nonempty '''and''' applying the predicate $p to
+ * this $option's value returns false. Otherwise, return $none.
+ *
+ * @param predicate the predicate used for testing.
+ */
+public inline fun <reified A> Option<A>.filterNot(predicate: (A) -> Boolean): Option<A> {
+  contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+  return flatMap { a -> if (!predicate(a)) Some(a) else None }
+}
+
+/**
+ * Returns true if this option is nonempty '''and''' the predicate
+ * $p returns true when applied to this $option's value.
+ * Otherwise, returns false.
+ *
+ * Example:
+ * ```kotlin
+ * import arrow.core.Some
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.exists
+ *
+ * fun main() {
+ *   Some(12).exists { it > 10 } // Result: true
+ *   Some(7).exists { it > 10 }  // Result: false
+ *
+ *   val none: Option<Int> = None
+ *   none.exists { it > 10 }      // Result: false
+ * }
+ * ```
+ * <!--- KNIT example-option-19.kt -->
+ *
+ * @param predicate the predicate to test
+ */
+public inline fun <reified A> Option<A>.exists(predicate: (A) -> Boolean): Boolean {
+  contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+  return fold({ false }, predicate)
+}
+
+/**
+ * Returns the $option's value if this option is nonempty '''and''' the predicate
+ * $p returns true when applied to this $option's value.
+ * Otherwise, returns null.
+ *
+ * Example:
+ * ```kotlin
+ * import arrow.core.Some
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.exists
+ *
+ * fun main() {
+ *   Some(12).exists { it > 10 } // Result: 12
+ *   Some(7).exists { it > 10 }  // Result: null
+ *
+ *   val none: Option<Int> = None
+ *   none.exists { it > 10 }      // Result: null
+ * }
+ * ```
+ * <!--- KNIT example-option-20.kt -->
+ */
+public inline fun <reified A> Option<A>.findOrNull(predicate: (A) -> Boolean): A? {
+  contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+  return fold({ null }) {
+    it.takeIf(predicate)
+  }
+}
+
+public inline fun <reified A, B> Option<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
+  foldLeft(empty()) { b, a -> b.combine(f(a)) }
+}
+
+public inline fun <reified A, B> Option<A>.foldLeft(initial: B, operation: (B, A) -> B): B =
+  fold({ initial }) {
+    operation(initial, it)
+  }
+
+public inline fun <reified A, reified B> Option<A>.padZip(other: Option<B>): Option<Pair<A?, B?>> =
+  align(other) { ior ->
+    ior.fold(
+      { it to null },
+      { null to it },
+      { a, b -> a to b }
+    )
+  }
+
+public inline fun <reified A, reified B, reified C> Option<A>.padZip(other: Option<B>, f: (A?, B?) -> C): Option<C> =
+  align(other) { ior ->
+    ior.fold(
+      { f(it, null) },
+      { f(null, it) },
+      { a, b -> f(a, b) }
+    )
+  }
+
+public inline fun <reified A, B> Option<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
+  fold({ null }) {
+    operation(initial(it), it)
+  }
+
+public inline fun <reified A> Option<A>.replicate(n: Int): Option<List<A>> =
+  if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
+
+public inline fun <reified A, L> Option<A>.toEither(ifEmpty: () -> L): Either<L, A> {
+  contract { callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE) }
+  return fold({ ifEmpty().left() }, { it.right() })
+}
+
+public inline fun <reified A> Option<A>.toList(): List<A> = fold(::emptyList) { listOf(it) }
+
+public fun <A> Option<A>.void(): Option<Unit> =
+  someUnit
+
+public inline fun <reified A, L> Option<A>.pairLeft(left: L): Option<Pair<L, A>> = this.map { left to it }
+
+public inline fun <reified A, R> Option<A>.pairRight(right: R): Option<Pair<A, R>> = this.map { it to right }
+
+public infix fun <A, X> Option<A>.and(value: Option<X>): Option<X> = if (isEmpty()) {
+  None
+} else {
+  value
+}
+
+@OptIn(OptionInternals::class)
+public val None: Option<Nothing> = Option.construct(NestedNone(0U))
+
+@PublishedApi
+internal data class NestedNone internal constructor(val nesting: UInt) {
+  companion object {
+    private val cache = Array(22) { NestedNone(it.toUInt()) }
+    operator fun invoke(nesting: UInt) =
+      cache.getOrElse(nesting.toInt()) { NestedNone(it.toUInt()) }
+  }
+
+  override fun toString(): String =
+    nesting.toInt().coerceAtLeast(0).let { nesting ->
+      buildString("Option.Some()".length * nesting + "Option.None".length) {
+        repeat(nesting) { this.append("Option.Some(") }
+        append("Option.None")
+        repeat(nesting) { this.append(")") }
+      }
+    }
+}
+
+@PublishedApi
+internal data class NestedNull internal constructor(val nesting: UInt) {
+  companion object {
+    private val cache = Array(22) { NestedNull(it.toUInt()) }
+    operator fun invoke(nesting: UInt) =
+      cache.getOrElse(nesting.toInt()) { NestedNull(it.toUInt()) }
+  }
+
+  override fun toString(): String =
+    nesting.toInt().coerceAtLeast(0).let { nesting ->
+      buildString("Option.Some()".length * nesting + "null".length) {
+        repeat(nesting) { this.append("Option.Some(") }
+        append("null")
+        repeat(nesting) { this.append(")") }
+      }
+    }
+}
+
+@OptIn(OptionInternals::class)
+public inline fun <reified T> Some(value: T): Option<T> {
+  // This `is` check gets inlined by the compiler if `value` is statically known to be an Option
+  val trueValue = if (value is Option<*>) value.underlying else value
+  return _Some(if (isTypeOption<T>()) trueValue else value)
+}
+
+@OptionInternals
+@PublishedApi
+internal fun <T> _Some(trueValue: Any?): Option<T> =
+  Option.construct(
+    when (trueValue) {
+      is NestedNone -> NestedNone(trueValue.nesting + 1U)
+      is NestedNull -> NestedNull(trueValue.nesting + 1U)
+      else -> trueValue ?: NestedNull(0U)
+    }
+  )
+
+@PublishedApi
+internal val someUnit: Option<Unit> = Some(Unit)
+
+@PublishedApi
+internal val boxedSomeUnit: Any = someUnit
+
 
 /**
  * Returns the option's value if the option is nonempty, otherwise
@@ -876,7 +990,7 @@ public data class Some<out T>(val value: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
+public inline fun <reified T> Option<T>.getOrElse(default: () -> T): T {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return fold({ default() }, ::identity)
 }
@@ -898,9 +1012,9 @@ public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) 
   this
 }
 
-public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
+public inline fun <reified T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
-public inline fun <A> Boolean.maybe(f: () -> A): Option<A> {
+public inline fun <reified A> Boolean.maybe(f: () -> A): Option<A> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
   return if (this) {
     Some(f())
@@ -909,7 +1023,7 @@ public inline fun <A> Boolean.maybe(f: () -> A): Option<A> {
   }
 }
 
-public fun <A> A.some(): Option<A> = Some(this)
+public inline fun <reified A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
@@ -918,23 +1032,20 @@ public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
   fold(Monoid.option(MA))
 
 @Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
-public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
+public inline fun <reified A> Option<A>.combineAll(MA: Monoid<A>): A =
   getOrElse { MA.empty() }
 
-public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> {
+public inline fun <reified A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> {
   contract {
     callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     callsInPlace(error, InvocationKind.AT_MOST_ONCE)
   }
-  return when (this) {
-    is Some ->
-      if (predicate(value)) this
-      else {
-        error()
-        None
-      }
-
-    is None -> this
+  return fold({ None }) {
+    if (predicate(it)) this
+    else {
+      error()
+      None
+    }
   }
 }
 
@@ -949,7 +1060,7 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
     }
   }
 
-public inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> {
+public inline fun <reified A> Option<A>.handleError(f: (Unit) -> A): Option<A> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
   return handleErrorWith { Some(f(Unit)) }
 }
@@ -962,7 +1073,7 @@ public inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<
 public fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
-public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> {
+public inline fun <reified A, reified B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> {
   contract {
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
@@ -970,7 +1081,7 @@ public inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option
   return map(fb).handleError(fe)
 }
 
-public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> {
+public inline fun <reified A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> {
   contract {
     callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
@@ -978,15 +1089,15 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
   return flatMap(fb).handleErrorWith(fe)
 }
 
-public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
+public inline fun <reified A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   if (n <= 0) Some(empty())
   else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
 }
 
-public fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
+public inline fun <reified A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
 
-public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
+public inline fun <reified A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
   align(b) {
     it.fold(::identity, ::identity) { a, b ->
       SA.run { a.combine(b) }
@@ -999,39 +1110,38 @@ public fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
  * @receiver Option of Either
  * @return a tuple containing Option of [Either.Left] and another Option of its [Either.Right] value.
  */
-public fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> {
+public inline fun <reified A, reified B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> {
   val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
   val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
   return asep to bsep
 }
 
-public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
+public inline fun <reified A, reified B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
 
-public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
-  when (val option = this.map(f)) {
-    is None -> None to None
-    is Some -> when (val v = option.value) {
+public inline fun <reified A, reified B, reified C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
+  map(f).fold({ None to None }) {
+    when (val v = it) {
       is Ior.Left -> Some(v.value) to None
       is Ior.Right -> None to Some(v.value)
       is Ior.Both -> Some(v.leftValue) to Some(v.rightValue)
     }
   }
 
-public fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
+public inline fun <reified A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
   map { iterable ->
     iterable.fold(MA)
   }
 
-public fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
+public inline fun <A, reified B> Option<Either<A, B>>.uniteEither(): Option<B> =
   flatMap { either ->
     either.fold({ None }, { b -> Some(b) })
   }
 
-public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
+public inline fun <reified A, reified B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
   unzip(::identity)
 
-public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
+public inline fun <reified A, reified B, reified C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
   fold(
     { None to None },
     { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
@@ -1062,17 +1172,14 @@ public fun <B, A : B> Option<A>.widen(): Option<B> =
 
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
-public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
-  when (this) {
-    is Some -> when (b) {
-      is Some -> Some(SGA.run { value.combine(b.value) })
-      None -> this
+public inline fun <reified A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+  fold({ b }) { a ->
+    b.fold({ this }) { b ->
+      Some(SGA.run { a.combine(b) })
     }
-
-    None -> b
   }
 
-public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
+public inline operator fun <reified A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },
   { a1 ->
     other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
@@ -1123,8 +1230,5 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-23.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
-  when (this@recover) {
-    is None -> option { recover(this, None) }
-    is Some -> this@recover
-  }
+public inline fun <reified A> Option<A>.recover(recover: OptionRaise.(Option<Nothing>) -> A): Option<A> =
+  fold({ option { recover(this, None) } }) { this }

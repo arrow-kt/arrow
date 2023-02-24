@@ -2,6 +2,7 @@ package arrow.optics.typeclasses
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.fold
 import arrow.optics.Lens
 import arrow.optics.Optional
 import arrow.optics.PLens
@@ -55,7 +56,7 @@ public fun interface At<S, I, A> {
   public companion object {
 
     @JvmStatic
-    public fun <K, V> map(): At<Map<K, V>, K, Option<V>> =
+    public inline fun <K, reified V> map(): At<Map<K, V>, K, Option<V>> =
       At { i ->
         PLens(
           get = { Option.fromNullable(it[i]) },

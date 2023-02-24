@@ -3,6 +3,7 @@ package arrow.core.examples.exampleOption17
 
 import arrow.core.Some
 import arrow.core.none
+import arrow.core.tapNone
 
 fun main() {
   Some(12).tapNone { println("flower") } // Result: Some(12)

@@ -246,7 +246,7 @@ public fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
   return destination
 }
 
-public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
+public inline fun <K, reified A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
 
 /**
  * Returns a Map containing all elements that are instances of specified type parameter R.
@@ -421,7 +421,7 @@ public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
 public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
 
-public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
+public inline fun <K, reified V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
 public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
   if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }

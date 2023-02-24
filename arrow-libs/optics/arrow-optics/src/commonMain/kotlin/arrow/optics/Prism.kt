@@ -1,16 +1,8 @@
 package arrow.optics
 
-import arrow.core.Either
+import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.compose
-import arrow.core.flatMap
-import arrow.core.identity
-import arrow.core.left
-import arrow.core.right
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic

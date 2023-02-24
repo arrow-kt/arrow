@@ -12,5 +12,5 @@ import arrow.core.identity
 suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> =
   fold({ Either.Left(it) }) { Either.Right(it) }
 
-suspend fun <A> Effect<None, A>.toOption(): Option<A> =
+suspend inline fun <reified A> Effect<Option<Nothing>, A>.toOption(): Option<A> =
   fold(::identity) { Some(it) }

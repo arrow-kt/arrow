@@ -1,13 +1,6 @@
 package arrow.optics
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.flatMap
-import arrow.core.identity
-import arrow.core.prependTo
-import arrow.core.toOption
+import arrow.core.*
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 

@@ -1,7 +1,7 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleOption13
 
-import arrow.core.toOption
+import arrow.core.*
 
 val nullString: String? = null
 val valueFromNull = nullString.toOption()

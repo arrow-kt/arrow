@@ -184,7 +184,7 @@ class EitherTest : StringSpec({
     
     "orNone should return None when left" {
       checkAll(Arb.string()) { a: String ->
-        Left(a).orNone() shouldBe None
+        Left(a).orNone<String, Any?>() shouldBe None
       }
     }
     
