@@ -5,6 +5,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -22,6 +23,17 @@ class OptionTest : StringSpec({
 
     testLaws(
       MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
+    )
+    testLaws(
+      MonoidLaws.laws(Monoid.option(Semigroup.option(Monoid.int())), Arb.option(Arb.option(Arb.int()))),
+    )
+
+    testLaws(
+      MonoidLaws.laws(Monoid.option(Semigroup.option(Monoid.option(Monoid.int()))), Arb.option(Arb.option(Arb.option(Arb.int())))),
+    )
+
+    testLaws(
+      MonoidLaws.laws(Monoid.option(Monoid.option(Semigroup.option(Monoid.int()))), Arb.option(Arb.option(Arb.option(Arb.int())))),
     )
 
     "ensure null in option computation" {

@@ -1,7 +1,6 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-
 package arrow.core.raise
 
 import arrow.atomic.Atomic

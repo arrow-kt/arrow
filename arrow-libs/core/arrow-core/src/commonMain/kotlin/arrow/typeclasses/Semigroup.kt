@@ -98,7 +98,8 @@ public fun interface Semigroup<A> {
         NonEmptyList(a.head, a.tail.plus(b))
     }
 
-    private class OptionSemigroup<A>(
+    @PublishedApi
+    internal class OptionSemigroup<A>(
       private val SGA: Semigroup<A>
     ) : Semigroup<Option<A>> {
 

@@ -100,7 +100,8 @@ public interface Monoid<A> : Semigroup<A> {
     public fun <A, B> pair(MA: Monoid<A>, MB: Monoid<B>): Monoid<Pair<A, B>> =
       PairMonoid(MA, MB)
 
-    private class OptionMonoid<A>(
+    @PublishedApi
+    internal class OptionMonoid<A>(
       private val MA: Semigroup<A>
     ) : Monoid<Option<A>> {
   

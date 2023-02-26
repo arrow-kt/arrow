@@ -1,12 +1,13 @@
 @file:OptIn(ExperimentalContracts::class)
-
 package arrow.core
 
 import arrow.core.Option.Companion.fromNullable
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Monoid.Companion.OptionMonoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroup.Companion.OptionSemigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -996,6 +997,18 @@ public inline fun <reified T> Option<T>.getOrElse(default: () -> T): T {
 }
 
 /**
+ * Returns the option's value if the option is nonempty, otherwise
+ * return the result of evaluating `default`.
+ *
+ * @param default the default expression.
+ */
+@JvmName("getOrElseOption")
+public inline fun <reified T> Option<Option<T>>.getOrElse(default: () -> Option<T>): Option<T> {
+  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold({ default() }, ::identity)
+}
+
+/**
  * Returns this option's if the option is nonempty, otherwise
  * returns another option provided lazily by `default`.
  *
@@ -1175,9 +1188,57 @@ public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 public inline fun <reified A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
   fold({ b }) { a ->
     b.fold({ this }) { b ->
-      Some(SGA.run { a.combine(b) })
+      SGA.combineToOption(a, b)
     }
   }
+
+// The purpose of this function is that, within the implementation of OptionSemigroup/Monoid
+// We can't know whether A inside the Option is meant to be a Option<Option<*>>. The impl just casts the Semigroup<A> to
+// a Semigroup<Any?> and lets nature take its course. If the values are  meant to be a nested Option, then the impl would fail
+// because it would pass the raw value of the nested Option instead of a boxed value. We deal with this here in the else branch
+// by ensuring that we coerce our values to be an Option if $this is an OptionSemigroup/Monoid. Also, in the if branch
+// we have some minor optimisations to ensure that first and second aren't boxed if they're intended to be passed to OS/OM
+@OptIn(OptionInternals::class)
+@Suppress("UNCHECKED_CAST")
+@PublishedApi
+internal inline fun <reified A> Semigroup<A>.combineToOption(first: A, second: A): Option<A> =
+  if (isTypeOption<A>() && null !is A) {
+    val first = first as Option<*>
+    val second = second as Option<*>
+    // It's important here to only cast the value as A when it's inside the option, otherwise we get unnecessary boxing
+    when {
+      this is OptionMonoid<*> ->
+        Some((this as OptionMonoid<Any?>).append(first, second)) as Option<A>
+
+      this is OptionSemigroup<*> ->
+        Some((this as OptionSemigroup<Any?>).append(first, second)) as Option<A>
+
+      else ->
+        Some((this as Semigroup<Option<*>>).append(first.rebox(), second.rebox()) as A)
+    }
+  } else {
+    when (this) {
+      is OptionMonoid<*> -> {
+        val first = if (first is Option<*>) first else Option.construct<Any>(first!!)
+        val second = if (second is Option<*>) second else Option.construct<Any>(second!!)
+        Some((this as OptionMonoid<Any?>).append(first, second)) as Option<A>
+      }
+
+      is OptionSemigroup<*> -> {
+        val first = if (first is Option<*>) first else Option.construct<Any>(first!!)
+        val second = if (second is Option<*>) second else Option.construct<Any>(second!!)
+        Some((this as OptionSemigroup<Any?>).append(first, second)) as Option<A>
+      }
+      else -> Some(first.combine(second))
+    }
+  }
+
+/**
+ * Purposefully NOT inline because, as the name suggests, this will cause the [this] to be reboxed,
+ * which convinces the compiler that [this] Maybe is not being used in an Any or generic context
+ */
+@PublishedApi
+internal fun <A> Option<A>.rebox(): Option<A> = this
 
 public inline operator fun <reified A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },
