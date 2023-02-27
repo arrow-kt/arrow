@@ -1614,9 +1614,15 @@ public fun <A> Option<A>.combine(combineA: (A, A) -> A, b: Option<A>): Option<A>
     None -> b
   }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("SGA.run { combine({ x, y -> x + y }, b) }"))
+@Deprecated(
+  "Prefer using the inline option DSL",
+  ReplaceWith(
+    "option { SGA.run { bind().combine(b.bind()) } }",
+    "arrow.core.raise.option"
+  )
+)
 public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
-  SGA.run { combine({ x, y -> x + y }, b) }
+  option { SGA.run { bind().combine(b.bind()) } }
 
 public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },
