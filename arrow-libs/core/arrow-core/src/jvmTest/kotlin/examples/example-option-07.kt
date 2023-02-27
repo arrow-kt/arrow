@@ -6,10 +6,7 @@ import arrow.core.Option
 import arrow.core.Some
 
 val someValue: Option<Double> = Some(20.0)
-val value = when(someValue) {
- is Some -> someValue.value
- is None -> 0.0
-}
+val value = someValue.fold({ 0.0 }) { it }
 fun main () {
  println("value = $value")
 }

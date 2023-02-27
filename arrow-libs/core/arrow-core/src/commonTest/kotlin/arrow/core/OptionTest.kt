@@ -55,10 +55,7 @@ class OptionTest : StringSpec({
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
         val res = option.tap { effect += 1 }
-        val expected = when (option) {
-          is Some -> 1
-          is None -> 0
-        }
+        val expected = option.fold({ 0 }) { 1 }
         effect shouldBe expected
         res shouldBe option
       }
@@ -68,10 +65,7 @@ class OptionTest : StringSpec({
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
         val res = option.tapNone { effect += 1 }
-        val expected = when (option) {
-          is Some -> 0
-          is None -> 1
-        }
+        val expected = option.fold({ 1 }) { 0 }
         effect shouldBe expected
         res shouldBe option
       }

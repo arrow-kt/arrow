@@ -8,6 +8,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.identity
+import arrow.core.getOrElse
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -223,9 +224,9 @@ public interface Raise<in R> {
    * suspend fun test() {
    *   val empty: Option<Int> = None
    *   either {
-   *     val x: Int = empty.bind { _: None -> 1 }
-   *     val y: Int = empty.bind { _: None -> raise("Something bad happened: Boom!") }
-   *     val z: Int = empty.recover { _: None ->
+   *     val x: Int = empty.bind { _: Option<Nothing> -> 1 }
+   *     val y: Int = empty.bind { _: Option<Nothing> -> raise("Something bad happened: Boom!") }
+   *     val z: Int = empty.recover { _: Option<Nothing> ->
    *       delay(10)
    *       1
    *     }.bind { raise("Something bad happened: Boom!") }
@@ -236,11 +237,8 @@ public interface Raise<in R> {
    * <!--- KNIT example-raise-dsl-06.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
-    when (this) {
-      None -> transform(None)
-      is Some -> value
-    }
+  public fun <A> Option<A>.bind(transform: Raise<R>.(Option<Nothing>) -> A): A =
+    getOrElse { transform(None) }
 
   @RaiseDSL
   public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<R>.(E) -> A): A =

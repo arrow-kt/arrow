@@ -28,8 +28,8 @@ public suspend fun <E, A> Effect<E, A>.toOption(orElse: suspend (E) -> Option<A>
 public fun <E, A> EagerEffect<E, A>.toOption(orElse: (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
 
 /** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
-public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
-public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
+public suspend fun <A> Effect<Option<Nothing>, A>.toOption(): Option<A> = option { invoke() }
+public fun <A> EagerEffect<Option<Nothing>, A>.toOption(): Option<A> = option { invoke() }
 
 /** Run the [Effect] by returning [Result] of [A], [orElse] run the fallback lambda and returning its result of [Result] of [A]. */
 public suspend fun <E, A> Effect<E, A>.toResult(orElse: suspend (E) -> Result<A>): Result<A> =

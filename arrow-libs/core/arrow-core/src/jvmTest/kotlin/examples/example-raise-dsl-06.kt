@@ -12,9 +12,9 @@ import io.kotest.matchers.shouldBe
 suspend fun test() {
   val empty: Option<Int> = None
   either {
-    val x: Int = empty.bind { _: None -> 1 }
-    val y: Int = empty.bind { _: None -> raise("Something bad happened: Boom!") }
-    val z: Int = empty.recover { _: None ->
+    val x: Int = empty.bind { _: Option<Nothing> -> 1 }
+    val y: Int = empty.bind { _: Option<Nothing> -> raise("Something bad happened: Boom!") }
+    val z: Int = empty.recover { _: Option<Nothing> ->
       delay(10)
       1
     }.bind { raise("Something bad happened: Boom!") }

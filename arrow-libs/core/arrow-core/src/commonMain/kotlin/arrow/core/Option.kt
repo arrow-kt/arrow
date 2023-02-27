@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
-import arrow.core.Either.Right
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
@@ -9,6 +8,7 @@ import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -105,8 +105,8 @@ import kotlin.jvm.JvmStatic
  *  if (flag) Some("Found value") else None
  *
  *  //sampleStart
- * val valueSome = maybeItWillReturnSomething(true) is None
- * val valueNone = maybeItWillReturnSomething(false) is None
+ * val valueSome = maybeItWillReturnSomething(true) == None
+ * val valueNone = maybeItWillReturnSomething(false) == None
  * //sampleEnd
  * fun main() {
  *  println("valueSome = $valueSome")
@@ -138,10 +138,7 @@ import kotlin.jvm.JvmStatic
  *
  * //sampleStart
  * val someValue: Option<Double> = Some(20.0)
- * val value = when(someValue) {
- *  is Some -> someValue.value
- *  is None -> 0.0
- * }
+ * val value = someValue.fold({ 0.0 }) { it }
  * //sampleEnd
  * fun main () {
  *  println("value = $value")
@@ -156,10 +153,7 @@ import kotlin.jvm.JvmStatic
  *
  * //sampleStart
  * val noValue: Option<Double> = None
- * val value = when(noValue) {
- *  is Some -> noValue.value
- *  is None -> 0.0
- * }
+ * val value = noValue.fold({ 0.0 }) { it }
  * //sampleEnd
  * fun main () {
  *  println("value = $value")
@@ -310,7 +304,8 @@ import kotlin.jvm.JvmStatic
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
  * Originally based on the Scala Koans.
  */
-public sealed class Option<out A> {
+@JvmInline
+public value class Option<out A> private constructor(private val underlying: Any) {
 
   public companion object {
 
@@ -318,7 +313,7 @@ public sealed class Option<out A> {
     public fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 
     @JvmStatic
-    public operator fun <A> invoke(a: A): Option<A> = Some(a)
+    public operator fun <A> invoke(a: A): Option<A> = Option(a ?: OptionNullValue)
 
     @JvmStatic
     @JvmName("tryCatchOrNone")
@@ -350,6 +345,15 @@ public sealed class Option<out A> {
       { it.map(f) }
   }
 
+  @PublishedApi
+  internal val value: A
+    get() = when (underlying) {
+      is OptionNullValue -> null
+      is OptionNoneValue -> error("Cannot unpack the value of an Option.None")
+      else -> underlying
+    } as A
+
+
   public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
     zip(other, ::Pair)
 
@@ -359,15 +363,12 @@ public sealed class Option<out A> {
   ): Option<C> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
     return zip(
-      b,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
+      b, someUnit, someUnit, someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit
     ) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
   }
 
@@ -380,13 +381,13 @@ public sealed class Option<out A> {
     return zip(
       b,
       c,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit
     ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
   }
 
@@ -410,14 +411,8 @@ public sealed class Option<out A> {
    */
   public inline fun tapNone(f: () -> Unit): Option<A> {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> {
-        f()
-        this
-      }
-
-      is Some -> this
-    }
+    if (isEmpty()) f()
+    return this
   }
 
   /**
@@ -440,12 +435,9 @@ public sealed class Option<out A> {
    */
   public inline fun tap(f: (A) -> Unit): Option<A> {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> this
-      is Some -> {
-        f(this.value)
-        this
-      }
+    return fold({ this }) {
+      f(it)
+      this
     }
   }
 
@@ -460,12 +452,12 @@ public sealed class Option<out A> {
       b,
       c,
       d,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit,
-      Some.unit
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit,
+      someUnit
     ) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
   }
 
@@ -477,7 +469,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E) -> F
   ): Option<F> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, Some.unit, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+    return zip(b, c, d, e, someUnit, someUnit, someUnit, someUnit, someUnit) { a, b, c, d, e, f, _, _, _, _ ->
       map(
         a,
         b,
@@ -497,7 +489,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F) -> G
   ): Option<G> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, Some.unit, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, _, _, _, _ ->
+    return zip(b, c, d, e, f, someUnit, someUnit, someUnit, someUnit) { a, b, c, d, e, f, _, _, _, _ ->
       map(
         a,
         b,
@@ -519,7 +511,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G) -> H
   ): Option<H> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, Some.unit, Some.unit, Some.unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+    return zip(b, c, d, e, f, g, someUnit, someUnit, someUnit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
   }
 
   public inline fun <B, C, D, E, F, G, H, I> zip(
@@ -533,7 +525,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H) -> I
   ): Option<I> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, Some.unit, Some.unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+    return zip(b, c, d, e, f, g, h, someUnit, someUnit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
   }
 
   public inline fun <B, C, D, E, F, G, H, I, J> zip(
@@ -548,7 +540,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I) -> J
   ): Option<J> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return zip(b, c, d, e, f, g, h, i, Some.unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+    return zip(b, c, d, e, f, g, h, i, someUnit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
   }
 
   public inline fun <B, C, D, E, F, G, H, I, J, K> zip(
@@ -564,18 +556,44 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I, J) -> K
   ): Option<K> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return if (this is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
-      Some(map(this.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-    } else {
-      None
+    val a = this.getOrElse {
+      return None
     }
+    val b = b.getOrElse {
+      return None
+    }
+    val c = c.getOrElse {
+      return None
+    }
+    val d = d.getOrElse {
+      return None
+    }
+    val e = e.getOrElse {
+      return None
+    }
+    val f = f.getOrElse {
+      return None
+    }
+    val g = g.getOrElse {
+      return None
+    }
+    val h = h.getOrElse {
+      return None
+    }
+    val i = i.getOrElse {
+      return None
+    }
+    val j = j.getOrElse {
+      return None
+    }
+    return Some(map(a, b, c, d, e, f, g, h, i, j))
   }
 
   /**
    * Returns true if the option is [None], false otherwise.
    * @note Used only for performance instead of fold.
    */
-  public abstract fun isEmpty(): Boolean
+  public fun isEmpty(): Boolean = this == None
 
   public fun isNotEmpty(): Boolean = !isEmpty()
 
@@ -591,10 +609,6 @@ public sealed class Option<out A> {
   public fun isDefined(): Boolean = !isEmpty()
 
   public fun orNull(): A? {
-    contract {
-      returns(null) implies (this@Option is None)
-      returnsNotNull() implies (this@Option is Some<A>)
-    }
     return fold({ null }, ::identity)
   }
 
@@ -619,8 +633,8 @@ public sealed class Option<out A> {
       callsInPlace(ifSome, InvocationKind.AT_MOST_ONCE)
     }
     return when (this) {
-      is None -> ifEmpty()
-      is Some<A> -> ifSome(value)
+      None -> ifEmpty()
+      else -> ifSome(value)
     }
   }
 
@@ -650,27 +664,23 @@ public sealed class Option<out A> {
    */
   public inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is None -> this
-      is Some -> f(value)
-    }
+    return fold({ None }, f)
   }
 
   /**
    * Align two options (`this` on the left and [b] on the right) as one Option of [Ior].
    */
-  public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> =
-    when (this) {
-      None -> when (b) {
-        None -> None
-        is Some -> Some(b.value.rightIor())
-      }
-
-      is Some -> when (b) {
-        None -> Some(this.value.leftIor())
-        is Some -> Some(Pair(this.value, b.value).bothIor())
-      }
+  public infix fun <B> align(b: Option<B>): Option<Ior<A, B>> = fold({
+    b.fold({ None }) { b ->
+      Some(b.rightIor())
     }
+  }) { a ->
+    b.fold({
+      Some(a.leftIor())
+    }) { b ->
+      Some(Pair(a, b).bothIor())
+    }
+  }
 
   /**
    * Align two options (`this` on the left and [b] on the right) as one Option of [Ior], and then, if it's not [None], map it using [f].
@@ -694,22 +704,12 @@ public sealed class Option<out A> {
   }
 
   public inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
-    when (this) {
-      is None -> this
-      is Some -> f(value).map { Some(it) }
-    }
-
+    fold({ None }) { f(it).map(::Some) }
   public inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
-    when (this) {
-      is None -> emptyMap()
-      is Some -> f(value).mapValues { Some(it.value) }
-    }
+    fold({ emptyMap() }) { value -> f(value).mapValues { Some(it.value) } }
 
   public inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
-    when (this) {
-      is None -> null
-      is Some -> f(value)?.let { Some(it) }
-    }
+    fold({ null }) { f(it)?.let(::Some) }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -784,10 +784,7 @@ public sealed class Option<out A> {
    */
   public inline fun findOrNull(predicate: (A) -> Boolean): A? {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is Some -> if (predicate(value)) value else null
-      is None -> null
-    }
+    return fold({ null }) { it.takeIf(predicate) }
   }
 
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
@@ -795,10 +792,7 @@ public sealed class Option<out A> {
   }
 
   public inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    when (this) {
-      is Some -> operation(initial, value)
-      is None -> initial
-    }
+    fold({ initial }) { operation(initial, it) }
 
   public fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
     align(other) { ior ->
@@ -819,11 +813,7 @@ public sealed class Option<out A> {
     }
 
   public inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
-    when (this) {
-      is None -> null
-      is Some -> operation(initial(value), value)
-    }
-
+    fold({ null }) { operation(initial(it), it) }
   public fun replicate(n: Int): Option<List<A>> =
     if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
 
@@ -847,28 +837,19 @@ public sealed class Option<out A> {
     value
   }
 
-  override fun toString(): String = fold(
-    { "Option.None" },
-    { "Option.Some($it)" }
-  )
+  override fun toString(): String = fold({ "Option.None" }, { "Option.Some($it)" })
 }
 
-public object None : Option<Nothing>() {
-  override fun isEmpty(): Boolean = true
+private object OptionNoneValue
+private object OptionNullValue
 
-  override fun toString(): String = "Option.None"
-}
+@Suppress("UNCHECKED_CAST")
+public val None: Option<Nothing> = Option(OptionNoneValue) as Option<Nothing>
 
-public data class Some<out T>(val value: T) : Option<T>() {
-  override fun isEmpty(): Boolean = false
+@PublishedApi
+internal val someUnit: Option<Unit> = Some(Unit)
 
-  override fun toString(): String = "Option.Some($value)"
-
-  public companion object {
-    @PublishedApi
-    internal val unit: Option<Unit> = Some(Unit)
-  }
-}
+public fun <T> Some(value: T): Option<T> = Option(value)
 
 /**
  * Returns the option's value if the option is nonempty, otherwise
@@ -926,15 +907,12 @@ public inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Bool
     callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     callsInPlace(error, InvocationKind.AT_MOST_ONCE)
   }
-  return when (this) {
-    is Some ->
-      if (predicate(value)) this
-      else {
-        error()
-        None
-      }
-
-    is None -> this
+  return flatMap {
+    if (predicate(it)) this
+    else {
+      error()
+      None
+    }
   }
 }
 
@@ -1009,12 +987,11 @@ public fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
   unalign(::identity)
 
 public inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
-  when (val option = this.map(f)) {
-    is None -> None to None
-    is Some -> when (val v = option.value) {
-      is Ior.Left -> Some(v.value) to None
-      is Ior.Right -> None to Some(v.value)
-      is Ior.Both -> Some(v.leftValue) to Some(v.rightValue)
+  this.map(f).fold({ None to None }) { ior ->
+    when (ior) {
+      is Ior.Left -> Some(ior.value) to None
+      is Ior.Right -> None to Some(ior.value)
+      is Ior.Both -> Some(ior.leftValue) to Some(ior.rightValue)
     }
   }
 
@@ -1063,13 +1040,10 @@ public fun <B, A : B> Option<A>.widen(): Option<B> =
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
 public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
-  when (this) {
-    is Some -> when (b) {
-      is Some -> Some(SGA.run { value.combine(b.value) })
-      None -> this
+  fold({ b }) { a ->
+    b.fold({ this }) { b ->
+      Some(SGA.run { a.combine(b) })
     }
-
-    None -> b
   }
 
 public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
@@ -1123,8 +1097,5 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-23.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
-  when (this@recover) {
-    is None -> option { recover(this, None) }
-    is Some -> this@recover
-  }
+public inline fun <A> Option<A>.recover(recover: OptionRaise.(Option<Nothing>) -> A): Option<A> =
+  orElse { option { recover(None) } }

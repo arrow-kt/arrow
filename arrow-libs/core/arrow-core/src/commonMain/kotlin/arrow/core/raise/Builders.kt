@@ -80,8 +80,8 @@ public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throw
 }
 
 @JvmInline
-public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
-  override fun raise(r: None): Nothing = cont.raise(r)
+public value class OptionRaise(private val cont: Raise<Option<Nothing>>) : Raise<Option<Nothing>> {
+  override fun raise(r: Option<Nothing>): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = bind { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
   

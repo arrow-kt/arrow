@@ -159,7 +159,7 @@ import kotlin.jvm.JvmName
  * suspend fun <R, A> Effect<R, A>.toEither(): Either<R, A> =
  *   fold({ Either.Left(it) }) { Either.Right(it) }
  *
- * suspend fun <A> Effect<None, A>.toOption(): Option<A> =
+ * suspend fun <A> Effect<Option<Nothing>, A>.toOption(): Option<A> =
  *   fold(::identity) { Some(it) }
  * ```
  * <!--- KNIT example-raise-03.kt -->
