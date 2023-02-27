@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
 import arrow.core.Either.Left
@@ -6,6 +8,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -259,29 +263,86 @@ public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
 public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   sequence()
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
   traverse(semigroup, f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public inline fun <K, E, A, B> Map<K, A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
-  foldLeft(mutableMapOf<K, B>().valid() as Validated<E, MutableMap<K, B>>) { acc, (k, v) ->
-    when (val res = f(v)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value[k] = res.value }
-        is Invalid -> acc
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+
+public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference transform: Raise<E>.(A) -> B
+): Either<E, Map<K, B>> =
+  fold<K, A, Either<E, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
+    when (val res = either { transform(v) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value[k] = res.value }
+        is Left -> acc
       }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> combine(acc.value, res.value).left() }
       }
     }
-  }
+
+public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<E>.(A) -> B
+): Either<NonEmptyList<E>, Map<K, B>> {
+  val buffer = mutableListOf<E>()
+  return fold<K, A, Either<MutableList<E>, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
+    when (val res = either { transform(v) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value[k] = res.value }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }.mapLeft { buffer.toNonEmptyListOrNull()!! }
+}
+
+public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<NonEmptyList<E>>.(A) -> B
+): Either<NonEmptyList<E>, Map<K, B>> {
+  val buffer = mutableListOf<E>()
+  return fold<K, A, Either<MutableList<E>, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
+    when (val res = either { transform(v) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value[k] = res.value }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.addAll(res.value) })
+        is Left -> Left(buffer.also { it.addAll(res.value) })
+      }
+    }
+  }.mapLeft { buffer.toNonEmptyListOrNull()!! }
+}
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
@@ -514,6 +575,13 @@ public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
   fold(Monoid.map(SG))
 
+public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
+  var accumulator = initial
+  forEach { accumulator = operation(accumulator, it) }
+  return accumulator
+}
+
+@Deprecated("Use fold instead align with Kotlin Std naming", ReplaceWith("fold<K, A, B>(b, f)"))
 public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
   this.forEach { result = f(result, it) }

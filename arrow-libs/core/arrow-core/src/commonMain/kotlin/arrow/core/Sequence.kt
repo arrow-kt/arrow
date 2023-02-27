@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -635,8 +639,15 @@ public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   sequence().map { it.asSequence() }
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
@@ -719,24 +730,76 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
 public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public fun <E, A, B> Sequence<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+
+public fun <E, A, B> Sequence<A>.mapOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference tranform: Raise<E>.(A) -> B
+): Either<E, List<B>> =
+  fold<A, Either<E, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
+    when (val res = either { tranform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value.add(res.value) }
+        is Left -> acc
       }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> combine(acc.value, res.value).left()
       }
     }
   }
+
+public fun <E, A, B> Sequence<A>.mapOrAccumulate(
+  @BuilderInference tranform: Raise<E>.(A) -> B
+): Either<NonEmptyList<E>, List<B>> {
+  val buffer = mutableListOf<E>()
+  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
+    when (val res = either { tranform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }.mapLeft { it.toNonEmptyListOrNull()!! }
+}
+
+public fun <E, A, B> Sequence<A>.mapOrAccumulate(
+  @BuilderInference tranform: Raise<NonEmptyList<E>>.(A) -> B
+): Either<NonEmptyList<E>, List<B>> {
+  val buffer = mutableListOf<E>()
+  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
+    when (val res = either { tranform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { it.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.addAll(res.value) })
+        is Left -> Left(buffer.also { it.addAll(res.value) })
+      }
+    }
+  }.mapLeft { it.toNonEmptyListOrNull()!! }
+}
 
 @Deprecated(
   "traverseValidated is being renamed to traverse to simplify the Arrow API",

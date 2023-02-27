@@ -854,3 +854,5 @@ public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
+
+internal const val ValidatedDeprMsg = "Validated functionally is being merged into Either.\n"

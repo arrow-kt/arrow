@@ -339,49 +339,64 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(
 ): Validated<E, List<B>> =
   traverse(semigroup, f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  semigroup.run {
-    fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-      when (val res = f(a)) {
-        is Validated.Valid -> when (acc) {
-          is Valid -> acc.also { it.value.add(res.value) }
-          is Invalid -> acc
-        }
-        is Validated.Invalid -> when (acc) {
-          is Valid -> res
-          is Invalid -> Invalid(acc.value.combine(res.value))
-        }
-      }
-    }
-  }
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
 
 @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(Semigroup.nonEmptyList(), f)
+  mapOrAccumulate { f(it).bind() }.toValidated()
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  traverse(Semigroup.nonEmptyList(), ::identity)
+  mapOrAccumulate { it.bind() }.toValidated()
 
 @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
@@ -475,6 +490,27 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
       is Left -> when (acc) {
         is Right -> Left(buffer.also { it.add(res.value) })
         is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
+
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<NonEmptyList<Error>>.(A) -> B,
+): Either<NonEmptyList<Error>, List<B>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.addAll(res.value) })
+        is Left -> Left(buffer.also { it.addAll(res.value) })
       }
     }
   }
@@ -1109,6 +1145,7 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
+@Deprecated("Use separateEither instead.", ReplaceWith("map { it.toEither() }.separateEither()"))
 public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val invalids = ArrayList<A>(collectionSizeOrDefault(10))
   val valids = ArrayList<B>(collectionSizeOrDefault(10))
