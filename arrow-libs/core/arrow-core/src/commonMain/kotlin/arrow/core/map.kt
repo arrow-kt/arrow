@@ -9,7 +9,7 @@ import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.Raise
-import arrow.core.raise.either
+import arrow.core.raise.fold
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -279,7 +279,7 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it.value).bind() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -287,61 +287,27 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it.value).bind() }.toValidated()
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: Raise<E>.(A) -> B
-): Either<E, Map<K, B>> =
-  fold<K, A, Either<E, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
-    when (val res = either { transform(v) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value[k] = res.value }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> res
-        is Left -> combine(acc.value, res.value).left() }
-      }
-    }
-
-public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
-  @BuilderInference transform: Raise<E>.(A) -> B
-): Either<NonEmptyList<E>, Map<K, B>> {
-  val buffer = mutableListOf<E>()
-  return fold<K, A, Either<MutableList<E>, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
-    when (val res = either { transform(v) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value[k] = res.value }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }.mapLeft { buffer.toNonEmptyListOrNull()!! }
+  @BuilderInference transform: Raise<E>.(Map.Entry<K, A>) -> B
+): Either<E, Map<K, B>> {
+  var left: Any? = EmptyValue
+  val right = mutableMapOf<K, B>()
+  for (element in this)
+    fold({ transform(element) }, { left = EmptyValue.combine(left, it, combine) }, { right[element.key] = it })
+  return if (left !== EmptyValue) EmptyValue.unbox<E>(left).left() else right.right()
 }
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
-  @BuilderInference transform: Raise<NonEmptyList<E>>.(A) -> B
+  @BuilderInference transform: AccumulatingRaise<E>.(Map.Entry<K, A>) -> B
 ): Either<NonEmptyList<E>, Map<K, B>> {
-  val buffer = mutableListOf<E>()
-  return fold<K, A, Either<MutableList<E>, MutableMap<K, B>>>(mutableMapOf<K, B>().right() ) { acc, (k, v) ->
-    when (val res = either { transform(v) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value[k] = res.value }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.addAll(res.value) })
-        is Left -> Left(buffer.also { it.addAll(res.value) })
-      }
-    }
-  }.mapLeft { buffer.toNonEmptyListOrNull()!! }
+  val left = mutableListOf<E>()
+  val right = mutableMapOf<K, B>()
+  for (element in this)
+    fold({ transform(AccumulatingRaise(this), element) }, { error -> left.addAll(error) }, { right[element.key] = it })
+  return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))

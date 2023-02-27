@@ -6,9 +6,11 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.either
+import arrow.core.raise.fold
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmName
 
 public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
@@ -745,60 +747,25 @@ public fun <E, A, B> Sequence<A>.traverse(
 ): Validated<E, List<B>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
 
-public fun <E, A, B> Sequence<A>.mapOrAccumulate(
-  combine: (E, E) -> E,
-  @BuilderInference tranform: Raise<E>.(A) -> B
-): Either<E, List<B>> =
-  fold<A, Either<E, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { tranform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> res
-        is Left -> combine(acc.value, res.value).left()
-      }
-    }
-  }
-
-public fun <E, A, B> Sequence<A>.mapOrAccumulate(
-  @BuilderInference tranform: Raise<E>.(A) -> B
-): Either<NonEmptyList<E>, List<B>> {
-  val buffer = mutableListOf<E>()
-  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { tranform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }.mapLeft { it.toNonEmptyListOrNull()!! }
+public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: Raise<Error>.(A) -> B
+): Either<Error, List<B>> {
+  var left: Any? = EmptyValue
+  val right = mutableListOf<B>()
+  for (item in this)
+    fold({ transform(item) }, { error -> left = EmptyValue.combine(left, error, combine) }, { b -> right.add(b) })
+  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
 }
 
-public fun <E, A, B> Sequence<A>.mapOrAccumulate(
-  @BuilderInference tranform: Raise<NonEmptyList<E>>.(A) -> B
-): Either<NonEmptyList<E>, List<B>> {
-  val buffer = mutableListOf<E>()
-  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { tranform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.addAll(res.value) })
-        is Left -> Left(buffer.also { it.addAll(res.value) })
-      }
-    }
-  }.mapLeft { it.toNonEmptyListOrNull()!! }
+public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
+  @BuilderInference transform: AccumulatingRaise<Error>.(A) -> B
+): Either<NonEmptyList<Error>, List<B>> {
+  val left = mutableListOf<Error>()
+  val right = mutableListOf<B>()
+  for (item in this)
+    fold({ transform(AccumulatingRaise(this), item) }, { error -> left.addAll(error) }, { b -> right.add(b) })
+  return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
 @Deprecated(

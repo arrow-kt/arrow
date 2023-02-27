@@ -8,6 +8,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -493,56 +494,12 @@ public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   combine: (E, E) -> E,
   @BuilderInference transform: Raise<E>.(A) -> B
 ): Either<E, NonEmptyList<B>> =
-  fold<A, Either<E, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { transform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-      is Left -> when (acc) {
-        is Right -> res
-        is Left -> Left(combine(acc.value, res.value))
-      }
-    }
-  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
+  all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: Raise<E>.(A) -> B
-): Either<NonEmptyList<E>, NonEmptyList<B>> {
-  val buffer = mutableListOf<E>()
-  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { transform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }.map { it.toNonEmptyListOrNull()!! }.mapLeft { it.toNonEmptyListOrNull()!! }
-}
-
-public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: Raise<NonEmptyList<E>>.(A) -> B
-): Either<NonEmptyList<E>, NonEmptyList<B>> {
-  val buffer = mutableListOf<E>()
-  return fold<A, Either<MutableList<E>, MutableList<B>>>(mutableListOf<B>().right()) { acc, a ->
-    when (val res = either { transform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { it.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.addAll(res.value) })
-        is Left -> Left(buffer.also { it.addAll(res.value) })
-      }
-    }
-  }.map { it.toNonEmptyListOrNull()!! }.mapLeft { it.toNonEmptyListOrNull()!! }
-}
+  @BuilderInference transform: AccumulatingRaise<E>.(A) -> B
+): Either<NonEmptyList<E>, NonEmptyList<B>> =
+  all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",
