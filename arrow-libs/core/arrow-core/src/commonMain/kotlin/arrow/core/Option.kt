@@ -1294,7 +1294,7 @@ public fun <A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
-@Deprecated("use fold instead", ReplaceWith("fold(None as Option<A>) { x, y -> x.combine(combine, y) }"))
+@Deprecated("use fold instead", ReplaceWith("fold(none<A>()) { x, y -> x.combine(combine, y) }", "arrow.core.none"))
 public fun <A> Iterable<Option<A>>.combineAll(combine: (A, A) -> A): Option<A> =
   fold(None as Option<A>) { x, y -> x.combine(combine, y) }
 
