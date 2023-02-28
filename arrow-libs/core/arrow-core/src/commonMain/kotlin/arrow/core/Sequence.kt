@@ -749,12 +749,12 @@ public fun <E, A, B> Sequence<A>.traverse(
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: Raise<Error>.(A) -> B
+  @BuilderInference transform: AccumulatingRaise<Error>.(A) -> B
 ): Either<Error, List<B>> {
   var left: Any? = EmptyValue
   val right = mutableListOf<B>()
   for (item in this)
-    fold({ transform(item) }, { error -> left = EmptyValue.combine(left, error, combine) }, { b -> right.add(b) })
+    fold({ transform(AccumulatingRaise(this), item) }, { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }, { b -> right.add(b) })
   return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
 }
 
@@ -764,7 +764,7 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   val left = mutableListOf<Error>()
   val right = mutableListOf<B>()
   for (item in this)
-    fold({ transform(AccumulatingRaise(this), item) }, { error -> left.addAll(error) }, { b -> right.add(b) })
+    fold({ transform(AccumulatingRaise(this), item) }, { errors -> left.addAll(errors) }, { b -> right.add(b) })
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 

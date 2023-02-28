@@ -492,7 +492,7 @@ public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: Raise<E>.(A) -> B
+  @BuilderInference transform: AccumulatingRaise<E>.(A) -> B
 ): Either<E, NonEmptyList<B>> =
   all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 

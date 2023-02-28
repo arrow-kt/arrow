@@ -498,7 +498,7 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   for (item in this)
     fold(
       { transform(AccumulatingRaise(this), item) },
-      { error -> left = EmptyValue.combine(left, error.reduce(combine), combine) },
+      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
       { b -> right.add(b) }
     )
   return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()

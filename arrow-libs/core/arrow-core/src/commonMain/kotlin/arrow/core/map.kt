@@ -291,12 +291,16 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: Raise<E>.(Map.Entry<K, A>) -> B
+  @BuilderInference transform: AccumulatingRaise<E>.(Map.Entry<K, A>) -> B
 ): Either<E, Map<K, B>> {
   var left: Any? = EmptyValue
   val right = mutableMapOf<K, B>()
   for (element in this)
-    fold({ transform(element) }, { left = EmptyValue.combine(left, it, combine) }, { right[element.key] = it })
+    fold(
+      { transform(AccumulatingRaise(this), element) },
+      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
+      { right[element.key] = it }
+    )
   return if (left !== EmptyValue) EmptyValue.unbox<E>(left).left() else right.right()
 }
 
