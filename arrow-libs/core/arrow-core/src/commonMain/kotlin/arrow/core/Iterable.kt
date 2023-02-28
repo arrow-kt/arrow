@@ -491,12 +491,16 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: Raise<Error>.(A) -> B,
+  @BuilderInference transform: AccumulatingRaise<Error>.(A) -> B,
 ): Either<Error, List<B>> {
   var left: Any? = EmptyValue
   val right = ArrayList<B>(collectionSizeOrDefault(10))
   for (item in this)
-    fold({ transform(item) }, { error -> left = EmptyValue.combine(left, error, combine) }, { b -> right.add(b) })
+    fold(
+      { transform(AccumulatingRaise(this), item) },
+      { error -> left = EmptyValue.combine(left, error.reduce(combine), combine) },
+      { b -> right.add(b) }
+    )
   return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
 }
 
@@ -526,6 +530,19 @@ public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(comb
     when (item) {
       is Right -> right.add(item.value)
       is Left -> left = EmptyValue.combine(left, item.value, combine)
+    }
+  }
+  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+}
+
+@JvmName("flattenNelOrAccumulate")
+public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> {
+  var left: Any? = EmptyValue
+  val right = ArrayList<A>(collectionSizeOrDefault(10))
+  for (item in this) {
+    when (item) {
+      is Right -> right.add(item.value)
+      is Left -> left = EmptyValue.combine(left, item.value.reduce(combine), combine)
     }
   }
   return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()

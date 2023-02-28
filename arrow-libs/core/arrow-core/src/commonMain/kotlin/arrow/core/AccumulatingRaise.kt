@@ -74,8 +74,8 @@ public open class AccumulatingRaise<E>(
     fold({ raise(it) }, ::identity)
 
   @RaiseDSL
-  @JsName("bind1")
-  @JvmName("bind1")
+  @JsName("bindEffect")
+  @JvmName("bindEffect")
   public suspend fun <A> Effect<E, A>.bind(): A =
     fold({ raise(it) }, ::identity)
 
@@ -96,37 +96,42 @@ public open class AccumulatingRaise<E>(
     is Validated.Valid -> value
   }
 
-//  @RaiseDSL
-//  public suspend infix fun <A> Effect<E, A>.recover(
-//    @BuilderInference resolve: suspend Raise<NonEmptyList<E>>.(E) -> A
-//  ): A =
-//    fold<E, A, A>({ this@recover.invoke(this) }, { throw it }, { resolve(it) }) { it }
-//
-//  /** @see [recover] */
-//  @RaiseDSL
-//  public infix fun <A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<NonEmptyList<E>>.(E) -> A): A =
-//    recover({ invoke() }, resolve)
-//
-//  /**
-//   * Execute the [Effect] resulting in [A],
-//   * and recover from any _logical error_ of type [E], and [Throwable], by providing a fallback value of type [A],
-//   * or raising a new error of type [R].
-//   *
-//   * @see [catch] if you don't need to recover from [Throwable].
-//   */
-//  @RaiseDSL
-//  public suspend fun <A> Effect<E, A>.recover(
-//    @BuilderInference recover: suspend Raise<NonEmptyList<E>>.(E) -> A,
-//    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
-//  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
-//
-//  @RaiseDSL
-//  public suspend infix fun <A> Effect<E, A>.catch(
-//    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
-//  ): A = fold({ catch(it) }, { raise(it) }, { it })
-//
-//  @RaiseDSL
-//  public infix fun <A> EagerEffect<E, A>.catch(
-//    @BuilderInference catch: Raise<NonEmptyList<E>>.(Throwable) -> A,
-//  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  @RaiseDSL
+  @JvmName("recoverEffect")
+  public suspend infix fun <A> Effect<E, A>.recover(
+    @BuilderInference resolve: suspend Raise<NonEmptyList<E>>.(E) -> A
+  ): A =
+    fold<E, A, A>({ this@recover.invoke(this) }, { throw it }, { resolve(it) }) { it }
+
+  /** @see [recover] */
+  @RaiseDSL
+  @JvmName("recoverEager")
+  public infix fun <A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<NonEmptyList<E>>.(E) -> A): A =
+    recover({ invoke() }, resolve)
+
+  /**
+   * Execute the [Effect] resulting in [A],
+   * and recover from any _logical error_ of type [E], and [Throwable], by providing a fallback value of type [A],
+   * or raising a new error of type [R].
+   *
+   * @see [catch] if you don't need to recover from [Throwable].
+   */
+  @RaiseDSL
+  @JvmName("recoverAndCatchEffect")
+  public suspend fun <A> Effect<E, A>.recover(
+    @BuilderInference recover: suspend Raise<NonEmptyList<E>>.(E) -> A,
+    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
+  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
+
+  @RaiseDSL
+  @JvmName("catchEffect")
+  public suspend infix fun <A> Effect<E, A>.catch(
+    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
+  ): A = fold({ catch(it) }, { raise(it) }, { it })
+
+  @RaiseDSL
+  @JvmName("catchEagerEffect")
+  public infix fun <A> EagerEffect<E, A>.catch(
+    @BuilderInference catch: Raise<NonEmptyList<E>>.(Throwable) -> A,
+  ): A = fold({ catch(it) }, { raise(it) }, { it })
 }
