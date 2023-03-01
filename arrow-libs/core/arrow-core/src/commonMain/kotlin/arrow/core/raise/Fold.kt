@@ -7,7 +7,6 @@ package arrow.core.raise
 import arrow.atomic.AtomicBoolean
 import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -113,8 +112,9 @@ public inline fun <R, A, B> fold(
 
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
+@Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
-  if (this is RaiseCancellationException && this.raise === raise) _raised as R
+  if (this is RaiseCancellationException && this.raise === raise) raised as R
   else throw this
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
@@ -124,20 +124,19 @@ internal class DefaultRaise : Raise<Any?> {
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   override fun raise(r: Any?): Nothing =
-    if (isActive.value) throw RaiseCancellationException(r, this) else throw ShiftLeakedException()
+    if (isActive.value) throw RaiseCancellationException(r, this) else throw RaiseLeakedException()
 }
 
 /** CancellationException is required to cancel coroutines when raising from within them. */
-private class RaiseCancellationException(val _raised: Any?, val raise: Raise<Any?>) : CancellationExceptionNoTrace()
+private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationExceptionNoTrace()
 
 public expect open class CancellationExceptionNoTrace() : CancellationException
 
-public class ShiftLeakedException : IllegalStateException(
+private class RaiseLeakedException : IllegalStateException(
   """
-  
-  shift or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
-  This is kind of usage is incorrect, make sure all calls to shift or bind occur within the lifecycle of effect { }, either { } or similar builders.
+  raise or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
+  This is kind of usage is incorrect, make sure all calls to raise or bind occur within the lifecycle of effect { }, either { } or similar builders.
  
-  See: Effect KDoc for additional information.
+  See: Effect documentation for additional information.
   """.trimIndent()
 )

@@ -9,6 +9,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -23,10 +24,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 
+@Suppress("DeferredResultUnused")
 class StructuredConcurrencySpec : StringSpec({
   "async - suspendCancellableCoroutine.invokeOnCancellation is called with Raised Continuation" {
     val started = CompletableDeferred<Unit>()
@@ -45,10 +48,10 @@ class StructuredConcurrencySpec : StringSpec({
         async<Int> {
           started.await()
           raise("hello")
-          }.await()
-            never.await()
-          }
-        }.runCont() shouldBe "hello"
+        }.await()
+        never.await()
+      }
+    }.fold(::identity) { fail("Should never be here") } shouldBe "hello"
 
     withTimeout(2.seconds) {
       cancelled.await().shouldNotBeNull().message shouldBe "Raised Continuation"
@@ -56,8 +59,9 @@ class StructuredConcurrencySpec : StringSpec({
   }
 
   "Computation blocks run on parent context" {
-    val parentCtx = currentContext()
-    effect<Nothing, Unit> { currentContext() shouldBe parentCtx }.runCont()
+    val parentCtx = currentCoroutineContext()
+    effect<Nothing, Unit> { currentCoroutineContext() shouldBe parentCtx }
+      .fold({ fail("Should never be here") }, ::identity)
   }
 
   "Concurrent raise - async await" {
@@ -69,7 +73,7 @@ class StructuredConcurrencySpec : StringSpec({
           fa.await() + fb.await()
         }
       }
-        .runCont() shouldBeIn listOf(a, b)
+        .fold(::identity, ::identity) shouldBeIn listOf(a, b)
     }
   }
 
@@ -108,7 +112,7 @@ class StructuredConcurrencySpec : StringSpec({
         }) { case -> require(scopeExit.complete(case)) }
         fail("Should never come here")
       }
-        .runCont() shouldBe a
+        .fold(::identity, ::identity) shouldBe a
       withTimeout(2.seconds) {
         scopeExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
         fbExit.await().shouldBeTypeOf<ExitCase.Cancelled>()
@@ -121,8 +125,8 @@ class StructuredConcurrencySpec : StringSpec({
     checkAll(Arb.int(), Arb.int()) { a, b ->
       effect {
         coroutineScope {
-          val fa = async { raise(a) }
-          val fb = async { raise(b) }
+          async { raise(a) }
+          async { raise(b) }
           "I will be overwritten by raise - coroutineScope waits until all async are finished"
         }
       }
@@ -150,17 +154,16 @@ class StructuredConcurrencySpec : StringSpec({
       effect {
         guaranteeCase({
           coroutineScope {
-            val fa =
-              async<Unit> {
-                startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
-                startLatches.awaitAll()
-                raise(a)
-              }
+            async<Unit> {
+              startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
+              startLatches.awaitAll()
+              raise(a)
+            }
             str
           }
         }) { case -> require(exitScope.complete(case)) }
       }
-        .runCont() shouldBe str
+        .fold(::identity, ::identity) shouldBe str
 
       withTimeout(2.seconds) {
         nestedExits.awaitAll().forEach { it.shouldBeTypeOf<ExitCase.Cancelled>() }
@@ -177,7 +180,7 @@ class StructuredConcurrencySpec : StringSpec({
           "raise does not escape `launch`"
         }
       }
-        .runCont() shouldBe "raise does not escape `launch`"
+        .fold(::identity, ::identity) shouldBe "raise does not escape `launch`"
     }
   }
 
@@ -200,7 +203,7 @@ class StructuredConcurrencySpec : StringSpec({
       effect {
         guaranteeCase({
           coroutineScope {
-            val fa = launch {
+            launch {
               startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
               startLatches.awaitAll()
               raise(a)
@@ -209,7 +212,7 @@ class StructuredConcurrencySpec : StringSpec({
           }
         }) { case -> require(scopeExit.complete(case)) }
       }
-        .runCont() shouldBe str
+        .fold(::identity, ::identity) shouldBe str
       withTimeout(2.seconds) {
         scopeExit.await().shouldBeTypeOf<ExitCase.Completed>()
         nestedExits.awaitAll().forEach { it.shouldBeTypeOf<ExitCase.Cancelled>() }
@@ -219,19 +222,19 @@ class StructuredConcurrencySpec : StringSpec({
 
   // `raise` escapes `cont` block, and gets rethrown inside `coroutineScope`.
   // Effectively awaiting/executing DSL code, outside of the DSL...
-  "async funky scenario #1 - Extract `shift` from `cont` through `async`" {
+  "async funky scenario #1 - Extract `raise` from `effect` through `async`" {
     checkAll(Arb.int(), Arb.int()) { a, b ->
-      shouldThrow<ShiftLeakedException> {
+      shouldThrow<IllegalStateException> {
         coroutineScope {
           val shiftedAsync =
             effect<Int, Deferred<String>> {
-              val fa = async<Int> { raise(a) }
+              async<Int> { raise(a) }
               async { raise(b) }
             }
               .fold({ fail("shift was never awaited, so it never took effect") }, ::identity)
           shiftedAsync.await()
         }
-      }
+      }.message shouldStartWith "raise or bind was called outside of its DSL scope"
     }
   }
 })

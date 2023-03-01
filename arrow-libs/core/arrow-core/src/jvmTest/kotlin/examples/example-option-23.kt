@@ -1,17 +1,14 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleOption23
 
-import arrow.core.Option
-import arrow.core.none
 import arrow.core.Some
-import arrow.core.recover
-import io.kotest.matchers.shouldBe
+import arrow.core.None
+import arrow.core.Option
 
-fun test() {
-  val error: Option<Int> = none()
-  fun fallback(): Option<Int> = Some(5)
-  fun failure(): Option<Int> = none()
+fun main() {
+  Some(12).exists { it > 10 } // Result: true
+  Some(7).exists { it > 10 }  // Result: false
 
-  error.recover { fallback().bind() } shouldBe Some(5)
-  error.recover { failure().bind() } shouldBe none()
+  val none: Option<Int> = None
+  none.exists { it > 10 }      // Result: false
 }

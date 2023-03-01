@@ -123,6 +123,9 @@ public abstract class arrow/core/Either {
 	public final fun bifoldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun bifoldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun bimap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun conditionally (ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public final fun exists (Lkotlin/jvm/functions/Function1;)Z
 	public final fun findOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -134,8 +137,10 @@ public abstract class arrow/core/Either {
 	public final fun getOrNull ()Ljava/lang/Object;
 	public final fun isEmpty ()Z
 	public final fun isLeft ()Z
+	public final fun isLeft (Lkotlin/jvm/functions/Function1;)Z
 	public final fun isNotEmpty ()Z
 	public final fun isRight ()Z
+	public final fun isRight (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun lift (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -149,7 +154,13 @@ public abstract class arrow/core/Either {
 	public final fun swap ()Larrow/core/Either;
 	public final fun tap (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun tapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun toEither ()Larrow/core/Either;
+	public final fun toIor ()Larrow/core/Ior;
 	public fun toString ()Ljava/lang/String;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun traverse (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public final fun traverseNullable (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun traverseOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
 	public static final fun tryCatchAndFlatten (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
@@ -247,6 +258,7 @@ public final class arrow/core/EitherKt {
 	public static final fun handleErrorWith (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun left (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftIfNull (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftWiden (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun merge (Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun orNull (Larrow/core/Either;)Ljava/lang/Object;
@@ -263,7 +275,6 @@ public final class arrow/core/EitherKt {
 	public static final fun sequenceNullable (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
-	public static final fun toEitherNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
 }
 
@@ -699,14 +710,20 @@ public abstract class arrow/core/Option {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullable (Ljava/lang/Object;)Larrow/core/Option;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public static final fun invoke (Ljava/lang/Object;)Larrow/core/Option;
 	public final fun isDefined ()Z
 	public abstract fun isEmpty ()Z
+	public final fun isNone ()Z
 	public final fun isNotEmpty ()Z
+	public final fun isSome ()Z
+	public final fun isSome (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun mapNotNull (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun nonEmpty ()Z
+	public final fun onNone (Lkotlin/jvm/functions/Function0;)Larrow/core/Option;
+	public final fun onSome (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun orNull ()Ljava/lang/Object;
 	public final fun padZip (Larrow/core/Option;)Larrow/core/Option;
 	public final fun padZip (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
@@ -1578,8 +1595,8 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise, arrow/typeclasses/Semigroup {
@@ -1600,8 +1617,8 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise, arrow/typ
 	public fun plus (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
@@ -1638,11 +1655,11 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public fun raise (Ljava/lang/Void;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/raise/Raise;Ljava/lang/Void;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
@@ -1681,11 +1698,11 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/raise/Raise;Larrow/core/None;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
@@ -1703,8 +1720,8 @@ public abstract interface class arrow/core/raise/Raise {
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public abstract fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/Raise$DefaultImpls {
@@ -1718,8 +1735,8 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
@@ -1818,18 +1835,14 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
 	public static fun raise-impl (Larrow/core/raise/Raise;Ljava/lang/Throwable;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recover-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
-}
-
-public final class arrow/core/raise/ShiftLeakedException : java/lang/IllegalStateException {
-	public fun <init> ()V
 }
 
 public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Semigroup {

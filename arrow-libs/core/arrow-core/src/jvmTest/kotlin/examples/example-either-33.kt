@@ -2,13 +2,14 @@
 package arrow.core.examples.exampleEither33
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import io.kotest.matchers.shouldBe
-import io.kotest.assertions.fail
 
 fun test() {
-  Either.Right(1)
-    .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
+ Left(12).isLeft { it > 10 } shouldBe true
+ Left(7).isLeft { it > 10 } shouldBe false
 
-  Either.Left(RuntimeException("Boom!"))
-    .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
+ val right: Either<Int, String> = Right("Hello World")
+ right.isLeft { it > 10 } shouldBe false
 }

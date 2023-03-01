@@ -2,9 +2,14 @@
 package arrow.core.examples.exampleEither34
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Left("left").swap() shouldBe Either.Right("left")
-  Either.Right("right").swap() shouldBe Either.Left("right")
+ Right(12).isRight { it > 10 } shouldBe true
+ Right(7).isRight { it > 10 } shouldBe false
+
+ val left: Either<String, Int> = Left("Hello World")
+ left.isRight { it > 10 } shouldBe false
 }

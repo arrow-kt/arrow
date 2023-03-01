@@ -7,6 +7,7 @@ class PrismTests {
   @Test
   fun `Prism will be generated for sealed class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |sealed class PrismSealed(val field: String, val nullable: String?) {
@@ -22,6 +23,7 @@ class PrismTests {
   @Test
   fun `Prism will be generated for generic sealed class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |sealed class PrismSealed<A,B>(val field: A, val nullable: B?) {
@@ -37,6 +39,7 @@ class PrismTests {
   @Test
   fun `Prism will not be generated for sealed class if DSL Target is specified`() {
     """
+      |$`package`
       |$imports
       |@optics([OpticsTarget.DSL])
       |sealed class PrismSealed(val field: String, val nullable: String?) {

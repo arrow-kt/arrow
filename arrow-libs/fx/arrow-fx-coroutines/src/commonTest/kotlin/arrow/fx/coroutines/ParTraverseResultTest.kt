@@ -72,11 +72,9 @@ class ParTraverseResultTest : StringSpec({
         Arb.int(min = 1, max = 9),
         Arb.string().orNull()
       ) { n, killOn, msg ->
-        Either.catch {
-          (0 until n).parTraverseResult { i ->
-            if (i == killOn) throw RuntimeException(msg) else Result.success(Unit)
-          }.let(::println)
-        }.shouldBeTypeOf<Either.Left<RuntimeException>>().value.message shouldBe msg
+        (0 until n).parTraverseResult { i ->
+          if (i == killOn) throw RuntimeException(msg) else Result.success(Unit)
+        }.exceptionOrNull().shouldBeTypeOf<RuntimeException>().message shouldBe msg
       }
     }
 

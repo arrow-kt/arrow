@@ -40,6 +40,7 @@ kotlin {
           implementation(libs.kotest.property)
         }
       }
+
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)

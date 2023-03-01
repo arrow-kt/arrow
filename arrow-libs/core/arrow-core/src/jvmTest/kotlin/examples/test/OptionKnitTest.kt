@@ -4,12 +4,12 @@ package arrow.core.examples.test
 import io.kotest.core.spec.style.StringSpec
 
 class OptionKnitTest : StringSpec({
-  "ExampleOption22" {
-    arrow.core.examples.exampleOption22.test()
+  "ExampleOption26" {
+    arrow.core.examples.exampleOption26.test()
   }
 
-  "ExampleOption23" {
-    arrow.core.examples.exampleOption23.test()
+  "ExampleOption27" {
+    arrow.core.examples.exampleOption27.test()
   }
 
 }) {

@@ -7,6 +7,7 @@ class OptionalTests {
   @Test
   fun `Optional will be generated for data class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class OptionalData(
@@ -22,6 +23,7 @@ class OptionalTests {
   @Test
   fun `Optional will be generated for generic data class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class OptionalData<A>(
@@ -37,6 +39,7 @@ class OptionalTests {
   @Test
   fun `Optional will be generated for data class with secondary constructors`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class OptionalSecondaryConstructor(val fieldNumber: Int?, val fieldString: String?) {

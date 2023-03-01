@@ -9,6 +9,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
@@ -18,6 +20,7 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 
+@Suppress("UNREACHABLE_CODE", "UNUSED_EXPRESSION")
 class EagerEffectSpec : StringSpec({
   "try/catch - can recover from raise" {
     checkAll(Arb.int(), Arb.string()) { i, s ->
@@ -27,10 +30,10 @@ class EagerEffectSpec : StringSpec({
         } catch (e: Throwable) {
           i
         }
-      }.fold({ fail("Should never come here") }, ::identity) shouldBe i
+      }.fold({ unreachable() }, ::identity) shouldBe i
     }
   }
-  
+
   "try/catch - finally works" {
     checkAll(Arb.string(), Arb.int()) { s, i ->
       val promise = CompletableDeferred<Int>()
@@ -41,26 +44,25 @@ class EagerEffectSpec : StringSpec({
           require(promise.complete(i))
         }
       }
-        .fold(::identity) { fail("Should never come here") } shouldBe s
+        .fold(::identity) { unreachable() } shouldBe s
       promise.await() shouldBe i
     }
   }
-  
+
   "try/catch - First raise is ignored and second is returned" {
     checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
       eagerEffect<String, Int> {
-        val x: Int =
-          try {
-            raise(s)
-          } catch (e: Throwable) {
-            i
-          }
+        try {
+          raise(s)
+        } catch (e: Throwable) {
+          i
+        }
         raise(s2)
-      }.fold(::identity) { fail("Should never come here") } shouldBe s2
+      }.fold(::identity) { unreachable() } shouldBe s2
     }
   }
-  
-  "attempt - catch" {
+
+  "recover - catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -69,11 +71,11 @@ class EagerEffectSpec : StringSpec({
           ll shouldBe l
           i
         }
-      }.runCont() shouldBe i
+      }.fold({ unreachable() }, { it }) shouldBe i
     }
   }
-  
-  "attempt - no catch" {
+
+  "recover - no catch" {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -82,12 +84,12 @@ class EagerEffectSpec : StringSpec({
           ll shouldBe l
           i + 1
         }
-      }.runCont() shouldBe i
+      }.fold({ unreachable() }, ::identity) shouldBe i
     }
   }
-  
-  "attempt - raise from catch" {
-    checkAll(Arb.int(), Arb.long(), Arb.string()) { i, l, error ->
+
+  "recover - raise from catch" {
+    checkAll(Arb.long(), Arb.string()) { l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
           raise(l)
@@ -95,130 +97,191 @@ class EagerEffectSpec : StringSpec({
           ll shouldBe l
           raise(error)
         }
-      }.runCont() shouldBe error
+      }.fold(::identity) { unreachable() } shouldBe error
     }
   }
-  
-  "values" { eagerEffect<Nothing, Int> { 1 }.toEither().getOrNull() shouldBe 1 }
-  
-  "short-circuit" { eagerEffect<String, Nothing> { raise("hello") }.runCont() shouldBe "hello" }
-  
+
+  "success" {
+    eagerEffect<Nothing, Int> { 1 }
+      .fold({ unreachable() }, ::identity) shouldBe 1
+  }
+
+  "short-circuit" {
+    eagerEffect {
+      raise("hello")
+    }.fold(::identity) { unreachable() } shouldBe "hello"
+  }
+
   "Rethrows exceptions" {
     val e = RuntimeException("test")
-    Either.catch { eagerEffect<Nothing, Nothing> { throw e }.runCont() } shouldBe Either.Left(e)
+    Either.catch {
+      eagerEffect<Nothing, Nothing> { throw e }
+        .fold({ unreachable() }, { unreachable() })
+    } shouldBe Either.Left(e)
   }
-  
+
   "ensure null in eager either computation" {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, raise ->
-      either<String, Int> {
+      either {
         ensure(predicate) { raise }
         success
       } shouldBe if (predicate) success.right() else raise.left()
     }
   }
-  
+
   "ensureNotNull in eager either computation" {
     fun square(i: Int): Int = i * i
-    
+
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, raise: String ->
-      val res =
-        either<String, Int> {
-          val ii = i
-          ensureNotNull(i) { raise }
-          square(i) // Smart-cast by contract
-        }
+      val res = either {
+        ensureNotNull(i) { raise }
+        square(i) // Smart-cast by contract
+      }
       val expected = i?.let(::square)?.right() ?: raise.left()
       res shouldBe expected
     }
   }
-  
-  "catch - happy path" {
+
+  "recover - happy path" {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
-      }.recover<Int, Nothing, String> { fail("It should never catch a success value") }
-        .runCont() shouldBe str
+      }.recover<Int, Nothing, String> { unreachable() }
+        .fold({ unreachable() }, ::identity) shouldBe str
     }
   }
-  
-  @Suppress("UNREACHABLE_CODE")
-  "catch - error path and recover" {
+
+  "recover - error path and recover" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
         raise(int)
-        fail("It should never reach this point")
+        unreachable()
       }.recover<Int, Nothing, String> { fallback }
-        .runCont() shouldBe fallback
+        .fold({ unreachable() }, ::identity) shouldBe fallback
     }
   }
-  
-  @Suppress("UNREACHABLE_CODE")
-  "catch - error path and re-raise" {
+
+  "recover - error path and re-raise" {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
         raise(int)
-        fail("It should never reach this point")
+        unreachable()
       }.recover { raise(fallback) }
-        .runCont() shouldBe fallback
+        .fold(::identity) { unreachable() } shouldBe fallback
     }
   }
-  
-  @Suppress("UNREACHABLE_CODE")
-  "catch - error path and throw" {
+
+  "recover - error path and throw" {
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
           raise(int)
-          fail("It should never reach this point")
+          unreachable()
         }.recover<Int, Nothing, String> { throw RuntimeException(msg) }
-          .runCont()
+          .fold({ unreachable() }, { unreachable() })
       }.message.shouldNotBeNull() shouldBe msg
     }
   }
-  
-  "attempt - happy path" {
+
+  "catch - happy path" {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
-      }.catch { fail("It should never catch a success value") }
-        .runCont() shouldBe str
+      }.catch { unreachable() }
+        .fold({ unreachable() }, ::identity) shouldBe str
     }
   }
-  
-  "attempt - error path and recover" {
+
+  "catch - error path and recover" {
     checkAll(Arb.string(), Arb.string()) { msg, fallback ->
       eagerEffect<Int, String> {
         throw RuntimeException(msg)
       }.catch { fallback }
-        .runCont() shouldBe fallback
+        .fold({ unreachable() }, ::identity) shouldBe fallback
     }
   }
-  
-  "attempt - error path and re-raise" {
+
+  "catch - error path and re-raise" {
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
       }.catch { raise(fallback) }
-        .runCont() shouldBe fallback
+        .fold(::identity) { unreachable() } shouldBe fallback
     }
   }
-  
-  "attempt - error path and throw" {
+
+  "catch - error path and throw" {
     checkAll(Arb.string(), Arb.string()) { msg, msg2 ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
           throw RuntimeException(msg)
         }.catch { throw RuntimeException(msg2) }
-          .runCont()
+          .fold({ unreachable() }, { unreachable() })
       }.message.shouldNotBeNull() shouldBe msg2
     }
   }
 
-  "shift leaked results in ShiftLeakException" {
-    shouldThrow<ShiftLeakedException> {
-      effect {
-        suspend { raise("failure") }
-      }.fold(::println) { it.invoke() }
-    }
+  "catch - reified exception and recover" {
+    eagerEffect<Nothing, Int> {
+      throw ArithmeticException()
+    }.catch { _: ArithmeticException -> 1 }
+      .fold({ unreachable() }, ::identity) shouldBe 1
+  }
+
+  "catch - reified exception and raise" {
+    eagerEffect<String, Int> {
+      throw ArithmeticException("Boom!")
+    }.catch { e: ArithmeticException -> raise(e.message.shouldNotBeNull()) }
+      .fold(::identity) { unreachable() } shouldBe "Boom!"
+  }
+
+  "catch - reified exception and no match" {
+    shouldThrow<RuntimeException> {
+      eagerEffect<Nothing, Int> {
+        throw RuntimeException("Boom!")
+      }.catch { _: ArithmeticException -> 1 }
+        .fold({ unreachable() }, { unreachable() })
+    }.message shouldBe "Boom!"
+  }
+
+  "shift leaked results in RaiseLeakException" {
+    eagerEffect {
+      suspend { raise("failure") }
+    }.fold(
+      {
+        it.message shouldStartWith "raise or bind was called outside of its DSL scope"
+      },
+      { unreachable() }) { f -> f() }
+  }
+
+  "shift leaked results in RaiseLeakException with exception" {
+    shouldThrow<IllegalStateException> {
+      val leak = CompletableDeferred<suspend () -> Unit>()
+      eagerEffect {
+        leak.complete { raise("failure") }
+        throw RuntimeException("Boom")
+      }.fold(
+        {
+          it.shouldBeTypeOf<RuntimeException>().message shouldBe "Boom"
+          leak.await().invoke()
+        },
+        { fail("Cannot be here") }
+      ) { fail("Cannot be here") }
+    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+  }
+
+  "shift leaked results in RaiseLeakException after raise" {
+    shouldThrow<IllegalStateException> {
+      val leak = CompletableDeferred<suspend () -> Unit>()
+      eagerEffect {
+        leak.complete { raise("failure") }
+        raise("Boom!")
+      }.fold(
+        { unreachable() },
+        {
+          it shouldBe "Boom!"
+          leak.await().invoke()
+        }) { fail("Cannot be here") }
+    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
 })

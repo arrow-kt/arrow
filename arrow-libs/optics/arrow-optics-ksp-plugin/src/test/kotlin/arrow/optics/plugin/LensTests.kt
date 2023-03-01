@@ -7,6 +7,7 @@ class LensTests {
   @Test
   fun `Lenses will be generated for data class`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class LensData(
@@ -21,6 +22,7 @@ class LensTests {
   @Test
   fun `Lenses will be generated for data class with secondary constructors`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class LensesSecondaryConstructor(val fieldNumber: Int, val fieldString: String) {
@@ -36,6 +38,7 @@ class LensTests {
   @Test
   fun `Lenses which mentions imported elements`() {
     """
+      |$`package`
       |$imports
       |
       |@optics
@@ -51,6 +54,7 @@ class LensTests {
   @Test
   fun `Lenses which mentions type arguments`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class OpticsTest<A>(val field: A) {
@@ -65,6 +69,7 @@ class LensTests {
   @Test
   fun `Lenses for nested classes`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class LensData(val field1: String) {
@@ -83,6 +88,7 @@ class LensTests {
   @Test
   fun `Lenses for nested classes with repeated names (#2718)`() {
     """
+      |$`package`
       |$imports
       |@optics
       |data class LensData(val field1: String) {

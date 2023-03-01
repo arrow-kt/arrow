@@ -25,7 +25,7 @@ public fun <E, A> EagerEffect<E, A>.orNull(): A? = fold({ _: E -> null }) { it }
 
 /** Run the [Effect] by returning [Option] of [A], [orElse] run the fallback lambda and returning its result of [Option] of [A]. */
 public suspend fun <E, A> Effect<E, A>.toOption(orElse: suspend (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
-public fun <E, A> EagerEffect<E, A>.toOption(orElse: (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
+public inline fun <E, A> EagerEffect<E, A>.toOption(orElse: (E) -> Option<A>): Option<A> = fold(orElse) { Some(it) }
 
 /** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
 public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
@@ -33,9 +33,9 @@ public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
 /** Run the [Effect] by returning [Result] of [A], [orElse] run the fallback lambda and returning its result of [Result] of [A]. */
 public suspend fun <E, A> Effect<E, A>.toResult(orElse: suspend (E) -> Result<A>): Result<A> =
-  fold({ orElse(it) }, { Result.success(it) })
-public fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): Result<A> =
-  fold({ orElse(it) }, { Result.success(it) })
+  fold({ Result.failure(it)  }, { orElse(it) }, { Result.success(it) })
+public inline fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): Result<A> =
+  fold({ Result.failure(it)  }, { orElse(it) }, { Result.success(it) })
 
 /** Run the [Effect] by returning [Result] of [A], or [Result.Failure] if raised with [Throwable]. */
 public suspend fun <A> Effect<Throwable, A>.toResult(): Result<A> = result { invoke() }

@@ -10,6 +10,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 
+@Suppress("UNREACHABLE_CODE")
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
@@ -41,8 +42,7 @@ class NullableSpec : StringSpec({
   "ensureNotNull short circuit" {
     nullable {
       val number: Int = "s".length
-      val x = ensureNotNull(number.takeIf { it > 1 })
-      x
+      ensureNotNull(number.takeIf { it > 1 })
       throw IllegalStateException("This should not be executed")
     } shouldBe null
   }

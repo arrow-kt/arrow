@@ -1,11 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither45
 
-import arrow.core.Either.Right
-import arrow.core.Either.Left
-import arrow.core.getOrElse
+ import arrow.core.*
 
-fun main() {
-  Right(12).getOrElse { 17 } // Result: 12
-  Left(12).getOrElse { 17 }  // Result: 17
+ fun main(args: Array<String>) {
+  //sampleStart
+  Either.Left("foo").isNotEmpty()  // Result: false
+  Either.Right("foo").isNotEmpty() // Result: true
+  //sampleEnd
 }
