@@ -187,6 +187,8 @@ public abstract class arrow/core/Either {
 	public final fun swap ()Larrow/core/Either;
 	public final fun tap (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public final fun tapLeft (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
+	public final fun toEither ()Larrow/core/Either;
+	public final fun toIor ()Larrow/core/Ior;
 	public fun toString ()Ljava/lang/String;
 	public final fun toValidated ()Larrow/core/Validated;
 	public final fun toValidatedNel ()Larrow/core/Validated;
@@ -297,6 +299,7 @@ public final class arrow/core/EitherKt {
 	public static final fun handleErrorWith (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun left (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftIfNull (Larrow/core/Either;Lkotlin/jvm/functions/Function0;)Larrow/core/Either;
+	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftWiden (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun merge (Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun orNull (Larrow/core/Either;)Ljava/lang/Object;
@@ -315,7 +318,6 @@ public final class arrow/core/EitherKt {
 	public static final fun sequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
-	public static final fun toEitherNel (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun zip (Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function10;)Larrow/core/Either;

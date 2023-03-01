@@ -118,10 +118,12 @@ public interface Raise<in R> {
   @Deprecated("Use raise instead", ReplaceWith("raise(r)"))
   public fun <B> shift(r: R): B = raise(r)
 
+  @RaiseDSL
   public suspend fun <B> arrow.core.continuations.Effect<R, B>.bind(): B =
     fold({ raise(it) }, ::identity)
 
   // Added for source compatibility with EffectScope / EagerScope
+  @RaiseDSL
   public suspend fun <B> arrow.core.continuations.EagerEffect<R, B>.bind(): B =
     fold({ raise(it) }, ::identity)
 
@@ -150,6 +152,7 @@ public interface Raise<in R> {
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
   public operator fun <A> EagerEffect<R, A>.invoke(): A = invoke(this@Raise)
+  @RaiseDSL
   public fun <A> EagerEffect<R, A>.bind(): A = invoke(this@Raise)
 
   /**
@@ -160,6 +163,7 @@ public interface Raise<in R> {
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
   public suspend operator fun <A> Effect<R, A>.invoke(): A = invoke(this@Raise)
+  @RaiseDSL
   public suspend fun <A> Effect<R, A>.bind(): A = invoke(this@Raise)
 
   /**
@@ -189,12 +193,18 @@ public interface Raise<in R> {
    * <!--- KNIT example-raise-dsl-04.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
+  @RaiseDSL
   public fun <A> Either<R, A>.bind(): A = when (this) {
     is Either.Left -> raise(value)
     is Either.Right -> value
   }
 
-  /* Will be removed in subsequent PRs for Arrow 2.x.x */
+
+  @Deprecated(
+    "Validated is deprecated in favor of Either.",
+    ReplaceWith("toEither().bind()")
+  )
+  @RaiseDSL
   public fun <A> Validated<R, A>.bind(): A = when (this) {
     is Validated.Invalid -> raise(value)
     is Validated.Valid -> value
@@ -236,6 +246,7 @@ public interface Raise<in R> {
    * <!--- KNIT example-raise-dsl-05.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
+  @RaiseDSL
   public fun <A> Result<A>.bind(transform: (Throwable) -> R): A =
     fold(::identity) { throwable -> raise(transform(throwable)) }
 
@@ -273,6 +284,7 @@ public interface Raise<in R> {
    * <!--- KNIT example-raise-dsl-06.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
+  @RaiseDSL
   public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
     when (this) {
       None -> transform(None)
