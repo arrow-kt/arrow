@@ -199,7 +199,11 @@ public interface Raise<in R> {
     is Either.Right -> value
   }
 
-  /* Will be removed in subsequent PRs for Arrow 2.x.x */
+
+  @Deprecated(
+    "Validated is deprecated in favor of Either.",
+    ReplaceWith("toEither().bind()")
+  )
   @RaiseDSL
   public fun <A> Validated<R, A>.bind(): A = when (this) {
     is Validated.Invalid -> raise(value)
