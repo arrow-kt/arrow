@@ -61,7 +61,7 @@ public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
   override fun raise(r: Nothing?): Nothing = cont.raise(r)
-  public fun <B> Option<B>.bind(): B = bind { raise(null) }
+  public fun <B> Option<B>.bind(): B = getOrElse { raise(null) }
 
   public fun <B> B?.bind(): B {
     contract { returns() implies (this@bind != null) }
@@ -83,7 +83,7 @@ public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throw
 @JvmInline
 public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   override fun raise(r: None): Nothing = cont.raise(r)
-  public fun <B> Option<B>.bind(): B = bind { raise(None) }
+  public fun <B> Option<B>.bind(): B = getOrElse { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
   public fun <B> ensureNotNull(value: B?): B {

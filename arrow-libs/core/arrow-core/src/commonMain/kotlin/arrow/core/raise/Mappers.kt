@@ -8,7 +8,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
-import arrow.core.identity
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -45,6 +44,3 @@ public inline fun <E, A> EagerEffect<E, A>.toResult(orElse:  (E) -> Result<A>): 
 /** Run the [Effect] by returning [Result] of [A], or [Result.Failure] if raised with [Throwable]. */
 public suspend fun <A> Effect<Throwable, A>.toResult(): Result<A> = result { invoke() }
 public fun <A> EagerEffect<Throwable, A>.toResult(): Result<A> = result { invoke() }
-
-public suspend fun <A> Effect<A, A>.merge(): A = fold(::identity, ::identity)
-public fun <A> EagerEffect<A, A>.merge(): A = fold(::identity, ::identity)

@@ -108,3 +108,9 @@ public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
   @BuilderInference crossinline recover: Raise<E>.(T) -> A,
 ): EagerEffect<E, A> =
   eagerEffect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
+
+public suspend inline infix fun <E, A> Effect<E, A>.getOrElse(onRaise: (E) -> A): A =
+  recover({ invoke() }, onRaise)
+
+public inline infix fun <E, A> EagerEffect<E, A>.getOrElse(onRaise: (E) -> A): A =
+  recover({ invoke() }, onRaise)
