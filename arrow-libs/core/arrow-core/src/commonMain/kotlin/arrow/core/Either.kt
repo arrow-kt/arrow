@@ -921,10 +921,10 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }")
+    ReplaceWith("MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }")
   )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C =
-    MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }
+    MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }
 
   /**
    * Swap the generic parameters [A] and [B] of this [Either].
@@ -1138,6 +1138,10 @@ public sealed class Either<out A, out B> {
     return getOrElse { null }
   }
 
+  @Deprecated(
+    "orNone is being renamed to getOrNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNone()")
+  )
   public fun orNone(): Option<B> = getOrNone()
 
   /**
@@ -1197,14 +1201,14 @@ public sealed class Either<out A, out B> {
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     orNull()?.let(fa)?.right()
 
-  // TODO will be renamed to mapAccumulating in 2.x.x. Backport, and deprecate in 1.x.x
+  @Deprecated(
+    NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith("fold({ it.left().valid() }, { fa(it).map(::Right) })")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    when (this) {
-      is Right -> fa(this.value).map(::Right)
-      is Left -> this.valid()
-    }
+    fold({ it.left().valid() }, { fa(it).map(::Right) })
 
   @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
@@ -1332,6 +1336,9 @@ public sealed class Either<out A, out B> {
 
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
+
+  public fun toIor(): Ior<A, B> =
+    fold({ Ior.Left(it) }, { Ior.Right(it) })
 
   public companion object {
 
@@ -1944,6 +1951,13 @@ public sealed class Either<out A, out B> {
   )
   public fun void(): Either<A, Unit> =
     map { }
+
+  @Deprecated(
+    "Facilitates the migration from Validated to Either, you can simply remove this method call.",
+    ReplaceWith("this")
+  )
+  public inline fun toEither(): Either<A, B> =
+    this
 }
 
 /**
@@ -2596,7 +2610,7 @@ public const val RedundantAPI: String =
 public fun <E, A> Either<E, A>.toEitherNel(): EitherNel<E, A> =
   mapLeft { nonEmptyListOf(it) }
 
-public fun <E> E.toEitherNel(): EitherNel<E, Nothing> =
+public fun <E> E.leftNel(): EitherNel<E, Nothing> =
   nonEmptyListOf(this).left()
 
 /**
