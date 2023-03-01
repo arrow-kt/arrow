@@ -15,7 +15,7 @@ fun test() {
 
   either {
     catch({ fetchId() }) { t ->
-      raise("something went wrong: $t.message")
+      raise("something went wrong: ${t.message}")
     }
   } shouldBe Either.Left("something went wrong: BOOM")
 }
