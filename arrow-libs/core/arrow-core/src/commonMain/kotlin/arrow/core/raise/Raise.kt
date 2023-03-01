@@ -361,7 +361,7 @@ public inline fun <reified T : Throwable, E, A> recover(
  *
  *   either {
  *     catch({ fetchId() }) { t ->
- *       raise("something went wrong: $t.message")
+ *       raise("something went wrong: ${t.message}")
  *     }
  *   } shouldBe Either.Left("something went wrong: BOOM")
  * }
@@ -400,7 +400,7 @@ public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A =
  *
  *   either {
  *     catch({ fetchId() }) { t: RuntimeException ->
- *       raise("something went wrong: $t.message")
+ *       raise("something went wrong: ${t.message}")
  *     }
  *   } shouldBe Either.Left("something went wrong: BOOM")
  * }
