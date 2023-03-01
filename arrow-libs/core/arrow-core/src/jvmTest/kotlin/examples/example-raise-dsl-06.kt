@@ -16,5 +16,5 @@ fun test() {
   recover(
     { boom() },
     { str -> str.length }
-  ) { t -> t.message ?: -1 } shouldBe 4
+  ) { t -> t.message?.length ?: -1 } shouldBe 4
 }

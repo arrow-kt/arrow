@@ -16,5 +16,5 @@ fun test() {
   recover(
     { boom() },
     { str -> str.length }
-  ) { t: RuntimeException -> t.message ?: -1 } shouldBe 4
+  ) { t: RuntimeException -> t.message?.length ?: -1 } shouldBe 4
 }

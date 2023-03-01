@@ -23,10 +23,8 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
-}
+public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
+  fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
 public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
   contract { callsInPlace(block, EXACTLY_ONCE) }
@@ -69,7 +67,7 @@ public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   }
 
   public fun <B> ensureNotNull(value: B?): B {
-    contract { returns() implies (value != null) }
+    contract { returnsNotNull() }
     return ensureNotNull(value) { null }
   }
 }
@@ -87,7 +85,7 @@ public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
   public fun <B> ensureNotNull(value: B?): B {
-    contract { returns() implies (value != null) }
+    contract { returnsNotNull() }
     return ensureNotNull(value) { None }
   }
 }

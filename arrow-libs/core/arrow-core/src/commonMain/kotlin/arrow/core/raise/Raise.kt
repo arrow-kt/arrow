@@ -228,17 +228,17 @@ public interface Raise<in R> {
   public suspend fun <E, A> Effect<E, A>.recover(
     @BuilderInference recover: suspend Raise<R>.(E) -> A,
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
-  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
+  ): A = recover({ invoke() }, { recover(it) }) { catch(it) }
 
   @RaiseDSL
   public suspend infix fun <A> Effect<R, A>.catch(
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  ): A = catch({ invoke() }) { catch(it) }
 
   @RaiseDSL
   public infix fun <A> EagerEffect<R, A>.catch(
     @BuilderInference catch: Raise<R>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  ): A = catch({ invoke() }) { catch(it) }
 }
 
 /**
@@ -268,13 +268,7 @@ public interface Raise<in R> {
 public inline fun <E, A> recover(
   @BuilderInference action: Raise<E>.() -> A,
   @BuilderInference recover: (E) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-  }
-  return fold<E, A, A>({ action(this) }, { throw it }, { recover(it) }, { it })
-}
+): A = fold(action, { throw it }, recover, ::identity)
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
@@ -298,7 +292,7 @@ public inline fun <E, A> recover(
  *   recover(
  *     { boom() },
  *     { str -> str.length }
- *   ) { t -> t.message ?: -1 } shouldBe 4
+ *   ) { t -> t.message?.length ?: -1 } shouldBe 4
  * }
  * ```
  * <!--- KNIT example-raise-dsl-06.kt -->
@@ -309,14 +303,7 @@ public inline fun <E, A> recover(
   @BuilderInference action: Raise<E>.() -> A,
   @BuilderInference recover: (E) -> A,
   @BuilderInference catch: (Throwable) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return fold({ action(this) }, { catch(it) }, { recover(it) }, ::identity)
-}
+): A = fold(action, catch, recover, ::identity)
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
@@ -340,7 +327,7 @@ public inline fun <E, A> recover(
  *   recover(
  *     { boom() },
  *     { str -> str.length }
- *   ) { t: RuntimeException -> t.message ?: -1 } shouldBe 4
+ *   ) { t: RuntimeException -> t.message?.length ?: -1 } shouldBe 4
  * }
  * ```
  * <!--- KNIT example-raise-dsl-07.kt -->
@@ -352,53 +339,82 @@ public inline fun <reified T : Throwable, E, A> recover(
   @BuilderInference action: Raise<E>.() -> A,
   @BuilderInference recover: (E) -> A,
   @BuilderInference catch: (T) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return fold({ action(this) }, { t ->
-    if (t is T) catch(t) else throw t
-  }, { recover(it) }, { it })
-}
+): A = fold(action, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
 
 /**
  * Allows safely catching exceptions without capturing [CancellationException],
  * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
  *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.catch
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *     "fallback"
+ *   } shouldBe "fallback"
+ *
+ *   fun fetchId(): Int = throw RuntimeException("BOOM")
+ *
+ *   either {
+ *     catch({ fetchId() }) { t ->
+ *       raise("something went wrong: $t.message")
+ *     }
+ *   } shouldBe Either.Left("something went wrong: BOOM")
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-08.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
  * Alternatively, you can use `try { } catch { }` blocks with [nonFatalOrThrow].
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
-public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return try {
+public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A =
+  try {
     action()
   } catch (t: Throwable) {
     catch(t.nonFatalOrThrow())
   }
-}
 
 /**
  * Allows safely catching exceptions of type `T` without capturing [CancellationException],
  * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.catch
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *     "fallback"
+ *   } shouldBe "fallback"
+ *
+ *   fun fetchId(): Int = throw RuntimeException("BOOM")
+ *
+ *   either {
+ *     catch({ fetchId() }) { t: RuntimeException ->
+ *       raise("something went wrong: $t.message")
+ *     }
+ *   } shouldBe Either.Left("something went wrong: BOOM")
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-09.kt -->
+ * <!--- TEST lines.isEmpty() -->
  *
  * Alternatively, you can use `try { } catch(e: T) { }` blocks.
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
 @JvmName("catchReified")
-public inline fun <reified T : Throwable, A> catch(action: () -> A, catch: (T) -> A): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
-}
+public inline fun <reified T : Throwable, A> catch(action: () -> A, catch: (T) -> A): A =
+  catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
 
 @RaiseDSL
 public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
@@ -413,7 +429,7 @@ public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
 public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
-    returns() implies (value != null)
+    returnsNotNull()
   }
   return value ?: raise(raise())
 }
