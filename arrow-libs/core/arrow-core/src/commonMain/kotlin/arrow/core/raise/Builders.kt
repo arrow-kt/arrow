@@ -67,7 +67,7 @@ public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   }
 
   public fun <B> ensureNotNull(value: B?): B {
-    contract { returnsNotNull() }
+    contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
@@ -85,7 +85,7 @@ public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
   public fun <B> ensureNotNull(value: B?): B {
-    contract { returnsNotNull() }
+    contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
   }
 }

@@ -429,7 +429,7 @@ public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
 public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
-    returnsNotNull()
+    returns() implies (value != null)
   }
   return value ?: raise(raise())
 }
