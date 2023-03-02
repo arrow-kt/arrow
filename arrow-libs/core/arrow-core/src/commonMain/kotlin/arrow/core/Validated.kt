@@ -557,6 +557,25 @@ public sealed class Validated<out E, out A> {
 @Deprecated(
   DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
+    "Either.zipOrAccumulate(combineError, toEither(), fb.toEither(), f)",
+    "arrow.core.Either"
+  )
+)
+public inline fun <E, A, B, Z> Validated<E, A>.zip(combineError: (E, E) -> E, fb: Validated<E, B>, f: (A, B) -> Z): Validated<E, Z> =
+  when (this) {
+    is Invalid -> when (fb) {
+      is Invalid -> Invalid(combineError(this.value, fb.value))
+      is Valid -> Invalid(this.value)
+    }
+    is Valid -> when (fb) {
+      is Invalid -> Invalid(fb.value)
+      is Valid -> Valid(f(this.value, fb.value))
+    }
+  }
+
+@Deprecated(
+  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), fb.toEither(), ::Pair).toValidated()",
     "arrow.core.Either"
   )

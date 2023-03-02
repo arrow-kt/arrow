@@ -1547,7 +1547,6 @@ public final class arrow/core/Partials {
 
 public final class arrow/core/PredefKt {
 	public static final fun emptyCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-	public static final fun emptyCombine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun identity (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -2584,7 +2583,6 @@ public final class arrow/core/ValidatedKt {
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function4;)Larrow/core/Validated;
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function3;)Larrow/core/Validated;
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
-	public static final fun zip (Larrow/core/Validated;Lkotlin/jvm/functions/Function2;Larrow/core/Validated;)Larrow/core/Validated;
 	public static final fun zip (Larrow/core/Validated;Lkotlin/jvm/functions/Function2;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 }
 

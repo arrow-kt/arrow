@@ -11,7 +11,6 @@ import arrow.core.Tuple5
 import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
-import arrow.core.emptyCombine
 import arrow.core.nel
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -546,7 +545,7 @@ public inline fun <R, A, B> Raise<R>.mapOrAccumulate(
       fold<R, B, Unit>({
         block(it)
       }, { newError ->
-        error = emptyCombine(error, newError, combineError)
+        error = EmptyValue.combine(error, newError, combineError)
       }, {
         add(it)
       })

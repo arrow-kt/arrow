@@ -530,7 +530,7 @@ public sealed class Ior<out A, out B> {
     )
 
   public inline fun <AA, C, D> bitraverseValidated(
-    combine: (AA, AA) -> AA,
+    noinline combine: (AA, AA) -> AA,
     fa: (A) -> Validated<AA, C>,
     fb: (B) -> Validated<AA, D>
   ): Validated<AA, Ior<C, D>> =
@@ -1114,32 +1114,32 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   if (this@zip is Left) return Left(this@zip.value)
   accumulatedLeft = if (this@zip is Both) this@zip.leftValue else accumulatedLeft
 
-  if (c is Left) return Left(emptyCombine(accumulatedLeft, c.value, combine))
-  accumulatedLeft = if (c is Both) emptyCombine(accumulatedLeft, c.leftValue, combine) else accumulatedLeft
+  if (c is Left) return Left(EmptyValue.combine(accumulatedLeft, c.value, combine))
+  accumulatedLeft = if (c is Both) EmptyValue.combine(accumulatedLeft, c.leftValue, combine) else accumulatedLeft
 
-  if (d is Left) return Left(emptyCombine(accumulatedLeft, d.value, combine))
-  accumulatedLeft = if (d is Both) emptyCombine(accumulatedLeft, d.leftValue, combine) else accumulatedLeft
+  if (d is Left) return Left(EmptyValue.combine(accumulatedLeft, d.value, combine))
+  accumulatedLeft = if (d is Both) EmptyValue.combine(accumulatedLeft, d.leftValue, combine) else accumulatedLeft
 
-  if (e is Left) return Left(emptyCombine(accumulatedLeft, e.value, combine))
-  accumulatedLeft = if (e is Both) emptyCombine(accumulatedLeft, e.leftValue, combine) else accumulatedLeft
+  if (e is Left) return Left(EmptyValue.combine(accumulatedLeft, e.value, combine))
+  accumulatedLeft = if (e is Both) EmptyValue.combine(accumulatedLeft, e.leftValue, combine) else accumulatedLeft
 
-  if (f is Left) return Left(emptyCombine(accumulatedLeft, f.value, combine))
-  accumulatedLeft = if (f is Both) emptyCombine(accumulatedLeft, f.leftValue, combine) else accumulatedLeft
+  if (f is Left) return Left(EmptyValue.combine(accumulatedLeft, f.value, combine))
+  accumulatedLeft = if (f is Both) EmptyValue.combine(accumulatedLeft, f.leftValue, combine) else accumulatedLeft
 
-  if (g is Left) return Left(emptyCombine(accumulatedLeft, g.value, combine))
-  accumulatedLeft = if (g is Both) emptyCombine(accumulatedLeft, g.leftValue, combine) else accumulatedLeft
+  if (g is Left) return Left(EmptyValue.combine(accumulatedLeft, g.value, combine))
+  accumulatedLeft = if (g is Both) EmptyValue.combine(accumulatedLeft, g.leftValue, combine) else accumulatedLeft
 
-  if (h is Left) return Left(emptyCombine(accumulatedLeft, h.value, combine))
-  accumulatedLeft = if (h is Both) emptyCombine(accumulatedLeft, h.leftValue, combine) else accumulatedLeft
+  if (h is Left) return Left(EmptyValue.combine(accumulatedLeft, h.value, combine))
+  accumulatedLeft = if (h is Both) EmptyValue.combine(accumulatedLeft, h.leftValue, combine) else accumulatedLeft
 
-  if (i is Left) return Left(emptyCombine(accumulatedLeft, i.value, combine))
-  accumulatedLeft = if (i is Both) emptyCombine(accumulatedLeft, i.leftValue, combine) else accumulatedLeft
+  if (i is Left) return Left(EmptyValue.combine(accumulatedLeft, i.value, combine))
+  accumulatedLeft = if (i is Both) EmptyValue.combine(accumulatedLeft, i.leftValue, combine) else accumulatedLeft
 
-  if (j is Left) return Left(emptyCombine(accumulatedLeft, j.value, combine))
-  accumulatedLeft = if (j is Both) emptyCombine(accumulatedLeft, j.leftValue, combine) else accumulatedLeft
+  if (j is Left) return Left(EmptyValue.combine(accumulatedLeft, j.value, combine))
+  accumulatedLeft = if (j is Both) EmptyValue.combine(accumulatedLeft, j.leftValue, combine) else accumulatedLeft
 
-  if (k is Left) return Left(emptyCombine(accumulatedLeft, k.value, combine))
-  accumulatedLeft = if (k is Both) emptyCombine(accumulatedLeft, k.leftValue, combine) else accumulatedLeft
+  if (k is Left) return Left(EmptyValue.combine(accumulatedLeft, k.value, combine))
+  accumulatedLeft = if (k is Both) EmptyValue.combine(accumulatedLeft, k.leftValue, combine) else accumulatedLeft
 
   return when {
     rightValue != EmptyValue && accumulatedLeft == EmptyValue -> Right(rightValue as L)

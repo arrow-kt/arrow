@@ -25,13 +25,6 @@ internal object EmptyValue {
  * Like [Semigroup.maybeCombine] but for using with [EmptyValue]
  */
 @PublishedApi
-@Deprecated(SemigroupDeprecation, ReplaceWith("emptyCombine(first, second) { x, y -> x.combine(y) }"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("EmptyValue.combine(first, second) { x, y -> x.combine(y) }", "arrow.core.EmptyValue"))
 internal fun <T> Semigroup<T>.emptyCombine(first: Any?, second: T): T =
-  emptyCombine(first, second) { x, y -> x.combine(y) }
-
-/**
- * Apply the [combine] function if [first] is not empty, otherwise return [second].
- */
-@PublishedApi
-internal inline fun <T> emptyCombine(first: Any?, second: T, combine: (T, T) -> T): T =
-  if (first == EmptyValue) second else combine(first as T, second)
+  EmptyValue.combine(first, second) { x, y -> x.combine(y) }
