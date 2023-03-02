@@ -392,10 +392,21 @@ public sealed class Option<out A> {
     }
 
     @JvmStatic
+    @Deprecated(
+      RedundantAPI + "Prefer explicitly creating lambdas",
+      ReplaceWith("{ it.map(f) }")
+    )
     public fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { Pair(bind(), b.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
     zip(other, ::Pair)
 
@@ -1256,20 +1267,19 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
  *
  * @param alternative the default option if this is empty.
  */
-public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> {
-  contract { callsInPlace(alternative, InvocationKind.AT_MOST_ONCE) }
-  return if (isEmpty()) alternative() else this
-}
+@Deprecated(
+  NicheAPI + "Prefer using the recover method",
+  ReplaceWith("recover { alternative().bind() }", "arrow.core.recover")
+)
+public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  recover { alternative().bind() }
 
 @Deprecated(
-  NicheAPI + "Prefer using the orElse method",
-  ReplaceWith("orElse(value)")
+  NicheAPI + "Prefer using the recover method",
+  ReplaceWith("recover { value.bind() }", "arrow.core.recover")
 )
-public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
-  value
-} else {
-  this
-}
+public infix fun <T> Option<T>.or(value: Option<T>): Option<T> =
+  recover { value.bind() }
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
@@ -1571,14 +1581,25 @@ public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
     validated.fold({ None }, { b -> Some(b) })
   }
 
-public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
-  unzip(::identity)
-
-public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
-  fold(
-    { None to None },
-    { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
+@Deprecated(
+  NicheAPI + "Prefer using fold, when or Option DSL",
+  ReplaceWith(
+    "fold({ None to None }, { (a, b) -> Some(a) to Some(b) })",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
   )
+)
+public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }, { (a, b) -> Some(a) to Some(b) })
+
+@Deprecated(
+  NicheAPI + "Prefer using fold, when or Option DSL",
+  ReplaceWith(
+    "fold({ None to None }, { f(it).let { (a, b) -> Some(a) to Some(b) } })",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
+  )
+)
+public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
+  fold({ None to None }, { f(it).let { (a, b) -> Some(a) to Some(b) } })
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
