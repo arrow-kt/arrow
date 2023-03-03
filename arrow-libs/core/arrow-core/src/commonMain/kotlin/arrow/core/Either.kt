@@ -1,18 +1,17 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalTypeInference::class)
 
 package arrow.core
 
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.Either.Right.Companion.unit
-import arrow.core.computations.ResultEffect.bind
-import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.Effect
-import arrow.core.continuations.Token
 import arrow.core.raise.Raise
+import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.catch
 import arrow.core.raise.either
+import arrow.core.raise.zipOrAccumulate
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
@@ -1378,14 +1377,8 @@ public sealed class Either<out A, out B> {
 
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <R> catch(f: () -> R): Either<Throwable, R> {
-      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
-      return try {
-        f().right()
-      } catch (t: Throwable) {
-        t.nonFatalOrThrow().left()
-      }
-    }
+    public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
+      catch({ f().right() }) { e -> e.left() }
 
     @Deprecated(
       RedundantAPI + "Compose catch with flatten instead",
@@ -1481,474 +1474,196 @@ public sealed class Either<out A, out B> {
     public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
 
-
-    public inline fun <E, A, B, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      transform: (A, B) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
-        transform(aa, bb)
-      }
+    public inline fun <R, A, B, C> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      block: (A, B) -> C
+    ): Either<R, C> = either {
+      zipOrAccumulate(combine, action1, action2, block)
     }
 
-    public inline fun <E, A, B, C, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      transform: (A, B, C) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
-        transform(aa, bb, cc)
-      }
+    public inline fun <R, A, B, C, D> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      block: (A, B, C) -> D
+    ): Either<R, D> = either {
+      zipOrAccumulate(combine, action1, action2, action3, block)
     }
 
-    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      transform: (A, B, C, D) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd)
-      }
+    public inline fun <R, A, B, C, D, E> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      block: (A, B, C, D) -> E
+    ): Either<R, E> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      transform: (A, B, C, D, EE) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee)
-      }
+    public inline fun <R, A, B, C, D, E, F> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      block: (A, B, C, D, E) -> F
+    ): Either<R, F> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, action5, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, FF>,
-      transform: (A, B, C, D, EE, FF) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff)
-      }
+    public inline fun <R, A, B, C, D, E, F, G> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      block: (A, B, C, D, E, F) -> G
+    ): Either<R, G> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, action5, action6, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      transform: (A, B, C, D, EE, F, G) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg)
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      block: (A, B, C, D, E, F, G) -> H
+    ): Either<R, H> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, action5, action6, action7, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      transform: (A, B, C, D, EE, F, G, H) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh)
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H, I> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      @BuilderInference action8: RaiseAccumulate<R>.() -> H,
+      block: (A, B, C, D, E, F, G, H) -> I
+    ): Either<R, I> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, action5, action6, action7, action8, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H, I, J> zipOrAccumulate(
+      combine: (R, R) -> R,
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      @BuilderInference action8: RaiseAccumulate<R>.() -> H,
+      @BuilderInference action9: RaiseAccumulate<R>.() -> I,
+      block: (A, B, C, D, E, F, G, H, I) -> J
+    ): Either<R, J> = either {
+      zipOrAccumulate(combine, action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
     }
 
-    @Suppress("DuplicatedCode")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      combine: (E, E) -> E,
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      j: Either<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-      } else {
-        var accumulatedError: Any? = EmptyValue
-        accumulatedError = if (a is Left) a.value else accumulatedError
-        accumulatedError = if (b is Left) EmptyValue.combine(accumulatedError, b.value, combine) else accumulatedError
-        accumulatedError = if (c is Left) EmptyValue.combine(accumulatedError, c.value, combine) else accumulatedError
-        accumulatedError = if (d is Left) EmptyValue.combine(accumulatedError, d.value, combine) else accumulatedError
-        accumulatedError = if (e is Left) EmptyValue.combine(accumulatedError, e.value, combine) else accumulatedError
-        accumulatedError = if (f is Left) EmptyValue.combine(accumulatedError, f.value, combine) else accumulatedError
-        accumulatedError = if (g is Left) EmptyValue.combine(accumulatedError, g.value, combine) else accumulatedError
-        accumulatedError = if (h is Left) EmptyValue.combine(accumulatedError, h.value, combine) else accumulatedError
-        accumulatedError = if (i is Left) EmptyValue.combine(accumulatedError, i.value, combine) else accumulatedError
-        accumulatedError = if (j is Left) EmptyValue.combine(accumulatedError, j.value, combine) else accumulatedError
-
-        @Suppress("UNCHECKED_CAST")
-        (Left(accumulatedError as E))
-      }
+    public inline fun <R, A, B, C, D> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      block: (A, B) -> C,
+    ): Either<NonEmptyList<R>, C> = either {
+      zipOrAccumulate(action1, action2, block)
     }
 
-    public inline fun <E, A, B, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      transform: (A, B) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
-        transform(aa, bb)
-      }
+    public inline fun <R, A, B, C, D> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      block: (A, B, C) -> D,
+    ): Either<NonEmptyList<R>, D> = either {
+      zipOrAccumulate(action1, action2, action3, block)
     }
 
-    public inline fun <E, A, B, C, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      transform: (A, B, C) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
-        transform(aa, bb, cc)
-      }
+    public inline fun <R, A, B, C, D, E> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      block: (A, B, C, D) -> E,
+    ): Either<NonEmptyList<R>, E> = either {
+      zipOrAccumulate(action1, action2, action3, action4, block)
     }
 
-    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      transform: (A, B, C, D) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd)
-      }
+    public inline fun <R, A, B, C, D, E, F> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      block: (A, B, C, D, E) -> F,
+    ): Either<NonEmptyList<R>, F> = either {
+      zipOrAccumulate(action1, action2, action3, action4, action5, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      transform: (A, B, C, D, EE) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee)
-      }
+    public inline fun <R, A, B, C, D, E, F, G> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      block: (A, B, C, D, E, F) -> G,
+    ): Either<NonEmptyList<R>, G> = either {
+      zipOrAccumulate(action1, action2, action3, action4, action5, action6, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, FF>,
-      transform: (A, B, C, D, EE, FF) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff)
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      block: (A, B, C, D, E, F, G) -> H,
+    ): Either<NonEmptyList<R>, H> = either {
+      zipOrAccumulate(action1, action2, action3, action4, action5, action6, action7, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      transform: (A, B, C, D, EE, F, G) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg)
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H, I> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      @BuilderInference action8: RaiseAccumulate<R>.() -> H,
+      block: (A, B, C, D, E, F, G, H) -> I,
+    ): Either<NonEmptyList<R>, I> = either {
+      zipOrAccumulate(action1, action2, action3, action4, action5, action6, action7, action8, block)
     }
 
-    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      transform: (A, B, C, D, EE, F, G, H) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh)
-      }
-    }
-
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
-    }
-
-    @Suppress("DuplicatedCode")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      a: Either<E, A>,
-      b: Either<E, B>,
-      c: Either<E, C>,
-      d: Either<E, D>,
-      e: Either<E, EE>,
-      f: Either<E, F>,
-      g: Either<E, G>,
-      h: Either<E, H>,
-      i: Either<E, I>,
-      j: Either<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-      } else {
-        val list = buildList(9) {
-          if (a is Left) add(a.value)
-          if (b is Left) add(b.value)
-          if (c is Left) add(c.value)
-          if (d is Left) add(d.value)
-          if (e is Left) add(e.value)
-          if (f is Left) add(f.value)
-          if (g is Left) add(g.value)
-          if (h is Left) add(h.value)
-          if (i is Left) add(i.value)
-          if (j is Left) add(j.value)
-        }
-        Left(NonEmptyList(list[0], list.drop(1)))
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      transform: (A, B) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
-        transform(aa, bb)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      transform: (A, B, C) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
-        transform(aa, bb, cc)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      transform: (A, B, C, D) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      transform: (A, B, C, D, EE) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, FF>,
-      transform: (A, B, C, D, EE, FF) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, F>,
-      g: EitherNel<E, G>,
-      transform: (A, B, C, D, EE, F, G) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, F>,
-      g: EitherNel<E, G>,
-      h: EitherNel<E, H>,
-      transform: (A, B, C, D, EE, F, G, H) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh)
-      }
-    }
-
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, F>,
-      g: EitherNel<E, G>,
-      h: EitherNel<E, H>,
-      i: EitherNel<E, I>,
-      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
-        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
-      }
-    }
-
-    @Suppress("DuplicatedCode")
-    @JvmName("zipOrAccumulateNonEmptyList")
-    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
-      a: EitherNel<E, A>,
-      b: EitherNel<E, B>,
-      c: EitherNel<E, C>,
-      d: EitherNel<E, D>,
-      e: EitherNel<E, EE>,
-      f: EitherNel<E, F>,
-      g: EitherNel<E, G>,
-      h: EitherNel<E, H>,
-      i: EitherNel<E, I>,
-      j: EitherNel<E, J>,
-      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
-    ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-      } else {
-        val list = buildList {
-          if (a is Left) addAll(a.value)
-          if (b is Left) addAll(b.value)
-          if (c is Left) addAll(c.value)
-          if (d is Left) addAll(d.value)
-          if (e is Left) addAll(e.value)
-          if (f is Left) addAll(f.value)
-          if (g is Left) addAll(g.value)
-          if (h is Left) addAll(h.value)
-          if (i is Left) addAll(i.value)
-          if (j is Left) addAll(j.value)
-        }
-        Left(NonEmptyList(list[0], list.drop(1)))
-      }
+    public inline fun <R, A, B, C, D, E, F, G, H, I, J> zipOrAccumulate(
+      @BuilderInference action1: RaiseAccumulate<R>.() -> A,
+      @BuilderInference action2: RaiseAccumulate<R>.() -> B,
+      @BuilderInference action3: RaiseAccumulate<R>.() -> C,
+      @BuilderInference action4: RaiseAccumulate<R>.() -> D,
+      @BuilderInference action5: RaiseAccumulate<R>.() -> E,
+      @BuilderInference action6: RaiseAccumulate<R>.() -> F,
+      @BuilderInference action7: RaiseAccumulate<R>.() -> G,
+      @BuilderInference action8: RaiseAccumulate<R>.() -> H,
+      @BuilderInference action9: RaiseAccumulate<R>.() -> I,
+      block: (A, B, C, D, E, F, G, H, I) -> J
+    ): Either<NonEmptyList<R>, J> = either {
+      zipOrAccumulate(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
     }
   }
 
@@ -2294,10 +2009,13 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
 
 @Deprecated(
   RedundantAPI + "Prefer zipOrAccumulate",
-  ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
+  ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, { this@combine.bind() }, { b.bind() }) { a, bb -> SGB.run { a.combine(bb) } }")
 )
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
+  Either.zipOrAccumulate(
+    { a, bb -> SGA.run { a.combine(bb) } },
+    { this@combine.bind() },
+    { b.bind() }) { a, bb -> SGB.run { a.combine(bb) } }
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
@@ -2505,7 +2223,20 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
 ): Either<A, L> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
+  return either {
+    map(
+      bind(),
+      c.bind(),
+      d.bind(),
+      e.bind(),
+      f.bind(),
+      g.bind(),
+      h.bind(),
+      i.bind(),
+      j.bind(),
+      k.bind()
+    )
+  }
 }
 
 @Deprecated(
@@ -2664,7 +2395,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
   contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
-  return when(this) {
+  return when (this) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
   }
