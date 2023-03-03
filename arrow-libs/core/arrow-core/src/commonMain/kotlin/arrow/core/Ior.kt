@@ -15,6 +15,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -56,8 +57,11 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-01.kt -->
    */
-  @JsName("_isRight")
-  internal abstract val isRight: Boolean
+  @Deprecated(
+    RedundantAPI + "Use isRight()",
+    ReplaceWith("isRight()")
+  )
+  public abstract val isRight: Boolean
 
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
@@ -75,8 +79,11 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-02.kt -->
    */
-  @JsName("_isLeft")
-  internal abstract val isLeft: Boolean
+  @Deprecated(
+    RedundantAPI + "Use isLeft()",
+    ReplaceWith("isLeft()")
+  )
+  public abstract val isLeft: Boolean
 
   /**
    * Returns `true` if this is a [Both], `false` otherwise.
@@ -93,10 +100,16 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-03.kt -->
    */
-  @JsName("_isBoth")
-  internal abstract val isBoth: Boolean
+
+  @Deprecated(
+    RedundantAPI + "Use isBoth()",
+    ReplaceWith("isBoth()")
+  )
+  public abstract val isBoth: Boolean
 
 
+  @JsName("_isLeft")
+  @JvmName("_isLeft")
   public fun isLeft(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Left<A>)
@@ -106,6 +119,8 @@ public sealed class Ior<out A, out B> {
     return this@Ior is Ior.Left<A>
   }
 
+  @JsName("_isRight")
+  @JvmName("_isRight")
   public fun isRight(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Right<B>)
@@ -115,6 +130,8 @@ public sealed class Ior<out A, out B> {
     return this@Ior is Ior.Right<B>
   }
 
+  @JsName("_isBoth")
+  @JvmName("_isBoth")
   public fun isBoth(): Boolean {
     contract {
       returns(false) implies (this@Ior is Ior.Right<B>)
