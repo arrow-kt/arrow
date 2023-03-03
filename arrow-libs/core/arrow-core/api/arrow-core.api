@@ -2,11 +2,9 @@ public class arrow/core/AccumulatingRaise : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun bindEager (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
