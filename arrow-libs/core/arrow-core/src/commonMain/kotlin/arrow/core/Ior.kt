@@ -505,6 +505,13 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-12.kt -->
    */
+  @Deprecated(
+    NicheAPI + "Prefer using fold",
+    ReplaceWith("this.fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })",
+      "arrow.core.Validated",
+      "arrow.core.Valid",
+      "arrow.core.Invalid")
+  )
   public fun toValidated(): Validated<A, B> =
     fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
@@ -654,6 +661,11 @@ public sealed class Ior<out A, out B> {
       { a, b -> nullable{ Both( fa(a).bind(), fb(b).bind()) } }
     )
 
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("this.fold({ a -> fa(a).map { Ior.Left(it) } }, { b -> fb(b).map { Ior.Right(it) } }, { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Ior.Both(aa, c) } })",
+      "arrow.core.Ior")
+  )
 public inline fun <AA, C, D> bitraverseValidated(
     SA: Semigroup<AA>,
     fa: (A) -> Validated<AA, C>,
@@ -1029,6 +1041,11 @@ public fun <B, C> Ior<B?, C?>.bisequenceNullable(): Ior<B, C>? =
         { b -> b?.let{ Right(it) } },
         { a, b -> nullable { Both(a.bind(), b.bind()) } })
 
+@Deprecated(
+  NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+  ReplaceWith("this.fold({ a -> fa(a).map { Ior.Left(it) } }, { b -> fb(b).map { Ior.Right(it) } }, { a, b -> fa(a).zip(SA, fb(b)) { aa, c -> Ior.Both(aa, c) } })",
+  "arrow.core.Ior")
+)
 public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(SA: Semigroup<A>): Validated<A, Ior<B, C>> =
   bitraverseValidated(SA, ::identity, ::identity)
 
@@ -1059,6 +1076,15 @@ public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: I
 public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
+@Deprecated(
+  NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+  ReplaceWith("if (n <= 0) Ior.Right<List<B>>(emptyList<B>())\n" +
+    "  else when (this) {\n" +
+    "    is Ior.Right -> Ior.Right<List<B>>(List(n) { value })\n" +
+    "    is Ior.Left -> this\n" +
+    "    is Ior.Both -> map { List(n) { rightValue } }.mapLeft<A>{ List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run<Semigroup<A>> { acc + a } } }\n" +
+    "  }","arrow.core.Ior")
+)
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
   if (n <= 0) Ior.Right(emptyList())
   else when (this) {
@@ -1067,6 +1093,19 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>>
     is Ior.Both -> map { List(n) { rightValue } }.mapLeft{ List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } }
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+  ReplaceWith("if (n <= 0) Ior.Right(MB.empty())\n" +
+    "  else when (this) {\n" +
+    "    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })\n" +
+    "    is Ior.Left -> this\n" +
+    "    is Ior.Both -> map { MB.run { List(n) { rightValue }.fold() } }.mapLeft {\n" +
+    "      List(n - 1) { leftValue }.fold(\n" +
+    "        leftValue\n" +
+    "      ) { acc, a -> SA.run { acc + a } }\n" +
+    "    }\n" +
+    "  }", "arrow.core.Ior")
+)
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
   if (n <= 0) Ior.Right(MB.empty())
   else when (this) {
