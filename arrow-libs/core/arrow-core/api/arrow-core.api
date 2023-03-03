@@ -284,7 +284,6 @@ public final class arrow/core/EitherKt {
 	public static final fun bisequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun catch (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combine (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Either;)Larrow/core/Either;
-	public static final fun combine (Larrow/core/Either;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combineK (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
