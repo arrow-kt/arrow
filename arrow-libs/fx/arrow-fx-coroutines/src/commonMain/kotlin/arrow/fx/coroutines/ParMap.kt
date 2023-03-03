@@ -16,12 +16,12 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 public suspend fun <A, B> Iterable<A>.parMap(
-  ctx: CoroutineContext = EmptyCoroutineContext,
+  context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
   f: suspend CoroutineScope.(A) -> B
 ): List<B> {
   val semaphore = Semaphore(concurrency)
-  return parMap(ctx) {
+  return parMap(context) {
     semaphore.withPermit { f(it) }
   }
 }
