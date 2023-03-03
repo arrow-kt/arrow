@@ -107,7 +107,7 @@ public open class AccumulatingRaise<E>(
   @RaiseDSL
   @JvmName("recoverEager")
   public infix fun <A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<NonEmptyList<E>>.(E) -> A): A =
-    recover({ invoke() }, resolve)
+    recover({ invoke() }) { resolve(it) }
 
   /**
    * Execute the [Effect] resulting in [A],
