@@ -219,7 +219,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ MN.empty() }, { f(it) }, { _, b -> f(b) })")
+    ReplaceWith("this.fold<C>({ MN.empty() }, { f }, { _, b -> f(b) })")
   )
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
@@ -230,7 +230,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })")
+    ReplaceWith("this.fold<C>({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })")
   )
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C {
     contract {
@@ -531,7 +531,10 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a).map { it.leftIor() } }, { b -> fb(b).map { it.rightIor() } },{ a, b -> fa(a).align(fb(b)) })")
+    ReplaceWith("fold({ a -> fa(a).map { it.leftIor() } }, { b -> fb(b).map { it.rightIor() } },{ a, b -> fa(a).align(fb(b)) })",
+      "arrow.core.leftIor",
+      "arrow.core.rightIor",
+      "arrow.core.align")
   )
   public inline fun <C, D> bicrosswalk(
     fa: (A) -> Iterable<C>,
@@ -545,7 +548,10 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
-    ReplaceWith("fold({ a -> fa(a).mapValues { it.value.leftIor() } },{ b -> fb(b).mapValues { it.value.rightIor() } },{ a, b -> fa(a).align(fb(b)) })")
+    ReplaceWith("this.fold<K, Ior<C, D>>( { a -> fa(a).mapValues { it.value.leftIor() } },{ b -> fb(b).mapValues { it.value.rightIor() } },{ a, b -> fa(a).align(fb(b)) })",
+      "arrow.core.leftIor",
+      "arrow.core.rightIor",
+      "arrow.core.align")
   )
   public inline fun <C, D, K> bicrosswalkMap(
     fa: (A) -> Map<K, C>,
