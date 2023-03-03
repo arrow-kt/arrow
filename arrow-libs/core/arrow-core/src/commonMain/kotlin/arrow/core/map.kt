@@ -8,7 +8,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
-import arrow.core.raise.Raise
+import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
 
 /**
@@ -291,13 +291,13 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: AccumulatingRaise<E>.(Map.Entry<K, A>) -> B
+  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<E, Map<K, B>> {
   var left: Any? = EmptyValue
   val right = mutableMapOf<K, B>()
   for (element in this)
     fold(
-      { transform(AccumulatingRaise(this), element) },
+      { transform(RaiseAccumulate(this), element) },
       { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
       { right[element.key] = it }
     )
@@ -305,12 +305,12 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
 }
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
-  @BuilderInference transform: AccumulatingRaise<E>.(Map.Entry<K, A>) -> B
+  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<NonEmptyList<E>, Map<K, B>> {
   val left = mutableListOf<E>()
   val right = mutableMapOf<K, B>()
   for (element in this)
-    fold({ transform(AccumulatingRaise(this), element) }, { error -> left.addAll(error) }, { right[element.key] = it })
+    fold({ transform(RaiseAccumulate(this), element) }, { error -> left.addAll(error) }, { right[element.key] = it })
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 

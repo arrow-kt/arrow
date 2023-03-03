@@ -574,7 +574,7 @@ public final class arrow/fx/coroutines/ScheduleKt {
 	public static final fun retryOrElseEither (Larrow/fx/coroutines/Schedule;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/fx/coroutines/ScopedAccumulatingRaise : arrow/core/AccumulatingRaise, kotlinx/coroutines/CoroutineScope {
+public final class arrow/fx/coroutines/ScopedRaiseAccumulate : arrow/core/raise/RaiseAccumulate, kotlinx/coroutines/CoroutineScope {
 	public fun <init> (Larrow/core/raise/Raise;Lkotlinx/coroutines/CoroutineScope;)V
 	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
 }

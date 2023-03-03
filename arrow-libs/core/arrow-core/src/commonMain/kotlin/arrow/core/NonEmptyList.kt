@@ -4,11 +4,9 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.raise.Raise
-import arrow.core.raise.either
+import arrow.core.raise.RaiseAccumulate
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -492,12 +490,12 @@ public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: AccumulatingRaise<E>.(A) -> B
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
 ): Either<E, NonEmptyList<B>> =
   all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: AccumulatingRaise<E>.(A) -> B
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
 ): Either<NonEmptyList<E>, NonEmptyList<B>> =
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
