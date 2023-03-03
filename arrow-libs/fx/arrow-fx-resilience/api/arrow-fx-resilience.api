@@ -241,3 +241,15 @@ public final class arrow/fx/resilience/TimeInMillisKt {
 	public static final fun timeInMillis ()J
 }
 
+public final class arrow/fx/resilience/common/Platform : java/lang/Enum {
+	public static final field JS Larrow/fx/resilience/common/Platform;
+	public static final field JVM Larrow/fx/resilience/common/Platform;
+	public static final field Native Larrow/fx/resilience/common/Platform;
+	public static fun valueOf (Ljava/lang/String;)Larrow/fx/resilience/common/Platform;
+	public static fun values ()[Larrow/fx/resilience/common/Platform;
+}
+
+public final class arrow/fx/resilience/common/PlatformKt {
+	public static final fun getPlatform ()Larrow/fx/resilience/common/Platform;
+}
+
