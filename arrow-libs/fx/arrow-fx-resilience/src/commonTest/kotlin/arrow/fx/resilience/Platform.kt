@@ -1,7 +1,7 @@
 package arrow.fx.resilience
 
-import io.kotest.common.Platform
-import io.kotest.common.platform
+import arrow.fx.resilience.common.Platform
+import arrow.fx.resilience.common.platform
 
 fun stackSafeIteration(): Int = when (platform) {
   Platform.JVM -> 500_000
