@@ -2292,13 +2292,6 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
   )
 
 @Deprecated(
-  RedundantAPI + "Prefer zipOrAccumulate",
-  ReplaceWith("Either.zipOrAccumulate(combineA, this, b, combineB)")
-)
-public fun <A, B> Either<A, B>.combine(combineA: (A, A) -> A, combineB: (B, B) -> B, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate(combineA, this, b, combineB)
-
-@Deprecated(
   SemigroupDeprecation + "Prefer zipOrAccumulate",
   ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
 )
