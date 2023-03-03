@@ -4,10 +4,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.updateAndGet
-import io.kotest.assertions.fail
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
@@ -19,7 +16,15 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.DurationUnit
 
@@ -33,271 +38,309 @@ data class JustANumber(val n: Int) {
   fun increment(): JustANumber = copy(n = n + 1)
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class ScheduleTest : StringSpec({
-    class MyException : Exception()
+class ScheduleTest {
+  class MyException : Exception()
 
-    val exception = MyException()
+  val exception = MyException()
 
-    "Schedule.identity()" {
-      val dec = Schedule.identity<Int>().calculateSchedule1(1)
-      val expected = Schedule.Decision<Any?, Int>(true, ZERO, Unit, Eval.now(1))
+  @Test
+  fun scheduleIdentity(): TestResult = runTest {
+    val dec = Schedule.identity<Int>().calculateSchedule1(1)
+    val expected = Schedule.Decision<Any?, Int>(true, ZERO, Unit, Eval.now(1))
 
-      dec eqv expected
+    dec eqv expected
+  }
+
+  @Test
+  fun scheduleUnfold(): TestResult = runTest {
+    val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
+    val expected = Schedule.Decision<Any?, Int>(true, ZERO, 1, Eval.now(1))
+
+    dec eqv expected
+  }
+
+  // schedule.forever() == Schedule.unfold(0) { it + 1 }
+  @Test
+  fun scheduleForever(): TestResult = runTest {
+    val foreverDesc = Schedule.forever<Any?>().calculateSchedule1(0)
+    val unfoldDesc = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
+
+    foreverDesc eqv unfoldDesc
+  }
+
+  @Test
+  fun scheduleRecursWithNegativeNumber(): TestResult = runTest {
+    checkRepeat(Schedule.recurs(-500), expected = 0)
+  }
+
+  @Test
+  fun scheduleRecursWithZero(): TestResult = runTest {
+    checkRepeat(Schedule.recurs(0), expected = 0)
+  }
+
+  @Test
+  fun scheduleRecursWithOne(): TestResult = runTest {
+    checkRepeat(Schedule.recurs(1), expected = 1)
+  }
+
+  @Test
+  fun scheduleRecursWithPositiveNumber(): TestResult = runTest {
+    val n = 500
+    val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
+
+    assertEquals(res.dropLast(1).map { ZERO }, res.dropLast(1).map { it.duration })
+    assertEquals(res.dropLast(1).map { true }, res.dropLast(1).map { it.cont })
+
+    res.last() eqv Schedule.Decision(false, ZERO, n + 1, Eval.now(n + 1))
+  }
+
+  @Test
+  fun scheduleOnceRepeatsOneAdditionalTime(): TestResult = runTest {
+    var count = 0
+    Schedule.once<Int>().repeat {
+      count++
     }
+    assertEquals(2, count)
+  }
 
-    "Schedule.unfold()" {
-      val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-      val expected = Schedule.Decision<Any?, Int>(true, ZERO, 1, Eval.now(1))
+  @Test
+  fun scheduleDoWhileRepeatsWhileConditionHolds(): TestResult = runTest {
+    checkRepeat(Schedule.doWhile { it < 10 }, expected = 10)
+    checkRepeat(Schedule.doWhile { it > 10 }, expected = 1)
+    checkRepeat(Schedule.doWhile { it == 1 }, expected = 2)
+  }
 
-      dec eqv expected
-    }
+  @Test
+  fun scheduleDoUntilRepeatsUntilConditionIsSatisfied(): TestResult = runTest {
+    checkRepeat(Schedule.doUntil { it < 10 }, expected = 1)
+    checkRepeat(Schedule.doUntil { it > 10 }, expected = 11)
+    checkRepeat(Schedule.doUntil { it == 1 }, expected = 1)
+  }
 
-    "Schedule.forever() == Schedule.unfold(0) { it + 1 }" {
-      val foreverDesc = Schedule.forever<Any?>().calculateSchedule1(0)
-      val unfoldDesc = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
+  @Test
+  fun scheduleDoWhileCollectCollectsAllInputsIntoAList(): TestResult = runTest {
+    checkRepeat(
+      Schedule
+        .doWhile<Int> { it < 10 }
+        .collect(),
+      expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    )
+  }
 
-      foreverDesc eqv unfoldDesc
-    }
+  @Test
+  fun scheduleDoUntilCollectCollectsAllInputsIntoAList(): TestResult = runTest {
+    checkRepeat(
+      Schedule
+        .doUntil<Int> { it > 10 }
+        .collect(),
+      expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    )
+  }
 
-    "Schedule.recurs(negative number)" {
-      checkRepeat(Schedule.recurs(-500), expected = 0)
-    }
-
-    "Schedule.recurs(0)" {
-      checkRepeat(Schedule.recurs(0), expected = 0)
-    }
-
-    "Schedule.recurs(1)" {
-      checkRepeat(Schedule.recurs(1), expected = 1)
-    }
-
-    "Schedule.recurs(n: Int)" {
-      val n = 500
-      val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
-
-      res.dropLast(1).map { it.duration } shouldBe res.dropLast(1).map { ZERO }
-      res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
-
-      res.last() eqv Schedule.Decision(false, ZERO, n + 1, Eval.now(n + 1))
-    }
-
-    "Schedule.once() repeats 1 additional time" {
-      var count = 0
-      Schedule.once<Int>().repeat {
+  @Test
+  fun repeatScheduledRepeatRepeatsTheWholeNumber(): TestResult = runTest {
+    val n = 42
+    var count = 0
+    Schedule.recurs<Int>(1).repeat {
+      Schedule.recurs<Int>(n).repeat {
         count++
       }
-      count shouldBe 2
     }
 
-    "Schedule.doWhile repeats while condition holds and returns itself" {
-      checkRepeat(Schedule.doWhile { it < 10 }, expected = 10)
-      checkRepeat(Schedule.doWhile { it > 10 }, expected = 1)
-      checkRepeat(Schedule.doWhile { it == 1 }, expected = 2)
-    }
-
-    "Schedule.doUntil repeats until the cond is satisfied" {
-      checkRepeat(Schedule.doUntil { it < 10 }, expected = 1)
-      checkRepeat(Schedule.doUntil { it > 10 }, expected = 11)
-      checkRepeat(Schedule.doUntil { it == 1 }, expected = 1)
-    }
-
-    "Schedule.doWhile.collect() collects all inputs into a list" {
-      checkRepeat(
-        Schedule
-          .doWhile<Int> { it < 10 }
-          .collect(),
-        expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
-      )
-    }
-
-    "Schedule.doUntil.collect() collects all inputs into a list" {
-      checkRepeat(
-        Schedule
-          .doUntil<Int> { it > 10 }
-          .collect(),
-        expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-      )
-    }
-
-    "Repeat a scheduled repeat repeats the whole number" {
-      val n = 42
-      var count = 0
-      Schedule.recurs<Int>(1).repeat {
-        Schedule.recurs<Int>(n).repeat {
-          count++
-        }
-      }
-
-      count shouldBe ((n + 1) * 2)
-    }
-
-    @Suppress("UNREACHABLE_CODE", "UNUSED_VARIABLE")
-    "Schedule.never() times out" {
-      withTimeoutOrNull(10.milliseconds) {
-        val a: Nothing = Schedule.never<Int>().repeat {
-          1
-        }
-      } shouldBe null
-    }
-
-    "Schedule.spaced()" {
-      val duration = 5.seconds
-      val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
-
-      res.map { it.cont } shouldBe res.map { true }
-      res.map { it.duration } shouldBe res.map { duration }
-    }
-
-    fun secondsToNanos(sec: Int): Double =
-      sec * 1_000_000_000.0
-
-    "Schedule.fibonacci()" {
-      val n = 10
-      val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
-
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val fib = fibs(secondsToNanos(10)).drop(1).take(n)
-
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe fib.sum()
-    }
-
-    "Schedule.linear()" {
-      val n = 10
-      val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
-
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val exp = linear(secondsToNanos(10)).drop(1).take(n)
-
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe exp.sum()
-    }
-
-    "Schedule.exponential()" {
-      val n = 10
-      val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
-
-      val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
-      val expSum = exp(secondsToNanos(10)).drop(1).take(n).sum()
-
-      res.all { it.cont } shouldBe true
-      sum.toDouble(DurationUnit.NANOSECONDS) shouldBe expSum
-    }
-
-    "repeat is stack-safe" {
-      checkRepeat(Schedule.recurs(20_000), expected = 20_000)
-    }
-
-    "repeatAsFlow is stack-safe" {
-      checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
-    }
-
-    "repeat" {
-      val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
-      val n = 100
-      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
-
-      val eff = SideEffect()
-
-      val l = Either.catch {
-        schedule.repeat {
-          if (eff.counter >= n) throw stop
-          else eff.increment()
-        }
-      }
-
-      eff.counter shouldBe 100
-      l shouldBe Either.Left(stop)
-    }
-
-    "repeatAsFlow" {
-      val stop = RuntimeException("WOOO")
-      val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
-      val n = 100
-      val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
-
-      val eff = SideEffect()
-
-      val l = Either.catch {
-        schedule.repeatAsFlow {
-          if (eff.counter >= n) throw stop
-          else eff.increment()
-        }.collect()
-      }
-
-      eff.counter shouldBe 100
-      l shouldBe Either.Left(stop)
-    }
-
-    "repeat fails fast on errors" {
-      val ex = Throwable("Hello")
-      Schedule.recurs<Int>(0).repeatOrElseEither({ throw ex }) { exc, _ -> exc }
-        .fold({ it shouldBe ex }, { fail("The impossible happened") })
-    }
-
-    "repeatAsFlow fails fast on errors" {
-      val ex = Throwable("Hello")
-      Schedule.recurs<Int>(0).repeatOrElseEitherAsFlow({ throw ex }, { t, _ -> t })
-        .collect { either -> either.fold({ it shouldBe ex }, { fail("The impossible happened") }) }
-    }
-
-    "repeat should run the schedule with the correct input" {
-      var i = 0
-      val n = 10
-      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeat { i++ } shouldBe (0..n).toList()
-    }
-
-    "repeatAsFlow should run the schedule with the correct input" {
-      var i = 0
-      val n = 10
-      (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList() shouldBe
-        (0..n).map { (0..it).toList() }
-    }
-
-    "retry is stack-safe" {
-      val count = AtomicRef(JustANumber(0))
-      val l = Either.catch {
-        Schedule.recurs<Throwable>(20_000).retry {
-          count.updateAndGet(JustANumber::increment)
-          throw exception
-        }
-      }
-
-      l.shouldBeTypeOf<Either.Left<MyException>>()
-      count.get().n shouldBe 20_001
-    }
-
-    "retry succeeds if no exception is thrown" {
-      Schedule.recurs<Throwable>(0).retry { 1 } shouldBe 1
-    }
-
-    "retryOrElseEither runs the schedule with the correct input and runs the orElse handler if it does not retry" {
-      val ex = Throwable("Hello")
-      val res = Schedule.recurs<Throwable>(0)
-        .retryOrElseEither({ throw ex }) { e, _ -> e }
-
-      res.fold({ it shouldBe ex }, { fail("The impossible happened") })
-    }
-
-    "Schedule stops retrying if first of more predicates is met" {
-      val ex = Throwable("Hello")
-
-      val schedule = Schedule.exponential<Throwable>(1.0.milliseconds)
-        .untilOutput { it > 50.0.milliseconds }
-        .untilInput<Throwable> { it is IllegalStateException }
-
-      val result: Either<Throwable, Unit> = withTimeout(10.seconds) {
-        schedule.retryOrElseEither({
-          throw ex
-        }, { t, _ -> t })
-      }
-
-      result.fold({ it shouldBe ex }, { fail("The impossible happened") })
-    }
+    assertEquals(((n + 1) * 2), count)
   }
-)
+
+  @Suppress("UNREACHABLE_CODE", "UNUSED_VARIABLE")
+  @Test
+  fun scheduleNeverTimesOut(): TestResult = runTest {
+    val result = withTimeoutOrNull(10.milliseconds) {
+      val a: Nothing = Schedule.never<Int>().repeat {
+        1
+      }
+    }
+    assertNull(result)
+  }
+
+  @Test
+  fun scheduleSpaced(): TestResult = runTest {
+    val duration = 5.seconds
+    val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
+
+    assertTrue { res.all { it.cont } }
+    assertTrue { res.all { it.duration == duration } }
+    assertContentEquals(res.map { true }, res.map { it.cont })
+    assertContentEquals(res.map { duration }, res.map { it.duration })
+  }
+
+  fun secondsToNanos(sec: Int): Double =
+    sec * 1_000_000_000.0
+
+  @Test
+  fun scheduleFibonacci(): TestResult = runTest {
+    val n = 10
+    val res = Schedule.fibonacci<Any?>(10.seconds).calculateSchedule(0, n)
+
+    val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+    val fib = fibs(secondsToNanos(10)).drop(1).take(n)
+
+    assertTrue { res.all { it.cont } }
+    assertEquals(fib.sum(), sum.toDouble(DurationUnit.NANOSECONDS))
+  }
+
+  @Test
+  fun scheduleLinear(): TestResult = runTest {
+    val n = 10
+    val res = Schedule.linear<Any?>(10.seconds).calculateSchedule(0, n)
+
+    val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+    val exp = linear(secondsToNanos(10)).drop(1).take(n)
+
+    assertTrue { res.all { it.cont } }
+    assertEquals(exp.sum(), sum.toDouble(DurationUnit.NANOSECONDS))
+  }
+
+  @Test
+  fun scheduleExponential(): TestResult = runTest {
+    val n = 10
+    val res = Schedule.exponential<Any?>(10.seconds).calculateSchedule(0, n)
+
+    val sum = res.fold(ZERO) { acc, v -> acc + v.duration }
+    val exp = exp(secondsToNanos(10)).drop(1).take(n)
+
+    assertTrue { res.all { it.cont } }
+    assertEquals(exp.sum(), sum.toDouble(DurationUnit.NANOSECONDS))
+  }
+
+  @Test
+  fun repeatIsStackSafe(): TestResult = runTest {
+    checkRepeat(Schedule.recurs(20_000), expected = 20_000)
+  }
+
+  @Test
+  fun repeatAsFlowIsStackSafe(): TestResult = runTest {
+    checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
+  }
+
+  @Test
+  fun repeat(): TestResult = runTest {
+    val stop = RuntimeException("WOOO")
+    val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
+    val n = 100
+    val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+
+    val eff = SideEffect()
+
+    val l = Either.catch {
+      schedule.repeat {
+        if (eff.counter >= n) throw stop
+        else eff.increment()
+      }
+    }
+
+    assertEquals(100, eff.counter)
+    assertEquals(Either.Left(stop), l)
+  }
+
+  @Test
+  fun repeatAsFlow(): TestResult = runTest {
+    val stop = RuntimeException("WOOO")
+    val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
+    val n = 100
+    val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
+
+    val eff = SideEffect()
+
+    val l = Either.catch {
+      schedule.repeatAsFlow {
+        if (eff.counter >= n) throw stop
+        else eff.increment()
+      }.collect()
+    }
+
+    assertEquals(100, eff.counter)
+    assertEquals(Either.Left(stop), l)
+  }
+
+  @Test
+  fun repeatFailsFastOnErrors(): TestResult = runTest {
+    val ex = Throwable("Hello")
+    Schedule.recurs<Int>(0).repeatOrElseEither({ throw ex }) { exc, _ -> exc }
+      .fold({ assertEquals(ex, it) }, { fail("The impossible happened") })
+  }
+
+  @Test
+  fun repeatAsFlowFailsFastOnErrors(): TestResult = runTest {
+    val ex = Throwable("Hello")
+    Schedule.recurs<Int>(0).repeatOrElseEitherAsFlow({ throw ex }, { t, _ -> t })
+      .collect { either -> either.fold({ assertEquals(ex, it) }, { fail("The impossible happened") }) }
+  }
+
+  @Test
+  fun repeatShouldRunTheScheduleWithTheCorrectInput(): TestResult = runTest {
+    var i = 0
+    val n = 10
+    val result = (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeat { i++ }
+
+    assertEquals((0..n).toList(), result)
+  }
+
+  @Test
+  fun repeatAsFlowShouldRunTheScheduleWithTheCorrectInput(): TestResult = runTest {
+    var i = 0
+    val n = 10
+    val result = (Schedule.recurs<Int>(n).zipRight(Schedule.collect())).repeatAsFlow { i++ }.toList()
+
+    assertEquals((0..n).map { (0..it).toList() }, result)
+  }
+
+  @Test
+  fun retryIsStackSafe(): TestResult = runTest {
+    val count = AtomicRef(JustANumber(0))
+    val l = Either.catch {
+      Schedule.recurs<Throwable>(20_000).retry {
+        count.updateAndGet(JustANumber::increment)
+        throw exception
+      }
+    }
+
+    assertTrue { l is Either.Left && l.value is MyException }
+    assertEquals(20_001, count.get().n)
+  }
+
+  @Test
+  fun retrySucceedsIfNoExceptionIsThrown(): TestResult = runTest {
+    val result = Schedule.recurs<Throwable>(0).retry { 1 }
+    assertEquals(1, result)
+  }
+
+  @Test
+  fun retryOrElseEitherRunsTheScheduleWithCorrectInputAndRunsOrElseHandlerIfItDoesNotRetry(): TestResult = runTest {
+    val ex = Throwable("Hello")
+    val res = Schedule.recurs<Throwable>(0)
+      .retryOrElseEither({ throw ex }) { e, _ -> e }
+
+    res.fold({ assertEquals(ex, it) }, { fail("The impossible happened") })
+  }
+
+  @Test
+  fun scheduleStopsRetryingIfFirstOfMorePredicatesIsMet(): TestResult = runTest {
+    val ex = Throwable("Hello")
+
+    val schedule = Schedule.exponential<Throwable>(1.0.milliseconds)
+      .untilOutput { it > 50.0.milliseconds }
+      .untilInput<Throwable> { it is IllegalStateException }
+
+    val result: Either<Throwable, Unit> = withTimeout(10.seconds) {
+      schedule.retryOrElseEither({
+        throw ex
+      }, { t, _ -> t })
+    }
+
+    result.fold({ assertEquals(ex, it) }, { fail("The impossible happened") })
+  }
+}
 
 @ExperimentalTime
 private fun fibs(one: Double): Sequence<Double> =
@@ -355,9 +398,11 @@ private tailrec suspend fun <I, A> go(
 
 private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B) {
   val count = AtomicRef(JustANumber(0))
-  schedule.repeat {
+  val result = schedule.repeat {
     count.updateAndGet(JustANumber::increment).n
-  } shouldBe expected
+  }
+
+  assertEquals(expected, result)
 }
 
 private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: Flow<B>) {
@@ -365,7 +410,7 @@ private suspend fun <B> checkRepeatAsFlow(schedule: Schedule<Int, B>, expected: 
   schedule.repeatAsFlow {
     count.updateAndGet(JustANumber::increment).n
   }.zip(expected, ::Pair)
-    .collect { (a, b) -> a shouldBe b }
+    .collect { (a, b) -> assertEquals(b, a) }
 }
 
 @ExperimentalTime

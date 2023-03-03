@@ -4,7 +4,6 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.publish)
 }
 
-apply(plugin = "io.kotest.multiplatform")
 apply(from = property("TEST_COVERAGE"))
 
 val enableCompatibilityMetadataVariant =
@@ -24,21 +23,19 @@ kotlin {
         api(projects.arrowCore)
         implementation(projects.arrowFxCoroutines)
         compileOnly(libs.kotlin.stdlibCommon)
-        implementation(libs.coroutines.core)
+        implementation("org.jetbrains.kotlin:kotlin-stdlib") {
+          version {
+            strictly("[1.7, 1.8[")
+            prefer("1.8.10")
+          }
+        }
       }
     }
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
           implementation(libs.coroutines.test)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
-      }
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
+          implementation(kotlin("test"))
         }
       }
     }
