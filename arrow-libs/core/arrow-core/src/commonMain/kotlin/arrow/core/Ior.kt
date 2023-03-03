@@ -858,6 +858,7 @@ public inline fun <AA, C, D> bitraverseValidated(
   @Deprecated(
     NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
     ReplaceWith("fold({ a -> Either.Right(Ior.Left(a)) }, { b -> fa(b).map { Ior.Right(it) } }, { a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Either",
       "arrow.core.Ior")
   )
   @OptIn(ExperimentalTypeInference::class)
