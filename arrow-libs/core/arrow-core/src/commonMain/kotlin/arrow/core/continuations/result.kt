@@ -28,14 +28,27 @@ public value class ResultEagerEffectScope(private val cont: EagerEffectScope<Thr
     fold(::identity) { shift(it) }
 }
 
+@Deprecated(resultDSLDeprecation, ReplaceWith("result", "arrow.core.raise.result"))
 @Suppress("ClassName")
 public object result {
+  @Deprecated(
+    resultDSLDeprecation,
+    ReplaceWith("result(f)", "arrow.core.raise.result")
+  )
   public inline fun <A> eager(crossinline f: suspend ResultEagerEffectScope.() -> A): Result<A> =
     eagerEffect<Throwable, A> {
       @Suppress("ILLEGAL_RESTRICTED_SUSPENDING_FUNCTION_CALL")
       f(ResultEagerEffectScope(this))
     }.toResult()
-
+  
+  @Deprecated(
+    resultDSLDeprecation,
+    ReplaceWith("result(f)", "arrow.core.raise.result")
+  )
   public suspend inline operator fun <A> invoke(crossinline f: suspend ResultEffectScope.() -> A): Result<A> =
     effect<Throwable, A> { f(ResultEffectScope(this)) }.toResult()
 }
+
+private const val resultDSLDeprecation =
+  "The result DSL has been moved to arrow.core.raise.result.\n" +
+    "Replace import arrow.core.computations.* with arrow.core.raise.*"

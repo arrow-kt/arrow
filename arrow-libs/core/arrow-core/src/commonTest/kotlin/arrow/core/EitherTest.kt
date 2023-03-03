@@ -18,10 +18,17 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.byte
+import io.kotest.property.arbitrary.char
+import io.kotest.property.arbitrary.double
+import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
+import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
+import io.kotest.property.arbitrary.short
 import io.kotest.property.checkAll
 
 class EitherTest : StringSpec({
@@ -582,6 +589,92 @@ class EitherTest : StringSpec({
           either.bitraverseValidated({ it.invalid() }, { it.valid() })
       }
     }
+
+  "zipOrAccumulate results in all Right transformed, or all Left combined according to combine" {
+    checkAll(
+      Arb.either(Arb.string(), Arb.short()),
+      Arb.either(Arb.string(), Arb.byte()),
+      Arb.either(Arb.string(), Arb.int()),
+      Arb.either(Arb.string(), Arb.long()),
+      Arb.either(Arb.string(), Arb.float()),
+      Arb.either(Arb.string(), Arb.double()),
+      Arb.either(Arb.string(), Arb.char()),
+      Arb.either(Arb.string(), Arb.string()),
+      Arb.either(Arb.string(), Arb.boolean())
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
+
+      val expected = if (all.any { it.isLeft() }) {
+        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+      } else {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
+        }
+      }
+
+      res shouldBe expected
+    }
+  }
+
+  "zipOrAccumulate without Semigroup results in all Right transformed, or all Left in a NonEmptyList" {
+    checkAll(
+      Arb.either(Arb.string(), Arb.short()),
+      Arb.either(Arb.string(), Arb.byte()),
+      Arb.either(Arb.string(), Arb.int()),
+      Arb.either(Arb.string(), Arb.long()),
+      Arb.either(Arb.string(), Arb.float()),
+      Arb.either(Arb.string(), Arb.double()),
+      Arb.either(Arb.string(), Arb.char()),
+      Arb.either(Arb.string(), Arb.string()),
+      Arb.either(Arb.string(), Arb.boolean())
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
+
+      val expected = if (all.any { it.isLeft() }) {
+        all.filterIsInstance<Left<String>>().map { it.value }.toNonEmptyListOrNull()!!.left()
+      } else {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
+        }
+      }
+
+      res shouldBe expected
+    }
+  }
+
+  "zipOrAccumulate EitherNel results in all Right transformed, or all Left in a NonEmptyList" {
+    fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>): Arb<NonEmptyList<A>> =
+      Arb.list(arb, 1..100).map { it.toNonEmptyListOrNull()!! }
+
+    checkAll(
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.short()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.byte()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.int()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.long()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.float()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.double()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.char()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.string()),
+      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.boolean())
+    ) { a, b, c, d, e, f, g, h, i ->
+      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
+      val all = listOf(a, b, c, d, e, f, g, h, i)
+
+      val expected = if (all.any { it.isLeft() }) {
+        all.filterIsInstance<Left<NonEmptyList<String>>>()
+          .flatMap { it.value }
+          .toNonEmptyListOrNull()!!.left()
+      } else {
+        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
+        }
+      }
+
+      res shouldBe expected
+    }
+  }
 })
 
 @Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")

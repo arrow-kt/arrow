@@ -2,13 +2,9 @@
 package arrow.core.examples.exampleOption22
 
 import arrow.core.Some
-import arrow.core.None
-import arrow.core.Option
+import arrow.core.none
 
 fun main() {
-  Some(12).exists { it > 10 } // Result: 12
-  Some(7).exists { it > 10 }  // Result: null
-
-  val none: Option<Int> = None
-  none.exists { it > 10 }      // Result: null
+  Some(12).tap { println("flower") } // Result: prints "flower" and returns: Some(12)
+  none<Int>().tap { println("flower") }  // Result: None
 }

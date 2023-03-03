@@ -630,6 +630,10 @@ import kotlin.coroutines.resumeWithException
  * ```
  * <!--- KNIT example-effect-guide-14.kt -->
  */
+@Deprecated(
+  "Use the arrow.core.raise.Effect type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick."
+)
 public interface Effect<out R, out A> {
   /**
    * Runs the suspending computation by creating a [Continuation], and running the `fold` function
@@ -658,7 +662,7 @@ public interface Effect<out R, out A> {
    */
   public suspend fun <B> fold(
     recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B
+    transform: suspend (value: A) -> B,
   ): B
 
   /**
@@ -668,7 +672,7 @@ public interface Effect<out R, out A> {
   public suspend fun <B> fold(
     error: suspend (error: Throwable) -> B,
     recover: suspend (shifted: R) -> B,
-    transform: suspend (value: A) -> B
+    transform: suspend (value: A) -> B,
   ): B =
     try {
       fold(recover, transform)
@@ -729,9 +733,16 @@ public interface Effect<out R, out A> {
       fold(recover, transform)
     }
 
+  @Deprecated(
+    "redeemWith is being removed in the Raise API",
+    ReplaceWith(
+      "effect { fold(recover, transform).bind() }",
+      "arrow.core.raise.effect"
+    )
+  )
   public fun <R2, B> redeemWith(
     recover: suspend (R) -> Effect<R2, B>,
-    transform: suspend (A) -> Effect<R2, B>
+    transform: suspend (A) -> Effect<R2, B>,
   ): Effect<R2, B> = effect { fold(recover, transform).bind() }
 }
 
@@ -868,6 +879,14 @@ internal class FoldContinuation<R, B>(
  * ```
  * <!--- KNIT example-effect-02.kt -->
  */
+@Deprecated(
+  "Use the arrow.core.raise.effect DSL instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+    "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
+  ReplaceWith(
+    "effect<R, A>(f)",
+    "arrow.core.raise.effect"
+  )
+)
 public fun <R, A> effect(f: suspend EffectScope<R>.() -> A): Effect<R, A> = DefaultEffect(f)
 
 private class DefaultEffect<R, A>(val f: suspend EffectScope<R>.() -> A) : Effect<R, A> {

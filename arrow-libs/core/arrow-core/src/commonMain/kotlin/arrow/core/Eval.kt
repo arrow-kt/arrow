@@ -57,6 +57,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-eval-01.kt -->
  *
  */
+@Deprecated("Eval is deprecated in Arrow Core and will be removed in 2.x.x. \n If Eval is crucial for you, please let us know on the Arrow Github. Thanks!\n" + " https://github.com/arrow-kt/arrow/issues\n")
 public sealed class Eval<out A> {
 
   public companion object {

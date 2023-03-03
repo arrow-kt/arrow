@@ -4,6 +4,8 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
@@ -427,6 +429,57 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
 @Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
+
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
+ * The [combine] function is used to accumulate all the _logical errors_.
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<Error, List<B>> =
+  fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> res
+        is Left -> Left(combine(acc.value, res.value))
+      }
+    }
+  }
+
+/**
+ * Returns [Either] a [List] containing the results of applying the given [transform] function
+ * to each element in the original collection,
+ * **or** accumulate all the _logical errors_ into a [NonEmptyList] that were _raised_ while applying the [transform] function.
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
+  @BuilderInference transform: Raise<Error>.(A) -> B,
+): Either<NonEmptyList<Error>, List<B>> {
+  val buffer = mutableListOf<Error>()
+  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
+    when (val res = either { transform(a) }) {
+      is Right -> when (acc) {
+        is Right -> acc.also { acc.value.add(res.value) }
+        is Left -> acc
+      }
+
+      is Left -> when (acc) {
+        is Right -> Left(buffer.also { it.add(res.value) })
+        is Left -> Left(buffer.also { it.add(res.value) })
+      }
+    }
+  }
+  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+}
 
 /**
  * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].

@@ -84,6 +84,40 @@ public final class arrow/fx/resilience/FlowKt {
 	public static final fun retry (Lkotlinx/coroutines/flow/Flow;Larrow/fx/resilience/Schedule;)Lkotlinx/coroutines/flow/Flow;
 }
 
+public final class arrow/fx/resilience/SagaActionStep {
+	public static final field INSTANCE Larrow/fx/resilience/SagaActionStep;
+}
+
+public final class arrow/fx/resilience/SagaBuilder : arrow/fx/resilience/SagaScope {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/concurrent/atomic/AtomicReference;)V
+	public synthetic fun <init> (Ljava/util/concurrent/atomic/AtomicReference;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun totalCompensation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class arrow/fx/resilience/SagaDSLMarker : java/lang/annotation/Annotation {
+}
+
+public final class arrow/fx/resilience/SagaKt {
+	public static final fun saga (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun transact (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/fx/resilience/SagaScope {
+	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/resilience/SagaScope$DefaultImpls {
+	public static fun bind (Larrow/fx/resilience/SagaScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun invoke (Larrow/fx/resilience/SagaScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public abstract class arrow/fx/resilience/Schedule {
 	public static final field Companion Larrow/fx/resilience/Schedule$Companion;
 	public final fun and (Larrow/fx/resilience/Schedule;)Larrow/fx/resilience/Schedule;

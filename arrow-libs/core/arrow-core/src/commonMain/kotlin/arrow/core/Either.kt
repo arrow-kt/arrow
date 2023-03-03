@@ -1,13 +1,18 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.core
 
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Either.Right.Companion.unit
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.Effect
 import arrow.core.continuations.Token
+import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
@@ -17,6 +22,8 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+
+public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
 
 /**
  * <!--- TEST_NAME EitherKnitTest -->
@@ -771,35 +778,91 @@ public sealed class Either<out A, out B> {
    * Used only for performance instead of fold.
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Right<*>)")
+    RedundantAPI + "Use isRight()",
+    ReplaceWith("isRight()")
   )
   @JsName("_isRight")
   internal abstract val isRight: Boolean
-  
+
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
    * Used only for performance instead of fold.
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Left<*>)")
+    RedundantAPI + "Use isLeft()",
+    ReplaceWith("isLeft()")
   )
   @JsName("_isLeft")
   internal abstract val isLeft: Boolean
-  
-  @OptIn(ExperimentalContracts::class)
+
   public fun isLeft(): Boolean {
-    contract { returns(true) implies (this@Either is Left<A>) }
+    contract {
+      returns(true) implies (this@Either is Left<A>)
+      returns(false) implies (this@Either is Right<B>)
+    }
     return this@Either is Left<A>
   }
-  
-  @OptIn(ExperimentalContracts::class)
+
   public fun isRight(): Boolean {
-    contract { returns(true) implies (this@Either is Right<B>) }
+    contract {
+      returns(true) implies (this@Either is Right<B>)
+      returns(false) implies (this@Either is Left<A>)
+    }
     return this@Either is Right<B>
   }
-  
+
+  /**
+   * Returns `false` if [Right]
+   * or returns the result of the given [predicate] to the [Left] value.
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.Either.Left
+   * import arrow.core.Either.Right
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *  Left(12).isLeft { it > 10 } shouldBe true
+   *  Left(7).isLeft { it > 10 } shouldBe false
+   *
+   *  val right: Either<Int, String> = Right("Hello World")
+   *  right.isLeft { it > 10 } shouldBe false
+   * }
+   * ```
+   * <!--- KNIT example-either-34.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
+    contract { returns(true) implies (this@Either is Left<A>) }
+    return this@Either is Left<A> && predicate(value)
+  }
+
+  /**
+   * Returns `false` if [Left]
+   * or returns the result of the given [predicate] to the [Right] value.
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.Either.Left
+   * import arrow.core.Either.Right
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *  Right(12).isRight { it > 10 } shouldBe true
+   *  Right(7).isRight { it > 10 } shouldBe false
+   *
+   *  val left: Either<String, Int> = Left("Hello World")
+   *  left.isRight { it > 10 } shouldBe false
+   * }
+   * ```
+   * <!--- KNIT example-either-35.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public inline fun isRight(predicate: (B) -> Boolean): Boolean {
+    contract { returns(true) implies (this@Either is Right<B>) }
+    return this@Either is Right<B> && predicate(value)
+  }
+
   /**
    * Transform an [Either] into a value of [C].
    * Alternative to using `when` to fold an [Either] into a value [C].
@@ -817,14 +880,13 @@ public sealed class Either<out A, out B> {
    *     .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
    * }
    * ```
-   * <!--- KNIT example-either-34.kt -->
+   * <!--- KNIT example-either-36.kt -->
    * <!--- TEST lines.isEmpty() -->
    *
    * @param ifLeft transform the [Either.Left] type [A] to [C].
    * @param ifRight transform the [Either.Right] type [B] to [C].
    * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
    */
-  @OptIn(ExperimentalContracts::class)
   public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
     contract {
       callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
@@ -835,35 +897,35 @@ public sealed class Either<out A, out B> {
       is Left -> ifLeft(value)
     }
   }
-  
+
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("fold({ initial }) { rightOperation(initial, it) }")
   )
   public inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fold({ initial }) { rightOperation(initial, it) }
-  
+
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }")
   )
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C =
     fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }
-  
+
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
     ReplaceWith("fold({ f(c, it) }, { g(c, it) })")
   )
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fold({ f(c, it) }, { g(c, it) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }")
+    ReplaceWith("MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }")
   )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C =
-    MN.run { fold({ MN.empty().combine(f(it)) }, { MN.empty().combine(g(it)) }) }
-  
+    MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }
+
   /**
    * Swap the generic parameters [A] and [B] of this [Either].
    *
@@ -876,12 +938,12 @@ public sealed class Either<out A, out B> {
    *   Either.Right("right").swap() shouldBe Either.Left("right")
    * }
    * ```
-   * <!--- KNIT example-either-35.kt -->
+   * <!--- KNIT example-either-37.kt -->
    * <!-- TEST lines.isEmpty() -->
    */
   public fun swap(): Either<B, A> =
     fold({ Right(it) }, { Left(it) })
-  
+
   /**
    * Map, or transform, the right value [B] of this [Either] to a new value [C].
    *
@@ -894,12 +956,17 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).map { _: Nothing -> "flower" } shouldBe Either.Left(12)
    * }
    * ```
-   * <!--- KNIT example-either-36.kt -->
+   * <!--- KNIT example-either-38.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> map(f: (right: B) -> C): Either<A, C> =
-    flatMap { Right(f(it)) }
-  
+  public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    }
+    return flatMap { Right(f(it)) }
+  }
+
+
   /**
    * Map, or transform, the left value [A] of this [Either] to a new value [C].
    *
@@ -912,26 +979,30 @@ public sealed class Either<out A, out B> {
    *  Either.Left(12).mapLeft { _: Int -> "flower" }  shouldBe Either.Left("flower")
    * }
    * ```
-   * <!--- KNIT example-either-37.kt -->
+   * <!--- KNIT example-either-39.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
-    fold({ Left(f(it)) }, { Right(it) })
-  
+  public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    }
+    return fold({ Left(f(it)) }, { Right(it) })
+  }
+
   @Deprecated(
     "tapLeft is being renamed to onLeft to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("onLeft(f)")
   )
   public inline fun tapLeft(f: (left: A) -> Unit): Either<A, B> =
     onLeft(f)
-  
+
   @Deprecated(
     "tap is being renamed to onRight to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("onRight(f)")
   )
   public inline fun tap(f: (right: B) -> Unit): Either<A, B> =
     onRight(f)
-  
+
   /**
    * Performs the given [action] on the encapsulated [B] value if this instance represents [Either.Right].
    * Returns the original [Either] unchanged.
@@ -944,12 +1015,16 @@ public sealed class Either<out A, out B> {
    *   Either.Right(1).onRight(::println) shouldBe Either.Right(1)
    * }
    * ```
-   * <!--- KNIT example-either-38.kt -->
+   * <!--- KNIT example-either-40.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> =
-    also { if (it.isRight()) action(it.value) }
-  
+  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isRight()) action(it.value) }
+  }
+
   /**
    * Performs the given [action] on the encapsulated [A] if this instance represents [Either.Left].
    * Returns the original [Either] unchanged.
@@ -962,12 +1037,16 @@ public sealed class Either<out A, out B> {
    *   Either.Left(2).onLeft(::println) shouldBe Either.Left(2)
    * }
    * ```
-   * <!--- KNIT example-either-39.kt -->
+   * <!--- KNIT example-either-41.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> =
-    also { if (it.isLeft()) action(it.value) }
-  
+  public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isLeft()) action(it.value) }
+  }
+
   /**
    * Map over Left and Right of this Either
    */
@@ -977,7 +1056,7 @@ public sealed class Either<out A, out B> {
   )
   public inline fun <C, D> bimap(leftOperation: (left: A) -> C, rightOperation: (right: B) -> D): Either<C, D> =
     map(rightOperation).mapLeft(leftOperation)
-  
+
   /**
    * Returns `false` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -995,15 +1074,22 @@ public sealed class Either<out A, out B> {
    *  left.exists { it > 10 }      // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-40.kt -->
+   * <!--- KNIT example-either-42.kt -->
    */
   @Deprecated(
-    NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ false }, predicate)")
+    NicheAPI + "Prefer isRight",
+    ReplaceWith("isRight(predicate)")
   )
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
-  
+
+  @Deprecated(
+    "Facilitates the migration from Validated to Either.",
+    ReplaceWith("isRight(predicate)")
+  )
+  public inline fun exist(predicate: (B) -> Boolean): Boolean =
+    exists(predicate)
+
   /**
    * Returns `true` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -1023,13 +1109,19 @@ public sealed class Either<out A, out B> {
   )
   public inline fun all(predicate: (B) -> Boolean): Boolean =
     fold({ true }, predicate)
-  
+
   @Deprecated(
     "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("getOrNull()")
   )
-  public fun orNull(): B? = fold({ null }, { it })
-  
+  public fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Either is Left<A>)
+      returnsNotNull() implies (this@Either is Right<B>)
+    }
+    return fold({ null }, { it })
+  }
+
   /**
    * Returns the encapsulated value [B] if this instance represents [Either.Right] or `null` if it is [Either.Left].
    *
@@ -1042,13 +1134,23 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNull() shouldBe null
    * }
    * ```
-   * <!--- KNIT example-either-41.kt -->
+   * <!--- KNIT example-either-43.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public fun getOrNull(): B? = getOrElse { null }
-  
+  public fun getOrNull(): B? {
+    contract {
+      returns(null) implies (this@Either is Left<A>)
+      returnsNotNull() implies (this@Either is Right<B>)
+    }
+    return getOrElse { null }
+  }
+
+  @Deprecated(
+    "orNone is being renamed to getOrNone to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNone()")
+  )
   public fun orNone(): Option<B> = getOrNone()
-  
+
   /**
    * Transforms [Either] into [Option],
    * where the encapsulated value [B] is wrapped in [Some] when this instance represents [Either.Right],
@@ -1065,18 +1167,18 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNone() shouldBe None
    * }
    * ```
-   * <!--- KNIT example-either-42.kt -->
+   * <!--- KNIT example-either-44.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or map",
     ReplaceWith("if (n <= 0) Right(emptyList()) else map { b -> List(n) { b } }")
   )
   public fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) Right(emptyList()) else map { b -> List(n) { b } }
-  
+
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
     ReplaceWith("fold({ emptyList() }, { fa(it).map(::Right) })")
@@ -1085,7 +1187,7 @@ public sealed class Either<out A, out B> {
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
     fold({ emptyList() }, { fa(it).map(::Right) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
     ReplaceWith("fold({ None }, { right -> fa(right).map(::Right) })")
@@ -1094,52 +1196,52 @@ public sealed class Either<out A, out B> {
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Either<A, C>> =
     fold({ None }, { right -> fa(right).map(::Right) })
-  
+
   @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
     traverse(fa)
-  
+
   @Deprecated(
     RedundantAPI + "Use orNull() and Kotlin nullable types",
     ReplaceWith("orNull()?.let(fa)?.right()")
   )
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
     orNull()?.let(fa)?.right()
-  
-  // TODO will be renamed to mapAccumulating in 2.x.x. Backport, and deprecate in 1.x.x
+
+  @Deprecated(
+    NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
+    ReplaceWith("fold({ it.left().valid() }, { fa(it).map(::Right) })")
+  )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <AA, C> traverse(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
-    when (this) {
-      is Right -> fa(this.value).map(::Right)
-      is Left -> this.valid()
-    }
-  
+    fold({ it.left().valid() }, { fa(it).map(::Right) })
+
   @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Either<A, C>> =
     traverse(fa)
-  
+
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fe(it).map { aa -> Left(aa) } }, { fa(it).map { c -> Right(c) } })")
   )
   public inline fun <AA, C> bitraverse(fe: (A) -> Iterable<AA>, fa: (B) -> Iterable<C>): List<Either<AA, C>> =
     fold({ fe(it).map { aa -> Left(aa) } }, { fa(it).map { c -> Right(c) } })
-  
+
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })")
   )
   public inline fun <AA, C> bitraverseOption(fl: (A) -> Option<AA>, fr: (B) -> Option<C>): Option<Either<AA, C>> =
     fold({ fl(it).map(::Left) }, { fr(it).map(::Right) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })")
   )
   public inline fun <AA, C> bitraverseNullable(fl: (A) -> AA?, fr: (B) -> C?): Either<AA, C>? =
     fold({ fl(it)?.let(::Left) }, { fr(it)?.let(::Right) })
-  
+
   @Deprecated(
     NicheAPI + "Prefer explicit fold instead",
     ReplaceWith("fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })")
@@ -1149,14 +1251,14 @@ public sealed class Either<out A, out B> {
     fa: (B) -> Validated<AA, D>,
   ): Validated<AA, Either<C, D>> =
     fold({ fe(it).map { Left(it) } }, { fa(it).map { Right(it) } })
-  
+
   @Deprecated(
     NicheAPI + "Prefer Kotlin nullable syntax instead",
     ReplaceWith("orNull()?.takeIf(predicate)")
   )
   public inline fun findOrNull(predicate: (B) -> Boolean): B? =
     orNull()?.takeIf(predicate)
-  
+
   /**
    * Returns `true` if [Left]
    *
@@ -1170,14 +1272,14 @@ public sealed class Either<out A, out B> {
    *   Either.Right("foo").isEmpty() // Result: false
    * }
    * ```
-   * <!--- KNIT example-either-43.kt -->
+   * <!--- KNIT example-either-45.kt -->
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Left<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Left<*>)")
+    RedundantAPI + "Use isLeft()",
+    ReplaceWith("isLeft()")
   )
   public fun isEmpty(): Boolean = isLeft
-  
+
   /**
    * Returns `true` if [Right]
    *
@@ -1192,66 +1294,68 @@ public sealed class Either<out A, out B> {
    *   //sampleEnd
    * }
    * ```
-   * <!--- KNIT example-either-44.kt -->
+   * <!--- KNIT example-either-46.kt -->
    */
   @Deprecated(
-    RedundantAPI + "Use `is Either.Right<*>`, `when`, or `fold` instead",
-    ReplaceWith("(this is Either.Right<*>)")
+    RedundantAPI + "Use isRight()",
+    ReplaceWith("isRight()")
   )
   public fun isNotEmpty(): Boolean = isRight
-  
+
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   public data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
     override val isLeft = true
     override val isRight = false
-    
+
     override fun toString(): String = "Either.Left($value)"
-    
+
     public companion object {
       @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Left(Unit)"))
       @PublishedApi
       internal val leftUnit: Either<Unit, Nothing> = Left(Unit)
     }
   }
-  
+
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
   public data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
     override val isLeft = false
     override val isRight = true
-    
+
     override fun toString(): String = "Either.Right($value)"
-    
+
     public companion object {
-      @Deprecated("Unused, will be removed from bytecode in Arrow 2.x.x", ReplaceWith("Right(Unit)"))
       @PublishedApi
       internal val unit: Either<Nothing, Unit> = Right(Unit)
     }
   }
-  
+
   override fun toString(): String = fold(
     { "Either.Left($it)" },
     { "Either.Right($it)" }
   )
-  
+
   public fun toValidatedNel(): ValidatedNel<A, B> =
     fold({ Validated.invalidNel(it) }, ::Valid)
-  
+
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
-  
+
+  public fun toIor(): Ior<A, B> =
+    fold({ Ior.Left(it) }, { Ior.Right(it) })
+
   public companion object {
-    
+
     @Deprecated(
       RedundantAPI + "Prefer Kotlin nullable syntax, or ensureNotNull inside Either DSL",
       ReplaceWith("a?.right() ?: Unit.left()")
     )
     @JvmStatic
     public fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
-    
+
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
      * provided on second and third parameters. Second parameter represents function for creating
@@ -1271,34 +1375,43 @@ public sealed class Either<out A, out B> {
     @JvmStatic
     public inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) Right(ifTrue()) else Left(ifFalse())
-    
+
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
-      try {
+    public inline fun <R> catch(f: () -> R): Either<Throwable, R> {
+      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
+      return try {
         f().right()
       } catch (t: Throwable) {
         t.nonFatalOrThrow().left()
       }
-    
+    }
+
     @Deprecated(
       RedundantAPI + "Compose catch with flatten instead",
       ReplaceWith("catch(f).flatten()")
     )
     @JvmStatic
     @JvmName("tryCatchAndFlatten")
-    public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> =
-      catch(f).flatten()
-    
+    public inline fun <R> catchAndFlatten(f: () -> Either<Throwable, R>): Either<Throwable, R> {
+      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
+      return catch(f).flatten()
+    }
+
     @Deprecated(
       RedundantAPI + "Compose catch with mapLeft instead",
       ReplaceWith("catch(f).mapLeft(fe)")
     )
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
-      catch(f).mapLeft(fe)
-    
+    public inline fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+      }
+      return catch(f).mapLeft(fe)
+    }
+
     /**
      * The resolve function can resolve any function that yields an Either into one type of value.
      *
@@ -1310,6 +1423,7 @@ public sealed class Either<out A, out B> {
      * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
      * @return the result of applying the [resolve] function.
      */
+    @Deprecated(NicheAPI + "Prefer using recover, catch and the either DSL to work with errors")
     @JvmStatic
     public inline fun <E, A, B> resolve(
       f: () -> Either<E, A>,
@@ -1317,13 +1431,21 @@ public sealed class Either<out A, out B> {
       error: (e: E) -> Either<Throwable, B>,
       throwable: (throwable: Throwable) -> Either<Throwable, B>,
       unrecoverableState: (throwable: Throwable) -> Either<Throwable, Unit>,
-    ): B =
-      catch(f)
+    ): B {
+      contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(success, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(error, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(throwable, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(unrecoverableState, InvocationKind.AT_MOST_ONCE)
+      }
+      return catch(f)
         .fold(
           { t: Throwable -> throwable(t) },
           { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
+    }
 
     /**
      *  Lifts a function `(B) -> C` to the [Either] structure returning a polymorphic function
@@ -1341,7 +1463,7 @@ public sealed class Either<out A, out B> {
      *   println(result)
      *  }
      *  ```
-     * <!--- KNIT example-either-45.kt -->
+     * <!--- KNIT example-either-47.kt -->
      */
     @JvmStatic
     @Deprecated(
@@ -1350,7 +1472,7 @@ public sealed class Either<out A, out B> {
     )
     public fun <A, B, C> lift(f: (B) -> C): (Either<A, B>) -> Either<A, C> =
       { it.map(f) }
-    
+
     @JvmStatic
     @Deprecated(
       RedundantAPI + "Prefer explicitly creating lambdas",
@@ -1358,14 +1480,491 @@ public sealed class Either<out A, out B> {
     )
     public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
+
+
+    public inline fun <E, A, B, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      transform: (A, B) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+        transform(aa, bb)
+      }
+    }
+
+    public inline fun <E, A, B, C, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      transform: (A, B, C) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+        transform(aa, bb, cc)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      transform: (A, B, C, D) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      transform: (A, B, C, D, EE) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, FF>,
+      transform: (A, B, C, D, EE, FF) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      transform: (A, B, C, D, EE, F, G) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      transform: (A, B, C, D, EE, F, G, H) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      i: Either<E, I>,
+      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
+      }
+    }
+
+    @Suppress("DuplicatedCode")
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
+      combine: (E, E) -> E,
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      i: Either<E, I>,
+      j: Either<E, J>,
+      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+    ): Either<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      } else {
+        var accumulatedError: Any? = EmptyValue
+        accumulatedError = if (a is Left) a.value else accumulatedError
+        accumulatedError = if (b is Left) EmptyValue.combine(accumulatedError, b.value, combine) else accumulatedError
+        accumulatedError = if (c is Left) EmptyValue.combine(accumulatedError, c.value, combine) else accumulatedError
+        accumulatedError = if (d is Left) EmptyValue.combine(accumulatedError, d.value, combine) else accumulatedError
+        accumulatedError = if (e is Left) EmptyValue.combine(accumulatedError, e.value, combine) else accumulatedError
+        accumulatedError = if (f is Left) EmptyValue.combine(accumulatedError, f.value, combine) else accumulatedError
+        accumulatedError = if (g is Left) EmptyValue.combine(accumulatedError, g.value, combine) else accumulatedError
+        accumulatedError = if (h is Left) EmptyValue.combine(accumulatedError, h.value, combine) else accumulatedError
+        accumulatedError = if (i is Left) EmptyValue.combine(accumulatedError, i.value, combine) else accumulatedError
+        accumulatedError = if (j is Left) EmptyValue.combine(accumulatedError, j.value, combine) else accumulatedError
+
+        @Suppress("UNCHECKED_CAST")
+        (Left(accumulatedError as E))
+      }
+    }
+
+    public inline fun <E, A, B, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      transform: (A, B) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+        transform(aa, bb)
+      }
+    }
+
+    public inline fun <E, A, B, C, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      transform: (A, B, C) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+        transform(aa, bb, cc)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      transform: (A, B, C, D) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      transform: (A, B, C, D, EE) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, FF>,
+      transform: (A, B, C, D, EE, FF) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      transform: (A, B, C, D, EE, F, G) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      transform: (A, B, C, D, EE, F, G, H) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh)
+      }
+    }
+
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      i: Either<E, I>,
+      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
+      }
+    }
+
+    @Suppress("DuplicatedCode")
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
+      a: Either<E, A>,
+      b: Either<E, B>,
+      c: Either<E, C>,
+      d: Either<E, D>,
+      e: Either<E, EE>,
+      f: Either<E, F>,
+      g: Either<E, G>,
+      h: Either<E, H>,
+      i: Either<E, I>,
+      j: Either<E, J>,
+      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+    ): Either<NonEmptyList<E>, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      } else {
+        val list = buildList(9) {
+          if (a is Left) add(a.value)
+          if (b is Left) add(b.value)
+          if (c is Left) add(c.value)
+          if (d is Left) add(d.value)
+          if (e is Left) add(e.value)
+          if (f is Left) add(f.value)
+          if (g is Left) add(g.value)
+          if (h is Left) add(h.value)
+          if (i is Left) add(i.value)
+          if (j is Left) add(j.value)
+        }
+        Left(NonEmptyList(list[0], list.drop(1)))
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      transform: (A, B) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+        transform(aa, bb)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      transform: (A, B, C) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+        transform(aa, bb, cc)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      transform: (A, B, C, D) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      transform: (A, B, C, D, EE) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, FF, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      f: EitherNel<E, FF>,
+      transform: (A, B, C, D, EE, FF) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, F, G, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      f: EitherNel<E, F>,
+      g: EitherNel<E, G>,
+      transform: (A, B, C, D, EE, F, G) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, F, G, H, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      f: EitherNel<E, F>,
+      g: EitherNel<E, G>,
+      h: EitherNel<E, H>,
+      transform: (A, B, C, D, EE, F, G, H) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh)
+      }
+    }
+
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      f: EitherNel<E, F>,
+      g: EitherNel<E, G>,
+      h: EitherNel<E, H>,
+      i: EitherNel<E, I>,
+      transform: (A, B, C, D, EE, F, G, H, I) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
+        transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
+      }
+    }
+
+    @Suppress("DuplicatedCode")
+    @JvmName("zipOrAccumulateNonEmptyList")
+    public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> zipOrAccumulate(
+      a: EitherNel<E, A>,
+      b: EitherNel<E, B>,
+      c: EitherNel<E, C>,
+      d: EitherNel<E, D>,
+      e: EitherNel<E, EE>,
+      f: EitherNel<E, F>,
+      g: EitherNel<E, G>,
+      h: EitherNel<E, H>,
+      i: EitherNel<E, I>,
+      j: EitherNel<E, J>,
+      transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
+    ): EitherNel<E, Z> {
+      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      } else {
+        val list = buildList {
+          if (a is Left) addAll(a.value)
+          if (b is Left) addAll(b.value)
+          if (c is Left) addAll(c.value)
+          if (d is Left) addAll(d.value)
+          if (e is Left) addAll(e.value)
+          if (f is Left) addAll(f.value)
+          if (g is Left) addAll(g.value)
+          if (h is Left) addAll(h.value)
+          if (i is Left) addAll(i.value)
+          if (j is Left) addAll(j.value)
+        }
+        Left(NonEmptyList(list[0], list.drop(1)))
+      }
+    }
   }
-  
+
   @Deprecated(
     RedundantAPI + "Map with Unit",
     ReplaceWith("map { }")
   )
   public fun void(): Either<A, Unit> =
     map { }
+
+  @Deprecated(
+    "Facilitates the migration from Validated to Either, you can simply remove this method call.",
+    ReplaceWith("this")
+  )
+  public inline fun toEither(): Either<A, B> =
+    this
 }
 
 /**
@@ -1374,11 +1973,13 @@ public sealed class Either<out A, out B> {
  *
  * @param f The function to bind across [Right].
  */
-public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either<A, C> =
-  when (this) {
+public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either<A, C> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
     is Right -> f(this.value)
     is Left -> this
   }
+}
 
 public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
@@ -1403,11 +2004,13 @@ public inline fun <B> Either<*, B>.getOrElse(default: () -> B): B =
  *   Either.Left(12).getOrElse { it + 5 } shouldBe 17
  * }
  * ```
- * <!--- KNIT example-either-46.kt -->
+ * <!--- KNIT example-either-48.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B =
-  fold(default, ::identity)
+public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
+  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold(default, ::identity)
+}
 
 /**
  * Returns the value from this [Right] or null if this is a [Left].
@@ -1422,7 +2025,7 @@ public inline fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B =
  *   Left(12).orNull()  // Result: null
  * }
  * ```
- * <!--- KNIT example-either-47.kt -->
+ * <!--- KNIT example-either-49.kt -->
  */
 @Deprecated(
   "Duplicated API. Please use Either's member function orNull. This will be removed towards Arrow 2.0",
@@ -1445,7 +2048,7 @@ public fun <B> Either<*, B>.orNull(): B? =
  *   Left(12).getOrHandle { it + 5 } // Result: 17
  * }
  * ```
- * <!--- KNIT example-either-48.kt -->
+ * <!--- KNIT example-either-50.kt -->
  */
 @Deprecated(
   RedundantAPI + "Use other getOrElse signature",
@@ -1477,14 +2080,14 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  *   left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-49.kt -->
+ * <!--- KNIT example-either-51.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: default().left() }")
+  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default(it)) }")
 )
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
-  ensure(default, predicate)
+  flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
  * Returns [Right] with the existing value of [Right] if this is a [Right] and the given
@@ -1514,7 +2117,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  *   //sampleEnd
  * }
  * ```
- * <!--- KNIT example-either-50.kt -->
+ * <!--- KNIT example-either-52.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
@@ -1537,7 +2140,7 @@ public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, d
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-51.kt -->
+ * <!--- KNIT example-either-53.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Either<A, A>.merge(): A =
@@ -1563,7 +2166,7 @@ public inline fun <A> Either<A, A>.merge(): A =
  *   Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * }
  * ```
- * <!--- KNIT example-either-52.kt -->
+ * <!--- KNIT example-either-54.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit flatMap",
@@ -1600,11 +2203,12 @@ public inline fun <A, B> Either<A, B?>.leftIfNull(default: () -> A): Either<A, B
 public fun <A, B> Either<A, B>.contains(elem: B): Boolean =
   fold({ false }) { it == elem }
 
+@Deprecated(
+  RedundantAPI + "Prefer the Either DSL, or new recover API",
+  ReplaceWith("recover { y.bind() }")
+)
 public fun <A, B> Either<A, B>.combineK(y: Either<A, B>): Either<A, B> =
-  when (this) {
-    is Left -> y
-    else -> this
-  }
+  recover { y.bind() }
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)
 
@@ -1623,7 +2227,7 @@ public fun <A> A.right(): Either<Nothing, A> = Right(this)
  *   null.rightIfNotNull { "left" }    // Left(a="left")
  * }
  * ```
- * <!--- KNIT example-either-53.kt -->
+ * <!--- KNIT example-either-55.kt -->
  */
 @Deprecated(
   RedundantAPI + "Prefer Kotlin nullable syntax",
@@ -1643,24 +2247,44 @@ public inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> =
 public inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> =
   this?.let { default().left() } ?: null.right()
 
+@Deprecated(
+  RedundantAPI + "Prefer the new recover API",
+  ReplaceWith(
+    "recover { a -> f(a).bind() }",
+    "arrow.core.recover"
+  )
+)
+public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { a -> f(a).bind() }
+}
 
-public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> =
-  when (this) {
-    is Left -> f(this.value)
-    is Right -> this
-  }
+@Deprecated(
+  RedundantAPI + "Prefer the new recover API",
+  ReplaceWith(
+    "recover { a -> f(a) }",
+    "arrow.core.recover"
+  )
+)
+public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return recover { a -> f(a) }
+}
 
-public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> =
-  when (this) {
-    is Left -> f(value).right()
-    is Right -> this
+@Deprecated(
+  RedundantAPI + "Prefer using the Either DSL or explicit fold with right",
+  ReplaceWith(
+    "fold({ a -> fe(a) }, fa).right()",
+    "arrow.core.right"
+  )
+)
+public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> {
+  contract {
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
   }
-
-public inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, C> =
-  when (this) {
-    is Left -> fe(value).right()
-    is Right -> map(fa)
-  }
+  return fold({ a -> fe(a) }, fa).right()
+}
 
 public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
   fold(
@@ -1668,19 +2292,12 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
     { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
   )
 
-// TODO this will get replaced by accumulating zip in 2.x.x
+@Deprecated(
+  RedundantAPI + "Prefer zipOrAccumulate",
+  ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
+)
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  when (this) {
-    is Left -> when (b) {
-      is Left -> Left(SGA.run { value.combine(b.value) })
-      is Right -> this
-    }
-    
-    is Right -> when (b) {
-      is Left -> b
-      is Right -> Right(SGB.run { this@combine.value.combine(b.value) })
-    }
-  }
+  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
@@ -1704,7 +2321,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-either-54.kt -->
+ * <!--- KNIT example-either-56.kt -->
  */
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
@@ -1712,71 +2329,87 @@ public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
 public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
-// TODO this will be completely breaking from 1.x.x -> 2.x.x. Only _real_ solution is `inline fun either { }`
-public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
-  flatMap { b ->
-    fb.map { c -> f(b, c) }
-  }
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { f(bind(), fb.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
+public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return either { f(bind(), fb.bind()) }
+}
 
-public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
-  flatMap { a ->
-    fb.map { b -> Pair(a, b) }
-  }
+@Deprecated(
+  "Prefer using the inline arrow.core.raise.either DSL",
+  ReplaceWith(
+    "either { Pair(bind(), fb.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
+public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> = either {
+  Pair(bind(), fb.bind())
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   map: (B, C, D) -> E,
-): Either<A, E> =
-  zip(
-    c,
-    d,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+): Either<A, E> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
   map: (B, C, D, E) -> F,
-): Either<A, F> =
-  zip(
-    c,
-    d,
-    e,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+): Either<A, F> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
   e: Either<A, E>,
   f: Either<A, F>,
   map: (B, C, D, E, F) -> G,
-): Either<A, G> =
-  zip(
-    c,
-    d,
-    e,
-    f,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit,
-    Right.unit
-  ) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+): Either<A, G> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
@@ -1784,18 +2417,18 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
   f: Either<A, F>,
   g: Either<A, G>,
   map: (B, C, D, E, F, G) -> H,
-): Either<A, H> =
-  zip(c, d, e, f, g, Right.unit, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, _, _, _, _ ->
-    map(
-      b,
-      c,
-      d,
-      e,
-      f,
-      g
-    )
-  }
+): Either<A, H> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
@@ -1804,19 +2437,18 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
   g: Either<A, G>,
   h: Either<A, H>,
   map: (B, C, D, E, F, G, H) -> I,
-): Either<A, I> =
-  zip(c, d, e, f, g, h, Right.unit, Right.unit, Right.unit) { b, c, d, e, f, g, h, _, _, _ ->
-    map(
-      b,
-      c,
-      d,
-      e,
-      f,
-      g,
-      h
-    )
-  }
+): Either<A, I> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
@@ -1826,9 +2458,18 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
   h: Either<A, H>,
   i: Either<A, I>,
   map: (B, C, D, E, F, G, H, I) -> J,
-): Either<A, J> =
-  zip(c, d, e, f, g, h, i, Right.unit, Right.unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+): Either<A, J> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
@@ -1839,9 +2480,18 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
   i: Either<A, I>,
   j: Either<A, J>,
   map: (B, C, D, E, F, G, H, I, J) -> K,
-): Either<A, K> =
-  zip(c, d, e, f, g, h, i, j, Right.unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+): Either<A, K> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
+}
 
+@Deprecated(
+  "Prefer using the inline either DSL",
+  ReplaceWith(
+    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }",
+    "arrow.core.raise.either"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   c: Either<A, C>,
   d: Either<A, D>,
@@ -1853,28 +2503,10 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   j: Either<A, J>,
   k: Either<A, K>,
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
-): Either<A, L> =
-  flatMap { bb ->
-    c.flatMap { cc ->
-      d.flatMap { dd ->
-        e.flatMap { ee ->
-          f.flatMap { ff ->
-            g.flatMap { gg ->
-              h.flatMap { hh ->
-                i.flatMap { ii ->
-                  j.flatMap { jj ->
-                    k.map { kk ->
-                      map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+): Either<A, L> {
+  contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
+}
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
@@ -1890,8 +2522,17 @@ public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }
 
-public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> =
-  fold(fa, fb)
+@Deprecated(
+  NicheAPI + "Prefer using a simple fold, or when expression",
+  ReplaceWith("fold(fa, fb)")
+)
+public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, fb: (B) -> Either<C, D>): Either<C, D> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return fold(fa, fb)
+}
 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
@@ -1972,3 +2613,107 @@ public const val NicheAPI: String =
 
 public const val RedundantAPI: String =
   "This API is considered redundant. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"
+
+public fun <E, A> Either<E, A>.toEitherNel(): EitherNel<E, A> =
+  mapLeft { nonEmptyListOf(it) }
+
+public fun <E> E.leftNel(): EitherNel<E, Nothing> =
+  nonEmptyListOf(this).left()
+
+/**
+ * Recover from any [Either.Left] if encountered.
+ *
+ * The recover DSL allows you to recover from any [Either.Left] value by:
+ *  - Computing a fallback value [A], and resolve the left type [E] to [Nothing].
+ *  - Shifting a _new error_ of type [EE] into the [Either.Left] channel.
+ *
+ * When providing a fallback value [A],
+ * the [Either.Left] type is discarded because the error was handled correctly.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Either<String, Int> = Either.Left("error")
+ *   val fallback: Either<Nothing, Int> = error.recover { it.length }
+ *   fallback shouldBe Either.Right(5)
+ * }
+ * ```
+ * <!--- KNIT example-either-57.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
+ * When shifting a new error [EE] into the [Either.Left] channel,
+ * the [Either.Left] is _transformed_ from [E] to [EE] since we shifted a _new error_.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.recover
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val error: Either<String, Int> = Either.Left("error")
+ *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
+ *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
+ * }
+ * ```
+ * <!--- KNIT example-either-58.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
+  return when(this) {
+    is Left -> either { recover(this, value) }
+    is Right -> this@recover
+  }
+}
+
+/**
+ * Catch allows for transforming [Throwable] in the [Either.Left] side.
+ * This API is the same as [recover],
+ * but offers the same APIs for working over [Throwable] as [Effect] & [EagerEffect].
+ *
+ * This is useful when working with [Either.catch] since this API offers a `reified` variant.
+ * The reified version allows you to refine `Throwable` to `T : Throwable`,
+ * where any `Throwable` not matching the `t is T` predicate will be rethrown.
+ *
+ * ```kotlin
+ * import arrow.core.Either
+ * import arrow.core.catch
+ * import io.kotest.assertions.throwables.shouldThrowUnit
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val left: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
+ *
+ *   val caught: Either<Nothing, Int> = left.catch { _: Throwable -> 1 }
+ *   val failure: Either<String, Int> = left.catch { _: Throwable -> shift("failure") }
+ *
+ *   shouldThrowUnit<RuntimeException> {
+ *     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }
+ *   }
+ *
+ *   caught shouldBe Either.Right(1)
+ *   failure shouldBe Either.Left("failure")
+ * }
+ * ```
+ * <!--- KNIT example-either-59.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(Throwable) -> A): Either<E, A> {
+  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
+    is Left -> either { catch(this, value) }
+    is Right -> this@catch
+  }
+}
+
+@JvmName("catchReified")
+@OptIn(ExperimentalTypeInference::class)
+public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> {
+  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  return catch { e -> if (e is T) catch(e) else throw e }
+}
