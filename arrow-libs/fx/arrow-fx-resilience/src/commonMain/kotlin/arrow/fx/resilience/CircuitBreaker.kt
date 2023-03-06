@@ -223,7 +223,7 @@ private constructor(
             // In case of failure, we either increment the failures counter, or we transition in the `Open` state.
             if (curr.shouldOpen()) {
               // We've gone over the permitted failures threshold, so we need to open the circuit breaker
-              val update = Open(TimeSource.Monotonic.markNow(), resetTimeout, CompletableDeferred())
+              val update = Open(timeSource.markNow(), resetTimeout, CompletableDeferred())
               if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result)
               else {
                 onOpen.invoke()
@@ -287,7 +287,7 @@ private constructor(
             // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
             val value = (resetTimeout * exponentialBackoffFactor)
             val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
-            state.set(Open(TimeSource.Monotonic.markNow(), nextTimeout, awaitClose))
+            state.set(Open(timeSource.markNow(), nextTimeout, awaitClose))
             onOpen.invoke()
           }
         }
