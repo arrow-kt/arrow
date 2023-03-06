@@ -218,7 +218,8 @@ class ScheduleTest {
 
   @Test
   fun repeatAsFlowIsStackSafe(): TestResult = runTest {
-    checkRepeatAsFlow(Schedule.recurs(500_000), expected = (1..500_000).asFlow())
+    val iterations = stackSafeIteration()
+    checkRepeatAsFlow(Schedule.recurs(iterations), expected = (1..iterations).asFlow())
   }
 
   @Test
