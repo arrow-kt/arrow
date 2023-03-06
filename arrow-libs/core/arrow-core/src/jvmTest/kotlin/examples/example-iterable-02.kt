@@ -7,7 +7,7 @@ import arrow.core.nonEmptyListOf
 import arrow.core.mapOrAccumulate
 import io.kotest.matchers.shouldBe
 
-fun main() {
+fun test() {
   listOf(1, 2, 3, 4).mapOrAccumulate { i ->
     when(i) {
       1 -> "Either - $i".left().bind()

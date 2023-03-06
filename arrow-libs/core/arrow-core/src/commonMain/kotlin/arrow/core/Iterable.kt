@@ -499,7 +499,7 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
  * import io.kotest.matchers.shouldBe
  * -->
  * ```kotlin
- * fun main() {
+ * fun test() {
  *   listOf(1, 2, 3, 4).mapOrAccumulate({ a, b -> "$a, $b" }) { i ->
  *     when(i) {
  *       1 -> "Either - $i".left().bind()
@@ -542,7 +542,7 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
  * import io.kotest.matchers.shouldBe
  * -->
  * ```kotlin
- * fun main() {
+ * fun test() {
  *   listOf(1, 2, 3, 4).mapOrAccumulate { i ->
  *     when(i) {
  *       1 -> "Either - $i".left().bind()
