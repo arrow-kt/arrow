@@ -3,7 +3,9 @@
 @file:JvmName("RaiseKt")
 package arrow.core.raise
 
+import arrow.core.mapOrAccumulate
 import arrow.core.Either
+import arrow.core.EitherNel
 import arrow.core.EmptyValue
 import arrow.core.NonEmptyList
 import arrow.core.Tuple4
@@ -12,6 +14,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Validated
+import arrow.core.ValidatedNel
 import arrow.core.emptyCombine
 import arrow.core.identity
 import arrow.core.nel
@@ -574,124 +577,34 @@ public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   mapOrAccumulate(Semigroup.nonEmptyList(), list) { elt -> mapErrorNel { block(elt) } }
 
 /**
- * This is a temporary solution for accumulating errors in the context of a [Raise],
- * belonging to [Iterable.mapOrAccumulate], [NonEmptyList.mapOrAccumulate], [Sequence.mapOrAccumulate] & [Map.mapOrAccumulate].
- *
- * All methods that are defined in [RaiseAccumulate] can be implemented using context receivers instead,
- * this can be [DeprecationLevel.HIDDEN] in a source -and binary-compatible way when context receivers are released:
- *
- * ```kotlin
- * context(Raise<NonEmptyList<Error>>)
- * fun <Error, A> Either<Error, A>.bind(): A = when (this) {
- *   is Invalid -> raise(nonEmptyListOf(value))
- *   is Valid -> value
- * }
- *
- * @OptIn(ExperimentalTypeInference::class)
- * public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
- *   @BuilderInference transform: Raise<NonEmptyList<Error>>.(A) -> B,
- * ): Either<NonEmptyList<Error>, List<B>>
- * ```
+ * Receiver type belonging to [mapOrAccumulate].
+ * Allows binding both [Either] and [EitherNel] values for [Either.Left] types of [Error].
+ * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
  */
-public open class RaiseAccumulate<E>(
-  private val raise: Raise<NonEmptyList<E>>
-): Raise<NonEmptyList<E>> by raise {
+public open class RaiseAccumulate<Error>(
+  public val raise: Raise<NonEmptyList<Error>>
+): Raise<Error> {
 
   @RaiseDSL
-  @JsName("raise1")
-  @JvmName("raise1")
-  public fun raise(r: E): Nothing =
+  public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
 
-  /**
-   * Invoke an [EagerEffect] inside `this` [Raise] context.
-   * Any _logical failure_ is raised in `this` [Raise] context,
-   * and thus short-circuits the computation.
-   *
-   * @see [recover] if you want to attempt to recover from any _logical failure_.
-   */
-  @JsName("invokeEager")
-  @JvmName("invokeEager")
-  public operator fun <A> EagerEffect<E, A>.invoke(): A =
-    fold({ raise(it) }, ::identity)
+  @RaiseDSL
+  public fun raise(r: NonEmptyList<Error>): Nothing =
+    raise.raise(r)
 
   @RaiseDSL
-  @JsName("bindEager")
-  @JvmName("bindEager")
-  public fun <A> EagerEffect<E, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  /**
-   * Invoke an [Effect] inside `this` [Raise] context.
-   * Any _logical failure_ raised are raised in `this` [Raise] context,
-   * and thus short-circuits the computation.
-   *
-   * @see [recover] if you want to attempt to recover from any _logical failure_.
-   */
-  @JsName("invokeEffect")
-  @JvmName("invokeEffect")
-  public suspend operator fun <A> Effect<E, A>.invoke(): A =
-    fold({ raise(it) }, ::identity)
-
-  @RaiseDSL
-  @JsName("bindEffect")
-  @JvmName("bindEffect")
-  public suspend fun <A> Effect<E, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  @RaiseDSL
-  @JsName("bindEither")
-  @JvmName("bindEither")
-  public fun <A> Either<E, A>.bind(): A = when (this) {
+  public fun <A> EitherNel<Error, A>.bindNel(): A = when(this) {
     is Either.Left -> raise(value)
     is Either.Right -> value
   }
 
-  /* Will be removed in subsequent PRs for Arrow 2.x.x */
   @RaiseDSL
-  @JsName("bindValidated")
-  @JvmName("bindValidated")
-  public fun <A> Validated<E, A>.bind(): A = when (this) {
+  public fun <A> ValidatedNel<Error, A>.bindNel(): A = when(this) {
     is Validated.Invalid -> raise(value)
     is Validated.Valid -> value
   }
 
-  @RaiseDSL
-  @JvmName("recoverEffect")
-  public suspend infix fun <A> Effect<E, A>.recover(
-    @BuilderInference resolve: suspend Raise<NonEmptyList<E>>.(E) -> A
-  ): A =
-    fold<E, A, A>({ this@recover.invoke(this) }, { throw it }, { resolve(it) }) { it }
-
-  /** @see [recover] */
-  @RaiseDSL
-  @JvmName("recoverEager")
-  public infix fun <A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<NonEmptyList<E>>.(E) -> A): A =
-    recover({ invoke() }) { resolve(it) }
-
-  /**
-   * Execute the [Effect] resulting in [A],
-   * and recover from any _logical error_ of type [E], and [Throwable], by providing a fallback value of type [A],
-   * or raising a new error of type [R].
-   *
-   * @see [catch] if you don't need to recover from [Throwable].
-   */
-  @RaiseDSL
-  @JvmName("recoverAndCatchEffect")
-  public suspend fun <A> Effect<E, A>.recover(
-    @BuilderInference recover: suspend Raise<NonEmptyList<E>>.(E) -> A,
-    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
-  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
-
-  @RaiseDSL
-  @JvmName("catchEffect")
-  public suspend infix fun <A> Effect<E, A>.catch(
-    @BuilderInference catch: suspend Raise<NonEmptyList<E>>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
-
-  @RaiseDSL
-  @JvmName("catchEagerEffect")
-  public infix fun <A> EagerEffect<E, A>.catch(
-    @BuilderInference catch: Raise<NonEmptyList<E>>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A =
+    block(raise)
 }
