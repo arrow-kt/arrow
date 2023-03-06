@@ -986,10 +986,11 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A,
     }
   }
 
-public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B {
+public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold({ default() }, ::identity, { _, b -> b })
+  return fold(default, ::identity) { _, b -> b }
 }
+
 
 public fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
