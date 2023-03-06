@@ -9,10 +9,13 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
 import arrow.core.raise.fold
+import arrow.core.raise.nullable
+import arrow.core.raise.option
+import arrow.core.raise.result
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.Result.Companion.success
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 
@@ -290,54 +293,70 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
+@Deprecated(
+  "",
+  ReplaceWith("either { map { f(it).bind() } }", "arrow.core.raise.either")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Right -> destination.add(res.value)
-      is Left -> return res
-    }
-  }
-  return destination.right()
-}
+public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> =
+  either { map { f(it).bind() } }
 
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceEither is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
+@Deprecated(
+  "",
+  ReplaceWith("either { map { it.bind() } }", "arrow.core.raise.either")
+)
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
+@Deprecated(
+  "",
+  ReplaceWith("result { map { f(it).bind() } }", "arrow.core.raise.result")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    f(item).fold(destination::add) { throwable ->
-      return@traverse Result.failure(throwable)
-    }
-  }
-  return success(destination)
-}
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> =
+  result { map { f(it).bind() } }
 
-@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseResult is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
-@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceResult is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
+@Deprecated(
+  "",
+  ReplaceWith("result { map { it.bind() } }", "arrow.core.raise.result")
+)
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+)
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
@@ -359,7 +378,10 @@ public inline fun <E, A, B> Iterable<A>.traverse(
 ): Validated<E, List<B>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
-@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseValidated is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
@@ -375,7 +397,10 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   mapOrAccumulate { f(it).bindNel() }.toValidated()
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
+)
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
@@ -389,7 +414,10 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
@@ -403,50 +431,56 @@ public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
   mapOrAccumulate { it.bindNel() }.toValidated()
 
-@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
   traverse(f)
 
+@Deprecated(
+  "",
+  ReplaceWith("option { map { f(it).bind() } }", "arrow.core.raise.option")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  val destination = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (val res = f(item)) {
-      is Some -> destination.add(res.value)
-      is None -> return res
-    }
-  }
-  return destination.some()
-}
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> =
+  option { map { f(it).bind() } }
 
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceOption is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
+@Deprecated(
+  "",
+  ReplaceWith("option { map { it.bind() } }", "arrow.core.raise.option")
+)
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseNullable is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
+@Deprecated(
+  "",
+  ReplaceWith("nullable { map { f(it).bind() } }", "arrow.core.raise.nullable")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    val res = f(a)
-    if (res != null) {
-      acc.add(res)
-    } else {
-      return res
-    }
-  }
-  return acc.toList()
-}
+public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? =
+  nullable { map { f(it).bind() } }
 
-@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
@@ -565,13 +599,21 @@ public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<N
 public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
   mapOrAccumulate { it.bindNel() }
 
+@Deprecated(
+  "",
+  ReplaceWith("nullable { map { it.bind() } }", "arrow.core.raise.nullable")
+)
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
 
+@Deprecated(
+  "",
+  ReplaceWith("map { }")
+)
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
 
-public fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
+public inline fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
   val iterator = this.iterator()
   if (!iterator.hasNext()) return null
   var accumulator: B = initial(iterator.next())
@@ -581,18 +623,15 @@ public fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B
   return accumulator
 }
 
+@Deprecated(
+  "",
+  ReplaceWith("asReversed().reduceOrNull(initial) { acc, a -> operation(a, acc) }")
+)
 public inline fun <A, B> List<A>.reduceRightNull(
   initial: (A) -> B,
   operation: (A, acc: B) -> B
-): B? {
-  val iterator = listIterator(size)
-  if (!iterator.hasPrevious()) return null
-  var accumulator: B = initial(iterator.previous())
-  while (iterator.hasPrevious()) {
-    accumulator = operation(iterator.previous(), accumulator)
-  }
-  return accumulator
-}
+): B? =
+  asReversed().reduceOrNull(initial) { acc, a -> operation(a, acc) }
 
 /**
  * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
@@ -863,21 +902,23 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
 /**
  * splits a union into its component parts.
  *
- * ```kotlin
+ * <!--- INCLUDE
  * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor())
- *      .unalign()
- *   //sampleEnd
- *   println(result)
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *    listOf(
+ *      Pair("A", 1).bothIor(),
+ *      Pair("B", 2).bothIor(),
+ *      "C".leftIor()
+ *    ).seperateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
  * }
  * ```
  * <!--- KNIT example-iterable-13.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
+public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     x.fold(
       { l + it to r },
@@ -886,53 +927,53 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
     )
   }
 
+@Deprecated(
+  "",
+  ReplaceWith("seperateIor()", "arrow.core.seperateIor")
+)
+public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = seperateIor()
+
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *      listOf(1, 2, 3).unalign {
- *        it.leftIor()
- *      }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *    listOf(1, 2, 3, 4).unalign {
+ *      if(it % 2 == 0) it.rightIor()
+ *      else it.leftIor()
+ *    } shouldBe Pair(listOf(1, 3), listOf(2, 4))
  * }
  * ```
  * <!--- KNIT example-iterable-14.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
-  map(fa).unalign()
+  fold(mutableListOf<A>() to mutableListOf<B>()) { (l, r), c ->
+    fa(c).fold(
+      { l.apply { add(it) } to r },
+      { l to r.apply { add(it) } },
+      { a, b -> l.apply { add(a) } to r.apply { add(b) } }
+    )
+  }
 
 @Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
 
 /**
- * Returns the first element as [Some(element)][Some], or [None] if the iterable is empty.
+ * Returns the first element as [Some], or [None] if the iterable is empty.
  */
 public fun <T> Iterable<T>.firstOrNone(): Option<T> =
   when (this) {
-    is Collection -> if (!isEmpty()) {
-      Some(first())
-    } else {
-      None
-    }
-
-    else -> {
-      iterator().nextOrNone()
-    }
+    is Collection -> if (!isEmpty()) Some(first()) else None
+    else -> iterator().nextOrNone()
   }
 
 private fun <T> Iterator<T>.nextOrNone(): Option<T> =
-  if (hasNext()) {
-    Some(next())
-  } else {
-    None
-  }
+  if (hasNext()) Some(next()) else None
 
 /**
  * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
@@ -956,9 +997,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       else -> None
     }
 
-    else -> {
-      iterator().run { nextOrNone().filter { !hasNext() } }
-    }
+    else -> iterator().run { nextOrNone().filter { !hasNext() } }
   }
 
 /**
@@ -982,12 +1021,7 @@ public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Optio
  */
 public fun <T> Iterable<T>.lastOrNone(): Option<T> =
   when (this) {
-    is Collection -> if (!isEmpty()) {
-      Some(last())
-    } else {
-      None
-    }
-
+    is Collection -> if (!isEmpty()) Some(last()) else None
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -1037,20 +1071,21 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
   }
 
 /**
- * attempt to split the computation, giving access to the first result.
+ * Attempt to split the [Iterable] into the tail and the first element.
+ * Returns `null` if the [Iterable] is empty,
+ * otherwise returns a [Pair] of the tail and the first element.
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf("A", "B", "C").split()
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   emptyList<Int>().split() shouldBe null
+ *   listOf("A", "B", "C").split() shouldBe Pair(listOf("B", "C"), "A")
  * }
  * ```
  * <!--- KNIT example-iterable-15.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
@@ -1061,21 +1096,22 @@ public fun <A> Iterable<A>.tail(): List<A> =
   drop(1)
 
 /**
- * interleave both computations in a fair way.
+ * Interleaves the elements of `this` [Iterable] with those of [other] [Iterable].
+ * Elements of `this` and [other] are taken in turn, and the resulting list is the concatenation of the interleaved elements.
+ * If one [Iterable] is longer than the other, the remaining elements are appended to the end.
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val tags = List(10) { "#" }
- *   val result =
- *    tags.interleave(listOf("A", "B", "C"))
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   val list1 = listOf(1, 2, 3)
+ *   val list2 = listOf(4, 5, 6, 7, 8)
+ *   list1.interleave(list2) shouldBe listOf(1, 4, 2, 5, 3, 6, 7, 8)
  * }
  * ```
  * <!--- KNIT example-iterable-16.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   this.split()?.let { (fa, a) ->
@@ -1083,17 +1119,17 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   } ?: other.toList()
 
 /**
- * Fair conjunction. Similarly to interleave
+ * [interleave]s the elements produced by applying [ffa] to every element of `this` [Iterable].
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf(1,2,3).unweave { i -> listOf("$i, ${i + 1}") }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   val ints = listOf(1, 2)
+ *   val res = ints.unweave { i -> listOf(i, i + 1, i + 2) }
+ *   res shouldBe listOf(1, 2, 2, 3, 3, 4)
+ *   res shouldBe ints.interleave(ints.flatMap { listOf(it + 1, it + 2) })
  * }
  * ```
  * <!--- KNIT example-iterable-17.kt -->
@@ -1123,12 +1159,16 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * ```
  * <!--- KNIT example-iterable-18.kt -->
  */
+@Deprecated(
+  "Use flatMap and ifEmpty instead.",
+  ReplaceWith("flatMap(ffa).ifEmpty<List<B>, Iterable<B>> { fb }")
+)
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
-  firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
+  flatMap(ffa).ifEmpty { fb }
 
-@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }"))
+@Deprecated("Use mapNotNull and getOrNull instead.", ReplaceWith("mapNotNull { it.getOrNull() }"))
 public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
-  mapNotNull { it.orNull() }
+  mapNotNull { it.getOrNull() }
 
 @Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }", "arrow.core.orNull"))
 public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
@@ -1137,18 +1177,28 @@ public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
- * @receiver Iterable of Validated
- * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
+ * ```kotlin
+ * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   listOf("A".left(), 2.right(), "C".left(), 4.right())
+ *     .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))
+ * }
+ * ```
+ * <!--- KNIT example-iterable-19.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
-  val left = ArrayList<A>(collectionSizeOrDefault(10))
-  val right = ArrayList<B>(collectionSizeOrDefault(10))
+  val left = mutableListOf<A>()
+  val right = mutableListOf<B>()
 
-  for (either in this)
+  for (either in this) {
     when (either) {
       is Left -> left.add(either.value)
       is Right -> right.add(either.value)
     }
+  }
 
   return Pair(left, right)
 }
@@ -1177,25 +1227,32 @@ public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
 
 /**
- *  Given [A] is a sub type of [B], re-type this value from Iterable<A> to Iterable<B>
- *
- *  Kind<F, A> -> Kind<F, B>
+ *  Given [A] is a subtype of [B], re-type this value from Iterable<A> to Iterable<B>
  *
  *  ```kotlin
  *  import arrow.core.*
  *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result: Iterable<CharSequence> =
- *     listOf("Hello World").widen()
- *   //sampleEnd
- *   println(result)
+ *  fun main() {
+ *  val original: List<String> = listOf("Hello", ",", "World")
+ *   val result: Iterable<CharSequence> = original.widen()
  *  }
  *  ```
  */
 public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
   this
 
+/**
+ *  Given [A] is a subtype of [B], re-type this value from List<A> to List<B>
+ *
+ *  ```kotlin
+ *  import arrow.core.*
+ *
+ *  fun main() {
+ *  val original: List<String> = listOf("Hello", ",", "World")
+ *   val result: Iterable<CharSequence> = original.widen()
+ *  }
+ *  ```
+ */
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
@@ -1246,10 +1303,14 @@ public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
 internal val listUnit: List<Unit> =
   listOf(Unit)
 
+@Deprecated(
+  "",
+  ReplaceWith("toList().let { l -> List(n) { l } }")
+)
 public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
-  if (n <= 0) emptyList()
-  else toList().let { l -> List(n) { l } }
+  if (n <= 0) emptyList() else toList().let { l -> List(n) { l } }
 
+@Deprecated("")
 public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
   if (n <= 0) listOf(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
