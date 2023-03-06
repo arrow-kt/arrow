@@ -584,7 +584,7 @@ class IterableTest : StringSpec({
   }
 
   "align is the inverse of unalign" {
-    checkAll(Arb.list(Arb.ior(Arb.int(0 .. 1), Arb.string(1)), 0 .. 10)) { xs ->
+    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
       val (a, b) = xs.unalign()
       a.align(b) shouldBe xs
     }
