@@ -170,8 +170,6 @@ class ScheduleTest {
 
     assertTrue { res.all { it.cont } }
     assertTrue { res.all { it.duration == duration } }
-    assertContentEquals(res.map { true }, res.map { it.cont })
-    assertContentEquals(res.map { duration }, res.map { it.duration })
   }
 
   fun secondsToNanos(sec: Int): Double =
