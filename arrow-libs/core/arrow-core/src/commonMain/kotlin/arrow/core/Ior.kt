@@ -397,11 +397,23 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-08.kt -->
    */
+  @Deprecated(
+    "padNull is being renamed to toNullablePair to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("toNullablePair()")
+  )
   public fun padNull(): Pair<A?, B?> = fold(
     { Pair(it, null) },
     { Pair(null, it) },
     { a, b -> Pair(a, b) }
   )
+
+
+  public fun toNullablePair(): Pair<A?, B?> = fold(
+    { Pair(it, null) },
+    { Pair(null, it) },
+    { a, b -> Pair(a, b) }
+  )
+
 
   /**
    * Returns a [Either.Right] containing the [Right] value or `B` if this is [Right] or [Both]
