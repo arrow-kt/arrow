@@ -55,8 +55,9 @@ class IterableTest : StringSpec({
 
   "mapAccumulating accumulates" {
     checkAll(Arb.list(Arb.int())) { ints ->
-      val res: Either<NonEmptyList<Int>, List<Int>> =
-        ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
+      val res = ints.mapOrAccumulate { i ->
+        if (i % 2 == 0) i else raise(i)
+      }
 
       val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
         .toNonEmptyListOrNull()?.left() ?: ints.filter { it % 2 == 0 }.right()

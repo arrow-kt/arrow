@@ -1,9 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.EitherNel
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.nonEmptyListOf
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -143,7 +145,7 @@ class ParMapTest : StringSpec({
   "parMapOrAccumulate accumulates shifts" {
     checkAll(Arb.string()) { e ->
       (0 until 100).parMapOrAccumulate { _ ->
-        shift<Int>(e)
+        raise(e)
       } shouldBe NonEmptyList(e, (1 until 100).map { e }).left()
     }
   }
