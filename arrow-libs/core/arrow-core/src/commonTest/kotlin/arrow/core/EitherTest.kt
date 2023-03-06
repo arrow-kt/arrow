@@ -650,8 +650,9 @@ class EitherTest : StringSpec({
         { f.bindNel() },
         { g.bind() },
         { h.bindNel() },
-        { i.bind() }
-      ) { aa, bb, cc, dd, ee, ff, gg, hh, ii -> Tuple9(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+        { i.bind() },
+        ::Tuple9
+      )
       val all = listOf(a.toEitherNel(), b, c.toEitherNel(), d, e.toEitherNel(), f, g.toEitherNel(), h, i.toEitherNel())
 
       val expected = if (all.any { it.isLeft() }) {
