@@ -37,13 +37,13 @@ import kotlin.coroutines.startCoroutine
 
 // copied from kotest-extensions-arrow
 
-fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0..100): Arb<NonEmptyList<A>> =
+fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
   Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
 
-fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0..100): Arb<NonEmptySet<A>> =
-  Arb.set(arb, max(range.first, 1)..range.last).map { it.toNonEmptySetOrNull()!! }
+fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
+  Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
 
-fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0..100): Arb<Sequence<A>> =
+fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
