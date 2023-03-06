@@ -11,7 +11,7 @@ fun test() {
   listOf(1, 2, 3, 4).mapOrAccumulate({ a, b -> "$a, $b" }) { i ->
     when(i) {
       1 -> "Either - $i".left().bind()
-      2 -> "Either - $i".leftNel().bindNel()
+      2 -> "EitherNel - $i".leftNel().bindNel()
       3 -> raise("Raise - $i")
       else -> withNel { raise(nonEmptyListOf("RaiseNel - $i")) }
     }
