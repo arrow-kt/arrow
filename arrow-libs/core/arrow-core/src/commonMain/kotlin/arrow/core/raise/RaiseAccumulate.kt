@@ -28,7 +28,7 @@ public inline fun <R, A, B, C> Raise<R>.zipOrAccumulate(
   combine: (R, R) -> R,
   @BuilderInference action1: RaiseAccumulate<R>.() -> A,
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
-  @BuilderInference block: (A, B) -> C
+  block: (A, B) -> C
 ): C =
   zipOrAccumulate(
     combine,
@@ -47,7 +47,7 @@ public inline fun <R, A, B, C, D> Raise<R>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<R>.() -> A,
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
-  @BuilderInference block: (A, B, C) -> D
+  block: (A, B, C) -> D
 ): D =
   zipOrAccumulate(
     combine,
@@ -68,7 +68,7 @@ public inline fun <R, A, B, C, D, E> Raise<R>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
-  @BuilderInference block: (A, B, C, D) -> E
+  block: (A, B, C, D) -> E
 ): E =
   zipOrAccumulate(
     combine,
@@ -91,7 +91,7 @@ public inline fun <R, A, B, C, D, E, F> Raise<R>.zipOrAccumulate(
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
-  @BuilderInference block: (A, B, C, D, E) -> F
+  block: (A, B, C, D, E) -> F
 ): F =
   zipOrAccumulate(
     combine,
@@ -116,7 +116,7 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<R>.zipOrAccumulate(
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
-  @BuilderInference block: (A, B, C, D, E, F) -> G
+  block: (A, B, C, D, E, F) -> G
 ): G =
   zipOrAccumulate(
     combine,
@@ -143,7 +143,7 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<R>.zipOrAccumulate(
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
-  @BuilderInference block: (A, B, C, D, E, F, G) -> H
+  block: (A, B, C, D, E, F, G) -> H
 ): H =
   zipOrAccumulate(
     combine,
@@ -172,7 +172,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<R>.zipOrAccumulate(
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
-  @BuilderInference block: (A, B, C, D, E, F, G, H) -> I
+  block: (A, B, C, D, E, F, G, H) -> I
 ): I =
   zipOrAccumulate(
     combine,
@@ -203,7 +203,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<R>.zipOrAccumulate(
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
   @BuilderInference action9: RaiseAccumulate<R>.() -> I,
-  @BuilderInference block: (A, B, C, D, E, F, G, H, I) -> J
+  block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
   var error: Any? = EmptyValue
   val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
@@ -243,7 +243,7 @@ public inline fun <R, A, B, C, D> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<R>.() -> A,
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
-  @BuilderInference block: (A, B, C) -> D
+  block: (A, B, C) -> D
 ): D =
   zipOrAccumulate(
     action1,
@@ -262,7 +262,7 @@ public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
-  @BuilderInference block: (A, B, C, D) -> E
+  block: (A, B, C, D) -> E
 ): E =
   zipOrAccumulate(
     action1,
@@ -283,7 +283,7 @@ public inline fun <R, A, B, C, D, E, F> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
-  @BuilderInference block: (A, B, C, D, E) -> F
+  block: (A, B, C, D, E) -> F
 ): F =
   zipOrAccumulate(
     action1,
@@ -306,7 +306,7 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<NonEmptyList<R>>.zipOrAccumulat
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
-  @BuilderInference block: (A, B, C, D, E, F) -> G
+  block: (A, B, C, D, E, F) -> G
 ): G =
   zipOrAccumulate(
     action1,
@@ -331,7 +331,7 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<NonEmptyList<R>>.zipOrAccumu
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
-  @BuilderInference block: (A, B, C, D, E, F, G) -> H
+  block: (A, B, C, D, E, F, G) -> H
 ): H =
   zipOrAccumulate(
     action1,
@@ -358,7 +358,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<R>>.zipOrAcc
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
-  @BuilderInference block: (A, B, C, D, E, F, G, H) -> I
+  block: (A, B, C, D, E, F, G, H) -> I
 ): I =
   zipOrAccumulate(
     action1,
@@ -387,7 +387,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<R>>.zipOr
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
   @BuilderInference action9: RaiseAccumulate<R>.() -> I,
-  @BuilderInference block: (A, B, C, D, E, F, G, H, I) -> J
+  block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
   val error: MutableList<R> = mutableListOf()
   val a = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
@@ -425,18 +425,18 @@ public inline fun <R, A, B> Raise<R>.mapOrAccumulate(
 }
 
 /**
- * Accumulate the errors obtained by executing the [block] over every element of [list].
+ * Accumulate the errors obtained by executing the [transform] over every element of [list].
  */
 @RaiseDSL
 public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   list: Iterable<A>,
-  @BuilderInference block: RaiseAccumulate<R>.(A) -> B
+  @BuilderInference transform: RaiseAccumulate<R>.(A) -> B
 ): List<B> {
   val error = mutableListOf<R>()
   val results = ArrayList<B>(list.collectionSizeOrDefault(10))
   for (item in list) {
     fold<NonEmptyList<R>, B, Unit>(
-      { block(RaiseAccumulate(this), item) },
+      { transform(RaiseAccumulate(this), item) },
       { errors -> error.addAll(errors) },
       { results.add(it) }
     )
