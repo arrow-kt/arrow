@@ -5,7 +5,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -19,6 +18,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.TestTimeSource
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class CircuitBreakerTest {
@@ -104,11 +104,14 @@ class CircuitBreakerTest {
     var halfOpenCount = 0
     var rejectedCount = 0
 
+    val timeSource = TestTimeSource()
+
     val cb = CircuitBreaker(
       maxFailures = maxFailures,
       resetTimeout = resetTimeout,
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeout = maxTimeout
+      maxResetTimeout = maxTimeout,
+      timeSource = timeSource
     ).doOnOpen { openedCount += 1 }
       .doOnClosed { closedCount += 1 }
       .doOnHalfOpen { halfOpenCount += 1 }
@@ -131,9 +134,7 @@ class CircuitBreakerTest {
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-    withContext(Dispatchers.Default) {
-      delay(resetTimeout + 10.milliseconds)
-    }
+    timeSource += resetTimeout + 10.milliseconds
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -190,11 +191,14 @@ class CircuitBreakerTest {
     var halfOpenCount = 0
     var rejectedCount = 0
 
+    val timeSource = TestTimeSource()
+
     val cb = CircuitBreaker(
       maxFailures = maxFailures,
       resetTimeout = resetTimeout,
       exponentialBackoffFactor = 2.0,
-      maxResetTimeout = maxTimeout
+      maxResetTimeout = maxTimeout,
+      timeSource = timeSource
     ).doOnOpen { openedCount += 1 }
       .doOnClosed { closedCount += 1 }
       .doOnHalfOpen { halfOpenCount += 1 }
@@ -218,9 +222,7 @@ class CircuitBreakerTest {
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-    withContext(Dispatchers.Default) {
-      delay(resetTimeout + 10.milliseconds)
-    }
+    timeSource += resetTimeout + 10.milliseconds
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
