@@ -3422,7 +3422,6 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun getRaise ()Larrow/core/raise/Raise;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun raise (Larrow/core/NonEmptyList;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

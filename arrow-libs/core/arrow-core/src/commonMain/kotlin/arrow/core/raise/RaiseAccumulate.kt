@@ -590,18 +590,14 @@ public open class RaiseAccumulate<Error>(
     raise.raise(nonEmptyListOf(r))
 
   @RaiseDSL
-  public fun raise(r: NonEmptyList<Error>): Nothing =
-    raise.raise(r)
-
-  @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when(this) {
-    is Either.Left -> raise(value)
+    is Either.Left -> raise.raise(value)
     is Either.Right -> value
   }
 
   @RaiseDSL
   public fun <A> ValidatedNel<Error, A>.bindNel(): A = when(this) {
-    is Validated.Invalid -> raise(value)
+    is Validated.Invalid -> raise.raise(value)
     is Validated.Valid -> value
   }
 

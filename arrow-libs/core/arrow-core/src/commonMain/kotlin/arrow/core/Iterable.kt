@@ -290,10 +290,7 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
@@ -310,10 +307,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
   return destination.right()
 }
 
-@Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
@@ -332,27 +326,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
   return success(destination)
 }
 
-@Deprecated(
-  "traverseResult is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
-@Deprecated(
-  "sequenceResult is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
@@ -374,17 +359,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(
 ): Validated<E, List<B>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<E, A, B> { f(it).bind() }.toValidated()",
+    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -393,10 +375,7 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   mapOrAccumulate { f(it).bindNel() }.toValidated()
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
@@ -410,27 +389,21 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bind() }.toValidated()",
+    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
   mapOrAccumulate { it.bindNel() }.toValidated()
 
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
   traverse(f)
 
@@ -447,20 +420,14 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   return destination.some()
 }
 
-@Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseNullable is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
@@ -479,10 +446,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
   return acc.toList()
 }
 
-@Deprecated(
-  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
@@ -568,60 +532,38 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
 }
 
 /**
- * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or [Either.Left] values accumulated using [combine].
  */
-public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> {
-  var left: Any? = EmptyValue
-  val right = ArrayList<A>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (item) {
-      is Right -> right.add(item.value)
-      is Left -> left = EmptyValue.combine(left, item.value, combine)
-    }
-  }
-  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
-}
-
-@JvmName("flattenNelOrAccumulate")
-public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> {
-  var left: Any? = EmptyValue
-  val right = ArrayList<A>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (item) {
-      is Right -> right.add(item.value)
-      is Left -> left = EmptyValue.combine(left, item.value.reduce(combine), combine)
-    }
-  }
-  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
-}
+public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  mapOrAccumulate(combine) { it.bind() }
 
 /**
- * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors with into an [NonEmptyList].
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or [EitherNel] [Left] values accumulated using [combine].
  */
-public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
-  val left = mutableListOf<Error>()
-  val right = ArrayList<A>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (item) {
-      is Right -> right.add(item.value)
-      is Left -> left.add(item.value)
-    }
-  }
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
-}
-
 @JvmName("flattenNelOrAccumulate")
-public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
-  val left = mutableListOf<Error>()
-  val right = ArrayList<A>(collectionSizeOrDefault(10))
-  for (item in this) {
-    when (item) {
-      is Right -> right.add(item.value)
-      is Left -> left.addAll(item.value)
-    }
-  }
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
-}
+public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  mapOrAccumulate(combine) { it.bindNel() }
+
+/**
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or a [NonEmptyList] of all [Either.Left] values.
+ */
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
+  mapOrAccumulate { it.bind() }
+
+/**
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or a [NonEmptyList] of all [EitherNel] [Left] values.
+ */
+@JvmName("flattenNelOrAccumulate")
+public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
+  mapOrAccumulate { it.bindNel() }
 
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
