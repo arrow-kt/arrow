@@ -4,22 +4,12 @@ package arrow.core.examples.exampleRaiseDsl05
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.recover
-import kotlinx.coroutines.delay
 import io.kotest.matchers.shouldBe
 
-suspend fun test() {
-  val one: Result<Int> = Result.success(1)
-  val failure: Result<Int> = Result.failure(RuntimeException("Boom!"))
+fun test() {
+  recover({ raise("failed") }) { str -> str.length } shouldBe 6
 
-  either {
-    val x = one.bind { -1 }
-    val y = failure.bind { failure: Throwable ->
-      raise("Something bad happened: ${failure.message}")
-    }
-    val z = failure.recover { failure: Throwable ->
-      delay(10)
-      1
-    }.bind { raise("Something bad happened: ${it.message}") }
-    x + y + z
-  } shouldBe Either.Left("Something bad happened: Boom!")
+  either<Int, String> {
+    recover({ raise("failed") }) { str -> raise(-1) }
+  } shouldBe Either.Left(-1)
 }

@@ -1083,6 +1083,13 @@ public sealed class Either<out A, out B> {
   public inline fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, predicate)
 
+  @Deprecated(
+    "Facilitates the migration from Validated to Either.",
+    ReplaceWith("isRight(predicate)")
+  )
+  public inline fun exist(predicate: (B) -> Boolean): Boolean =
+    exists(predicate)
+
   /**
    * Returns `true` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
