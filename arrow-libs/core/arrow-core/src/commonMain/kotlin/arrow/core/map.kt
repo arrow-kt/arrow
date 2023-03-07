@@ -10,6 +10,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
+import arrow.core.raise.nullable
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -50,26 +51,25 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * ```
  * <!--- KNIT example-map-02.kt -->
  */
-public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> {
-  val destination = LinkedHashMap<Key, C>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(other[key]) { cc -> map(key, bb, cc) }
-      ?.let { l -> destination.put(key, l) }
+public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
+  buildMap(size) {
+    this@zip.forEach { (key, bb) ->
+      nullable {
+        put(key, map(key, bb, other[key].bind()))
+      }
+    }
   }
-  return destination
-}
 
 public inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   map: (Key, B, C, D) -> E
-): Map<Key, E> {
-  val destination = LinkedHashMap<Key, E>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key]) { cc, dd -> map(key, bb, cc, dd) }
-      ?.let { l -> destination.put(key, l) }
+): Map<Key, E> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(key, map(key, bb, c[key].bind(), d[key].bind()))
+    }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
@@ -77,13 +77,12 @@ public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   d: Map<Key, D>,
   e: Map<Key, E>,
   map: (Key, B, C, D, E) -> F
-): Map<Key, F> {
-  val destination = LinkedHashMap<Key, F>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key]) { cc, dd, ee -> map(key, bb, cc, dd, ee) }
-      ?.let { l -> destination.put(key, l) }
+): Map<Key, F> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind()))
+    }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
@@ -92,13 +91,12 @@ public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   e: Map<Key, E>,
   f: Map<Key, F>,
   map: (Key, B, C, D, E, F) -> G
-): Map<Key, G> {
-  val destination = LinkedHashMap<Key, G>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key]) { cc, dd, ee, ff -> map(key, bb, cc, dd, ee, ff) }
-      ?.let { l -> destination.put(key, l) }
+): Map<Key, G> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind()))
+    }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
@@ -108,13 +106,12 @@ public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   f: Map<Key, F>,
   g: Map<Key, G>,
   map: (Key, B, C, D, E, F, G) -> H
-): Map<Key, H> {
-  val destination = LinkedHashMap<Key, H>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key]) { cc, dd, ee, ff, gg -> map(key, bb, cc, dd, ee, ff, gg) }
-      ?.let { l -> destination.put(key, l) }
+): Map<Key, H> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind(), g[key].bind()))
+    }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
@@ -125,24 +122,12 @@ public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   g: Map<Key, G>,
   h: Map<Key, H>,
   map: (Key, B, C, D, E, F, G, H) -> I
-): Map<Key, I> {
-  val destination = LinkedHashMap<Key, I>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key]) { cc, dd, ee, ff, gg, hh ->
-      map(
-        key,
-        bb,
-        cc,
-        dd,
-        ee,
-        ff,
-        gg,
-        hh
-      )
+): Map<Key, I> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind(), g[key].bind(), h[key].bind()))
     }
-      ?.let { l -> destination.put(key, l) }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
@@ -154,25 +139,25 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   h: Map<Key, H>,
   i: Map<Key, I>,
   map: (Key, B, C, D, E, F, G, H, I) -> J
-): Map<Key, J> {
-  val destination = LinkedHashMap<Key, J>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(c[key], d[key], e[key], f[key], g[key], h[key], i[key]) { cc, dd, ee, ff, gg, hh, ii ->
-      map(
+): Map<Key, J> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(
         key,
-        bb,
-        cc,
-        dd,
-        ee,
-        ff,
-        gg,
-        hh,
-        ii
+        map(
+          key,
+          bb,
+          c[key].bind(),
+          d[key].bind(),
+          e[key].bind(),
+          f[key].bind(),
+          g[key].bind(),
+          h[key].bind(),
+          i[key].bind()
+        )
       )
     }
-      ?.let { l -> destination.put(key, l) }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
@@ -185,22 +170,26 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   i: Map<Key, I>,
   j: Map<Key, J>,
   map: (Key, B, C, D, E, F, G, H, I, J) -> K
-): Map<Key, K> {
-  val destination = LinkedHashMap<Key, K>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(
-      c[key],
-      d[key],
-      e[key],
-      f[key],
-      g[key],
-      h[key],
-      i[key],
-      j[key]
-    ) { cc, dd, ee, ff, gg, hh, ii, jj -> map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj) }
-      ?.let { l -> destination.put(key, l) }
+): Map<Key, K> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(
+        key,
+        map(
+          key,
+          bb,
+          c[key].bind(),
+          d[key].bind(),
+          e[key].bind(),
+          f[key].bind(),
+          g[key].bind(),
+          h[key].bind(),
+          i[key].bind(),
+          j[key].bind()
+        )
+      )
+    }
   }
-  return destination
 }
 
 public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
@@ -214,24 +203,27 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   j: Map<Key, J>,
   k: Map<Key, K>,
   map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
-): Map<Key, L> {
-  val destination = LinkedHashMap<Key, L>(size)
-  for ((key, bb) in this) {
-    Nullable.zip(
-      c[key],
-      d[key],
-      e[key],
-      f[key],
-      g[key],
-      h[key],
-      i[key],
-      j[key],
-      k[key]
-    ) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
-      map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
-    }?.let { l -> destination.put(key, l) }
+): Map<Key, L> = buildMap(size) {
+  this@zip.forEach { (key, bb) ->
+    nullable {
+      put(
+        key,
+        map(
+          key,
+          bb,
+          c[key].bind(),
+          d[key].bind(),
+          e[key].bind(),
+          f[key].bind(),
+          g[key].bind(),
+          h[key].bind(),
+          i[key].bind(),
+          j[key].bind(),
+          k[key].bind()
+        )
+      )
+    }
   }
-  return destination
 }
 
 public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
@@ -252,14 +244,20 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Eithe
   return acc.right()
 }
 
-@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
   traverse(f)
 
 public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
   traverse(::identity)
 
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceEither is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
   sequence()
 
@@ -287,7 +285,7 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it.value).bind() }.toValidated()
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it.value).bind() }.toValidated()
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
@@ -314,7 +312,10 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
+)
 public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   sequence(semigroup)
 
@@ -334,11 +335,17 @@ public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<
   return acc.some()
 }
 
-@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
 public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
   traverse(f)
 
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "sequenceOption is being renamed to sequence to simplify the Arrow API",
+  ReplaceWith("sequence()", "arrow.core.sequence")
+)
 public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
   sequence()
 
@@ -351,21 +358,32 @@ public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
 public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
 
-public fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> {
-  val destination = LinkedHashMap<K, B>(mapCapacity(size))
-  for ((key, a) in this) {
-    f(a)?.let { l -> destination.put(key, l) }
+public fun <K, A, B> Map<K, A>.mapNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
+  buildMap {
+    this@mapNotNull.forEach { entry ->
+      transform(entry)?.let { put(entry.key, it) }
+    }
   }
-  return destination
-}
 
-public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> = filterMap { it.orNull() }
+@Deprecated(
+  "",
+  ReplaceWith("mapNotNull { (_, a) -> f(a) }", "arrow.core.mapNotNull")
+)
+public fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> =
+  mapNotNull { (_, a) -> f(a) }
+
+public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> =
+  buildMap {
+    this@filterOption.forEach { (key, option) ->
+      option.fold({ }, { put(key, it) })
+    }
+  }
 
 /**
  * Returns a Map containing all elements that are instances of specified type parameter R.
  */
 public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
-  filterMap { it as? R }
+  mapNotNull { it as? R }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
@@ -384,9 +402,7 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  * <!--- KNIT example-map-03.kt -->
  */
 public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
-  (keys + b.keys).mapNotNull { key ->
-    Ior.fromNullables(this[key], b[key])?.let { key to it }
-  }.toMap()
+  align(b) { (_, ior) -> ior }
 
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
@@ -407,7 +423,13 @@ public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
  * <!--- KNIT example-map-04.kt -->
  */
 public fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
-  this.align(b).mapValues(fa)
+  buildMap {
+    (keys + b.keys).forEach { key ->
+      Ior.fromNullables(this@align[key], b[key])?.let { put(key, fa(Entry(key, it))) }
+    }
+  }
+
+private data class Entry<K, A>(override val key: K, override val value: A) : Map.Entry<K, A>
 
 /**
  * aligns two structures and combine them with the given Semigroups '+'
@@ -462,13 +484,7 @@ public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C)
  * <!--- KNIT example-map-05.kt -->
  */
 public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
-  entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
-    v.fold(
-      { a -> ls.plus(k to a) to rs },
-      { b -> ls to rs.plus(k to b) },
-      { a, b -> ls.plus(k to a) to rs.plus(k to b) }
-    )
-  }
+  unalign { (_, ior) -> ior }
 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
@@ -487,8 +503,21 @@ public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
  * ```
  * <!--- KNIT example-map-06.kt -->
  */
-public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> =
-  mapValues(fa).unalign()
+public inline fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> {
+  val lefts = mutableMapOf<K, A>()
+  val rights = mutableMapOf<K, B>()
+  forEach { entry ->
+    fa(entry).fold(
+      { lefts[entry.key] = it },
+      { rights[entry.key] = it },
+      { a, b ->
+        lefts[entry.key] = a
+        rights[entry.key] = b
+      }
+    )
+  }
+  return lefts to rights
+}
 
 /**
  * Unzips the structure holding the resulting elements in an `Pair`
@@ -507,9 +536,7 @@ public fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): P
  * <!--- KNIT example-map-07.kt -->
  */
 public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
-  entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
-    ls.plus(k to v.first) to rs.plus(k to v.second)
-  }
+  unzip { (_, pair) -> pair }
 
 /**
  * After applying the given function unzip the resulting structure into its elements.
@@ -531,8 +558,16 @@ public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  * ```
  * <!--- KNIT example-map-08.kt -->
  */
-public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
-  mapValues(fc).unzip()
+public inline fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> {
+  val lefts = mutableMapOf<K, A>()
+  val rights = mutableMapOf<K, B>()
+  forEach { entry ->
+    val (a, b) = fc(entry)
+    lefts[entry.key] = a
+    rights[entry.key] = b
+  }
+  return lefts to rights
+}
 
 public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
