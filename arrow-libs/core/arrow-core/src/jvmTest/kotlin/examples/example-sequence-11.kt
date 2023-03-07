@@ -2,10 +2,12 @@
 package arrow.core.examples.exampleSequence11
 
 import arrow.core.split
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result = sequenceOf("A", "B", "C").split()
-  //sampleEnd
-  result?.let { println("(${it.first.toList()}, ${it.second.toList()})") }
+fun test() {
+  sequenceOf("A", "B", "C").split()?.let { (tail, head) ->
+    head shouldBe "A"
+    tail.toList() shouldBe listOf("B", "C")
+  }
+  emptySequence<String>().split() shouldBe null
 }
