@@ -833,7 +833,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  * <!--- KNIT example-iterable-11.kt -->
  */
 @Deprecated(
-  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
   ReplaceWith("separateIor()", "arrow.core.separateIor")
 )
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separateIor()
@@ -857,7 +857,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separa
  * <!--- KNIT example-iterable-12.kt -->
  */
 @Deprecated(
-  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
   ReplaceWith("map(fa).separateIor()", "arrow.core.separateIor")
 )
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
