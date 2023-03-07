@@ -301,8 +301,8 @@ public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): 
   traverse(f)
 
 @Deprecated(
-  "",
-  ReplaceWith("either { map { f(it).bind() } }", "arrow.core.raise.either")
+  "Traverse for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("either<E, List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.either")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -317,15 +317,15 @@ public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
 @Deprecated(
-  "",
-  ReplaceWith("either { map { it.bind() } }", "arrow.core.raise.either")
+  "Sequence for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("either<E, List<A>> { this.map { it.bind() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
 @Deprecated(
-  "",
-  ReplaceWith("result { map { f(it).bind() } }", "arrow.core.raise.result")
+  "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("result<List<B>> { this.map { f(it).bind<B>() } }", "arrow.core.raise.result")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -347,8 +347,8 @@ public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
 @Deprecated(
-  "",
-  ReplaceWith("result { map { it.bind() } }", "arrow.core.raise.result")
+  "Sequence for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("result<List<A>> { this.map { it.bind() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
@@ -439,8 +439,8 @@ public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option
   traverse(f)
 
 @Deprecated(
-  "",
-  ReplaceWith("option { map { f(it).bind() } }", "arrow.core.raise.option")
+  "Traverse for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("option<List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.option")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -455,8 +455,8 @@ public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
 @Deprecated(
-  "",
-  ReplaceWith("option { map { it.bind() } }", "arrow.core.raise.option")
+  "Sequence for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("option<List<A>> { this.map { it.bind() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
@@ -469,8 +469,8 @@ public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
 @Deprecated(
-  "",
-  ReplaceWith("nullable { map { f(it).bind() } }", "arrow.core.raise.nullable")
+  "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("nullable<List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.nullable")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -600,14 +600,14 @@ public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Eithe
   mapOrAccumulate { it.bindNel() }
 
 @Deprecated(
-  "",
+  "Sequence for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
   ReplaceWith("nullable { map { it.bind() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
 
 @Deprecated(
-  "",
+  "Void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
   ReplaceWith("map { }")
 )
 public fun <A> Iterable<A>.void(): List<Unit> =
@@ -624,7 +624,7 @@ public inline fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: 
 }
 
 @Deprecated(
-  "",
+  "reduceRightNull is being deprecated in favor of simply reduceOrNull, asReversed() offers an optimised way to achieve from-right behavior.\n$NicheAPI",
   ReplaceWith("asReversed().reduceOrNull(initial) { acc, a -> operation(a, acc) }")
 )
 public inline fun <A, B> List<A>.reduceRightNull(
@@ -918,17 +918,24 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  * <!--- KNIT example-iterable-13.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
-    x.fold(
-      { l + it to r },
-      { l to r + it },
-      { a, b -> l + a to r + b }
+public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> {
+  val lefts = mutableListOf<A>()
+  val rights = mutableListOf<B>()
+  forEach { ior ->
+    ior.fold(
+      { lefts.add(it) },
+      { rights.add(it) },
+      { a, b ->
+        lefts.add(a)
+        rights.add(b)
+      }
     )
   }
+  return Pair(lefts, rights)
+}
 
 @Deprecated(
-  "",
+  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
   ReplaceWith("seperateIor()", "arrow.core.seperateIor")
 )
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = seperateIor()
@@ -950,6 +957,10 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = sepera
  * <!--- KNIT example-iterable-14.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@Deprecated(
+  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  ReplaceWith("map(fa).seperateIor()", "arrow.core.seperateIor")
+)
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   fold(mutableListOf<A>() to mutableListOf<B>()) { (l, r), c ->
     fa(c).fold(
@@ -959,9 +970,9 @@ public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List
     )
   }
 
-@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
-  fold(MA)
+  fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
 
 /**
  * Returns the first element as [Some], or [None] if the iterable is empty.
@@ -976,7 +987,7 @@ private fun <T> Iterator<T>.nextOrNone(): Option<T> =
   if (hasNext()) Some(next()) else None
 
 /**
- * Returns the first element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found.
+ * Returns the first element as [Some] matching the given [predicate], or [None] if element was not found.
  */
 public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> {
   for (element in this) {
@@ -988,7 +999,7 @@ public inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option
 }
 
 /**
- * Returns single element as [Some(element)][Some], or [None] if the iterable is empty or has more than one element.
+ * Returns single element as [Some], or [None] if the iterable is empty or has more than one element.
  */
 public fun <T> Iterable<T>.singleOrNone(): Option<T> =
   when (this) {
@@ -1001,7 +1012,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
   }
 
 /**
- * Returns the single element as [Some(element)][Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
+ * Returns the single element as [Some] matching the given [predicate], or [None] if element was not found or more than one element was found.
  */
 public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> {
   val list = mutableListOf<T>()
@@ -1017,7 +1028,7 @@ public inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Optio
 }
 
 /**
- * Returns the last element as [Some(element)][Some], or [None] if the iterable is empty.
+ * Returns the last element as [Some], or [None] if the iterable is empty.
  */
 public fun <T> Iterable<T>.lastOrNone(): Option<T> =
   when (this) {
@@ -1034,7 +1045,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
   }
 
 /**
- * Returns the last element as [Some(element)][Some] matching the given [predicate], or [None] if no such element was found.
+ * Returns the last element as [Some] matching the given [predicate], or [None] if no such element was found.
  */
 public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> {
   var value: Any? = EmptyValue
@@ -1047,7 +1058,7 @@ public inline fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<
 }
 
 /**
- * Returns an element as [Some(element)][Some] at the given [index] or [None] if the [index] is out of bounds of this iterable.
+ * Returns an element as [Some] at the given [index] or [None] if the [index] is out of bounds of this iterable.
  */
 public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
   when {
@@ -1092,6 +1103,7 @@ public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
     tail() to first
   }
 
+/** Alias for drop(1) */
 public fun <A> Iterable<A>.tail(): List<A> =
   drop(1)
 
@@ -1160,17 +1172,23 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * <!--- KNIT example-iterable-18.kt -->
  */
 @Deprecated(
-  "Use flatMap and ifEmpty instead.",
+  "Use flatMap and ifEmpty instead.\n$NicheAPI",
   ReplaceWith("flatMap(ffa).ifEmpty<List<B>, Iterable<B>> { fb }")
 )
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   flatMap(ffa).ifEmpty { fb }
 
-@Deprecated("Use mapNotNull and getOrNull instead.", ReplaceWith("mapNotNull { it.getOrNull() }"))
+@Deprecated(
+  "Use mapNotNull and getOrNull instead.\n$NicheAPI",
+  ReplaceWith("mapNotNull { it.getOrNull() }")
+)
 public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
   mapNotNull { it.getOrNull() }
 
-@Deprecated("Use mapNotNull and orNull instead.", ReplaceWith("mapNotNull { it.orNull() }", "arrow.core.orNull"))
+@Deprecated(
+  "${ValidatedDeprMsg}Use mapNotNull and orNull instead.",
+  ReplaceWith("mapNotNull { it.orNull() }", "arrow.core.orNull")
+)
 public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
   mapNotNull { it.orNull() }
 
@@ -1209,7 +1227,10 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
-@Deprecated("Use separateEither instead.", ReplaceWith("map { it.toEither() }.separateEither()"))
+@Deprecated(
+  "${ValidatedDeprMsg}Use separateEither instead.",
+  ReplaceWith("map { it.toEither() }.separateEither()")
+)
 public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val invalids = ArrayList<A>(collectionSizeOrDefault(10))
   val valids = ArrayList<B>(collectionSizeOrDefault(10))
@@ -1299,18 +1320,19 @@ public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
     )
   }
 
+@Deprecated("Not being used anymore. Will be removed from the binary in 2.0.0")
 @PublishedApi
 internal val listUnit: List<Unit> =
   listOf(Unit)
 
 @Deprecated(
-  "",
+  NicheAPI,
   ReplaceWith("toList().let { l -> List(n) { l } }")
 )
 public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
   if (n <= 0) emptyList() else toList().let { l -> List(n) { l } }
 
-@Deprecated("")
+@Deprecated(NicheAPI)
 public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
   if (n <= 0) listOf(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
