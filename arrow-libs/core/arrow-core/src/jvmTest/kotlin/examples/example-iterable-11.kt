@@ -6,8 +6,7 @@ import arrow.core.*
 fun main(args: Array<String>) {
   //sampleStart
   val result =
-   listOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor())
-     .unalign()
+     listOf("A" to 1, "B" to 2).unzip()
   //sampleEnd
   println(result)
 }

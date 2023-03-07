@@ -6,11 +6,7 @@ import arrow.core.*
 fun main(args: Array<String>) {
   //sampleStart
   val result =
-   listOf("A:1", "B:2", "C:3").unzip { e ->
-     e.split(":").let {
-       it.first() to it.last()
-     }
-   }
+    listOf("A", "B").align(listOf(1, 2, 3))
   //sampleEnd
   println(result)
 }
