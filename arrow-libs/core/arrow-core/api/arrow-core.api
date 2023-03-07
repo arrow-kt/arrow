@@ -632,6 +632,8 @@ public final class arrow/core/IterableKt {
 	public static final fun firstOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun firstOrNone (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun flattenNelOrAccumulate (Ljava/lang/Iterable;)Larrow/core/Either;
+	public static final fun flattenNelOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun flattenOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun flattenOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
@@ -714,8 +716,11 @@ public final class arrow/core/MapKt {
 	public static final fun filterMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun filterOption (Ljava/util/Map;)Ljava/util/Map;
 	public static final fun flatMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
+	public static final fun fold (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun foldLeft (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun getOrNone (Ljava/util/Map;Ljava/lang/Object;)Larrow/core/Option;
+	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 	public static final fun salign (Ljava/util/Map;Larrow/typeclasses/Semigroup;Ljava/util/Map;)Ljava/util/Map;
@@ -806,6 +811,8 @@ public final class arrow/core/NonEmptyList$Companion {
 public final class arrow/core/NonEmptyListKt {
 	public static final fun compareTo (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)I
 	public static final fun flatten (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public static final fun mapOrAccumulate (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapOrAccumulate (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun max (Larrow/core/NonEmptyList;)Ljava/lang/Comparable;
 	public static final fun maxBy (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun min (Larrow/core/NonEmptyList;)Ljava/lang/Comparable;
@@ -1561,6 +1568,8 @@ public final class arrow/core/SequenceKt {
 	public static final fun leftPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun leftPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun many (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun mapOrAccumulate (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapOrAccumulate (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun once (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun padZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun padZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
@@ -3403,6 +3412,31 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun recover (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun shift (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;)V
+	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun bindNel (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bindNel (Larrow/core/Validated;)Ljava/lang/Object;
+	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getRaise ()Larrow/core/raise/Raise;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
