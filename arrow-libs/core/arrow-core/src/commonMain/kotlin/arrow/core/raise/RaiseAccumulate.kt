@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 package arrow.core.raise
@@ -15,6 +15,9 @@ import arrow.core.collectionSizeOrDefault
 import arrow.core.ValidatedNel
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
@@ -29,14 +32,16 @@ public inline fun <R, A, B, C> Raise<R>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<R>.() -> A,
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   block: (A, B) -> C
-): C =
-  zipOrAccumulate(
+): C {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
     { }) { a, b, _ ->
     block(a, b)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], and [action3] using the given [combine].
@@ -48,8 +53,9 @@ public inline fun <R, A, B, C, D> Raise<R>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   block: (A, B, C) -> D
-): D =
-  zipOrAccumulate(
+): D {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -57,6 +63,7 @@ public inline fun <R, A, B, C, D> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, _ ->
     block(a, b, c)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], and [action4] using the given [combine].
@@ -69,8 +76,9 @@ public inline fun <R, A, B, C, D, E> Raise<R>.zipOrAccumulate(
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   block: (A, B, C, D) -> E
-): E =
-  zipOrAccumulate(
+): E {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -79,6 +87,7 @@ public inline fun <R, A, B, C, D, E> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, d, _ ->
     block(a, b, c, d)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5] using the given [combine].
@@ -92,8 +101,9 @@ public inline fun <R, A, B, C, D, E, F> Raise<R>.zipOrAccumulate(
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   block: (A, B, C, D, E) -> F
-): F =
-  zipOrAccumulate(
+): F {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -103,6 +113,7 @@ public inline fun <R, A, B, C, D, E, F> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, d, e, _ ->
     block(a, b, c, d, e)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6] using the given [combine].
@@ -117,8 +128,9 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<R>.zipOrAccumulate(
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   block: (A, B, C, D, E, F) -> G
-): G =
-  zipOrAccumulate(
+): G {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -129,6 +141,7 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, d, e, f, _ ->
     block(a, b, c, d, e, f)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7] using the given [combine].
@@ -144,8 +157,9 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<R>.zipOrAccumulate(
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   block: (A, B, C, D, E, F, G) -> H
-): H =
-  zipOrAccumulate(
+): H {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -157,6 +171,7 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, d, e, f, g, _ ->
     block(a, b, c, d, e, f, g)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8] using the given [combine].
@@ -173,8 +188,9 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<R>.zipOrAccumulate(
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
   block: (A, B, C, D, E, F, G, H) -> I
-): I =
-  zipOrAccumulate(
+): I {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     combine,
     action1,
     action2,
@@ -187,6 +203,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<R>.zipOrAccumulate(
     { }) { a, b, c, d, e, f, g, h, _ ->
     block(a, b, c, d, e, f, g, h)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9] using the given [combine].
@@ -205,6 +222,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<R>.zipOrAccumulate(
   @BuilderInference action9: RaiseAccumulate<R>.() -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
   var error: Any? = EmptyValue
   val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
   val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
@@ -227,13 +245,15 @@ public inline fun <R, A, B, C> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<R>.() -> A,
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   block: (A, B) -> C
-): C =
-  zipOrAccumulate(
+): C {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     {}) { a, b, _ ->
     block(a, b)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], and [action3].
@@ -244,14 +264,16 @@ public inline fun <R, A, B, C, D> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<R>.() -> B,
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   block: (A, B, C) -> D
-): D =
-  zipOrAccumulate(
+): D {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
     {}) { a, b, c, _ ->
     block(a, b, c)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], and [action4].
@@ -263,8 +285,9 @@ public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action3: RaiseAccumulate<R>.() -> C,
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   block: (A, B, C, D) -> E
-): E =
-  zipOrAccumulate(
+): E {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
@@ -272,6 +295,7 @@ public inline fun <R, A, B, C, D, E> Raise<NonEmptyList<R>>.zipOrAccumulate(
     {}) { a, b, c, d, _ ->
     block(a, b, c, d)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5].
@@ -284,8 +308,9 @@ public inline fun <R, A, B, C, D, E, F> Raise<NonEmptyList<R>>.zipOrAccumulate(
   @BuilderInference action4: RaiseAccumulate<R>.() -> D,
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   block: (A, B, C, D, E) -> F
-): F =
-  zipOrAccumulate(
+): F {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
@@ -294,6 +319,7 @@ public inline fun <R, A, B, C, D, E, F> Raise<NonEmptyList<R>>.zipOrAccumulate(
     {}) { a, b, c, d, e, _ ->
     block(a, b, c, d, e)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6].
@@ -307,8 +333,9 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<NonEmptyList<R>>.zipOrAccumulat
   @BuilderInference action5: RaiseAccumulate<R>.() -> E,
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   block: (A, B, C, D, E, F) -> G
-): G =
-  zipOrAccumulate(
+): G {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
@@ -318,6 +345,7 @@ public inline fun <R, A, B, C, D, E, F, G> Raise<NonEmptyList<R>>.zipOrAccumulat
     {}) { a, b, c, d, e, f, _ ->
     block(a, b, c, d, e, f)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7].
@@ -332,8 +360,9 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<NonEmptyList<R>>.zipOrAccumu
   @BuilderInference action6: RaiseAccumulate<R>.() -> F,
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   block: (A, B, C, D, E, F, G) -> H
-): H =
-  zipOrAccumulate(
+): H {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
@@ -344,6 +373,7 @@ public inline fun <R, A, B, C, D, E, F, G, H> Raise<NonEmptyList<R>>.zipOrAccumu
     {}) { a, b, c, d, e, f, g, _ ->
     block(a, b, c, d, e, f, g)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8].
@@ -359,8 +389,9 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<R>>.zipOrAcc
   @BuilderInference action7: RaiseAccumulate<R>.() -> G,
   @BuilderInference action8: RaiseAccumulate<R>.() -> H,
   block: (A, B, C, D, E, F, G, H) -> I
-): I =
-  zipOrAccumulate(
+): I {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return zipOrAccumulate(
     action1,
     action2,
     action3,
@@ -372,6 +403,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<R>>.zipOrAcc
     {}) { a, b, c, d, e, f, g, h, _ ->
     block(a, b, c, d, e, f, g, h)
   }
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9].
@@ -389,6 +421,7 @@ public inline fun <R, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<R>>.zipOr
   @BuilderInference action9: RaiseAccumulate<R>.() -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
   val error: MutableList<R> = mutableListOf()
   val a = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
   val b = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
