@@ -3,7 +3,9 @@
 @file:JvmName("RaiseKt")
 package arrow.core.raise
 
+import arrow.core.mapOrAccumulate
 import arrow.core.Either
+import arrow.core.EitherNel
 import arrow.core.EmptyValue
 import arrow.core.NonEmptyList
 import arrow.core.Tuple4
@@ -11,11 +13,18 @@ import arrow.core.Tuple5
 import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
+import arrow.core.Validated
+import arrow.core.ValidatedNel
+import arrow.core.emptyCombine
+import arrow.core.identity
 import arrow.core.nel
+import arrow.core.nonEmptyListOf
+import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.js.JsName
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -567,3 +576,32 @@ public inline fun <R, A, B> Raise<NonEmptyList<R>>.mapOrAccumulate(
   @BuilderInference crossinline block: Raise<R>.(A) -> B
 ): List<B> =
   mapOrAccumulate({ x, y -> x + y }, list) { elt -> mapErrorNel { block(elt) } }
+
+/**
+ * Receiver type belonging to [mapOrAccumulate].
+ * Allows binding both [Either] and [EitherNel] values for [Either.Left] types of [Error].
+ * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
+ */
+public open class RaiseAccumulate<Error>(
+  public val raise: Raise<NonEmptyList<Error>>
+): Raise<Error> {
+
+  @RaiseDSL
+  public override fun raise(r: Error): Nothing =
+    raise.raise(nonEmptyListOf(r))
+
+  @RaiseDSL
+  public fun <A> EitherNel<Error, A>.bindNel(): A = when(this) {
+    is Either.Left -> raise.raise(value)
+    is Either.Right -> value
+  }
+
+  @RaiseDSL
+  public fun <A> ValidatedNel<Error, A>.bindNel(): A = when(this) {
+    is Validated.Invalid -> raise.raise(value)
+    is Validated.Valid -> value
+  }
+
+  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A =
+    block(raise)
+}

@@ -6,5 +6,5 @@ import arrow.core.raise.recover
 
 fun Raise<String>.failure(): Int = raise("failed")
 
-fun Raise<Nothing>.recovered(): Int =
+fun recovered(): Int =
   recover({ failure() }) { _: String -> 1 }

@@ -9,37 +9,37 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @Deprecated(
-  DeprMsg + "ValidatedNel is being replaced by EitherNel",
+  ValidatedDeprMsg + "ValidatedNel is being replaced by EitherNel",
   ReplaceWith("EitherNel<E, A>", "arrow.core.EitherNel")
 )
 public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
 @Deprecated(
-  DeprMsg + "Use Right to construct Either values instead",
+  ValidatedDeprMsg + "Use Right to construct Either values instead",
   ReplaceWith("Either.Right(value)", "arrow.core.Either")
 )
 public typealias Valid<A> = Validated.Valid<A>
 
 @Deprecated(
-  DeprMsg + "Use Left to construct Either values instead",
+  ValidatedDeprMsg + "Use Left to construct Either values instead",
   ReplaceWith("Either.Left(value)", "arrow.core.Either")
 )
 public typealias Invalid<E> = Validated.Invalid<E>
 
-@Deprecated(DeprMsg + "You can find more details about how to migrate on the Github release page, or the 1.2.0 release post.")
+@Deprecated(ValidatedDeprMsg + "You can find more details about how to migrate on the Github release page, or the 1.2.0 release post.")
 public sealed class Validated<out E, out A> {
 
   public companion object {
 
     @Deprecated(
-      DeprMsg + "Use leftNel instead to construct the equivalent Either value",
+      ValidatedDeprMsg + "Use leftNel instead to construct the equivalent Either value",
       ReplaceWith("e.leftNel()", "arrow.core.leftNel")
     )
     @JvmStatic
     public fun <E, A> invalidNel(e: E): ValidatedNel<E, A> = Invalid(nonEmptyListOf(e))
 
     @Deprecated(
-      DeprMsg + "Use right instead to construct the equivalent Either value",
+      ValidatedDeprMsg + "Use right instead to construct the equivalent Either value",
       ReplaceWith("a.right()", "arrow.core.right")
     )
     @JvmStatic
@@ -48,7 +48,7 @@ public sealed class Validated<out E, out A> {
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
-    @Deprecated(DeprMsg)
+    @Deprecated(ValidatedDeprMsg)
     @JvmStatic
     public fun <E, A> fromEither(e: Either<E, A>): Validated<E, A> = e.fold({ Invalid(it) }, { Valid(it) })
 
@@ -80,7 +80,7 @@ public sealed class Validated<out E, out A> {
       value?.let(::Valid) ?: Invalid(ifNull())
 
     @Deprecated(
-      DeprMsg + "Use Either.catch instead",
+      ValidatedDeprMsg + "Use Either.catch instead",
       ReplaceWith("Either.catch(f).toValidated()")
     )
     @JvmStatic
@@ -304,7 +304,7 @@ public sealed class Validated<out E, out A> {
     fold({ fe(it)?.let(::Invalid) }, { fa(it)?.let(::Valid) })
 
   @Deprecated(
-    DeprMsg + "Use fold on Either after refactoring instead",
+    ValidatedDeprMsg + "Use fold on Either after refactoring instead",
     ReplaceWith("toEither().fold({ MB.empty() }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
@@ -316,7 +316,7 @@ public sealed class Validated<out E, out A> {
   )
 
   @Deprecated(
-    DeprMsg + "Use Right to construct Either values instead",
+    ValidatedDeprMsg + "Use Right to construct Either values instead",
     ReplaceWith("Either.Right(value)", "arrow.core.Either")
   )
   public data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
@@ -330,7 +330,7 @@ public sealed class Validated<out E, out A> {
   }
 
   @Deprecated(
-    DeprMsg + "Use Left to construct Either values instead",
+    ValidatedDeprMsg + "Use Left to construct Either values instead",
     ReplaceWith("Either.Left(value)", "arrow.core.Either")
   )
   public data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
@@ -338,7 +338,7 @@ public sealed class Validated<out E, out A> {
   }
 
   @Deprecated(
-    DeprMsg + "Use fold on Either after refactoring",
+    ValidatedDeprMsg + "Use fold on Either after refactoring",
     ReplaceWith("toEither().fold(fe, fa)")
   )
   public inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
@@ -348,14 +348,14 @@ public sealed class Validated<out E, out A> {
     }
 
   @Deprecated(
-    DeprMsg + "Use isRight on Either after refactoring",
+    ValidatedDeprMsg + "Use isRight on Either after refactoring",
     ReplaceWith("toEither().isRight()")
   )
   public val isValid: Boolean =
     fold({ false }, { true })
 
   @Deprecated(
-    DeprMsg + "Use isLeft on Either after refactoring",
+    ValidatedDeprMsg + "Use isLeft on Either after refactoring",
     ReplaceWith("toEither().isLeft()")
   )
   public val isInvalid: Boolean =
@@ -365,7 +365,7 @@ public sealed class Validated<out E, out A> {
    * Is this Valid and matching the given predicate
    */
   @Deprecated(
-    DeprMsg + "Use isRight on Either after refactoring",
+    ValidatedDeprMsg + "Use isRight on Either after refactoring",
     ReplaceWith("toEither().isRight(predicate)")
   )
   public inline fun exist(predicate: (A) -> Boolean): Boolean =
@@ -389,13 +389,13 @@ public sealed class Validated<out E, out A> {
     fold({ true }, predicate)
 
   @Deprecated(
-    DeprMsg + "Use isRight on Either after refactoring",
+    ValidatedDeprMsg + "Use isRight on Either after refactoring",
     ReplaceWith("toEither().isLeft()")
   )
   public fun isEmpty(): Boolean = isInvalid
 
   @Deprecated(
-    DeprMsg + "Use isRight on Either after refactoring",
+    ValidatedDeprMsg + "Use isRight on Either after refactoring",
     ReplaceWith("toEither().isRight()")
   )
   public fun isNotEmpty(): Boolean = isValid
@@ -410,7 +410,7 @@ public sealed class Validated<out E, out A> {
    * Returns Valid values wrapped in Some, and None for Invalid values
    */
   @Deprecated(
-    DeprMsg + "Use getOrNone on Either after refactoring",
+    ValidatedDeprMsg + "Use getOrNone on Either after refactoring",
     ReplaceWith("toEither().getOrNone()")
   )
   public fun toOption(): Option<A> =
@@ -429,7 +429,7 @@ public sealed class Validated<out E, out A> {
 
   /** Lift the Invalid value into a NonEmptyList. */
   @Deprecated(
-    DeprMsg + "Use toEitherNel directly instead",
+    ValidatedDeprMsg + "Use toEitherNel directly instead",
     ReplaceWith("toEither().toEitherNel().toValidated()")
   )
   public fun toValidatedNel(): ValidatedNel<E, A> =
@@ -440,7 +440,7 @@ public sealed class Validated<out E, out A> {
    * when you want to use the Monadic properties of the Either type.
    */
   @Deprecated(
-    DeprMsg + "Use Either directly instead",
+    ValidatedDeprMsg + "Use Either directly instead",
     ReplaceWith("toEither().let(f).toValidated()")
   )
   public inline fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> =
@@ -458,7 +458,7 @@ public sealed class Validated<out E, out A> {
    * Apply a function to a Valid value, returning a new Valid value
    */
   @Deprecated(
-    DeprMsg + "Use map on Either after refactoring",
+    ValidatedDeprMsg + "Use map on Either after refactoring",
     ReplaceWith("toEither().map(f).toValidated()")
   )
   public inline fun <B> map(f: (A) -> B): Validated<E, B> =
@@ -469,7 +469,7 @@ public sealed class Validated<out E, out A> {
    * Or, if the original valid was Valid, return it.
    */
   @Deprecated(
-    DeprMsg + "Use mapLeft on Either after refactoring",
+    ValidatedDeprMsg + "Use mapLeft on Either after refactoring",
     ReplaceWith("toEither().mapLeft(f).toValidated()")
   )
   public inline fun <EE> mapLeft(f: (E) -> EE): Validated<EE, A> =
@@ -493,7 +493,7 @@ public sealed class Validated<out E, out A> {
    * <!--- KNIT example-validated-03.kt -->
    */
   @Deprecated(
-    DeprMsg + "Use onLeft on Either after refactoring",
+    ValidatedDeprMsg + "Use onLeft on Either after refactoring",
     ReplaceWith("toEither().onLeft(f).toValidated()")
   )
   public inline fun tapInvalid(f: (E) -> Unit): Validated<E, A> =
@@ -523,7 +523,7 @@ public sealed class Validated<out E, out A> {
    * <!--- KNIT example-validated-04.kt -->
    */
   @Deprecated(
-    DeprMsg + "Use onRight on Either after refactoring",
+    ValidatedDeprMsg + "Use onRight on Either after refactoring",
     ReplaceWith("toEither().onRight(f).toValidated()")
   )
   public inline fun tap(f: (A) -> Unit): Validated<E, A> =
@@ -540,14 +540,14 @@ public sealed class Validated<out E, out A> {
    * valid, otherwise return the given B
    */
   @Deprecated(
-    DeprMsg + "Use fold on Either after refactoring",
+    ValidatedDeprMsg + "Use fold on Either after refactoring",
     ReplaceWith("toEither().fold({ b }) { f(b, it) }")
   )
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     fold({ b }, { f(b, it) })
 
   @Deprecated(
-    DeprMsg + "Use swap on Either after refactoring",
+    ValidatedDeprMsg + "Use swap on Either after refactoring",
     ReplaceWith("toEither().swap()")
   )
   public fun swap(): Validated<A, E> =
@@ -555,7 +555,7 @@ public sealed class Validated<out E, out A> {
 }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(combineError, toEither(), fb.toEither(), f)",
     "arrow.core.Either"
@@ -574,7 +574,7 @@ public inline fun <E, A, B, Z> Validated<E, A>.zip(combineError: (E, E) -> E, fb
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), fb.toEither(), ::Pair).toValidated()",
     "arrow.core.Either"
@@ -584,7 +584,7 @@ public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>):
   zip(SE, fb, ::Pair)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -598,7 +598,7 @@ public inline fun <E, A, B, Z> Validated<E, A>.zip(
   SE.run { zip({ x, y -> x + y }, b, f) }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -626,7 +626,7 @@ public inline fun <E, A, B, C, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -655,7 +655,7 @@ public inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -685,7 +685,7 @@ public inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -716,7 +716,7 @@ public inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -737,7 +737,7 @@ public inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -759,7 +759,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -782,7 +782,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate({ a, b -> SE.run<Semigroup<E>, E> { a.combine(b) } }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), j.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -830,7 +830,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
   }
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -843,7 +843,7 @@ public inline fun <E, A, B, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -857,7 +857,7 @@ public inline fun <E, A, B, C, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -872,7 +872,7 @@ public inline fun <E, A, B, C, D, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -888,7 +888,7 @@ public inline fun <E, A, B, C, D, EE, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -905,7 +905,7 @@ public inline fun <E, A, B, C, D, EE, FF, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -923,7 +923,7 @@ public inline fun <E, A, B, C, D, EE, F, G, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -942,7 +942,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -962,7 +962,7 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> ValidatedNel<E, A>.zip(
   zip(Semigroup.nonEmptyList(), b, c, d, e, ff, g, h, i, f)
 
 @Deprecated(
-  DeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
+  ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
     "Either.zipOrAccumulate(toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), j.toEither(), f).toValidated()",
     "arrow.core.Either"
@@ -1000,14 +1000,14 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  * <!--- KNIT example-validated-05.kt -->
  */
 @Deprecated(
-  DeprMsg + "Use widen on Either after refactoring",
+  ValidatedDeprMsg + "Use widen on Either after refactoring",
   ReplaceWith("toEither().widen()")
 )
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
 
 @Deprecated(
-  DeprMsg + "Use leftWiden on Either after refactoring",
+  ValidatedDeprMsg + "Use leftWiden on Either after refactoring",
   ReplaceWith("toEither().leftWiden()")
 )
 public fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
@@ -1137,7 +1137,7 @@ public fun <A, B> Validated<A, B?>.sequence(): Validated<A, B>? =
   traverseNullable(::identity)
 
 @Deprecated(
-  DeprMsg + "Use compareTo on Either after refactoring",
+  ValidatedDeprMsg + "Use compareTo on Either after refactoring",
   ReplaceWith("toEither(). compareTo(other.toEither())")
 )
 public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compareTo(other: Validated<E, A>): Int =
@@ -1150,7 +1150,7 @@ public operator fun <E : Comparable<E>, A : Comparable<A>> Validated<E, A>.compa
  * Return the Valid value, or the default if Invalid
  */
 @Deprecated(
-  DeprMsg + "Use getOrElse on Either after refactoring",
+  ValidatedDeprMsg + "Use getOrElse on Either after refactoring",
   ReplaceWith("toEither().getOrElse { default() }")
 )
 public inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
@@ -1160,14 +1160,14 @@ public inline fun <E, A> Validated<E, A>.getOrElse(default: () -> A): A =
  * Return the Valid value, or null if Invalid
  */
 @Deprecated(
-  DeprMsg + "Use getOrNull on Either after refactoring",
+  ValidatedDeprMsg + "Use getOrNull on Either after refactoring",
   ReplaceWith("toEither().getOrNull()")
 )
 public fun <E, A> Validated<E, A>.orNull(): A? =
   getOrElse { null }
 
 @Deprecated(
-  DeprMsg + "Use getOrNone on Either after refactoring",
+  ValidatedDeprMsg + "Use getOrNone on Either after refactoring",
   ReplaceWith("toEither().getOrNone()")
 )
 public fun <E, A> Validated<E, A>.orNone(): Option<A> =
@@ -1177,7 +1177,7 @@ public fun <E, A> Validated<E, A>.orNone(): Option<A> =
  * Return the Valid value, or the result of f if Invalid
  */
 @Deprecated(
-  DeprMsg + "Use getOrElse on Either after refactoring",
+  ValidatedDeprMsg + "Use getOrElse on Either after refactoring",
   ReplaceWith("toEither().getOrElse(f)")
 )
 public inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
@@ -1222,7 +1222,7 @@ public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () ->
  * <!--- KNIT example-validated-06.kt -->
  */
 @Deprecated(
-  DeprMsg + "Use Either DSL or flatMap instead after refactoring.",
+  ValidatedDeprMsg + "Use Either DSL or flatMap instead after refactoring.",
   ReplaceWith("toEither().flatMap { f(it).toEither() }.toValidated()")
 )
 public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): Validated<E, B> =
@@ -1237,7 +1237,7 @@ public inline fun <E, A, B> Validated<E, A>.andThen(f: (A) -> Validated<E, B>): 
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
 @Deprecated(
-  DeprMsg + "Use recover on Either instead after refactoring.",
+  ValidatedDeprMsg + "Use recover on Either instead after refactoring.",
   ReplaceWith("toEither().recover { default().bind() }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
@@ -1247,7 +1247,7 @@ public inline fun <E, A> Validated<E, A>.orElse(default: () -> Validated<E, A>):
   )
 
 @Deprecated(
-  DeprMsg + "Use recover on Either instead after refactoring.",
+  ValidatedDeprMsg + "Use recover on Either instead after refactoring.",
   ReplaceWith("toEither().recover { e -> f(e).bind() }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, A>): Validated<E, A> =
@@ -1257,7 +1257,7 @@ public inline fun <E, A> Validated<E, A>.handleErrorWith(f: (E) -> Validated<E, 
   }
 
 @Deprecated(
-  DeprMsg + "Use recover on Either instead after refactoring.",
+  ValidatedDeprMsg + "Use recover on Either instead after refactoring.",
   ReplaceWith("toEither().recover<E, Nothing, A> { e -> f(e) }.toValidated()")
 )
 public inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
@@ -1267,7 +1267,7 @@ public inline fun <E, A> Validated<E, A>.handleError(f: (E) -> A): Validated<Not
   }
 
 @Deprecated(
-  DeprMsg + "Use fold on Either instead after refactoring.",
+  ValidatedDeprMsg + "Use fold on Either instead after refactoring.",
   ReplaceWith("fold(fe, fa).valid()")
 )
 public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
@@ -1277,21 +1277,21 @@ public inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): 
   }
 
 @Deprecated(
-  DeprMsg + "Validated is deprecated in favor of Either",
+  ValidatedDeprMsg + "Validated is deprecated in favor of Either",
   ReplaceWith("toEither().valid()")
 )
 public fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
   map { Right(it) }.handleError { Left(it) }
 
 @Deprecated(
-  DeprMsg + "Use merge() on Either instead after refactoring.",
+  ValidatedDeprMsg + "Use merge() on Either instead after refactoring.",
   ReplaceWith("toEither().merge()")
 )
 public inline fun <A> Validated<A, A>.merge(): A =
   fold(::identity, ::identity)
 
 @Deprecated(
-  DeprMsg + "Use Either.zipOrAccumulate instead",
+  ValidatedDeprMsg + "Use Either.zipOrAccumulate instead",
   ReplaceWith("Either.zipOrAccumulate({ a, b -> SE.run { a.combine(b) } }, toEither(), y.toEither(), { a, b -> SA.run { a.combine(b) } }).toValidated()")
 )
 public fun <E, A> Validated<E, A>.combine(
@@ -1327,41 +1327,41 @@ public fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>)
  * Converts the value to an Ior<E, A>
  */
 @Deprecated(
-  DeprMsg + "Use toIor on Either after refactoring Validated to Either",
+  ValidatedDeprMsg + "Use toIor on Either after refactoring Validated to Either",
   ReplaceWith("toEither().toIor()")
 )
 public fun <E, A> Validated<E, A>.toIor(): Ior<E, A> =
   fold({ Ior.Left(it) }, { Ior.Right(it) })
 
 @Deprecated(
-  DeprMsg + "Use right instead to construct the equivalent Either value",
+  ValidatedDeprMsg + "Use right instead to construct the equivalent Either value",
   ReplaceWith("this.right()", "arrow.core.right")
 )
 public inline fun <A> A.valid(): Validated<Nothing, A> =
   Valid(this)
 
 @Deprecated(
-  DeprMsg + "Use left instead to construct the equivalent Either value",
+  ValidatedDeprMsg + "Use left instead to construct the equivalent Either value",
   ReplaceWith("this.left()", "arrow.core.left")
 )
 public inline fun <E> E.invalid(): Validated<E, Nothing> =
   Invalid(this)
 
 @Deprecated(
-  DeprMsg + "Use right instead to construct the equivalent Either value",
+  ValidatedDeprMsg + "Use right instead to construct the equivalent Either value",
   ReplaceWith("this.right()", "arrow.core.right")
 )
 public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
   Validated.validNel(this)
 
 @Deprecated(
-  DeprMsg + "Use leftNel instead to construct the equivalent Either value",
+  ValidatedDeprMsg + "Use leftNel instead to construct the equivalent Either value",
   ReplaceWith("this.leftNel()", "arrow.core.leftNel")
 )
 public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
 
-private const val DeprMsg = "Validated functionally is being merged into Either.\n"
+internal const val ValidatedDeprMsg = "Validated functionally is being merged into Either.\n"
 
 private const val DeprAndNicheMsg =
   "Validated functionaliy is being merged into Either, but this API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"

@@ -1,17 +1,23 @@
 @file:Suppress("unused", "FunctionName")
 
+/**
+ * <!--- TEST_NAME IterableKnitTest -->
+ */
 package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.either
+import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.fold
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupDeprecation
 import kotlin.Result.Companion.success
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmName
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -341,62 +347,64 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(
 ): Validated<E, List<B>> =
   traverse(semigroup, f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(
-  combine: (E, E) -> E,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  fold(Valid(ArrayList<B>(collectionSizeOrDefault(10))) as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Validated.Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Validated.Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> Invalid(combine(acc.value, res.value))
-      }
-    }
-  }
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { traverse({ x, y -> x.combine(y) }, f) }"))
 public inline fun <E, A, B> Iterable<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
-): Validated<E, List<B>> = semigroup.run {
-  traverse({ x, y -> x.combine(y) }, f)
-}
+): Validated<E, List<B>> =
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse({ x, y -> x + y }, f)
+  mapOrAccumulate { f(it).bindNel() }.toValidated()
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
-public fun <E, A> Iterable<Validated<E, A>>.sequence(combine: (E, E) -> E): Validated<E, List<A>> =
-  traverse(combine, ::identity)
-
-@Deprecated(SemigroupDeprecation, ReplaceWith("semigroup.run { sequence { x, y -> x.combine(y) } }"))
-public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> = semigroup.run {
-  sequence { x, y -> x.combine(y) }
-}
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
+public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
 @Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  sequence { x, y -> x + y }
+  mapOrAccumulate { it.bindNel() }.toValidated()
 
 @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
@@ -446,94 +454,119 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
 /**
- * Returns [Either] a [List] containing the results of applying the given [transform] function
- * to each element in the original collection,
- * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection.
- * The [combine] function is used to accumulate all the _logical errors_.
+ * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,
+ * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection using the [combine] function is used to accumulate all the _logical errors_.
+ *
+ * Within this DSL you can `bind` both [Either], and [EitherNel] values and invoke [Raise] based function of _logical error_ type [Error]. Let's see an example of all the different cases:
+ * <!--- INCLUDE
+ * import arrow.core.left
+ * import arrow.core.leftNel
+ * import arrow.core.nonEmptyListOf
+ * import arrow.core.mapOrAccumulate
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   listOf(1, 2, 3, 4).mapOrAccumulate({ a, b -> "$a, $b" }) { i ->
+ *     when(i) {
+ *       1 -> "Either - $i".left().bind()
+ *       2 -> "EitherNel - $i".leftNel().bindNel()
+ *       3 -> raise("Raise - $i")
+ *       else -> withNel { raise(nonEmptyListOf("RaiseNel - $i")) }
+ *     }
+ *   } shouldBe "Either - 1, EitherNel - 2, Raise - 3, RaiseNel - 4".left()
+ * }
+ * ```
+ * <!--- KNIT example-iterable-01.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: Raise<Error>.(A) -> B,
-): Either<Error, List<B>> =
-  fold<A, Either<Error, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
-    when (val res = either { transform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { acc.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> res
-        is Left -> Left(combine(acc.value, res.value))
-      }
-    }
-  }
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
+): Either<Error, List<B>> {
+  var left: Any? = EmptyValue
+  val right = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this)
+    fold(
+      { transform(RaiseAccumulate(this), item) },
+      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
+      { b -> right.add(b) }
+    )
+  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+}
 
 /**
- * Returns [Either] a [List] containing the results of applying the given [transform] function
- * to each element in the original collection,
+ * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,
  * **or** accumulate all the _logical errors_ into a [NonEmptyList] that were _raised_ while applying the [transform] function.
+ *
+ * Let's see an example of all the different cases:
+ * <!--- INCLUDE
+ * import arrow.core.left
+ * import arrow.core.leftNel
+ * import arrow.core.nonEmptyListOf
+ * import arrow.core.mapOrAccumulate
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   listOf(1, 2, 3, 4).mapOrAccumulate { i ->
+ *     when(i) {
+ *       1 -> "Either - $i".left().bind()
+ *       2 -> "EitherNel - $i".leftNel().bindNel()
+ *       3 -> raise("Raise - $i")
+ *       else -> withNel { raise(nonEmptyListOf("RaiseNel - $i")) }
+ *     }
+ *   } shouldBe nonEmptyListOf("Either - 1", "EitherNel - 2", "Raise - 3", "RaiseNel - 4").left()
+ * }
+ * ```
+ * <!--- KNIT example-iterable-02.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  @BuilderInference transform: Raise<Error>.(A) -> B,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
 ): Either<NonEmptyList<Error>, List<B>> {
-  val buffer = mutableListOf<Error>()
-  val res = fold<A, Either<MutableList<Error>, ArrayList<B>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, a ->
-    when (val res = either { transform(a) }) {
-      is Right -> when (acc) {
-        is Right -> acc.also { acc.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }
-  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
+  val left = mutableListOf<Error>()
+  val right = ArrayList<B>(collectionSizeOrDefault(10))
+  for (item in this)
+    fold({ transform(RaiseAccumulate(this), item) }, { error -> left.addAll(error) }, { b -> right.add(b) })
+  return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
 /**
- * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors using [combine].
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or [Either.Left] values accumulated using [combine].
  */
 public inline fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
-  fold<Either<Error, A>, Either<Error, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
-    when (res) {
-      is Right -> when (acc) {
-        is Right -> acc.also { acc.value.add(res.value) }
-        is Left -> acc
-      }
-
-      is Left -> when (acc) {
-        is Right -> res
-        is Left -> Left(combine(acc.value, res.value))
-      }
-    }
-  }
+  mapOrAccumulate(combine) { it.bind() }
 
 /**
- * Flatten a list of [Either] into a single [Either] with a list of values, or accumulates all errors with into an [NonEmptyList].
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or [EitherNel] [Left] values accumulated using [combine].
  */
-public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> {
-  val buffer = mutableListOf<Error>()
-  val res = fold<Either<Error, A>, Either<MutableList<Error>, ArrayList<A>>>(Right(ArrayList(collectionSizeOrDefault(10)))) { acc, res ->
-    when (res) {
-      is Right -> when (acc) {
-        is Right -> acc.also { acc.value.add(res.value) }
-        is Left -> acc
-      }
+@JvmName("flattenNelOrAccumulate")
+public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(combine: (Error, Error) -> Error): Either<Error, List<A>> =
+  mapOrAccumulate(combine) { it.bindNel() }
 
-      is Left -> when (acc) {
-        is Right -> Left(buffer.also { it.add(res.value) })
-        is Left -> Left(buffer.also { it.add(res.value) })
-      }
-    }
-  }
-  return res.mapLeft { NonEmptyList(it[0], it.drop(1)) }
-}
+/**
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or a [NonEmptyList] of all [Either.Left] values.
+ */
+public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
+  mapOrAccumulate { it.bind() }
+
+/**
+ * Flatten an [Iterable] of [Either].
+ * Alias for [mapOrAccumulate] over an [Iterable] of computed [Either].
+ * Either returns a [List] containing all [Either.Right] values, or a [NonEmptyList] of all [EitherNel] [Left] values.
+ */
+@JvmName("flattenNelOrAccumulate")
+public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
+  mapOrAccumulate { it.bindNel() }
 
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   traverse(::identity)
@@ -583,7 +616,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-iterable-01.kt -->
+ * <!--- KNIT example-iterable-03.kt -->
  */
 public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   align(other) { ior ->
@@ -614,7 +647,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-iterable-02.kt -->
+ * <!--- KNIT example-iterable-04.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
   padZip(other).map { fa(it.first, it.second) }
@@ -639,7 +672,7 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-iterable-03.kt -->
+ * <!--- KNIT example-iterable-05.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
@@ -665,7 +698,7 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-iterable-04.kt -->
+ * <!--- KNIT example-iterable-06.kt -->
  */
 public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
@@ -690,7 +723,7 @@ public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> 
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-iterable-05.kt -->
+ * <!--- KNIT example-iterable-07.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
@@ -715,7 +748,7 @@ public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, 
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-iterable-06.kt -->
+ * <!--- KNIT example-iterable-08.kt -->
  */
 public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -736,7 +769,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-07.kt -->
+ * <!--- KNIT example-iterable-09.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
   buildList(maxOf(this.collectionSizeOrDefault(10), b.collectionSizeOrDefault(10))) {
@@ -767,7 +800,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-08.kt -->
+ * <!--- KNIT example-iterable-10.kt -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
@@ -788,7 +821,7 @@ public fun <A> Iterable<A>.salign(
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("SG.run { salign({ a, b -> a.combine(b) }, other) }"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign({ a, b -> SG.run { a.combine(b) } }, other)"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
@@ -810,7 +843,7 @@ public fun <A> Iterable<A>.salign(
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-09.kt -->
+ * <!--- KNIT example-iterable-11.kt -->
  */
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -835,7 +868,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-10.kt -->
+ * <!--- KNIT example-iterable-12.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
@@ -855,7 +888,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-11.kt -->
+ * <!--- KNIT example-iterable-13.kt -->
  */
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -882,7 +915,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-12.kt -->
+ * <!--- KNIT example-iterable-14.kt -->
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
@@ -901,6 +934,7 @@ public fun <T> Iterable<T>.firstOrNone(): Option<T> =
     } else {
       None
     }
+
     else -> {
       iterator().nextOrNone()
     }
@@ -934,6 +968,7 @@ public fun <T> Iterable<T>.singleOrNone(): Option<T> =
       1 -> firstOrNone()
       else -> None
     }
+
     else -> {
       iterator().run { nextOrNone().filter { !hasNext() } }
     }
@@ -965,6 +1000,7 @@ public fun <T> Iterable<T>.lastOrNone(): Option<T> =
     } else {
       None
     }
+
     else -> iterator().run {
       if (hasNext()) {
         var last: T
@@ -999,6 +1035,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
       in indices -> Some(elementAt(index))
       else -> None
     }
+
     else -> iterator().skip(index).nextOrNone()
   }
 
@@ -1008,6 +1045,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
       next()
       skip(count - 1)
     }
+
     else -> this
   }
 
@@ -1025,7 +1063,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-13.kt -->
+ * <!--- KNIT example-iterable-15.kt -->
  */
 public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
@@ -1050,7 +1088,7 @@ public fun <A> Iterable<A>.tail(): List<A> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-14.kt -->
+ * <!--- KNIT example-iterable-16.kt -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
   this.split()?.let { (fa, a) ->
@@ -1071,7 +1109,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-15.kt -->
+ * <!--- KNIT example-iterable-17.kt -->
  */
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
@@ -1096,7 +1134,7 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  *   println(result)
  * }
  * ```
- * <!--- KNIT example-iterable-16.kt -->
+ * <!--- KNIT example-iterable-18.kt -->
  */
 public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
   firstOrNull()?.let { first -> ffa(first) + tail().flatMap(ffa) } ?: fb.toList()
@@ -1134,6 +1172,7 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
+@Deprecated("Use separateEither instead.", ReplaceWith("map { it.toEither() }.separateEither()"))
 public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val invalids = ArrayList<A>(collectionSizeOrDefault(10))
   val valids = ArrayList<B>(collectionSizeOrDefault(10))
@@ -1173,21 +1212,13 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-@Deprecated(MonoidDeprecation, ReplaceWith("MA.run { fold(empty()) { acc, a -> acc.combine(a) } }"))
-public fun <A> Iterable<A>.fold(MA: Monoid<A>): A = MA.run {
-  this@fold.fold(empty()) { acc, a -> acc.combine(a) }
-}
+@Deprecated(MonoidDeprecation, ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
+public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
+  fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
 
-public fun <A, B> Iterable<A>.foldMap(
-  initial: B,
-  combine: (B, B) -> B,
-  f: (A) -> B
-): B = this.fold(initial) { acc: B, x: A -> combine(acc, f(x)) }
-
-@Deprecated(MonoidDeprecation, ReplaceWith("MB.run { foldMap(empty(), { acc, a -> acc.combine(a) }, f) }"))
-public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-  this@foldMap.foldMap(empty(), { acc, a -> acc.combine(a) }, f)
-}
+@Deprecated(MonoidDeprecation, ReplaceWith("fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }"))
+public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
+  fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
@@ -1228,14 +1259,9 @@ public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
   if (n <= 0) emptyList()
   else toList().let { l -> List(n) { l } }
 
-public fun <A> Iterable<A>.replicate(n: Int, empty: A, combine: (A, A) -> A): List<A> =
-  if (n <= 0) listOf(empty)
-  else zip(replicate(n - 1, empty, combine), combine)
-
-@Deprecated(MonoidDeprecation, ReplaceWith("MA.run { replicate(n, MA.empty()) { a, xs -> a.combine(xs) } }"))
-public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> = MA.run {
-  replicate(n, MA.empty()) { a, xs -> a.combine(xs) }
-}
+public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
+  if (n <= 0) listOf(MA.empty())
+  else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
 public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }

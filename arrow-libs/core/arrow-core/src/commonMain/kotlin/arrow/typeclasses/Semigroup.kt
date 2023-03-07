@@ -162,3 +162,6 @@ public fun interface Semigroup<A> {
     }
   }
 }
+
+public fun <A> Semigroup<A>.combine(a: A, b: A): A =
+  a.combine(b)

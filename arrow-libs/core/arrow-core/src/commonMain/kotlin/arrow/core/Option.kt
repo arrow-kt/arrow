@@ -2,6 +2,8 @@
 package arrow.core
 
 import arrow.core.Either.Right
+import arrow.core.raise.EagerEffect
+import arrow.core.raise.Effect
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
@@ -1282,6 +1284,12 @@ public infix fun <T> Option<T>.or(value: Option<T>): Option<T> =
   recover { value.bind() }
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
+
+/** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
+public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
+
+/** Run the [EagerEffect] by returning [Option] of [A], or [None] if raised with [None]. */
+public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
 @Deprecated(
   NicheAPI + "Prefer using if-else statement",
