@@ -398,8 +398,8 @@ public sealed class Ior<out A, out B> {
  * <!--- KNIT example-ior-08.kt -->
    */
   @Deprecated(
-    "padNull is being renamed to toNullablePair to be more consistent with the Kotlin Standard Library naming",
-    ReplaceWith("toNullablePair()")
+    "padNull is being renamed to toPair to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("toPair()")
   )
   public fun padNull(): Pair<A?, B?> = fold(
     { Pair(it, null) },
@@ -408,7 +408,7 @@ public sealed class Ior<out A, out B> {
   )
 
 
-  public fun toNullablePair(): Pair<A?, B?> = fold(
+  public fun toPair(): Pair<A?, B?> = fold(
     { Pair(it, null) },
     { Pair(null, it) },
     { a, b -> Pair(a, b) }
