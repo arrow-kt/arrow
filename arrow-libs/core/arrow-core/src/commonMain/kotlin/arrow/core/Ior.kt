@@ -998,6 +998,15 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A,
     }
   }
 
+@Deprecated(
+  RedundantAPI + "This API is overloaded with an API with a single argument",
+  level = DeprecationLevel.HIDDEN
+)
+public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B {
+  contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold({ default() }, ::identity, { _, b -> b })
+}
+
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return fold(default, ::identity) { _, b -> b }
