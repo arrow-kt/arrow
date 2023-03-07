@@ -493,19 +493,7 @@ public sealed class Ior<out A, out B> {
    * ```
  * <!--- KNIT example-ior-11.kt -->
    */
-  @Deprecated(
-    "leftOrNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
-    ReplaceWith("getLeftOrNull()")
-  )
   public fun leftOrNull(): A? {
-    contract {
-      returns(null) implies (this@Ior is Right<B>)
-      returnsNotNull() implies ((this@Ior is Left<A>) || (this@Ior is Both<A, B>))
-    }
-    return fold({ it }, { null }, { a, _ -> a })
-  }
-
-  public fun getLeftOrNull(): A? {
     contract {
       returns(null) implies (this@Ior is Right<B>)
       returnsNotNull() implies ((this@Ior is Left<A>) || (this@Ior is Both<A, B>))
