@@ -283,9 +283,9 @@ public final class arrow/core/EitherKt {
 	public static final fun bisequenceOption (Larrow/core/Either;)Larrow/core/Option;
 	public static final fun bisequenceValidated (Larrow/core/Either;)Larrow/core/Validated;
 	public static final fun catch (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun combine (Larrow/core/Either;Larrow/core/Either;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combine (Larrow/core/Either;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monoid;)Larrow/core/Either;
-	public static final fun combineAll (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun combineK (Larrow/core/Either;Larrow/core/Either;)Larrow/core/Either;
 	public static final fun compareTo (Larrow/core/Either;Larrow/core/Either;)I
 	public static final fun contains (Larrow/core/Either;Ljava/lang/Object;)Z
@@ -471,7 +471,6 @@ public abstract class arrow/core/Ior {
 	public final fun bitraverseNullable (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public final fun bitraverseOption (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public final fun bitraverseValidated (Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
-	public final fun bitraverseValidated (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun bothNel (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
 	public final fun crosswalk (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun crosswalkMap (Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
@@ -578,22 +577,16 @@ public final class arrow/core/IorKt {
 	public static final fun bisequenceNullable (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun bisequenceOption (Larrow/core/Ior;)Larrow/core/Option;
 	public static final fun bisequenceValidated (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
-	public static final fun bisequenceValidated (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 	public static final fun bothIor (Lkotlin/Pair;)Larrow/core/Ior;
 	public static final fun combine (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
-	public static final fun combine (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun compareTo (Larrow/core/Ior;Larrow/core/Ior;)I
 	public static final fun flatMap (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
-	public static final fun flatMap (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun flatten (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Ior;
-	public static final fun flatten (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
 	public static final fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun leftIor (Ljava/lang/Object;)Larrow/core/Ior;
 	public static final fun leftWiden (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun replicate (Larrow/core/Ior;Larrow/typeclasses/Semigroup;I)Larrow/core/Ior;
 	public static final fun replicate (Larrow/core/Ior;Larrow/typeclasses/Semigroup;ILarrow/typeclasses/Monoid;)Larrow/core/Ior;
-	public static final fun replicate (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;I)Larrow/core/Ior;
-	public static final fun replicate (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
 	public static final fun rightIor (Ljava/lang/Object;)Larrow/core/Ior;
 	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Either;
 	public static final fun sequence (Larrow/core/Ior;)Larrow/core/Ior;
@@ -615,16 +608,6 @@ public final class arrow/core/IorKt {
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function4;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function3;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function10;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function9;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function8;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function7;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function6;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function5;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function4;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function3;)Larrow/core/Ior;
-	public static final fun zip (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Larrow/core/Ior;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
 }
 
 public final class arrow/core/IterableKt {
@@ -798,8 +781,8 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 	public final fun plus (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public final fun plus (Ljava/util/List;)Larrow/core/NonEmptyList;
+	public final fun salign (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
 	public final fun salign (Larrow/typeclasses/Semigroup;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
-	public final fun salign (Lkotlin/jvm/functions/Function2;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun toList ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
 	public final fun zip (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
@@ -992,11 +975,10 @@ public final class arrow/core/Option$Companion {
 }
 
 public final class arrow/core/OptionKt {
+	public static final fun combine (Larrow/core/Option;Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun combine (Larrow/core/Option;Larrow/typeclasses/Semigroup;Larrow/core/Option;)Larrow/core/Option;
-	public static final fun combine (Larrow/core/Option;Lkotlin/jvm/functions/Function2;Larrow/core/Option;)Larrow/core/Option;
 	public static final fun combineAll (Larrow/core/Option;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
 	public static final fun combineAll (Ljava/lang/Iterable;Larrow/typeclasses/Monoid;)Larrow/core/Option;
-	public static final fun combineAll (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun compareTo (Larrow/core/Option;Larrow/core/Option;)I
 	public static final fun ensure (Larrow/core/Option;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun flatten (Larrow/core/Option;)Larrow/core/Option;
@@ -1011,7 +993,6 @@ public final class arrow/core/OptionKt {
 	public static final fun redeem (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun redeemWith (Larrow/core/Option;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun replicate (Larrow/core/Option;ILarrow/typeclasses/Monoid;)Larrow/core/Option;
-	public static final fun replicate (Larrow/core/Option;ILjava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 	public static final fun rethrow (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun salign (Larrow/core/Option;Larrow/typeclasses/Semigroup;Larrow/core/Option;)Larrow/core/Option;
 	public static final fun separateEither (Larrow/core/Option;)Lkotlin/Pair;
@@ -1593,7 +1574,7 @@ public final class arrow/core/SequenceKt {
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun rightPadZip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun salign (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
-	public static final fun salign (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
+	public static final fun salign (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun separateEither (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
@@ -2398,7 +2379,6 @@ public final class arrow/core/Tuple9$Companion {
 
 public final class arrow/core/TupleNKt {
 	public static final fun combine (Lkotlin/Pair;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Lkotlin/Pair;)Lkotlin/Pair;
-	public static final fun combine (Lkotlin/Pair;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/Pair;)Lkotlin/Pair;
 	public static final fun compareTo (Larrow/core/Tuple10;Larrow/core/Tuple10;)I
 	public static final fun compareTo (Larrow/core/Tuple4;Larrow/core/Tuple4;)I
 	public static final fun compareTo (Larrow/core/Tuple5;Larrow/core/Tuple5;)I
@@ -2583,7 +2563,6 @@ public final class arrow/core/ValidatedKt {
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function4;)Larrow/core/Validated;
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Larrow/core/Validated;Lkotlin/jvm/functions/Function3;)Larrow/core/Validated;
 	public static final fun zip (Larrow/core/Validated;Larrow/typeclasses/Semigroup;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
-	public static final fun zip (Larrow/core/Validated;Lkotlin/jvm/functions/Function2;Larrow/core/Validated;Lkotlin/jvm/functions/Function2;)Larrow/core/Validated;
 }
 
 public abstract interface class arrow/core/computations/EitherEffect : arrow/continuations/Effect {

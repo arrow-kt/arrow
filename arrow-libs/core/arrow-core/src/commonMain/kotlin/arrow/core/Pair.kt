@@ -5,6 +5,7 @@ package arrow.core
 
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -14,12 +15,13 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(
   else first
 }
 
-public fun <A, B> Pair<A, B>.combine(combineA: (A, A) -> A, combineB: (B, B) -> B, b: Pair<A, B>): Pair<A, B> {
-  val (xa, xb) = this
-  val (ya, yb) = b
-  return Pair(combineA(xa, ya), combineB(xb, yb))
-}
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("combine({ x, y -> SA.run { x + y } }, { x, y -> SB.run { x + y } }, b)"))
+@Deprecated(
+  "$SemigroupDeprecation\n$NicheAPI",
+  ReplaceWith(
+    "Pair(SA.combine(first, b.first), SB.combine(second, b.second))",
+    "arrow.typeclasses.combine"
+  )
+)
 public fun <A, B> Pair<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, b: Pair<A, B>): Pair<A, B> =
-  combine({ x, y -> SA.run { x + y } }, { x, y -> SB.run { x + y } }, b)
+  Pair(SA.combine(first, b.first), SB.combine(second, b.second))

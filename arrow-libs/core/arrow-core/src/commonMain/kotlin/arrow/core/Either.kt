@@ -14,6 +14,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -906,10 +907,10 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }")
+    ReplaceWith(" fold({ MN.empty() }, f)")
   )
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C =
-    fold({ MN.empty() }) { b -> MN.run { MN.empty().combine(f(b)) } }
+    fold({ MN.empty() }, f)
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
@@ -920,10 +921,10 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }")
+    ReplaceWith("fold(f, g)")
   )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C =
-    MN.run { fold({ empty().combine(f(it)) }, { empty().combine(g(it)) }) }
+    fold(f, g)
 
   /**
    * Swap the generic parameters [A] and [B] of this [Either].
@@ -2291,26 +2292,43 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
     { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
   )
 
-@Deprecated(
-  SemigroupDeprecation + "Prefer zipOrAccumulate",
-  ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
-)
-public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
+/**
+ * Combine two [Either] values.
+ * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
+ * otherwise it returns the `this` or fallbacks to [other] in case `this` is [Left].
+ */
+public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> =
+  when (this) {
+    is Left -> when (other) {
+      is Left -> Left(combineLeft(value, other.value))
+      is Right -> this
+    }
+
+    is Right -> when (other) {
+      is Left -> other
+      is Right -> Right(combineRight(this@combine.value, other.value))
+    }
+  }
 
 @Deprecated(
-  RedundantAPI + "Prefer explicit fold instead",
-  ReplaceWith("fold(initialB.right()) { x: Either<A, B>, y -> Either.zipOrAccumulate(combineA, x, y, combineB) }", "arrow.core.fold", "arrow.core.right")
+  SemigroupDeprecation,
+  ReplaceWith(
+    "Either.zipOrAccumulate(SGA::combine, this, b, SGB::combine)",
+    "arrow.typeclasses.combine"
+  )
 )
-public fun <A, B> Iterable<Either<A, B>>.combineAll(combineA: (A, A) -> A, initialB: B, combineB: (B, B) -> B): Either<A, B> =
-  fold(initialB.right()) { x: Either<A, B>, y -> Either.zipOrAccumulate(combineA, x, y, combineB) }
+public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
+  combine(b, SGA::combine, SGB::combine)
 
 @Deprecated(
   MonoidDeprecation,
-  ReplaceWith("combineAll({ x, y -> MA.run { x.combine(y) } }, MB.empty(), { x, y -> MB.run { x.combine(y) } })")
+  ReplaceWith(
+    "fold<Either<A, B>, Either<A, B>>(MB.empty().right()) { x, y -> Either.zipOrAccumulate(MA::combine, x, y, MB::combine) }",
+    "arrow.typeclasses.combine"
+  )
 )
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
-  combineAll({ x, y -> MA.run { x.combine(y) } }, MB.empty(), { x, y -> MB.run { x.combine(y) } })
+  fold<Either<A, B>, Either<A, B>>(MB.empty().right()) { x, y -> Either.zipOrAccumulate(MA::combine, x, y, MB::combine) }
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>
@@ -2516,10 +2534,13 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
-  ReplaceWith("if (n <= 0) Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }")
+  ReplaceWith(
+    "map { b -> List(n) { b }.fold(MB.empty(), MB::combine) }",
+    "arrow.typeclasses.combine"
+  )
 )
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
-  if (n <= 0) Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }
+  map { b -> List(n) { b }.fold(MB.empty(), MB::combine) }
 
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",

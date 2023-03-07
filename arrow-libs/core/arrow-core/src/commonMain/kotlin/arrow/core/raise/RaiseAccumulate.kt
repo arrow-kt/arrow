@@ -15,16 +15,12 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Validated
 import arrow.core.ValidatedNel
-import arrow.core.emptyCombine
-import arrow.core.identity
 import arrow.core.nel
 import arrow.core.nonEmptyListOf
-import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.js.JsName
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 

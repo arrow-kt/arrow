@@ -10,6 +10,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
+import arrow.typeclasses.combine
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -547,19 +548,20 @@ public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map
   if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
   else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b) { x, y -> SG.run { x + y } }"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SG::combine)", "arrow.typeclasses.combine"))
 public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
-  combine(b) { x, y -> SG.run { x + y } }
+  combine(b, SG::combine)
 
 @Deprecated(
   "Use fold & Map.combine instead.\n$NicheAPI",
   ReplaceWith(
-    "fold(emptyMap()) { acc, map -> acc.combine(map) { x, y -> SG.run { x.combine(y) } } }",
-    "arrow.core.combine"
+    "fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }",
+    "arrow.core.combine",
+    "arrow.typeclasses.combine"
   )
 )
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(emptyMap()) { acc, map -> acc.combine(map) { x, y -> SG.run { x.combine(y) } } }
+  fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }
 
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial

@@ -13,7 +13,7 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public const val SemigroupDeprecation: String =
-  "Please switch to functions using a binary function as argument."
+  "Semigroup is being deprecated, use combine (A, A) -> A lambdas or method references instead."
 
 @Deprecated(SemigroupDeprecation)
 public fun interface Semigroup<A> {
@@ -163,5 +163,6 @@ public fun interface Semigroup<A> {
   }
 }
 
+@Deprecated(SemigroupDeprecation)
 public fun <A> Semigroup<A>.combine(a: A, b: A): A =
   a.combine(b)

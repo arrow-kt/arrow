@@ -16,7 +16,7 @@ import kotlin.jvm.JvmStatic
 import kotlin.collections.plus as _plus
 
 public const val MonoidDeprecation: String =
-  "Please switch to functions using a binary function and initial value as arguments."
+  "Monoid is being deprecated, use combine (A, A) -> A lambdas or method references with initial values instead."
 
 @Deprecated(MonoidDeprecation)
 public interface Monoid<A> : Semigroup<A> {
