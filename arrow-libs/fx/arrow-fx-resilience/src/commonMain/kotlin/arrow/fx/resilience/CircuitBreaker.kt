@@ -183,14 +183,13 @@ private constructor(
     when (val curr = state.get()) {
       is Closed -> markOrResetFailures(Either.catch { fa() })
       is Open -> {
-        val elapsedNow = curr.startedAt.elapsedNow()
-        if (elapsedNow >= curr.resetTimeout) {
+        if (curr.expiresAt.hasPassedNow()) {
           // The Open state has expired, so we are transition to HalfOpen and attempt to close the CircuitBreaker
           if (!state.compareAndSet(curr, HalfOpen(curr.resetTimeout, curr.awaitClose))) protectOrThrow(fa)
           else attemptReset(fa, curr.resetTimeout, curr.awaitClose, curr.startedAt)
         } else {
           // Open isn't expired, so we reject execution
-          val expiresInMillis = elapsedNow - curr.resetTimeout
+          val expiresInMillis = curr.expiresAt.elapsedNow().absoluteValue.inWholeMilliseconds
           onRejected.invoke()
           throw ExecutionRejected(
             "Rejected because the CircuitBreaker is in the Open state, attempting to close in $expiresInMillis millis",
@@ -484,7 +483,7 @@ private constructor(
        * It is calculated as:
        * `startedAt + resetTimeout`
        */
-      public val expiresAt: Long = timeInMillis() + (resetTimeout - startedAt.elapsedNow()).inWholeMilliseconds
+      public val expiresAt: TimeMark = startedAt + resetTimeout
 
       override fun equals(other: Any?): Boolean =
         if (other is Open) this.startedAt == startedAt && this.resetTimeout == resetTimeout

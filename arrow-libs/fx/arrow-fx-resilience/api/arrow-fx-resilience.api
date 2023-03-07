@@ -72,7 +72,7 @@ public final class arrow/fx/resilience/CircuitBreaker$State$Open : arrow/fx/resi
 	public fun <init> (JD)V
 	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getExpiresAt ()J
+	public final fun getExpiresAt ()Lkotlin/time/TimeMark;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public final fun getStartedAt ()Lkotlin/time/TimeMark;
