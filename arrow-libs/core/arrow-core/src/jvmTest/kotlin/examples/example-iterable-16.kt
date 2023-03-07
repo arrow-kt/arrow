@@ -5,10 +5,9 @@ import arrow.core.*
 
 fun main(args: Array<String>) {
   //sampleStart
+  val tags = List(10) { "#" }
   val result =
-   listOf(1,2,3).ifThen(listOf("empty")) { i ->
-     listOf("$i, ${i + 1}")
-   }
+   tags.interleave(listOf("A", "B", "C"))
   //sampleEnd
   println(result)
 }

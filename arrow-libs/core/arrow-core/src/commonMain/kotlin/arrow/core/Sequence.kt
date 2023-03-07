@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.fold
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.experimental.ExperimentalTypeInference
@@ -635,8 +639,15 @@ public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
 public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
   sequence().map { it.asSequence() }
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  traverse(semigroup, ::identity)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
@@ -719,24 +730,41 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
 public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public fun <E, A, B> Sequence<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  fold(mutableListOf<B>().valid() as Validated<E, MutableList<B>>) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { acc.value.combine(res.value).invalid() }
-      }
-    }
-  }
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+
+public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): Either<Error, List<B>> {
+  var left: Any? = EmptyValue
+  val right = mutableListOf<B>()
+  for (item in this)
+    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }, { b -> right.add(b) })
+  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+}
+
+public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): Either<NonEmptyList<Error>, List<B>> {
+  val left = mutableListOf<Error>()
+  val right = mutableListOf<B>()
+  for (item in this)
+    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left.addAll(errors) }, { b -> right.add(b) })
+  return left.toNonEmptyListOrNull()?.left() ?: right.right()
+}
 
 @Deprecated(
   "traverseValidated is being renamed to traverse to simplify the Arrow API",
