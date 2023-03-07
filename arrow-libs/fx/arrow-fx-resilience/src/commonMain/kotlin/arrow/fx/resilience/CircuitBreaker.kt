@@ -3,13 +3,14 @@ package arrow.fx.resilience
 import arrow.core.Either
 import arrow.core.continuations.AtomicRef
 import arrow.core.identity
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.bracketCase
 import arrow.fx.resilience.CircuitBreaker.State.Closed
 import arrow.fx.resilience.CircuitBreaker.State.HalfOpen
 import arrow.fx.resilience.CircuitBreaker.State.Open
+import kotlinx.coroutines.CancellationException
 import kotlin.jvm.JvmOverloads
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
@@ -263,35 +264,32 @@ private constructor(
     resetTimeout: Duration,
     awaitClose: CompletableDeferred<Unit>,
     lastStartedAt: TimeMark
-  ): A =
-    bracketCase(
-      acquire = onHalfOpen,
-      use = { task.invoke() },
-      release = { _, exit ->
-        when (exit) {
-          is ExitCase.Cancelled -> {
-            // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-            state.set(Open(lastStartedAt, resetTimeout, awaitClose))
-            onOpen.invoke()
-          }
+  ): A = try {
+    onHalfOpen.invoke()
+    task.invoke()
+  } catch (e: CancellationException) {
+    // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
+    state.set(Open(lastStartedAt, resetTimeout, awaitClose))
+    onOpenAndThrow(e)
+  } catch (e: Throwable) {
+    // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
+    val value: Duration = (resetTimeout * exponentialBackoffFactor)
+    val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
+    state.set(Open(timeSource.markNow(), nextTimeout, awaitClose))
+    onOpenAndThrow(e)
+  }.also {
+    // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
+    state.set(Closed(0))
+    awaitClose.complete(Unit)
+    onClosed.invoke()
+  }
 
-          ExitCase.Completed -> {
-            // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
-            state.set(Closed(0))
-            awaitClose.complete(Unit)
-            onClosed.invoke()
-          }
-
-          is ExitCase.Failure -> {
-            // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
-            val value = (resetTimeout * exponentialBackoffFactor)
-            val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
-            state.set(Open(timeSource.markNow(), nextTimeout, awaitClose))
-            onOpen.invoke()
-          }
-        }
-      }
-    )
+  private suspend fun onOpenAndThrow(original: Throwable): Nothing {
+    runCatching {
+      withContext(NonCancellable) { onOpen.invoke() }
+    }.exceptionOrNull()?.let { original.addSuppressed(it) }
+    throw original
+  }
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that upon a task being rejected will execute the given [callback].

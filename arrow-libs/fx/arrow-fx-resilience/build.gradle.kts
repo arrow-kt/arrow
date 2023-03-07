@@ -23,8 +23,8 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        implementation(projects.arrowFxCoroutines)
         compileOnly(libs.kotlin.stdlibCommon)
+        implementation(libs.coroutines.core)
         implementation("org.jetbrains.kotlin:kotlin-stdlib") {
           version {
             strictly("[1.7, 1.8[")
@@ -36,6 +36,7 @@ kotlin {
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
+          implementation(projects.arrowFxCoroutines)
           implementation(libs.coroutines.test)
           implementation(kotlin("test"))
         }
