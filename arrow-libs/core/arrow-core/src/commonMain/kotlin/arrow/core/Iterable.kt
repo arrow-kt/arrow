@@ -623,15 +623,18 @@ public inline fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: 
   return accumulator
 }
 
-@Deprecated(
-  "reduceRightNull is being deprecated in favor of simply reduceOrNull, asReversed() offers an optimised way to achieve from-right behavior.\n$NicheAPI",
-  ReplaceWith("asReversed().reduceOrNull(initial) { acc, a -> operation(a, acc) }")
-)
 public inline fun <A, B> List<A>.reduceRightNull(
   initial: (A) -> B,
   operation: (A, acc: B) -> B
-): B? =
-  asReversed().reduceOrNull(initial) { acc, a -> operation(a, acc) }
+): B? {
+  val iterator = listIterator(size)
+  if (!iterator.hasPrevious()) return null
+  var accumulator: B = initial(iterator.previous())
+  while (iterator.hasPrevious()) {
+    accumulator = operation(iterator.previous(), accumulator)
+  }
+  return accumulator
+}
 
 /**
  * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
