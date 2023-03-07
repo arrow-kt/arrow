@@ -43,10 +43,11 @@ class CircuitBreakerTest {
   fun shouldWorkForSuccessfulImmediateTasks(): TestResult = runTest {
     val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
     var effect = 0
-    Schedule.recurs<Unit>(10_000).repeat {
+    val iterations = stackSafeIteration()
+    Schedule.recurs<Unit>(iterations).repeat {
       cb.protectOrThrow { effect += 1 }
     }
-    assertEquals(10_001, effect)
+    assertEquals(iterations + 1, effect)
   }
 
   @Test

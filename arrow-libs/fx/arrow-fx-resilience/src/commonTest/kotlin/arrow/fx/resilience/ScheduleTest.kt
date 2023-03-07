@@ -213,7 +213,8 @@ class ScheduleTest {
 
   @Test
   fun repeatIsStackSafe(): TestResult = runTest {
-    checkRepeat(Schedule.recurs(20_000), expected = 20_000)
+    val iterations = stackSafeIteration()
+    checkRepeat(Schedule.recurs(iterations), expected = iterations)
   }
 
   @Test
@@ -297,15 +298,16 @@ class ScheduleTest {
   @Test
   fun retryIsStackSafe(): TestResult = runTest {
     val count = AtomicRef(JustANumber(0))
+    val iterations = stackSafeIteration()
     val l = Either.catch {
-      Schedule.recurs<Throwable>(20_000).retry {
+      Schedule.recurs<Throwable>(iterations).retry {
         count.updateAndGet(JustANumber::increment)
         throw exception
       }
     }
 
     assertTrue { l is Either.Left && l.value is MyException }
-    assertEquals(20_001, count.get().n)
+    assertEquals(iterations + 1, count.get().n)
   }
 
   @Test
