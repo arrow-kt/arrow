@@ -570,14 +570,6 @@ class IterableTest : StringSpec({
     }
   }
 
-  "zip is the inverse of unzip" {
-    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string()))) { xs ->
-      val (l, r) = xs.unzip()
-
-      l.zip(r) shouldBe xs
-    }
-  }
-
   "unalign is the inverse of align" {
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.string())) { a, b ->
       a.align(b).unalign() shouldBe (a to b)

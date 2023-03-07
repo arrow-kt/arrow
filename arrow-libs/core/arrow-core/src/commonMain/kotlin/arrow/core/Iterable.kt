@@ -777,7 +777,7 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
         first.hasNext() && second.hasNext() -> Ior.Both(first.next(), second.next())
         first.hasNext() -> first.next().leftIor()
         second.hasNext() -> second.next().rightIor()
-        else -> throw AssertionError("this should never happen")
+        else -> throw IllegalStateException("this should never happen")
       }
       add(fa(element))
     }
