@@ -5,9 +5,10 @@ import arrow.core.*
 
 fun main(args: Array<String>) {
   //sampleStart
-  val tags = List(10) { "#" }
   val result =
-   tags.interleave(listOf("A", "B", "C"))
+     listOf(1, 2, 3).unalign {
+       it.leftIor()
+     }
   //sampleEnd
   println(result)
 }

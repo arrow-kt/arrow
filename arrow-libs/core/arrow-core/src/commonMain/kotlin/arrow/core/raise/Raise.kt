@@ -2,16 +2,16 @@
 @file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
+
 package arrow.core.raise
 
 import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import arrow.core.Validated
 import arrow.core.continuations.EffectScope
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.core.recover
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -39,7 +39,7 @@ public annotation class RaiseDSL
  * ```kotlin
  * fun Raise<String>.failure(): Int = raise("failed")
  *
- * fun Raise<Nothing>.recovered(): Int =
+ * fun recovered(): Int =
  *   recover({ failure() }) { _: String -> 1 }
  * ```
  * <!--- KNIT example-raise-dsl-01.kt -->
@@ -96,11 +96,11 @@ public annotation class RaiseDSL
  *
  * fun Raise<String>.failure(): Int = raise("failed")
  *
- * fun Raise<Nothing>.recovered(): Int = recover({ failure() }) { _: String -> 1 }
+ * fun recovered(): Int = recover({ failure() }) { _: String -> 1 }
  * -->
  * ```kotlin
  * fun test() {
- *   val either = either { failure() }
+ *   val either: Either<Nothing, Int> = either { failure() }
  *     .recover { _: String -> recovered() }
  *
  *   either shouldBe Either.Right(1)
@@ -152,6 +152,7 @@ public interface Raise<in R> {
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
   public operator fun <A> EagerEffect<R, A>.invoke(): A = invoke(this@Raise)
+
   @RaiseDSL
   public fun <A> EagerEffect<R, A>.bind(): A = invoke(this@Raise)
 
@@ -163,6 +164,7 @@ public interface Raise<in R> {
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
   public suspend operator fun <A> Effect<R, A>.invoke(): A = invoke(this@Raise)
+
   @RaiseDSL
   public suspend fun <A> Effect<R, A>.bind(): A = invoke(this@Raise)
 
@@ -210,87 +212,6 @@ public interface Raise<in R> {
     is Validated.Valid -> value
   }
 
-  /**
-   * Extract the [Result.success] value out of [Result],
-   * because [Result] works with [Throwable] as its error type you need to [transform] [Throwable] to [R].
-   *
-   * Note that this functions can currently not be _inline_ without Context Receivers,
-   * and thus doesn't allow suspension in its error handler.
-   * To do so, use [Result.recover] and [bind].
-   *
-   * <!--- INCLUDE
-   * import arrow.core.Either
-   * import arrow.core.raise.either
-   * import arrow.core.raise.recover
-   * import kotlinx.coroutines.delay
-   * import io.kotest.matchers.shouldBe
-   * -->
-   * ```kotlin
-   * suspend fun test() {
-   *   val one: Result<Int> = Result.success(1)
-   *   val failure: Result<Int> = Result.failure(RuntimeException("Boom!"))
-   *
-   *   either {
-   *     val x = one.bind { -1 }
-   *     val y = failure.bind { failure: Throwable ->
-   *       raise("Something bad happened: ${failure.message}")
-   *     }
-   *     val z = failure.recover { failure: Throwable ->
-   *       delay(10)
-   *       1
-   *     }.bind { raise("Something bad happened: ${it.message}") }
-   *     x + y + z
-   *   } shouldBe Either.Left("Something bad happened: Boom!")
-   * }
-   * ```
-   * <!--- KNIT example-raise-dsl-05.kt -->
-   * <!--- TEST lines.isEmpty() -->
-   */
-  @RaiseDSL
-  public fun <A> Result<A>.bind(transform: (Throwable) -> R): A =
-    fold(::identity) { throwable -> raise(transform(throwable)) }
-
-  /**
-   * Extract the [Some] value out of [Option],
-   * because [Option] works with [None] as its error type you need to [transform] [None] to [R].
-   *
-   * Note that this functions can currently not be _inline_ without Context Receivers,
-   * and thus doesn't allow suspension in its error handler.
-   * To do so, use [Option.recover] and [bind].
-   *
-   * <!--- INCLUDE
-   * import arrow.core.Either
-   * import arrow.core.None
-   * import arrow.core.Option
-   * import arrow.core.recover
-   * import arrow.core.raise.either
-   * import kotlinx.coroutines.delay
-   * import io.kotest.matchers.shouldBe
-   * -->
-   * ```kotlin
-   * suspend fun test() {
-   *   val empty: Option<Int> = None
-   *   either {
-   *     val x: Int = empty.bind { _: None -> 1 }
-   *     val y: Int = empty.bind { _: None -> raise("Something bad happened: Boom!") }
-   *     val z: Int = empty.recover { _: None ->
-   *       delay(10)
-   *       1
-   *     }.bind { raise("Something bad happened: Boom!") }
-   *     x + y + z
-   *   } shouldBe Either.Left("Something bad happened: Boom!")
-   * }
-   * ```
-   * <!--- KNIT example-raise-dsl-06.kt -->
-   * <!--- TEST lines.isEmpty() -->
-   */
-  @RaiseDSL
-  public fun <A> Option<A>.bind(transform: Raise<R>.(None) -> A): A =
-    when (this) {
-      None -> transform(None)
-      is Some -> value
-    }
-
   @RaiseDSL
   public suspend infix fun <E, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<R>.(E) -> A): A =
     fold<E, A, A>({ this@recover.invoke(this) }, { throw it }, { resolve(it) }) { it }
@@ -298,7 +219,7 @@ public interface Raise<in R> {
   /** @see [recover] */
   @RaiseDSL
   public infix fun <E, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<R>.(E) -> A): A =
-    recover({ invoke() }, resolve)
+    recover({ invoke() }) { resolve(it) }
 
   /**
    * Execute the [Effect] resulting in [A],
@@ -311,22 +232,23 @@ public interface Raise<in R> {
   public suspend fun <E, A> Effect<E, A>.recover(
     @BuilderInference recover: suspend Raise<R>.(E) -> A,
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
-  ): A = fold({ invoke() }, { catch(it) }, { recover(it) }, { it })
+  ): A = recover({ invoke() }, { recover(it) }) { catch(it) }
 
   @RaiseDSL
   public suspend infix fun <A> Effect<R, A>.catch(
     @BuilderInference catch: suspend Raise<R>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  ): A = catch({ invoke() }) { catch(it) }
 
   @RaiseDSL
   public infix fun <A> EagerEffect<R, A>.catch(
     @BuilderInference catch: Raise<R>.(Throwable) -> A,
-  ): A = fold({ catch(it) }, { raise(it) }, { it })
+  ): A = catch({ invoke() }) { catch(it) }
 }
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
- * and recover by providing a fallback value of type [A] or raising a new error of type [R].
+ * and recover by providing a transform [E] into a fallback value of type [A].
+ * Base implementation of `effect { f() } getOrElse { fallback() }`.
  *
  * <!--- INCLUDE
  * import arrow.core.Either
@@ -335,69 +257,168 @@ public interface Raise<in R> {
  * import io.kotest.matchers.shouldBe
  * -->
  * ```kotlin
- * suspend fun test() {
- *   either<Nothing, Int> {
- *     recover({ raise("failed") }) { str -> str.length }
- *   } shouldBe Either.Right(6)
+ * fun test() {
+ *   recover({ raise("failed") }) { str -> str.length } shouldBe 6
  *
- *   either {
+ *   either<Int, String> {
  *     recover({ raise("failed") }) { str -> raise(-1) }
  *   } shouldBe Either.Left(-1)
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-05.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+public inline fun <E, A> recover(
+  @BuilderInference action: Raise<E>.() -> A,
+  @BuilderInference recover: (E) -> A,
+): A = fold(action, { throw it }, recover, ::identity)
+
+/**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
+ * and [recover] by providing a transform [E] into a fallback value of type [A],
+ * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
+ *
+ * <!--- INCLUDE
+ * import arrow.core.raise.recover
+ * import arrow.core.raise.Raise
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   recover(
+ *     { raise("failed") },
+ *     { str -> str.length }
+ *   ) { t -> t.message ?: -1 } shouldBe 6
+ *
+ *   fun Raise<String>.boom(): Int = throw RuntimeException("BOOM")
+ *
+ *   recover(
+ *     { boom() },
+ *     { str -> str.length }
+ *   ) { t -> t.message?.length ?: -1 } shouldBe 4
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-06.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+public inline fun <E, A> recover(
+  @BuilderInference action: Raise<E>.() -> A,
+  @BuilderInference recover: (E) -> A,
+  @BuilderInference catch: (Throwable) -> A,
+): A = fold(action, catch, recover, ::identity)
+
+/**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
+ * and [recover] by providing a transform [E] into a fallback value of type [A],
+ * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
+ *
+ * <!--- INCLUDE
+ * import arrow.core.raise.recover
+ * import arrow.core.raise.Raise
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   recover(
+ *     { raise("failed") },
+ *     { str -> str.length }
+ *   ) { t -> t.message ?: -1 } shouldBe 6
+ *
+ *   fun Raise<String>.boom(): Int = throw RuntimeException("BOOM")
+ *
+ *   recover(
+ *     { boom() },
+ *     { str -> str.length }
+ *   ) { t: RuntimeException -> t.message?.length ?: -1 } shouldBe 4
  * }
  * ```
  * <!--- KNIT example-raise-dsl-07.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @RaiseDSL
-public inline fun <R, E, A> Raise<R>.recover(
+@JvmName("recoverReified")
+public inline fun <reified T : Throwable, E, A> recover(
   @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference recover: Raise<R>.(E) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-  }
-  return fold<E, A, A>({ action(this) }, { throw it }, { recover(it) }, { it })
-}
+  @BuilderInference recover: (E) -> A,
+  @BuilderInference catch: (T) -> A,
+): A = fold(action, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
 
+/**
+ * Allows safely catching exceptions without capturing [CancellationException],
+ * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.catch
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *     "fallback"
+ *   } shouldBe "fallback"
+ *
+ *   fun fetchId(): Int = throw RuntimeException("BOOM")
+ *
+ *   either {
+ *     catch({ fetchId() }) { t ->
+ *       raise("something went wrong: ${t.message}")
+ *     }
+ *   } shouldBe Either.Left("something went wrong: BOOM")
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-08.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
+ * Alternatively, you can use `try { } catch { }` blocks with [nonFatalOrThrow].
+ * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
+ */
 @RaiseDSL
-public inline fun <R, E, A> Raise<R>.recover(
-  @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference recover: Raise<R>.(E) -> A,
-  @BuilderInference catch: Raise<R>.(Throwable) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
+public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A =
+  try {
+    action()
+  } catch (t: Throwable) {
+    catch(t.nonFatalOrThrow())
   }
-  return fold({ action(this) }, { catch(it) }, { recover(it) }, { it })
-}
 
-@RaiseDSL
-public inline fun <R, A> Raise<R>.catch(
-  @BuilderInference action: Raise<R>.() -> A,
-  @BuilderInference catch: Raise<R>.(Throwable) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return fold({ action(this) }, { catch(it) }, { raise(it) }, { it })
-}
-
+/**
+ * Allows safely catching exceptions of type `T` without capturing [CancellationException],
+ * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.catch
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *     "fallback"
+ *   } shouldBe "fallback"
+ *
+ *   fun fetchId(): Int = throw RuntimeException("BOOM")
+ *
+ *   either {
+ *     catch({ fetchId() }) { t: RuntimeException ->
+ *       raise("something went wrong: ${t.message}")
+ *     }
+ *   } shouldBe Either.Left("something went wrong: BOOM")
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-09.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ *
+ * Alternatively, you can use `try { } catch(e: T) { }` blocks.
+ * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
+ */
 @RaiseDSL
 @JvmName("catchReified")
-public inline fun <reified T : Throwable, R, A> Raise<R>.catch(
-  @BuilderInference action: Raise<R>.() -> A,
-  @BuilderInference catch: Raise<R>.(T) -> A,
-): A {
-  contract {
-    callsInPlace(action, EXACTLY_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-  }
-  return catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
-}
+public inline fun <reified T : Throwable, A> catch(action: () -> A, catch: (T) -> A): A =
+  catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
 
 @RaiseDSL
 public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
